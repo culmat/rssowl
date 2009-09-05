@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin>
-   <extension-point id="EntityPropertyPage" name="Entity Property Page" schema="schema/EntityPropertyPage.exsd"/>
-   <extension-point id="KeywordFeed" name="Keyword Feed" schema="schema/KeywordFeed.exsd"/>
-   <extension-point id="NewsActionPresentation" name="News Action Presentation" schema="schema/NewsActionPresentation.exsd"/>
-   <extension-point id="ShareProvider" name="Share Provider" schema="schema/ShareProvider.exsd"/>
-   <extension-point id="FeedSearch" name="Feed Search" schema="schema/FeedSearch.exsd"/>
+   <extension-point id="EntityPropertyPage" name="%extension-point.name" schema="schema/EntityPropertyPage.exsd"/>
+   <extension-point id="KeywordFeed" name="%extension-point.name.0" schema="schema/KeywordFeed.exsd"/>
+   <extension-point id="NewsActionPresentation" name="%extension-point.name.1" schema="schema/NewsActionPresentation.exsd"/>
+   <extension-point id="ShareProvider" name="%extension-point.name.2" schema="schema/ShareProvider.exsd"/>
+   <extension-point id="FeedSearch" name="%extension-point.name.3" schema="schema/FeedSearch.exsd"/>
 
    <extension
          id="rssowl"
@@ -22,29 +22,29 @@
             class="org.rssowl.ui.internal.Perspective"
             icon="icons/product/16x16.png"
             id="org.rssowl.ui.perspective"
-            name="RSSOwl">
+            name="%perspective.name">
       </perspective>
    </extension>
    <extension
          point="org.eclipse.ui.actionSets">
       <actionSet
             id="orgrssowluiseta"
-            label="File"
+            label="%actionSet.label"
             visible="true">
          <action
                class="org.rssowl.ui.internal.actions.NewTypeDropdownAction"
                icon="icons/etool16/add.gif"
                id="org.rssowl.ui.NewType"
-               label="&amp;New"
+               label="%action.label"
                style="pulldown"
-               tooltip="New">
+               tooltip="%action.tooltip">
          </action>
          <action
                class="org.rssowl.ui.internal.actions.NewBookMarkAction"
                definitionId="org.rssowl.ui.actions.NewBookMark"
                icon="icons/obj16/bookmark.gif"
                id="org.rssowl.ui.actions.NewBookMark"
-               label="&amp;Bookmark..."
+               label="%action.label.0"
                menubarPath="file/new_sub/bookmark"
                style="push">
          </action>
@@ -53,7 +53,7 @@
                definitionId="org.rssowl.ui.actions.NewNewsBin"
                icon="icons/obj16/newsbin.gif"
                id="org.rssowl.ui.actions.NewNewsBin"
-               label="&amp;News Bin..."
+               label="%action.label.1"
                menubarPath="file/new_sub/newsbin"
                style="push">
          </action>
@@ -62,7 +62,7 @@
                definitionId="org.rssowl.ui.actions.NewSearchMark"
                icon="icons/obj16/searchmark.gif"
                id="org.rssowl.ui.actions.NewSearchMark"
-               label="&amp;Saved Search..."
+               label="%action.label.2"
                menubarPath="file/new_sub/searchmark"
                style="push">
          </action>
@@ -71,7 +71,7 @@
                definitionId="org.rssowl.ui.actions.NewFolder"
                icon="icons/obj16/folder.gif"
                id="org.rssowl.ui.actions.NewFolder"
-               label="&amp;Folder..."
+               label="%action.label.3"
                menubarPath="file/new_sub/folder"
                style="push">
          </action>
@@ -80,22 +80,22 @@
                definitionId="org.rssowl.ui.actions.ExportFeeds"
                icon="icons/etool16/export.gif"
                id="org.rssowl.ui.actions.ExportFeeds"
-               label="&amp;Export..."
+               label="%action.label.4"
                menubarPath="file/additions"
                style="push"
-               tooltip="Export to a OPML file"/>
+               tooltip="%action.tooltip.0"/>
          <action
                class="org.rssowl.ui.internal.actions.ImportAction"
                definitionId="org.rssowl.ui.actions.ImportFeeds"
                icon="icons/etool16/import.gif"
                id="org.rssowl.ui.actions.ImportFeeds"
-               label="&amp;Import..."
+               label="%action.label.5"
                menubarPath="file/additions"
                style="push"
-               tooltip="Import from a OPML file"/>
+               tooltip="%action.tooltip.1"/>
          <menu
                id="new_sub"
-               label="&amp;New"
+               label="%menu.label"
                path="file/new.ext">
             <groupMarker
                   name="bookmark" />
@@ -112,24 +112,24 @@
       </actionSet>
       <actionSet
             id="orgrssowluisetb"
-            label="Edit"
+            label="%actionSet.label.0"
             visible="true">
          <action
                class="org.rssowl.ui.internal.actions.SearchNewsAction"
                definitionId="org.rssowl.ui.SearchNewsAction"
                icon="icons/obj16/searchmark.gif"
                id="org.rssowl.ui.SearchNewsAction"
-               label="&amp;Search News..."
+               label="%action.label.6"
                style="push">
          </action>
       </actionSet>
       <actionSet
             id="org.rssowl.ui.GoSet"
-            label="Go"
+            label="%actionSet.label.1"
             visible="true">
          <menu
                id="previous"
-               label="&amp;Previous"
+               label="%menu.label.0"
                path="navigate/previous.ext">
             <separator
                   name="previous.news">
@@ -143,7 +143,7 @@
          </menu>
          <menu
                id="next"
-               label="&amp;Next"
+               label="%menu.label.1"
                path="navigate/next.ext">
             <separator
                   name="next.news">
@@ -159,7 +159,7 @@
                class="org.rssowl.ui.internal.actions.NavigationActionFactory:nextUnreadNews"
                definitionId="org.rssowl.ui.NextUnreadNews"
                id="org.rssowl.ui.NextUnreadNews"
-               label="Next &amp;Unread News"
+               label="%action.label.7"
                menubarPath="navigate/next/next.news"
                style="push">
          </action>
@@ -167,7 +167,7 @@
                class="org.rssowl.ui.internal.actions.NavigationActionFactory:nextNews"
                definitionId="org.rssowl.ui.NextNews"
                id="org.rssowl.ui.NextNews"
-               label="&amp;Next News"
+               label="%action.label.8"
                menubarPath="navigate/next/next.news"
                style="push">
          </action>
@@ -175,7 +175,7 @@
                class="org.rssowl.ui.internal.actions.NavigationActionFactory:nextUnreadFeed"
                definitionId="org.rssowl.ui.NextUnreadFeed"
                id="org.rssowl.ui.NextUnreadFeed"
-               label="Next Feed &amp;with Unread News"
+               label="%action.label.9"
                menubarPath="navigate/next/next.feed"
                style="push">
          </action>
@@ -183,7 +183,7 @@
                class="org.rssowl.ui.internal.actions.NavigationActionFactory:nextFeed"
                definitionId="org.rssowl.ui.NextFeed"
                id="org.rssowl.ui.NextFeed"
-               label="Next &amp;Feed"
+               label="%action.label.10"
                menubarPath="navigate/next/next.feed"
                style="push">
          </action>
@@ -191,7 +191,7 @@
                class="org.rssowl.ui.internal.actions.NavigationActionFactory:nextTab"
                definitionId="org.rssowl.ui.NextTab"
                id="org.rssowl.ui.NextTab"
-               label="Next &amp;Tab"
+               label="%action.label.11"
                menubarPath="navigate/next/next.tab"
                style="push">
          </action>
@@ -199,7 +199,7 @@
                class="org.rssowl.ui.internal.actions.NavigationActionFactory:previousUnreadNews"
                definitionId="org.rssowl.ui.PreviousUnreadNews"
                id="org.rssowl.ui.PreviousUnreadNews"
-               label="Previous &amp;Unread News"
+               label="%action.label.12"
                menubarPath="navigate/previous/previous.news"
                style="push">
          </action>
@@ -207,7 +207,7 @@
                class="org.rssowl.ui.internal.actions.NavigationActionFactory:previousNews"
                definitionId="org.rssowl.ui.PreviousNews"
                id="org.rssowl.ui.PreviousNews"
-               label="&amp;Previous News"
+               label="%action.label.13"
                menubarPath="navigate/previous/previous.news"
                style="push">
          </action>
@@ -215,7 +215,7 @@
                class="org.rssowl.ui.internal.actions.NavigationActionFactory:previousUnreadFeed"
                definitionId="org.rssowl.ui.PreviousUnreadFeed"
                id="org.rssowl.ui.PreviousUnreadFeed"
-               label="Previous Feed &amp;with Unread News"
+               label="%action.label.14"
                menubarPath="navigate/previous/previous.feed"
                style="push">
          </action>
@@ -223,7 +223,7 @@
                class="org.rssowl.ui.internal.actions.NavigationActionFactory:previousFeed"
                definitionId="org.rssowl.ui.PreviousFeed"
                id="org.rssowl.ui.PreviousFeed"
-               label="Previous &amp;Feed"
+               label="%action.label.15"
                menubarPath="navigate/previous/previous.feed"
                style="push">
          </action>
@@ -231,46 +231,46 @@
                class="org.rssowl.ui.internal.actions.NavigationActionFactory:previousTab"
                definitionId="org.rssowl.ui.PreviousTab"
                id="org.rssowl.ui.PreviousTab"
-               label="Previous &amp;Tab"
+               label="%action.label.16"
                menubarPath="navigate/previous/previous.tab"
                style="push">
          </action>
       </actionSet>
       <actionSet
             id="org.rssowl.ui.ManageExtensions"
-            label="Manage Extensions"
+            label="%actionSet.label.2"
             visible="true">
          <action
                class="org.rssowl.ui.internal.actions.FindUpdatesAction"
                definitionId="org.rssowl.ui.actions.FindUpdates"
                icon="icons/elcl16/updates.gif"
                id="org.rssowl.ui.actions.FindUpdates"
-               label="&amp;Check for Updates"
+               label="%action.label.17"
                menubarPath="help/helpEnd"
                style="push"
-               tooltip="Find Updates for installed Extensions">
+               tooltip="%action.tooltip.2">
          </action>
          <action
                class="org.rssowl.ui.internal.actions.FindExtensionsAction"
                definitionId="org.rssowl.ui.actions.FindExtensions"
                icon="icons/elcl16/usearch_obj.gif"
                id="org.rssowl.ui.actions.FindExtensions"
-               label="&amp;Get More Extensions"
+               label="%action.label.18"
                menubarPath="tools/extensions/findExtensions"
                style="push"
-               tooltip="Get More Extensions"/>
+               tooltip="%action.tooltip.3"/>
          <action
                class="org.rssowl.ui.internal.actions.ManageConfigurationAction"
                definitionId="org.rssowl.ui.actions.ManageConfiguration"
                icon="icons/elcl16/configs.gif"
                id="org.rssowl.ui.actions.ManageConfiguration"
-               label="&amp;Manage Extensions"
+               label="%action.label.19"
                menubarPath="tools/extensions/manageConfiguration"
                style="push"
-               tooltip="Manage Extensions"/>
+               tooltip="%action.tooltip.4"/>
          <menu
                id="extensions"
-               label="&amp;Extensions"
+               label="%menu.label.2"
                path="tools/additions">
             <separator name="extensionsBegin"/>
             <groupMarker name="findExtensions"/>
@@ -280,7 +280,7 @@
       </actionSet>
       <actionSet
             id="orgrssowluisetc"
-            label="News"
+            label="%actionSet.label.3"
             visible="true">
          <action
                class="org.rssowl.ui.internal.actions.MarkAllNewsReadAction"
@@ -288,7 +288,7 @@
                disabledIcon="icons/dlcl16/mark_all_read.gif"
                icon="icons/elcl16/mark_all_read.gif"
                id="org.rssowl.ui.MarkAllRead"
-               label="Mark &amp;All News as Read"
+               label="%action.label.20"
                style="push">
          </action>
          <action
@@ -298,9 +298,9 @@
                enablesFor="+"
                icon="icons/elcl16/mark_read.gif"
                id="org.rssowl.ui.actions.MarkRead"
-               label="&amp;Mark News as Read"
+               label="%action.label.21"
                style="push"
-               tooltip="Mark News as Read">
+               tooltip="%action.tooltip.5">
             <enablement>
                <or>
                   <objectClass
@@ -317,19 +317,19 @@
                definitionId="org.rssowl.ui.actions.ReloadAll"
                icon="icons/elcl16/reload_all.gif"
                id="org.rssowl.ui.actions.ReloadAll"
-               label="Update &amp;All"
+               label="%action.label.22"
                style="push"/>
          <action
                definitionId="org.rssowl.ui.actions.Reload"
                disabledIcon="icons/dlcl16/reload.gif"
                icon="icons/elcl16/reload.gif"
                id="org.rssowl.ui.actions.Reload"
-               label="&amp;Update"
+               label="%action.label.23"
                retarget="true"
                style="push"/>
          <menu
                id="news"
-               label="News">
+               label="%menu.label.3">
             <separator name="mark"/>
             <separator name="reload"/>
             <separator name="additions"/>
@@ -337,54 +337,54 @@
       </actionSet>
       <actionSet
             id="org.rssowl.ui.CleanUpSet"
-            label="Clean Up"
+            label="%actionSet.label.4"
             visible="true">
          <action
                class="org.rssowl.ui.internal.actions.CleanUpAction"
                definitionId="org.rssowl.ui.CleanUpAction"
                id="org.rssowl.ui.CleanUpAction"
-               label="&amp;Clean Up..."
+               label="%action.label.24"
                menubarPath="tools/middle">
          </action>
       </actionSet>
       <actionSet
             id="org.rssowl.ui.NewsFiltersSet"
-            label="News Filters"
+            label="%actionSet.label.5"
             visible="true">
          <action
                class="org.rssowl.ui.internal.actions.OpenNewsFiltersAction"
                definitionId="org.rssowl.ui.OpenNewsFiltersAction"
                icon="icons/etool16/filter.gif"
                id="org.rssowl.ui.OpenNewsFiltersAction"
-               label="&amp;News Filters..."
+               label="%action.label.25"
                menubarPath="tools/middle"
                style="push">
          </action>
       </actionSet>
       <actionSet
             id="org.rssowl.ui.ShowActivitySet"
-            label="Downloads &amp; Activity"
+            label="%actionSet.label.6"
             visible="true">
          <action
                class="org.rssowl.ui.internal.actions.ShowActivityAction"
                definitionId="org.rssowl.ui.ShowActivityAction"
                icon="icons/elcl16/activity.gif"
                id="org.rssowl.ui.ShowActivityAction"
-               label="&amp;Downloads &amp;&amp; Activity"
+               label="%action.label.26"
                menubarPath="tools/end"
                style="push">
          </action>
       </actionSet>
       <actionSet
             id="org.rssowl.ui.FindNewFeedsSet"
-            label="Find more Feeds"
+            label="%actionSet.label.7"
             visible="true">
          <action
                class="org.rssowl.ui.internal.actions.SearchFeedsAction"
                definitionId="org.rssowl.ui.SearchFeedsAction"
                icon="icons/etool16/new_bkmrk.gif"
                id="org.rssowl.ui.SearchFeedsAction"
-               label="&amp;Find more Feeds..."
+               label="%action.label.27"
                menubarPath="tools/begin"
                style="push">
          </action>
@@ -398,10 +398,10 @@
             class="org.rssowl.ui.internal.views.explorer.BookMarkExplorer"
             icon="icons/eview16/bkmrk_explorer.gif"
             id="org.rssowl.ui.BookMarkExplorer"
-            name="Bookmarks"/>
+            name="%view.name"/>
       <category
             id="org.rssowl.ui.category"
-            name="RSSOwl">
+            name="%category.name">
       </category>
    </extension>
    <extension
@@ -409,27 +409,27 @@
       <page
             class="org.rssowl.ui.internal.dialogs.preferences.OverviewPreferencesPage"
             id="org.eclipse.ui.preferencePages.Workbench"
-            name="Overview">
+            name="%page.name">
          <keywordReference id="org.rssowl.ui.preferences.keywords.Overview"/>
       </page>
       <page
             category="org.eclipse.ui.preferencePages.Workbench"
             class="org.eclipse.ui.ExtensionFactory:newKeysPreferencePage"
             id="org.rssowl.ui.preferences.Keys"
-            name="Keys">
+            name="%page.name.0">
          <keywordReference id="org.rssowl.ui.preferences.keywords.Keys"/>
       </page>
       <page
             category="org.eclipse.ui.preferencePages.Workbench"
             class="org.eclipse.ui.ExtensionFactory:colorsAndFontsPreferencePage"
             id="org.rssowl.ui.preferences.ColorsAndFonts"
-            name="Colors and Fonts">
+            name="%page.name.1">
          <keywordReference id="org.rssowl.ui.preferences.keywords.ColorsAndFonts"/>
       </page>
       <page
             class="org.rssowl.ui.internal.dialogs.preferences.FeedsPreferencePage"
             id="org.rssowl.ui.FeedsPreferences"
-            name="Feeds">
+            name="%page.name.2">
          <keywordReference
                id="org.rssowl.ui.preferences.keywords.Feeds">
          </keywordReference>
@@ -437,7 +437,7 @@
       <page
             class="org.rssowl.ui.internal.dialogs.preferences.MiscPreferencePage"
             id="org.rssowl.ui.MiscPreferences"
-            name="View">
+            name="%page.name.3">
          <keywordReference
                id="org.rssowl.ui.preferences.keywords.View">
          </keywordReference>
@@ -445,7 +445,7 @@
       <page
             class="org.rssowl.ui.internal.dialogs.preferences.ManageLabelsPreferencePage"
             id="org.rssowl.ui.ManageLabels"
-            name="Organize Labels">
+            name="%page.name.4">
          <keywordReference
                id="org.rssowl.ui.preferences.keywords.ManageLabels">
          </keywordReference>
@@ -453,7 +453,7 @@
       <page
             class="org.rssowl.ui.internal.dialogs.preferences.NotifierPreferencesPage"
             id="org.rssowl.ui.NotifierPreferences"
-            name="Notifier">
+            name="%page.name.5">
          <keywordReference
                id="org.rssowl.ui.preferences.keywords.Notifier">
          </keywordReference>
@@ -461,7 +461,7 @@
       <page
             class="org.rssowl.ui.internal.dialogs.preferences.CredentialsPreferencesPage"
             id="org.rssowl.ui.CredentialsPreferences"
-            name="Passwords">
+            name="%page.name.6">
          <keywordReference
                id="org.rssowl.ui.preferences.keywords.Credentials">
          </keywordReference>
@@ -469,7 +469,7 @@
       <page
             class="org.rssowl.ui.internal.dialogs.preferences.BrowserPreferencePage"
             id="org.rssowl.ui.BrowserPreferencesPage"
-            name="Browser">
+            name="%page.name.7">
          <keywordReference
                id="org.rssowl.ui.preferences.keywords.Browser">
          </keywordReference>
@@ -477,7 +477,7 @@
       <page
             class="org.rssowl.ui.internal.dialogs.preferences.SharingPreferencesPage"
             id="org.rssowl.ui.SharingPreferencesPage"
-            name="Sharing">
+            name="%page.name.8">
          <keywordReference
                id="org.rssowl.ui.preferences.keywords.Sharing">
          </keywordReference>
@@ -487,360 +487,360 @@
          point="org.eclipse.ui.keywords">
       <keyword
             id="org.rssowl.ui.preferences.keywords.Overview"
-            label="help guide guidance search intro"/>
+            label="%keyword.label"/>
       <keyword
             id="org.rssowl.ui.preferences.keywords.Keys"
-            label="binding command scheme hotkey accelerator"/>
+            label="%keyword.label.0"/>
       <keyword
             id="org.rssowl.ui.preferences.keywords.ColorsAndFonts"
-            label="presentation theme style"/>
+            label="%keyword.label.1"/>
       <keyword
             id="org.rssowl.ui.preferences.keywords.View"
-            label="systemtray reopen open single multi tab minimize tray feed view single double click mouse layout newspaper vertical alignment">
+            label="%keyword.label.2">
       </keyword>
       <keyword
             id="org.rssowl.ui.preferences.keywords.Feeds"
-            label="update reload display startup start-up auto automatic clean clean-up retention delete age maximum columns sort order images flash">
+            label="%keyword.label.3">
       </keyword>
       <keyword
             id="org.rssowl.ui.preferences.keywords.ManageLabels"
-            label="label labels tag tags organize categorize category prioritize priority">
+            label="%keyword.label.4">
       </keyword>
       <keyword
             id="org.rssowl.ui.preferences.keywords.Notifier"
-            label="notifier notification alert popup fade animate info notify">
+            label="%keyword.label.5">
       </keyword>
       <keyword
             id="org.rssowl.ui.preferences.keywords.Credentials"
-            label="password passwords credential credentials protected secure security username login master protect authorization authentication auth">
+            label="%keyword.label.6">
       </keyword>
       <keyword
             id="org.rssowl.ui.preferences.keywords.Browser"
-            label="internal embedded external browser script js web link javascript java background">
+            label="%keyword.label.7">
       </keyword>
       <keyword
             id="org.rssowl.ui.preferences.keywords.Sharing"
-            label="publish blog share notify inform email create send print export delicious technorati facebook digg twitter stumbleupon reddit mixx friendfeed google bookmark linkedin tumblr">
+            label="%keyword.label.8">
       </keyword>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
       <category
-            description="RSSOwl Commands"
+            description="%category.description"
             id="org.rssowl.ui.commands.category.RSSOwl"
-            name="RSSOwl"/>
+            name="%category.name.0"/>
       <category
-            description="Manage Extensions"
+            description="%category.description.0"
             id="org.rssowl.ui.commands.category.Extensions"
-            name="Extensions"/>
+            name="%category.name.1"/>
       <command
             categoryId="org.rssowl.ui.commands.category.Extensions"
             id="org.rssowl.ui.actions.FindUpdates"
-            name="Check for Updates"/>
+            name="%command.name"/>
       <command
             categoryId="org.rssowl.ui.commands.category.Extensions"
             id="org.rssowl.ui.actions.FindExtensions"
-            name="Get More Extensions"/>
+            name="%command.name.0"/>
       <command
             categoryId="org.rssowl.ui.commands.category.Extensions"
             id="org.rssowl.ui.actions.ManageConfiguration"
-            name="Manage Configuration"/>
+            name="%command.name.1"/>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
-            description="Reloads the current active View or Editor."
+            description="%command.description"
             id="org.rssowl.ui.actions.Reload"
-            name="Update"/>
+            name="%command.name.2"/>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
-            description="Reloads all BookMarks."
+            description="%command.description.0"
             id="org.rssowl.ui.actions.ReloadAll"
-            name="Update All"/>
+            name="%command.name.3"/>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             defaultHandler="org.rssowl.ui.internal.handler.MarkReadHandler"
-            description="Mark selected News as Read"
+            description="%command.description.1"
             id="org.rssowl.ui.actions.MarkRead"
-            name="Mark Read"/>
+            name="%command.name.4"/>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
-            description="Mark all News of the currently displayed Feed as Read"
+            description="%command.description.2"
             id="org.rssowl.ui.MarkAllRead"
-            name="Mark All Read"/>
+            name="%command.name.5"/>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             defaultHandler="org.rssowl.ui.internal.handler.MarkStickyHandler"
-            description="Mark selected News as Sticky"
+            description="%command.description.3"
             id="org.rssowl.ui.actions.MarkSticky"
-            name="Mark Sticky"/>
+            name="%command.name.6"/>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
-            description="Create a new BookMark"
+            description="%command.description.4"
             id="org.rssowl.ui.actions.NewBookMark"
-            name="New BookMark">
+            name="%command.name.7">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
-            description="Create a new Saved Search"
+            description="%command.description.5"
             id="org.rssowl.ui.actions.NewSearchMark"
-            name="New Saved Search">
+            name="%command.name.8">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
-            description="Create a new News Bin"
+            description="%command.description.6"
             id="org.rssowl.ui.actions.NewNewsBin"
-            name="New News Bin">
+            name="%command.name.9">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
-            description="Create a new Folder"
+            description="%command.description.7"
             id="org.rssowl.ui.actions.NewFolder"
-            name="New Folder">
+            name="%command.name.10">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
-            description="Search in the displayed News"
+            description="%command.description.8"
             id="org.rssowl.ui.FindAction"
-            name="Find">
+            name="%command.name.11">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             id="org.rssowl.ui.NextUnreadNews"
-            name="Next Unread News">
+            name="%command.name.12">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             id="org.rssowl.ui.NextNews"
-            name="Next News">
+            name="%command.name.13">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             id="org.rssowl.ui.PreviousUnreadNews"
-            name="Previous Unread News">
+            name="%command.name.14">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             id="org.rssowl.ui.PreviousNews"
-            name="Previous News">
+            name="%command.name.15">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             id="org.rssowl.ui.NextUnreadFeed"
-            name="Next Feed with Unread News">
+            name="%command.name.16">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             id="org.rssowl.ui.NextFeed"
-            name="Next Feed">
+            name="%command.name.17">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             id="org.rssowl.ui.PreviousUnreadFeed"
-            name="Previous Feed with Unread News">
+            name="%command.name.18">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             id="org.rssowl.ui.PreviousFeed"
-            name="Previous Feed">
+            name="%command.name.19">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
-            description="Search across all News"
+            description="%command.description.9"
             id="org.rssowl.ui.SearchNewsAction"
-            name="Search News">
+            name="%command.name.20">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
-            description="Export Feeds and Settings"
+            description="%command.description.10"
             id="org.rssowl.ui.actions.ExportFeeds"
-            name="Export Feeds and Settings">
+            name="%command.name.21">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
-            description="Import Feeds and Settings"
+            description="%command.description.11"
             id="org.rssowl.ui.actions.ImportFeeds"
-            name="Import Feeds and Settings">
+            name="%command.name.22">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             defaultHandler="org.rssowl.ui.internal.handler.OpenExternalHandler"
             id="org.rssowl.ui.OpenInExternalBrowser"
-            name="Open in External Browser">
+            name="%command.name.23">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
-            description="Perform Clean Up Tasks"
+            description="%command.description.12"
             id="org.rssowl.ui.CleanUpAction"
-            name="Clean Up">
+            name="%command.name.24">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
-            description="Send the link of the selected element as E-Mail."
+            description="%command.description.13"
             id="org.rssowl.ui.SendLinkAction"
-            name="Send Link">
+            name="%command.name.25">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             defaultHandler="org.rssowl.ui.internal.handler.CopyLinkHandler"
             id="org.rssowl.ui.CopyLinkAction"
-            name="Copy Link">
+            name="%command.name.26">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             id="org.rssowl.ui.OpenInBrowserAction"
-            name="Open in Browser">
+            name="%command.name.27">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             id="org.rssowl.ui.SortByNameAction"
-            name="Sort by Name">
+            name="%command.name.28">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             defaultHandler="org.rssowl.ui.internal.handler.UndoRedoHandler"
-            description="Undo the last operation"
+            description="%command.description.14"
             id="org.rssowl.ui.UndoAction"
-            name="Undo">
+            name="%command.name.29">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             defaultHandler="org.rssowl.ui.internal.handler.UndoRedoHandler"
-            description="Redo the last operation"
+            description="%command.description.15"
             id="org.rssowl.ui.RedoAction"
-            name="Redo">
+            name="%command.name.30">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             defaultHandler="org.rssowl.ui.internal.handler.ToggleReadStateHandler"
-            description="Toggle Read State of selected News"
+            description="%command.description.16"
             id="org.rssowl.ui.ToggleReadState"
-            name="Toggle Read State">
+            name="%command.name.31">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
-            description="Aggregate all news of the selected folder."
+            description="%command.description.17"
             id="org.rssowl.ui.AggregateFolderAction"
-            name="Aggregate News">
+            name="%command.name.32">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             defaultHandler="org.rssowl.ui.internal.handler.ToggleFullScreenHandler"
-            description="Toggle Full Screen"
+            description="%command.description.18"
             id="org.rssowl.ui.FullScreenCommand"
-            name="Toggle Full Screen">
+            name="%command.name.33">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             defaultHandler="org.rssowl.ui.internal.handler.ToggleBookMarksHandler"
-            description="Show or Hide the Bookmarks View"
+            description="%command.description.19"
             id="org.rssowl.ui.ToggleBookmarksCommand"
-            name="Toggle Bookmarks">
+            name="%command.name.34">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             defaultHandler="org.rssowl.ui.internal.handler.NextBookmarkSetHandler"
-            description="Navigate to the next Bookmark Set"
+            description="%command.description.20"
             id="org.rssowl.ui.NextBookmarkSetCommand"
-            name="Next Bookmark Set">
+            name="%command.name.35">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             defaultHandler="org.rssowl.ui.internal.handler.PreviousBookmarkSetHandler"
-            description="Navigate to the previous Bookmark Set"
+            description="%command.description.21"
             id="org.rssowl.ui.PreviousBookmarkSetCommand"
-            name="Previous Bookmark Set">
+            name="%command.name.36">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
-            description="Select a Tab from all Opened Tabs"
+            description="%command.description.22"
             id="org.eclipse.ui.window.nextEditor"
-            name="Select Tab">
+            name="%command.name.37">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
-            description="Find a Tab to Open"
+            description="%command.description.23"
             id="org.eclipse.ui.window.openEditorDropDown"
-            name="Find Tab">
+            name="%command.name.38">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
-            description="Opens a dialog to manage all news filters."
+            description="%command.description.24"
             id="org.rssowl.ui.OpenNewsFiltersAction"
-            name="News Filters">
+            name="%command.name.39">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
-            description="Create a new filter from a selected news."
+            description="%command.description.25"
             id="org.rssowl.ui.CreateFilterAction"
-            name="Create Filter">
+            name="%command.name.40">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
-            description="Create a new filter from a selected bookmark or folder."
+            description="%command.description.26"
             id="org.rssowl.ui.FilterNewsAction"
-            name="Filter News">
+            name="%command.name.41">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             id="org.rssowl.ui.LabelAction0"
-            name="Label News 1">
+            name="%command.name.42">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             id="org.rssowl.ui.LabelAction1"
-            name="Label News 2">
+            name="%command.name.43">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             id="org.rssowl.ui.LabelAction2"
-            name="Label News 3">
+            name="%command.name.44">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             id="org.rssowl.ui.LabelAction3"
-            name="Label News 4">
+            name="%command.name.45">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             id="org.rssowl.ui.LabelAction4"
-            name="Label News 5">
+            name="%command.name.46">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             defaultHandler="org.rssowl.ui.internal.handler.AssignLabelsHandler"
-            description="Assign Labels for a selection of News"
+            description="%command.description.27"
             id="org.rssowl.ui.AssignLabels"
-            name="Assign Labels">
+            name="%command.name.47">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
-            description="Select the Next Tab"
+            description="%command.description.28"
             id="org.rssowl.ui.NextTab"
-            name="Next Tab">
+            name="%command.name.48">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
-            description="Select the Previous Tab"
+            description="%command.description.29"
             id="org.rssowl.ui.PreviousTab"
-            name="Previous Tab">
+            name="%command.name.49">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             defaultHandler="org.rssowl.ui.internal.handler.ToggleHeadlinesHandler"
-            description="Show or hide headlines from the feed view."
+            description="%command.description.30"
             id="org.rssowl.ui.ToggleHeadlinesCommand"
-            name="Toggle Headlines">
+            name="%command.name.50">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
-            description="Show pending feed updates and downloads."
+            description="%command.description.31"
             id="org.rssowl.ui.ShowActivityAction"
-            name="Downloads &amp; Activity">
+            name="%command.name.51">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
-            description="Search for Feeds based on Keywords."
+            description="%command.description.32"
             id="org.rssowl.ui.SearchFeedsAction"
-            name="Find more Feeds">
+            name="%command.name.52">
       </command>
    </extension>
    <extension
@@ -848,7 +848,7 @@
          point="org.eclipse.core.runtime.products">
       <product
             application="org.rssowl.ui.rssowl"
-            name="RSSOwl">
+            name="%product.name">
          <property
                name="aboutImage"
                value="icons/product/about.gif"/>
@@ -870,9 +870,9 @@
    <extension
          point="org.eclipse.ui.bindings">
       <scheme
-            description="This is the RSSOwl Keys Scheme"
+            description="%scheme.description"
             id="org.rssowl.ui.KeyScheme"
-            name="RSSOwl Keys"/>
+            name="%scheme.name"/>
       <key
             commandId="org.eclipse.ui.file.close"
             contextId="org.eclipse.ui.contexts.window"
@@ -1103,10 +1103,10 @@
                enablesFor="+"
                icon="icons/elcl16/mark_read.gif"
                id="org.rssowl.ui.actions.MarkRead"
-               label="&amp;Mark Read"
+               label="%action.label.28"
                menubarPath="mark"
                style="push"
-               tooltip="Mark selected News as Read"/>
+               tooltip="%action.tooltip.6"/>
          <visibility>
             <or>
                <objectClass name="org.rssowl.core.persist.IMark"/>
@@ -1130,7 +1130,7 @@
                enablesFor="+"
                icon="icons/elcl16/remove.gif"
                id="org.eclipse.ui.edit.delete"
-               label="&amp;Delete"
+               label="%action.label.29"
                menubarPath="edit">
          </action>
          <visibility>
@@ -1162,7 +1162,7 @@
                definitionId="org.rssowl.ui.SortByNameAction"
                enablesFor="+"
                id="org.rssowl.ui.SortByNameAction"
-               label="&amp;Sort by Name"
+               label="%action.label.30"
                menubarPath="edit">
          </action>
          <visibility>
@@ -1180,7 +1180,7 @@
                definitionId="org.rssowl.ui.actions.Reload"
                icon="icons/elcl16/reload.gif"
                id="org.rssowl.ui.actions.Reload"
-               label="&amp;Update"
+               label="%action.label.31"
                menubarPath="edit">
          </action>
          <visibility>
@@ -1212,7 +1212,7 @@
                definitionId="org.rssowl.ui.OpenInBrowserAction"
                enablesFor="+"
                id="org.rssowl.ui.OpenInBrowserAction"
-               label="&amp;Open in Browser"
+               label="%action.label.32"
                menubarPath="open"
                style="push"/>
       </objectContribution>
@@ -1236,9 +1236,9 @@
                class="org.rssowl.ui.internal.actions.EntityPropertyDialogAction"
                definitionId="org.eclipse.ui.file.properties"
                id="org.rssowl.ui.actions.PropertiesAction"
-               label="&amp;Properties"
+               label="%action.label.33"
                menubarPath="properties"
-               tooltip="Show Properties">
+               tooltip="%action.tooltip.7">
          </action>
       </objectContribution>
       <objectContribution
@@ -1250,7 +1250,7 @@
                definitionId="org.rssowl.ui.AggregateFolderAction"
                enablesFor="1"
                id="org.rssowl.ui.AggregateFolderAction"
-               label="&amp;Aggregate News"
+               label="%action.label.34"
                menubarPath="new.ext">
          </action>
       </objectContribution>
@@ -1263,7 +1263,7 @@
                definitionId="org.rssowl.ui.CreateFilterAction"
                icon="icons/etool16/filter.gif"
                id="org.rssowl.ui.FilterNewsAction"
-               label="&amp;Filter News..."
+               label="%action.label.35"
                menubarPath="find.ext"
                style="push">
          </action>
@@ -1287,7 +1287,7 @@
                definitionId="org.rssowl.ui.CreateFilterAction"
                icon="icons/etool16/filter.gif"
                id="org.rssowl.ui.CreateFilterAction"
-               label="&amp;Create Filter..."
+               label="%action.label.36"
                menubarPath="filter"
                style="push">
          </action>
@@ -1306,13 +1306,13 @@
             icon="icons/obj16/bookmark.gif"
             id="org.rssowl.ui.FeedView"
             matchingStrategy="org.rssowl.ui.internal.editors.feed.FeedViewMatcher"
-            name="Feed View"/>
+            name="%editor.name"/>
       <editor
             class="org.rssowl.ui.internal.editors.browser.WebBrowserView"
             default="false"
             icon="icons/eview16/webbrowser.gif"
             id="org.rssowl.ui.WebBrowser"
-            name="Web Browser">
+            name="%editor.name.0">
       </editor>
    </extension>
    <extension
@@ -1321,7 +1321,7 @@
             class="org.rssowl.ui.internal.dialogs.properties.GeneralPropertyPage"
             handlesMultipleEntities="true"
             id="org.rssowl.ui.internal.dialogs.properties.GeneralPropertyPage"
-            name="General"
+            name="%entityPropertyPage.name"
             order="0">
          <targetEntity
                class="org.rssowl.core.persist.IFolder">
@@ -1337,7 +1337,7 @@
             class="org.rssowl.ui.internal.dialogs.properties.SearchMarkPropertyPage"
             handlesMultipleEntities="true"
             id="org.rssowl.ui.internal.dialogs.properties.SearchMarkPropertyPage"
-            name="General"
+            name="%entityPropertyPage.name.0"
             order="0">
          <targetEntity
                class="org.rssowl.core.persist.ISearchMark">
@@ -1347,7 +1347,7 @@
             class="org.rssowl.ui.internal.dialogs.properties.ReadingPropertyPage"
             handlesMultipleEntities="true"
             id="org.rssowl.ui.ReadingPropertyPage"
-            name="Reading"
+            name="%entityPropertyPage.name.1"
             order="1">
          <targetEntity
                class="org.rssowl.core.persist.IFolder">
@@ -1366,7 +1366,7 @@
             class="org.rssowl.ui.internal.dialogs.properties.DisplayPropertyPage"
             handlesMultipleEntities="true"
             id="org.rssowl.ui.internal.dialogs.properties.DisplayPropertyPage"
-            name="Display"
+            name="%entityPropertyPage.name.2"
             order="2">
          <targetEntity
                class="org.rssowl.core.persist.IFolder">
@@ -1385,7 +1385,7 @@
             class="org.rssowl.ui.internal.dialogs.properties.ColumnsPropertyPage"
             handlesMultipleEntities="true"
             id="org.rssowl.ui.internal.dialogs.properties.ColumnsPropertyPage"
-            name="Columns"
+            name="%entityPropertyPage.name.3"
             order="3">
          <targetEntity
                class="org.rssowl.core.persist.IFolder">
@@ -1404,7 +1404,7 @@
             class="org.rssowl.ui.internal.dialogs.properties.RetentionPropertyPage"
             handlesMultipleEntities="true"
             id="org.rssowl.ui.internal.dialogs.properties.RetentionPropertyPage"
-            name="Clean Up"
+            name="%entityPropertyPage.name.4"
             order="4">
          <targetEntity
                class="org.rssowl.core.persist.IFolder">
@@ -1417,7 +1417,7 @@
             class="org.rssowl.ui.internal.dialogs.properties.InformationPropertyPage"
             handlesMultipleEntities="false"
             id="org.rssowl.ui.InfoPropertyPage"
-            name="Status"
+            name="%entityPropertyPage.name.5"
             order="5">
          <targetEntity
                class="org.rssowl.core.persist.IBookMark">
@@ -1427,9 +1427,9 @@
    <extension
          point="org.eclipse.ui.contexts">
       <context
-            description="This context is reserved for bindings in RSSOwl."
+            description="%context.description"
             id="org.rssowl.ui.NavigationContext"
-            name="In RSSOwl"
+            name="%context.name"
             parentId="org.eclipse.ui.contexts.window">
       </context>
    </extension>
@@ -1448,56 +1448,56 @@
          point="org.eclipse.ui.themes">
       <themeElementCategory
             id="org.rssowl.ui.ThemeCategory"
-            label="RSSOwl">
+            label="%themeElementCategory.label">
       </themeElementCategory>
       <fontDefinition
             categoryId="org.rssowl.ui.ThemeCategory"
             id="org.rssowl.ui.NewsTextFont"
-            label="News Text Font"
+            label="%fontDefinition.label"
             value="Verdana-regular-10">
          <description>
-            The news text font is used to display the contents of a news.</description>
+            %fontDefinition.description</description>
       </fontDefinition>
       <fontDefinition
             categoryId="org.rssowl.ui.ThemeCategory"
             id="org.rssowl.ui.HeadlinesFont"
-            label="Headlines Font">
+            label="%fontDefinition.label.0">
          <description>
-            The headlines font is used to display the headlines of a feed.
+            %fontDefinition.description.0
          </description>
       </fontDefinition>
       <fontDefinition
             categoryId="org.rssowl.ui.ThemeCategory"
             id="org.rssowl.ui.BookmarkExplorerFont"
-            label="Bookmark Explorer Font">
+            label="%fontDefinition.label.1">
          <description>
-            The bookmark explorer font is used in the bookmark explorer to display all folders, bookmarks and saved searches.
+            %fontDefinition.description.1
          </description>
       </fontDefinition>
       <colorDefinition
             categoryId="org.rssowl.ui.ThemeCategory"
             id="org.rssowl.ui.StickyBGColor"
-            label="Sticky News Background"
+            label="%colorDefinition.label"
             value="255,255,180">
          <description>
-            The sticky news background color is used as background color for all sticky news including the bookmark that the news is belonging to.
+            %colorDefinition.description
          </description>
       </colorDefinition>
       <fontDefinition
             categoryId="org.rssowl.ui.ThemeCategory"
             id="org.rssowl.ui.NotificationPopupFont"
-            label="Notification Popup Font">
+            label="%fontDefinition.label.2">
          <description>
-            The notification popup font is used in the notification when news are coming in.
+            %fontDefinition.description.2
          </description>
       </fontDefinition>
       <colorDefinition
             categoryId="org.rssowl.ui.ThemeCategory"
             id="org.rssowl.ui.SearchHighlightBGColor"
-            label="Search Result Background"
+            label="%colorDefinition.label.0"
             value="255,255,0">
          <description>
-            The search result background color is used when the words of a search are highlighted inside the news content.
+            %colorDefinition.description.0
          </description>
       </colorDefinition>
    </extension>
@@ -1524,55 +1524,55 @@
       <keywordFeed
             icon="icons/obj16/fav_google.gif"
             id="org.rssowl.ui.GoogleNewsKeywordFeed"
-            name="&amp;Google News"
+            name="%keywordFeed.name"
             url="http://news.google.com/news?q=[:]&amp;output=rss">
       </keywordFeed>
       <keywordFeed
             icon="icons/obj16/fav_technorati.gif"
             id="org.rssowl.ui.TechnoratiKeywordFeed"
-            name="&amp;Technorati"
+            name="%keywordFeed.name.0"
             url="http://feeds.technorati.com/search/[:]">
       </keywordFeed>
       <keywordFeed
             icon="icons/obj16/fav_delicious.gif"
             id="org.rssowl.ui.DeliciousKeywordFeed"
-            name="&amp;Delicious"
+            name="%keywordFeed.name.1"
             url="http://del.icio.us/rss/tag/[:]">
       </keywordFeed>
       <keywordFeed
             icon="icons/obj16/fav_live.gif"
             id="org.rssowl.ui.LiveKeywordFeed"
-            name="&amp;Live Search"
+            name="%keywordFeed.name.2"
             url="http://search.live.com/results.aspx?q=[:]&amp;format=rss">
       </keywordFeed>
       <keywordFeed
             icon="icons/obj16/fav_digg.gif"
             id="org.rssowl.ui.DiggKeywordFeed"
-            name="D&amp;igg"
+            name="%keywordFeed.name.3"
             url="http://digg.com/rss_search?s=[:]">
       </keywordFeed>
       <keywordFeed
             icon="icons/obj16/fav_twitter.gif"
             id="org.rssowl.ui.TwitterKeywordFeed"
-            name="T&amp;witter"
+            name="%keywordFeed.name.4"
             url="http://search.twitter.com/search.atom?q=[:]">
       </keywordFeed>
       <keywordFeed
             icon="icons/obj16/fav_google.gif"
             id="org.rssowl.ui.GoogleBlogKeywordFeed"
-            name="Google &amp;Blog"
+            name="%keywordFeed.name.5"
             url="http://blogsearch.google.com/blogsearch_feeds?q=[:]&amp;num=10&amp;output=rss">
       </keywordFeed>
       <keywordFeed
             icon="icons/obj16/fav_youtube.gif"
             id="org.rssowl.ui.YoutubeKeywordFeed"
-            name="&amp;YouTube Video"
+            name="%keywordFeed.name.6"
             url="http://www.youtube.com/rss/tag/[:].rss">
       </keywordFeed>
       <keywordFeed
             icon="icons/obj16/fav_flickr.gif"
             id="org.rssowl.ui.FlickrKeywordFeed"
-            name="&amp;Flickr Photo"
+            name="%keywordFeed.name.7"
             url="http://www.flickr.com/services/feeds/photos_public.gne?tags=[:]&amp;format=rss_200">
       </keywordFeed>
    </extension>
@@ -1599,25 +1599,25 @@
          point="org.rssowl.core.NewsAction">
       <newsAction
             class="org.rssowl.ui.internal.filter.ShowNotifierNewsAction"
-            description="Shows matching News in the Notifier Pop-Up"
+            description="%newsAction.description"
             id="org.rssowl.ui.ShowNotifierNewsAction"
-            name="Show News in Notifier"
+            name="%newsAction.name"
             forcable="false"
             sortKey="51">
       </newsAction>
       <newsAction
             class="org.rssowl.ui.internal.filter.PlaySoundAction"
             id="org.rssowl.ui.PlaySoundAction"
-            name="Play a Sound"
+            name="%newsAction.name.0"
             forcable="false"
             sortKey="50">
       </newsAction>
       <newsAction
             class="org.rssowl.ui.internal.filter.DownloadAttachmentsNewsAction"
-            description="Downloads Attachments (e.g. Podcasts) from matching news if present"
+            description="%newsAction.description.0"
             forcable="true"
             id="org.rssowl.ui.DownloadAttachmentsNewsAction"
-            name="Download Attachments"
+            name="%newsAction.name.1"
             sortKey="49">
       </newsAction>
    </extension>
@@ -1658,21 +1658,21 @@
             enabled="true"
             icon="icons/obj16/share_delicious.gif"
             id="org.rssowl.ui.DeliciousShareProvider"
-            name="Delicious"
+            name="%shareProvider.name"
             url="http://delicious.com/save?url=[L]&amp;title=[T]">
       </shareProvider>
       <shareProvider
             enabled="true"
             icon="icons/obj16/share_technorati.gif"
             id="org.rssowl.ui.TechnoratiShareProvider"
-            name="Technorati"
+            name="%shareProvider.name.0"
             url="http://www.technorati.com/faves/?add=[L]">
       </shareProvider>
       <shareProvider
             enabled="true"
             icon="icons/obj16/share_fb.gif"
             id="org.rssowl.ui.FacebookShareProvider"
-            name="Facebook"
+            name="%shareProvider.name.1"
             url="http://www.facebook.com/sharer.php?u=[L]&amp;t=[T]">
       </shareProvider>
       <shareProvider
@@ -1680,133 +1680,133 @@
             icon="icons/obj16/share_digg.gif"
             id="org.rssowl.ui.DiggShareProvider"
             maxTitleLength="75"
-            name="Digg"
+            name="%shareProvider.name.2"
             url="http://digg.com/submit?url=[L]&amp;title=[T]">
       </shareProvider>
       <shareProvider
             enabled="true"
             icon="icons/obj16/share_twitter.gif"
             id="org.rssowl.ui.TwitterShareProvider"
-            name="Twitter"
+            name="%shareProvider.name.3"
             url="http://twitter.com/home?status=[L]">
       </shareProvider>
       <shareProvider
             enabled="true"
             icon="icons/obj16/share_mail.gif"
             id="org.rssowl.ui.SendLinkAction"
-            name="E-Mail"
+            name="%shareProvider.name.4"
             url="mailto">
       </shareProvider>
       <shareProvider
             enabled="true"
             icon="icons/obj16/share_printfriendly.gif"
             id="org.rssowl.ui.PrintFriendlyShareProvider"
-            name="PrintFriendly"
+            name="%shareProvider.name.5"
             url="http://www.printfriendly.com/print?url=[L]">
       </shareProvider>
       <shareProvider
             enabled="false"
             icon="icons/obj16/share_stumbleupon.gif"
             id="org.rssowl.ui.StumbleuponShareProvider"
-            name="StumbleUpon"
+            name="%shareProvider.name.6"
             url="http://www.stumbleupon.com/submit?url=[L]&amp;title=[T]">
       </shareProvider>
       <shareProvider
             enabled="false"
             icon="icons/obj16/share_google.gif"
             id="org.rssowl.ui.GoogleShareProvider"
-            name="Google Bookmarks"
+            name="%shareProvider.name.7"
             url="http://www.google.com/bookmarks/mark?op=edit&amp;bkmk=[L]&amp;title=[T]">
       </shareProvider>
       <shareProvider
             enabled="false"
             icon="icons/obj16/share_reddit.gif"
             id="org.rssowl.ui.RedditShareProvider"
-            name="Reddit"
+            name="%shareProvider.name.8"
             url="http://www.reddit.com/submit?url=[L]&amp;title=[T]">
       </shareProvider>
       <shareProvider
             enabled="false"
             icon="icons/obj16/share_mixx.gif"
             id="org.rssowl.ui.MixxShareProvider"
-            name="Mixx"
+            name="%shareProvider.name.9"
             url="http://www.mixx.com/submit?page_url=[L]&amp;title=[T]">
       </shareProvider>
       <shareProvider
             enabled="false"
             icon="icons/obj16/share_friendfeed.gif"
             id="org.rssowl.ui.FriendFeedShareProvider"
-            name="FriendFeed"
+            name="%shareProvider.name.10"
             url="http://friendfeed.com/share?url=[L]&amp;title=[T]">
       </shareProvider>
       <shareProvider
             enabled="false"
             icon="icons/obj16/share_mrwong.gif"
             id="org.rssowl.ui.MisterWongShareProvider"
-            name="Mister Wong"
+            name="%shareProvider.name.11"
             url="http://www.mister-wong.com/index.php?action=addurl&amp;bm_url=[L]&amp;bm_description=[T]">
       </shareProvider>
       <shareProvider
             enabled="false"
             icon="icons/obj16/share_newsvine.gif"
             id="org.rssowl.ui.NewsvineShareProvider"
-            name="Newsvine"
+            name="%shareProvider.name.12"
             url="http://www.newsvine.com/_tools/seed&amp;save?u=[L]&amp;h=[T]">
       </shareProvider>
       <shareProvider
             enabled="false"
             icon="icons/obj16/share_myspace.gif"
             id="org.rssowl.ui.MyspaceShareProvider"
-            name="MySpace"
+            name="%shareProvider.name.13"
             url="http://www.myspace.com/Modules/PostTo/Pages/?l=3&amp;u=[L]&amp;t=[T]">
       </shareProvider>
       <shareProvider
             enabled="false"
             icon="icons/obj16/share_slashdot.gif"
             id="org.rssowl.ui.SlashdotShareProvider"
-            name="Slashdot"
+            name="%shareProvider.name.14"
             url="http://slashdot.org/bookmark.pl?title=[T]&amp;url=[L]">
       </shareProvider>
       <shareProvider
             enabled="false"
             icon="icons/obj16/share_yahoobuzz.gif"
             id="org.rssowl.ui.BuzzShareProvider"
-            name="Buzz"
+            name="%shareProvider.name.15"
             url="http://buzz.yahoo.com/buzz?targetUrl=[L]&amp;headline=[T]">
       </shareProvider>
       <shareProvider
             enabled="false"
             icon="icons/obj16/share_diigo.gif"
             id="org.rssowl.ui.DiigoShareProvider"
-            name="Diigo"
+            name="%shareProvider.name.16"
             url="http://secure.diigo.com/post?url=[L]&amp;title=[T]">
       </shareProvider>
       <shareProvider
             enabled="false"
             icon="icons/obj16/share_linkedin.gif"
             id="org.rssowl.ui.LinkedInShareProvider"
-            name="LinkedIn"
+            name="%shareProvider.name.17"
             url="http://www.linkedin.com/shareArticle?mini=true&amp;url=[L]&amp;title=[T]">
       </shareProvider>
       <shareProvider
             enabled="false"
             icon="icons/obj16/share_posterous.gif"
             id="org.rssowl.ui.PosterousShareProvider"
-            name="Posterous"
+            name="%shareProvider.name.18"
             url="http://posterous.com/share?linkto=[L]&amp;title=[T]">
       </shareProvider>
       <shareProvider
             enabled="false"
             icon="icons/obj16/share_tumblr.gif"
             id="org.rssowl.ui.TumblrShareProvider"
-            name="Tumblr"
+            name="%shareProvider.name.19"
             url="http://www.tumblr.com/share?v=3&amp;u=[L]&amp;t=[T]">
       </shareProvider>
       <shareProvider
             enabled="false"
             icon="icons/obj16/share_propeller.gif"
             id="org.rssowl.ui.PropellerShareProvider"
-            name="Propeller"
+            name="%shareProvider.name.20"
             url="http://www.propeller.com/submit/?U=[L]&amp;T=[T]">
       </shareProvider>
    </extension>

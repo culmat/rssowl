@@ -1,10 +1,10 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: UI
+Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.rssowl.ui; singleton:=true
 Bundle-Version: 2.0.0.qualifier
 Bundle-Activator: org.rssowl.ui.internal.Activator
-Bundle-Vendor: RSSOwl.org
+Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.update.ui,
@@ -35,3 +35,4 @@ Export-Package: org.rssowl.ui.dialogs.properties,
  org.rssowl.ui.internal.undo;x-internal:=true,
  org.rssowl.ui.internal.util;x-internal:=true,
  org.rssowl.ui.internal.views.explorer;x-internal:=true
+Bundle-Localization: plugin
