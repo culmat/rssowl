@@ -104,7 +104,7 @@ import java.util.List;
 public class CustomizeToolbarDialog extends Dialog {
 
   /* Size and Location Settings */
-  private static final String DIALOG_SETTINGS_KEY = "org.rssowl.ui.internal.dialogs.CustomizeToolbarDialog";
+  private static final String DIALOG_SETTINGS_KEY = "org.rssowl.ui.internal.dialogs.CustomizeToolbarDialog"; //$NON-NLS-1$
 
   private LocalResourceManager fResources;
   private boolean fFirstTimeOpen;
@@ -187,7 +187,7 @@ public class CustomizeToolbarDialog extends Dialog {
   @Override
   protected void configureShell(Shell shell) {
     super.configureShell(shell);
-    shell.setText("Customize Toolbar");
+    shell.setText(Messages.CustomizeToolbarDialog_CUSTOMIZE_TOOLBAR);
   }
 
   /*
@@ -251,7 +251,7 @@ public class CustomizeToolbarDialog extends Dialog {
     TableColumn nameCol = new TableColumn(fItemViewer.getTable(), SWT.NONE);
 
     CColumnLayoutData data = new CColumnLayoutData(Size.FILL, 100);
-    cTable.manageColumn(nameCol, data, "Currently Visible Items", null, null, false, false);
+    cTable.manageColumn(nameCol, data, Messages.CustomizeToolbarDialog_VISIBLE_ITEMS, null, null, false, false);
 
     /* ContentProvider returns all selected Items */
     fItemViewer.setContentProvider(new IStructuredContentProvider() {
@@ -429,7 +429,7 @@ public class CustomizeToolbarDialog extends Dialog {
     });
 
     fAddButton = new Button(buttonContainer, SWT.DOWN);
-    fAddButton.setText("&Add");
+    fAddButton.setText(Messages.CustomizeToolbarDialog_ADD);
     applyDialogFont(fAddButton);
     setButtonLayoutData(fAddButton);
     fAddButton.addSelectionListener(new SelectionAdapter() {
@@ -445,7 +445,7 @@ public class CustomizeToolbarDialog extends Dialog {
 
     /* Remove */
     fRemoveButton = new Button(buttonContainer, SWT.PUSH);
-    fRemoveButton.setText("&Remove");
+    fRemoveButton.setText(Messages.CustomizeToolbarDialog_REMOVE);
     fRemoveButton.setEnabled(false);
     applyDialogFont(fRemoveButton);
     setButtonLayoutData(fRemoveButton);
@@ -462,7 +462,7 @@ public class CustomizeToolbarDialog extends Dialog {
 
     /* Move Provider Up */
     fMoveUpButton = new Button(buttonContainer, SWT.PUSH);
-    fMoveUpButton.setText("Move &Up");
+    fMoveUpButton.setText(Messages.CustomizeToolbarDialog_MOVE_UP);
     fMoveUpButton.setEnabled(false);
     applyDialogFont(fMoveUpButton);
     setButtonLayoutData(fMoveUpButton);
@@ -475,7 +475,7 @@ public class CustomizeToolbarDialog extends Dialog {
 
     /* Move Provider Down */
     fMoveDownButton = new Button(buttonContainer, SWT.PUSH);
-    fMoveDownButton.setText("Move &Down");
+    fMoveDownButton.setText(Messages.CustomizeToolbarDialog_MOVE_DOWN);
     fMoveDownButton.setEnabled(false);
     applyDialogFont(fMoveDownButton);
     setButtonLayoutData(fMoveDownButton);
@@ -488,7 +488,7 @@ public class CustomizeToolbarDialog extends Dialog {
 
     /* Restore Defaults */
     fRestoreDefaults = new Button(buttonContainer, SWT.PUSH);
-    fRestoreDefaults.setText("R&estore Defaults");
+    fRestoreDefaults.setText(Messages.CustomizeToolbarDialog_RESTORE_DEFAULTS);
     applyDialogFont(fRestoreDefaults);
     setButtonLayoutData(fRestoreDefaults);
     ((GridData) fRestoreDefaults.getLayoutData()).grabExcessVerticalSpace = true;
@@ -506,7 +506,7 @@ public class CustomizeToolbarDialog extends Dialog {
     modeContainer.setLayoutData(new GridData(SWT.BEGINNING, SWT.FILL, false, false, 2, 1));
 
     Label showLabel = new Label(modeContainer, SWT.NONE);
-    showLabel.setText("Show: ");
+    showLabel.setText(Messages.CustomizeToolbarDialog_SHOW);
 
     fModeViewer = new ComboViewer(modeContainer, SWT.READ_ONLY | SWT.BORDER);
     fModeViewer.setContentProvider(new ArrayContentProvider());
@@ -516,13 +516,13 @@ public class CustomizeToolbarDialog extends Dialog {
         if (element instanceof CoolBarMode) {
           switch ((CoolBarMode) element) {
             case IMAGE:
-              return "Icons";
+              return Messages.CustomizeToolbarDialog_ICONS;
             case TEXT:
-              return "Text";
+              return Messages.CustomizeToolbarDialog_TEXT;
             case IMAGE_TEXT_VERTICAL:
-              return "Icons and Text";
+              return Messages.CustomizeToolbarDialog_ICONS_AND_TEXT;
             case IMAGE_TEXT_HORIZONTAL:
-              return "Icons and Text (small)";
+              return Messages.CustomizeToolbarDialog_ICONS_AND_TEXT_SMALL;
           }
         }
 
@@ -756,11 +756,11 @@ public class CustomizeToolbarDialog extends Dialog {
     ((GridLayout) infoContainer.getLayout()).marginRight = 10;
 
     Label infoImg = new Label(infoContainer, SWT.NONE);
-    infoImg.setImage(OwlUI.getImage(fResources, "icons/obj16/info.gif"));
+    infoImg.setImage(OwlUI.getImage(fResources, "icons/obj16/info.gif")); //$NON-NLS-1$
     infoImg.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 
     Label infoText = new Label(infoContainer, SWT.WRAP);
-    infoText.setText("You can use the mouse to move items.");
+    infoText.setText(Messages.CustomizeToolbarDialog_USE_MOUSE_INFO);
     infoText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
     applyDialogFont(infoContainer);

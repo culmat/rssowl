@@ -173,7 +173,7 @@ public class ManageSetsDialog extends TitleAreaDialog {
   @Override
   protected void configureShell(Shell shell) {
     super.configureShell(shell);
-    shell.setText("Manage Bookmark Sets");
+    shell.setText(Messages.ManageSetsDialog_MANAGE_SETS);
   }
 
   /*
@@ -183,10 +183,10 @@ public class ManageSetsDialog extends TitleAreaDialog {
   protected Control createDialogArea(Composite parent) {
 
     /* Title */
-    setTitle("Bookmark Sets");
+    setTitle(Messages.ManageSetsDialog_SETS);
 
     /* Title Image */
-    setTitleImage(OwlUI.getImage(fResources, "icons/wizban/bkmrk_set_title.gif"));
+    setTitleImage(OwlUI.getImage(fResources, "icons/wizban/bkmrk_set_title.gif")); //$NON-NLS-1$
 
     /* Title Message */
     showInfo();
@@ -260,7 +260,7 @@ public class ManageSetsDialog extends TitleAreaDialog {
 
     /* Adds a new Bookmark Set */
     Button addButton = new Button(buttonContainer, SWT.PUSH);
-    addButton.setText("&New...");
+    addButton.setText(Messages.ManageSetsDialog_NEW);
     applyDialogFont(addButton);
     setButtonLayoutData(addButton);
     addButton.addSelectionListener(new SelectionAdapter() {
@@ -272,7 +272,7 @@ public class ManageSetsDialog extends TitleAreaDialog {
 
     /* Edits a selected Bookmark Set */
     fEditButton = new Button(buttonContainer, SWT.PUSH);
-    fEditButton.setText("&Edit...");
+    fEditButton.setText(Messages.ManageSetsDialog_EDIT);
     applyDialogFont(fEditButton);
     setButtonLayoutData(fEditButton);
     fEditButton.setEnabled(false);
@@ -285,7 +285,7 @@ public class ManageSetsDialog extends TitleAreaDialog {
 
     /* Deletes the selected Bookmark Set */
     fDeleteButton = new Button(buttonContainer, SWT.PUSH);
-    fDeleteButton.setText("&Delete...");
+    fDeleteButton.setText(Messages.ManageSetsDialog_DELETE);
     applyDialogFont(fDeleteButton);
     setButtonLayoutData(fDeleteButton);
     ((GridData) fDeleteButton.getLayoutData()).verticalAlignment = SWT.END;
@@ -457,7 +457,7 @@ public class ManageSetsDialog extends TitleAreaDialog {
 
     /* Require at least 1 Set to remain undeleted */
     if (fViewer.getTable().getItemCount() == 1) {
-      setErrorMessage("It is not possible to delete the last Bookmark Set.\n Please create a new Set first.");
+      setErrorMessage(Messages.ManageSetsDialog_DELETE_LAST_SET_ERROR);
       return;
     }
 
@@ -523,34 +523,34 @@ public class ManageSetsDialog extends TitleAreaDialog {
 
   private void showInfo() {
     setErrorMessage(null);
-    setMessage("Please select a Bookmark Set to manage.");
+    setMessage(Messages.ManageSetsDialog_SELECT_SET);
   }
 
   private void updateStatusLabel() {
     IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
     if (selection.isEmpty())
-      fStatusLabel.setText("");
+      fStatusLabel.setText(""); //$NON-NLS-1$
     else {
       IFolder bookmarkSet = (IFolder) selection.getFirstElement();
       int counter[] = new int[4];
 
       count(bookmarkSet, counter);
 
-      StringBuilder str = new StringBuilder("Set contains ");
+      StringBuilder str = new StringBuilder("Set contains "); //$NON-NLS-1$
       if (counter[0] > 0)
-        str.append(counter[0] == 1 ? "1 folder, " : (counter[0] + " folders, "));
+        str.append(counter[0] == 1 ? "1 folder, " : (counter[0] + " folders, ")); //$NON-NLS-1$ //$NON-NLS-2$
       if (counter[1] > 0)
-        str.append(counter[1] == 1 ? "1 bookmark, " : (counter[1] + " bookmarks, "));
+        str.append(counter[1] == 1 ? "1 bookmark, " : (counter[1] + " bookmarks, ")); //$NON-NLS-1$ //$NON-NLS-2$
       if (counter[2] > 0)
-        str.append(counter[2] == 1 ? "1 saved search, " : (counter[2] + " saved searches, "));
+        str.append(counter[2] == 1 ? "1 saved search, " : (counter[2] + " saved searches, ")); //$NON-NLS-1$ //$NON-NLS-2$
       if (counter[3] > 0)
-        str.append(counter[3] == 1 ? "1 news bin, " : (counter[3] + " news bins, "));
+        str.append(counter[3] == 1 ? "1 news bin, " : (counter[3] + " news bins, ")); //$NON-NLS-1$ //$NON-NLS-2$
 
       /* Set is Empty */
       if (counter[0] == 0 && counter[1] == 0 && counter[2] == 0 && counter[3] == 0)
-        str = new StringBuilder("Set is empty.");
+        str = new StringBuilder("Set is empty."); //$NON-NLS-1$
       else
-        str.delete(str.length() - 2, str.length()).append(".");
+        str.delete(str.length() - 2, str.length()).append("."); //$NON-NLS-1$
 
       fStatusLabel.setText(str.toString());
     }

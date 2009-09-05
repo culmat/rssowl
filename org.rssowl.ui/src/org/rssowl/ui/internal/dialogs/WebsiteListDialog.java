@@ -90,7 +90,7 @@ public class WebsiteListDialog extends Dialog {
     /* Info Label */
     Label infoLabel = new Label(composite, SWT.None);
     infoLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
-    infoLabel.setText("Enter websites for which JavaScript should be enabled: ");
+    infoLabel.setText(Messages.WebsiteListDialog_ENTER_WEBSITE);
 
     /* URL Input */
     fWebsiteInput = new Text(composite, SWT.BORDER | SWT.SINGLE);
@@ -99,7 +99,7 @@ public class WebsiteListDialog extends Dialog {
 
     Button addWebsiteButton = new Button(composite, SWT.PUSH);
     addWebsiteButton.getShell().setDefaultButton(addWebsiteButton);
-    addWebsiteButton.setText("&Add");
+    addWebsiteButton.setText(Messages.WebsiteListDialog_ADD);
     applyDialogFont(addWebsiteButton);
     setButtonLayoutData(addWebsiteButton);
     addWebsiteButton.addSelectionListener(new SelectionAdapter() {
@@ -124,7 +124,7 @@ public class WebsiteListDialog extends Dialog {
     TableColumn nameCol = new TableColumn(fViewer.getTable(), SWT.NONE);
 
     CColumnLayoutData data = new CColumnLayoutData(Size.FILL, 100);
-    cTable.manageColumn(nameCol, data, "Website", null, null, false, false);
+    cTable.manageColumn(nameCol, data, Messages.WebsiteListDialog_WEBSITE, null, null, false, false);
 
     /* ContentProvider returns all providers */
     fViewer.setContentProvider(new ArrayContentProvider());
@@ -171,7 +171,7 @@ public class WebsiteListDialog extends Dialog {
   @Override
   protected void configureShell(Shell newShell) {
     super.configureShell(newShell);
-    newShell.setText("Exceptions - JavaScript");
+    newShell.setText(Messages.WebsiteListDialog_JS_EXCEPTIONS);
   }
 
   /*
@@ -191,7 +191,7 @@ public class WebsiteListDialog extends Dialog {
   protected void createButtonsForButtonBar(Composite parent) {
 
     /* Remove Selected */
-    fRemoveSelectedButton = createButton(parent, -1, "&Remove Website", false);
+    fRemoveSelectedButton = createButton(parent, -1, Messages.WebsiteListDialog_REMOVE_WEBSITE, false);
     fRemoveSelectedButton.setEnabled(false);
     fRemoveSelectedButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -201,7 +201,7 @@ public class WebsiteListDialog extends Dialog {
     });
 
     /* Remove All */
-    Button removeAllButton = createButton(parent, -2, "Remove all &Websites", false);
+    Button removeAllButton = createButton(parent, -2, Messages.WebsiteListDialog_REMOVE_ALL_WEBSITES, false);
     removeAllButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -228,7 +228,7 @@ public class WebsiteListDialog extends Dialog {
       String[] newWebsitesArray = newWebsites.toArray(new String[newWebsites.size()]);
       fPreferences.putStrings(DefaultPreferences.DISABLE_JAVASCRIPT_EXCEPTIONS, newWebsitesArray);
       fViewer.setInput(newWebsitesArray);
-      fWebsiteInput.setText("");
+      fWebsiteInput.setText(""); //$NON-NLS-1$
       fWebsiteInput.setFocus();
     }
   }

@@ -28,6 +28,7 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
@@ -60,7 +61,7 @@ import java.net.URI;
 public class LoginDialog extends TitleAreaDialog {
 
   /* Divider between Protocol and Host */
-  private static final String PROTOCOL_SEPARATOR = "://";
+  private static final String PROTOCOL_SEPARATOR = "://"; //$NON-NLS-1$
 
   private final LocalResourceManager fResources;
   private final URI fLink;
@@ -140,7 +141,7 @@ public class LoginDialog extends TitleAreaDialog {
   @Override
   protected void configureShell(Shell shell) {
     super.configureShell(shell);
-    shell.setText("The requested Feed requires authorization");
+    shell.setText(Messages.LoginDialog_FEED_REQUIRES_AUTH);
   }
 
   /*
@@ -158,16 +159,16 @@ public class LoginDialog extends TitleAreaDialog {
     composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
     /* Title */
-    setTitle("Login");
+    setTitle(Messages.LoginDialog_LOGIN);
 
     /* Title Image */
-    setTitleImage(OwlUI.getImage(fResources, "icons/wizban/auth.gif"));
+    setTitleImage(OwlUI.getImage(fResources, "icons/wizban/auth.gif")); //$NON-NLS-1$
 
     /* Title Message */
     if (fRealm != null)
-      setMessage("Enter Username and Password for '" + fRealm + "'");
+      setMessage(NLS.bind(Messages.LoginDialog_ENTER_USER_PW_REALM, fRealm));
     else
-      setMessage("Enter Username and Password");
+      setMessage(Messages.LoginDialog_ENTER_USER_PW);
 
     /* Spacer */
     new Label(composite, SWT.NONE);
@@ -189,7 +190,7 @@ public class LoginDialog extends TitleAreaDialog {
 
     /* Username Label */
     Label usernameLabel = new Label(composite, SWT.NONE);
-    usernameLabel.setText("Username: ");
+    usernameLabel.setText(Messages.LoginDialog_USERNAME);
     usernameLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
 
     /* Username input field */
@@ -199,7 +200,7 @@ public class LoginDialog extends TitleAreaDialog {
 
     /* Password Label */
     Label passwordLabel = new Label(composite, SWT.NONE);
-    passwordLabel.setText("Password: ");
+    passwordLabel.setText(Messages.LoginDialog_PASSWORD);
     passwordLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
 
     /* Password input field */

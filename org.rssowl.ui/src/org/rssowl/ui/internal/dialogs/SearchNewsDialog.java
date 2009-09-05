@@ -60,6 +60,7 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.SameShellProvider;
 import org.eclipse.jface.window.ToolTip;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.dnd.DND;
@@ -187,10 +188,10 @@ public class SearchNewsDialog extends TitleAreaDialog {
   private static final int[] THREE_SASH_WEIGHTS = new int[] { 33, 33, 33 };
 
   /* Section for Dialogs Settings */
-  private static final String SETTINGS_SECTION = "org.rssowl.ui.internal.dialogs.SearchNewsDialog";
+  private static final String SETTINGS_SECTION = "org.rssowl.ui.internal.dialogs.SearchNewsDialog"; //$NON-NLS-1$
 
   /* Preference: Sash Weights */
-  private static final String PREF_SASH_WEIGHTS = "org.rssowl.ui.internal.dialogs.search.SashWeights";
+  private static final String PREF_SASH_WEIGHTS = "org.rssowl.ui.internal.dialogs.search.SashWeights"; //$NON-NLS-1$
 
   /* Number of News to preload before showing as result */
   private static final int NUM_PRELOADED = 20;
@@ -358,9 +359,9 @@ public class SearchNewsDialog extends TitleAreaDialog {
     }
 
     private void createResources() {
-      fHighRelevanceIcon = OwlUI.getImage(fResources, "icons/obj16/high.gif");
-      fMediumRelevanceIcon = OwlUI.getImage(fResources, "icons/obj16/medium.gif");
-      fLowRelevanceIcon = OwlUI.getImage(fResources, "icons/obj16/low.gif");
+      fHighRelevanceIcon = OwlUI.getImage(fResources, "icons/obj16/high.gif"); //$NON-NLS-1$
+      fMediumRelevanceIcon = OwlUI.getImage(fResources, "icons/obj16/medium.gif"); //$NON-NLS-1$
+      fLowRelevanceIcon = OwlUI.getImage(fResources, "icons/obj16/low.gif"); //$NON-NLS-1$
     }
 
     /*
@@ -403,9 +404,9 @@ public class SearchNewsDialog extends TitleAreaDialog {
       List<ICategory> categories = news.getCategories();
       for (ICategory category : categories) {
         if (category.getName() != null)
-          builder.append(category.getName()).append(", ");
+          builder.append(category.getName()).append(", "); //$NON-NLS-1$
         else if (category.getDomain() != null)
-          builder.append(category.getDomain()).append(", ");
+          builder.append(category.getDomain()).append(", "); //$NON-NLS-1$
       }
 
       if (builder.length() > 0)
@@ -456,11 +457,11 @@ public class SearchNewsDialog extends TitleAreaDialog {
       if (news.getParentId() != 0) {
         INewsBin bin = DynamicDAO.load(INewsBin.class, news.getParentId());
         if (bin != null) {
-          name = bin.getName() + ": " + name;
+          name = NLS.bind(Messages.SearchNewsDialog_BIN_NAME, bin.getName(), name);
         }
       }
 
-      return StringUtils.replaceAll(name, "&", "&&");
+      return StringUtils.replaceAll(name, "&", "&&"); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     /*
@@ -560,7 +561,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
     /* Add default condition as well */
     ISearchField field = factory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
-    conditions.add(factory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, ""));
+    conditions.add(factory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "")); //$NON-NLS-1$
 
     return conditions;
   }
@@ -645,7 +646,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
   @Override
   protected void configureShell(Shell shell) {
     super.configureShell(shell);
-    shell.setText("Search News");
+    shell.setText(Messages.SearchNewsDialog_SEARCH_NEWS);
   }
 
   /*
@@ -675,10 +676,10 @@ public class SearchNewsDialog extends TitleAreaDialog {
     new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     /* Title */
-    setTitle("Search News");
+    setTitle(Messages.SearchNewsDialog_SEARCH_NEWS);
 
     /* Title Image */
-    setTitleImage(OwlUI.getImage(fResources, "icons/wizban/search.gif"));
+    setTitleImage(OwlUI.getImage(fResources, "icons/wizban/search.gif")); //$NON-NLS-1$
 
     /* Title Message */
     restoreInfoMessage(false);
@@ -797,11 +798,11 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
     /* Radio to select Condition Matching */
     fMatchAllRadio = new Button(topControlsContainer, SWT.RADIO);
-    fMatchAllRadio.setText("&Match all conditions");
+    fMatchAllRadio.setText(Messages.SearchNewsDialog_MATCH_ALL);
     fMatchAllRadio.setSelection(fMatchAllConditions);
 
     fMatchAnyRadio = new Button(topControlsContainer, SWT.RADIO);
-    fMatchAnyRadio.setText("Match &any condition");
+    fMatchAnyRadio.setText(Messages.SearchNewsDialog_MATCH_ANY);
     fMatchAnyRadio.setSelection(!fMatchAllConditions);
 
     /* Separator */
@@ -814,12 +815,12 @@ public class SearchNewsDialog extends TitleAreaDialog {
     scopeContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0, 0, 0, false));
 
     Label locationLabel = new Label(scopeContainer, SWT.NONE);
-    locationLabel.setText("Search in: ");
+    locationLabel.setText(Messages.SearchNewsDialog_SEARCH_IN);
 
     fLocationControl = new LocationControl(scopeContainer, SWT.WRAP) {
       @Override
       protected String getDefaultLabel() {
-        return "All News";
+        return Messages.SearchNewsDialog_ALL_NEWS;
       }
     };
     fLocationControl.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
@@ -830,7 +831,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     final ToolBarManager dialogToolBar = new ToolBarManager(SWT.RIGHT | SWT.FLAT);
 
     /* Columns */
-    IAction columnDropdown = new Action("Visible Columns", IAction.AS_DROP_DOWN_MENU) {
+    IAction columnDropdown = new Action(Messages.SearchNewsDialog_VISIBLE_COLUMNS, IAction.AS_DROP_DOWN_MENU) {
       @Override
       public void run() {
         getMenuCreator().getMenu(dialogToolBar.getControl()).setVisible(true);
@@ -847,7 +848,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
         Menu menu = new Menu(parent);
 
         MenuItem restoreDefaults = new MenuItem(menu, SWT.None);
-        restoreDefaults.setText("&Restore Default Columns");
+        restoreDefaults.setText(Messages.SearchNewsDialog_RESTORE_DEFAULT_COLUMNS);
         restoreDefaults.addSelectionListener(new SelectionAdapter() {
           @Override
           public void widgetSelected(SelectionEvent e) {
@@ -897,8 +898,8 @@ public class SearchNewsDialog extends TitleAreaDialog {
     dialogToolBar.add(new Separator());
 
     /* Toggle Preview */
-    final String previewActionId = "org.rssowl.ui.internal.dialogs.search.PreviewAction";
-    IAction previewAction = new Action("&Preview Results", IAction.AS_CHECK_BOX) {
+    final String previewActionId = "org.rssowl.ui.internal.dialogs.search.PreviewAction"; //$NON-NLS-1$
+    IAction previewAction = new Action(Messages.SearchNewsDialog_PREVIEW_RESULTS, IAction.AS_CHECK_BOX) {
       @Override
       public void run() {
         fIsPreviewVisible = !fIsPreviewVisible;
@@ -926,15 +927,15 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
       @Override
       public ImageDescriptor getImageDescriptor() {
-        return OwlUI.getImageDescriptor("icons/etool16/browsermaximized.gif");
+        return OwlUI.getImageDescriptor("icons/etool16/browsermaximized.gif"); //$NON-NLS-1$
       }
 
       @Override
       public String getToolTipText() {
         if (fIsPreviewVisible)
-          return "Hide Preview";
+          return Messages.SearchNewsDialog_HIDE_PREVIEW;
 
-        return "Show Preview";
+        return Messages.SearchNewsDialog_SHOW_PREVIEW;
       }
     };
     previewAction.setId(previewActionId);
@@ -945,7 +946,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     dialogToolBar.add(new Separator());
 
     /* Existing Saved Searches */
-    IAction savedSearches = new Action("Show Saved Search", IAction.AS_DROP_DOWN_MENU) {
+    IAction savedSearches = new Action(Messages.SearchNewsDialog_SHOW_SAVED_SEARCH, IAction.AS_DROP_DOWN_MENU) {
       @Override
       public void run() {
         getMenuCreator().getMenu(dialogToolBar.getControl()).setVisible(true);
@@ -966,8 +967,8 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
         /* Create new Saved Search */
         MenuItem newSavedSearch = new MenuItem(menu, SWT.NONE);
-        newSavedSearch.setText("New Saved Search...");
-        newSavedSearch.setImage(OwlUI.getImage(fResources, "icons/etool16/add.gif"));
+        newSavedSearch.setText(Messages.SearchNewsDialog_NEW_SAVED_SEARCH);
+        newSavedSearch.setImage(OwlUI.getImage(fResources, "icons/etool16/add.gif")); //$NON-NLS-1$
         newSavedSearch.addSelectionListener(new SelectionAdapter() {
           @Override
           public void widgetSelected(SelectionEvent e) {
@@ -1069,7 +1070,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
   private void restoreInfoMessage(boolean clearError) {
     if (clearError)
       setErrorMessage(null);
-    setMessage("Use \'?\' for any character and \'*\' for any character sequence in your search. Surround words with quotes to search for phrases.", IMessageProvider.INFORMATION);
+    setMessage(Messages.SearchNewsDialog_SEARCH_HELP, IMessageProvider.INFORMATION);
   }
 
   /*
@@ -1090,7 +1091,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     /* Status Label */
     fStatusLabel = new Link(buttonBar, SWT.NONE);
     fStatusLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
-    fStatusLabel.setText("");
+    fStatusLabel.setText(""); //$NON-NLS-1$
     applyDialogFont(fStatusLabel);
     fStatusLabel.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -1100,12 +1101,12 @@ public class SearchNewsDialog extends TitleAreaDialog {
     });
 
     /* Search */
-    Button searchButton = createButton(buttonBar, BUTTON_SEARCH, "&Search", true);
+    Button searchButton = createButton(buttonBar, BUTTON_SEARCH, Messages.SearchNewsDialog_SEARCH, true);
     ((GridData) searchButton.getLayoutData()).horizontalAlignment = SWT.END;
     ((GridData) searchButton.getLayoutData()).grabExcessHorizontalSpace = false;
 
     /* Clear */
-    createButton(buttonBar, BUTTON_CLEAR, "C&lear", false);
+    createButton(buttonBar, BUTTON_CLEAR, Messages.SearchNewsDialog_CLEAR, false);
 
     /* Close */
     Button closeButton = createButton(buttonBar, IDialogConstants.CLOSE_ID, IDialogConstants.CLOSE_LABEL, false);
@@ -1139,7 +1140,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
     /* Make sure Conditions are provided */
     if (fSearchConditionList.isEmpty()) {
-      setErrorMessage("Please specify your search by defining some conditions below.");
+      setErrorMessage(Messages.SearchNewsDialog_SEARCH_DESCRIPTION);
       fSearchConditionList.focusInput();
       return;
     }
@@ -1153,7 +1154,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     /* Make sure there is no Location Conflict */
     if (CoreUtils.isLocationConflict(fCurrentSearchConditions)) {
       setErrorMessage(null);
-      setMessage("You are using a location condition together with a value for \"Search in\".", IMessageProvider.WARNING);
+      setMessage(Messages.SearchNewsDialog_LOCATION_WARNING, IMessageProvider.WARNING);
     }
 
     /* Unset Warning/Error Message */
@@ -1237,13 +1238,12 @@ public class SearchNewsDialog extends TitleAreaDialog {
         String text;
         int size = fResult.size();
         if (size == 0)
-          text = "The search returned no results. ";
+          text = Messages.SearchNewsDialog_SEARCH_RESULT_1;
         else if (size == 1)
-          text = "The search returned " + fResult.size() + " result. ";
+          text = NLS.bind(Messages.SearchNewsDialog_SEARCH_RESULT_2, fResult.size());
         else
-          text = "The search returned " + fResult.size() + " results. ";
+          text = NLS.bind(Messages.SearchNewsDialog_SEARCH_RESULT_3, fResult.size());
 
-        text += "<a>Click here</a> to save this search.";
         fStatusLabel.setText(text);
 
         /* Enable Buttons and update Cursor */
@@ -1306,7 +1306,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     restoreInfoMessage(true);
 
     /* Unset Status Message */
-    fStatusLabel.setText("");
+    fStatusLabel.setText(""); //$NON-NLS-1$
   }
 
   private void onSave() {
@@ -1753,11 +1753,11 @@ public class SearchNewsDialog extends TitleAreaDialog {
         {
 
           /* Open in FeedView */
-          manager.add(new Separator("internalopen"));
+          manager.add(new Separator("internalopen")); //$NON-NLS-1$
           if (!selection.isEmpty())
-            manager.appendToGroup("internalopen", new OpenNewsAction(selection, getShell()));
+            manager.appendToGroup("internalopen", new OpenNewsAction(selection, getShell())); //$NON-NLS-1$
 
-          manager.add(new GroupMarker("open"));
+          manager.add(new GroupMarker("open")); //$NON-NLS-1$
 
           /* Show only when internal browser is used */
           if (!selection.isEmpty() && !fPreferences.getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER) && !fPreferences.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER))
@@ -1771,10 +1771,10 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
         /* Mark / Label */
         if (!selection.isEmpty()) {
-          manager.add(new Separator("mark"));
+          manager.add(new Separator("mark")); //$NON-NLS-1$
 
           /* Mark */
-          MenuManager markMenu = new MenuManager("M&ark", "mark");
+          MenuManager markMenu = new MenuManager(Messages.SearchNewsDialog_MARK, "mark"); //$NON-NLS-1$
           manager.add(markMenu);
 
           /* Mark as Read */
@@ -1794,7 +1794,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
         /* Move To / Copy To */
         if (!selection.isEmpty()) {
-          manager.add(new Separator("movecopy"));
+          manager.add(new Separator("movecopy")); //$NON-NLS-1$
 
           /* Load all news bins and sort by name */
           List<INewsBin> newsbins = new ArrayList<INewsBin>(DynamicDAO.loadAll(INewsBin.class));
@@ -1808,25 +1808,25 @@ public class SearchNewsDialog extends TitleAreaDialog {
           Collections.sort(newsbins, comparator);
 
           /* Move To */
-          MenuManager moveMenu = new MenuManager("&Move To", "moveto");
+          MenuManager moveMenu = new MenuManager(Messages.SearchNewsDialog_MOVE, "moveto"); //$NON-NLS-1$
           manager.add(moveMenu);
 
           for (INewsBin bin : newsbins) {
             moveMenu.add(new MoveCopyNewsToBinAction(selection, bin, true));
           }
 
-          moveMenu.add(new Separator("movetonewbin"));
+          moveMenu.add(new Separator("movetonewbin")); //$NON-NLS-1$
           moveMenu.add(new MoveCopyNewsToBinAction(selection, null, true));
 
           /* Copy To */
-          MenuManager copyMenu = new MenuManager("&Copy To", "copyto");
+          MenuManager copyMenu = new MenuManager(Messages.SearchNewsDialog_COPY, "copyto"); //$NON-NLS-1$
           manager.add(copyMenu);
 
           for (INewsBin bin : newsbins) {
             copyMenu.add(new MoveCopyNewsToBinAction(selection, bin, false));
           }
 
-          copyMenu.add(new Separator("copytonewbin"));
+          copyMenu.add(new Separator("copytonewbin")); //$NON-NLS-1$
           copyMenu.add(new MoveCopyNewsToBinAction(selection, null, false));
         }
 
@@ -1835,9 +1835,9 @@ public class SearchNewsDialog extends TitleAreaDialog {
           ApplicationActionBarAdvisor.fillShareMenu(manager, selection, new SameShellProvider(getShell()), false);
         }
 
-        manager.add(new Separator("filter"));
-        manager.add(new Separator("edit"));
-        manager.add(new Separator("copy"));
+        manager.add(new Separator("filter")); //$NON-NLS-1$
+        manager.add(new Separator("edit")); //$NON-NLS-1$
+        manager.add(new Separator("copy")); //$NON-NLS-1$
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
       }
     });
@@ -1889,7 +1889,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     IModelFactory factory = Owl.getModelFactory();
 
     ISearchField field = factory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
-    ISearchCondition condition = factory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "");
+    ISearchCondition condition = factory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, ""); //$NON-NLS-1$
 
     conditions.add(condition);
 

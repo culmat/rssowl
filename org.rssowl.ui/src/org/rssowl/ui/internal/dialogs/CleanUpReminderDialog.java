@@ -101,7 +101,7 @@ public class CleanUpReminderDialog extends TitleAreaDialog {
   @Override
   protected void configureShell(Shell shell) {
     super.configureShell(shell);
-    shell.setText("Reminder to perform Clean Up");
+    shell.setText(Messages.CleanUpReminderDialog_CLEANUP_REMINDER_TITLE);
   }
 
   /*
@@ -111,13 +111,13 @@ public class CleanUpReminderDialog extends TitleAreaDialog {
   protected Control createDialogArea(Composite parent) {
 
     /* Title */
-    setTitle("Clean Up Reminder");
+    setTitle(Messages.CleanUpReminderDialog_CLEANUP_REMINDER);
 
     /* Title Image */
-    setTitleImage(OwlUI.getImage(fResources, "icons/wizban/cleanup_wiz.gif"));
+    setTitleImage(OwlUI.getImage(fResources, "icons/wizban/cleanup_wiz.gif")); //$NON-NLS-1$
 
     /* Title Message */
-    setMessage("As time goes on, unused bookmarks may accumulate in your feed reader.\nThe Clean Up Wizard can help with this as well as optimize your system.");
+    setMessage(Messages.CleanUpReminderDialog_REMINDER_MSG);
 
     /* Separator */
     new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
@@ -129,7 +129,7 @@ public class CleanUpReminderDialog extends TitleAreaDialog {
 
     Label infoLabel = new Label(composite, SWT.WRAP);
     infoLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-    infoLabel.setText("Would you like to open the Clean Up wizard now?");
+    infoLabel.setText(Messages.CleanUpReminderDialog_OPEN_CLEANUP_WIZARD);
 
     Composite controlsContainer = new Composite(composite, SWT.NONE);
     controlsContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -137,7 +137,7 @@ public class CleanUpReminderDialog extends TitleAreaDialog {
     ((GridLayout) controlsContainer.getLayout()).marginTop = 25;
 
     final Button reminderCheck = new Button(controlsContainer, SWT.CHECK);
-    reminderCheck.setText("&Remind me every ");
+    reminderCheck.setText(Messages.CleanUpReminderDialog_REMIND_EVERY);
     reminderCheck.setSelection(fPreferences.getBoolean(DefaultPreferences.CLEAN_UP_REMINDER_STATE));
 
     final Spinner reminderDaysValue = new Spinner(controlsContainer, SWT.BORDER);
@@ -161,7 +161,7 @@ public class CleanUpReminderDialog extends TitleAreaDialog {
     });
 
     Label reminderDaysLabel = new Label(controlsContainer, SWT.NONE);
-    reminderDaysLabel.setText(" days.");
+    reminderDaysLabel.setText(Messages.CleanUpReminderDialog_DAYS);
 
     /* Separator */
     new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));

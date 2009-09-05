@@ -99,7 +99,7 @@ import java.util.List;
 public class NewsFilterDialog extends TitleAreaDialog {
 
   /* Section for Dialogs Settings */
-  private static final String SETTINGS_SECTION = "org.rssowl.ui.internal.dialogs.NewsFilterDialog";
+  private static final String SETTINGS_SECTION = "org.rssowl.ui.internal.dialogs.NewsFilterDialog"; //$NON-NLS-1$
 
   private LocalResourceManager fResources;
   private final ISearchFilter fEditedFilter;

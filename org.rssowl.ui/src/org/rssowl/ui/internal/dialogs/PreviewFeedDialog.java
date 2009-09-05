@@ -29,6 +29,7 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
@@ -83,7 +84,7 @@ public class PreviewFeedDialog extends Dialog {
 
   private static final int DIALOG_WIDTH_DLUS = 600;
   private static final int DIALOG_HEIGHT_DLUS = 400;
-  private static final String DIALOG_SETTINGS_KEY = "org.rssowl.ui.internal.dialogs.PreviewFeedDialog";
+  private static final String DIALOG_SETTINGS_KEY = "org.rssowl.ui.internal.dialogs.PreviewFeedDialog"; //$NON-NLS-1$
 
   private IBookMark fBookmark;
   private IFeed fLoadedFeed;
@@ -126,8 +127,8 @@ public class PreviewFeedDialog extends Dialog {
     }
 
     int normal = fontHeight;
-    String fontUnit = "pt";
-    fNormalFontCSS = "font-size: " + normal + fontUnit + ";";
+    String fontUnit = "pt"; //$NON-NLS-1$
+    fNormalFontCSS = "font-size: " + normal + fontUnit + ";"; //$NON-NLS-1$ //$NON-NLS-2$
   }
 
   /*
@@ -172,9 +173,9 @@ public class PreviewFeedDialog extends Dialog {
     /* Show Info that Feed is loading */
     if (fLoadedFeed == null) {
       if (StringUtils.isSet(fBookmark.getName()))
-        showMessage("Please wait while loading the feed '" + fBookmark.getName() + "'...", false);
+        showMessage(NLS.bind(Messages.PreviewFeedDialog_LOAD_FEED_N, fBookmark.getName()), false);
       else
-        showMessage("Please wait while loading the feed...", false);
+        showMessage(Messages.PreviewFeedDialog_LOAD_FEED, false);
     }
 
     /* Load Feed in Background */
@@ -228,7 +229,7 @@ public class PreviewFeedDialog extends Dialog {
         if (feed != null && error == null)
           showFeed(feed);
         else if (error != null && StringUtils.isSet(error.getMessage()))
-          showMessage("Unable to load the feed. Reason: " + error.getMessage(), true);
+          showMessage(NLS.bind(Messages.PreviewFeedDialog_UNABLE_LOAD_FEED, error.getMessage()), true);
       }
     });
   }
@@ -238,16 +239,16 @@ public class PreviewFeedDialog extends Dialog {
       return;
 
     StringBuilder html = new StringBuilder();
-    html.append("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n");
-    html.append("<html>\n");
-    html.append("<body style=\"overflow: auto; font-family: ").append(fNewsFontFamily).append(",Verdanna,sans-serif; ").append(fNormalFontCSS).append("\">");
+    html.append("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n"); //$NON-NLS-1$
+    html.append("<html>\n"); //$NON-NLS-1$
+    html.append("<body style=\"overflow: auto; font-family: ").append(fNewsFontFamily).append(",Verdanna,sans-serif; ").append(fNormalFontCSS).append("\">"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     if (error)
-      html.append("<span style=\"color: darkred;\">");
+      html.append("<span style=\"color: darkred;\">"); //$NON-NLS-1$
     html.append(msg);
     if (error)
-      html.append("</span>");
-    html.append("</body>\n");
-    html.append("</html>\n");
+      html.append("</span>"); //$NON-NLS-1$
+    html.append("</body>\n"); //$NON-NLS-1$
+    html.append("</html>\n"); //$NON-NLS-1$
 
     fBrowser.getControl().setText(html.toString());
   }
@@ -258,27 +259,27 @@ public class PreviewFeedDialog extends Dialog {
 
       /* Start HTML */
       StringBuilder html = new StringBuilder();
-      html.append("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n");
+      html.append("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n"); //$NON-NLS-1$
 
       /* Windows only: Mark of the Web */
       if (Application.IS_WINDOWS) {
         html.append(IE_MOTW);
-        html.append("\n");
+        html.append("\n"); //$NON-NLS-1$
       }
 
       /* Head */
-      html.append("<html>\n  <head>\n");
+      html.append("<html>\n  <head>\n"); //$NON-NLS-1$
 
       /* Append Base URI if available */
       URI base = (feed.getBase() != null) ? feed.getBase() : feed.getLink();
       if (base != null) {
-        html.append("  <base href=\"");
+        html.append("  <base href=\""); //$NON-NLS-1$
         html.append(base);
-        html.append("\">");
+        html.append("\">"); //$NON-NLS-1$
       }
 
       /* Meta */
-      html.append("\n  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n");
+      html.append("\n  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n"); //$NON-NLS-1$
 
       /* CSS */
       try {
@@ -290,11 +291,11 @@ public class PreviewFeedDialog extends Dialog {
       }
 
       /* Open Body */
-      html.append("  </head>\n  <body id=\"owlbody\">\n");
+      html.append("  </head>\n  <body id=\"owlbody\">\n"); //$NON-NLS-1$
 
       /* Title */
       if (StringUtils.isSet(fBookmark.getName()))
-        html.append("<div class=\"group\">").append(fBookmark.getName()).append("</div>");
+        html.append("<div class=\"group\">").append(fBookmark.getName()).append("</div>"); //$NON-NLS-1$ //$NON-NLS-2$
 
       /* Write News */
       for (INews item : news) {
@@ -302,7 +303,7 @@ public class PreviewFeedDialog extends Dialog {
       }
 
       /* End HTML */
-      html.append("\n  </body>\n</html>");
+      html.append("\n  </body>\n</html>"); //$NON-NLS-1$
 
       /* Apply to Browser */
       fBrowser.getControl().setText(html.toString());
@@ -310,17 +311,16 @@ public class PreviewFeedDialog extends Dialog {
       /* Also Update Status */
       if (StringUtils.isSet(fBookmark.getName())) {
         StringBuilder str = new StringBuilder();
-        str.append("Found ").append(news.size()).append(" News in '");
-        str.append(fBookmark.getName()).append("'");
         if (feed.getHomepage() != null) {
-          str.append(" (<a>Visit Homepage</a>)");
+          str.append(NLS.bind(Messages.PreviewFeedDialog_FOUND_N_NEWS_HOMEPAGE, news.size(), fBookmark.getName()));
           fStatusLabel.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
               new OpenInBrowserAction(new StructuredSelection(feed.getHomepage())).run();
             }
           });
-        }
+        } else
+          str.append(NLS.bind(Messages.PreviewFeedDialog_FOUND_N_NEWS, news.size(), fBookmark.getName()));
 
         fStatusLabel.setText(str.toString());
       }
@@ -335,9 +335,9 @@ public class PreviewFeedDialog extends Dialog {
     super.configureShell(shell);
 
     if (StringUtils.isSet(fBookmark.getName()))
-      shell.setText("Preview of '" + fBookmark.getName() + "'");
+      shell.setText(NLS.bind(Messages.PreviewFeedDialog_PREVIEW_OF, fBookmark.getName()));
     else
-      shell.setText("Preview");
+      shell.setText(Messages.PreviewFeedDialog_PREVIEW);
   }
 
   /*

@@ -113,7 +113,7 @@ public class LabelDialog extends Dialog {
     /* Name */
     if (fMode == DialogMode.ADD || fMode == DialogMode.EDIT) {
       Label nameLabel = new Label(composite, SWT.NONE);
-      nameLabel.setText("Name: ");
+      nameLabel.setText(Messages.LabelDialog_NAME);
 
       fNameInput = new Text(composite, SWT.BORDER | SWT.SINGLE);
       fNameInput.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
@@ -144,7 +144,7 @@ public class LabelDialog extends Dialog {
             });
 
             Set<String> categoryNames = DynamicDAO.getDAO(ICategoryDAO.class).loadAllNames();
-            categoryNames = StringUtils.replaceAll(categoryNames, ",", " "); // Comma not allowed for Labels
+            categoryNames = StringUtils.replaceAll(categoryNames, ",", " "); // Comma not allowed for Labels //$NON-NLS-1$ //$NON-NLS-2$
 
             values.addAll(categoryNames);
 
@@ -159,7 +159,7 @@ public class LabelDialog extends Dialog {
     /* Color */
     if (fMode == DialogMode.ADD || fMode == DialogMode.EDIT) {
       Label nameLabel = new Label(composite, SWT.NONE);
-      nameLabel.setText("Color: ");
+      nameLabel.setText(Messages.LabelDialog_COLOR);
 
       fColorPicker = new ColorPicker(composite, SWT.FLAT);
       if (fExistingLabel != null)
@@ -188,20 +188,20 @@ public class LabelDialog extends Dialog {
   private void showInfo() {
     switch (fMode) {
       case ADD:
-        fInfoText.setText("Please enter the name and color for the new Label.");
+        fInfoText.setText(Messages.LabelDialog_ENTER_NEW_LABEL);
         break;
       case EDIT:
-        fInfoText.setText("Please enter the name and color for this Label.");
+        fInfoText.setText(Messages.LabelDialog_EDIT_LABEL_INFO);
         break;
     }
 
-    fInfoImg.setImage(OwlUI.getImage(fResources, "icons/obj16/info.gif"));
+    fInfoImg.setImage(OwlUI.getImage(fResources, "icons/obj16/info.gif")); //$NON-NLS-1$
     fInfoImg.getParent().layout();
   }
 
   private void showError(String msg) {
     fInfoText.setText(msg);
-    fInfoImg.setImage(OwlUI.getImage(fResources, "icons/obj16/error.gif"));
+    fInfoImg.setImage(OwlUI.getImage(fResources, "icons/obj16/error.gif")); //$NON-NLS-1$
     fInfoImg.getParent().layout();
   }
 
@@ -210,9 +210,9 @@ public class LabelDialog extends Dialog {
     String inputValue = fNameInput.getText().trim().toLowerCase();
 
     /* Disallow comma in the Name for a Label */
-    if (inputValue.contains(",")) {
+    if (inputValue.contains(",")) { //$NON-NLS-1$
       getButton(IDialogConstants.OK_ID).setEnabled(false);
-      showError("A comma is not allowed in the name for a Label.");
+      showError(Messages.LabelDialog_ERROR_COMMA);
       return;
     }
 
@@ -227,7 +227,7 @@ public class LabelDialog extends Dialog {
     /* Disable OK Button if Label exists */
     getButton(IDialogConstants.OK_ID).setEnabled(!labelExists && fNameInput.getText().length() > 0);
     if (labelExists)
-      showError("A Label with this name already exists.");
+      showError(Messages.LabelDialog_LABEL_EXISTS);
     else
       showInfo();
   }
@@ -258,10 +258,10 @@ public class LabelDialog extends Dialog {
 
     switch (fMode) {
       case ADD:
-        newShell.setText("New Label");
+        newShell.setText(Messages.LabelDialog_NEW_LABEL);
         break;
       case EDIT:
-        newShell.setText("Edit Label");
+        newShell.setText(Messages.LabelDialog_EDIT_LABEL);
         break;
     }
   }

@@ -86,7 +86,7 @@ import java.util.List;
 public class SearchMarkDialog extends TitleAreaDialog {
 
   /* Section for Dialogs Settings */
-  private static final String SETTINGS_SECTION = "org.rssowl.ui.internal.actions.NewSearchMarkAction";
+  private static final String SETTINGS_SECTION = "org.rssowl.ui.internal.actions.NewSearchMarkAction"; //$NON-NLS-1$
 
   private Text fNameInput;
   private SearchConditionList fSearchConditionList;
@@ -150,7 +150,7 @@ public class SearchMarkDialog extends TitleAreaDialog {
 
     /* Make sure Conditions are provided */
     if (fSearchConditionList.isEmpty()) {
-      setErrorMessage("Please specify your search by defining some conditions below.");
+      setErrorMessage(Messages.SearchMarkDialog_ERROR_MISSING_CONDITIONS);
       return;
     }
 
@@ -213,7 +213,7 @@ public class SearchMarkDialog extends TitleAreaDialog {
    */
   @Override
   protected void configureShell(Shell newShell) {
-    newShell.setText("New Saved Search");
+    newShell.setText(Messages.SearchMarkDialog_NEW_SAVED_SEARCH);
     super.configureShell(newShell);
   }
 
@@ -235,20 +235,20 @@ public class SearchMarkDialog extends TitleAreaDialog {
     new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     /* Title */
-    setTitle("Saved Search");
+    setTitle(Messages.SearchMarkDialog_SAVED_SEARCH);
 
     /* Title Image */
-    setTitleImage(OwlUI.getImage(fResources, "icons/wizban/search.gif"));
+    setTitleImage(OwlUI.getImage(fResources, "icons/wizban/search.gif")); //$NON-NLS-1$
 
     /* Title Message */
-    setMessage("Use \'?\' for any character and \'*\' for any character sequence in your search.\n Surround words with quotes to search for phrases.", IMessageProvider.INFORMATION);
+    setMessage(Messages.SearchMarkDialog_SEARCH_HELP, IMessageProvider.INFORMATION);
 
     Composite container = new Composite(parent, SWT.NONE);
     container.setLayout(LayoutUtils.createGridLayout(2, 5, 5, 5, 5, false));
     container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
     Label nameLabel = new Label(container, SWT.NONE);
-    nameLabel.setText("Name: ");
+    nameLabel.setText(Messages.SearchMarkDialog_NAME);
 
     Composite nameContainer = new Composite(container, SWT.BORDER);
     nameContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
@@ -267,8 +267,8 @@ public class SearchMarkDialog extends TitleAreaDialog {
     generateTitleBar.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
     ToolItem generateTitleItem = new ToolItem(generateTitleBar, SWT.PUSH);
-    generateTitleItem.setImage(OwlUI.getImage(fResources, "icons/etool16/info.gif"));
-    generateTitleItem.setToolTipText("Create name from conditions");
+    generateTitleItem.setImage(OwlUI.getImage(fResources, "icons/etool16/info.gif")); //$NON-NLS-1$
+    generateTitleItem.setToolTipText(Messages.SearchMarkDialog_CREATE_NAME_FROM_CONDITIONS);
     generateTitleItem.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -278,7 +278,7 @@ public class SearchMarkDialog extends TitleAreaDialog {
 
     Label folderLabel = new Label(container, SWT.NONE);
     folderLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
-    folderLabel.setText("Location: ");
+    folderLabel.setText(Messages.SearchMarkDialog_LOCATION);
 
     /* Folder Chooser */
     fFolderChooser = new FolderChooser(container, fParent, SWT.BORDER, true);
@@ -292,11 +292,11 @@ public class SearchMarkDialog extends TitleAreaDialog {
     ((GridLayout) topControlsContainer.getLayout()).marginTop = 10;
 
     fMatchAllRadio = new Button(topControlsContainer, SWT.RADIO);
-    fMatchAllRadio.setText("&Match all conditions");
+    fMatchAllRadio.setText(Messages.SearchMarkDialog_MATCH_ALL_CONDITIONS);
     fMatchAllRadio.setSelection(fInitialMatchAllConditions);
 
     fMatchAnyRadio = new Button(topControlsContainer, SWT.RADIO);
-    fMatchAnyRadio.setText("Match &any condition");
+    fMatchAnyRadio.setText(Messages.SearchMarkDialog_MATCH_ANY_CONDITION);
     fMatchAnyRadio.setSelection(!fInitialMatchAllConditions);
 
     /* Separator */
@@ -309,12 +309,12 @@ public class SearchMarkDialog extends TitleAreaDialog {
     scopeContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0, 0, 0, false));
 
     Label locationLabel = new Label(scopeContainer, SWT.NONE);
-    locationLabel.setText("Search in: ");
+    locationLabel.setText(Messages.SearchMarkDialog_SEARCH_IN);
 
     fLocationControl = new LocationControl(scopeContainer, SWT.WRAP) {
       @Override
       protected String getDefaultLabel() {
-        return "All News";
+        return Messages.SearchMarkDialog_ALL_NEWS;
       }
     };
     fLocationControl.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
@@ -343,7 +343,7 @@ public class SearchMarkDialog extends TitleAreaDialog {
 
     /* Show Warning in case of location conflict */
     if (fShowLocationConflict)
-      setMessage("You are using a location condition together with a value for \"Search in\".", IMessageProvider.WARNING);
+      setMessage(Messages.SearchMarkDialog_LOCATION_WARNING, IMessageProvider.WARNING);
 
     applyDialogFont(container);
 
@@ -368,7 +368,7 @@ public class SearchMarkDialog extends TitleAreaDialog {
     IModelFactory factory = Owl.getModelFactory();
 
     ISearchField field = factory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
-    ISearchCondition condition = factory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "");
+    ISearchCondition condition = factory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, ""); //$NON-NLS-1$
     conditions.add(condition);
 
     return conditions;
@@ -391,7 +391,7 @@ public class SearchMarkDialog extends TitleAreaDialog {
 
     /* Status Label */
     Link previewLink = new Link(buttonBar, SWT.NONE);
-    previewLink.setText("Click <a>here</a> to preview the search results.");
+    previewLink.setText(Messages.SearchMarkDialog_PREVIEW_RESULTS);
     applyDialogFont(previewLink);
     previewLink.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
     previewLink.addSelectionListener(new SelectionAdapter() {
