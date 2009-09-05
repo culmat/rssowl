@@ -102,7 +102,7 @@ public class ImportSourcePage extends WizardPage {
   }
 
   ImportSourcePage(String website, boolean isKewordSearch) {
-    super("Choose Source", "Choose Source", null);
+    super(Messages.ImportSourcePage_CHOOSE_SOURCE, Messages.ImportSourcePage_CHOOSE_SOURCE, null);
     fWebsite = website;
     fIsKewordSearch = isKewordSearch;
     fPreferences = Owl.getPreferenceService().getGlobalScope();
@@ -156,14 +156,14 @@ public class ImportSourcePage extends WizardPage {
     boolean isWelcome = isWelcome();
 
     /* Title Image */
-    setImageDescriptor(OwlUI.getImageDescriptor(isWelcome ? "icons/wizban/welcome_wiz.gif" : "icons/wizban/import_wiz.png"));
+    setImageDescriptor(OwlUI.getImageDescriptor(isWelcome ? "icons/wizban/welcome_wiz.gif" : "icons/wizban/import_wiz.png")); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* Override Title and Message if this is the Welcome Wizard */
     if (isWelcome) {
-      setTitle("Welcome to RSSOwl");
-      setMessage("Use this wizard to subscribe to your initial list of news feeds.");
+      setTitle(Messages.ImportSourcePage_WELCOME);
+      setMessage(Messages.ImportSourcePage_WELCOME_INFO);
     } else
-      setMessage("Please choose the source of import.");
+      setMessage(Messages.ImportSourcePage_CHOOSE_SOURCE_FOR_IMPORT);
 
     /* Container */
     Composite container = new Composite(parent, SWT.NONE);
@@ -210,7 +210,7 @@ public class ImportSourcePage extends WizardPage {
     fImportFromResourceRadio.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     if (isWelcome())
       ((GridData) fImportFromResourceRadio.getLayoutData()).verticalIndent = 10;
-    fImportFromResourceRadio.setText("&Import Feeds from a File or Website:");
+    fImportFromResourceRadio.setText(Messages.ImportSourcePage_IMPORT_FROM_FILE_OR_WEBSITE);
     fImportFromResourceRadio.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -252,7 +252,7 @@ public class ImportSourcePage extends WizardPage {
     });
 
     fBrowseFileButton = new Button(sourceInputContainer, SWT.PUSH);
-    fBrowseFileButton.setText("&Browse...");
+    fBrowseFileButton.setText(Messages.ImportSourcePage_BROWSE);
     fBrowseFileButton.setEnabled(fImportFromResourceRadio.getSelection());
     Dialog.applyDialogFont(fBrowseFileButton);
     setButtonLayoutData(fBrowseFileButton);
@@ -267,7 +267,7 @@ public class ImportSourcePage extends WizardPage {
   private void createImportKeywordControls(Composite container) {
     fImportFromKeywordRadio = new Button(container, SWT.RADIO);
     fImportFromKeywordRadio.setSelection(fIsKewordSearch && !isWelcome());
-    fImportFromKeywordRadio.setText("Import Feeds matching the following &Keywords:");
+    fImportFromKeywordRadio.setText(Messages.ImportSourcePage_IMPORT_BY_KEYWORD);
     fImportFromKeywordRadio.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -312,7 +312,7 @@ public class ImportSourcePage extends WizardPage {
 
   private void createImportRecommendedControls(Composite container) {
     fImportFromRecommendedRadio = new Button(container, SWT.RADIO);
-    fImportFromRecommendedRadio.setText("Import &Recommended Feeds");
+    fImportFromRecommendedRadio.setText(Messages.ImportSourcePage_IMPORT_RECOMMENDED);
     fImportFromRecommendedRadio.setSelection(isWelcome());
     fImportFromRecommendedRadio.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -324,7 +324,7 @@ public class ImportSourcePage extends WizardPage {
 
   private void createImportNoneControls(Composite container) {
     fImportNoneRadio = new Button(container, SWT.RADIO);
-    fImportNoneRadio.setText("Do &not Import Feeds");
+    fImportNoneRadio.setText(Messages.ImportSourcePage_NO_MPORT);
     fImportNoneRadio.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     fImportNoneRadio.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -336,22 +336,22 @@ public class ImportSourcePage extends WizardPage {
 
   private void onBrowse() {
     FileDialog dialog = new FileDialog(getShell());
-    dialog.setText("Choose Import File");
+    dialog.setText(Messages.ImportSourcePage_CHOOSE_FILE);
 
     /* Set Export Formats also for Import (we assume this is supported) */
     List<String> filterExtensions = new ArrayList<String>();
-    filterExtensions.add("*.opml");
-    filterExtensions.add("*.xml");
+    filterExtensions.add("*.opml"); //$NON-NLS-1$
+    filterExtensions.add("*.xml"); //$NON-NLS-1$
 
     Collection<String> exportFormats = Owl.getInterpreter().getExportFormats();
     for (String exportFormat : exportFormats) {
-      String format = "*." + exportFormat.toLowerCase();
+      String format = "*." + exportFormat.toLowerCase(); //$NON-NLS-1$
       if (!filterExtensions.contains(format))
         filterExtensions.add(format);
     }
 
-    if (!filterExtensions.contains("*.*"))
-      filterExtensions.add("*.*");
+    if (!filterExtensions.contains("*.*")) //$NON-NLS-1$
+      filterExtensions.add("*.*"); //$NON-NLS-1$
 
     dialog.setFilterExtensions(filterExtensions.toArray(new String[filterExtensions.size()]));
     if (StringUtils.isSet(fResourceInput.getText()))
@@ -388,7 +388,7 @@ public class ImportSourcePage extends WizardPage {
           boolean fileExists = fileToImport.exists() && fileToImport.isFile();
           setPageComplete(fileExists);
           if (!fileExists)
-            errorMessage = "Please select an existing file.";
+            errorMessage = Messages.ImportSourcePage_CHOOSE_EXISTING_FILE;
         }
       }
     }
@@ -404,7 +404,7 @@ public class ImportSourcePage extends WizardPage {
     /* Restore Normal Message */
     else {
       setErrorMessage(null);
-      setMessage(isWelcome() ? "Use this wizard to subscribe to your initial list of news feeds." : "Please choose the source of import.");
+      setMessage(isWelcome() ? Messages.ImportSourcePage_WELCOME_INFO : Messages.ImportSourcePage_CHOOSE_SOURCE_FOR_IMPORT);
     }
   }
 

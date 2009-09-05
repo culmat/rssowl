@@ -40,6 +40,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -222,8 +223,8 @@ public class ImportElementsPage extends WizardPage {
   }
 
   ImportElementsPage() {
-    super("Choose Elements", "Choose Elements", null);
-    setMessage("Please choose the elements to import.");
+    super(Messages.ImportElementsPage_CHOOSE_ELEMENTS, Messages.ImportElementsPage_CHOOSE_ELEMENTS, null);
+    setMessage(Messages.ImportElementsPage_CHOOSE_ELEMENTS_MESSAGE);
   }
 
   /* Get Elements to Import */
@@ -267,7 +268,7 @@ public class ImportElementsPage extends WizardPage {
     boolean isWelcome = (getWizard() instanceof WelcomeWizard);
 
     /* Title Image */
-    setImageDescriptor(OwlUI.getImageDescriptor(getWizard() instanceof WelcomeWizard ? "icons/wizban/welcome_wiz.gif" : "icons/wizban/import_wiz.png"));
+    setImageDescriptor(OwlUI.getImageDescriptor(getWizard() instanceof WelcomeWizard ? "icons/wizban/welcome_wiz.gif" : "icons/wizban/import_wiz.png")); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* Container */
     Composite container = new Composite(parent, SWT.NONE);
@@ -311,7 +312,7 @@ public class ImportElementsPage extends WizardPage {
     buttonContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     fSelectAll = new Button(buttonContainer, SWT.PUSH);
-    fSelectAll.setText("&Select All");
+    fSelectAll.setText(Messages.ImportElementsPage_SELECT_ALL);
     Dialog.applyDialogFont(fSelectAll);
     setButtonLayoutData(fSelectAll);
     fSelectAll.addSelectionListener(new SelectionAdapter() {
@@ -323,7 +324,7 @@ public class ImportElementsPage extends WizardPage {
     });
 
     fDeselectAll = new Button(buttonContainer, SWT.PUSH);
-    fDeselectAll.setText("&Deselect All");
+    fDeselectAll.setText(Messages.ImportElementsPage_DESELECT_ALL);
     Dialog.applyDialogFont(fDeselectAll);
     setButtonLayoutData(fDeselectAll);
     fDeselectAll.addSelectionListener(new SelectionAdapter() {
@@ -339,9 +340,9 @@ public class ImportElementsPage extends WizardPage {
     ((GridData) sep.getLayoutData()).heightHint = 20;
 
     fPreviewButton = new Button(buttonContainer, SWT.PUSH);
-    fPreviewButton.setText("&Preview");
+    fPreviewButton.setText(Messages.ImportElementsPage_PREVIEW);
     fPreviewButton.setEnabled(false);
-    fPreviewButton.setToolTipText("Show a Preview of a Selected Feed");
+    fPreviewButton.setToolTipText(Messages.ImportElementsPage_SHOW_PREVIEW);
     Dialog.applyDialogFont(fPreviewButton);
     setButtonLayoutData(fPreviewButton);
     fPreviewButton.addSelectionListener(new SelectionAdapter() {
@@ -353,7 +354,7 @@ public class ImportElementsPage extends WizardPage {
 
     /* Show as Flat List of News Marks */
     fFlattenCheck = new Button(buttonContainer, SWT.CHECK);
-    fFlattenCheck.setText("&Flatten Hierarchy");
+    fFlattenCheck.setText(Messages.ImportElementsPage_FLATTEN);
     Dialog.applyDialogFont(fFlattenCheck);
     setButtonLayoutData(fFlattenCheck);
     ((GridData) fFlattenCheck.getLayoutData()).horizontalAlignment = SWT.END;
@@ -370,7 +371,7 @@ public class ImportElementsPage extends WizardPage {
 
     /* Hide Existing News Marks */
     fHideExistingCheck = new Button(buttonContainer, SWT.CHECK);
-    fHideExistingCheck.setText("&Hide Existing");
+    fHideExistingCheck.setText(Messages.ImportElementsPage_HIDE_EXISTING);
     fHideExistingCheck.setSelection(true);
     Dialog.applyDialogFont(fHideExistingCheck);
     setButtonLayoutData(fHideExistingCheck);
@@ -409,8 +410,8 @@ public class ImportElementsPage extends WizardPage {
   private void onCancel() {
     if (fCurrentProgressMonitor != null) {
       IProgressMonitor monitor = fCurrentProgressMonitor;
-      monitor.setTaskName("Please wait while the search is canceled...");
-      monitor.subTask("");
+      monitor.setTaskName(Messages.ImportElementsPage_CANCEL_SEARCH);
+      monitor.subTask(""); //$NON-NLS-1$
     }
   }
 
@@ -442,9 +443,9 @@ public class ImportElementsPage extends WizardPage {
   private void updateMessage(boolean clearErrors) {
     List<?> input = (List<?>) fViewer.getInput();
     if (!input.isEmpty() && fViewer.getTree().getItemCount() == 0 && fViewer.getFilters().length > 0)
-      setMessage("Some elemens are hidden because they already exist.", IMessageProvider.WARNING);
+      setMessage(Messages.ImportElementsPage_HIDDEN_ELEMENTS_INFO, IMessageProvider.WARNING);
     else
-      setMessage("Please choose the elements to import.");
+      setMessage(Messages.ImportElementsPage_CHOOSE_ELEMENTS_MESSAGE);
 
     if (clearErrors)
       setErrorMessage(null);
@@ -511,7 +512,7 @@ public class ImportElementsPage extends WizardPage {
 
     /* Reset Messages */
     setErrorMessage(null);
-    setMessage("Please choose the elements to import.");
+    setMessage(Messages.ImportElementsPage_CHOOSE_ELEMENTS_MESSAGE);
 
     /* Clear Viewer if remotely loading */
     if (importSourcePage.isRemoteSource())
@@ -546,9 +547,9 @@ public class ImportElementsPage extends WizardPage {
             message = e.getCause().getMessage();
 
           if (StringUtils.isSet(message))
-            message = "Unable to Import. Reason: " + message;
+            message = NLS.bind(Messages.ImportElementsPage_UNABLE_TO_IMPORT_REASON, message);
           else
-            message = "Unable to Import";
+            message = Messages.ImportElementsPage_UNABLE_TO_IMPORT;
 
           Activator.getDefault().logError(message, e);
           setErrorMessage(message);
@@ -584,8 +585,8 @@ public class ImportElementsPage extends WizardPage {
         Exception error = null;
         boolean bruteForce = false;
         try {
-          monitor.beginTask("Searching for Feeds ('Cancel' to stop)", IProgressMonitor.UNKNOWN);
-          monitor.subTask("Connecting...");
+          monitor.beginTask(Messages.ImportElementsPage_SEARCHING_FOR_FEEDS, IProgressMonitor.UNKNOWN);
+          monitor.subTask(Messages.ImportElementsPage_CONNECTING);
           fCurrentProgressMonitor = monitor;
 
           /* Return on Cancellation */
@@ -724,8 +725,8 @@ public class ImportElementsPage extends WizardPage {
     IRunnableWithProgress runnable = new IRunnableWithProgress() {
       public void run(IProgressMonitor monitor) throws InvocationTargetException {
         try {
-          monitor.beginTask("Searching for Feeds ('Cancel' to stop)", IProgressMonitor.UNKNOWN);
-          monitor.subTask("Connecting...");
+          monitor.beginTask(Messages.ImportElementsPage_SEARCHING_FOR_FEEDS, IProgressMonitor.UNKNOWN);
+          monitor.subTask(Messages.ImportElementsPage_CONNECTING);
           fCurrentProgressMonitor = monitor;
 
           /* Build Link for Keyword-Feed Search */
@@ -805,11 +806,11 @@ public class ImportElementsPage extends WizardPage {
       return;
 
     /* Update Task Information */
-    monitor.beginTask("Searching for Feeds ('Cancel' to stop)", links.size());
-    monitor.subTask("Fetching Results...");
+    monitor.beginTask(Messages.ImportElementsPage_SEARCHING_FOR_FEEDS, links.size());
+    monitor.subTask(Messages.ImportElementsPage_FETCHING_RESULTS);
 
     /* A Root to add Found Bookmarks into */
-    final IFolder defaultRootFolder = Owl.getModelFactory().createFolder(null, null, "Bookmarks");
+    final IFolder defaultRootFolder = Owl.getModelFactory().createFolder(null, null, Messages.ImportElementsPage_BOOKMARKS);
     defaultRootFolder.setProperty(ITypeImporter.TEMPORARY_FOLDER, true);
 
     /* For Each Link of the Queue - try to interpret as Feed */
@@ -827,16 +828,16 @@ public class ImportElementsPage extends WizardPage {
 
         /* Report Progress Back To User */
         if (counter == 1)
-          monitor.subTask("1 Result");
+          monitor.subTask(Messages.ImportElementsPage_SINGLE_RESULT);
         else if (counter > 1)
-          monitor.subTask(counter + " Results");
+          monitor.subTask(NLS.bind(Messages.ImportElementsPage_N_RESULTS, counter));
 
         /* Ignore if already present in Subscriptions List (ignoring trailing slashes) */
         if (dao.exists(new FeedLinkReference(feedLink)))
           continue;
-        else if (feedLinkVal.endsWith("/") && dao.exists(new FeedLinkReference(new URI(feedLinkVal.substring(0, feedLinkVal.length() - 1)))))
+        else if (feedLinkVal.endsWith("/") && dao.exists(new FeedLinkReference(new URI(feedLinkVal.substring(0, feedLinkVal.length() - 1))))) //$NON-NLS-1$
           continue;
-        else if (!feedLinkVal.endsWith("/") && dao.exists(new FeedLinkReference(new URI(feedLinkVal + "/"))))
+        else if (!feedLinkVal.endsWith("/") && dao.exists(new FeedLinkReference(new URI(feedLinkVal + "/")))) //$NON-NLS-1$ //$NON-NLS-2$
           continue;
 
         /* Return on Cancellation */
@@ -868,7 +869,7 @@ public class ImportElementsPage extends WizardPage {
           String title = feed.getTitle();
           boolean sameTitleExists = foundBookMarkNames.contains(title);
           if (sameTitleExists && StringUtils.isSet(feed.getFormat()))
-            title = title + " (" + feed.getFormat() + ")";
+            title = NLS.bind(Messages.ImportElementsPage_FEED_TITLE, title, feed.getFormat());
 
           final IBookMark bookmark = Owl.getModelFactory().createBookMark(null, defaultRootFolder, new FeedLinkReference(feedLink), title);
           foundBookMarkNames.add(bookmark.getName());
@@ -915,7 +916,7 @@ public class ImportElementsPage extends WizardPage {
     if (counter == 0) {
       JobRunner.runInUIThread(getShell(), new Runnable() {
         public void run() {
-          setMessage("No Feeds Found during Search.", IMessageProvider.INFORMATION);
+          setMessage(Messages.ImportElementsPage_NO_FEEDS_FOUND, IMessageProvider.INFORMATION);
         }
       });
     }

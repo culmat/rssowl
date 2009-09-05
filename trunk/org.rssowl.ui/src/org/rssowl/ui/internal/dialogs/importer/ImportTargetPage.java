@@ -27,6 +27,7 @@ package org.rssowl.ui.internal.dialogs.importer;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -64,8 +65,8 @@ public class ImportTargetPage extends WizardPage {
   private Text fSetNameInput;
 
   ImportTargetPage() {
-    super("Choose Target Location", "Choose Target Location", OwlUI.getImageDescriptor("icons/wizban/import_wiz.png"));
-    setMessage("Please choose the target folder to import into.");
+    super(Messages.ImportTargetPage_CHOOSE_TARGET, Messages.ImportTargetPage_CHOOSE_TARGET, OwlUI.getImageDescriptor("icons/wizban/import_wiz.png")); //$NON-NLS-1$
+    setMessage(Messages.ImportTargetPage_CHOOSE_TARGET_FOLDER);
   }
 
   /**
@@ -93,9 +94,9 @@ public class ImportTargetPage extends WizardPage {
       setPageComplete(StringUtils.isSet(fSetNameInput.getText()));
 
     if (fCreateNewSetRadio.getSelection() && newSetExists(fSetNameInput.getText()))
-      setMessage("A Bookmark Set with the name '" + fSetNameInput.getText() + "' already exists.", IMessageProvider.WARNING);
+      setMessage(NLS.bind(Messages.ImportTargetPage_BOOKMARK_EXISTS, fSetNameInput.getText()), IMessageProvider.WARNING);
     else
-      setMessage("Please choose the target folder to import into.");
+      setMessage(Messages.ImportTargetPage_CHOOSE_TARGET_FOLDER);
   }
 
   /*
@@ -107,7 +108,7 @@ public class ImportTargetPage extends WizardPage {
 
     /* No Specific Location */
     fNoSpecificLocationRadio = new Button(container, SWT.RADIO);
-    fNoSpecificLocationRadio.setText("&Direct Import");
+    fNoSpecificLocationRadio.setText(Messages.ImportTargetPage_DIRECT_IMPORT);
     fNoSpecificLocationRadio.setSelection(true);
     fNoSpecificLocationRadio.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -120,7 +121,7 @@ public class ImportTargetPage extends WizardPage {
     fChooseExistingRadio = new Button(container, SWT.RADIO);
     fChooseExistingRadio.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     ((GridData) fChooseExistingRadio.getLayoutData()).verticalIndent = 10;
-    fChooseExistingRadio.setText("&Import into an existing Folder");
+    fChooseExistingRadio.setText(Messages.ImportTargetPage_IMPORT_TO_EXISTING);
 
     Composite folderContainer = new Composite(container, SWT.None);
     folderContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
@@ -149,7 +150,7 @@ public class ImportTargetPage extends WizardPage {
     fCreateNewSetRadio = new Button(container, SWT.RADIO);
     fCreateNewSetRadio.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     ((GridData) fCreateNewSetRadio.getLayoutData()).verticalIndent = 10;
-    fCreateNewSetRadio.setText("Import into a new &Bookmark Set");
+    fCreateNewSetRadio.setText(Messages.ImportTargetPage_IMPORT_TO_NEW_SET);
     fCreateNewSetRadio.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -166,7 +167,7 @@ public class ImportTargetPage extends WizardPage {
     newBookmarkSetContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     Label nameLabel = new Label(newBookmarkSetContainer, SWT.None);
-    nameLabel.setText("Name: ");
+    nameLabel.setText(Messages.ImportTargetPage_NAME);
 
     fSetNameInput = new Text(newBookmarkSetContainer, SWT.SINGLE | SWT.BORDER);
     fSetNameInput.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));

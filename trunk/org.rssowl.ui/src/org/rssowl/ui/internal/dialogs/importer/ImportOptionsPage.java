@@ -27,6 +27,7 @@ package org.rssowl.ui.internal.dialogs.importer;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -56,8 +57,8 @@ public class ImportOptionsPage extends WizardPage {
   private boolean fFiltersUseLabels;
 
   ImportOptionsPage() {
-    super("Import Options", "Import Options", null);
-    setMessage("Please select additional options for the import.");
+    super(Messages.ImportOptionsPage_IMPORT_OPTIONS, Messages.ImportOptionsPage_IMPORT_OPTIONS, null);
+    setMessage(Messages.ImportOptionsPage_SELECT_OPTIONS);
   }
 
   /*
@@ -66,7 +67,7 @@ public class ImportOptionsPage extends WizardPage {
   public void createControl(Composite parent) {
 
     /* Title Image */
-    setImageDescriptor(OwlUI.getImageDescriptor(getWizard() instanceof WelcomeWizard ? "icons/wizban/welcome_wiz.gif" : "icons/wizban/import_wiz.png"));
+    setImageDescriptor(OwlUI.getImageDescriptor(getWizard() instanceof WelcomeWizard ? "icons/wizban/welcome_wiz.gif" : "icons/wizban/import_wiz.png")); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* Container */
     Composite container = new Composite(parent, SWT.NONE);
@@ -77,11 +78,11 @@ public class ImportOptionsPage extends WizardPage {
     infoText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
     ((GridData) infoText.getLayoutData()).widthHint = 300;
     infoText.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-    infoText.setText("The following options allow to import more than just feeds. You can choose to import Labels, News Filters and Preferences if available from the source.");
+    infoText.setText(Messages.ImportOptionsPage_OPTIONS_INFO);
 
     /* Labels */
     fImportLabelsCheck = new Button(container, SWT.CHECK);
-    fImportLabelsCheck.setImage(OwlUI.getImage(fImportLabelsCheck, "icons/elcl16/labels.gif"));
+    fImportLabelsCheck.setImage(OwlUI.getImage(fImportLabelsCheck, "icons/elcl16/labels.gif")); //$NON-NLS-1$
     fImportLabelsCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     ((GridData) fImportLabelsCheck.getLayoutData()).verticalIndent = 10;
 
@@ -95,16 +96,16 @@ public class ImportOptionsPage extends WizardPage {
       public void widgetSelected(SelectionEvent e) {
         if (fImportFiltersCheck.getSelection() && !fImportLabelsCheck.getSelection() && fFiltersUseLabels) {
           fImportLabelsCheck.setSelection(true);
-          setMessage("Labels will also be imported because some Filters make use of them as part of their actions.", IMessageProvider.INFORMATION);
+          setMessage(Messages.ImportOptionsPage_LABELS_INFO, IMessageProvider.INFORMATION);
         } else if (!fImportFiltersCheck.getSelection()) {
-          setMessage("Please select additional options for the import.");
+          setMessage(Messages.ImportOptionsPage_SELECT_OPTIONS);
         }
       }
     });
 
     /* Preferences */
     fImportPreferencesCheck = new Button(container, SWT.CHECK);
-    fImportPreferencesCheck.setImage(OwlUI.getImage(fImportPreferencesCheck, "icons/elcl16/preferences.gif"));
+    fImportPreferencesCheck.setImage(OwlUI.getImage(fImportPreferencesCheck, "icons/elcl16/preferences.gif")); //$NON-NLS-1$
     fImportPreferencesCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     Dialog.applyDialogFont(container);
@@ -151,23 +152,23 @@ public class ImportOptionsPage extends WizardPage {
 
     /* Labels */
     if (labelCount != 0)
-      fImportLabelsCheck.setText("Import &Labels (" + labelCount + " in total)");
+      fImportLabelsCheck.setText(NLS.bind(Messages.ImportOptionsPage_IMPORT_N_LABELS, labelCount));
     else
-      fImportLabelsCheck.setText("Import &Labels (No Labels Available)");
+      fImportLabelsCheck.setText(Messages.ImportOptionsPage_IMPORT_LABELS);
     fImportLabelsCheck.setEnabled(labelCount != 0);
 
     /* Filters */
     if (filterCount != 0)
-      fImportFiltersCheck.setText("Import News &Filters (" + filterCount + " in total)");
+      fImportFiltersCheck.setText(NLS.bind(Messages.ImportOptionsPage_IMPORT_N_FILTERS, filterCount));
     else
-      fImportFiltersCheck.setText("Import News &Filters (No Filters Available)");
+      fImportFiltersCheck.setText(Messages.ImportOptionsPage_IMPORT_FILTERS);
     fImportFiltersCheck.setEnabled(filterCount != 0);
 
     /* Preferences */
     if (hasPreferences)
-      fImportPreferencesCheck.setText("Import &Preferences");
+      fImportPreferencesCheck.setText(Messages.ImportOptionsPage_IMPORT_PREFRENCES);
     else
-      fImportPreferencesCheck.setText("Import &Preferences (No Preferences Available)");
+      fImportPreferencesCheck.setText(Messages.ImportOptionsPage_IMPORT_PREFERENCES_UNAVAILABLE);
     fImportPreferencesCheck.setEnabled(hasPreferences);
   }
 
