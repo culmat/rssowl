@@ -52,6 +52,6 @@ class OptimizeSearchTask extends CleanUpTask {
    */
   @Override
   String getLabel() {
-    return "Improve search performance";
+    return Messages.OptimizeSearchTask_IMPROVE_PERFORMANCE;
   }
 }

@@ -58,19 +58,19 @@ public class CleanUpWizard extends Wizard {
    */
   @Override
   public void addPages() {
-    setWindowTitle("Clean Up");
+    setWindowTitle(Messages.CleanUpWizard_CLEAN_UP);
     setHelpAvailable(false);
 
     /* Choose Feeds for Clean-Up */
-    fFeedSelectionPage = new FeedSelectionPage("Choose Bookmarks");
+    fFeedSelectionPage = new FeedSelectionPage(Messages.CleanUpWizard_CHOOSE_BOOKMARKS);
     addPage(fFeedSelectionPage);
 
     /* Clean Up Options */
-    fCleanUpOptionsPage = new CleanUpOptionsPage("Clean Up Operations");
+    fCleanUpOptionsPage = new CleanUpOptionsPage(Messages.CleanUpWizard_CLEANUP_OPS);
     addPage(fCleanUpOptionsPage);
 
     /* Clean Up Summary */
-    fCleanUpSummaryPage = new CleanUpSummaryPage("Summary");
+    fCleanUpSummaryPage = new CleanUpSummaryPage(Messages.CleanUpWizard_SUMMARY);
     addPage(fCleanUpSummaryPage);
   }
 
@@ -96,16 +96,16 @@ public class CleanUpWizard extends Wizard {
     }
 
     if (bmCounter != 0 || newsCounter != 0) {
-      String msg = "Are you sure you want to delete ";
-      String bmMsg = bmCounter > 1 ? bmCounter + " bookmarks" : bmCounter + " bookmark";
+      String msg = "Are you sure you want to delete "; //$NON-NLS-1$
+      String bmMsg = bmCounter > 1 ? bmCounter + " bookmarks" : bmCounter + " bookmark"; //$NON-NLS-1$ //$NON-NLS-2$
       if (bmCounter != 0 && newsCounter != 0)
-        msg += bmMsg + " and " + newsCounter + " news?";
+        msg += bmMsg + " and " + newsCounter + " news?"; //$NON-NLS-1$ //$NON-NLS-2$
       else if (bmCounter != 0)
-        msg += bmMsg + "?";
+        msg += bmMsg + "?"; //$NON-NLS-1$
       else
-        msg += newsCounter + " news?";
+        msg += newsCounter + " news?"; //$NON-NLS-1$
 
-      ConfirmDialog dialog = new ConfirmDialog(getShell(), "Confirm Delete", "This action can not be undone", msg, null);
+      ConfirmDialog dialog = new ConfirmDialog(getShell(), Messages.CleanUpWizard_CONFIRM_DELETE, Messages.CleanUpWizard_NO_UNDO, msg, null);
       if (dialog.open() != Window.OK)
         return false;
     }
@@ -114,7 +114,7 @@ public class CleanUpWizard extends Wizard {
     IRunnableWithProgress runnable = new IRunnableWithProgress() {
       public void run(IProgressMonitor monitor) {
         boolean optimizeSearch = false;
-        monitor.beginTask("Please wait while cleaning up...", IProgressMonitor.UNKNOWN);
+        monitor.beginTask(Messages.CleanUpWizard_WAIT_CLEANUP, IProgressMonitor.UNKNOWN);
 
         /* Perform Tasks */
         List<IBookMark> bookmarks = new ArrayList<IBookMark>();

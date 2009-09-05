@@ -162,8 +162,8 @@ public class CleanUpSummaryPage extends WizardPage {
    * @param pageName
    */
   protected CleanUpSummaryPage(String pageName) {
-    super(pageName, pageName, OwlUI.getImageDescriptor("icons/wizban/cleanup_wiz.gif"));
-    setMessage("Please review and approve the suggested operations.");
+    super(pageName, pageName, OwlUI.getImageDescriptor("icons/wizban/cleanup_wiz.gif")); //$NON-NLS-1$
+    setMessage(Messages.CleanUpSummaryPage_REVIEW_OPS);
     fResources = new LocalResourceManager(JFaceResources.getResources());
   }
 
@@ -269,7 +269,7 @@ public class CleanUpSummaryPage extends WizardPage {
     buttonContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     fSelectAll = new Button(buttonContainer, SWT.PUSH);
-    fSelectAll.setText("&Select All");
+    fSelectAll.setText(Messages.CleanUpSummaryPage_SELECT_ALL);
     Dialog.applyDialogFont(fSelectAll);
     setButtonLayoutData(fSelectAll);
     fSelectAll.addSelectionListener(new SelectionAdapter() {
@@ -280,7 +280,7 @@ public class CleanUpSummaryPage extends WizardPage {
     });
 
     fDeselectAll = new Button(buttonContainer, SWT.PUSH);
-    fDeselectAll.setText("&Deselect All");
+    fDeselectAll.setText(Messages.CleanUpSummaryPage_DESELECT_ALL);
     Dialog.applyDialogFont(fDeselectAll);
     setButtonLayoutData(fDeselectAll);
     fDeselectAll.addSelectionListener(new SelectionAdapter() {
@@ -312,7 +312,7 @@ public class CleanUpSummaryPage extends WizardPage {
 
       IRunnableWithProgress runnable = new IRunnableWithProgress() {
         public void run(IProgressMonitor monitor) {
-          monitor.beginTask("Please wait while generating the preview...", IProgressMonitor.UNKNOWN);
+          monitor.beginTask(Messages.CleanUpSummaryPage_WAIT_GENERATE_PREVIEW, IProgressMonitor.UNKNOWN);
           onGenerateSummary(operations, selection);
         }
       };
