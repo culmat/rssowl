@@ -37,6 +37,7 @@ import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.ModifyEvent;
@@ -180,14 +181,14 @@ public class NewsFilterDialog extends TitleAreaDialog {
 
     /* Ensure that a Search Condition is specified if required */
     if (fSearchConditionList.isEmpty() && !fMatchAllNewsRadio.getSelection()) {
-      setErrorMessage("Please enter at least one search condition for the news filter or select \"Match All\" to match all news.");
+      setErrorMessage(Messages.NewsFilterDialog_ENTER_CONDITION);
       fSearchConditionList.focusInput();
       return;
     }
 
     /* Ensure that an Action is specified */
     if (fFilterActionList.isEmpty()) {
-      setErrorMessage("Please choose at least one action for the news filter.");
+      setErrorMessage(Messages.NewsFilterDialog_CHOOSE_ACTION);
       fFilterActionList.focusInput();
       return;
     }
@@ -301,7 +302,7 @@ public class NewsFilterDialog extends TitleAreaDialog {
         NewsActionDescriptor otherNewsAction = fNewsActionPresentationManager.getNewsActionDescriptor(otherAction.getActionId());
         if (otherNewsAction.getNewsAction().conflictsWith(newsAction.getNewsAction())) {
           StringBuilder str = new StringBuilder();
-          str.append("Please remove the action '").append(otherNewsAction.getName()).append("'. It can not be used together with the action '").append(newsAction.getName()).append("'.");
+          str.append(NLS.bind(Messages.NewsFilterDialog_REMOVE_ACTION_N, otherNewsAction.getName(), newsAction.getName()));
 
           setErrorMessage(str.toString());
           return true;
@@ -332,13 +333,13 @@ public class NewsFilterDialog extends TitleAreaDialog {
     new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     /* Title */
-    setTitle("News Filter");
+    setTitle(Messages.NewsFilterDialog_NEWS_FILTER);
 
     /* Title Image */
-    setTitleImage(OwlUI.getImage(fResources, "icons/wizban/filter_wiz.png"));
+    setTitleImage(OwlUI.getImage(fResources, "icons/wizban/filter_wiz.png")); //$NON-NLS-1$
 
     /* Title Message */
-    setMessage("Please define the search conditions and actions to perform on matching news.");
+    setMessage(Messages.NewsFilterDialog_DEFINE_SEARCH);
 
     /* Name Input Filed */
     Composite container = new Composite(parent, SWT.None);
@@ -346,7 +347,7 @@ public class NewsFilterDialog extends TitleAreaDialog {
     container.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     Label nameLabel = new Label(container, SWT.NONE);
-    nameLabel.setText("Name: ");
+    nameLabel.setText(Messages.NewsFilterDialog_NAME);
 
     Composite nameContainer = new Composite(container, SWT.BORDER);
     nameContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
@@ -378,8 +379,8 @@ public class NewsFilterDialog extends TitleAreaDialog {
     generateTitleBar.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
     ToolItem generateTitleItem = new ToolItem(generateTitleBar, SWT.PUSH);
-    generateTitleItem.setImage(OwlUI.getImage(fResources, "icons/etool16/info.gif"));
-    generateTitleItem.setToolTipText("Create name from conditions");
+    generateTitleItem.setImage(OwlUI.getImage(fResources, "icons/etool16/info.gif")); //$NON-NLS-1$
+    generateTitleItem.setToolTipText(Messages.NewsFilterDialog_CREATE_NAME_FROM_CONDITIONS);
     generateTitleItem.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -406,7 +407,7 @@ public class NewsFilterDialog extends TitleAreaDialog {
     ((GridLayout) labelContainer.getLayout()).marginBottom = 2;
     labelContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     Label explanationLabel = new Label(labelContainer, SWT.NONE);
-    explanationLabel.setText("For news matching the above conditions perform the following actions:");
+    explanationLabel.setText(Messages.NewsFilterDialog_PERFORM_ACTIONS);
 
     /* Action Controls */
     createActionControls(bottomSash);
@@ -426,7 +427,7 @@ public class NewsFilterDialog extends TitleAreaDialog {
     String name;
     ISearchCondition locationCondition = fLocationControl.toScopeCondition();
     if (fMatchAllNewsRadio.getSelection() && locationCondition == null) {
-      name = "All News";
+      name = Messages.NewsFilterDialog_ALL_NEWS;
     } else {
       List<ISearchCondition> conditions = fSearchConditionList.createConditions();
       if (locationCondition != null)
@@ -453,15 +454,15 @@ public class NewsFilterDialog extends TitleAreaDialog {
 
     /* Radio to select Condition Matching */
     fMatchAllRadio = new Button(topControlsContainer, SWT.RADIO);
-    fMatchAllRadio.setText("&Match all conditions");
+    fMatchAllRadio.setText(Messages.NewsFilterDialog_MATCH_ALL_CONDITIONS);
     fMatchAllRadio.setSelection(matchAllConditions && !matchAllNews);
 
     fMatchAnyRadio = new Button(topControlsContainer, SWT.RADIO);
-    fMatchAnyRadio.setText("Match any c&ondition");
+    fMatchAnyRadio.setText(Messages.NewsFilterDialog_MATCH_ANY_CONDITION);
     fMatchAnyRadio.setSelection(!matchAllConditions && !matchAllNews);
 
     fMatchAllNewsRadio = new Button(topControlsContainer, SWT.RADIO);
-    fMatchAllNewsRadio.setText("Match &all");
+    fMatchAllNewsRadio.setText(Messages.NewsFilterDialog_MATCH_ALL);
     fMatchAllNewsRadio.setSelection(matchAllNews);
     fMatchAllNewsRadio.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -480,12 +481,12 @@ public class NewsFilterDialog extends TitleAreaDialog {
     scopeContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0, 0, 0, false));
 
     Label locationLabel = new Label(scopeContainer, SWT.NONE);
-    locationLabel.setText("In: ");
+    locationLabel.setText(Messages.NewsFilterDialog_IN);
 
     fLocationControl = new LocationControl(scopeContainer, SWT.WRAP) {
       @Override
       protected String getDefaultLabel() {
-        return "All News";
+        return Messages.NewsFilterDialog_ALL_NEWS;
       }
     };
     fLocationControl.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
@@ -500,7 +501,7 @@ public class NewsFilterDialog extends TitleAreaDialog {
 
     /* Existing Filters */
     {
-      IAction existingFilters = new Action("Show News Filter", IAction.AS_DROP_DOWN_MENU) {
+      IAction existingFilters = new Action(Messages.NewsFilterDialog_SHOW_NEWS_FILTER, IAction.AS_DROP_DOWN_MENU) {
         @Override
         public void run() {
           getMenuCreator().getMenu(dialogToolBar.getControl()).setVisible(true);
@@ -522,7 +523,7 @@ public class NewsFilterDialog extends TitleAreaDialog {
           /* Show Something if Collection is Empty */
           if (filters.isEmpty()) {
             MenuItem item= new MenuItem(menu, SWT.None);
-            item.setText("No News Filter Found");
+            item.setText(Messages.NewsFilterDialog_NO_FILTER);
             item.setEnabled(false);
           }
 
@@ -567,7 +568,7 @@ public class NewsFilterDialog extends TitleAreaDialog {
 
     /* Existing Saved Searches */
     {
-      IAction savedSearches = new Action("Show Saved Search", IAction.AS_DROP_DOWN_MENU) {
+      IAction savedSearches = new Action(Messages.NewsFilterDialog_SHOW_SAVED_SEARCH, IAction.AS_DROP_DOWN_MENU) {
         @Override
         public void run() {
           getMenuCreator().getMenu(dialogToolBar.getControl()).setVisible(true);
@@ -589,7 +590,7 @@ public class NewsFilterDialog extends TitleAreaDialog {
           /* Show Something if Collection is Empty */
           if (searchMarks.isEmpty()) {
             MenuItem item= new MenuItem(menu, SWT.None);
-            item.setText("No Saved Search Found");
+            item.setText(Messages.NewsFilterDialog_NO_SAVED_SEARCH);
             item.setEnabled(false);
           }
 
@@ -663,7 +664,7 @@ public class NewsFilterDialog extends TitleAreaDialog {
         fSearchConditionList.showConditions(conditions.getSecond());
 
       if (CoreUtils.isLocationConflict(initialConditions))
-        setMessage("You are using a location condition together with a value for \"In\".", IMessageProvider.WARNING);
+        setMessage(Messages.NewsFilterDialog_LOCATION_IN_WARNING, IMessageProvider.WARNING);
     }
 
     /* Update Enable-State of Search Condition List */
@@ -728,7 +729,7 @@ public class NewsFilterDialog extends TitleAreaDialog {
     IModelFactory factory = Owl.getModelFactory();
 
     ISearchField field = factory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
-    ISearchCondition condition = factory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "");
+    ISearchCondition condition = factory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, ""); //$NON-NLS-1$
 
     conditions.add(condition);
 
@@ -780,9 +781,9 @@ public class NewsFilterDialog extends TitleAreaDialog {
   protected void configureShell(Shell shell) {
     super.configureShell(shell);
     if (fEditedFilter == null)
-      shell.setText("New News Filter");
+      shell.setText(Messages.NewsFilterDialog_NEW_FILTER);
     else
-      shell.setText("Edit News Filter '" + fEditedFilter.getName() + "'");
+      shell.setText(NLS.bind(Messages.NewsFilterDialog_EDIT_NEWS_FILTER_N, fEditedFilter.getName()));
   }
 
   /*
