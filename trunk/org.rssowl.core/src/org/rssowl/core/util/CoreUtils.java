@@ -182,7 +182,7 @@ public class CoreUtils {
       StringBuilder fieldExpression = new StringBuilder();
 
       /* Append Field Name */
-      fieldExpression.append(fieldName).append(" ");
+      fieldExpression.append(fieldName).append(" "); //$NON-NLS-1$
 
       /* For each Field Condition */
       for (ISearchCondition fieldCondition : fieldConditions) {
@@ -196,7 +196,7 @@ public class CoreUtils {
 
           /* Append specifier if not identical with previous */
           if (prevSpecName == null || !prevSpecName.equals(specName)) {
-            fieldExpression.append(specName).append(" ");
+            fieldExpression.append(specName).append(" "); //$NON-NLS-1$
             prevSpecName = specName;
           }
 
@@ -204,26 +204,26 @@ public class CoreUtils {
           if (fieldId == INews.AGE_IN_DAYS || fieldId == INews.AGE_IN_MINUTES) {
             Integer value = Integer.valueOf(condValue);
             if (value >= 0)
-              fieldExpression.append(value).append(value == 1 ? " Day" : " Days");
+              fieldExpression.append(value).append(value == 1 ? " Day" : " Days"); //$NON-NLS-1$ //$NON-NLS-2$
             else if (value % 60 == 0)
-              fieldExpression.append(Math.abs(value) / 60).append(value == -60 ? " Hour" : " Hours");
+              fieldExpression.append(Math.abs(value) / 60).append(value == -60 ? " Hour" : " Hours"); //$NON-NLS-1$ //$NON-NLS-2$
             else
-              fieldExpression.append(Math.abs(value)).append(value == -1 ? " Minute" : " Minutes");
+              fieldExpression.append(Math.abs(value)).append(value == -1 ? " Minute" : " Minutes"); //$NON-NLS-1$ //$NON-NLS-2$
           }
 
           /* Append Condition Value based on Type */
           else {
             switch (typeId) {
               case ISearchValueType.STRING:
-                fieldExpression.append("'").append(condValue).append("'");
+                fieldExpression.append("'").append(condValue).append("'"); //$NON-NLS-1$ //$NON-NLS-2$
                 break;
               case ISearchValueType.LINK:
-                fieldExpression.append("'").append(condValue).append("'");
+                fieldExpression.append("'").append(condValue).append("'"); //$NON-NLS-1$ //$NON-NLS-2$
                 break;
               case ISearchValueType.ENUM:
                 condValue = condValue.toLowerCase();
-                condValue = condValue.replace("[", "");
-                condValue = condValue.replace("]", "");
+                condValue = condValue.replace("[", ""); //$NON-NLS-1$ //$NON-NLS-2$
+                condValue = condValue.replace("]", ""); //$NON-NLS-1$ //$NON-NLS-2$
 
                 fieldExpression.append(condValue.toLowerCase());
 
@@ -243,30 +243,30 @@ public class CoreUtils {
             }
           }
 
-          fieldExpression.append(matchAllConditions ? " and " : " or ");
+          fieldExpression.append(matchAllConditions ? " and " : " or "); //$NON-NLS-1$ //$NON-NLS-2$
         }
       }
 
       if (fieldExpression.length() > 0)
-        fieldExpression.delete(fieldExpression.length() - (matchAllConditions ? " and ".length() : " or ".length()), fieldExpression.length());
+        fieldExpression.delete(fieldExpression.length() - (matchAllConditions ? " and ".length() : " or ".length()), fieldExpression.length()); //$NON-NLS-1$ //$NON-NLS-2$
 
-      name.append(fieldExpression).append(matchAllConditions ? " and " : " or ");
+      name.append(fieldExpression).append(matchAllConditions ? " and " : " or "); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     if (name.length() > 0)
-      name.delete(name.length() - (matchAllConditions ? " and ".length() : " or ".length()), name.length());
+      name.delete(name.length() - (matchAllConditions ? " and ".length() : " or ".length()), name.length()); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* Append location if provided */
     if (!locationConditions.isEmpty()) {
       if (name.length() == 0)
-        name.append("All News in ");
+        name.append("All News in "); //$NON-NLS-1$
       else
-        name.append(" in ");
+        name.append(" in "); //$NON-NLS-1$
 
       for (ISearchCondition locationCondition : locationConditions) {
         List<IFolderChild> locations = toEntities((Long[][]) locationCondition.getValue());
         for (IFolderChild location : locations) {
-          name.append("'").append(location.getName()).append("', ");
+          name.append("'").append(location.getName()).append("', "); //$NON-NLS-1$ //$NON-NLS-2$
         }
       }
 
@@ -427,7 +427,7 @@ public class CoreUtils {
         return content;
     }
 
-    return "No Headline";
+    return Messages.CoreUtils_NO_HEADLINE;
   }
 
   /**
