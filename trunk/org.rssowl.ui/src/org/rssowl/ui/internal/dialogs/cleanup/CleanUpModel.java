@@ -24,6 +24,7 @@
 
 package org.rssowl.ui.internal.dialogs.cleanup;
 
+import org.eclipse.osgi.util.NLS;
 import org.rssowl.core.Owl;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ILabel;
@@ -111,14 +112,14 @@ public class CleanUpModel {
     Map<IBookMark, Set<NewsReference>> newsToDelete = new HashMap<IBookMark, Set<NewsReference>>();
 
     /* 0.) Create Recommended Tasks */
-    CleanUpGroup recommendedTasks = new CleanUpGroup("Recommended Operations");
+    CleanUpGroup recommendedTasks = new CleanUpGroup(Messages.CleanUpModel_RECOMMENDED_OPS);
     recommendedTasks.addTask(new DefragDatabaseTask(recommendedTasks));
     recommendedTasks.addTask(new OptimizeSearchTask(recommendedTasks));
     fTasks.add(recommendedTasks);
 
     /* 1.) Delete BookMarks that have Last Visit > X Days ago */
     if (fOps.deleteFeedByLastVisit()) {
-      CleanUpGroup group = new CleanUpGroup("Bookmarks that have not been displayed for " + fOps.getLastVisitDays() + " days");
+      CleanUpGroup group = new CleanUpGroup(NLS.bind(Messages.CleanUpModel_DELETE_BY_VISIT, fOps.getLastVisitDays()));
 
       int days = fOps.getLastVisitDays();
       long maxLastVisitDate = DateUtils.getToday().getTimeInMillis() - (days * DAY);
@@ -142,7 +143,7 @@ public class CleanUpModel {
 
     /* 2.) Delete BookMarks that have not updated in X Days */
     if (fOps.deleteFeedByLastUpdate()) {
-      CleanUpGroup group = new CleanUpGroup("Bookmarks that have not been updated for " + fOps.getLastUpdateDays() + " days");
+      CleanUpGroup group = new CleanUpGroup(NLS.bind(Messages.CleanUpModel_DELETE_BY_UPDATE, fOps.getLastUpdateDays()));
 
       int days = fOps.getLastUpdateDays();
       long maxLastUpdateDate = DateUtils.getToday().getTimeInMillis() - (days * DAY);
@@ -178,7 +179,7 @@ public class CleanUpModel {
 
     /* 3.) Delete BookMarks that have Connection Error */
     if (fOps.deleteFeedsByConError()) {
-      CleanUpGroup group = new CleanUpGroup("Bookmarks with a connection error");
+      CleanUpGroup group = new CleanUpGroup(Messages.CleanUpModel_DELETE_CON_ERROR);
 
       for (IBookMark mark : fBookmarks) {
         if (!bookmarksToDelete.contains(mark) && mark.isErrorLoading()) {
@@ -193,7 +194,7 @@ public class CleanUpModel {
 
     /* 4.) Delete Duplicate BookMarks */
     if (fOps.deleteFeedsByDuplicates()) {
-      CleanUpGroup group = new CleanUpGroup("Most recently created duplicate bookmarks");
+      CleanUpGroup group = new CleanUpGroup(Messages.CleanUpModel_DELETE_DUPLICATES);
 
       for (IBookMark currentBookMark : fBookmarks) {
         if (!bookmarksToDelete.contains(currentBookMark)) {
@@ -249,7 +250,7 @@ public class CleanUpModel {
 
     /* 4.) Delete News that exceed a certain limit in a Feed */
     if (fOps.deleteNewsByCount()) {
-      CleanUpGroup group = new CleanUpGroup("News exceeding a limit of " + fOps.getMaxNewsCountPerFeed() + " per feed");
+      CleanUpGroup group = new CleanUpGroup(NLS.bind(Messages.CleanUpModel_DELETE_BY_COUNT, fOps.getMaxNewsCountPerFeed()));
 
       /* For each selected Bookmark */
       for (IBookMark mark : fBookmarks) {
@@ -298,7 +299,7 @@ public class CleanUpModel {
 
     /* 5.) Delete News with an age > X Days */
     if (fOps.deleteNewsByAge()) {
-      CleanUpGroup group = new CleanUpGroup("News older than " + fOps.getMaxNewsAge() + " days");
+      CleanUpGroup group = new CleanUpGroup(NLS.bind(Messages.CleanUpModel_DELETE_BY_AGE, fOps.getMaxNewsAge()));
 
       ISearchField ageInDaysField = fFactory.createSearchField(INews.AGE_IN_DAYS, fNewsName);
       ISearchCondition ageCond = fFactory.createSearchCondition(ageInDaysField, SearchSpecifier.IS_GREATER_THAN, fOps.getMaxNewsAge());
@@ -349,7 +350,7 @@ public class CleanUpModel {
 
     /* 6.) Delete Read News */
     if (fOps.deleteReadNews()) {
-      CleanUpGroup group = new CleanUpGroup("Read News");
+      CleanUpGroup group = new CleanUpGroup(Messages.CleanUpModel_READ_NEWS);
 
       EnumSet<State> readState = EnumSet.of(INews.State.READ);
       ISearchCondition stateCond = fFactory.createSearchCondition(stateField, SearchSpecifier.IS, readState);

@@ -26,6 +26,7 @@ package org.rssowl.ui.internal.dialogs.cleanup;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.osgi.util.NLS;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.ui.internal.OwlUI;
 
@@ -50,7 +51,7 @@ public class BookMarkTask extends CleanUpTask {
   private void init() {
 
     /* Label */
-    fLabel = "Delete '" + fMark.getName() + "'";
+    fLabel = NLS.bind(Messages.BookMarkTask_DELETE_N, fMark.getName());
 
     /* Image */
     fImage = OwlUI.getFavicon(fMark);

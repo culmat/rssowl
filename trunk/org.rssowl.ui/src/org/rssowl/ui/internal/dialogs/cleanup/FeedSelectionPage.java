@@ -61,8 +61,8 @@ public class FeedSelectionPage extends WizardPage {
    * @param pageName
    */
   protected FeedSelectionPage(String pageName) {
-    super(pageName, pageName, OwlUI.getImageDescriptor("icons/wizban/cleanup_wiz.gif"));
-    setMessage("Please choose the Bookmarks you want to clean up.");
+    super(pageName, pageName, OwlUI.getImageDescriptor("icons/wizban/cleanup_wiz.gif")); //$NON-NLS-1$
+    setMessage(Messages.FeedSelectionPage_CHOOSE_BOOKMARKS);
   }
 
   /* Returns all selected Bookmarks */
@@ -132,7 +132,7 @@ public class FeedSelectionPage extends WizardPage {
     buttonContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     fSelectAll = new Button(buttonContainer, SWT.PUSH);
-    fSelectAll.setText("&Select All");
+    fSelectAll.setText(Messages.FeedSelectionPage_SELECT_ALL);
     Dialog.applyDialogFont(fSelectAll);
     setButtonLayoutData(fSelectAll);
     fSelectAll.addSelectionListener(new SelectionAdapter() {
@@ -143,7 +143,7 @@ public class FeedSelectionPage extends WizardPage {
     });
 
     fDeselectAll = new Button(buttonContainer, SWT.PUSH);
-    fDeselectAll.setText("&Deselect All");
+    fDeselectAll.setText(Messages.FeedSelectionPage_DESELECT_ALL);
     Dialog.applyDialogFont(fDeselectAll);
     setButtonLayoutData(fDeselectAll);
     fDeselectAll.addSelectionListener(new SelectionAdapter() {

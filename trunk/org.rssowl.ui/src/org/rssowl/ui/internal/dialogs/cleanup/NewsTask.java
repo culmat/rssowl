@@ -26,6 +26,7 @@ package org.rssowl.ui.internal.dialogs.cleanup;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.osgi.util.NLS;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.reference.NewsReference;
@@ -58,7 +59,7 @@ public class NewsTask extends CleanUpTask {
   private void init(IBookMark container) {
 
     /* Label */
-    fLabel = "Delete " + fNews.size() + " news from '" + container.getName() + "'";
+    fLabel = NLS.bind(Messages.NewsTask_DELETE_N_NEWS_FROM_M, fNews.size(), container.getName());
 
     /* Image */
     fImage = OwlUI.getFavicon(container);

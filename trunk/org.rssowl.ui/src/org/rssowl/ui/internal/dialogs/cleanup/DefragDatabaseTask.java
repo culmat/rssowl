@@ -43,7 +43,7 @@ class DefragDatabaseTask extends CleanUpTask {
    */
   @Override
   ImageDescriptor getImage() {
-    return OwlUI.getImageDescriptor("icons/obj16/database.gif");
+    return OwlUI.getImageDescriptor("icons/obj16/database.gif"); //$NON-NLS-1$
   }
 
   /*
@@ -51,6 +51,6 @@ class DefragDatabaseTask extends CleanUpTask {
    */
   @Override
   String getLabel() {
-    return "Improve application performance (after restart)";
+    return Messages.DefragDatabaseTask_IMPROVE_DB_PERFORMANCE;
   }
 }
