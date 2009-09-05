@@ -76,14 +76,14 @@ public class ExportWizard extends Wizard {
    */
   @Override
   public void addPages() {
-    setWindowTitle("Export");
+    setWindowTitle(Messages.ExportWizard_EXPORT);
 
     /* Page 1: Folder Child Selection */
-    fExportElementsPage = new ExportElementsPage("Choose Elements");
+    fExportElementsPage = new ExportElementsPage(Messages.ExportWizard_CHOOSE_ELEMENTS);
     addPage(fExportElementsPage);
 
     /* Page 2: Export Settings Configuration */
-    fExportOptionsPage = new ExportOptionsPage("Export Options");
+    fExportOptionsPage = new ExportOptionsPage(Messages.ExportWizard_EXPORT_OPTIONS);
     addPage(fExportOptionsPage);
   }
 
@@ -103,25 +103,25 @@ public class ExportWizard extends Wizard {
 
     /* Prompt for Filename */
     FileDialog dialog = new FileDialog(getShell(), SWT.SAVE);
-    dialog.setText("Choose Export File");
+    dialog.setText(Messages.ExportWizard_EXPORT_FILE);
 
     /* Receive Formats for Export */
     List<String> filterExtensions = new ArrayList<String>();
-    filterExtensions.add("*.opml");
-    filterExtensions.add("*.xml");
+    filterExtensions.add("*.opml"); //$NON-NLS-1$
+    filterExtensions.add("*.xml"); //$NON-NLS-1$
 
     Collection<String> exportFormats = Owl.getInterpreter().getExportFormats();
     for (String exportFormat : exportFormats) {
-      String format = "*." + exportFormat.toLowerCase();
+      String format = "*." + exportFormat.toLowerCase(); //$NON-NLS-1$
       if (!filterExtensions.contains(format))
         filterExtensions.add(format);
     }
 
-    if (!filterExtensions.contains("*.*"))
-      filterExtensions.add("*.*");
+    if (!filterExtensions.contains("*.*")) //$NON-NLS-1$
+      filterExtensions.add("*.*"); //$NON-NLS-1$
 
     dialog.setFilterExtensions(filterExtensions.toArray(new String[filterExtensions.size()]));
-    dialog.setFileName("rssowl.opml");
+    dialog.setFileName("rssowl.opml"); //$NON-NLS-1$
     dialog.setOverwrite(true);
     String string = dialog.open();
 

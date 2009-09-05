@@ -56,8 +56,8 @@ public class ExportElementsPage extends WizardPage {
    * @param pageName
    */
   protected ExportElementsPage(String pageName) {
-    super(pageName, pageName, OwlUI.getImageDescriptor("icons/wizban/export_wiz.png"));
-    setMessage("Please choose the elements to export.");
+    super(pageName, pageName, OwlUI.getImageDescriptor("icons/wizban/export_wiz.png")); //$NON-NLS-1$
+    setMessage(Messages.ExportElementsPage_EXPORT_ELEMENTS);
   }
 
   /* Return the Checked Elements */
@@ -84,7 +84,7 @@ public class ExportElementsPage extends WizardPage {
     buttonContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     fSelectAll = new Button(buttonContainer, SWT.PUSH);
-    fSelectAll.setText("&Select All");
+    fSelectAll.setText(Messages.ExportElementsPage_SELECT_ALL);
     Dialog.applyDialogFont(fSelectAll);
     setButtonLayoutData(fSelectAll);
     fSelectAll.addSelectionListener(new SelectionAdapter() {
@@ -95,7 +95,7 @@ public class ExportElementsPage extends WizardPage {
     });
 
     fDeselectAll = new Button(buttonContainer, SWT.PUSH);
-    fDeselectAll.setText("&Deselect All");
+    fDeselectAll.setText(Messages.ExportElementsPage_DESELECT_ALL);
     Dialog.applyDialogFont(fDeselectAll);
     setButtonLayoutData(fDeselectAll);
     fDeselectAll.addSelectionListener(new SelectionAdapter() {

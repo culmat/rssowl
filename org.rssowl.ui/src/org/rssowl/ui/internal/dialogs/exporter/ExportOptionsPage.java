@@ -27,6 +27,7 @@ package org.rssowl.ui.internal.dialogs.exporter;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -63,8 +64,8 @@ public class ExportOptionsPage extends WizardPage {
    * @param pageName
    */
   protected ExportOptionsPage(String pageName) {
-    super(pageName, pageName, OwlUI.getImageDescriptor("icons/wizban/export_wiz.png"));
-    setMessage("Please select additional options for the export.");
+    super(pageName, pageName, OwlUI.getImageDescriptor("icons/wizban/export_wiz.png")); //$NON-NLS-1$
+    setMessage(Messages.ExportOptionsPage_EXPORT_OPTIONS);
   }
 
   /*
@@ -78,16 +79,16 @@ public class ExportOptionsPage extends WizardPage {
     infoText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
     ((GridData) infoText.getLayoutData()).widthHint = 200;
     infoText.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-    infoText.setText("The following options allow to export more than just feeds. You can choose to export Labels, News Filters and Preferences. They will get restored when imported into RSSOwl again.");
+    infoText.setText(Messages.ExportOptionsPage_OPTIONS_INFO);
 
     /* Labels */
     Collection<ILabel> labels = DynamicDAO.loadAll(ILabel.class);
     fExportLabelsCheck = new Button(container, SWT.CHECK);
-    fExportLabelsCheck.setImage(OwlUI.getImage(fExportLabelsCheck, "icons/elcl16/labels.gif"));
+    fExportLabelsCheck.setImage(OwlUI.getImage(fExportLabelsCheck, "icons/elcl16/labels.gif")); //$NON-NLS-1$
     if (!labels.isEmpty())
-      fExportLabelsCheck.setText("Export &Labels (" + labels.size() + " in total)");
+      fExportLabelsCheck.setText(NLS.bind(Messages.ExportOptionsPage_EXPORT_N_LABELS, labels.size()));
     else
-      fExportLabelsCheck.setText("Export &Labels (No Labels Found)");
+      fExportLabelsCheck.setText(Messages.ExportOptionsPage_EXPORT_LABELS);
     fExportLabelsCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     ((GridData) fExportLabelsCheck.getLayoutData()).verticalIndent = 10;
     fExportLabelsCheck.setEnabled(!labels.isEmpty());
@@ -98,9 +99,9 @@ public class ExportOptionsPage extends WizardPage {
     fExportFiltersCheck = new Button(container, SWT.CHECK);
     fExportFiltersCheck.setImage(OwlUI.getImage(fExportFiltersCheck, OwlUI.FILTER));
     if (!filters.isEmpty())
-      fExportFiltersCheck.setText("Export News &Filters (" + filters.size() + " in total)");
+      fExportFiltersCheck.setText(NLS.bind(Messages.ExportOptionsPage_EXPORT_N_FILTERS, filters.size()));
     else
-      fExportFiltersCheck.setText("Export News &Filters (No Filters Found)");
+      fExportFiltersCheck.setText(Messages.ExportOptionsPage_EXPORT_FILTERS);
     fExportFiltersCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     fExportFiltersCheck.setEnabled(!filters.isEmpty());
     fExportFiltersCheck.addSelectionListener(new SelectionAdapter() {
@@ -108,17 +109,17 @@ public class ExportOptionsPage extends WizardPage {
       public void widgetSelected(SelectionEvent e) {
         if (fExportFiltersCheck.getSelection() && !fExportLabelsCheck.getSelection() && filtersUseLabels) {
           fExportLabelsCheck.setSelection(true);
-          setMessage("Labels will also be exported because some Filters make use of them as part of their actions.", IMessageProvider.INFORMATION);
+          setMessage(Messages.ExportOptionsPage_EXPORT_LABEL_FILTER_INFO, IMessageProvider.INFORMATION);
         } else if (!fExportFiltersCheck.getSelection()) {
-          setMessage("Please select additional options for the export.");
+          setMessage(Messages.ExportOptionsPage_EXPORT_OPTIONS);
         }
       }
     });
 
     /* Properties */
     fExportSettingsCheck = new Button(container, SWT.CHECK);
-    fExportSettingsCheck.setImage(OwlUI.getImage(fExportSettingsCheck, "icons/elcl16/preferences.gif"));
-    fExportSettingsCheck.setText("Export &Preferences");
+    fExportSettingsCheck.setImage(OwlUI.getImage(fExportSettingsCheck, "icons/elcl16/preferences.gif")); //$NON-NLS-1$
+    fExportSettingsCheck.setText(Messages.ExportOptionsPage_EXPORT_PREFERENCES);
     fExportSettingsCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     Dialog.applyDialogFont(container);
