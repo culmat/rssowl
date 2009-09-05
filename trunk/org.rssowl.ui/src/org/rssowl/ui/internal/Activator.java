@@ -153,7 +153,7 @@ public class Activator extends AbstractUIPlugin {
 
     /* Dialog to show progress */
     Display display = Display.getDefault();
-    Display.setAppName("RSSOwl");
+    Display.setAppName("RSSOwl"); //$NON-NLS-1$
     final ProgressMonitorDialog dialog = new ProgressMonitorDialog(new Shell(display)) {
       @Override
       protected Point getInitialLocation(Point initialSize) {
@@ -313,9 +313,9 @@ public class Activator extends AbstractUIPlugin {
         System.exit(0);
       }
     } catch (UnknownHostException e) {
-      Activator.getDefault().logError("handleSocketBound()", e);
+      Activator.getDefault().logError(Messages.Activator_ERROR_STARTUP, e);
     } catch (IOException e) {
-      Activator.getDefault().logError("handleSocketBound()", e);
+      Activator.getDefault().logError(Messages.Activator_ERROR_STARTUP, e);
     }
   }
 
@@ -369,7 +369,7 @@ public class Activator extends AbstractUIPlugin {
    * @return the image descriptor
    */
   public static ImageDescriptor getImageDescriptor(String pluginId, String path) {
-    return AbstractUIPlugin.imageDescriptorFromPlugin(pluginId, path); //$NON-NLS-1$
+    return AbstractUIPlugin.imageDescriptorFromPlugin(pluginId, path);
   }
 
   /**
@@ -377,7 +377,7 @@ public class Activator extends AbstractUIPlugin {
    *
    * @param msg The message to log as Info.
    */
-  public void logInfo(@SuppressWarnings("unused") String msg) {
+  public void logInfo(String msg) {
   // TODO Need a better logging facility here
   // getLog().log(new Status(IStatus.INFO, getBundle().getSymbolicName(),
   // IStatus.OK, msg, null));

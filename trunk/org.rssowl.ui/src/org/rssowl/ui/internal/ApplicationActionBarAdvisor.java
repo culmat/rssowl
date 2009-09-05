@@ -45,6 +45,7 @@ import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.IShellProvider;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.DirectoryDialog;
@@ -136,13 +137,13 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
   public static final String M_MANAGE_EXTENSIONS = "manageExtensions"; //$NON-NLS-1$
 
   /** Name of the View Top Menu */
-  public static final String M_VIEW = "view";
+  public static final String M_VIEW = "view"; //$NON-NLS-1$
 
   /** Start of the View Top Menu */
-  public static final String M_VIEW_START = "viewStart";
+  public static final String M_VIEW_START = "viewStart"; //$NON-NLS-1$
 
   /** End of the View Top Menu */
-  public static final String M_VIEW_END = "viewEnd";
+  public static final String M_VIEW_END = "viewEnd"; //$NON-NLS-1$
 
   /* Local Resource Manager (lives across entire application life) */
   private static ResourceManager fgResources = new LocalResourceManager(JFaceResources.getResources());
@@ -190,7 +191,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
     /* Menu: Window */
     register(ActionFactory.OPEN_NEW_WINDOW.create(window));
-    getAction(ActionFactory.OPEN_NEW_WINDOW.getId()).setText("&New Window");
+    getAction(ActionFactory.OPEN_NEW_WINDOW.getId()).setText(Messages.ApplicationActionBarAdvisor_NEW_WINDOW);
     fOpenWindowsItem = ContributionItemFactory.OPEN_WINDOWS.create(window);
 
     //    register(ActionFactory.TOGGLE_COOLBAR.create(window));
@@ -208,7 +209,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     /* Menu: Help */
     // register(ActionFactory.INTRO.create(window));
     register(ActionFactory.ABOUT.create(window));
-    getAction(ActionFactory.ABOUT.getId()).setText("&About RSSOwl");
+    getAction(ActionFactory.ABOUT.getId()).setText(Messages.ApplicationActionBarAdvisor_ABOUT_RSSOWL);
 
     /* CoolBar: Contextual Menu */
     register(ActionFactory.LOCK_TOOL_BAR.create(window));
@@ -253,7 +254,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
   /* Menu: File */
   private void createFileMenu(IMenuManager menuBar) {
-    MenuManager fileMenu = new MenuManager("&File", IWorkbenchActionConstants.M_FILE);
+    MenuManager fileMenu = new MenuManager(Messages.ApplicationActionBarAdvisor_FILE, IWorkbenchActionConstants.M_FILE);
     menuBar.add(fileMenu);
 
     fileMenu.add(new GroupMarker(IWorkbenchActionConstants.FILE_START));
@@ -280,7 +281,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
   /* Menu: Edit */
   private void createEditMenu(IMenuManager menuBar) {
-    MenuManager editMenu = new MenuManager("&Edit", IWorkbenchActionConstants.M_EDIT);
+    MenuManager editMenu = new MenuManager(Messages.ApplicationActionBarAdvisor_EDIT, IWorkbenchActionConstants.M_EDIT);
     editMenu.add(getAction(ActionFactory.COPY.getId())); //Dummy action
     menuBar.add(editMenu);
 
@@ -321,12 +322,12 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     final IPreferenceScope preferences = Owl.getPreferenceService().getGlobalScope();
     final IPreferenceScope eclipsePrefs = Owl.getPreferenceService().getEclipseScope();
 
-    MenuManager viewMenu = new MenuManager("&View", M_VIEW);
+    MenuManager viewMenu = new MenuManager(Messages.ApplicationActionBarAdvisor_VIEW, M_VIEW);
     viewMenu.setRemoveAllWhenShown(true);
     menuBar.add(viewMenu);
 
     /* Add dummy action to show the top level menu */
-    viewMenu.add(new Action("") {
+    viewMenu.add(new Action("") { //$NON-NLS-1$
       @Override
       public void run() {}
     });
@@ -337,7 +338,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         manager.add(new GroupMarker(M_VIEW_START));
 
         /* Toggle State of Toolbar Visibility */
-        manager.add(new Action("&Toolbar", IAction.AS_CHECK_BOX) {
+        manager.add(new Action(Messages.ApplicationActionBarAdvisor_TOOLBAR, IAction.AS_CHECK_BOX) {
           @Override
           public void run() {
             ApplicationWorkbenchWindowAdvisor configurer = ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor;
@@ -354,7 +355,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         });
 
         /* Toggle State of Status Bar Visibility */
-        manager.add(new Action("&Status", IAction.AS_CHECK_BOX) {
+        manager.add(new Action(Messages.ApplicationActionBarAdvisor_STATUS, IAction.AS_CHECK_BOX) {
           @Override
           public void run() {
             ApplicationWorkbenchWindowAdvisor configurer = ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor;
@@ -371,7 +372,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         });
 
         /* Toggle State of Bookmarks Visibility */
-        manager.add(new Action("&Bookmarks", IAction.AS_CHECK_BOX) {
+        manager.add(new Action(Messages.ApplicationActionBarAdvisor_BOOKMARKS, IAction.AS_CHECK_BOX) {
           @Override
           public void run() {
             OwlUI.toggleBookmarks();
@@ -379,12 +380,12 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
           @Override
           public String getActionDefinitionId() {
-            return "org.rssowl.ui.ToggleBookmarksCommand";
+            return "org.rssowl.ui.ToggleBookmarksCommand"; //$NON-NLS-1$
           }
 
           @Override
           public String getId() {
-            return "org.rssowl.ui.ToggleBookmarksCommand";
+            return "org.rssowl.ui.ToggleBookmarksCommand"; //$NON-NLS-1$
           }
 
           @Override
@@ -399,7 +400,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
         /* Customize Toolbar */
         manager.add(new Separator());
-        manager.add(new Action("&Customize Toolbar...") {
+        manager.add(new Action(Messages.ApplicationActionBarAdvisor_CUSTOMIZE_TOOLBAR) {
           @Override
           public void run() {
 
@@ -421,7 +422,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
         /* Tabbed Browsing */
         manager.add(new Separator());
-        manager.add(new Action("T&abbed Browsing", IAction.AS_CHECK_BOX) {
+        manager.add(new Action(Messages.ApplicationActionBarAdvisor_TABBED_BROWSING, IAction.AS_CHECK_BOX) {
           @Override
           public void run() {
             boolean tabbedBrowsingEnabled = isChecked();
@@ -436,8 +437,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
                 IEditorReference[] editorReferences = page.getEditorReferences();
                 if (editorReferences.length > 1) {
                   MessageBox confirmDialog = new MessageBox(page.getWorkbenchWindow().getShell(), SWT.ICON_QUESTION | SWT.YES | SWT.NO);
-                  confirmDialog.setText("Disable Tabbed Browsing");
-                  confirmDialog.setMessage("You currently have " + editorReferences.length + " tabs opened.\nDo you want to close all tabs except for the active one?");
+                  confirmDialog.setText(Messages.ApplicationActionBarAdvisor_DISABLE_TABBED_BROWSING);
+                  confirmDialog.setMessage(NLS.bind(Messages.ApplicationActionBarAdvisor_TABS_MESSAGE, editorReferences.length));
                   if (confirmDialog.open() == SWT.YES)
                     OwlUI.closeOtherEditors();
                   else
@@ -471,7 +472,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
         /* Hide Headlines */
         final boolean headlinesHidden = preferences.getBoolean(DefaultPreferences.FV_BROWSER_MAXIMIZED);
-        manager.add(new Action("&Hide Headlines", IAction.AS_CHECK_BOX) {
+        manager.add(new Action(Messages.ApplicationActionBarAdvisor_HIDE_HEADLINES, IAction.AS_CHECK_BOX) {
           @Override
           public void run() {
             preferences.putBoolean(DefaultPreferences.FV_BROWSER_MAXIMIZED, !headlinesHidden);
@@ -485,12 +486,12 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
           @Override
           public String getActionDefinitionId() {
-            return "org.rssowl.ui.ToggleHeadlinesCommand";
+            return "org.rssowl.ui.ToggleHeadlinesCommand"; //$NON-NLS-1$
           }
 
           @Override
           public String getId() {
-            return "org.rssowl.ui.ToggleHeadlinesCommand";
+            return "org.rssowl.ui.ToggleHeadlinesCommand"; //$NON-NLS-1$
           }
 
           @Override
@@ -501,7 +502,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
         /* Fullscreen Mode */
         manager.add(new Separator());
-        manager.add(new Action("&Full Screen", IAction.AS_CHECK_BOX) {
+        manager.add(new Action(Messages.ApplicationActionBarAdvisor_FULL_SCREEN, IAction.AS_CHECK_BOX) {
           @Override
           public void run() {
             OwlUI.toggleFullScreen();
@@ -509,12 +510,12 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
           @Override
           public String getActionDefinitionId() {
-            return "org.rssowl.ui.FullScreenCommand";
+            return "org.rssowl.ui.FullScreenCommand"; //$NON-NLS-1$
           }
 
           @Override
           public String getId() {
-            return "org.rssowl.ui.FullScreenCommand";
+            return "org.rssowl.ui.FullScreenCommand"; //$NON-NLS-1$
           }
 
           @Override
@@ -535,7 +536,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
   /* Menu: Go */
   private void createGoMenu(IMenuManager menuBar) {
-    MenuManager goMenu = new MenuManager("&Go", IWorkbenchActionConstants.M_NAVIGATE);
+    MenuManager goMenu = new MenuManager(Messages.ApplicationActionBarAdvisor_GO, IWorkbenchActionConstants.M_NAVIGATE);
     menuBar.add(goMenu);
 
     goMenu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
@@ -544,9 +545,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
   /* Menu: Bookmarks */
   private void createBookMarksMenu(IMenuManager menuBar) {
-    MenuManager bmMenu = new MenuManager("&Bookmarks", "bookmarks");
+    MenuManager bmMenu = new MenuManager(Messages.ApplicationActionBarAdvisor_BOOKMARKS, "bookmarks"); //$NON-NLS-1$
     bmMenu.setRemoveAllWhenShown(true);
-    bmMenu.add(new Action("") {}); //Dummy Action
+    bmMenu.add(new Action("") {}); //Dummy Action //$NON-NLS-1$
     bmMenu.addMenuListener(new IMenuListener() {
       public void menuAboutToShow(IMenuManager manager) {
         fillBookMarksMenu(manager, getActionBarConfigurer().getWindowConfigurer().getWindow());
@@ -561,7 +562,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
   private void createNewsMenu(IMenuManager menuBar) {
     final IPreferenceScope preferences = Owl.getPreferenceService().getGlobalScope();
 
-    final MenuManager newsMenu = new MenuManager("&News", "news");
+    final MenuManager newsMenu = new MenuManager(Messages.ApplicationActionBarAdvisor_NEWS, "news"); //$NON-NLS-1$
     menuBar.add(newsMenu);
     newsMenu.setRemoveAllWhenShown(true);
 
@@ -579,7 +580,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
         /* Open */
         {
-          manager.add(new Separator("open"));
+          manager.add(new Separator("open")); //$NON-NLS-1$
 
           /* Open News in Browser */
           manager.add(new OpenInBrowserAction(selection, WebBrowserContext.createFrom(selection, activeFeedView)) {
@@ -601,11 +602,11 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
         /* Mark / Label */
         {
-          manager.add(new Separator("mark"));
+          manager.add(new Separator("mark")); //$NON-NLS-1$
 
           /* Mark */
           {
-            MenuManager markMenu = new MenuManager("M&ark", "mark");
+            MenuManager markMenu = new MenuManager(Messages.ApplicationActionBarAdvisor_MARK, "mark"); //$NON-NLS-1$
             manager.add(markMenu);
 
             /* Mark as Read */
@@ -631,7 +632,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
         /* Move To / Copy To */
         if (!selection.isEmpty()) {
-          manager.add(new Separator("movecopy"));
+          manager.add(new Separator("movecopy")); //$NON-NLS-1$
 
           /* Load all news bins and sort by name */
           List<INewsBin> newsbins = new ArrayList<INewsBin>(DynamicDAO.loadAll(INewsBin.class));
@@ -645,7 +646,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
           Collections.sort(newsbins, comparator);
 
           /* Move To */
-          MenuManager moveMenu = new MenuManager("&Move To", "moveto");
+          MenuManager moveMenu = new MenuManager(Messages.ApplicationActionBarAdvisor_MOVE_TO, "moveto"); //$NON-NLS-1$
           manager.add(moveMenu);
 
           for (INewsBin bin : newsbins) {
@@ -655,11 +656,11 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
             moveMenu.add(new MoveCopyNewsToBinAction(selection, bin, true));
           }
 
-          moveMenu.add(new Separator("movetonewbin"));
+          moveMenu.add(new Separator("movetonewbin")); //$NON-NLS-1$
           moveMenu.add(new MoveCopyNewsToBinAction(selection, null, true));
 
           /* Copy To */
-          MenuManager copyMenu = new MenuManager("&Copy To", "copyto");
+          MenuManager copyMenu = new MenuManager(Messages.ApplicationActionBarAdvisor_COPY_TO, "copyto"); //$NON-NLS-1$
           manager.add(copyMenu);
 
           for (INewsBin bin : newsbins) {
@@ -669,7 +670,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
             copyMenu.add(new MoveCopyNewsToBinAction(selection, bin, false));
           }
 
-          copyMenu.add(new Separator("copytonewbin"));
+          copyMenu.add(new Separator("copytonewbin")); //$NON-NLS-1$
           copyMenu.add(new MoveCopyNewsToBinAction(selection, null, false));
         }
 
@@ -678,10 +679,10 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
         /* Filter */
         if (!selection.isEmpty()) {
-          manager.add(new Separator("filter"));
+          manager.add(new Separator("filter")); //$NON-NLS-1$
 
           /* Create Filter */
-          manager.add(new Action("Create &Filter...") {
+          manager.add(new Action(Messages.ApplicationActionBarAdvisor_CREATE_FILTER) {
             @Override
             public void run() {
               CreateFilterAction action = new CreateFilterAction();
@@ -698,10 +699,10 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
         /* Update */
         {
-          manager.add(new Separator("reload"));
+          manager.add(new Separator("reload")); //$NON-NLS-1$
 
           /* Update */
-          manager.add(new Action("&Update") {
+          manager.add(new Action(Messages.ApplicationActionBarAdvisor_UPDATE) {
             @Override
             public void run() {
               IActionDelegate action = new ReloadTypesAction();
@@ -711,12 +712,12 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
             @Override
             public ImageDescriptor getImageDescriptor() {
-              return OwlUI.getImageDescriptor("icons/elcl16/reload.gif");
+              return OwlUI.getImageDescriptor("icons/elcl16/reload.gif"); //$NON-NLS-1$
             }
 
             @Override
             public ImageDescriptor getDisabledImageDescriptor() {
-              return OwlUI.getImageDescriptor("icons/dlcl16/reload.gif");
+              return OwlUI.getImageDescriptor("icons/dlcl16/reload.gif"); //$NON-NLS-1$
             }
 
             @Override
@@ -746,32 +747,32 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
   /* Menu: Tools */
   private void createToolsMenu(IMenuManager menuBar) {
-    MenuManager toolsMenu = new MenuManager("&Tools", OwlUI.M_TOOLS);
+    MenuManager toolsMenu = new MenuManager(Messages.ApplicationActionBarAdvisor_TOOLS, OwlUI.M_TOOLS);
     menuBar.add(toolsMenu);
 
     /* Contributions */
-    toolsMenu.add(new GroupMarker("begin"));
+    toolsMenu.add(new GroupMarker("begin")); //$NON-NLS-1$
     toolsMenu.add(new Separator());
-    toolsMenu.add(new GroupMarker("middle"));
+    toolsMenu.add(new GroupMarker("middle")); //$NON-NLS-1$
     toolsMenu.add(new Separator());
     toolsMenu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
     toolsMenu.add(new Separator());
-    toolsMenu.add(new GroupMarker("end"));
+    toolsMenu.add(new GroupMarker("end")); //$NON-NLS-1$
     toolsMenu.add(new Separator());
 
     /* Preferences */
     IAction preferences = getAction(ActionFactory.PREFERENCES.getId());
-    preferences.setImageDescriptor(OwlUI.getImageDescriptor("icons/elcl16/preferences.gif"));
+    preferences.setImageDescriptor(OwlUI.getImageDescriptor("icons/elcl16/preferences.gif")); //$NON-NLS-1$
     toolsMenu.add(preferences);
   }
 
   /* Menu: Window */
   private void createWindowMenu(IMenuManager menuBar) {
-    MenuManager windowMenu = new MenuManager("&Window", IWorkbenchActionConstants.M_WINDOW);
+    MenuManager windowMenu = new MenuManager(Messages.ApplicationActionBarAdvisor_WINDOW, IWorkbenchActionConstants.M_WINDOW);
     menuBar.add(windowMenu);
 
     IAction openNewWindowAction = getAction(ActionFactory.OPEN_NEW_WINDOW.getId());
-    openNewWindowAction.setImageDescriptor(OwlUI.getImageDescriptor("icons/elcl16/newwindow.gif"));
+    openNewWindowAction.setImageDescriptor(OwlUI.getImageDescriptor("icons/elcl16/newwindow.gif")); //$NON-NLS-1$
     windowMenu.add(openNewWindowAction);
 
     windowMenu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
@@ -808,26 +809,26 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
   /* Menu: Help */
   private void createHelpMenu(IMenuManager menuBar) {
-    MenuManager helpMenu = new MenuManager("&Help", IWorkbenchActionConstants.M_HELP);
+    MenuManager helpMenu = new MenuManager(Messages.ApplicationActionBarAdvisor_HELP, IWorkbenchActionConstants.M_HELP);
     menuBar.add(helpMenu);
 
     helpMenu.add(new GroupMarker(IWorkbenchActionConstants.HELP_START));
 
     /* Link to boreal.rssowl.org */
-    helpMenu.add(new Action("&Frequently Asked Questions") {
+    helpMenu.add(new Action(Messages.ApplicationActionBarAdvisor_FAQ) {
       @Override
       public void run() {
-        BrowserUtils.openLinkExternal("http://boreal.rssowl.org/#faq");
+        BrowserUtils.openLinkExternal("http://boreal.rssowl.org/#faq"); //$NON-NLS-1$
       }
 
       @Override
       public ImageDescriptor getImageDescriptor() {
-        return OwlUI.getImageDescriptor("icons/elcl16/help.gif");
+        return OwlUI.getImageDescriptor("icons/elcl16/help.gif"); //$NON-NLS-1$
       }
     });
 
     /* Show Key Bindings */
-    helpMenu.add(new Action("&Show Key Bindings") {
+    helpMenu.add(new Action(Messages.ApplicationActionBarAdvisor_SHOW_KEY_BINDINGS) {
       @Override
       public void run() {
         IWorkbench workbench = PlatformUI.getWorkbench();
@@ -839,26 +840,26 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     helpMenu.add(new Separator());
 
     /* Report Bugs */
-    helpMenu.add(new Action("&Report Problems") {
+    helpMenu.add(new Action(Messages.ApplicationActionBarAdvisor_REPORT_PROBLEMS) {
       @Override
       public void run() {
-        BrowserUtils.openLinkExternal("http://dev.rssowl.org");
+        BrowserUtils.openLinkExternal("http://dev.rssowl.org"); //$NON-NLS-1$
       }
 
       @Override
       public ImageDescriptor getImageDescriptor() {
-        return OwlUI.getImageDescriptor("icons/elcl16/bug.gif");
+        return OwlUI.getImageDescriptor("icons/elcl16/bug.gif"); //$NON-NLS-1$
       }
     });
 
     /* Export Log to File */
-    helpMenu.add(new Action("&Export Logfile...") {
+    helpMenu.add(new Action(Messages.ApplicationActionBarAdvisor_EXPORT_LOGFILE) {
       @Override
       public void run() {
         FileDialog dialog = new FileDialog(getActionBarConfigurer().getWindowConfigurer().getWindow().getShell(), SWT.SAVE);
-        dialog.setText("Export Logfile");
-        dialog.setFilterExtensions(new String[] { "*.log" });
-        dialog.setFileName("rssowl.log");
+        dialog.setText(Messages.ApplicationActionBarAdvisor_EXPORT_LOGFILE_DIALOG);
+        dialog.setFilterExtensions(new String[] { "*.log" }); //$NON-NLS-1$
+        dialog.setFileName("rssowl.log"); //$NON-NLS-1$
         dialog.setOverwrite(true);
 
         String file = dialog.open();
@@ -877,18 +878,18 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     helpMenu.add(new Separator());
 
     /* Homepage */
-    helpMenu.add(new Action("&Homepage") {
+    helpMenu.add(new Action(Messages.ApplicationActionBarAdvisor_HOMEPAGE) {
       @Override
       public void run() {
-        BrowserUtils.openLinkExternal("http://www.rssowl.org");
+        BrowserUtils.openLinkExternal("http://www.rssowl.org"); //$NON-NLS-1$
       }
     });
 
     /* License */
-    helpMenu.add(new Action("&License") {
+    helpMenu.add(new Action(Messages.ApplicationActionBarAdvisor_LICENSE) {
       @Override
       public void run() {
-        BrowserUtils.openLinkExternal("http://www.rssowl.org/legal/epl-v10.html");
+        BrowserUtils.openLinkExternal("http://www.rssowl.org/legal/epl-v10.html"); //$NON-NLS-1$
       }
     });
 
@@ -927,7 +928,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     trayItem.add(new ReloadAllAction(false));
     trayItem.add(new Separator());
 
-    trayItem.add(new Action("&Configure Notifications") {
+    trayItem.add(new Action(Messages.ApplicationActionBarAdvisor_CONFIGURE_NOTIFICATIONS) {
       @Override
       public void run() {
         advisor.restoreFromTray(shell);
@@ -936,11 +937,11 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
       @Override
       public ImageDescriptor getImageDescriptor() {
-        return OwlUI.getImageDescriptor("icons/elcl16/notification.gif");
+        return OwlUI.getImageDescriptor("icons/elcl16/notification.gif"); //$NON-NLS-1$
       }
     });
 
-    trayItem.add(new Action("&Preferences") {
+    trayItem.add(new Action(Messages.ApplicationActionBarAdvisor_PREFERENCES) {
       @Override
       public void run() {
         advisor.restoreFromTray(shell);
@@ -949,7 +950,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
       @Override
       public ImageDescriptor getImageDescriptor() {
-        return OwlUI.getImageDescriptor("icons/elcl16/preferences.gif");
+        return OwlUI.getImageDescriptor("icons/elcl16/preferences.gif"); //$NON-NLS-1$
       }
     });
 
@@ -968,7 +969,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     coolBar.setContextMenuManager(coolBarContextMenuManager);
 
     /* Customize Coolbar */
-    coolBarContextMenuManager.add(new Action("&Customize Toolbar...") {
+    coolBarContextMenuManager.add(new Action(Messages.ApplicationActionBarAdvisor_CUSTOMIZE_TOOLBAR) {
       @Override
       public void run() {
         CustomizeToolbarDialog dialog = new CustomizeToolbarDialog(getActionBarConfigurer().getWindowConfigurer().getWindow().getShell());
@@ -980,11 +981,11 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     /* Lock Coolbar  */
     coolBarContextMenuManager.add(new Separator());
     IAction lockToolbarAction = getAction(ActionFactory.LOCK_TOOL_BAR.getId());
-    lockToolbarAction.setText("&Lock Toolbar");
+    lockToolbarAction.setText(Messages.ApplicationActionBarAdvisor_LOCK_TOOLBAR);
     coolBarContextMenuManager.add(lockToolbarAction);
 
     /* Toggle State of Toolbar Visibility */
-    coolBarContextMenuManager.add(new Action("&Hide Toolbar") {
+    coolBarContextMenuManager.add(new Action(Messages.ApplicationActionBarAdvisor_HIDE_TOOLBAR) {
       @Override
       public void run() {
         ApplicationWorkbenchWindowAdvisor configurer = ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor;
@@ -1011,14 +1012,14 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
   public static void fillAttachmentsMenu(IMenuManager manager, final IStructuredSelection selection, final IShellProvider shellProvider, boolean directMenu) {
     final List<Pair<IAttachment, URI>> attachments = ModelUtils.getAttachmentLinks(selection);
     if (!attachments.isEmpty()) {
-      manager.add(new Separator("attachments"));
+      manager.add(new Separator("attachments")); //$NON-NLS-1$
 
       /* Either as direct Menu or Submenu */
       IMenuManager attachmentMenu;
       if (directMenu)
         attachmentMenu = manager;
       else {
-        attachmentMenu = new MenuManager("&Attachments", "attachments");
+        attachmentMenu = new MenuManager(Messages.ApplicationActionBarAdvisor_ATTACHMENTS, "attachments"); //$NON-NLS-1$
         manager.add(attachmentMenu);
       }
 
@@ -1035,11 +1036,11 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         }
         String sumSize = OwlUI.getSize(sumBytes);
 
-        attachmentMenu.add(new Action(sumSize != null ? ("&Download All..." + " (" + sumSize + ")") : ("&Download All...")) {
+        attachmentMenu.add(new Action(sumSize != null ? (NLS.bind(Messages.ApplicationActionBarAdvisor_DOWNLOAD_ALL_WITH_SIZE, sumSize)) : (Messages.ApplicationActionBarAdvisor_DOWNLOAD_ALL)) {
           @Override
           public void run() {
             DirectoryDialog dialog = new DirectoryDialog(shellProvider.getShell(), SWT.None);
-            dialog.setText("Select a Folder for the Downloads");
+            dialog.setText(Messages.ApplicationActionBarAdvisor_SELECT_FOLDER_FOR_DOWNLOADS);
             String folder = dialog.open();
             if (StringUtils.isSet(folder)) {
               for (Pair<IAttachment, URI> attachment : attachments) {
@@ -1057,11 +1058,11 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         String fileName = URIUtils.getFile(attachmentPair.getSecond());
         String size = OwlUI.getSize(attachment.getLength());
 
-        Action action = new Action(size != null ? (fileName + " (" + size + ")") : (fileName)) {
+        Action action = new Action(size != null ? (NLS.bind(Messages.ApplicationActionBarAdvisor_FILE_SIZE, fileName, size)) : (fileName)) {
           @Override
           public void run() {
             DirectoryDialog dialog = new DirectoryDialog(shellProvider.getShell(), SWT.None);
-            dialog.setText("Select a Folder for the Download");
+            dialog.setText(Messages.ApplicationActionBarAdvisor_SELECT_FOLDER_FOR_DOWNLOAD);
             String folder = dialog.open();
             if (StringUtils.isSet(folder))
               Controller.getDefault().getDownloadService().download(attachmentPair.getFirst(), attachmentPair.getSecond(), new File(folder), true);
@@ -1074,7 +1075,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
       /* Offer to Automize Downloading */
       attachmentMenu.add(new Separator());
-      attachmentMenu.add(new Action("&Automate Download...") {
+      attachmentMenu.add(new Action(Messages.ApplicationActionBarAdvisor_AUTOMATE_DOWNLOAD) {
         @Override
         public void run() {
           CreateFilterAction action = new CreateFilterAction();
@@ -1099,14 +1100,14 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
    * otherwise create a sub menu.
    */
   public static void fillShareMenu(IMenuManager manager, final IStructuredSelection selection, final IShellProvider shellProvider, boolean directMenu) {
-    manager.add(new Separator("share"));
+    manager.add(new Separator("share")); //$NON-NLS-1$
 
     /* Either as direct Menu or Submenu */
     IMenuManager shareMenu;
     if (directMenu)
       shareMenu = manager;
     else {
-      shareMenu = new MenuManager("&Share News", OwlUI.SHARE, "sharenews");
+      shareMenu = new MenuManager(Messages.ApplicationActionBarAdvisor_SHARE_NEWS, OwlUI.SHARE, "sharenews"); //$NON-NLS-1$
       manager.add(shareMenu);
     }
 
@@ -1163,7 +1164,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
     /* Allow to Configure Providers */
     shareMenu.add(new Separator());
-    shareMenu.add(new Action("&Configure...") {
+    shareMenu.add(new Action(Messages.ApplicationActionBarAdvisor_CONFIGURE) {
       @Override
       public void run() {
         PreferencesUtil.createPreferenceDialogOn(shellProvider.getShell(), SharingPreferencesPage.ID, null, null).open();
@@ -1185,7 +1186,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     if (directMenu)
       labelMenu = manager;
     else {
-      labelMenu = new MenuManager("&Label");
+      labelMenu = new MenuManager(Messages.ApplicationActionBarAdvisor_LABEL);
       manager.add(labelMenu);
     }
 
@@ -1193,7 +1194,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     labelMenu.add(new AssignLabelsAction(shellProvider.getShell(), selection));
 
     /* Organize Labels */
-    labelMenu.add(new Action("&Organize Labels...") {
+    labelMenu.add(new Action(Messages.ApplicationActionBarAdvisor_ORGANIZE_LABELS) {
       @Override
       public void run() {
         PreferencesUtil.createPreferenceDialogOn(shellProvider.getShell(), ManageLabelsPreferencePage.ID, null, null).open();
@@ -1232,18 +1233,18 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     Type selectedFilter = allFilters[preferences.getInteger(DefaultPreferences.BM_MENU_FILTER)];
     List<Type> displayedFilters = Arrays.asList(new Type[] { Type.SHOW_ALL, Type.SHOW_NEW, Type.SHOW_UNREAD, Type.SHOW_STICKY });
 
-    MenuManager optionsMenu = new MenuManager("&Filter Elements", (selectedFilter == Type.SHOW_ALL) ? OwlUI.FILTER : OwlUI.getImageDescriptor("icons/etool16/filter_active.gif"), null);
+    MenuManager optionsMenu = new MenuManager(Messages.ApplicationActionBarAdvisor_FILTER_ELEMENTS, (selectedFilter == Type.SHOW_ALL) ? OwlUI.FILTER : OwlUI.getImageDescriptor("icons/etool16/filter_active.gif"), null); //$NON-NLS-1$
     for (final Type filter : displayedFilters) {
-      String name = "Show &All";
+      String name = Messages.ApplicationActionBarAdvisor_SHOW_ALL;
       switch (filter) {
         case SHOW_NEW:
-          name = "Show &New";
+          name = Messages.ApplicationActionBarAdvisor_SHOW_NEW;
           break;
         case SHOW_UNREAD:
-          name = "Show &Unread";
+          name = Messages.ApplicationActionBarAdvisor_SHOW_UNREAD;
           break;
         case SHOW_STICKY:
-          name = "Show &Sticky";
+          name = Messages.ApplicationActionBarAdvisor_SHOW_STICKY;
           break;
       }
 
@@ -1289,7 +1290,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
       }
 
       if (hasBookMarks) {
-        menu.add(new Action("Some Elements are Filtered") {
+        menu.add(new Action(Messages.ApplicationActionBarAdvisor_SOME_ELEMENTS_FILTERED) {
           @Override
           public boolean isEnabled() {
             return false;
@@ -1331,7 +1332,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         if (child instanceof INewsMark) {
           int unreadNewsCount = (((INewsMark) child).getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)));
           if (unreadNewsCount > 0)
-            name = name + " (" + unreadNewsCount + ")";
+            name = NLS.bind(Messages.ApplicationActionBarAdvisor_MARK_UNREAD_COUNT, name, unreadNewsCount);
         }
 
         Action action = new Action(name) {
@@ -1351,7 +1352,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
         final MenuManager folderMenu = new MenuManager(folder.getName(), getImageDescriptor(folder), null);
         parent.add(folderMenu);
-        folderMenu.add(new Action("") {}); //Dummy Action
+        folderMenu.add(new Action("") {}); //Dummy Action //$NON-NLS-1$
         folderMenu.setRemoveAllWhenShown(true);
         folderMenu.addMenuListener(new IMenuListener() {
           public void menuAboutToShow(IMenuManager manager) {
@@ -1373,7 +1374,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
       /* Overlay if News are *new* */
       Image base = (favicon != null) ? OwlUI.getImage(fgResources, favicon) : OwlUI.getImage(fgResources, OwlUI.BOOKMARK);
-      DecorationOverlayIcon overlay = new DecorationOverlayIcon(base, OwlUI.getImageDescriptor("icons/ovr16/new.gif"), IDecoration.BOTTOM_RIGHT);
+      DecorationOverlayIcon overlay = new DecorationOverlayIcon(base, OwlUI.getImageDescriptor("icons/ovr16/new.gif"), IDecoration.BOTTOM_RIGHT); //$NON-NLS-1$
       return overlay;
     }
 

@@ -97,13 +97,13 @@ public class ApplicationServer {
   static final int DEFAULT_SOCKET_PORT = 8795;
 
   /* Handshake Message */
-  static final String STARTUP_HANDSHAKE = "org.rssowl.ui.internal.StartupHandshake";
+  static final String STARTUP_HANDSHAKE = "org.rssowl.ui.internal.StartupHandshake"; //$NON-NLS-1$
 
   /* DWord controlling the startup-handshake */
-  private static final String MULTI_INSTANCE_PROPERTY = "multiInstance";
+  private static final String MULTI_INSTANCE_PROPERTY = "multiInstance"; //$NON-NLS-1$
 
   /* Identifies the Viewer providing the Content */
-  private static final String ID = "id=";
+  private static final String ID = "id="; //$NON-NLS-1$
 
   /* Used after all HTTP-Headers */
   private static final String CRLF = "\r\n"; //$NON-NLS-1$
@@ -225,7 +225,7 @@ public class ApplicationServer {
       }
     }
 
-    Activator.getDefault().logInfo("Unable to open a Port for the Application-Server");
+    Activator.getDefault().logInfo(Messages.ApplicationServer_INFO_UNABLE_OPEN_PORT);
     return null;
   }
 
@@ -295,7 +295,7 @@ public class ApplicationServer {
   public String toResourceUrl(String path) {
     StringBuilder url = new StringBuilder();
     url.append(PROTOCOL).append("://").append(LOCALHOST).append(':').append(fPort).append("/"); //$NON-NLS-1$ //$NON-NLS-2$
-    url.append("?").append(OP_RESOURCE).append(path);
+    url.append("?").append(OP_RESOURCE).append(path); //$NON-NLS-1$
 
     return url.toString();
   }
@@ -317,7 +317,7 @@ public class ApplicationServer {
     url.append(PROTOCOL).append("://").append(LOCALHOST).append(':').append(fPort).append("/"); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* Append the ID */
-    url.append("?").append(ID).append(id);
+    url.append("?").append(ID).append(id); //$NON-NLS-1$
 
     /* Wrap into Object Array */
     if (!(input instanceof Object[]))
@@ -638,49 +638,49 @@ public class ApplicationServer {
 
       /* Send Headers (Bug on Mac: Header printed in Browser) */
       if (Application.IS_MAC)
-        writer.append("<!--").append(CRLF);
-      writer.append("HTTP/1.x 200 OK").append(CRLF);
+        writer.append("<!--").append(CRLF); //$NON-NLS-1$
+      writer.append("HTTP/1.x 200 OK").append(CRLF); //$NON-NLS-1$
 
       synchronized (RFC_1123_DATE) {
-        writer.append("Date: ").append(RFC_1123_DATE.format(new Date())).append(CRLF);
+        writer.append("Date: ").append(RFC_1123_DATE.format(new Date())).append(CRLF); //$NON-NLS-1$
       }
 
-      writer.append("Server: RSSOwl Local Server").append(CRLF);
-      writer.append("Content-Type: text/html; charset=UTF-8").append(CRLF);
-      writer.append("Connection: close").append(CRLF);
-      writer.append("Expires: 0").append(CRLF);
+      writer.append("Server: RSSOwl Local Server").append(CRLF); //$NON-NLS-1$
+      writer.append("Content-Type: text/html; charset=UTF-8").append(CRLF); //$NON-NLS-1$
+      writer.append("Connection: close").append(CRLF); //$NON-NLS-1$
+      writer.append("Expires: 0").append(CRLF); //$NON-NLS-1$
       if (Application.IS_MAC)
-        writer.append("-->").append(CRLF);
+        writer.append("-->").append(CRLF); //$NON-NLS-1$
       writer.write(CRLF);
 
       /* Begin HTML */
-      writer.write("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n");
+      writer.write("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n"); //$NON-NLS-1$
 
       /* Windows only: Mark of the Web */
       if (Application.IS_WINDOWS) {
         writer.write(IE_MOTW);
-        writer.write("\n");
+        writer.write("\n"); //$NON-NLS-1$
       }
 
-      writer.write("<html>\n  <head>\n");
+      writer.write("<html>\n  <head>\n"); //$NON-NLS-1$
 
       /* Append Base URI if available */
       String base = getBase(children);
       if (base != null) {
-        writer.write("  <base href=\"");
+        writer.write("  <base href=\""); //$NON-NLS-1$
         writer.write(base);
-        writer.write("\">");
+        writer.write("\">"); //$NON-NLS-1$
       }
 
-      writer.write("\n  <title></title>");
-      writer.write("\n  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n");
+      writer.write("\n  <title></title>"); //$NON-NLS-1$
+      writer.write("\n  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n"); //$NON-NLS-1$
 
       /* CSS */
       if (labelProvider instanceof NewsBrowserLabelProvider)
         ((NewsBrowserLabelProvider) labelProvider).writeCSS(writer);
 
       /* Open Body */
-      writer.write("  </head>\n  <body id=\"owlbody\">\n");
+      writer.write("  </head>\n  <body id=\"owlbody\">\n"); //$NON-NLS-1$
 
       /* Output each Element as HTML */
       for (Object el : children) {
@@ -689,7 +689,7 @@ public class ApplicationServer {
       }
 
       /* End HTML */
-      writer.write("\n  </body>\n</html>");
+      writer.write("\n  </body>\n</html>"); //$NON-NLS-1$
     } catch (IOException e) {
       if (Activator.getDefault() != null)
         Activator.getDefault().logInfo(e.getMessage());
@@ -736,13 +736,13 @@ public class ApplicationServer {
 
       /* This is a non ASCII, non Whitespace character */
       if (!((ch >= 0x0020) && (ch <= 0x007e)) && !Character.isWhitespace(ch)) {
-        strBuf.append("&#x");
+        strBuf.append("&#x"); //$NON-NLS-1$
         String hex = Integer.toHexString(ch & 0xFFFF);
 
         if (hex.length() == 2)
-          strBuf.append("00");
+          strBuf.append("00"); //$NON-NLS-1$
 
-        strBuf.append(hex).append(";");
+        strBuf.append(hex).append(";"); //$NON-NLS-1$
       }
 
       /* This is an ASCII character */

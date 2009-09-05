@@ -87,7 +87,7 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
    */
   @Override
   public String getMainPreferencePageId() {
-    return "org.eclipse.ui.preferencePages.Workbench";
+    return "org.eclipse.ui.preferencePages.Workbench"; //$NON-NLS-1$
   }
 
   /**

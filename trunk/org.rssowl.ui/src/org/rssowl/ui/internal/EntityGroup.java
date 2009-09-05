@@ -26,6 +26,7 @@ package org.rssowl.ui.internal;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.IActionFilter;
 import org.rssowl.core.persist.IEntity;
 
@@ -105,7 +106,7 @@ public class EntityGroup implements IActionFilter {
    * @return Returns the Name of this EntityGroup.
    */
   public String getName() {
-    return fName != null ? fName : "Group " + fId;
+    return fName != null ? fName : NLS.bind(Messages.EntityGroup_GROUP, fId);
   }
 
   /**
