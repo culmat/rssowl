@@ -34,8 +34,10 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
+import org.eclipse.osgi.util.NLS;
 import org.rssowl.core.internal.Activator;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -450,16 +452,11 @@ public class JobQueue {
   }
 
   private String formatTask() {
-    StringBuilder buf = new StringBuilder();
-    buf.append(fTaskPrefix);
-    buf.append(" ");
     int workDone = fWorkDone.get();
-    buf.append(workDone != 0 ? workDone : 1); // Show a Minimum of '1'
-    buf.append(" of ");
-    buf.append(fTotalWork.get());
-    buf.append(": ");
-    buf.append(fCurrentTask.replaceAll("&", "&&")); //$NON-NLS-1$//$NON-NLS-2$
-    return buf.toString();
+    Object[] bindings = Arrays.asList(fTaskPrefix, String.valueOf((workDone != 0 ? workDone : 1)), String.valueOf(fTotalWork.get()), fCurrentTask.replaceAll("&", "&&")).toArray(); //$NON-NLS-1$//$NON-NLS-2$
+
+    String str = NLS.bind(Messages.JobQueue_TASK_NAME, bindings);
+    return str;
   }
 
   /* Reset fields and cancel all Jobs of this Family */
