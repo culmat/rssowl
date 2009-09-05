@@ -83,7 +83,6 @@ import java.util.Set;
  *
  * @author bpasero
  */
-@SuppressWarnings("restriction")
 public class CredentialsPreferencesPage extends PreferencePage implements IWorkbenchPreferencePage {
 
   /** ID of the Page */
@@ -281,7 +280,6 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
 
     /* Label Provider */
     fViewer.setLabelProvider(new CellLabelProvider() {
-      @SuppressWarnings("unchecked")
       @Override
       public void update(ViewerCell cell) {
         CredentialsModelData data = (CredentialsModelData) cell.getElement();
@@ -304,7 +302,6 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
 
     /* Sorter */
     fViewer.setSorter(new ViewerSorter() {
-      @SuppressWarnings("unchecked")
       @Override
       public int compare(Viewer viewer, Object e1, Object e2) {
         CredentialsModelData data1 = (CredentialsModelData) e1;
@@ -356,7 +353,6 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
     return container;
   }
 
-  @SuppressWarnings("unchecked")
   private void onRemove() {
     IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
     List<?> credentialsToRemove = selection.toList();
@@ -520,7 +516,6 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
     fResetMasterPassword.setEnabled(fUseMasterPasswordCheck.getSelection());
   }
 
-  @SuppressWarnings("restriction")
   private void reSetAllCredentials() {
     boolean clearedOnce = false; // Implementation Detail of PlatformCredentialsProvider
     Set<CredentialsModelData> credentials = loadCredentials();

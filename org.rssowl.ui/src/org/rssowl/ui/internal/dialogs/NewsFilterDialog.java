@@ -95,7 +95,6 @@ import java.util.List;
  *
  * @author bpasero
  */
-@SuppressWarnings("restriction")
 public class NewsFilterDialog extends TitleAreaDialog {
 
   /* Section for Dialogs Settings */

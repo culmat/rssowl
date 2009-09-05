@@ -671,7 +671,6 @@ public class LocationControl extends Composite {
     return "Choose Location...";
   }
 
-  @SuppressWarnings("null")
   private String getLabel(List<IFolderChild> entities) {
     if (entities == null || entities.size() == 0) {
       return "<a href=\"\">" + getDefaultLabel() + "</a>";
