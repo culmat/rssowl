@@ -77,7 +77,6 @@ public class CleanUpWizard extends Wizard {
   /*
    * @see org.eclipse.jface.wizard.Wizard#performFinish()
    */
-  @SuppressWarnings("restriction")
   @Override
   public boolean performFinish() {
     final INewsDAO newsDao = DynamicDAO.getDAO(INewsDAO.class);

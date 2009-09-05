@@ -293,7 +293,7 @@ public class BookMarkFilter extends ViewerFilter {
    * @param element the tree element to check
    * @return true if the given element's label matches the filter text
    */
-  protected boolean isLeafMatch(@SuppressWarnings("unused") Viewer viewer, Object element) {
+  protected boolean isLeafMatch(Viewer viewer, Object element) {
 
     /* Element is a News Mark */
     if (element instanceof INewsMark) {

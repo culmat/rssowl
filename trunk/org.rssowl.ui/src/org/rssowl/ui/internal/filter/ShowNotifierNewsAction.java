@@ -39,7 +39,6 @@ import java.util.List;
  *
  * @author bpasero
  */
-@SuppressWarnings("restriction")
 public class ShowNotifierNewsAction implements INewsAction {
 
   /*

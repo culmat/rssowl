@@ -39,7 +39,6 @@ import java.util.Map;
  *
  * @author bpasero
  */
-@SuppressWarnings("restriction")
 public class PlaySoundAction implements INewsAction {
 
   /* Remember when the last Sound was played */

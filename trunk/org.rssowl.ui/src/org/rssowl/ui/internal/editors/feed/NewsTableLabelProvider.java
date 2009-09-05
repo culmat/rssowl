@@ -399,7 +399,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
    * @param columnIndex
    * @return Font
    */
-  protected Font getFont(Object element, @SuppressWarnings("unused") int columnIndex) {
+  protected Font getFont(Object element, int columnIndex) {
 
     /* Use a Bold Font for Unread News */
     if (element instanceof INews) {
@@ -425,7 +425,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
    * @param columnIndex
    * @return Color
    */
-  protected Color getBackground(Object element, @SuppressWarnings("unused") int columnIndex) {
+  protected Color getBackground(Object element, int columnIndex) {
 
     /* Handle INews */
     if (element instanceof INews && ((INews) element).isFlagged())
@@ -443,7 +443,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
    * @param columnIndex
    * @return Color
    */
-  protected Color getForeground(Object element, @SuppressWarnings("unused") int columnIndex) {
+  protected Color getForeground(Object element, int columnIndex) {
 
     /* Handle EntityGroup */
     if (element instanceof EntityGroup)

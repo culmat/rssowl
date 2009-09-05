@@ -62,7 +62,6 @@ import java.util.List;
  *
  * @author bpasero
  */
-@SuppressWarnings("restriction")
 public class NewsActionList extends ScrolledComposite {
   private final NewsActionPresentationManager fNewsActionPresentationManager = NewsActionPresentationManager.getInstance();
   private List<NewsActionItem> fItems;
