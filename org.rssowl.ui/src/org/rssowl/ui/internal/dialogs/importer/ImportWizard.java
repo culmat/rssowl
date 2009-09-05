@@ -110,7 +110,7 @@ public class ImportWizard extends Wizard {
    */
   @Override
   public void addPages() {
-    setWindowTitle("Import");
+    setWindowTitle(Messages.ImportWizard_IMPORT);
 
     /* Page 1: Source to Import */
     fImportSourcePage = new ImportSourcePage(fWebsite, fIsKewordSearch);
@@ -223,7 +223,7 @@ public class ImportWizard extends Wizard {
 
     /* Show warning and ask for confirmation if preferences should be imported */
     if (importPreferences && preferences != null && !preferences.isEmpty()) {
-      MessageDialog dialog = new MessageDialog(getShell(), "Attention", null, "All of your existing preferences will be replaced with the imported ones.\n\nDo you want to continue?", MessageDialog.WARNING, new String[] { IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL }, 0);
+      MessageDialog dialog = new MessageDialog(getShell(), Messages.ImportWizard_ATTENTION, null, Messages.ImportWizard_PREFERENCE_OVERWRITE, MessageDialog.WARNING, new String[] { IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL }, 0);
       if (dialog.open() != 0)
         return false;
     }
@@ -240,7 +240,7 @@ public class ImportWizard extends Wizard {
 
     /* Ask for a restart if preferences have been imported */
     if (importPreferences && preferences != null && !preferences.isEmpty()) {
-      boolean restart = MessageDialog.openQuestion(getShell(), "Restart RSSOwl", "It is necessary to restart RSSOwl after preferences have been imported.\n\nDo you want to restart now?");
+      boolean restart = MessageDialog.openQuestion(getShell(), Messages.ImportWizard_RESTART_RSSOWL, Messages.ImportWizard_RESTART_RSSOWL_INFO);
       if (restart) {
         BookMarkExplorer explorer = OwlUI.getOpenedBookMarkExplorer();
         if (explorer != null)
@@ -386,7 +386,7 @@ public class ImportWizard extends Wizard {
 
     /* SearchCondition: New and Updated News */
     {
-      ISearchMark mark = factory.createSearchMark(null, root, "New and Updated News");
+      ISearchMark mark = factory.createSearchMark(null, root, Messages.ImportWizard_NEW_UPDATED_NEWS);
       mark.setMatchAllConditions(true);
 
       ISearchField field1 = factory.createSearchField(INews.STATE, newsEntityName);
@@ -395,7 +395,7 @@ public class ImportWizard extends Wizard {
 
     /* SearchCondition: Recent News */
     {
-      ISearchMark mark = factory.createSearchMark(null, root, "Recent News");
+      ISearchMark mark = factory.createSearchMark(null, root, Messages.ImportWizard_RECENT_NEWS);
       mark.setMatchAllConditions(true);
 
       ISearchField field1 = factory.createSearchField(INews.AGE_IN_DAYS, newsEntityName);
@@ -404,7 +404,7 @@ public class ImportWizard extends Wizard {
 
     /* SearchCondition: News with Attachments */
     {
-      ISearchMark mark = factory.createSearchMark(null, root, "News with Attachments");
+      ISearchMark mark = factory.createSearchMark(null, root, Messages.ImportWizard_NEWS_WITH_ATTACHMENTS);
       mark.setMatchAllConditions(true);
 
       ISearchField field = factory.createSearchField(INews.HAS_ATTACHMENTS, newsEntityName);
@@ -413,7 +413,7 @@ public class ImportWizard extends Wizard {
 
     /* SearchCondition: Sticky News */
     {
-      ISearchMark mark = factory.createSearchMark(null, root, "Sticky News");
+      ISearchMark mark = factory.createSearchMark(null, root, Messages.ImportWizard_STICKY_NEWS);
       mark.setMatchAllConditions(true);
 
       ISearchField field = factory.createSearchField(INews.IS_FLAGGED, newsEntityName);
@@ -422,12 +422,12 @@ public class ImportWizard extends Wizard {
 
     /* SearchCondition: News is Labeld */
     {
-      ISearchMark mark = factory.createSearchMark(null, root, "Labeled News");
+      ISearchMark mark = factory.createSearchMark(null, root, Messages.ImportWizard_LABELED_NEWS);
       IPreferenceScope preferences = Owl.getPreferenceService().getEntityScope(mark);
       preferences.putInteger(DefaultPreferences.BM_NEWS_GROUPING, NewsGrouping.Type.GROUP_BY_LABEL.ordinal());
 
       ISearchField field = factory.createSearchField(INews.LABEL, newsEntityName);
-      factory.createSearchCondition(null, mark, field, SearchSpecifier.IS, "*");
+      factory.createSearchCondition(null, mark, field, SearchSpecifier.IS, "*"); //$NON-NLS-1$
     }
 
     DynamicDAO.save(root);
