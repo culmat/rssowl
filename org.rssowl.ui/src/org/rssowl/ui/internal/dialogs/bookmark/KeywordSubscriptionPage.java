@@ -31,6 +31,7 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -52,8 +53,8 @@ import java.util.List;
  * @author bpasero
  */
 public class KeywordSubscriptionPage extends WizardPage {
-  private static final String URL_INPUT_TOKEN = "[:]";
-  private static final String KEYWORD_FEED_EXTENSION_POINT = "org.rssowl.ui.KeywordFeed";
+  private static final String URL_INPUT_TOKEN = "[:]"; //$NON-NLS-1$
+  private static final String KEYWORD_FEED_EXTENSION_POINT = "org.rssowl.ui.KeywordFeed"; //$NON-NLS-1$
 
   /* Base class for Search Engines */
   static class SearchEngine {
@@ -84,7 +85,7 @@ public class KeywordSubscriptionPage extends WizardPage {
     }
 
     String getLabel(String keywords) {
-      return fName + " on '" + keywords + "'";
+      return NLS.bind(Messages.KeywordSubscriptionPage_N_ON_M, fName, keywords);
     }
 
     String getIconPath() {
@@ -104,8 +105,8 @@ public class KeywordSubscriptionPage extends WizardPage {
    * @param pageName
    */
   protected KeywordSubscriptionPage(String pageName) {
-    super(pageName, pageName, OwlUI.getImageDescriptor("icons/wizban/bkmrk_wiz.gif"));
-    setMessage("Create a new Bookmark to read News from a Feed.");
+    super(pageName, pageName, OwlUI.getImageDescriptor("icons/wizban/bkmrk_wiz.gif")); //$NON-NLS-1$
+    setMessage(Messages.KeywordSubscriptionPage_CREATE_BOOKMARK);
   }
 
   private static List<SearchEngine> loadSearchEngines() {
@@ -116,10 +117,10 @@ public class KeywordSubscriptionPage extends WizardPage {
 
     /* For each contributed property keyword feed */
     for (IConfigurationElement element : elements) {
-      String id = element.getAttribute("id");
-      String name = element.getAttribute("name");
-      String iconPath = element.getAttribute("icon");
-      String url = element.getAttribute("url");
+      String id = element.getAttribute("id"); //$NON-NLS-1$
+      String name = element.getAttribute("name"); //$NON-NLS-1$
+      String iconPath = element.getAttribute("icon"); //$NON-NLS-1$
+      String url = element.getAttribute("url"); //$NON-NLS-1$
 
       engines.add(new SearchEngine(id, element.getNamespaceIdentifier(), name, iconPath, url));
     }
@@ -146,7 +147,7 @@ public class KeywordSubscriptionPage extends WizardPage {
 
     Label infoLabel = new Label(container, SWT.NONE);
     infoLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-    infoLabel.setText("Please select from one of the following search engines: ");
+    infoLabel.setText(Messages.KeywordSubscriptionPage_SELECT_SEARCH_ENGINE);
 
     Composite contentMargin = new Composite(container, SWT.NONE);
     contentMargin.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));

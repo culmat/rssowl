@@ -30,6 +30,7 @@ import org.eclipse.jface.fieldassist.ContentProposalAdapter;
 import org.eclipse.jface.fieldassist.SimpleContentProposalProvider;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
@@ -88,8 +89,8 @@ public class FeedDefinitionPage extends WizardPage {
    * @param initialLink
    */
   protected FeedDefinitionPage(String pageName, String initialLink) {
-    super(pageName, pageName, OwlUI.getImageDescriptor("icons/wizban/bkmrk_wiz.gif"));
-    setMessage("Create a new bookmark to read news from a feed.");
+    super(pageName, pageName, OwlUI.getImageDescriptor("icons/wizban/bkmrk_wiz.gif")); //$NON-NLS-1$
+    setMessage(Messages.FeedDefinitionPage_CREATE_BOOKMARK);
     fInitialLink = initialLink;
 
     Collection<IBookMark> bookmarks = DynamicDAO.loadAll(IBookMark.class);
@@ -174,7 +175,7 @@ public class FeedDefinitionPage extends WizardPage {
 
     fFeedByLinkButton = new Button(container, SWT.RADIO);
     fFeedByLinkButton.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-    fFeedByLinkButton.setText("&Create a feed by supplying the website or direct link:");
+    fFeedByLinkButton.setText(Messages.FeedDefinitionPage_CREATE_FEED);
     fFeedByLinkButton.setSelection(true);
     fFeedByLinkButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -221,7 +222,7 @@ public class FeedDefinitionPage extends WizardPage {
     });
 
     fLoadTitleFromFeedButton = new Button(textIndent, SWT.CHECK);
-    fLoadTitleFromFeedButton.setText("&Use the title of the feed as name for the bookmark");
+    fLoadTitleFromFeedButton.setText(Messages.FeedDefinitionPage_USE_TITLE_OF_FEED);
     fLoadTitleFromFeedButton.setSelection(fGlobalScope.getBoolean(DefaultPreferences.BM_LOAD_TITLE_FROM_FEED));
     fLoadTitleFromFeedButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -233,7 +234,7 @@ public class FeedDefinitionPage extends WizardPage {
     /* 2) Feed by Keyword */
     fFeedByKeywordButton = new Button(container, SWT.RADIO);
     fFeedByKeywordButton.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-    fFeedByKeywordButton.setText("Create a feed by typing a &keyword or phrase describing your interest:");
+    fFeedByKeywordButton.setText(Messages.FeedDefinitionPage_CREATE_KEYWORD_FEED);
     fFeedByKeywordButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -267,11 +268,11 @@ public class FeedDefinitionPage extends WizardPage {
     infoContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 5));
 
     Label infoImg = new Label(infoContainer, SWT.NONE);
-    infoImg.setImage(OwlUI.getImage(infoImg, "icons/obj16/info.gif"));
+    infoImg.setImage(OwlUI.getImage(infoImg, "icons/obj16/info.gif")); //$NON-NLS-1$
     infoImg.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 
     Link infoLink = new Link(infoContainer, SWT.NONE);
-    infoLink.setText("Tip: Use the <a>Import Wizard</a> to find more Feeds.");
+    infoLink.setText(Messages.FeedDefinitionPage_IMPORT_WIZARD_TIP);
     infoLink.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
     infoLink.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -289,9 +290,9 @@ public class FeedDefinitionPage extends WizardPage {
     IBookMark existingBookMark = fExistingFeeds.get(fFeedLinkInput.getText());
 
     if (existingBookMark != null)
-      setMessage("A bookmark named '" + existingBookMark.getName() + "' with the same link already exists.", WARNING);
+      setMessage(NLS.bind(Messages.FeedDefinitionPage_BOOKMARK_EXISTS, existingBookMark.getName()), WARNING);
     else
-      setMessage("Create a new bookmark to read news from a feed.");
+      setMessage(Messages.FeedDefinitionPage_CREATE_BOOKMARK);
   }
 
   private void hookKeywordAutocomplete() {

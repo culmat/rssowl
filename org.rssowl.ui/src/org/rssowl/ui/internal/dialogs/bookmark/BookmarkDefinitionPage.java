@@ -65,11 +65,11 @@ public class BookmarkDefinitionPage extends WizardPage {
     JobRunner.runInUIThread(fNameInput, new Runnable() {
       public void run() {
         if (StringUtils.isSet(name)) {
-          setMessage("Create a new Bookmark to read News from a Feed.");
+          setMessage(Messages.BookmarkDefinitionPage_CREATE_BOOKMARK);
           fNameInput.setText(name);
           fNameInput.selectAll();
         } else {
-          setMessage("Unable to load the title from the feed", IMessageProvider.WARNING);
+          setMessage(Messages.BookmarkDefinitionPage_UNABLE_LOAD_TITLE, IMessageProvider.WARNING);
         }
       }
     });
@@ -88,9 +88,9 @@ public class BookmarkDefinitionPage extends WizardPage {
    * @param selectedFolder
    */
   protected BookmarkDefinitionPage(String pageName, IFolder selectedFolder) {
-    super(pageName, pageName, OwlUI.getImageDescriptor("icons/wizban/bkmrk_wiz.gif"));
+    super(pageName, pageName, OwlUI.getImageDescriptor("icons/wizban/bkmrk_wiz.gif")); //$NON-NLS-1$
     fSelectedFolder = selectedFolder;
-    setMessage("Create a new Bookmark to read News from a Feed.");
+    setMessage(Messages.BookmarkDefinitionPage_CREATE_BOOKMARK);
   }
 
   /*
@@ -114,7 +114,7 @@ public class BookmarkDefinitionPage extends WizardPage {
 
     /* Name */
     Label nameLabel = new Label(container, SWT.None);
-    nameLabel.setText("Name: ");
+    nameLabel.setText(Messages.BookmarkDefinitionPage_NAME);
 
     fNameInput = new Text(container, SWT.BORDER);
     fNameInput.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
@@ -130,7 +130,7 @@ public class BookmarkDefinitionPage extends WizardPage {
     labelContainer.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
 
     Label locationLabel = new Label(labelContainer, SWT.None);
-    locationLabel.setText("Location: ");
+    locationLabel.setText(Messages.BookmarkDefinitionPage_LOCATION);
 
     fFolderChooser = new FolderChooser(container, fSelectedFolder, null, SWT.BORDER, false, 5);
     fFolderChooser.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
