@@ -84,10 +84,10 @@ import java.util.Set;
 public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
   /* WebSite class being used for the Browser on Windows only */
-  private static final String SWT_BROWSER_WIN = "org.eclipse.swt.browser.WebSite";
+  private static final String SWT_BROWSER_WIN = "org.eclipse.swt.browser.WebSite"; //$NON-NLS-1$
 
   /** Key for Data-Slot in Controls that support this Hook */
-  public static final String FOCUSLESS_SCROLL_HOOK = "org.rssowl.ui.internal.FocuslessScrollHook";
+  public static final String FOCUSLESS_SCROLL_HOOK = "org.rssowl.ui.internal.FocuslessScrollHook"; //$NON-NLS-1$
 
   private TrayItem fTrayItem;
   private boolean fTrayTeasing;
@@ -195,9 +195,9 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     /* Use PNG on Windows and Linux */
     if (Application.IS_WINDOWS || Application.IS_LINUX) {
       Image[] shellImg = new Image[3];
-      shellImg[0] = new Image(shell.getDisplay(), getClass().getResourceAsStream("/icons/product/16x16.png"));
-      shellImg[1] = new Image(shell.getDisplay(), getClass().getResourceAsStream("/icons/product/24x24.png"));
-      shellImg[2] = new Image(shell.getDisplay(), getClass().getResourceAsStream("/icons/product/32x32.png"));
+      shellImg[0] = new Image(shell.getDisplay(), getClass().getResourceAsStream("/icons/product/16x16.png")); //$NON-NLS-1$
+      shellImg[1] = new Image(shell.getDisplay(), getClass().getResourceAsStream("/icons/product/24x24.png")); //$NON-NLS-1$
+      shellImg[2] = new Image(shell.getDisplay(), getClass().getResourceAsStream("/icons/product/32x32.png")); //$NON-NLS-1$
       shell.setImages(shellImg);
 
       /* Apply to all Dialogs */
@@ -441,7 +441,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
     /* Create Item in Tray */
     fTrayItem = new TrayItem(tray, SWT.NONE);
-    fTrayItem.setToolTipText("RSSOwl");
+    fTrayItem.setToolTipText("RSSOwl"); //$NON-NLS-1$
     fTrayEnabled = true;
 
     if (Application.IS_WINDOWS)
@@ -471,7 +471,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
           @Override
           public void fill(Menu menu, int index) {
             MenuItem restoreItem = new MenuItem(menu, SWT.PUSH);
-            restoreItem.setText("Restore");
+            restoreItem.setText(Messages.ApplicationWorkbenchWindowAdvisor_RESTORE);
             restoreItem.addSelectionListener(new SelectionAdapter() {
               @Override
               public void widgetSelected(SelectionEvent e) {

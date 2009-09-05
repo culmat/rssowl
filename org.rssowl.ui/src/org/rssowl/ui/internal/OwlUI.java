@@ -51,6 +51,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.ProgressMonitorPart;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.SWTException;
@@ -260,28 +261,28 @@ public class OwlUI {
   public static final int MIN_DIALOG_WIDTH_DLU = 320;
 
   /** News-Text Font Id */
-  public static final String NEWS_TEXT_FONT_ID = "org.rssowl.ui.NewsTextFont";
+  public static final String NEWS_TEXT_FONT_ID = "org.rssowl.ui.NewsTextFont"; //$NON-NLS-1$
 
   /** Headlines Font Id */
-  public static final String HEADLINES_FONT_ID = "org.rssowl.ui.HeadlinesFont";
+  public static final String HEADLINES_FONT_ID = "org.rssowl.ui.HeadlinesFont"; //$NON-NLS-1$
 
   /** BookMark Explorer Font Id */
-  public static final String BKMRK_EXPLORER_FONT_ID = "org.rssowl.ui.BookmarkExplorerFont";
+  public static final String BKMRK_EXPLORER_FONT_ID = "org.rssowl.ui.BookmarkExplorerFont"; //$NON-NLS-1$
 
   /** Notification Popup Font Id */
-  public static final String NOTIFICATION_POPUP_FONT_ID = "org.rssowl.ui.NotificationPopupFont";
+  public static final String NOTIFICATION_POPUP_FONT_ID = "org.rssowl.ui.NotificationPopupFont"; //$NON-NLS-1$
 
   /** Dialog Font Id */
-  public static final String DIALOG_FONT_ID = "org.eclipse.jface.dialogfont";
+  public static final String DIALOG_FONT_ID = "org.eclipse.jface.dialogfont"; //$NON-NLS-1$
 
   /** Sticky Background Color */
-  public static final String STICKY_BG_COLOR_ID = "org.rssowl.ui.StickyBGColor";
+  public static final String STICKY_BG_COLOR_ID = "org.rssowl.ui.StickyBGColor"; //$NON-NLS-1$
 
   /** Search Highlight Background Color */
-  public static final String SEARCH_HIGHLIGHT_BG_COLOR_ID = "org.rssowl.ui.SearchHighlightBGColor";
+  public static final String SEARCH_HIGHLIGHT_BG_COLOR_ID = "org.rssowl.ui.SearchHighlightBGColor"; //$NON-NLS-1$
 
   /* ID of the High Contrast Theme */
-  private static final String HIGH_CONTRAST_THEME = "org.eclipse.ui.ide.systemDefault";
+  private static final String HIGH_CONTRAST_THEME = "org.eclipse.ui.ide.systemDefault"; //$NON-NLS-1$
 
   /* Used to cache Image-Descriptors for Favicons */
   private static final Map<Long, ImageDescriptor> FAVICO_CACHE = new HashMap<Long, ImageDescriptor>();
@@ -293,7 +294,7 @@ public class OwlUI {
   private static final Map<String, String> fgImageUriMap = new ConcurrentHashMap<String, String>();
 
   /* Name of Folder for storing Icons */
-  private static final String ICONS_FOLDER = "icons";
+  private static final String ICONS_FOLDER = "icons"; //$NON-NLS-1$
 
   /* Shared Clipboard instance */
   private static Clipboard fgClipboard;
@@ -312,38 +313,38 @@ public class OwlUI {
   static {
 
     /* Audio */
-    fgMapMimeToExtension.put("audio/mpeg", "mp3");
-    fgMapMimeToExtension.put("audio/mpeg3", "mp3");
-    fgMapMimeToExtension.put("audio/x-mpeg3", "mp3");
-    fgMapMimeToExtension.put("audio/mpeg4", "mp4");
-    fgMapMimeToExtension.put("audio/x-mpeg4", "mp4");
-    fgMapMimeToExtension.put("audio/aac", "aac");
-    fgMapMimeToExtension.put("audio/aacp", "aac");
+    fgMapMimeToExtension.put("audio/mpeg", "mp3"); //$NON-NLS-1$ //$NON-NLS-2$
+    fgMapMimeToExtension.put("audio/mpeg3", "mp3"); //$NON-NLS-1$ //$NON-NLS-2$
+    fgMapMimeToExtension.put("audio/x-mpeg3", "mp3"); //$NON-NLS-1$ //$NON-NLS-2$
+    fgMapMimeToExtension.put("audio/mpeg4", "mp4"); //$NON-NLS-1$ //$NON-NLS-2$
+    fgMapMimeToExtension.put("audio/x-mpeg4", "mp4"); //$NON-NLS-1$ //$NON-NLS-2$
+    fgMapMimeToExtension.put("audio/aac", "aac"); //$NON-NLS-1$ //$NON-NLS-2$
+    fgMapMimeToExtension.put("audio/aacp", "aac"); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* Image */
-    fgMapMimeToExtension.put("image/bmp", "bmp");
-    fgMapMimeToExtension.put("image/x-windows-bmp", "bmp");
-    fgMapMimeToExtension.put("image/gif", "gif");
-    fgMapMimeToExtension.put("image/jpeg", "jpg");
-    fgMapMimeToExtension.put("image/pjpeg", "jpg");
-    fgMapMimeToExtension.put("image/png", "png");
-    fgMapMimeToExtension.put("image/x-quicktime", "qti");
+    fgMapMimeToExtension.put("image/bmp", "bmp"); //$NON-NLS-1$ //$NON-NLS-2$
+    fgMapMimeToExtension.put("image/x-windows-bmp", "bmp"); //$NON-NLS-1$ //$NON-NLS-2$
+    fgMapMimeToExtension.put("image/gif", "gif"); //$NON-NLS-1$ //$NON-NLS-2$
+    fgMapMimeToExtension.put("image/jpeg", "jpg"); //$NON-NLS-1$ //$NON-NLS-2$
+    fgMapMimeToExtension.put("image/pjpeg", "jpg"); //$NON-NLS-1$ //$NON-NLS-2$
+    fgMapMimeToExtension.put("image/png", "png"); //$NON-NLS-1$ //$NON-NLS-2$
+    fgMapMimeToExtension.put("image/x-quicktime", "qti"); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* Video */
-    fgMapMimeToExtension.put("video/x-ms-asf", "asd");
-    fgMapMimeToExtension.put("application/x-troff-msvideo", "avi");
-    fgMapMimeToExtension.put("video/avi", "avi");
-    fgMapMimeToExtension.put("video/msvideo", "avi");
-    fgMapMimeToExtension.put("video/x-msvideo", "avi");
-    fgMapMimeToExtension.put("video/x-flv", "flv");
-    fgMapMimeToExtension.put("video/quicktime", "mov");
+    fgMapMimeToExtension.put("video/x-ms-asf", "asd"); //$NON-NLS-1$ //$NON-NLS-2$
+    fgMapMimeToExtension.put("application/x-troff-msvideo", "avi"); //$NON-NLS-1$ //$NON-NLS-2$
+    fgMapMimeToExtension.put("video/avi", "avi"); //$NON-NLS-1$ //$NON-NLS-2$
+    fgMapMimeToExtension.put("video/msvideo", "avi"); //$NON-NLS-1$ //$NON-NLS-2$
+    fgMapMimeToExtension.put("video/x-msvideo", "avi"); //$NON-NLS-1$ //$NON-NLS-2$
+    fgMapMimeToExtension.put("video/x-flv", "flv"); //$NON-NLS-1$ //$NON-NLS-2$
+    fgMapMimeToExtension.put("video/quicktime", "mov"); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* Application */
-    fgMapMimeToExtension.put("application/msword", "doc");
-    fgMapMimeToExtension.put("application/pdf", "pdf");
-    fgMapMimeToExtension.put("application/rtf", "rtf");
-    fgMapMimeToExtension.put("text/richtext", "rtf");
-    fgMapMimeToExtension.put("application/x-rtf", "rtf");
+    fgMapMimeToExtension.put("application/msword", "doc"); //$NON-NLS-1$ //$NON-NLS-2$
+    fgMapMimeToExtension.put("application/pdf", "pdf"); //$NON-NLS-1$ //$NON-NLS-2$
+    fgMapMimeToExtension.put("application/rtf", "rtf"); //$NON-NLS-1$ //$NON-NLS-2$
+    fgMapMimeToExtension.put("text/richtext", "rtf"); //$NON-NLS-1$ //$NON-NLS-2$
+    fgMapMimeToExtension.put("application/x-rtf", "rtf"); //$NON-NLS-1$ //$NON-NLS-2$
   }
 
   /** An enumeration of Operating System Themes */
@@ -664,7 +665,7 @@ public class OwlUI {
   private static String getImageUri(File file) {
     URI uri = file.toURI();
     String s = uri.toASCIIString();
-    return s.replaceFirst("/", "///");
+    return s.replaceFirst("/", "///"); //$NON-NLS-1$ //$NON-NLS-2$
   }
 
   /**
@@ -717,7 +718,7 @@ public class OwlUI {
    * @return RGB
    */
   public static RGB getRGB(String rgb) {
-    String color[] = rgb.split(",");
+    String color[] = rgb.split(","); //$NON-NLS-1$
     return new RGB(Integer.parseInt(color[0]), Integer.parseInt(color[1]), Integer.parseInt(color[2]));
   }
 
@@ -726,7 +727,7 @@ public class OwlUI {
    * @return String
    */
   public static String toString(RGB rgb) {
-    return rgb.red + "," + rgb.green + "," + rgb.blue;
+    return rgb.red + "," + rgb.green + "," + rgb.blue; //$NON-NLS-1$ //$NON-NLS-2$
   }
 
   /**
@@ -859,7 +860,7 @@ public class OwlUI {
       res = true;
 
     if (!res)
-      Activator.getDefault().logInfo("Unable to delete image with ID " + id);
+      Activator.getDefault().logInfo("Unable to delete image with ID " + id); //$NON-NLS-1$
   }
 
   /**
@@ -1013,7 +1014,7 @@ public class OwlUI {
     path = path.append(fileName);
 
     if (!res) {
-      activator.logInfo("Unable to get image file with name " + fileName);
+      activator.logInfo("Unable to get image file with name " + fileName); //$NON-NLS-1$
       return null;
     }
 
@@ -1021,7 +1022,7 @@ public class OwlUI {
   }
 
   private static File getImageFile(long id) {
-    return getImageFile(id + ".ico");
+    return getImageFile(id + ".ico"); //$NON-NLS-1$
   }
 
   /**
@@ -1418,9 +1419,9 @@ public class OwlUI {
   public static void updateWindowTitle(String title) {
     IWorkbenchWindow window = getWindow();
     if (window != null) {
-      String appTitle = "RSSOwl";
+      String appTitle = "RSSOwl"; //$NON-NLS-1$
       if (StringUtils.isSet(title))
-        title = title + " - " + appTitle;
+        title = NLS.bind(Messages.OwlUI_TITLE, title, appTitle);
       else
         title = appTitle;
 
@@ -1622,7 +1623,7 @@ public class OwlUI {
     if (decorate) {
       ControlDecoration controlDeco = new ControlDecoration(control, SWT.LEFT | SWT.TOP);
       controlDeco.setImage(FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_CONTENT_PROPOSAL).getImage());
-      controlDeco.setDescriptionText("Content Assist Available (Press Arrow-Down Key)");
+      controlDeco.setDescriptionText(Messages.OwlUI_CONTENT_ASSIST);
       controlDeco.setShowOnlyOnFocus(true);
     }
 
@@ -1753,7 +1754,7 @@ public class OwlUI {
       return STATE_WIDTH;
 
     /* Calculate and Cache */
-    String sampleState = "Updated";
+    String sampleState = Messages.OwlUI_UPDATED;
 
     STATE_WIDTH = OwlUI.getTextSize(Display.getDefault(), OwlUI.getBold(HEADLINES_FONT_ID), sampleState).x;
     STATE_WIDTH += Application.IS_WINDOWS ? 15 : 30; // Bounds of Column requires more space
@@ -1951,7 +1952,6 @@ public class OwlUI {
    * @return an {@link ImageDescriptor} for the attachment. Never
    * <code>null</code>.
    */
-  @SuppressWarnings("restriction")
   public static ImageDescriptor getAttachmentImage(String name, String mimeType) {
 
     /* First try to lookup image from Mime Type */
@@ -1972,7 +1972,7 @@ public class OwlUI {
   private static ImageDescriptor getImageForFile(String file) {
     if (StringUtils.isSet(file)) {
       int lastIndexOfDot = file.lastIndexOf('.');
-      if (lastIndexOfDot != -1 && !file.endsWith(".")) {
+      if (lastIndexOfDot != -1 && !file.endsWith(".")) { //$NON-NLS-1$
         String extension = file.substring(lastIndexOfDot + 1);
         return getImageForExtension(extension.toLowerCase());
       }
@@ -2012,13 +2012,13 @@ public class OwlUI {
       int hours = seconds / 3600;
       int minutes = (seconds / 60) % 60;
 
-      String hoursStr = (hours == 1) ? " Hour" : " Hours";
-      String minutesStr = (minutes == 1) ? " Minute" : " Minutes";
-      String secondsStr = (seconds == 1) ? " Second" : " Seconds";
+      String hoursStr = (hours == 1) ? " Hour" : " Hours"; //$NON-NLS-1$ //$NON-NLS-2$
+      String minutesStr = (minutes == 1) ? " Minute" : " Minutes"; //$NON-NLS-1$ //$NON-NLS-2$
+      String secondsStr = (seconds == 1) ? " Second" : " Seconds"; //$NON-NLS-1$ //$NON-NLS-2$
 
       /* X Hours, Y Minutes */
       if (hours > 0 && minutes > 0)
-        return hours + hoursStr + ", " + minutes + minutesStr;
+        return hours + hoursStr + ", " + minutes + minutesStr; //$NON-NLS-1$
 
       /* X Hours */
       else if (hours > 0)
@@ -2045,15 +2045,15 @@ public class OwlUI {
       double mb = bytes / (1024d * 1024d);
       double kb = bytes / 1024d;
 
-      NumberFormat format = new DecimalFormat("0.0");
+      NumberFormat format = new DecimalFormat("0.0"); //$NON-NLS-1$
 
       if (mb >= 1)
-        return format.format(mb) + " MB";
+        return format.format(mb) + " MB"; //$NON-NLS-1$
 
       if (kb >= 1)
-        return format.format(kb) + " KB";
+        return format.format(kb) + " KB"; //$NON-NLS-1$
 
-      return bytes + " Bytes";
+      return bytes + " Bytes"; //$NON-NLS-1$
     }
 
     return null;

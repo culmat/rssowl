@@ -38,8 +38,8 @@ import org.rssowl.core.util.URIUtils;
  * @author bpasero
  */
 public class ShareProvider {
-  private static final String URL_INPUT_TOKEN = "[L]";
-  private static final String TITLE_INPUT_TOKEN = "[T]";
+  private static final String URL_INPUT_TOKEN = "[L]"; //$NON-NLS-1$
+  private static final String TITLE_INPUT_TOKEN = "[T]"; //$NON-NLS-1$
 
   private final String fId;
   private final String fPluginId;
@@ -156,10 +156,10 @@ public class ShareProvider {
    */
   public String toShareUrl(String link, String title) {
     if (!StringUtils.isSet(link))
-      link = "";
+      link = ""; //$NON-NLS-1$
 
     if (!StringUtils.isSet(title))
-      title = "";
+      title = ""; //$NON-NLS-1$
 
     if (title.length() > fMaxTitleLength)
       title = StringUtils.smartTrim(title, fMaxTitleLength);

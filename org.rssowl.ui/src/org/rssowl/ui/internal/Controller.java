@@ -39,6 +39,7 @@ import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.window.Window;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
@@ -135,24 +136,24 @@ import java.util.concurrent.locks.ReentrantLock;
 public class Controller {
 
   /* Backup Files */
-  private static final String DAILY_BACKUP = "backup.opml";
-  private static final String BACKUP_TMP = "backup.tmp";
-  private static final String WEEKLY_BACKUP = "backup_weekly.opml";
+  private static final String DAILY_BACKUP = "backup.opml"; //$NON-NLS-1$
+  private static final String BACKUP_TMP = "backup.tmp"; //$NON-NLS-1$
+  private static final String WEEKLY_BACKUP = "backup_weekly.opml"; //$NON-NLS-1$
 
   /* Extension-Points */
   private static final String ENTITY_PROPERTY_PAGE_EXTENSION_POINT = "org.rssowl.ui.EntityPropertyPage"; //$NON-NLS-1$
 
   /** Property to store info about a Realm in a Bookmark */
-  public static final String BM_REALM_PROPERTY = "org.rssowl.ui.BMRealmProperty";
+  public static final String BM_REALM_PROPERTY = "org.rssowl.ui.BMRealmProperty"; //$NON-NLS-1$
 
   /** Prefix for dynamic Label Actions */
-  public static final String LABEL_ACTION_PREFIX = "org.rssowl.ui.LabelAction";
+  public static final String LABEL_ACTION_PREFIX = "org.rssowl.ui.LabelAction"; //$NON-NLS-1$
 
   /** Key to store error messages into entities during reload */
-  public static final String LOAD_ERROR_KEY = "org.rssowl.ui.internal.LoadErrorKey";
+  public static final String LOAD_ERROR_KEY = "org.rssowl.ui.internal.LoadErrorKey"; //$NON-NLS-1$
 
   /* ID of RSSOwl's Keybinding Category */
-  private static final String RSSOWL_KEYBINDING_CATEGORY = "org.rssowl.ui.commands.category.RSSOwl";
+  private static final String RSSOWL_KEYBINDING_CATEGORY = "org.rssowl.ui.commands.category.RSSOwl"; //$NON-NLS-1$
 
   /* The Singleton Instance */
   private static Controller fInstance;
@@ -164,7 +165,7 @@ public class Controller {
   private static final int DEFAULT_MAX_CONCURRENT_RELOAD_JOBS = 10;
 
   /* System Property to override default Max. number of concurrent running reload Jobs */
-  private static final String MAX_CONCURRENT_RELOAD_JOBS_PROPERTY = "maxReloadJobs";
+  private static final String MAX_CONCURRENT_RELOAD_JOBS_PROPERTY = "maxReloadJobs"; //$NON-NLS-1$
 
   /* Max. number of concurrent Jobs for saving a Feed */
   private static final int MAX_CONCURRENT_SAVE_JOBS = 1;
@@ -176,10 +177,10 @@ public class Controller {
   private static final int DEFAULT_FEED_CON_TIMEOUT = 30000;
 
   /* System Property to override default connection timeout */
-  private static final String FEED_CON_TIMEOUT_PROPERTY = "conTimeout";
+  private static final String FEED_CON_TIMEOUT_PROPERTY = "conTimeout"; //$NON-NLS-1$
 
   /* System Property to import a file on first startup */
-  private static final String IMPORT_PROPERTY = "import";
+  private static final String IMPORT_PROPERTY = "import"; //$NON-NLS-1$
 
   /* Queue for reloading Feeds */
   private final JobQueue fReloadFeedQueue;
@@ -212,13 +213,13 @@ public class Controller {
   private ContextService fContextService;
 
   /* Share News Provider Extension Point */
-  private static final String SHARE_PROVIDER_EXTENSION_POINT = "org.rssowl.ui.ShareProvider";
+  private static final String SHARE_PROVIDER_EXTENSION_POINT = "org.rssowl.ui.ShareProvider"; //$NON-NLS-1$
 
   /* Feed Search Extension Point */
-  private static final String FEED_SEARCH_EXTENSION_POINT = "org.rssowl.ui.FeedSearch";
+  private static final String FEED_SEARCH_EXTENSION_POINT = "org.rssowl.ui.FeedSearch"; //$NON-NLS-1$
 
   /* Token to replace keywords with in the Feed Search Link */
-  private static final String FEED_SEARCH_KEYWORD_TOKEN = "[K]";
+  private static final String FEED_SEARCH_KEYWORD_TOKEN = "[K]"; //$NON-NLS-1$
 
   /* Misc. */
   private final IApplicationService fAppService;
@@ -309,8 +310,8 @@ public class Controller {
 
   private Controller() {
     int maxConcurrentReloadJobs = getSystemProperty(MAX_CONCURRENT_RELOAD_JOBS_PROPERTY, 0, DEFAULT_MAX_CONCURRENT_RELOAD_JOBS);
-    fReloadFeedQueue = new JobQueue("Updating Feeds...", "Updating", maxConcurrentReloadJobs, Integer.MAX_VALUE, true, 0);
-    fSaveFeedQueue = new JobQueue("Updating Feeds...", MAX_CONCURRENT_SAVE_JOBS, MAX_SAVE_QUEUE_SIZE, false, 0);
+    fReloadFeedQueue = new JobQueue(Messages.Controller_UPDATING_FEEDS, Messages.Controller_UPDATING, maxConcurrentReloadJobs, Integer.MAX_VALUE, true, 0);
+    fSaveFeedQueue = new JobQueue(Messages.Controller_UPDATING_FEEDS, MAX_CONCURRENT_SAVE_JOBS, MAX_SAVE_QUEUE_SIZE, false, 0);
     fSaveFeedQueue.setUnknownProgress(true);
     fEntityPropertyPages = loadEntityPropertyPages();
     fBookMarkDAO = DynamicDAO.getDAO(IBookMarkDAO.class);
@@ -418,15 +419,15 @@ public class Controller {
     /* For each contributed property Page */
     for (IConfigurationElement element : elements) {
       try {
-        String id = element.getAttribute("id");
-        String name = element.getAttribute("name");
-        int order = Integer.valueOf(element.getAttribute("order"));
-        boolean handlesMultipleEntities = Boolean.valueOf(element.getAttribute("handlesMultipleEntities"));
+        String id = element.getAttribute("id"); //$NON-NLS-1$
+        String name = element.getAttribute("name"); //$NON-NLS-1$
+        int order = Integer.valueOf(element.getAttribute("order")); //$NON-NLS-1$
+        boolean handlesMultipleEntities = Boolean.valueOf(element.getAttribute("handlesMultipleEntities")); //$NON-NLS-1$
 
         List<Class<?>> targetEntities = new ArrayList<Class<?>>();
-        IConfigurationElement[] entityTargets = element.getChildren("targetEntity");
+        IConfigurationElement[] entityTargets = element.getChildren("targetEntity"); //$NON-NLS-1$
         for (IConfigurationElement entityTarget : entityTargets)
-          targetEntities.add(Class.forName(entityTarget.getAttribute("class")));
+          targetEntities.add(Class.forName(entityTarget.getAttribute("class"))); //$NON-NLS-1$
 
         pages.add(new EntityPropertyPageWrapper(id, element, targetEntities, name, order, handlesMultipleEntities));
       } catch (ClassNotFoundException e) {
@@ -661,7 +662,7 @@ public class Controller {
 
           @Override
           public String getName() {
-            return "Updating Feeds";
+            return Messages.Controller_UPDATING_FEEDS_JOB;
           }
         });
       } else {
@@ -917,12 +918,12 @@ public class Controller {
     for (int i = 0; i < elements.length; i++) {
       IConfigurationElement element = elements[i];
 
-      String id = element.getAttribute("id");
-      String name = element.getAttribute("name");
-      String iconPath = element.getAttribute("icon");
-      String url = element.getAttribute("url");
-      String maxTitleLength = element.getAttribute("maxTitleLength");
-      String enabled = element.getAttribute("enabled");
+      String id = element.getAttribute("id"); //$NON-NLS-1$
+      String name = element.getAttribute("name"); //$NON-NLS-1$
+      String iconPath = element.getAttribute("icon"); //$NON-NLS-1$
+      String url = element.getAttribute("url"); //$NON-NLS-1$
+      String maxTitleLength = element.getAttribute("maxTitleLength"); //$NON-NLS-1$
+      String enabled = element.getAttribute("enabled"); //$NON-NLS-1$
 
       boolean isEnabled = (enabled != null && Boolean.parseBoolean(enabled));
       fShareProviders.add(new ShareProvider(id, element.getNamespaceIdentifier(), i, name, iconPath, url, maxTitleLength, isEnabled));
@@ -1052,7 +1053,7 @@ public class Controller {
     /* Check for Status of Startup */
     IStatus startupStatus = Owl.getPersistenceService().getStartupStatus();
     if (startupStatus.getSeverity() == IStatus.ERROR)
-      ErrorDialog.openError(OwlUI.getPrimaryShell(), "Startup error", "There was an error while starting RSSOwl.", startupStatus);
+      ErrorDialog.openError(OwlUI.getPrimaryShell(), Messages.Controller_STARTUP_ERROR, Messages.Controller_START_ERROR_MSG, startupStatus);
 
     /* Backup Subscriptions as OPML if no error */
     else {
@@ -1185,34 +1186,34 @@ public class Controller {
 
     /* Show Welcome Otherwise */
     if (showWelcome) {
-      DynamicDAO.save(Owl.getModelFactory().createFolder(null, null, "My Bookmarks"));
+      DynamicDAO.save(Owl.getModelFactory().createFolder(null, null, Messages.Controller_MY_BOOKMARKS));
       fShowWelcome = true;
     }
   }
 
   private void addDefaultLabels() throws PersistenceException {
-    ILabel label = fFactory.createLabel(null, "Important");
-    label.setColor("163,21,2");
+    ILabel label = fFactory.createLabel(null, Messages.Controller_IMPORTANT);
+    label.setColor("163,21,2"); //$NON-NLS-1$
     label.setOrder(0);
     fLabelDao.save(label);
 
-    label = fFactory.createLabel(null, "Work");
-    label.setColor("200,118,10");
+    label = fFactory.createLabel(null, Messages.Controller_WORK);
+    label.setColor("200,118,10"); //$NON-NLS-1$
     label.setOrder(1);
     fLabelDao.save(label);
 
-    label = fFactory.createLabel(null, "Personal");
-    label.setColor("82,92,58");
+    label = fFactory.createLabel(null, Messages.Controller_PERSONAL);
+    label.setColor("82,92,58"); //$NON-NLS-1$
     label.setOrder(2);
     fLabelDao.save(label);
 
-    label = fFactory.createLabel(null, "To Do");
-    label.setColor("92,101,126");
+    label = fFactory.createLabel(null, Messages.Controller_TODO);
+    label.setColor("92,101,126"); //$NON-NLS-1$
     label.setOrder(3);
     fLabelDao.save(label);
 
-    label = fFactory.createLabel(null, "Later");
-    label.setColor("82,16,0");
+    label = fFactory.createLabel(null, Messages.Controller_LATER);
+    label.setColor("82,16,0"); //$NON-NLS-1$
     label.setOrder(4);
     fLabelDao.save(label);
   }
@@ -1226,12 +1227,12 @@ public class Controller {
 
   private IStatus createWarningStatus(IStatus status, IBookMark bookmark, URI feedLink) {
     StringBuilder msg = new StringBuilder();
-    msg.append("Error loading '").append(bookmark.getName()).append("' ");
+    msg.append(NLS.bind(Messages.Controller_ERROR_LOADING, bookmark.getName()));
 
     if (StringUtils.isSet(status.getMessage()))
-      msg.append("\nProblem: ").append(status.getMessage());
+      msg.append("\n").append(Messages.Controller_PROBLEM).append(status.getMessage()); //$NON-NLS-1$
 
-    msg.append("\nLink: ").append(feedLink);
+    msg.append("\n").append(Messages.Controller_LINK).append(feedLink); //$NON-NLS-1$
 
     return new Status(IStatus.WARNING, status.getPlugin(), status.getCode(), msg.toString(), null);
   }
@@ -1252,7 +1253,7 @@ public class Controller {
     /* Define Command For Each Label */
     for (final ILabel label : labels) {
       Command command = commandService.getCommand(LABEL_ACTION_PREFIX + label.getOrder());
-      command.define("Label '" + label.getName() + "'", "Assign the label " + label.getName() + " to selected News.", commandService.getCategory(RSSOWL_KEYBINDING_CATEGORY));
+      command.define(NLS.bind(Messages.Controller_LABEL, label.getName()), NLS.bind(Messages.Controller_LABEL_MSG, label.getName()), commandService.getCategory(RSSOWL_KEYBINDING_CATEGORY));
       command.setHandler(new LabelNewsHandler(label));
     }
   }

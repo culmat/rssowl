@@ -78,9 +78,9 @@ public class StatusLineUpdater implements ISelectionChangedListener {
       else if (element instanceof EntityGroup)
         return ((EntityGroup) element).getName();
       else if (element instanceof INews) // Ignore This
-        return "";
+        return ""; //$NON-NLS-1$
 
-      return "Item selected";
+      return "Item selected"; //$NON-NLS-1$
     }
 
     /* More than 1 Element selected */
@@ -108,28 +108,28 @@ public class StatusLineUpdater implements ISelectionChangedListener {
 
     StringBuilder buf = new StringBuilder();
     buf.append(elements.length);
-    buf.append(" items selected (");
+    buf.append(" items selected ("); //$NON-NLS-1$
 
     if (folderCount > 0)
-      buf.append(folderCount).append(folderCount == 1 ? " Folder, " : " Folders, ");
+      buf.append(folderCount).append(folderCount == 1 ? " Folder, " : " Folders, "); //$NON-NLS-1$ //$NON-NLS-2$
 
     if (bookMarkCount > 0)
-      buf.append(bookMarkCount).append(bookMarkCount == 1 ? " Bookmark, " : " Bookmarks, ");
+      buf.append(bookMarkCount).append(bookMarkCount == 1 ? " Bookmark, " : " Bookmarks, "); //$NON-NLS-1$ //$NON-NLS-2$
 
     if (newsBinCount > 0)
-      buf.append(newsBinCount).append(newsBinCount == 1 ? " News Bin, " : " News Bins, ");
+      buf.append(newsBinCount).append(newsBinCount == 1 ? " News Bin, " : " News Bins, "); //$NON-NLS-1$ //$NON-NLS-2$
 
     if (searchMarkCount > 0)
-      buf.append(searchMarkCount).append(searchMarkCount == 1 ? " Saved Search, " : " Saved Searches, ");
+      buf.append(searchMarkCount).append(searchMarkCount == 1 ? " Saved Search, " : " Saved Searches, "); //$NON-NLS-1$ //$NON-NLS-2$
 
     if (viewerGroupCount > 0)
-      buf.append(viewerGroupCount).append(viewerGroupCount == 1 ? " Group, " : " Groups, ");
+      buf.append(viewerGroupCount).append(viewerGroupCount == 1 ? " Group, " : " Groups, "); //$NON-NLS-1$ //$NON-NLS-2$
 
     if (newsCount > 0)
-      buf.append(newsCount).append(" News, ");
+      buf.append(newsCount).append(" News, "); //$NON-NLS-1$
 
     buf.delete(buf.length() - 2, buf.length());
-    buf.append(")");
+    buf.append(")"); //$NON-NLS-1$
     return buf.toString();
   }
 }

@@ -40,6 +40,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -118,10 +119,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class CoolBarAdvisor {
 
   /* ID of a Separator */
-  private static final String SEPARATOR_ID = "org.rssowl.ui.CoolBarSeparator";
+  private static final String SEPARATOR_ID = "org.rssowl.ui.CoolBarSeparator"; //$NON-NLS-1$
 
   /* ID of a Separator */
-  private static final String SPACER_ID = "org.rssowl.ui.CoolBarSpacer";
+  private static final String SPACER_ID = "org.rssowl.ui.CoolBarSpacer"; //$NON-NLS-1$
 
   private final IWorkbenchWindow fWindow;
   private final ICoolBarManager fManager;
@@ -152,115 +153,115 @@ public class CoolBarAdvisor {
   public enum CoolBarItem {
 
     /** Separator */
-    SEPARATOR(SEPARATOR_ID, "Separator", null, OwlUI.getImageDescriptor("icons/obj16/separator.gif"), null, 0),
+    SEPARATOR(SEPARATOR_ID, Messages.CoolBarAdvisor_SEPARATOR, null, OwlUI.getImageDescriptor("icons/obj16/separator.gif"), null, 0), //$NON-NLS-1$
 
     /** Spacer */
-    SPACER(SPACER_ID, "Blank Space", null, OwlUI.getImageDescriptor("icons/etool16/spacer.gif"), null, 0),
+    SPACER(SPACER_ID, Messages.CoolBarAdvisor_BLANK, null, OwlUI.getImageDescriptor("icons/etool16/spacer.gif"), null, 0), //$NON-NLS-1$
 
     /** New */
-    NEW("org.rssowl.ui.NewDropDown", "New", null, OwlUI.getImageDescriptor("icons/etool16/add.gif"), null, IAction.AS_DROP_DOWN_MENU, false, 1),
+    NEW("org.rssowl.ui.NewDropDown", Messages.CoolBarAdvisor_NEW, null, OwlUI.getImageDescriptor("icons/etool16/add.gif"), null, IAction.AS_DROP_DOWN_MENU, false, 1), //$NON-NLS-1$ //$NON-NLS-2$
 
     /** Import */
-    IMPORT(ImportAction.ID, "Import", null, OwlUI.getImageDescriptor("icons/etool16/import.gif"), null, 1),
+    IMPORT(ImportAction.ID, Messages.CoolBarAdvisor_IMPORT, null, OwlUI.getImageDescriptor("icons/etool16/import.gif"), null, 1), //$NON-NLS-1$
 
     /** Export */
-    EXPORT(ExportAction.ID, "Export", null, OwlUI.getImageDescriptor("icons/etool16/export.gif"), null, 1),
+    EXPORT(ExportAction.ID, Messages.CoolBarAdvisor_EXPORT, null, OwlUI.getImageDescriptor("icons/etool16/export.gif"), null, 1), //$NON-NLS-1$
 
     /** Undo */
-    UNDO(UndoAction.ID, "Undo", null, OwlUI.getImageDescriptor("icons/elcl16/undo_edit.gif"), OwlUI.getImageDescriptor("icons/dlcl16/undo_edit.gif"), 2),
+    UNDO(UndoAction.ID, Messages.CoolBarAdvisor_UNDO, null, OwlUI.getImageDescriptor("icons/elcl16/undo_edit.gif"), OwlUI.getImageDescriptor("icons/dlcl16/undo_edit.gif"), 2),  //$NON-NLS-1$//$NON-NLS-2$
 
     /** Redo */
-    REDO(RedoAction.ID, "Redo", null, OwlUI.getImageDescriptor("icons/elcl16/redo_edit.gif"), OwlUI.getImageDescriptor("icons/dlcl16/redo_edit.gif"), 2),
+    REDO(RedoAction.ID, Messages.CoolBarAdvisor_REDO, null, OwlUI.getImageDescriptor("icons/elcl16/redo_edit.gif"), OwlUI.getImageDescriptor("icons/dlcl16/redo_edit.gif"), 2),  //$NON-NLS-1$//$NON-NLS-2$
 
     /** Update */
-    UPDATE(ReloadTypesAction.ID, "Update", null, OwlUI.getImageDescriptor("icons/elcl16/reload.gif"), OwlUI.getImageDescriptor("icons/dlcl16/reload.gif"), 3),
+    UPDATE(ReloadTypesAction.ID, Messages.CoolBarAdvisor_UPDATE, null, OwlUI.getImageDescriptor("icons/elcl16/reload.gif"), OwlUI.getImageDescriptor("icons/dlcl16/reload.gif"), 3),  //$NON-NLS-1$//$NON-NLS-2$
 
     /** Update All */
-    UPDATE_ALL(ReloadAllAction.ID, "Update All", null, OwlUI.getImageDescriptor("icons/elcl16/reload_all.gif"), null, 3),
+    UPDATE_ALL(ReloadAllAction.ID, Messages.CoolBarAdvisor_UPDATE_ALL, null, OwlUI.getImageDescriptor("icons/elcl16/reload_all.gif"), null, 3), //$NON-NLS-1$
 
     /** Stop */
-    STOP("org.rssowl.ui.StopUpdate", "Stop", "Stop Updates", OwlUI.getImageDescriptor("icons/etool16/cancel.gif"), OwlUI.getImageDescriptor("icons/dtool16/cancel.gif"), IAction.AS_PUSH_BUTTON, false, 3),
+    STOP("org.rssowl.ui.StopUpdate", Messages.CoolBarAdvisor_STOP, Messages.CoolBarAdvisor_STOP_UPDATES, OwlUI.getImageDescriptor("icons/etool16/cancel.gif"), OwlUI.getImageDescriptor("icons/dtool16/cancel.gif"), IAction.AS_PUSH_BUTTON, false, 3), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
     /** Search */
-    SEARCH(SearchNewsAction.ID, "Search", null, OwlUI.SEARCHMARK, null, 4),
+    SEARCH(SearchNewsAction.ID, Messages.CoolBarAdvisor_SEARCH, null, OwlUI.SEARCHMARK, null, 4),
 
     /** Mark Read */
-    MARK_READ(ToggleReadStateAction.ID, "Mark Read", null, OwlUI.getImageDescriptor("icons/elcl16/mark_read.gif"), OwlUI.getImageDescriptor("icons/dlcl16/mark_read.gif"), 5),
+    MARK_READ(ToggleReadStateAction.ID, Messages.CoolBarAdvisor_MARK_READ, null, OwlUI.getImageDescriptor("icons/elcl16/mark_read.gif"), OwlUI.getImageDescriptor("icons/dlcl16/mark_read.gif"), 5),  //$NON-NLS-1$//$NON-NLS-2$
 
     /** Mark All Read */
-    MARK_ALL_READ(MarkAllNewsReadAction.ID, "Mark All Read", null, OwlUI.getImageDescriptor("icons/elcl16/mark_all_read.gif"), OwlUI.getImageDescriptor("icons/dlcl16/mark_all_read.gif"), 5),
+    MARK_ALL_READ(MarkAllNewsReadAction.ID, Messages.CoolBarAdvisor_MARK_ALL_READ, null, OwlUI.getImageDescriptor("icons/elcl16/mark_all_read.gif"), OwlUI.getImageDescriptor("icons/dlcl16/mark_all_read.gif"), 5),  //$NON-NLS-1$//$NON-NLS-2$
 
     /** Label */
-    LABEL("org.rssowl.ui.Label", "Label", "Label News", OwlUI.getImageDescriptor("icons/elcl16/labels.gif"), null, IAction.AS_DROP_DOWN_MENU, false, 6),
+    LABEL("org.rssowl.ui.Label", Messages.CoolBarAdvisor_LABEL, Messages.CoolBarAdvisor_LABEL_NEWS, OwlUI.getImageDescriptor("icons/elcl16/labels.gif"), null, IAction.AS_DROP_DOWN_MENU, false, 6), //$NON-NLS-1$ //$NON-NLS-2$
 
     /** Sticky */
-    STICKY("org.rssowl.ui.actions.MarkSticky", "Sticky", "Mark a News Sticky", OwlUI.NEWS_PINNED, OwlUI.getImageDescriptor("icons/obj16/news_pinned_disabled.gif"), 6),
+    STICKY("org.rssowl.ui.actions.MarkSticky", Messages.CoolBarAdvisor_STICKY, Messages.CoolBarAdvisor_MARK_STICKY, OwlUI.NEWS_PINNED, OwlUI.getImageDescriptor("icons/obj16/news_pinned_disabled.gif"), 6), //$NON-NLS-1$ //$NON-NLS-2$
 
     /** Next Unread News */
-    NEXT("org.rssowl.ui.Next", "Next", null, OwlUI.getImageDescriptor("icons/etool16/next.gif"), null, IAction.AS_DROP_DOWN_MENU, false, 7),
+    NEXT("org.rssowl.ui.Next", Messages.CoolBarAdvisor_NEXT, null, OwlUI.getImageDescriptor("icons/etool16/next.gif"), null, IAction.AS_DROP_DOWN_MENU, false, 7), //$NON-NLS-1$ //$NON-NLS-2$
 
     /** Previous Unread News */
-    PREVIOUS("org.rssowl.ui.Previous", "Previous", null, OwlUI.getImageDescriptor("icons/etool16/previous.gif"), null, IAction.AS_DROP_DOWN_MENU, false, 7),
+    PREVIOUS("org.rssowl.ui.Previous", Messages.CoolBarAdvisor_PREVIOUS, null, OwlUI.getImageDescriptor("icons/etool16/previous.gif"), null, IAction.AS_DROP_DOWN_MENU, false, 7), //$NON-NLS-1$ //$NON-NLS-2$
 
     /** Open News */
-    OPEN(OpenInBrowserAction.ID, "Open", "Open News", OwlUI.getImageDescriptor("icons/elcl16/browser.gif"), OwlUI.getImageDescriptor("icons/dlcl16/browser.gif"), 8),
+    OPEN(OpenInBrowserAction.ID, Messages.CoolBarAdvisor_OPEN, Messages.CoolBarAdvisor_OPEN_NEWS, OwlUI.getImageDescriptor("icons/elcl16/browser.gif"), OwlUI.getImageDescriptor("icons/dlcl16/browser.gif"), 8), //$NON-NLS-1$ //$NON-NLS-2$
 
     /** Move To */
-    MOVE("org.rssowl.ui.Move", "Move", "Move News", OwlUI.getImageDescriptor("icons/etool16/move_to.gif"), OwlUI.getImageDescriptor("icons/dtool16/move_to.gif"), IAction.AS_DROP_DOWN_MENU, false, 8),
+    MOVE("org.rssowl.ui.Move", Messages.CoolBarAdvisor_MOVE, Messages.CoolBarAdvisor_MOVE_NEWS, OwlUI.getImageDescriptor("icons/etool16/move_to.gif"), OwlUI.getImageDescriptor("icons/dtool16/move_to.gif"), IAction.AS_DROP_DOWN_MENU, false, 8), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
     /** Copy To */
-    COPY("org.rssowl.ui.Copy", "Copy", "Copy News", OwlUI.getImageDescriptor("icons/etool16/copy_to.gif"), OwlUI.getImageDescriptor("icons/dtool16/copy_to.gif"), IAction.AS_DROP_DOWN_MENU, false, 8),
+    COPY("org.rssowl.ui.Copy", Messages.CoolBarAdvisor_COPY, Messages.CoolBarAdvisor_COPY_NEWS, OwlUI.getImageDescriptor("icons/etool16/copy_to.gif"), OwlUI.getImageDescriptor("icons/dtool16/copy_to.gif"), IAction.AS_DROP_DOWN_MENU, false, 8), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
     /** Share */
-    SHARE("org.rssowl.ui.Share", "Share", "Share News", OwlUI.getImageDescriptor("icons/elcl16/share.gif"), null, IAction.AS_DROP_DOWN_MENU, false, 8),
+    SHARE("org.rssowl.ui.Share", Messages.CoolBarAdvisor_SHARE, Messages.CoolBarAdvisor_SHARE_NEWS, OwlUI.getImageDescriptor("icons/elcl16/share.gif"), null, IAction.AS_DROP_DOWN_MENU, false, 8), //$NON-NLS-1$ //$NON-NLS-2$
 
     /** Save As */
-    SAVE_AS("org.eclipse.ui.file.saveAs", "Save", "Save News", OwlUI.getImageDescriptor("icons/etool16/save_as.gif"), OwlUI.getImageDescriptor("icons/dtool16/save_as.gif"), 8),
+    SAVE_AS("org.eclipse.ui.file.saveAs", Messages.CoolBarAdvisor_SAVE, Messages.CoolBarAdvisor_SAVE_NEWS, OwlUI.getImageDescriptor("icons/etool16/save_as.gif"), OwlUI.getImageDescriptor("icons/dtool16/save_as.gif"), 8), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
     /** Print */
-    PRINT("org.eclipse.ui.file.print", "Print", "Print News", OwlUI.getImageDescriptor("icons/etool16/print.gif"), OwlUI.getImageDescriptor("icons/dtool16/print.gif"), 8),
+    PRINT("org.eclipse.ui.file.print", Messages.CoolBarAdvisor_PRINT, Messages.CoolBarAdvisor_PRINT_NEWS, OwlUI.getImageDescriptor("icons/etool16/print.gif"), OwlUI.getImageDescriptor("icons/dtool16/print.gif"), 8), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
     /** Find More Feeds */
-    FIND_MORE_FEEDS("org.rssowl.ui.SearchFeedsAction", "Find Feeds", null, OwlUI.getImageDescriptor("icons/etool16/new_bkmrk.gif"), null, 9),
+    FIND_MORE_FEEDS("org.rssowl.ui.SearchFeedsAction", Messages.CoolBarAdvisor_FIND_FEEDS, null, OwlUI.getImageDescriptor("icons/etool16/new_bkmrk.gif"), null, 9), //$NON-NLS-1$ //$NON-NLS-2$
 
     /** New Bookmark */
-    NEW_BOOKMARK("org.rssowl.ui.actions.NewBookMark", "Bookmark", "New Bookmark", OwlUI.BOOKMARK, null, 9),
+    NEW_BOOKMARK("org.rssowl.ui.actions.NewBookMark", Messages.CoolBarAdvisor_BOOKMARK, Messages.CoolBarAdvisor_NEW_BOOKMARK, OwlUI.BOOKMARK, null, 9), //$NON-NLS-1$
 
     /** New News Bin */
-    NEW_BIN("org.rssowl.ui.actions.NewNewsBin", "News Bin", "New News Bin", OwlUI.NEWSBIN, null, 9),
+    NEW_BIN("org.rssowl.ui.actions.NewNewsBin", Messages.CoolBarAdvisor_NEWS_BIN, Messages.CoolBarAdvisor_NEW_NEWSBIN, OwlUI.NEWSBIN, null, 9), //$NON-NLS-1$
 
     /** New Saved Search */
-    NEW_SAVED_SEARCH("org.rssowl.ui.actions.NewSearchMark", "Saved Search", "New Saved Search", OwlUI.SEARCHMARK, null, 9),
+    NEW_SAVED_SEARCH("org.rssowl.ui.actions.NewSearchMark", Messages.CoolBarAdvisor_SAVED_SEARCH, Messages.CoolBarAdvisor_NEW_SAVED_SEARCH, OwlUI.SEARCHMARK, null, 9), //$NON-NLS-1$
 
     /** New Folder */
-    NEW_FOLDER("org.rssowl.ui.actions.NewFolder", "Folder", "New Folder", OwlUI.FOLDER, null, 9),
+    NEW_FOLDER("org.rssowl.ui.actions.NewFolder", Messages.CoolBarAdvisor_FOLDER, Messages.CoolBarAdvisor_NEW_FOLDER, OwlUI.FOLDER, null, 9), //$NON-NLS-1$
 
     /** Close Tab */
-    CLOSE("org.eclipse.ui.file.close", "Close", null, OwlUI.getImageDescriptor("icons/etool16/close_tab.gif"), OwlUI.getImageDescriptor("icons/dtool16/close_tab.gif"), 10),
+    CLOSE("org.eclipse.ui.file.close", Messages.CoolBarAdvisor_CLOSE, null, OwlUI.getImageDescriptor("icons/etool16/close_tab.gif"), OwlUI.getImageDescriptor("icons/dtool16/close_tab.gif"), 10), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
     /** Close Others */
-    CLOSE_OTHERS("org.eclipse.ui.file.closeOthers", "Close Others", null, OwlUI.getImageDescriptor("icons/etool16/close_other_tabs.gif"), OwlUI.getImageDescriptor("icons/dtool16/close_other_tabs.gif"), 10),
+    CLOSE_OTHERS("org.eclipse.ui.file.closeOthers", Messages.CoolBarAdvisor_CLOSE_OTHERS, null, OwlUI.getImageDescriptor("icons/etool16/close_other_tabs.gif"), OwlUI.getImageDescriptor("icons/dtool16/close_other_tabs.gif"), 10), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
     /** Close All Tabs */
-    CLOSE_ALL("org.eclipse.ui.file.closeAll", "Close All", null, OwlUI.getImageDescriptor("icons/etool16/close_all_tabs.gif"), OwlUI.getImageDescriptor("icons/dtool16/close_all_tabs.gif"), 10),
+    CLOSE_ALL("org.eclipse.ui.file.closeAll", Messages.CoolBarAdvisor_CLOSE_ALL, null, OwlUI.getImageDescriptor("icons/etool16/close_all_tabs.gif"), OwlUI.getImageDescriptor("icons/dtool16/close_all_tabs.gif"), 10), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
     /** Bookmarks */
-    BOOKMARKS("org.rssowl.ui.Bookmarks", "Bookmarks", null, OwlUI.getImageDescriptor("icons/etool16/subscriptions.gif"), null, IAction.AS_DROP_DOWN_MENU, false, 11),
+    BOOKMARKS("org.rssowl.ui.Bookmarks", Messages.CoolBarAdvisor_BOOKMARKS, null, OwlUI.getImageDescriptor("icons/etool16/subscriptions.gif"), null, IAction.AS_DROP_DOWN_MENU, false, 11), //$NON-NLS-1$ //$NON-NLS-2$
 
     /** History */
-    HISTORY("org.rssowl.ui.History", "History", "Recently Visited Feeds", OwlUI.getImageDescriptor("icons/etool16/history.gif"), null, IAction.AS_DROP_DOWN_MENU, false, 11),
+    HISTORY("org.rssowl.ui.History", Messages.CoolBarAdvisor_HISTORY, Messages.CoolBarAdvisor_RECENTLY_VISITED_FEEDS, OwlUI.getImageDescriptor("icons/etool16/history.gif"), null, IAction.AS_DROP_DOWN_MENU, false, 11), //$NON-NLS-1$ //$NON-NLS-2$
 
     /** Bookmark View */
-    BOOKMARK_VIEW("org.rssowl.ui.ToggleBookmarksCommand", "Bookmark View", null, OwlUI.getImageDescriptor("icons/eview16/bkmrk_explorer.gif"), null, IAction.AS_CHECK_BOX, true, 11),
+    BOOKMARK_VIEW("org.rssowl.ui.ToggleBookmarksCommand", Messages.CoolBarAdvisor_BOOKMARK_VIEW, null, OwlUI.getImageDescriptor("icons/eview16/bkmrk_explorer.gif"), null, IAction.AS_CHECK_BOX, true, 11), //$NON-NLS-1$ //$NON-NLS-2$
 
     /** Downloads and Activity */
-    ACTIVITIES("org.rssowl.ui.ShowActivityAction", "Activity", "Downloads && Activity", OwlUI.getImageDescriptor("icons/elcl16/activity.gif"), null, 12),
+    ACTIVITIES("org.rssowl.ui.ShowActivityAction", Messages.CoolBarAdvisor_ACTIVITY, Messages.CoolBarAdvisor_DOWNLOADS_ACTIVITY, OwlUI.getImageDescriptor("icons/elcl16/activity.gif"), null, 12), //$NON-NLS-1$ //$NON-NLS-2$
 
     /** Preferences */
-    PREFERENCES("org.rssowl.ui.ShowPreferences", "Preferences", null, OwlUI.getImageDescriptor("icons/elcl16/preferences.gif"), null, IAction.AS_PUSH_BUTTON, false, 12),
+    PREFERENCES("org.rssowl.ui.ShowPreferences", Messages.CoolBarAdvisor_PREFERENCES, null, OwlUI.getImageDescriptor("icons/elcl16/preferences.gif"), null, IAction.AS_PUSH_BUTTON, false, 12), //$NON-NLS-1$ //$NON-NLS-2$
 
     /** Fullscreen */
-    FULLSCREEN("org.rssowl.ui.FullScreenCommand", "Full Screen", "Toggle Full Screen", OwlUI.getImageDescriptor("icons/etool16/fullscreen.gif"), null, IAction.AS_CHECK_BOX, true, 12);
+    FULLSCREEN("org.rssowl.ui.FullScreenCommand", Messages.CoolBarAdvisor_FULL_SCREEN, Messages.CoolBarAdvisor_TOGGLE_FULL_SCREEN, OwlUI.getImageDescriptor("icons/etool16/fullscreen.gif"), null, IAction.AS_CHECK_BOX, true, 12); //$NON-NLS-1$ //$NON-NLS-2$
 
     private final String fId;
     private final String fName;
@@ -569,7 +570,7 @@ public class CoolBarAdvisor {
 
           /* Spacer */
           else if (item == CoolBarItem.SPACER) {
-            ActionContributionItem contribItem = new ActionContributionItem(new Action("") {
+            ActionContributionItem contribItem = new ActionContributionItem(new Action("") { //$NON-NLS-1$
               @Override
               public boolean isEnabled() {
                 return false;
@@ -1354,7 +1355,7 @@ public class CoolBarAdvisor {
           manager.add(new MoveCopyNewsToBinAction(selection, bin, isMove));
         }
 
-        manager.add(new Separator("movetonewbin"));
+        manager.add(new Separator("movetonewbin")); //$NON-NLS-1$
         manager.add(new MoveCopyNewsToBinAction(selection, null, isMove));
 
         return manager.createContextMenu(parent);
@@ -1375,7 +1376,7 @@ public class CoolBarAdvisor {
   private String getLabelWithBinding(String id, String label, boolean forToolTip) {
     TriggerSequence binding = fBindingService.getBestActiveBindingFor(id);
     if (binding != null)
-      return forToolTip ? (label + " (" + binding.format() + ")") : (label + "\t" + binding.format());
+      return forToolTip ? (NLS.bind(Messages.CoolBarAdvisor_LABEL_KEY, label, binding.format())) : (NLS.bind(Messages.CoolBarAdvisor_LABEL_TAB_KEY, label, binding.format()));
 
     return label;
   }

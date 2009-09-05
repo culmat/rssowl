@@ -51,7 +51,6 @@ public class DefaultPasswordProvider extends PasswordProvider {
   /*
    * @see org.eclipse.equinox.security.storage.provider.PasswordProvider#getPassword(org.eclipse.equinox.security.storage.provider.IPreferencesContainer, int)
    */
-  @SuppressWarnings("restriction")
   @Override
   public PBEKeySpec getPassword(IPreferencesContainer container, final int passwordType) {
     if (!PlatformUI.isWorkbenchRunning())

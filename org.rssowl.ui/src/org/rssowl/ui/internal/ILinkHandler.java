@@ -35,7 +35,7 @@ import java.net.URI;
 public interface ILinkHandler {
 
   /** The Application Protocol for use with ILinkHandler */
-  public static final String HANDLER_PROTOCOL = "rssowl://";
+  public static final String HANDLER_PROTOCOL = "rssowl://"; //$NON-NLS-1$
 
   /**
    * A callback from the <code>CBrowser</code> that knows about this handler.

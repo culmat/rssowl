@@ -58,13 +58,13 @@ public class Application implements IApplication {
   private ApplicationWorkbenchAdvisor fWorkbenchAdvisor;
 
   /** Constant for the application being run on Windows or not */
-  public static final boolean IS_WINDOWS = "win32".equals(SWT.getPlatform());
+  public static final boolean IS_WINDOWS = "win32".equals(SWT.getPlatform()); //$NON-NLS-1$
 
   /** Constant for the application being run on Linux or not */
-  public static final boolean IS_LINUX = "gtk".equals(SWT.getPlatform());
+  public static final boolean IS_LINUX = "gtk".equals(SWT.getPlatform()); //$NON-NLS-1$
 
   /** Constant for the application being run on Mac or not */
-  public static final boolean IS_MAC = "carbon".equals(SWT.getPlatform());
+  public static final boolean IS_MAC = "carbon".equals(SWT.getPlatform()); //$NON-NLS-1$
 
   /*
    * @see org.eclipse.equinox.app.IApplication#start(org.eclipse.equinox.app.IApplicationContext)
@@ -100,7 +100,7 @@ public class Application implements IApplication {
       /* Check Startup Status */
       IStatus startupStatus = Activator.getDefault().getStartupStatus();
       if (startupStatus.getSeverity() == IStatus.ERROR) {
-        ErrorDialog.openError(new Shell(), "Fatal startup error", "There was a fatal error while starting RSSOwl.", startupStatus);
+        ErrorDialog.openError(new Shell(), Messages.Application_STARTUP_ERROR, Messages.Application_ERROR_STARTUP, startupStatus);
         return IApplication.EXIT_OK;
       }
 

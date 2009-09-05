@@ -75,7 +75,7 @@ public class DefaultStatusHandler extends WorkbenchErrorHandler {
       public void run() {
         Throwable cause = ex.getCause();
         if (cause != null && cause instanceof IOException) {
-          ErrorDialog.openError(OwlUI.getPrimaryShell(), "Error", "RSSOwl was unable to write to your disk. This is typically caused by a disk that is full or if the permissions are not set correctly. We recommend that you solve the problem and restart the application.", Activator.getDefault().createErrorStatus(cause.getMessage(), (Exception) cause));
+          ErrorDialog.openError(OwlUI.getPrimaryShell(), Messages.DefaultStatusHandler_ERROR, Messages.DefaultStatusHandler_ERROR_DISK_WRITE, Activator.getDefault().createErrorStatus(cause.getMessage(), (Exception) cause));
         }
       }
     });
@@ -89,7 +89,7 @@ public class DefaultStatusHandler extends WorkbenchErrorHandler {
     JobRunner.runInUIThread(null, new Runnable() {
       public void run() {
         try {
-          ErrorDialog dialog = new ErrorDialog(OwlUI.getPrimaryShell(), "Error", "RSSOwl has run out of memory. This should not happen under normal circumstances, but it can happen when a very high number of news got downloaded. You can solve this issue by setting the -Xmx value inside RSSOwl.ini to a higher value. Find this file in the installation directory of RSSOwl.\n\nDo you want to exit the application?", Activator.getDefault().createErrorStatus(error.getMessage()), IStatus.OK | IStatus.INFO | IStatus.WARNING | IStatus.ERROR) {
+          ErrorDialog dialog = new ErrorDialog(OwlUI.getPrimaryShell(), Messages.DefaultStatusHandler_ERROR, Messages.DefaultStatusHandler_ERROR_OUT_OF_MEMORY, Activator.getDefault().createErrorStatus(error.getMessage()), IStatus.OK | IStatus.INFO | IStatus.WARNING | IStatus.ERROR) {
             @Override
             protected void createButtonsForButtonBar(Composite parent) {
               createButton(parent, IDialogConstants.OK_ID, IDialogConstants.YES_LABEL, true);

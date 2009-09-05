@@ -26,6 +26,7 @@ package org.rssowl.ui.internal;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -93,7 +94,7 @@ public class SplashHandler extends AbstractSplashHandler {
     versionLabel.setLayoutData(new GridData(SWT.END, SWT.BEGINNING, true, false));
     versionLabel.setFont(fVersionFont);
     versionLabel.setForeground(fVersionColor);
-    versionLabel.setText("Build: " + System.getProperty("rssowl.buildId"));
+    versionLabel.setText(NLS.bind(Messages.SplashHandler_BUILD, System.getProperty("rssowl.buildId"))); //$NON-NLS-1$
 
     /* Layout All */
     shell.layout(true, true);
