@@ -50,6 +50,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -116,7 +117,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
   private static NewsFiltersListDialog fgVisibleInstance;
 
   /* Section for Dialogs Settings */
-  private static final String SETTINGS_SECTION = "org.rssowl.ui.internal.dialogs.NewsFiltersListDialog";
+  private static final String SETTINGS_SECTION = "org.rssowl.ui.internal.dialogs.NewsFiltersListDialog"; //$NON-NLS-1$
 
   private NewsActionPresentationManager fNewsActionPresentationManager = NewsActionPresentationManager.getInstance();
   private LocalResourceManager fResources;
@@ -178,10 +179,10 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
     new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     /* Title */
-    setTitle("News Filters");
+    setTitle(Messages.NewsFiltersListDialog_NEWS_FILTERS);
 
     /* Title Image */
-    setTitleImage(OwlUI.getImage(fResources, "icons/wizban/filter_wiz.png"));
+    setTitleImage(OwlUI.getImage(fResources, "icons/wizban/filter_wiz.png")); //$NON-NLS-1$
 
     /* Composite to hold all components */
     Composite composite = new Composite(parent, SWT.NONE);
@@ -202,7 +203,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
     TableColumn nameCol = new TableColumn(fViewer.getTable(), SWT.NONE);
 
     CColumnLayoutData data = new CColumnLayoutData(Size.FILL, 100);
-    cTable.manageColumn(nameCol, data, "Name", null, null, false, false);
+    cTable.manageColumn(nameCol, data, Messages.NewsFiltersListDialog_NAME, null, null, false, false);
 
     /* ContentProvider returns all filters */
     fViewer.setContentProvider(new IStructuredContentProvider() {
@@ -280,7 +281,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
 
     /* Adds a new Filter */
     Button addButton = new Button(buttonContainer, SWT.PUSH);
-    addButton.setText("&New...");
+    addButton.setText(Messages.NewsFiltersListDialog_NEW);
     addButton.setFocus();
     applyDialogFont(addButton);
     setButtonLayoutData(addButton);
@@ -293,7 +294,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
 
     /* Edits a selected Filter */
     fEditButton = new Button(buttonContainer, SWT.PUSH);
-    fEditButton.setText("&Edit...");
+    fEditButton.setText(Messages.NewsFiltersListDialog_EDIT);
     applyDialogFont(fEditButton);
     setButtonLayoutData(fEditButton);
     fEditButton.setEnabled(false);
@@ -306,7 +307,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
 
     /* Deletes the selected Filter */
     fDeleteButton = new Button(buttonContainer, SWT.PUSH);
-    fDeleteButton.setText("&Delete...");
+    fDeleteButton.setText(Messages.NewsFiltersListDialog_DELETE);
     applyDialogFont(fDeleteButton);
     setButtonLayoutData(fDeleteButton);
     fDeleteButton.setEnabled(false);
@@ -323,7 +324,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
 
     /* Move Filter Up */
     fMoveUpButton = new Button(buttonContainer, SWT.PUSH);
-    fMoveUpButton.setText("Move &Up");
+    fMoveUpButton.setText(Messages.NewsFiltersListDialog_MOVE_UP);
     fMoveUpButton.setEnabled(false);
     applyDialogFont(fMoveUpButton);
     setButtonLayoutData(fMoveUpButton);
@@ -336,7 +337,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
 
     /* Move Filter Down */
     fMoveDownButton = new Button(buttonContainer, SWT.PUSH);
-    fMoveDownButton.setText("Move &Down");
+    fMoveDownButton.setText(Messages.NewsFiltersListDialog_MOVE_DOWN);
     fMoveDownButton.setEnabled(false);
     applyDialogFont(fMoveDownButton);
     setButtonLayoutData(fMoveDownButton);
@@ -353,7 +354,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
 
     /* Button to apply filter on all News */
     fApplySelectedFilter = new Button(buttonBar, SWT.PUSH);
-    fApplySelectedFilter.setText("&Run Selected Filter...");
+    fApplySelectedFilter.setText(Messages.NewsFiltersListDialog_RUN_SELECTED_FILTER);
     fApplySelectedFilter.setEnabled(false);
     applyDialogFont(fApplySelectedFilter);
     setButtonLayoutData(fApplySelectedFilter);
@@ -368,7 +369,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
 
     /* Close */
     Button closeButton = new Button(buttonBar, SWT.PUSH);
-    closeButton.setText("&Close");
+    closeButton.setText(Messages.NewsFiltersListDialog_CLOSE);
     applyDialogFont(closeButton);
     setButtonLayoutData(closeButton);
     ((GridData) closeButton.getLayoutData()).grabExcessHorizontalSpace = true;
@@ -408,7 +409,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
 
       /* Return early if selected Action is not forcable */
       if (forcableActions.isEmpty()) {
-        MessageDialog.openWarning(getShell(), "Run Selected Filter '" + filter.getName() + "'", "The selected filter '" + filter.getName() + "' does not contain any action that can be forced to run on your news. Please select a different filter.");
+        MessageDialog.openWarning(getShell(), NLS.bind(Messages.NewsFiltersListDialog_RUN_SELECTED_FILTER_N, filter.getName()), NLS.bind(Messages.NewsFiltersListDialog_NO_ACTIONS_TO_RUN, filter.getName()));
         return;
       }
 
@@ -438,30 +439,30 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
 
       /* Return early if there is no matching News */
       if (targetNews.isEmpty()) {
-        MessageDialog.openWarning(getShell(), "Run Selected Filter '" + filter.getName() + "'", "The selected filter '" + filter.getName() + "' does not match any of the existing News.");
+        MessageDialog.openWarning(getShell(), NLS.bind(Messages.NewsFiltersListDialog_RUN_SELECTED_FILTER_N, filter.getName()), NLS.bind(Messages.NewsFiltersListDialog_NO_FILTER_MATCH, filter.getName()));
         return;
       }
 
       /* Ask for Confirmation */
       boolean multipleActions = forcableActions.size() > 1;
-      String title = "Run Selected Filter '" + filter.getName() + "'";
-      StringBuilder message = new StringBuilder("The following " + (multipleActions ? "actions" : "action") + " will be performed on " + targetNews.size() + " matching news:\n");
+      String title = NLS.bind(Messages.NewsFiltersListDialog_RUN_SELECTED_FILTER_N, filter.getName());
+      StringBuilder message = new StringBuilder("The following " + (multipleActions ? "actions" : "action") + " will be performed on " + targetNews.size() + " matching news:\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
       for (IFilterAction action : forcableActions) {
         NewsActionDescriptor newsActionDescriptor = fNewsActionPresentationManager.getNewsActionDescriptor(action.getActionId());
-        message.append("\n - ").append(newsActionDescriptor.getName());
+        message.append("\n - ").append(newsActionDescriptor.getName()); //$NON-NLS-1$
       }
 
-      message.append("\n\nPress OK to to confirm.");
+      message.append("\n\nPress OK to to confirm."); //$NON-NLS-1$
 
-      ConfirmDialog dialog = new ConfirmDialog(getShell(), title, "This action can not be undone", message.toString(), IDialogConstants.OK_LABEL, null) {
+      ConfirmDialog dialog = new ConfirmDialog(getShell(), title, Messages.NewsFiltersListDialog_NO_UNDO, message.toString(), IDialogConstants.OK_LABEL, null) {
         @Override
         protected String getTitleImage() {
-          return "icons/wizban/filter_wiz.png";
+          return "icons/wizban/filter_wiz.png"; //$NON-NLS-1$
         }
 
         @Override
         public void setTitle(String newTitle) {
-          super.setTitle("Run Selected Filter");
+          super.setTitle(Messages.NewsFiltersListDialog_RUN_SELECTED_FILTER_TITLE);
         }
       };
 
@@ -476,7 +477,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
     IRunnableWithProgress runnable = new IRunnableWithProgress() {
       public void run(IProgressMonitor monitor) {
         List<List<SearchHit<NewsReference>>> chunks = toChunks(FILTER_CHUNK_SIZE, news);
-        monitor.beginTask("Please wait while the filter is applied...", chunks.size());
+        monitor.beginTask(Messages.NewsFiltersListDialog_WAIT_FILTER_APPLIED, chunks.size());
 
         if (monitor.isCanceled())
           return;
@@ -486,7 +487,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
           if (monitor.isCanceled())
             return;
 
-          monitor.subTask("Filtered " + counter * FILTER_CHUNK_SIZE + " of " + news.size() + " News");
+          monitor.subTask(NLS.bind(Messages.NewsFiltersListDialog_FILTERED_N_OF_M_NEWS, (counter * FILTER_CHUNK_SIZE), news.size()));
           List<INews> newsItemsToFilter = new ArrayList<INews>(FILTER_CHUNK_SIZE);
           for (SearchHit<NewsReference> chunkItem : chunk) {
             INews newsItemToFilter = chunkItem.getResult().resolve();
@@ -583,9 +584,9 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
     }
 
     if (problematicFilter != null)
-      setMessage("The filter '" + problematicFilter.getName() + "' matches on all News. Move it to the bottom or\n disable it to support the other filters below.", IMessageProvider.WARNING);
+      setMessage(NLS.bind(Messages.NewsFiltersListDialog_FILTER_MATCHES_ALL_NEWS, problematicFilter.getName()), IMessageProvider.WARNING);
     else
-      setMessage("Enabled filters will run automatically in the order shown below.\n If a news matches more than one filter, only the first will be applied.", IMessageProvider.INFORMATION);
+      setMessage(Messages.NewsFiltersListDialog_ENABLED_FILTERS, IMessageProvider.INFORMATION);
   }
 
   /*
@@ -684,7 +685,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
     IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
 
     List<?> selectedFilters = selection.toList();
-    ConfirmDialog dialog = new ConfirmDialog(getShell(), "Confirm Delete", "This action can not be undone", getMessage(selectedFilters), null);
+    ConfirmDialog dialog = new ConfirmDialog(getShell(), Messages.NewsFiltersListDialog_CONFIRM_DELETE, Messages.NewsFiltersListDialog_NO_UNDO, getMessage(selectedFilters), null);
     if (dialog.open() == IDialogConstants.OK_ID) {
       List<ISearchFilter> filtersToDelete = new ArrayList<ISearchFilter>(selectedFilters.size());
       for (Iterator<?> iterator = selectedFilters.iterator(); iterator.hasNext();) {
@@ -699,17 +700,17 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
   }
 
   private String getMessage(List<?> elements) {
-    StringBuilder message = new StringBuilder("Are you sure you want to delete ");
+    StringBuilder message = new StringBuilder();
 
     /* One Element */
     if (elements.size() == 1) {
       ISearchFilter filter = (ISearchFilter) elements.get(0);
-      message.append("the filter '").append(filter.getName()).append("'?");
+      message.append(NLS.bind(Messages.NewsFiltersListDialog_CONFIRM_DELETE_FILTER_N, filter.getName()));
     }
 
     /* N Elements */
     else {
-      message.append("the selected elements?");
+      message.append(Messages.NewsFiltersListDialog_CONFIRM_DELETE_FILTERS);
     }
 
     return message.toString();
@@ -721,7 +722,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
   @Override
   protected void configureShell(Shell shell) {
     super.configureShell(shell);
-    shell.setText("News Filters");
+    shell.setText(Messages.NewsFiltersListDialog_NEWS_FILTERS);
   }
 
   /**

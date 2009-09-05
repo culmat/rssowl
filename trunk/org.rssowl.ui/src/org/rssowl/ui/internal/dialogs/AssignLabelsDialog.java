@@ -7,6 +7,7 @@ import org.eclipse.jface.fieldassist.SimpleContentProposalProvider;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.resource.ResourceManager;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -72,7 +73,7 @@ public class AssignLabelsDialog extends Dialog {
   @Override
   protected void okPressed() {
     String labelsValue = fLabelsInput.getText();
-    String[] labelsValueSplit = labelsValue.split(",");
+    String[] labelsValueSplit = labelsValue.split(","); //$NON-NLS-1$
 
     /* Remove All Labels first */
     for (INews news : fNews) {
@@ -143,7 +144,7 @@ public class AssignLabelsDialog extends Dialog {
 
     /* Name */
     Label nameLabel = new Label(composite, SWT.NONE);
-    nameLabel.setText("Labels: ");
+    nameLabel.setText(Messages.AssignLabelsDialog_LABELS);
 
     fLabelsInput = new Text(composite, SWT.BORDER | SWT.SINGLE);
     fLabelsInput.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
@@ -179,7 +180,7 @@ public class AssignLabelsDialog extends Dialog {
 
           /* Categories */
           Set<String> categoryNames = DynamicDAO.getDAO(ICategoryDAO.class).loadAllNames();
-          categoryNames = StringUtils.replaceAll(categoryNames, ",", " "); // Comma not allowed for Labels
+          categoryNames = StringUtils.replaceAll(categoryNames, ",", " "); // Comma not allowed for Labels //$NON-NLS-1$ //$NON-NLS-2$
           values.addAll(categoryNames);
 
           /* Labels */
@@ -230,7 +231,7 @@ public class AssignLabelsDialog extends Dialog {
 
     StringBuilder str = new StringBuilder();
     for (ILabel label : labels) {
-      str.append(label.getName()).append(", ");
+      str.append(label.getName()).append(", "); //$NON-NLS-1$
     }
 
     return str.toString();
@@ -238,20 +239,20 @@ public class AssignLabelsDialog extends Dialog {
 
   private void showWarning(String msg) {
     fInfoText.setText(msg);
-    fInfoImg.setImage(OwlUI.getImage(fResources, "icons/obj16/warning.gif"));
+    fInfoImg.setImage(OwlUI.getImage(fResources, "icons/obj16/warning.gif")); //$NON-NLS-1$
     fInfoImg.getParent().layout();
   }
 
   private void showInfo() {
-    fInfoText.setText("Separate Labels with commas. New Labels will be created if not yet existing.");
-    fInfoImg.setImage(OwlUI.getImage(fResources, "icons/obj16/info.gif"));
+    fInfoText.setText(Messages.AssignLabelsDialog_SEPARATE_LABELS);
+    fInfoImg.setImage(OwlUI.getImage(fResources, "icons/obj16/info.gif")); //$NON-NLS-1$
     fInfoImg.getParent().layout();
   }
 
   private void onModifyName() {
     int newLabelCounter = 0;
     String labelsValue = fLabelsInput.getText();
-    String[] labelsValueSplit = labelsValue.split(",");
+    String[] labelsValueSplit = labelsValue.split(","); //$NON-NLS-1$
     Set<String> handledNewLabels = new HashSet<String>(1);
     for (String labelValue : labelsValueSplit) {
       labelValue = labelValue.trim().toLowerCase();
@@ -264,9 +265,9 @@ public class AssignLabelsDialog extends Dialog {
     if (newLabelCounter == 0)
       showInfo();
     else if (newLabelCounter == 1)
-      showWarning("One new Label will be created.");
+      showWarning(Messages.AssignLabelsDialog_NEW_LABEL_CREATE);
     else
-      showWarning(newLabelCounter + " new Labels will be created.");
+      showWarning(NLS.bind(Messages.AssignLabelsDialog_N_LABEL_CREATE, newLabelCounter));
   }
 
   /*
@@ -287,6 +288,6 @@ public class AssignLabelsDialog extends Dialog {
   @Override
   protected void configureShell(Shell newShell) {
     super.configureShell(newShell);
-    newShell.setText("Assign Labels");
+    newShell.setText(Messages.AssignLabelsDialog_ASSIGN_LABELS);
   }
 }

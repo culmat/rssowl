@@ -68,7 +68,7 @@ public class ActivityDialog extends TitleAreaDialog {
   private static ActivityDialog fgVisibleInstance;
 
   /* Section for Dialogs Settings */
-  private static final String SETTINGS_SECTION = "org.rssowl.ui.internal.dialogs.ActivityDialog";
+  private static final String SETTINGS_SECTION = "org.rssowl.ui.internal.dialogs.ActivityDialog"; //$NON-NLS-1$
 
   /* Minimum Height in DLUs */
   private static final int MIN_DIALOG_HEIGHT_DLU = 160;
@@ -125,7 +125,7 @@ public class ActivityDialog extends TitleAreaDialog {
   @Override
   protected void configureShell(Shell shell) {
     super.configureShell(shell);
-    shell.setText("Downloads & Activity");
+    shell.setText(Messages.ActivityDialog_DOWNLOADS_ACTIVITY);
   }
 
   /*
@@ -148,13 +148,13 @@ public class ActivityDialog extends TitleAreaDialog {
   protected Control createDialogArea(Composite parent) {
 
     /* Title */
-    setTitle("Downloads && Activity");
+    setTitle(Messages.ActivityDialog_DOWNLOADS_AND_ACTIVITY);
 
     /* Title Image */
-    setTitleImage(OwlUI.getImage(fResources, "icons/wizban/activity_wiz.png"));
+    setTitleImage(OwlUI.getImage(fResources, "icons/wizban/activity_wiz.png")); //$NON-NLS-1$
 
     /* Title Message */
-    setMessage("Downloads and Feed Updates show up in the list below.");
+    setMessage(Messages.ActivityDialog_ACTIVITY_INFO);
 
     /* Separator */
     new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
@@ -237,7 +237,7 @@ public class ActivityDialog extends TitleAreaDialog {
 
     /* Keep or Hide Completed Downloads */
     fHideCompletedCheck = new Button(buttonBar, SWT.CHECK);
-    fHideCompletedCheck.setText("&Remove Completed Downloads from List");
+    fHideCompletedCheck.setText(Messages.ActivityDialog_REMOVE_COMPLETED);
     fHideCompletedCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
     fHideCompletedCheck.setSelection(fPreferences.getBoolean(DefaultPreferences.HIDE_COMPLETED_DOWNLOADS));
     fHideCompletedCheck.addSelectionListener(new SelectionAdapter() {

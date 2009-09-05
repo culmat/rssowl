@@ -106,15 +106,14 @@ public class MasterPasswordDialog extends TitleAreaDialog {
   /*
    * @see org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets.Shell)
    */
-  @SuppressWarnings("restriction")
   @Override
   protected void configureShell(Shell shell) {
     super.configureShell(shell);
 
     if ((fStyle & PasswordProvider.CREATE_NEW_PASSWORD) != 0)
-      shell.setText("Please enter a new master password");
+      shell.setText(Messages.MasterPasswordDialog_ENTER_MASTER_PASSWORD_TITLE);
     else
-      shell.setText("Please enter your master password");
+      shell.setText(Messages.MasterPasswordDialog_ENTER_MASTER_PASSWORD);
   }
 
   /*
@@ -131,7 +130,6 @@ public class MasterPasswordDialog extends TitleAreaDialog {
   /*
    * @see org.eclipse.jface.dialogs.TitleAreaDialog#createDialogArea(org.eclipse.swt.widgets.Composite)
    */
-  @SuppressWarnings("restriction")
   @Override
   protected Control createDialogArea(Composite parent) {
 
@@ -144,20 +142,20 @@ public class MasterPasswordDialog extends TitleAreaDialog {
     composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
     /* Title */
-    setTitle("Master Password");
+    setTitle(Messages.MasterPasswordDialog_MASTER_PASSWORD);
 
     /* Title Image */
     if ((fStyle & PasswordProvider.CREATE_NEW_PASSWORD) != 0) {
-      setTitleImage(OwlUI.getImage(fResources, "icons/wizban/new_value_wiz.png"));
-      setMessage("Please make sure to remember the master password you have set.", IMessageProvider.WARNING);
+      setTitleImage(OwlUI.getImage(fResources, "icons/wizban/new_value_wiz.png")); //$NON-NLS-1$
+      setMessage(Messages.MasterPasswordDialog_REMEMBER_PASSWORD, IMessageProvider.WARNING);
     } else {
-      setTitleImage(OwlUI.getImage(fResources, "icons/wizban/login_wiz.png"));
-      setMessage("The master password is used to encrypt and\n decrypt the passwords used for protected feeds.", IMessageProvider.INFORMATION);
+      setTitleImage(OwlUI.getImage(fResources, "icons/wizban/login_wiz.png")); //$NON-NLS-1$
+      setMessage(Messages.MasterPasswordDialog_MASTER_PASSWORD_INFO, IMessageProvider.INFORMATION);
     }
 
     /* Username Label */
     Label passwordLabel = new Label(composite, SWT.NONE);
-    passwordLabel.setText("Password: ");
+    passwordLabel.setText(Messages.MasterPasswordDialog_PASSWORD);
     passwordLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
 
     /* Password input field */
@@ -178,7 +176,7 @@ public class MasterPasswordDialog extends TitleAreaDialog {
     /* Confirm Password Label */
     if ((fStyle & PasswordProvider.CREATE_NEW_PASSWORD) != 0) {
       Label confirmPasswordLabel = new Label(composite, SWT.NONE);
-      confirmPasswordLabel.setText("Confirm Password: ");
+      confirmPasswordLabel.setText(Messages.MasterPasswordDialog_CONFIRM_PASSWORD);
       confirmPasswordLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
 
       /* Confirm Password input field */
@@ -197,7 +195,7 @@ public class MasterPasswordDialog extends TitleAreaDialog {
 
       /* Password Quality Meter */
       Label passwordQuality = new Label(composite, SWT.NONE);
-      passwordQuality.setText("Password Quality: ");
+      passwordQuality.setText(Messages.MasterPasswordDialog_PASSWORD_QUALITY);
       passwordQuality.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
 
       fQualityBar = new ProgressBar(composite, SWT.HORIZONTAL);

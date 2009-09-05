@@ -72,7 +72,7 @@ public class ConfirmDialog extends TitleAreaDialog {
    * setting for "Never ask again"
    */
   public ConfirmDialog(Shell parentShell, String title, String dialogHeaderMessage, String dialogMessage, String confirmPrefKey) {
-    this(parentShell, title, dialogHeaderMessage, dialogMessage, "Delete", confirmPrefKey);
+    this(parentShell, title, dialogHeaderMessage, dialogMessage, Messages.ConfirmDialog_DELETE, confirmPrefKey);
   }
 
   /**
@@ -132,7 +132,7 @@ public class ConfirmDialog extends TitleAreaDialog {
    * @return the path to the title image to use.
    */
   protected String getTitleImage() {
-    return "/icons/wizban/trash.gif";
+    return "/icons/wizban/trash.gif"; //$NON-NLS-1$
   }
 
   /*
@@ -147,7 +147,7 @@ public class ConfirmDialog extends TitleAreaDialog {
     composite.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     /* Title */
-    setTitle("Delete");
+    setTitle(Messages.ConfirmDialog_DELETE);
 
     /* Title Image */
     setTitleImage(OwlUI.getImage(fResources, getTitleImage()));
@@ -166,7 +166,7 @@ public class ConfirmDialog extends TitleAreaDialog {
     /* Checkbox to disable confirm dialog */
     if (fConfirmPrefKey != null) {
       fNeverAskAgainCheck = new Button(composite, SWT.CHECK);
-      fNeverAskAgainCheck.setText("&Never ask again");
+      fNeverAskAgainCheck.setText(Messages.ConfirmDialog_NEVER_ASK_AGAIN);
     }
 
     /* Holder for the separator to the OK and Cancel buttons */
