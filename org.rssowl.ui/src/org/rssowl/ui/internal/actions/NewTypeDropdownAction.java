@@ -31,6 +31,7 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -64,7 +65,7 @@ public class NewTypeDropdownAction implements IWorkbenchWindowPulldownDelegate, 
     Menu menu = new Menu(parent);
 
     MenuItem newBookMark = new MenuItem(menu, SWT.PUSH);
-    newBookMark.setText(getLabelWithBinding("org.rssowl.ui.actions.NewBookMark", "&Bookmark"));
+    newBookMark.setText(getLabelWithBinding("org.rssowl.ui.actions.NewBookMark", Messages.NewTypeDropdownAction_BOOKMARK)); //$NON-NLS-1$
     newBookMark.setImage(OwlUI.getImage(fResources, OwlUI.BOOKMARK));
     newBookMark.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -78,7 +79,7 @@ public class NewTypeDropdownAction implements IWorkbenchWindowPulldownDelegate, 
     });
 
     MenuItem newNewsBin = new MenuItem(menu, SWT.PUSH);
-    newNewsBin.setText(getLabelWithBinding("org.rssowl.ui.actions.NewNewsBin", "&News Bin"));
+    newNewsBin.setText(getLabelWithBinding("org.rssowl.ui.actions.NewNewsBin", Messages.NewTypeDropdownAction_NEWSBIN)); //$NON-NLS-1$
     newNewsBin.setImage(OwlUI.getImage(fResources, OwlUI.NEWSBIN));
     newNewsBin.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -92,7 +93,7 @@ public class NewTypeDropdownAction implements IWorkbenchWindowPulldownDelegate, 
     });
 
     MenuItem newSearchMark = new MenuItem(menu, SWT.PUSH);
-    newSearchMark.setText(getLabelWithBinding("org.rssowl.ui.actions.NewSearchMark", "&Saved Search"));
+    newSearchMark.setText(getLabelWithBinding("org.rssowl.ui.actions.NewSearchMark", Messages.NewTypeDropdownAction_SAVED_SEARCH)); //$NON-NLS-1$
     newSearchMark.setImage(OwlUI.getImage(fResources, OwlUI.SEARCHMARK));
     newSearchMark.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -108,7 +109,7 @@ public class NewTypeDropdownAction implements IWorkbenchWindowPulldownDelegate, 
     new MenuItem(menu, SWT.SEPARATOR);
 
     MenuItem newFolder = new MenuItem(menu, SWT.PUSH);
-    newFolder.setText(getLabelWithBinding("org.rssowl.ui.actions.NewFolder", "&Folder"));
+    newFolder.setText(getLabelWithBinding("org.rssowl.ui.actions.NewFolder", Messages.NewTypeDropdownAction_FOLDER)); //$NON-NLS-1$
     newFolder.setImage(OwlUI.getImage(fResources, OwlUI.FOLDER));
     newFolder.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -200,7 +201,7 @@ public class NewTypeDropdownAction implements IWorkbenchWindowPulldownDelegate, 
   private String getLabelWithBinding(String id, String label) {
     TriggerSequence binding = fBindingService.getBestActiveBindingFor(id);
     if (binding != null)
-      return label + "\t" + binding.format();
+      return NLS.bind(Messages.NewTypeDropdownAction_LABEL_BINDING, label, binding.format());
 
     return label;
   }

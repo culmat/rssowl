@@ -51,7 +51,7 @@ public class FindExtensionsAction extends Action implements IWorkbenchWindowActi
   private static final String UPDATE_SITE = "http://boreal.rssowl.org"; //$NON-NLS-1$
 
   /* RSSOwl Category */
-  private static final String RSSOWL_CATEGORY = "RSSOwl Application"; //$NON-NLS-1$
+  private static final String RSSOWL_CATEGORY = Messages.FindExtensionsAction_RSSOWL_APPLICATION;
 
   private Shell fShell;
 
@@ -62,7 +62,7 @@ public class FindExtensionsAction extends Action implements IWorkbenchWindowActi
   public void run() {
     BusyIndicator.showWhile(fShell.getDisplay(), new Runnable() {
       public void run() {
-        UpdateJob job = new UpdateJob("Searching for RSSOwl Extensions", getSearchRequest());
+        UpdateJob job = new UpdateJob(Messages.FindExtensionsAction_SEARCHING_EXTENSIONS, getSearchRequest());
         job.setUser(true);
         job.setPriority(Job.INTERACTIVE);
         UpdateManagerUI.openInstaller(fShell, job);
@@ -74,7 +74,7 @@ public class FindExtensionsAction extends Action implements IWorkbenchWindowActi
     UpdateSearchScope scope = new UpdateSearchScope();
     try {
       URL url = new URL(UPDATE_SITE);
-      scope.addSearchSite("RSSOwl.org", url, new String[] { RSSOWL_CATEGORY });
+      scope.addSearchSite("RSSOwl.org", url, new String[] { RSSOWL_CATEGORY }); //$NON-NLS-1$
     } catch (MalformedURLException e) {
       // skip bad URLs
     }

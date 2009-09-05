@@ -102,7 +102,7 @@ public class NewFolderAction implements IWorkbenchWindowActionDelegate, IObjectA
 
     @Override
     protected void configureShell(Shell newShell) {
-      newShell.setText(fRootMode ? "New Bookmark Set" : "New Folder");
+      newShell.setText(fRootMode ? Messages.NewFolderAction_NEW_SET : Messages.NewFolderAction_NEW_FOLDER);
       super.configureShell(newShell);
     }
 
@@ -113,20 +113,23 @@ public class NewFolderAction implements IWorkbenchWindowActionDelegate, IObjectA
       new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
       /* Title */
-      setTitle("Folder");
+      setTitle(Messages.NewFolderAction_FOLDER);
 
       /* Title Image */
-      setTitleImage(OwlUI.getImage(fResources, fRootMode ? "icons/wizban/bkmrk_set_title.gif" : "icons/wizban/folder_wiz.gif"));
+      setTitleImage(OwlUI.getImage(fResources, fRootMode ? "icons/wizban/bkmrk_set_title.gif" : "icons/wizban/folder_wiz.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 
       /* Title Message */
-      setMessage("Create a new " + (fRootMode ? "Bookmark Set" : "Folder") + ".");
+      if (fRootMode)
+        setMessage(Messages.NewFolderAction_NEW_SET_MSG);
+      else
+        setMessage(Messages.NewFolderAction_NEW_FOLDER_MSG);
 
       Composite container = new Composite(parent, SWT.NONE);
       container.setLayout(LayoutUtils.createGridLayout(2, 5, 5));
       container.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
       Label l1 = new Label(container, SWT.NONE);
-      l1.setText("Name: ");
+      l1.setText(Messages.NewFolderAction_NAME);
 
       fNameInput = new Text(container, SWT.SINGLE | SWT.BORDER);
       fNameInput.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
@@ -139,7 +142,7 @@ public class NewFolderAction implements IWorkbenchWindowActionDelegate, IObjectA
       if (!fRootMode) {
         Label l2 = new Label(container, SWT.NONE);
         l2.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
-        l2.setText("Location: ");
+        l2.setText(Messages.NewFolderAction_LOCATION);
 
         /* Folder Chooser */
         fFolderChooser = new FolderChooser(container, fFolder, SWT.BORDER, true);

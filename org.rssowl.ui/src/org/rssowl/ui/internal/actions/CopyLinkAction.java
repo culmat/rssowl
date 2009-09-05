@@ -45,7 +45,7 @@ import java.util.List;
 public class CopyLinkAction extends Action {
 
   /** ID of this Action */
-  public static final String ID = "org.rssowl.ui.CopyLinkAction";
+  public static final String ID = "org.rssowl.ui.CopyLinkAction"; //$NON-NLS-1$
 
   /**
    * Set ID and Action Definition ID.
@@ -53,9 +53,9 @@ public class CopyLinkAction extends Action {
   public CopyLinkAction() {
     setId(ID);
     setActionDefinitionId(ID);
-    setText("Copy &Link");
-    setImageDescriptor(OwlUI.getImageDescriptor("icons/elcl16/copy_link.gif"));
-    setDisabledImageDescriptor(OwlUI.getImageDescriptor("icons/dlcl16/copy_link.gif"));
+    setText(Messages.CopyLinkAction_COPY_LINK);
+    setImageDescriptor(OwlUI.getImageDescriptor("icons/elcl16/copy_link.gif")); //$NON-NLS-1$
+    setDisabledImageDescriptor(OwlUI.getImageDescriptor("icons/dlcl16/copy_link.gif")); //$NON-NLS-1$
   }
 
   /*
@@ -91,13 +91,13 @@ public class CopyLinkAction extends Action {
         int i = 0;
         for (Object element : list) {
           if (element instanceof IBookMark) {
-            str.append(i > 0 ? "\n" : "").append(((IBookMark) element).getFeedLinkReference().getLinkAsText());
+            str.append(i > 0 ? "\n" : "").append(((IBookMark) element).getFeedLinkReference().getLinkAsText()); //$NON-NLS-1$ //$NON-NLS-2$
             i++;
           } else if (element instanceof INews) {
             INews news = (INews) element;
             String link = CoreUtils.getLink(news);
             if (link != null) {
-              str.append(i > 0 ? "\n" : "").append(link);
+              str.append(i > 0 ? "\n" : "").append(link); //$NON-NLS-1$ //$NON-NLS-2$
               i++;
             }
           }

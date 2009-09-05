@@ -80,7 +80,7 @@ public class MoveCopyNewsToBinAction extends Action {
    */
   @Override
   public String getText() {
-    return fBin != null ? fBin.getName() : "&New News Bin...";
+    return fBin != null ? fBin.getName() : Messages.MoveCopyNewsToBinAction_NEW_NEWSBIN;
   }
 
   /*

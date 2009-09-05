@@ -60,7 +60,7 @@ import java.util.TreeSet;
 public class ReloadTypesAction extends Action implements IObjectActionDelegate {
 
   /** ID of this Action */
-  public static final String ID = "org.rssowl.ui.actions.Reload";
+  public static final String ID = "org.rssowl.ui.actions.Reload"; //$NON-NLS-1$
 
   private IStructuredSelection fSelection;
   private Shell fShell;

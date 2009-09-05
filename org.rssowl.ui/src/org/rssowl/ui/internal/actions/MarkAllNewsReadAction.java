@@ -40,12 +40,12 @@ import org.rssowl.ui.internal.editors.feed.FeedViewInput;
 public class MarkAllNewsReadAction extends Action implements IWorkbenchWindowActionDelegate {
 
   /** Action ID */
-  public static final String ID = "org.rssowl.ui.MarkAllRead";
+  public static final String ID = "org.rssowl.ui.MarkAllRead"; //$NON-NLS-1$
 
   /** Leave for reflection */
   public MarkAllNewsReadAction() {
-    setText("&All News as Read");
-    setImageDescriptor(OwlUI.getImageDescriptor("icons/elcl16/mark_all_read.gif"));
+    setText(Messages.MarkAllNewsReadAction_MARK_ALL_READ);
+    setImageDescriptor(OwlUI.getImageDescriptor("icons/elcl16/mark_all_read.gif")); //$NON-NLS-1$
     setId(ID);
     setActionDefinitionId(ID);
   }

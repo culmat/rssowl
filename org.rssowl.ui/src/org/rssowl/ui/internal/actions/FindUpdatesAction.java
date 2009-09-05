@@ -48,7 +48,7 @@ public class FindUpdatesAction extends Action implements IWorkbenchWindowActionD
   public void run() {
     BusyIndicator.showWhile(fShell.getDisplay(), new Runnable() {
       public void run() {
-        UpdateJob job = new UpdateJob("Searching for updates", false, false);
+        UpdateJob job = new UpdateJob(Messages.FindUpdatesAction_SEARCHING_FOR_UPDATES, false, false);
         job.setUser(true);
         job.setPriority(Job.INTERACTIVE);
         UpdateManagerUI.openInstaller(fShell, job);

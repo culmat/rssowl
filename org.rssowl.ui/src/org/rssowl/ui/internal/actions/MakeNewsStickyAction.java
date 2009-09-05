@@ -31,6 +31,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.PlatformUI;
@@ -51,7 +52,7 @@ import java.util.List;
  * @author bpasero
  */
 public class MakeNewsStickyAction extends Action implements IWorkbenchWindowActionDelegate {
-  private static final String ID = "org.rssowl.ui.actions.MarkSticky";
+  private static final String ID = "org.rssowl.ui.actions.MarkSticky"; //$NON-NLS-1$
 
   private IStructuredSelection fSelection;
   private boolean fMarkSticky;
@@ -79,7 +80,7 @@ public class MakeNewsStickyAction extends Action implements IWorkbenchWindowActi
     IBindingService bs = (IBindingService) PlatformUI.getWorkbench().getService(IBindingService.class);
     TriggerSequence binding = bs.getBestActiveBindingFor(ID);
 
-    return binding != null ? "News as &Sticky\t" + binding.format() : "News as &Sticky";
+    return binding != null ? NLS.bind(Messages.MakeNewsStickyAction_NEWS_STICKY_BINDING, binding.format()) : Messages.MakeNewsStickyAction_NEWS_STICKY;
   }
 
   /*

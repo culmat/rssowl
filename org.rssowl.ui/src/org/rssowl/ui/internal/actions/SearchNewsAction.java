@@ -40,7 +40,7 @@ import org.rssowl.ui.internal.dialogs.SearchNewsDialog;
 public class SearchNewsAction extends Action implements IWorkbenchWindowActionDelegate {
 
   /** Action ID */
-  public static final String ID = "org.rssowl.ui.SearchNewsAction";
+  public static final String ID = "org.rssowl.ui.SearchNewsAction"; //$NON-NLS-1$
 
   private IWorkbenchWindow fWindow;
 
@@ -54,7 +54,7 @@ public class SearchNewsAction extends Action implements IWorkbenchWindowActionDe
    */
   public SearchNewsAction(IWorkbenchWindow window) {
     fWindow = window;
-    setText("&Search News...");
+    setText(Messages.SearchNewsAction_SEARCH_NEWS);
     setImageDescriptor(OwlUI.SEARCHMARK);
     setId(ID);
     setActionDefinitionId(ID);

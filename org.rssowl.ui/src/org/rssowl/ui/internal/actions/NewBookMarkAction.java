@@ -43,7 +43,7 @@ import org.rssowl.ui.internal.dialogs.bookmark.CreateBookmarkWizard;
 public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjectActionDelegate {
 
   /* Section for Dialogs Settings */
-  private static final String SETTINGS_SECTION = "org.rssowl.ui.internal.dialogs.bookmark.CreateBookmarkWizard";
+  private static final String SETTINGS_SECTION = "org.rssowl.ui.internal.dialogs.bookmark.CreateBookmarkWizard"; //$NON-NLS-1$
 
   private Shell fShell;
   private IFolder fParent;

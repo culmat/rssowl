@@ -46,7 +46,7 @@ import java.util.Collection;
 public class ReloadAllAction extends Action implements IWorkbenchWindowActionDelegate {
 
   /** Action ID */
-  public static final String ID = "org.rssowl.ui.actions.ReloadAll";
+  public static final String ID = "org.rssowl.ui.actions.ReloadAll"; //$NON-NLS-1$
 
   private Shell fShell;
 
@@ -64,7 +64,7 @@ public class ReloadAllAction extends Action implements IWorkbenchWindowActionDel
    * shows a keybinding.
    */
   public ReloadAllAction(boolean registerIds) {
-    super("Update &All", OwlUI.getImageDescriptor("icons/elcl16/reload_all.gif"));
+    super(Messages.ReloadAllAction_UPDATE_ALL, OwlUI.getImageDescriptor("icons/elcl16/reload_all.gif")); //$NON-NLS-1$
     if (registerIds) {
       setId(ID);
       setActionDefinitionId(ID);

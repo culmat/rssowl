@@ -56,8 +56,8 @@ public class SearchInTypeAction extends Action {
     fWindow = window;
     fSelectionProvider = selectionProvider;
 
-    setText("&Search News...");
-    setImageDescriptor(OwlUI.getImageDescriptor("icons/obj16/searchmark.gif"));
+    setText(Messages.SearchInTypeAction_SEARCH_NEWS);
+    setImageDescriptor(OwlUI.getImageDescriptor("icons/obj16/searchmark.gif")); //$NON-NLS-1$
   }
 
   /*

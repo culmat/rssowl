@@ -146,33 +146,33 @@ public class DeleteTypesAction extends Action implements IObjectActionDelegate {
     }
 
     /* Create Dialog and open if confirmation required */
-    ConfirmDialog dialog = new ConfirmDialog(fShell, "Confirm Delete", "This action can not be undone", getMessage(elements), null);
+    ConfirmDialog dialog = new ConfirmDialog(fShell, Messages.DeleteTypesAction_CONFIRM_DELETE, Messages.DeleteTypesAction_NO_UNDO, getMessage(elements), null);
     return dialog.open() == IDialogConstants.OK_ID;
   }
 
   private String getMessage(List<?> elements) {
-    StringBuilder message = new StringBuilder("Are you sure you want to delete ");
+    StringBuilder message = new StringBuilder("Are you sure you want to delete "); //$NON-NLS-1$
 
     /* One Element */
     if (elements.size() == 1) {
       Object element = elements.get(0);
       if (element instanceof IFolder)
-        message.append("the folder '").append(((IFolder) element).getName()).append("'?");
+        message.append("the folder '").append(((IFolder) element).getName()).append("'?"); //$NON-NLS-1$ //$NON-NLS-2$
       else if (element instanceof IBookMark)
-        message.append("the bookmark '").append(((IMark) element).getName()).append("'?");
+        message.append("the bookmark '").append(((IMark) element).getName()).append("'?"); //$NON-NLS-1$ //$NON-NLS-2$
       else if (element instanceof INewsBin)
-        message.append("the news bin '").append(((IMark) element).getName()).append("'?");
+        message.append("the news bin '").append(((IMark) element).getName()).append("'?"); //$NON-NLS-1$ //$NON-NLS-2$
       else if (element instanceof ISearchMark)
-        message.append("the saved search '").append(((IMark) element).getName()).append("'?");
+        message.append("the saved search '").append(((IMark) element).getName()).append("'?"); //$NON-NLS-1$ //$NON-NLS-2$
       else if (element instanceof INews)
-        message.append("the selected News?");
+        message.append("the selected News?"); //$NON-NLS-1$
       else if (element instanceof EntityGroup)
-        message.append("all elements of the group '").append(((EntityGroup) element).getName()).append("'?");
+        message.append("all elements of the group '").append(((EntityGroup) element).getName()).append("'?"); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     /* N Elements */
     else {
-      message.append("the selected elements?");
+      message.append("the selected elements?"); //$NON-NLS-1$
     }
 
     return message.toString();
@@ -279,7 +279,7 @@ public class DeleteTypesAction extends Action implements IObjectActionDelegate {
     /* Runnable with Progress */
     IRunnableWithProgress runnableWithProgress = new IRunnableWithProgress() {
       public void run(IProgressMonitor monitor) {
-        monitor.beginTask("Please wait while deleting...", -1);
+        monitor.beginTask(Messages.DeleteTypesAction_WAIT_DELETE, -1);
         try {
           deleteRunnable.run();
         } finally {

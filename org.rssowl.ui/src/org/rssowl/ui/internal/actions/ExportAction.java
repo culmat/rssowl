@@ -42,10 +42,10 @@ import org.rssowl.ui.internal.dialogs.exporter.ExportWizard;
 public class ExportAction implements IWorkbenchWindowActionDelegate {
 
   /** Action ID */
-  public static final String ID = "org.rssowl.ui.actions.ExportFeeds";
+  public static final String ID = "org.rssowl.ui.actions.ExportFeeds"; //$NON-NLS-1$
 
   /* Section for Dialogs Settings */
-  private static final String SETTINGS_SECTION = "org.rssowl.ui.internal.dialogs.exporter.ExportWizard";
+  private static final String SETTINGS_SECTION = "org.rssowl.ui.internal.dialogs.exporter.ExportWizard"; //$NON-NLS-1$
 
   private IWorkbenchWindow fWindow;
 

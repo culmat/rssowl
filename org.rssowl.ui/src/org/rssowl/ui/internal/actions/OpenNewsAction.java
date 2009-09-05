@@ -77,7 +77,7 @@ public class OpenNewsAction extends Action {
     fSelection = selection;
     fShellToMinimize = shellToMinimize;
 
-    setText("&Open");
+    setText(Messages.OpenNewsAction_OPEN);
   }
 
   /**

@@ -36,7 +36,7 @@ import java.util.List;
  * @author bpasero
  */
 public class OpenInExternalBrowserAction extends Action {
-  private static final String ID = "org.rssowl.ui.OpenInExternalBrowser";
+  private static final String ID = "org.rssowl.ui.OpenInExternalBrowser"; //$NON-NLS-1$
   private IStructuredSelection fSelection;
 
   /**
@@ -45,7 +45,7 @@ public class OpenInExternalBrowserAction extends Action {
   public OpenInExternalBrowserAction(IStructuredSelection selection) {
     fSelection = selection;
 
-    setText("Open in &External Browser");
+    setText(Messages.OpenInExternalBrowserAction_OPEN_IN_EXTERNAL_BROWSER);
     setId(ID);
     setActionDefinitionId(ID);
   }

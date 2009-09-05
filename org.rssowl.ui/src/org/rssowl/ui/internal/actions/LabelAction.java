@@ -27,6 +27,7 @@ package org.rssowl.ui.internal.actions;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.bindings.TriggerSequence;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.keys.IBindingService;
 import org.rssowl.core.persist.ILabel;
@@ -50,7 +51,7 @@ public class LabelAction extends Action {
    * @param selection
    */
   public LabelAction(ILabel label, IStructuredSelection selection) {
-    super("", label != null ? AS_CHECK_BOX : AS_UNSPECIFIED);
+    super("", label != null ? AS_CHECK_BOX : AS_UNSPECIFIED); //$NON-NLS-1$
 
     fLabel = label;
     fSelection = selection;
@@ -73,12 +74,12 @@ public class LabelAction extends Action {
   @Override
   public String getText() {
     if (fLabel == null)
-      return "&Remove All Labels";
+      return Messages.LabelAction_REMOVE_ALL_LABELS;
 
     IBindingService bs = (IBindingService) PlatformUI.getWorkbench().getService(IBindingService.class);
     TriggerSequence binding = bs.getBestActiveBindingFor(Controller.LABEL_ACTION_PREFIX + fLabel.getId());
 
-    return binding != null ? fLabel.getName() + "\t" + binding.format() : fLabel.getName();
+    return binding != null ? NLS.bind(Messages.LabelAction_LABEL_BINDING, fLabel.getName(), binding.format()) : fLabel.getName();
   }
 
   /*

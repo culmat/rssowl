@@ -184,34 +184,34 @@ public class NavigationActionFactory implements IExecutableExtensionFactory, IEx
   public enum NavigationActionType {
 
     /** Action: Go to the next News */
-    NEXT_NEWS("nextNews", "org.rssowl.ui.NextNews", "&Next News", true, true, false),
+    NEXT_NEWS("nextNews", "org.rssowl.ui.NextNews", Messages.NavigationActionFactory_NEXT_NEWS, true, true, false), //$NON-NLS-1$ //$NON-NLS-2$
 
     /** Action: Go to the next unread News */
-    NEXT_UNREAD_NEWS("nextUnreadNews", "org.rssowl.ui.NextUnreadNews", "Next &Unread News", true, true, true),
+    NEXT_UNREAD_NEWS("nextUnreadNews", "org.rssowl.ui.NextUnreadNews", Messages.NavigationActionFactory_NEXT_UNREAD_NEWS, true, true, true), //$NON-NLS-1$ //$NON-NLS-2$
 
     /** Action: Go to the next Feed */
-    NEXT_FEED("nextFeed", "org.rssowl.ui.NextFeed", "Next &Feed", false, true, false),
+    NEXT_FEED("nextFeed", "org.rssowl.ui.NextFeed", Messages.NavigationActionFactory_NEXT_FEED, false, true, false), //$NON-NLS-1$ //$NON-NLS-2$
 
     /** Action: Go to the next unread Feed */
-    NEXT_UNREAD_FEED("nextUnreadFeed", "org.rssowl.ui.NextUnreadFeed", "Next Feed &with Unread News", false, true, true),
+    NEXT_UNREAD_FEED("nextUnreadFeed", "org.rssowl.ui.NextUnreadFeed", Messages.NavigationActionFactory_NEXT_UNREAD_FEED, false, true, true), //$NON-NLS-1$ //$NON-NLS-2$
 
     /** Action: Go to the previous News */
-    PREVIOUS_NEWS("previousNews", "org.rssowl.ui.PreviousNews", "&Previous News", true, false, false),
+    PREVIOUS_NEWS("previousNews", "org.rssowl.ui.PreviousNews", Messages.NavigationActionFactory_PREVIOUS_NEWS, true, false, false), //$NON-NLS-1$ //$NON-NLS-2$
 
     /** Action: Go to the previous unread News */
-    PREVIOUS_UNREAD_NEWS("previousUnreadNews", "org.rssowl.ui.PreviousUnreadNews", "Previous Unrea&d News", true, false, true),
+    PREVIOUS_UNREAD_NEWS("previousUnreadNews", "org.rssowl.ui.PreviousUnreadNews", Messages.NavigationActionFactory_PREVIOUS_UNREAD_NEWS, true, false, true), //$NON-NLS-1$ //$NON-NLS-2$
 
     /** Action: Go to the previous Feed */
-    PREVIOUS_FEED("previousFeed", "org.rssowl.ui.PreviousFeed", "Previous F&eed", false, false, false),
+    PREVIOUS_FEED("previousFeed", "org.rssowl.ui.PreviousFeed", Messages.NavigationActionFactory_PREVIOUS_FEED, false, false, false), //$NON-NLS-1$ //$NON-NLS-2$
 
     /** Action: Go to the previous unread Feed */
-    PREVIOUS_UNREAD_FEED("previousUnreadFeed", "org.rssowl.ui.PreviousUnreadFeed", "Previous Feed wit&h Unread News", false, false, true),
+    PREVIOUS_UNREAD_FEED("previousUnreadFeed", "org.rssowl.ui.PreviousUnreadFeed", Messages.NavigationActionFactory_PREVIOUS_UNREAD_FEED, false, false, true), //$NON-NLS-1$ //$NON-NLS-2$
 
     /** Action: Go to next Tab */
-    NEXT_TAB("nextTab", "org.rssowl.ui.NextTab", "Next &Tab", false, false, false),
+    NEXT_TAB("nextTab", "org.rssowl.ui.NextTab", Messages.NavigationActionFactory_NEXT_TAB, false, false, false), //$NON-NLS-1$ //$NON-NLS-2$
 
     /** Action: Go to previous Tab */
-    PREVIOUS_TAB("previousTab", "org.rssowl.ui.PreviousTab", "Previous T&ab", false, false, false);
+    PREVIOUS_TAB("previousTab", "org.rssowl.ui.PreviousTab", Messages.NavigationActionFactory_PREVIOUS_TAB, false, false, false); //$NON-NLS-1$ //$NON-NLS-2$
 
     String fId;
     String fCommandId;
@@ -311,6 +311,6 @@ public class NavigationActionFactory implements IExecutableExtensionFactory, IEx
     if (data instanceof String)
       fId = (String) data;
     else
-      throw new CoreException(Activator.getDefault().createErrorStatus("Data argument must be a String for " + getClass(), null));
+      throw new CoreException(Activator.getDefault().createErrorStatus("Data argument must be a String for " + getClass(), null)); //$NON-NLS-1$
   }
 }

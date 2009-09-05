@@ -38,7 +38,7 @@ import org.rssowl.ui.internal.dialogs.cleanup.CleanUpWizard;
 public class CleanUpAction implements IWorkbenchWindowActionDelegate {
 
   /* Section for Dialogs Settings */
-  private static final String SETTINGS_SECTION = "org.rssowl.ui.internal.dialogs.cleanup.CleanUpWizard";
+  private static final String SETTINGS_SECTION = "org.rssowl.ui.internal.dialogs.cleanup.CleanUpWizard"; //$NON-NLS-1$
 
   private IWorkbenchWindow fWindow;
 
