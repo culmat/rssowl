@@ -97,18 +97,18 @@ public class CreateBookmarkWizard extends Wizard {
    */
   @Override
   public void addPages() {
-    setWindowTitle("New Bookmark");
+    setWindowTitle(Messages.CreateBookmarkWizard_NEW_BOOKMARK);
 
     /* Page 1: Enter Link or Keyword */
-    fFeedDefinitionPage = new FeedDefinitionPage("Bookmark", fInitialLink);
+    fFeedDefinitionPage = new FeedDefinitionPage(Messages.CreateBookmarkWizard_BOOKMARK, fInitialLink);
     addPage(fFeedDefinitionPage);
 
     /* Page 2: Choose Provider for Keyword Subscription (optional) */
-    fKeywordPage = new KeywordSubscriptionPage("Bookmark");
+    fKeywordPage = new KeywordSubscriptionPage(Messages.CreateBookmarkWizard_BOOKMARK);
     addPage(fKeywordPage);
 
     /* Page 2: Define Name and Location */
-    fBookMarkDefinitionPage = new BookmarkDefinitionPage("Bookmark", fSelection);
+    fBookMarkDefinitionPage = new BookmarkDefinitionPage(Messages.CreateBookmarkWizard_BOOKMARK, fSelection);
     addPage(fBookMarkDefinitionPage);
   }
 
@@ -143,7 +143,7 @@ public class CreateBookmarkWizard extends Wizard {
       final String linkText = URIUtils.ensureProtocol(fFeedDefinitionPage.getLink());
       IRunnableWithProgress runnable = new IRunnableWithProgress() {
         public void run(IProgressMonitor monitor) {
-          monitor.beginTask("Please wait while loading the title from the feed...", IProgressMonitor.UNKNOWN);
+          monitor.beginTask(Messages.CreateBookmarkWizard_LOADING_TITLE, IProgressMonitor.UNKNOWN);
 
           /* Load Title from Feed */
           String feedTitle = null;
@@ -258,7 +258,7 @@ public class CreateBookmarkWizard extends Wizard {
       res = internalPerformFinish();
     } catch (URISyntaxException e) {
       Activator.getDefault().logError(e.getMessage(), e);
-      ((DialogPage) getContainer().getCurrentPage()).setMessage("Please enter a valid link", IMessageProvider.ERROR);
+      ((DialogPage) getContainer().getCurrentPage()).setMessage(Messages.CreateBookmarkWizard_ENTER_VALID_LINK, IMessageProvider.ERROR);
     }
 
     /* Remember Settings */
@@ -277,7 +277,7 @@ public class CreateBookmarkWizard extends Wizard {
       uriObj[0] = new URI(fKeywordPage.getSelectedEngine().toUrl(fFeedDefinitionPage.getKeyword()));
     else {
       String linkVal = URIUtils.ensureProtocol(fFeedDefinitionPage.getLink());
-      if (linkVal.endsWith("/")) //Strip trailing slashes
+      if (linkVal.endsWith("/")) //Strip trailing slashes //$NON-NLS-1$
         linkVal = linkVal.substring(0, linkVal.length() - 1);
       uriObj[0] = new URI(URIUtils.fastEncode(linkVal));
     }
@@ -289,7 +289,7 @@ public class CreateBookmarkWizard extends Wizard {
       if (!fFeedDefinitionPage.isKeywordSubscription()) {
         IRunnableWithProgress runnable = new IRunnableWithProgress() {
           public void run(IProgressMonitor monitor) {
-            monitor.beginTask("Please wait while loading the title from the feed...", IProgressMonitor.UNKNOWN);
+            monitor.beginTask(Messages.CreateBookmarkWizard_LOADING_TITLE, IProgressMonitor.UNKNOWN);
             try {
 
               /* Return if cancelled */
