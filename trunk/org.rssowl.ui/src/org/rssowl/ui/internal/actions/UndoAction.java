@@ -37,7 +37,7 @@ import org.rssowl.ui.internal.undo.UndoStack;
 public class UndoAction extends Action {
 
   /** ID of this Action */
-  public static final String ID = "org.rssowl.ui.UndoAction";
+  public static final String ID = "org.rssowl.ui.UndoAction"; //$NON-NLS-1$
 
   /** Set ID for Key Binding Support */
   public UndoAction() {
@@ -74,7 +74,7 @@ public class UndoAction extends Action {
    */
   @Override
   public ImageDescriptor getImageDescriptor() {
-    return OwlUI.getImageDescriptor("icons/elcl16/undo_edit.gif");
+    return OwlUI.getImageDescriptor("icons/elcl16/undo_edit.gif"); //$NON-NLS-1$
   }
 
   /*
@@ -82,6 +82,6 @@ public class UndoAction extends Action {
    */
   @Override
   public ImageDescriptor getDisabledImageDescriptor() {
-    return OwlUI.getImageDescriptor("icons/dlcl16/undo_edit.gif");
+    return OwlUI.getImageDescriptor("icons/dlcl16/undo_edit.gif"); //$NON-NLS-1$
   }
 }

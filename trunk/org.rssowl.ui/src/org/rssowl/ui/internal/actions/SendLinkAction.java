@@ -45,7 +45,7 @@ import java.util.List;
 public class SendLinkAction implements IObjectActionDelegate {
 
   /** ID of this Action */
-  public static final String ID = "org.rssowl.ui.SendLinkAction";
+  public static final String ID = "org.rssowl.ui.SendLinkAction"; //$NON-NLS-1$
 
   private IStructuredSelection fSelection;
 
@@ -71,7 +71,7 @@ public class SendLinkAction implements IObjectActionDelegate {
         if (element instanceof IBookMark) {
           IBookMark bookmark = (IBookMark) element;
           String title = bookmark.getName();
-          str.append(i > 0 ? "\n\n" : "").append(title).append("\n").append(bookmark.getFeedLinkReference().getLinkAsText());
+          str.append(i > 0 ? "\n\n" : "").append(title).append("\n").append(bookmark.getFeedLinkReference().getLinkAsText()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
           i++;
         }
 
@@ -80,8 +80,8 @@ public class SendLinkAction implements IObjectActionDelegate {
           INews news = (INews) element;
           String link = CoreUtils.getLink(news);
           if (link != null) {
-            String title = CoreUtils.getHeadline(news, true) + "\n";
-            str.append(i > 0 ? "\n\n" : "").append(title).append(link);
+            String title = CoreUtils.getHeadline(news, true) + "\n"; //$NON-NLS-1$
+            str.append(i > 0 ? "\n\n" : "").append(title).append(link); //$NON-NLS-1$ //$NON-NLS-2$
             i++;
           }
         }

@@ -41,10 +41,10 @@ public class FindAction extends Action {
 
   /** Find Action! */
   public FindAction() {
-    setId("org.rssowl.ui.FindAction");
-    setActionDefinitionId("org.rssowl.ui.FindAction");
-    setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/find.gif"));
-    setText("&Find");
+    setId("org.rssowl.ui.FindAction"); //$NON-NLS-1$
+    setActionDefinitionId("org.rssowl.ui.FindAction"); //$NON-NLS-1$
+    setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/find.gif")); //$NON-NLS-1$
+    setText(Messages.FindAction_FIND);
   }
 
   /*

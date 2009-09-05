@@ -103,7 +103,7 @@ public class NewNewsBinAction implements IWorkbenchWindowActionDelegate, IObject
 
     @Override
     protected void configureShell(Shell newShell) {
-      newShell.setText("New News Bin");
+      newShell.setText(Messages.NewNewsBinAction_NEW_NEWSBIN);
       super.configureShell(newShell);
     }
 
@@ -114,20 +114,20 @@ public class NewNewsBinAction implements IWorkbenchWindowActionDelegate, IObject
       new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
       /* Title */
-      setTitle("News Bin");
+      setTitle(Messages.NewNewsBinAction_NEWSBIN);
 
       /* Title Image */
-      setTitleImage(OwlUI.getImage(fResources, "icons/wizban/newsbin_wiz.gif"));
+      setTitleImage(OwlUI.getImage(fResources, "icons/wizban/newsbin_wiz.gif")); //$NON-NLS-1$
 
       /* Title Message */
-      setMessage("Create a new News Bin.");
+      setMessage(Messages.NewNewsBinAction_NEW_NEWSBIN_MSG);
 
       Composite container = new Composite(parent, SWT.NONE);
       container.setLayout(LayoutUtils.createGridLayout(2, 5, 5));
       container.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
       Label l1 = new Label(container, SWT.NONE);
-      l1.setText("Name: ");
+      l1.setText(Messages.NewNewsBinAction_NAME);
 
       Composite nameContainer = new Composite(container, SWT.BORDER);
       nameContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
@@ -144,7 +144,7 @@ public class NewNewsBinAction implements IWorkbenchWindowActionDelegate, IObject
 
       Label l3 = new Label(container, SWT.NONE);
       l3.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
-      l3.setText("Location: ");
+      l3.setText(Messages.NewNewsBinAction_LOCATION);
 
       /* Folder Chooser */
       fFolderChooser = new FolderChooser(container, fFolder, SWT.BORDER, true);
@@ -169,7 +169,7 @@ public class NewNewsBinAction implements IWorkbenchWindowActionDelegate, IObject
       boolean valid = fNameInput.getText().length() > 0;
       Control button = getButton(IDialogConstants.OK_ID);
       button.setEnabled(valid);
-      setMessage("Create a new News Bin.");
+      setMessage(Messages.NewNewsBinAction_NEW_NEWSBIN_MSG);
     }
 
     IFolder getFolder() {

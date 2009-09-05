@@ -54,7 +54,7 @@ import java.util.List;
 public class OpenInBrowserAction extends Action implements IWorkbenchWindowActionDelegate {
 
   /** Action ID */
-  public static final String ID = "org.rssowl.ui.OpenInBrowserAction";
+  public static final String ID = "org.rssowl.ui.OpenInBrowserAction"; //$NON-NLS-1$
 
   private IStructuredSelection fSelection;
   private WebBrowserContext fContext;
@@ -78,7 +78,7 @@ public class OpenInBrowserAction extends Action implements IWorkbenchWindowActio
   public OpenInBrowserAction(IStructuredSelection selection, WebBrowserContext context) {
     fSelection = selection;
     fContext = context;
-    setText("&Open in Browser");
+    setText(Messages.OpenInBrowserAction_OPEN_IN_BROWSER);
     setId(ID);
     setActionDefinitionId(ID);
   }
@@ -113,7 +113,7 @@ public class OpenInBrowserAction extends Action implements IWorkbenchWindowActio
   }
 
   private void internalRun() throws URISyntaxException {
-    String title = "Loading...";
+    String title = Messages.OpenInBrowserAction_LOADING;
     List<?> selection = fSelection.toList();
     for (Object object : selection) {
       URI link = null;

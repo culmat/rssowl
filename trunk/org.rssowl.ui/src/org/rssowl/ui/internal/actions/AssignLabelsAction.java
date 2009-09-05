@@ -56,7 +56,7 @@ public class AssignLabelsAction extends Action {
    */
   @Override
   public String getActionDefinitionId() {
-    return "org.rssowl.ui.AssignLabels";
+    return "org.rssowl.ui.AssignLabels"; //$NON-NLS-1$
   }
 
   /*
@@ -64,7 +64,7 @@ public class AssignLabelsAction extends Action {
    */
   @Override
   public String getText() {
-    return "&Assign Labels...";
+    return Messages.AssignLabelsAction_ASSIGN_LABELS;
   }
 
   /*

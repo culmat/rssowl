@@ -139,10 +139,10 @@ public class EntityPropertyDialogAction extends Action implements IObjectActionD
       IEntity entity = entities.get(0);
 
       if (entity instanceof IFolder)
-        return "'" + ((IFolder) entity).getName() + "'";
+        return "'" + ((IFolder) entity).getName() + "'"; //$NON-NLS-1$ //$NON-NLS-2$
 
       if (entity instanceof IMark)
-        return "'" + ((IMark) entity).getName() + "'";
+        return "'" + ((IMark) entity).getName() + "'"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     /* Multi Entities selected */
@@ -166,16 +166,16 @@ public class EntityPropertyDialogAction extends Action implements IObjectActionD
       StringBuilder buf = new StringBuilder();
 
       if (folderCount > 0)
-        buf.append(folderCount).append(folderCount == 1 ? " Folder, " : " Folders, ");
+        buf.append(folderCount).append(folderCount == 1 ? " Folder, " : " Folders, "); //$NON-NLS-1$ //$NON-NLS-2$
 
       if (bookMarkCount > 0)
-        buf.append(bookMarkCount).append(bookMarkCount == 1 ? " Bookmark, " : " Bookmarks, ");
+        buf.append(bookMarkCount).append(bookMarkCount == 1 ? " Bookmark, " : " Bookmarks, "); //$NON-NLS-1$ //$NON-NLS-2$
 
       if (searchMarkCount > 0)
-        buf.append(searchMarkCount).append(searchMarkCount == 1 ? " Saved Search, " : " Saved Searches, ");
+        buf.append(searchMarkCount).append(searchMarkCount == 1 ? " Saved Search, " : " Saved Searches, "); //$NON-NLS-1$ //$NON-NLS-2$
 
       if (newsBinCount > 0)
-        buf.append(newsBinCount).append(newsBinCount == 1 ? " News Bin, " : " News Bins, ");
+        buf.append(newsBinCount).append(newsBinCount == 1 ? " News Bin, " : " News Bins, "); //$NON-NLS-1$ //$NON-NLS-2$
 
       buf.delete(buf.length() - 2, buf.length());
 

@@ -30,6 +30,7 @@ import org.eclipse.jface.bindings.TriggerSequence;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.PlatformUI;
@@ -53,7 +54,7 @@ import java.util.List;
 public class ToggleReadStateAction extends Action implements IWorkbenchWindowActionDelegate {
 
   /** Action ID */
-  public static final String ID = "org.rssowl.ui.ToggleReadState";
+  public static final String ID = "org.rssowl.ui.ToggleReadState"; //$NON-NLS-1$
 
   /* Unread States (New, Unread, Updated) */
   private static final EnumSet<INews.State> STATES = EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED);
@@ -101,7 +102,7 @@ public class ToggleReadStateAction extends Action implements IWorkbenchWindowAct
     IBindingService bs = (IBindingService) PlatformUI.getWorkbench().getService(IBindingService.class);
     TriggerSequence binding = bs.getBestActiveBindingFor(ID);
 
-    return binding != null ? "News as &Read\t" + binding.format() : "News as &Read";
+    return binding != null ? NLS.bind(Messages.ToggleReadStateAction_NEWS_READ_BINDING, binding.format()) : Messages.ToggleReadStateAction_NEWS_READ;
   }
 
   /*
@@ -117,7 +118,7 @@ public class ToggleReadStateAction extends Action implements IWorkbenchWindowAct
    */
   @Override
   public ImageDescriptor getImageDescriptor() {
-    return OwlUI.getImageDescriptor("icons/elcl16/mark_read.gif");
+    return OwlUI.getImageDescriptor("icons/elcl16/mark_read.gif"); //$NON-NLS-1$
   }
 
   /*
