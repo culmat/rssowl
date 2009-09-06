@@ -80,7 +80,7 @@ public class CleanUpReminderService {
   }
 
   private Job createJob() {
-    return new Job("Clean Up Reminder Service ") {
+    return new Job("") { //$NON-NLS-1$
       @Override
       protected IStatus run(final IProgressMonitor monitor) {
 

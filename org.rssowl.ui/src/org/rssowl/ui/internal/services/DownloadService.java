@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.window.Window;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.progress.IProgressConstants;
@@ -102,7 +103,7 @@ public class DownloadService {
     }
 
     public String getName() {
-      return "Downloading " + fFile.toString();
+      return NLS.bind(Messages.DownloadService_DOWNLOADING_N, fFile.toString());
     }
 
     public Priority getPriority() {
@@ -132,7 +133,7 @@ public class DownloadService {
 
   /** Default Constructor to create a Download Queue */
   public DownloadService() {
-    fDownloadQueue = new DownloadJobQueue("Downloading...", MAX_CONCURRENT_DOWNLOAD_JOBS, Integer.MAX_VALUE);
+    fDownloadQueue = new DownloadJobQueue(Messages.DownloadService_DOWNLOADING_TITLE, MAX_CONCURRENT_DOWNLOAD_JOBS, Integer.MAX_VALUE);
   }
 
   /**
@@ -152,7 +153,7 @@ public class DownloadService {
   private IStatus internalDownload(Job job, final IAttachment attachment, final URI link, final File folder, final IProgressMonitor monitor, final boolean userInitiated) {
     String downloadFileName = URIUtils.getFile(link);
     File downloadFile = new File(folder, downloadFileName);
-    job.setName("Downloading " + downloadFileName + "...");
+    job.setName(NLS.bind(Messages.DownloadService_DOWNLOADING, downloadFileName));
     job.setProperty(IProgressConstants.ICON_PROPERTY, OwlUI.getAttachmentImage(downloadFileName, attachment.getType()));
 
     int bytesConsumed = 0;
@@ -179,7 +180,7 @@ public class DownloadService {
         /* First Download to a temporary File */
         InputStream in = null;
         FileOutputStream out = null;
-        File partFile = new File(folder, downloadFileName + ".part");
+        File partFile = new File(folder, downloadFileName + ".part"); //$NON-NLS-1$
         boolean canceled = false;
         Exception error = null;
         try {
@@ -292,13 +293,13 @@ public class DownloadService {
           /* Indicate Error Message if any and offer Action to download again */
           if (error != null) {
             if (error.getMessage() != null)
-              job.setName("Error Downloading " + downloadFileName + ": " + error.getMessage());
+              job.setName(NLS.bind(Messages.DownloadService_ERROR_DOWNLOADING_N, downloadFileName, error.getMessage()));
             else
-              job.setName("Error Downloading " + downloadFileName);
+              job.setName(NLS.bind(Messages.DownloadService_ERROR_DOWNLOADING, downloadFileName));
 
             job.setProperty(IProgressConstants.ICON_PROPERTY, OwlUI.ERROR);
             job.setProperty(IProgressConstants.ACTION_PROPERTY, getRedownloadAction(new AttachmentDownloadTask(attachment, link, folder, true)));
-            monitor.setTaskName("Try Again");
+            monitor.setTaskName(Messages.DownloadService_TRY_AGAIN);
           }
 
           /* Close Output Stream */
@@ -350,12 +351,12 @@ public class DownloadService {
 
     /* Update Job Name */
     if (bytesConsumed > 0)
-      job.setName(downloadFileName + " - " + OwlUI.getSize(bytesConsumed));
+      job.setName(NLS.bind(Messages.DownloadService_N_OF_M, downloadFileName, OwlUI.getSize(bytesConsumed)));
     else
       job.setName(downloadFileName);
 
     /* The Label of the Status is used as Link for Action */
-    return new Status(IStatus.OK, Activator.PLUGIN_ID, "Open Folder");
+    return new Status(IStatus.OK, Activator.PLUGIN_ID, Messages.DownloadService_OPEN_FOLDER);
   }
 
   private String formatTask(int bytesConsumed, int totalBytes, int bytesPerSecond) {
@@ -367,36 +368,36 @@ public class DownloadService {
       int secondsRemaining = bytesToGo / bytesPerSecond;
       String period = OwlUI.getPeriod(secondsRemaining);
       if (period != null)
-        str.append(period).append(" Remaining - ");
+        str.append(period).append(" Remaining - "); //$NON-NLS-1$
     }
 
     /* "X MB of Y MB "*/
     String consumed = OwlUI.getSize(bytesConsumed);
     if (consumed == null)
-      consumed = "0";
+      consumed = "0"; //$NON-NLS-1$
 
     str.append(consumed);
-    str.append(" of ");
+    str.append(" of "); //$NON-NLS-1$
 
     String total = OwlUI.getSize(totalBytes);
     if (total != null)
       str.append(total);
     else
-      str.append("Unknown Size");
+      str.append("Unknown Size"); //$NON-NLS-1$
 
     /* "(X MB/sec)" */
     if (bytesPerSecond > 0) {
-      str.append(" (");
+      str.append(" ("); //$NON-NLS-1$
       str.append(OwlUI.getSize(bytesPerSecond));
-      str.append("/sec");
-      str.append(")");
+      str.append("/sec"); //$NON-NLS-1$
+      str.append(")"); //$NON-NLS-1$
     }
 
     return str.toString();
   }
 
   private IAction getOpenAction(final File downloadFile) {
-    return new Action("Open Folder") {
+    return new Action(Messages.DownloadService_OPEN_FOLDER) {
       @Override
       public void run() {
         Program.launch(downloadFile.getParent());
@@ -405,7 +406,7 @@ public class DownloadService {
   }
 
   private IAction getRedownloadAction(final AttachmentDownloadTask task) {
-    return new Action("Re-Download") {
+    return new Action(Messages.DownloadService_RE_DOWNLOAD) {
       @Override
       public void run() {
         fDownloadQueue.schedule(task);
