@@ -120,7 +120,7 @@ public class ModelUtils {
 
       /* Other type not supported */
       else
-        throw new IllegalArgumentException("Only Folders, Bookmars and News Bins are allowed!");
+        throw new IllegalArgumentException("Only Folders, Bookmars and News Bins are allowed!"); //$NON-NLS-1$
     }
 
     if (folderIds == null && bookmarkIds == null && newsbinIds == null)

@@ -56,22 +56,22 @@ import java.util.List;
 public class ColorPicker {
 
   private static final String[] COLOR_LABELS = new String[] { //
-      "Barn Red", //
-      "Salem Red", //
-      "Salmon", //
-      "Pumpkin", //
-      "Marigold Yellow", //
-      "Mustard", //
-      "Bayberry Green", //
-      "Tavern Green", //
-      "Lexington Green", //
-      "Sea Green", //
-      "Federal Blue", //
-      "Soldier Blue", //
-      "Slate", //
-      "Pitch Black", //
-      "Driftwood", //
-      "Chocolate Brown" //
+      Messages.ColorPicker_BARN_RED, //
+      Messages.ColorPicker_SALEM_RED, //
+      Messages.ColorPicker_SALMON, //
+      Messages.ColorPicker_PUMPKIN, //
+      Messages.ColorPicker_MARIGOLD_YELLOW, //
+      Messages.ColorPicker_MUSTARD, //
+      Messages.ColorPicker_BARBERRY_GREEN, //
+      Messages.ColorPicker_TAVERN_GREEN, //
+      Messages.ColorPicker_LEXINGTON_GREEN, //
+      Messages.ColorPicker_SEA_GREEN, //
+      Messages.ColorPicker_FEDERAL_BLUE, //
+      Messages.ColorPicker_SOLIDER_BLUE, //
+      Messages.ColorPicker_SLATE, //
+      Messages.ColorPicker_PITCH_BLACK, //
+      Messages.ColorPicker_DRIFTWOOD, //
+      Messages.ColorPicker_CHOCOLATE_BROWN //
   };
 
   private static final RGB[] COLOR_VALUES = new RGB[] { //
@@ -177,7 +177,7 @@ public class ColorPicker {
     /* Add Item to open the native Color Picker */
     new MenuItem(fColorMenu, SWT.SEPARATOR);
     MenuItem moreColor = new MenuItem(fColorMenu, SWT.PUSH);
-    moreColor.setText("Other...");
+    moreColor.setText(Messages.ColorPicker_OTHER);
     moreColor.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {

@@ -47,7 +47,7 @@ import java.util.List;
 public class CTree {
 
   /* ID to store Layout-Data with TreeColumns */
-  private static final String LAYOUT_DATA = "org.rssowl.ui.internal.CTreeLayoutData";
+  private static final String LAYOUT_DATA = "org.rssowl.ui.internal.CTreeLayoutData"; //$NON-NLS-1$
 
   private Tree fTree;
   private List<TreeColumn> fCols = new ArrayList<TreeColumn>();

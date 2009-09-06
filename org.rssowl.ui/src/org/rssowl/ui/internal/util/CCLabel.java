@@ -89,7 +89,7 @@ public class CCLabel extends Canvas {
   private static final int INDENT = 3;
 
   /* a string inserted in the middle of text that has been shortened */
-  private static final String ELLIPSIS = "..."; //$NON-NLS-1$ // could use the ellipsis glyph on some platforms "\u2026"
+  private static final String ELLIPSIS = "..."; //$NON-NLS-1$
 
   private static int DRAW_FLAGS = SWT.DRAW_MNEMONIC | SWT.DRAW_TAB | SWT.DRAW_TRANSPARENT | SWT.DRAW_DELIMITER;
 
@@ -881,7 +881,7 @@ public class CCLabel extends Canvas {
       return text;
 
     /* Create substring that fits available width */
-    String subStr = "";
+    String subStr = ""; //$NON-NLS-1$
     for (int i = 1; i < text.length(); i++) {
       subStr = text.substring(0, i);
 
