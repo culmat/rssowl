@@ -2045,15 +2045,15 @@ public class OwlUI {
       double mb = bytes / (1024d * 1024d);
       double kb = bytes / 1024d;
 
-      NumberFormat format = new DecimalFormat("0.0"); //$NON-NLS-1$
+      NumberFormat format = new DecimalFormat(Messages.OwlUI_SIZE_FORMAT);
 
       if (mb >= 1)
-        return format.format(mb) + " MB"; //$NON-NLS-1$
+        return NLS.bind(Messages.OwlUI_N_MB, format.format(mb));
 
       if (kb >= 1)
-        return format.format(kb) + " KB"; //$NON-NLS-1$
+        return NLS.bind(Messages.OwlUI_N_KB, format.format(kb));
 
-      return bytes + " Bytes"; //$NON-NLS-1$
+      return NLS.bind(Messages.OwlUI_N_BYTES, bytes);
     }
 
     return null;
