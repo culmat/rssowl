@@ -265,16 +265,16 @@ public class FeedView extends EditorPart implements IReusableEditor {
     FileDialog dialog = new FileDialog(getSite().getShell(), SWT.SAVE);
     dialog.setOverwrite(true);
     if (fInput.getMark() instanceof IBookMark)
-      dialog.setFilterExtensions(new String[] { ".html", ".xml" });
+      dialog.setFilterExtensions(new String[] { ".html", ".xml" }); //$NON-NLS-1$ //$NON-NLS-2$
     else
-      dialog.setFilterExtensions(new String[] { ".html" });
+      dialog.setFilterExtensions(new String[] { ".html" }); //$NON-NLS-1$
     dialog.setFileName(fInput.getName());
 
     String fileName = dialog.open();
     if (fileName == null)
       return;
 
-    if (fileName.endsWith(".xml"))
+    if (fileName.endsWith(".xml")) //$NON-NLS-1$
       saveAsXml(fileName);
     else
       saveAsHtml(fileName);
@@ -287,7 +287,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
     try {
       final IProtocolHandler handler = Owl.getConnectionService().getHandler(feedLink);
       if (handler instanceof org.rssowl.core.internal.connection.DefaultProtocolHandler) {
-        Job downloadJob = new Job("Downloading Feed...") {
+        Job downloadJob = new Job(Messages.FeedView_DOWNLOADING_FEED) {
           @Override
           protected IStatus run(IProgressMonitor monitor) {
             monitor.beginTask(bm.getName(), IProgressMonitor.UNKNOWN);
@@ -390,9 +390,9 @@ public class FeedView extends EditorPart implements IReusableEditor {
         }
 
         /* Create Content for each Item */
-        content.append("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n");
-        content.append("<html>\n  <head>\n");
-        content.append("\n  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n");
+        content.append("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n"); //$NON-NLS-1$
+        content.append("<html>\n  <head>\n"); //$NON-NLS-1$
+        content.append("\n  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n"); //$NON-NLS-1$
         StringWriter css = new StringWriter();
         try {
           labelProvider.writeCSS(css);
@@ -400,12 +400,12 @@ public class FeedView extends EditorPart implements IReusableEditor {
           /* Ignore */
         }
         content.append(css.toString());
-        content.append("  </head>\n  <body>\n");
+        content.append("  </head>\n  <body>\n"); //$NON-NLS-1$
         for (INews newsItemToSave : newsToSave) {
           String text = labelProvider.getText(newsItemToSave, false);
           content.append(text);
         }
-        content.append("\n  </body>\n</html>");
+        content.append("\n  </body>\n</html>"); //$NON-NLS-1$
       }
     }
 
@@ -1000,7 +1000,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
       /* Reset the Quicksearch if active */
       if (fNewsFilter.isPatternSet())
-        fNewsFilter.setPattern("");
+        fNewsFilter.setPattern(""); //$NON-NLS-1$
 
       /* Update news mark in filter */
       fNewsFilter.setNewsMark(fInput.getMark());

@@ -31,6 +31,7 @@ import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.OwnerDrawLabelProvider;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerColumn;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -77,8 +78,8 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
   protected NewsColumnViewModel fColumnModel;
 
   /* Some Colors of a Label */
-  private static final String LABEL_COLOR_BLACK = "0,0,0";
-  private static final String LABEL_COLOR_WHITE = "255,255,255";
+  private static final String LABEL_COLOR_BLACK = "0,0,0"; //$NON-NLS-1$
+  private static final String LABEL_COLOR_WHITE = "255,255,255"; //$NON-NLS-1$
 
   /** Resource Manager to use */
   protected LocalResourceManager fResources;
@@ -216,11 +217,11 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
     if (news.getParentId() != 0) {
       INewsBin bin = DynamicDAO.load(INewsBin.class, news.getParentId());
       if (bin != null) {
-        name = bin.getName() + ": " + name;
+        name = NLS.bind(Messages.NewsTableLabelProvider_BIN_NAME, bin.getName(), name);
       }
     }
 
-    return StringUtils.replaceAll(name, "&", "&&");
+    return StringUtils.replaceAll(name, "&", "&&"); //$NON-NLS-1$ //$NON-NLS-2$
   }
 
   /**
@@ -272,7 +273,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
           if (!labels.isEmpty()) {
             StringBuilder str = new StringBuilder();
             for (ILabel label : labels) {
-              str.append(label.getName()).append(", ");
+              str.append(label.getName()).append(", "); //$NON-NLS-1$
             }
 
             str = str.delete(str.length() - 2, str.length());
@@ -283,13 +284,13 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
         case STATUS:
           State state = news.getState();
           if (state == State.NEW)
-            text = "New";
+            text = Messages.NewsTableLabelProvider_NEW;
           else if (state == State.UNREAD)
-            text = "Unread";
+            text = Messages.NewsTableLabelProvider_UNREAD;
           else if (state == State.UPDATED)
-            text = "Updated";
+            text = Messages.NewsTableLabelProvider_UPDATED;
           else if (state == State.READ)
-            text = "Read";
+            text = Messages.NewsTableLabelProvider_READ;
 
           break;
 

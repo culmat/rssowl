@@ -64,7 +64,7 @@ public class FeedViewFactory implements IElementFactory {
             if (mark != null)
               return new FeedViewInput(mark);
           } else
-            throw new IllegalStateException(FeedViewInput.MARK_INPUT_CLASS + " does not implement IMark: " + inputClass);
+            throw new IllegalStateException(FeedViewInput.MARK_INPUT_CLASS + " does not implement IMark: " + inputClass); //$NON-NLS-1$
         } catch (ClassNotFoundException e) {
           /* Should never happen */
           throw new IllegalStateException(e);

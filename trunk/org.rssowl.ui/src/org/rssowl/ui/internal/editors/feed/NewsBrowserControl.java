@@ -63,7 +63,7 @@ import org.rssowl.ui.internal.util.CBrowser;
  * @author bpasero
  */
 public class NewsBrowserControl implements IFeedViewPart {
-  private static final String LOCALHOST = "127.0.0.1";
+  private static final String LOCALHOST = "127.0.0.1"; //$NON-NLS-1$
   private IEditorSite fEditorSite;
   private NewsBrowserViewer fViewer;
   private ISelectionListener fSelectionListener;
@@ -298,44 +298,44 @@ public class NewsBrowserControl implements IFeedViewPart {
     /* Create JavaScript to Execute */
     StringBuffer js = new StringBuffer();
     if (browser.isIE())
-      js.append("var scrollPosY = document.body.scrollTop; ");
+      js.append("var scrollPosY = document.body.scrollTop; "); //$NON-NLS-1$
     else
-      js.append("var scrollPosY = window.pageYOffset; ");
-    js.append("var body = document.getElementById(\"owlbody\"); ");
-    js.append("var divs = body.childNodes; ");
+      js.append("var scrollPosY = window.pageYOffset; "); //$NON-NLS-1$
+    js.append("var body = document.getElementById(\"owlbody\"); "); //$NON-NLS-1$
+    js.append("var divs = body.childNodes; "); //$NON-NLS-1$
 
     /* Next News */
     if (next) {
-      js.append("  for (var i = 1; i < divs.length; i++) { ");
-      js.append("    if (divs[i].nodeType != 1) { ");
-      js.append("      continue; ");
-      js.append("    } ");
-      js.append("    var divPosY = divs[i].offsetTop; ");
+      js.append("  for (var i = 1; i < divs.length; i++) { "); //$NON-NLS-1$
+      js.append("    if (divs[i].nodeType != 1) { "); //$NON-NLS-1$
+      js.append("      continue; "); //$NON-NLS-1$
+      js.append("    } "); //$NON-NLS-1$
+      js.append("    var divPosY = divs[i].offsetTop; "); //$NON-NLS-1$
       if (unread) {
-        js.append("  if (divPosY > scrollPosY && divs[i].className == \"newsitemUnread\") { ");
+        js.append("  if (divPosY > scrollPosY && divs[i].className == \"newsitemUnread\") { "); //$NON-NLS-1$
       } else
-        js.append("  if (divPosY > scrollPosY) { ");
-      js.append("      divs[i].scrollIntoView(); ");
-      js.append("      break; ");
-      js.append("    } ");
-      js.append("  } ");
+        js.append("  if (divPosY > scrollPosY) { "); //$NON-NLS-1$
+      js.append("      divs[i].scrollIntoView(); "); //$NON-NLS-1$
+      js.append("      break; "); //$NON-NLS-1$
+      js.append("    } "); //$NON-NLS-1$
+      js.append("  } "); //$NON-NLS-1$
     }
 
     /* Previous News */
     else {
-      js.append("  for (var i = divs.length - 1; i >= 0; i--) { ");
-      js.append("    if (divs[i].nodeType != 1) { ");
-      js.append("      continue; ");
-      js.append("    } ");
-      js.append("    var divPosY = divs[i].offsetTop; ");
+      js.append("  for (var i = divs.length - 1; i >= 0; i--) { "); //$NON-NLS-1$
+      js.append("    if (divs[i].nodeType != 1) { "); //$NON-NLS-1$
+      js.append("      continue; "); //$NON-NLS-1$
+      js.append("    } "); //$NON-NLS-1$
+      js.append("    var divPosY = divs[i].offsetTop; "); //$NON-NLS-1$
       if (unread) {
-        js.append("  if (divPosY < scrollPosY - 10 && divs[i].className == \"newsitemUnread\") { ");
+        js.append("  if (divPosY < scrollPosY - 10 && divs[i].className == \"newsitemUnread\") { "); //$NON-NLS-1$
       } else
-        js.append("  if (divPosY < scrollPosY - 10) { ");
-      js.append("      divs[i].scrollIntoView(); ");
-      js.append("      break; ");
-      js.append("    } ");
-      js.append("  } ");
+        js.append("  if (divPosY < scrollPosY - 10) { "); //$NON-NLS-1$
+      js.append("      divs[i].scrollIntoView(); "); //$NON-NLS-1$
+      js.append("      break; "); //$NON-NLS-1$
+      js.append("    } "); //$NON-NLS-1$
+      js.append("  } "); //$NON-NLS-1$
     }
 
     /* See if the Scroll Position Changed at all and handle */
@@ -353,13 +353,13 @@ public class NewsBrowserControl implements IFeedViewPart {
     }
 
     if (browser.isIE())
-      js.append("var newScrollPosY = document.body.scrollTop; ");
+      js.append("var newScrollPosY = document.body.scrollTop; "); //$NON-NLS-1$
     else
-      js.append("var newScrollPosY = window.pageYOffset; ");
+      js.append("var newScrollPosY = window.pageYOffset; "); //$NON-NLS-1$
 
-    js.append("if (scrollPosY == newScrollPosY) { ");
-    js.append("  window.location.href = \"").append(ILinkHandler.HANDLER_PROTOCOL + actionId).append("\"; ");
-    js.append("} ");
+    js.append("if (scrollPosY == newScrollPosY) { "); //$NON-NLS-1$
+    js.append("  window.location.href = \"").append(ILinkHandler.HANDLER_PROTOCOL + actionId).append("\"; "); //$NON-NLS-1$ //$NON-NLS-2$
+    js.append("} "); //$NON-NLS-1$
 
     try {
       browser.getControl().execute(js.toString());

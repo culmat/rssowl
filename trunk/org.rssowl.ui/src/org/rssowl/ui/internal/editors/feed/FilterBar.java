@@ -94,16 +94,16 @@ import java.util.List;
 public class FilterBar {
 
   /* Action to Filter News */
-  private static final String FILTER_ACTION = "org.rssowl.ui.internal.editors.feed.FilterAction";
+  private static final String FILTER_ACTION = "org.rssowl.ui.internal.editors.feed.FilterAction"; //$NON-NLS-1$
 
   /* Action to Group News */
-  private static final String GROUP_ACTION = "org.rssowl.ui.internal.editors.feed.GroupAction";
+  private static final String GROUP_ACTION = "org.rssowl.ui.internal.editors.feed.GroupAction"; //$NON-NLS-1$
 
   /* Columns */
-  private static final String COLUMNS_ACTION = "org.rssowl.ui.internal.editors.feed.ColumnsAction";
+  private static final String COLUMNS_ACTION = "org.rssowl.ui.internal.editors.feed.ColumnsAction"; //$NON-NLS-1$
 
   /* Maximize Browser */
-  private static final String TOGGLE_MAXIMIZED_ACTION = "org.rssowl.ui.internal.editors.feed.ToggleMaximizedAction";
+  private static final String TOGGLE_MAXIMIZED_ACTION = "org.rssowl.ui.internal.editors.feed.ToggleMaximizedAction"; //$NON-NLS-1$
 
   private Composite fParent;
   private ToolBarManager fSecondToolBarManager;
@@ -188,7 +188,7 @@ public class FilterBar {
   }
 
   private void createHighlightBar() {
-    IAction highlightSearchAction = new Action("Highlight searched Words", IAction.AS_CHECK_BOX) {
+    IAction highlightSearchAction = new Action(Messages.FilterBar_HIGHLIGHT, IAction.AS_CHECK_BOX) {
       @Override
       public void run() {
         fGlobalPreferences.putBoolean(DefaultPreferences.FV_HIGHLIGHT_SEARCH_RESULTS, isChecked());
@@ -196,8 +196,8 @@ public class FilterBar {
       }
     };
 
-    highlightSearchAction.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/highlight.gif"));
-    highlightSearchAction.setToolTipText("Highlight searched Words");
+    highlightSearchAction.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/highlight.gif")); //$NON-NLS-1$
+    highlightSearchAction.setToolTipText(Messages.FilterBar_HIGHLIGHT);
     highlightSearchAction.setChecked(fGlobalPreferences.getBoolean(DefaultPreferences.FV_HIGHLIGHT_SEARCH_RESULTS));
 
     fSecondToolBarManager.add(highlightSearchAction);
@@ -214,7 +214,7 @@ public class FilterBar {
     final ToolBarManager manager = new ToolBarManager(SWT.FLAT);
     final NewsFilter filter = fFeedView.getFilter();
 
-    IAction quickSearch = new Action("Quick Search", IAction.AS_DROP_DOWN_MENU) {
+    IAction quickSearch = new Action(Messages.FilterBar_QUICK_SEARCH, IAction.AS_DROP_DOWN_MENU) {
       @Override
       public void run() {
 
@@ -222,7 +222,7 @@ public class FilterBar {
         getMenuCreator().getMenu(manager.getControl()).setVisible(true);
       }
     };
-    quickSearch.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/find.gif"));
+    quickSearch.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/find.gif")); //$NON-NLS-1$
 
     quickSearch.setMenuCreator(new IMenuCreator() {
       public void dispose() {}
@@ -412,7 +412,7 @@ public class FilterBar {
         }
       };
 
-      clearTextAction.setToolTipText("Clear");
+      clearTextAction.setToolTipText(Messages.FilterBar_CLEAR);
       clearTextAction.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/clear.gif")); //$NON-NLS-1$
 
       fFilterToolBar.add(clearTextAction);
@@ -432,10 +432,10 @@ public class FilterBar {
 
   /* Layout */
   private void createLayoutBar() {
-    final ImageDescriptor columnsImgDisabled = OwlUI.getImageDescriptor("icons/dtool16/columns.gif");
+    final ImageDescriptor columnsImgDisabled = OwlUI.getImageDescriptor("icons/dtool16/columns.gif"); //$NON-NLS-1$
 
     /* Set Columns */
-    IAction columnDropdown = new Action("Visible Columns", IAction.AS_DROP_DOWN_MENU) {
+    IAction columnDropdown = new Action(Messages.FilterBar_VISIBLE_COLUMNS, IAction.AS_DROP_DOWN_MENU) {
       @Override
       public void run() {
         getMenuCreator().getMenu(fSecondToolBarManager.getControl()).setVisible(true);
@@ -463,7 +463,7 @@ public class FilterBar {
         Menu menu = new Menu(parent);
 
         MenuItem restoreDefaults = new MenuItem(menu, SWT.None);
-        restoreDefaults.setText("&Restore Default Columns");
+        restoreDefaults.setText(Messages.FilterBar_RESTORE_DEFAULTS);
         restoreDefaults.addSelectionListener(new SelectionAdapter() {
           @Override
           public void widgetSelected(SelectionEvent e) {
@@ -511,9 +511,9 @@ public class FilterBar {
     fSecondToolBarManager.add(columnDropdown);
 
     /* Maximize / Minimize Browser */
-    final ImageDescriptor img = OwlUI.getImageDescriptor("icons/etool16/browsermaximized.gif");
+    final ImageDescriptor img = OwlUI.getImageDescriptor("icons/etool16/browsermaximized.gif"); //$NON-NLS-1$
 
-    IAction toggleMaximized = new Action("", IAction.AS_CHECK_BOX) {
+    IAction toggleMaximized = new Action("", IAction.AS_CHECK_BOX) { //$NON-NLS-1$
 
       @Override
       public void run() {
@@ -536,9 +536,9 @@ public class FilterBar {
       @Override
       public String getToolTipText() {
         if (fMaximized)
-          return "Show Headlines";
+          return Messages.FilterBar_SHOW_HEADLINES;
 
-        return "Hide Headlines";
+        return Messages.FilterBar_HIDE_HEADLINES;
       }
     };
     toggleMaximized.setId(TOGGLE_MAXIMIZED_ACTION);
@@ -576,7 +576,7 @@ public class FilterBar {
   private void createFilterBar() {
     final NewsFilter filter = fFeedView.getFilter();
 
-    IAction newsFilterAction = new Action("Filter News", IAction.AS_DROP_DOWN_MENU) {
+    IAction newsFilterAction = new Action(Messages.FilterBar_FILTER_NEWS, IAction.AS_DROP_DOWN_MENU) {
       @Override
       public void run() {
 
@@ -705,7 +705,7 @@ public class FilterBar {
 
           /* Convert Filter to Saved Search */
           final MenuItem createSavedSearch = new MenuItem(menu, SWT.RADIO);
-          createSavedSearch.setText("Save as new Search...");
+          createSavedSearch.setText(Messages.FilterBar_SAVE_SEARCH);
           createSavedSearch.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -738,7 +738,7 @@ public class FilterBar {
     switch (filterType) {
       case SHOW_ALL:
         field = factory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
-        conditions.add(factory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, ""));
+        conditions.add(factory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "")); //$NON-NLS-1$
         break;
 
       case SHOW_NEW:
@@ -810,7 +810,7 @@ public class FilterBar {
   private void createGrouperBar() {
     final NewsGrouping grouping = fFeedView.getGrouper();
 
-    final IAction newsGroup = new Action("Group News", IAction.AS_DROP_DOWN_MENU) {
+    final IAction newsGroup = new Action(Messages.FilterBar_GROUP_NEWS, IAction.AS_DROP_DOWN_MENU) {
       @Override
       public void run() {
 
@@ -914,7 +914,7 @@ public class FilterBar {
 
         /* Group: By Other */
         final MenuItem groupByOther = new MenuItem(menu, SWT.CASCADE);
-        groupByOther.setText("Other");
+        groupByOther.setText(Messages.FilterBar_OTHER);
         Menu otherMenu = new Menu(groupByOther);
         groupByOther.setMenu(otherMenu);
 

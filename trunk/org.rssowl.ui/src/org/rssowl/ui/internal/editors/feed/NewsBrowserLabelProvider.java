@@ -80,11 +80,11 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   private DateFormat fDateFormat = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.SHORT);
 
   /* Potential Media Tags */
-  private final Set<String> fMediaTags = new HashSet<String>(Arrays.asList(new String[] { "img", "applet", "embed", "area", "frame", "frameset", "iframe", "map", "object" }));
+  private final Set<String> fMediaTags = new HashSet<String>(Arrays.asList(new String[] { "img", "applet", "embed", "area", "frame", "frameset", "iframe", "map", "object" })); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$
 
   /* Dynamic HTML in Content */
   enum Dynamic {
-    NEWS("newsitem"), TITLE("title"), TOGGLE_READ_LINK("toggleRead"), TOGGLE_READ_IMG("toggleReadImg"), HEADER("header"), FOOTER("footer"), TOGGLE_STICKY("toggleSticky"), LABELS("labels"), LABELS_SEPARATOR("labelsSeparator");
+    NEWS("newsitem"), TITLE("title"), TOGGLE_READ_LINK("toggleRead"), TOGGLE_READ_IMG("toggleReadImg"), HEADER("header"), FOOTER("footer"), TOGGLE_STICKY("toggleSticky"), LABELS("labels"), LABELS_SEPARATOR("labelsSeparator"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$
 
     private String fId;
 
@@ -187,17 +187,17 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     int bigger = normal + 1;
     int biggest = bigger + 6;
 
-    String fontUnit = "pt";
-    fNormalFontCSS = "font-size: " + normal + fontUnit + ";";
-    fSmallFontCSS = "font-size: " + small + fontUnit + ";";
-    fBiggerFontCSS = "font-size: " + bigger + fontUnit + ";";
-    fBiggestFontCSS = "font-size: " + biggest + fontUnit + ";";
+    String fontUnit = "pt"; //$NON-NLS-1$
+    fNormalFontCSS = "font-size: " + normal + fontUnit + ";"; //$NON-NLS-1$ //$NON-NLS-2$
+    fSmallFontCSS = "font-size: " + small + fontUnit + ";"; //$NON-NLS-1$ //$NON-NLS-2$
+    fBiggerFontCSS = "font-size: " + bigger + fontUnit + ";"; //$NON-NLS-1$ //$NON-NLS-2$
+    fBiggestFontCSS = "font-size: " + biggest + fontUnit + ";"; //$NON-NLS-1$ //$NON-NLS-2$
   }
 
   /* Init the Theme Color (from UI Thread) */
   private void createColors() {
     RGB stickyRgb = OwlUI.getThemeRGB(OwlUI.STICKY_BG_COLOR_ID, new RGB(255, 255, 180));
-    fStickyBGColorCSS = "background-color: rgb(" + stickyRgb.red + "," + stickyRgb.green + "," + stickyRgb.blue + ");";
+    fStickyBGColorCSS = "background-color: rgb(" + stickyRgb.red + "," + stickyRgb.green + "," + stickyRgb.blue + ");"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
   }
 
   /*
@@ -241,125 +241,125 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   public void writeCSS(Writer writer) throws IOException {
 
     /* Open CSS */
-    writer.write("<style type=\"text/css\">\n");
+    writer.write("<style type=\"text/css\">\n"); //$NON-NLS-1$
 
     /* General */
-    writer.append("body { overflow: auto; margin: 0; font-family: ").append(fNewsFontFamily).append(",Verdanna,sans-serif; }\n");
-    writer.write("a { color: #009; text-decoration: none; }\n");
-    writer.write("a:hover { color: #009; text-decoration: underline; }\n");
-    writer.write("a:visited { color: #009; text-decoration: none; }\n");
-    writer.write("img { border: none; }\n");
-    writer.write("div.hidden { display: none; }\n");
+    writer.append("body { overflow: auto; margin: 0; font-family: ").append(fNewsFontFamily).append(",Verdanna,sans-serif; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.write("a { color: #009; text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.write("a:hover { color: #009; text-decoration: underline; }\n"); //$NON-NLS-1$
+    writer.write("a:visited { color: #009; text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.write("img { border: none; }\n"); //$NON-NLS-1$
+    writer.write("div.hidden { display: none; }\n"); //$NON-NLS-1$
 
     /* Group */
-    writer.append("div.group { color: #678; ").append(fBiggestFontCSS).append(" font-weight: bold; padding: 10px 0px 10px 5px; }\n");
+    writer.append("div.group { color: #678; ").append(fBiggestFontCSS).append(" font-weight: bold; padding: 10px 0px 10px 5px; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* Main DIV per Item */
     if (isSingleNewsDisplayed()) {
-      writer.write("div.newsitemUnread { margin: 0; border-bottom: dotted 1px silver; }\n");
-      writer.write("div.newsitemRead { margin: 0; border-bottom: dotted 1px silver; }\n");
+      writer.write("div.newsitemUnread { margin: 0; border-bottom: dotted 1px silver; }\n"); //$NON-NLS-1$
+      writer.write("div.newsitemRead { margin: 0; border-bottom: dotted 1px silver; }\n"); //$NON-NLS-1$
     } else {
-      writer.write("div.newsitemUnread { margin: 0px 0px 25px 0px; border-top: dotted 1px silver; border-bottom: dotted 1px silver; }\n");
-      writer.write("div.newsitemRead { margin: 0px 0px 25px 0px; border-top: dotted 1px silver; border-bottom: dotted 1px silver; }\n");
+      writer.write("div.newsitemUnread { margin: 0px 0px 25px 0px; border-top: dotted 1px silver; border-bottom: dotted 1px silver; }\n"); //$NON-NLS-1$
+      writer.write("div.newsitemRead { margin: 0px 0px 25px 0px; border-top: dotted 1px silver; border-bottom: dotted 1px silver; }\n"); //$NON-NLS-1$
     }
 
     /* Main DIV Item Areas */
-    writer.write("div.header { padding: 10px 10px 5px 10px; background-color: #eee; }\n");
-    writer.append("div.headerSticky { padding: 10px 10px 5px 10px; ").append(fStickyBGColorCSS).append(" }\n");
-    writer.write("div.content { \n");
-    writer.write("   padding: 15px 10px 15px 10px; border-top: dotted 1px silver; \n");
-    writer.append("  background-color: #fff; clear: both; ").append(fNormalFontCSS).append("\n");
-    writer.write("}\n");
-    writer.write("div.footer { background-color: rgb(248,248,248); padding: 5px 10px 5px 10px; line-height: 20px; border-top: dotted 1px silver; }\n");
-    writer.append("div.footerSticky { ").append(fStickyBGColorCSS).append(" padding: 5px 10px 5px 10px; line-height: 20px; border-top: dotted 1px silver; }\n");
+    writer.write("div.header { padding: 10px 10px 5px 10px; background-color: #eee; }\n"); //$NON-NLS-1$
+    writer.append("div.headerSticky { padding: 10px 10px 5px 10px; ").append(fStickyBGColorCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.write("div.content { \n"); //$NON-NLS-1$
+    writer.write("   padding: 15px 10px 15px 10px; border-top: dotted 1px silver; \n"); //$NON-NLS-1$
+    writer.append("  background-color: #fff; clear: both; ").append(fNormalFontCSS).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.write("}\n"); //$NON-NLS-1$
+    writer.write("div.footer { background-color: rgb(248,248,248); padding: 5px 10px 5px 10px; line-height: 20px; border-top: dotted 1px silver; }\n"); //$NON-NLS-1$
+    writer.append("div.footerSticky { ").append(fStickyBGColorCSS).append(" padding: 5px 10px 5px 10px; line-height: 20px; border-top: dotted 1px silver; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* Restrict the style of embedded Paragraphs */
-    writer.write("div.content p { margin-top: 0; padding-top: 0; margin-left: 0; padding-left: 0; }\n");
+    writer.write("div.content p { margin-top: 0; padding-top: 0; margin-left: 0; padding-left: 0; }\n"); //$NON-NLS-1$
 
     /* Title */
-    writer.append("div.title { float: left; padding-bottom: 6px; ").append(fBiggerFontCSS).append(" }\n");
+    writer.append("div.title { float: left; padding-bottom: 6px; ").append(fBiggerFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
-    writer.write("div.title a { color: #009; text-decoration: none; }\n");
-    writer.write("div.title a.unread { font-weight: bold; text-decoration: none; }\n");
-    writer.write("div.title a:hover { color: #009; text-decoration: none; }\n");
-    writer.write("div.title a:visited { color: #009; text-decoration: none; }\n");
+    writer.write("div.title a { color: #009; text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.write("div.title a.unread { font-weight: bold; text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.write("div.title a:hover { color: #009; text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.write("div.title a:visited { color: #009; text-decoration: none; }\n"); //$NON-NLS-1$
 
-    writer.write("a.comments { color: rgb(80,80,80); text-decoration: none; }\n");
-    writer.write("a.comments:hover { color: rgb(80,80,80); text-decoration: none; }\n");
-    writer.write("a.comments:active { color: rgb(80,80,80); text-decoration: none; }\n");
-    writer.write("a.comments:visited { color: rgb(80,80,80); text-decoration: none; }\n");
+    writer.write("a.comments { color: rgb(80,80,80); text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.write("a.comments:hover { color: rgb(80,80,80); text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.write("a.comments:active { color: rgb(80,80,80); text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.write("a.comments:visited { color: rgb(80,80,80); text-decoration: none; }\n"); //$NON-NLS-1$
 
-    writer.write("div.title span.unread { font-weight: bold; }\n");
+    writer.write("div.title span.unread { font-weight: bold; }\n"); //$NON-NLS-1$
 
     /* Delete */
-    writer.append("div.delete { text-align: right; ").append(fSmallFontCSS).append(" }\n");
+    writer.append("div.delete { text-align: right; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* Subline */
-    writer.append("div.subline { margin: 0; padding: 0; clear: left; ").append(fSmallFontCSS).append(" }\n");
-    writer.append("table.subline { margin: 0; padding: 0; }\n");
-    writer.append("tr.subline { margin: 0; padding: 0; }\n");
-    writer.append("td.subline { margin: 0; padding: 0; color: rgb(80, 80, 80); padding-right: 8px; ").append(fSmallFontCSS).append(" }\n");
+    writer.append("div.subline { margin: 0; padding: 0; clear: left; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("table.subline { margin: 0; padding: 0; }\n"); //$NON-NLS-1$
+    writer.append("tr.subline { margin: 0; padding: 0; }\n"); //$NON-NLS-1$
+    writer.append("td.subline { margin: 0; padding: 0; color: rgb(80, 80, 80); padding-right: 8px; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* Date */
-    writer.append("div.date { float: left; ").append(fSmallFontCSS).append(" }\n");
+    writer.append("div.date { float: left; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* Author */
-    writer.append("div.author { text-align: right; ").append(fSmallFontCSS).append(" }\n");
+    writer.append("div.author { text-align: right; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* Attachments */
-    writer.append("div.attachments { clear: both; ").append(fSmallFontCSS).append(" }\n");
-    writer.write("div.attachments span.label { float: left; padding-right: 5px; }\n");
-    writer.write("div.attachments a { color: #009; text-decoration: none; }\n");
-    writer.write("div.attachments a:visited { color: #009; text-decoration: none; }\n");
-    writer.write("div.attachments a:hover { text-decoration: underline; }\n");
+    writer.append("div.attachments { clear: both; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.write("div.attachments span.label { float: left; padding-right: 5px; }\n"); //$NON-NLS-1$
+    writer.write("div.attachments a { color: #009; text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.write("div.attachments a:visited { color: #009; text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.write("div.attachments a:hover { text-decoration: underline; }\n"); //$NON-NLS-1$
 
     /* Categories */
-    writer.append("div.categories { clear: both; ").append(fSmallFontCSS).append(" }\n");
-    writer.write("div.categories span.label { float: left; padding-right: 5px; }\n");
-    writer.write("div.categories a { color: #009; text-decoration: none; }\n");
-    writer.write("div.categories a:visited { color: #009; text-decoration: none; }\n");
-    writer.write("div.categories a:hover { text-decoration: underline; }\n");
+    writer.append("div.categories { clear: both; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.write("div.categories span.label { float: left; padding-right: 5px; }\n"); //$NON-NLS-1$
+    writer.write("div.categories a { color: #009; text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.write("div.categories a:visited { color: #009; text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.write("div.categories a:hover { text-decoration: underline; }\n"); //$NON-NLS-1$
 
     /* Source */
-    writer.append("div.source { clear: both; ").append(fSmallFontCSS).append(" }\n");
-    writer.write("div.source span.label {float: left; padding-right: 5px; }\n");
-    writer.write("div.source a { color: #009; text-decoration: none; }\n");
-    writer.write("div.source a:visited { color: #009; text-decoration: none; }\n");
-    writer.write("div.source a:hover { text-decoration: underline; }\n");
+    writer.append("div.source { clear: both; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.write("div.source span.label {float: left; padding-right: 5px; }\n"); //$NON-NLS-1$
+    writer.write("div.source a { color: #009; text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.write("div.source a:visited { color: #009; text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.write("div.source a:hover { text-decoration: underline; }\n"); //$NON-NLS-1$
 
     /* Comments */
-    writer.append("div.comments { clear: both; ").append(fSmallFontCSS).append(" }\n");
-    writer.write("div.comments span.label {float: left; padding-right: 5px; }\n");
-    writer.write("div.comments a { color: #009; text-decoration: none; }\n");
-    writer.write("div.comments a:visited { color: #009; text-decoration: none; }\n");
-    writer.write("div.comments a:hover { text-decoration: underline; }\n");
+    writer.append("div.comments { clear: both; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.write("div.comments span.label {float: left; padding-right: 5px; }\n"); //$NON-NLS-1$
+    writer.write("div.comments a { color: #009; text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.write("div.comments a:visited { color: #009; text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.write("div.comments a:hover { text-decoration: underline; }\n"); //$NON-NLS-1$
 
     /* Search Related */
-    writer.append("div.searchrelated { clear: both; ").append(fSmallFontCSS).append(" }\n");
-    writer.write("div.searchrelated span.label {float: left; padding-right: 5px; }\n");
-    writer.write("div.searchrelated a { color: #009; text-decoration: none; }\n");
-    writer.write("div.searchrelated a:visited { color: #009; text-decoration: none; }\n");
-    writer.write("div.searchrelated a:hover { text-decoration: underline; }\n");
+    writer.append("div.searchrelated { clear: both; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.write("div.searchrelated span.label {float: left; padding-right: 5px; }\n"); //$NON-NLS-1$
+    writer.write("div.searchrelated a { color: #009; text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.write("div.searchrelated a:visited { color: #009; text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.write("div.searchrelated a:hover { text-decoration: underline; }\n"); //$NON-NLS-1$
 
     /* Quotes */
-    writer.write("span.quote_lvl1 { color: #660066; }\n");
-    writer.write("span.quote_lvl2 { color: #007777; }\n");
-    writer.write("span.quote_lvl3 { color: #3377ff; }\n");
-    writer.write("span.quote_lvl4 { color: #669966; }\n");
+    writer.write("span.quote_lvl1 { color: #660066; }\n"); //$NON-NLS-1$
+    writer.write("span.quote_lvl2 { color: #007777; }\n"); //$NON-NLS-1$
+    writer.write("span.quote_lvl3 { color: #3377ff; }\n"); //$NON-NLS-1$
+    writer.write("span.quote_lvl4 { color: #669966; }\n"); //$NON-NLS-1$
 
-    writer.write("</style>\n");
+    writer.write("</style>\n"); //$NON-NLS-1$
   }
 
   private String getLabel(EntityGroup group) {
     StringBuilder builder = new StringBuilder();
 
     /* DIV: Group */
-    div(builder, "group");
+    div(builder, "group"); //$NON-NLS-1$
 
     builder.append(StringUtils.htmlEscape(group.getName()));
 
     /* Close: Group */
-    close(builder, "div");
+    close(builder, "div"); //$NON-NLS-1$
 
     return builder.toString();
   }
@@ -390,7 +390,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     boolean isUnread = (state == State.NEW || state == State.UPDATED || state == State.UNREAD);
     Set<ILabel> labels = CoreUtils.getSortedLabels(news);
     String color = !labels.isEmpty() ? labels.iterator().next().getColor() : null;
-    if ("0,0,0".equals(color)) //Don't let black override link color
+    if ("0,0,0".equals(color)) //Don't let black override link color //$NON-NLS-1$
       color = null;
 
     boolean hasAttachments = false;
@@ -403,18 +403,18 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     }
 
     /* DIV: NewsItem */
-    div(builder, isUnread ? "newsitemUnread" : "newsitemRead", Dynamic.NEWS.getId(news));
+    div(builder, isUnread ? "newsitemUnread" : "newsitemRead", Dynamic.NEWS.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* DIV: NewsItem/Header */
-    div(builder, news.isFlagged() ? "headerSticky" : "header", Dynamic.HEADER.getId(news));
+    div(builder, news.isFlagged() ? "headerSticky" : "header", Dynamic.HEADER.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* News Title */
     {
 
       /* DIV: NewsItem/Header/Title */
-      div(builder, "title");
+      div(builder, "title"); //$NON-NLS-1$
 
-      String cssClass = isUnread ? "unread" : "read";
+      String cssClass = isUnread ? "unread" : "read"; //$NON-NLS-1$ //$NON-NLS-2$
 
       /* Link */
       if (hasLink)
@@ -425,187 +425,184 @@ public class NewsBrowserLabelProvider extends LabelProvider {
         span(builder, newsTitle, cssClass, Dynamic.TITLE.getId(news), color);
 
       /* Close: NewsItem/Header/Title */
-      close(builder, "div");
+      close(builder, "div"); //$NON-NLS-1$
     }
 
     /* Delete */
     if (withInternalLinks) {
 
       /* DIV: NewsItem/Header/Delete */
-      div(builder, "delete");
+      div(builder, "delete"); //$NON-NLS-1$
 
-      String link = HANDLER_PROTOCOL + DELETE_HANDLER_ID + "?" + news.getId();
-      imageLink(builder, link, "Delete", "Delete", "/icons/elcl16/remove_light.gif", "remove_light.gif", null, null);
+      String link = HANDLER_PROTOCOL + DELETE_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
+      imageLink(builder, link, Messages.NewsBrowserLabelProvider_DELETE, Messages.NewsBrowserLabelProvider_DELETE, "/icons/elcl16/remove_light.gif", "remove_light.gif", null, null); //$NON-NLS-1$ //$NON-NLS-2$
 
       /* DIV: NewsItem/Header/Delete */
-      close(builder, "div");
+      close(builder, "div"); //$NON-NLS-1$
     }
 
     /* DIV: NewsItem/Header/Subline */
-    div(builder, "subline");
-    builder.append("<table class=\"subline\">");
-    builder.append("<tr class=\"subline\">");
+    div(builder, "subline"); //$NON-NLS-1$
+    builder.append("<table class=\"subline\">"); //$NON-NLS-1$
+    builder.append("<tr class=\"subline\">"); //$NON-NLS-1$
 
     /* Actions */
     if (withInternalLinks) {
 
       /* Toggle Read */
-      builder.append("<td class=\"subline\">");
-      String link = HANDLER_PROTOCOL + TOGGLE_READ_HANDLER_ID + "?" + news.getId();
-      String text= (news.getState() == INews.State.READ) ? "Mark Unread" : "Mark Read";
-      imageLink(builder, link, text, text, "/icons/elcl16/mark_read_light.gif", "mark_read_light.gif", Dynamic.TOGGLE_READ_LINK.getId(news), Dynamic.TOGGLE_READ_IMG.getId(news));
-      builder.append("</td>");
+      builder.append("<td class=\"subline\">"); //$NON-NLS-1$
+      String link = HANDLER_PROTOCOL + TOGGLE_READ_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
+      String text= (news.getState() == INews.State.READ) ? Messages.NewsBrowserLabelProvider_MARK_UNREAD : Messages.NewsBrowserLabelProvider_MARK_READ;
+      imageLink(builder, link, text, text, "/icons/elcl16/mark_read_light.gif", "mark_read_light.gif", Dynamic.TOGGLE_READ_LINK.getId(news), Dynamic.TOGGLE_READ_IMG.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
+      builder.append("</td>"); //$NON-NLS-1$
 
       /* Toggle Sticky */
-      builder.append("<td class=\"subline\">");
-      link = HANDLER_PROTOCOL + TOGGLE_STICKY_HANDLER_ID + "?" + news.getId();
-      imageLink(builder, link, "Sticky", "Sticky", news.isFlagged() ? "/icons/obj16/news_pinned_light.gif" : "/icons/obj16/news_pin_light.gif", news.isFlagged() ? "news_pinned_light.gif" : "news_pin_light.gif", null, Dynamic.TOGGLE_STICKY.getId(news));
-      builder.append("</td>");
+      builder.append("<td class=\"subline\">"); //$NON-NLS-1$
+      link = HANDLER_PROTOCOL + TOGGLE_STICKY_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
+      imageLink(builder, link, Messages.NewsBrowserLabelProvider_STICKY, Messages.NewsBrowserLabelProvider_STICKY, news.isFlagged() ? "/icons/obj16/news_pinned_light.gif" : "/icons/obj16/news_pin_light.gif", news.isFlagged() ? "news_pinned_light.gif" : "news_pin_light.gif", null, Dynamic.TOGGLE_STICKY.getId(news));   //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$ //$NON-NLS-4$
+      builder.append("</td>"); //$NON-NLS-1$
 
       /* Assign Labels */
-      builder.append("<td class=\"subline\">");
-      link = HANDLER_PROTOCOL + LABELS_MENU_HANDLER_ID + "?" + news.getId();
-      imageLink(builder, link, "Assign Labels", "Label", "/icons/elcl16/labels_light.gif", "labels_light.gif", null, null);
-      builder.append("</td>");
+      builder.append("<td class=\"subline\">"); //$NON-NLS-1$
+      link = HANDLER_PROTOCOL + LABELS_MENU_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
+      imageLink(builder, link, Messages.NewsBrowserLabelProvider_ASSIGN_LABELS, Messages.NewsBrowserLabelProvider_LABEL, "/icons/elcl16/labels_light.gif", "labels_light.gif", null, null); //$NON-NLS-1$ //$NON-NLS-2$
+      builder.append("</td>"); //$NON-NLS-1$
 
       /* Share News Context Menu */
-      builder.append("<td class=\"subline\">");
-      link = HANDLER_PROTOCOL + SHARE_NEWS_MENU_HANDLER_ID + "?" + news.getId();
-      imageLink(builder, link, "Share News", "Share", "/icons/elcl16/share_light.gif", "share_light.gif", null, null);
-      builder.append("</td>");
+      builder.append("<td class=\"subline\">"); //$NON-NLS-1$
+      link = HANDLER_PROTOCOL + SHARE_NEWS_MENU_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
+      imageLink(builder, link, Messages.NewsBrowserLabelProvider_SHARE_NEWS, Messages.NewsBrowserLabelProvider_SHARE, "/icons/elcl16/share_light.gif", "share_light.gif", null, null); //$NON-NLS-1$ //$NON-NLS-2$
+      builder.append("</td>"); //$NON-NLS-1$
 
       /* News Context Menu */
-      builder.append("<td class=\"subline\">");
-      link = HANDLER_PROTOCOL + NEWS_MENU_HANDLER_ID + "?" + news.getId();
-      imageLink(builder, link, "Menu", "Menu", "/icons/obj16/menu_light.gif", "menu_light.gif", null, null);
-      builder.append("</td>");
+      builder.append("<td class=\"subline\">"); //$NON-NLS-1$
+      link = HANDLER_PROTOCOL + NEWS_MENU_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
+      imageLink(builder, link, Messages.NewsBrowserLabelProvider_MENU, Messages.NewsBrowserLabelProvider_MENU, "/icons/obj16/menu_light.gif", "menu_light.gif", null, null); //$NON-NLS-1$ //$NON-NLS-2$
+      builder.append("</td>"); //$NON-NLS-1$
 
-      builder.append("<td class=\"subline\">");
-      builder.append("|");
-      builder.append("</td>");
+      builder.append("<td class=\"subline\">"); //$NON-NLS-1$
+      builder.append("|"); //$NON-NLS-1$
+      builder.append("</td>"); //$NON-NLS-1$
     }
 
     /* Date */
-    builder.append("<td class=\"subline\">");
+    builder.append("<td class=\"subline\">"); //$NON-NLS-1$
     builder.append(fDateFormat.format(DateUtils.getRecentDate(news)));
-    builder.append("</td>");
+    builder.append("</td>"); //$NON-NLS-1$
 
     /* Author */
     IPerson author = news.getAuthor();
     if (author != null) {
-      builder.append("<td class=\"subline\">");
-      builder.append("|");
-      builder.append("</td>");
+      builder.append("<td class=\"subline\">"); //$NON-NLS-1$
+      builder.append("|"); //$NON-NLS-1$
+      builder.append("</td>"); //$NON-NLS-1$
 
-      builder.append("<td class=\"subline\">By ");
+      builder.append("<td class=\"subline\">By "); //$NON-NLS-1$
       String name = author.getName();
       String email = (author.getEmail() != null) ? author.getEmail().toASCIIString() : null;
-      if (email != null && !email.contains("mail:"))
-        email = "mailto:" + email;
+      if (email != null && !email.contains("mail:")) //$NON-NLS-1$
+        email = "mailto:" + email; //$NON-NLS-1$
 
       /* Use name as email if valid */
-      if (email == null && name.contains("@") && !name.contains(" "))
+      if (email == null && name.contains("@") && !name.contains(" ")) //$NON-NLS-1$ //$NON-NLS-2$
         email = name;
 
       if (StringUtils.isSet(name) && email != null)
-        link(builder, email, StringUtils.htmlEscape(name), "author");
+        link(builder, email, StringUtils.htmlEscape(name), "author"); //$NON-NLS-1$
       else if (StringUtils.isSet(name))
         builder.append(StringUtils.htmlEscape(name));
       else if (email != null)
-        link(builder, email, StringUtils.htmlEscape(email), "author");
+        link(builder, email, StringUtils.htmlEscape(email), "author"); //$NON-NLS-1$
       else
-        builder.append("Unknown");
+        builder.append(Messages.NewsBrowserLabelProvider_UNKNOWN);
 
       /* Add to Search */
       String value = StringUtils.isSet(name) ? name : email;
       if (StringUtils.isSet(value)) {
-        String link = ILinkHandler.HANDLER_PROTOCOL + NewsBrowserViewer.AUTHOR_HANDLER_ID + "?" + URIUtils.urlEncode(value);
-        link(search, link, StringUtils.htmlEscape(value), "searchrelated");
-        search.append(", ");
+        String link = ILinkHandler.HANDLER_PROTOCOL + NewsBrowserViewer.AUTHOR_HANDLER_ID + "?" + URIUtils.urlEncode(value); //$NON-NLS-1$
+        link(search, link, StringUtils.htmlEscape(value), "searchrelated"); //$NON-NLS-1$
+        search.append(", "); //$NON-NLS-1$
       }
-      builder.append("</td>");
+      builder.append("</td>"); //$NON-NLS-1$
     }
 
     /* Comments */
     if (StringUtils.isSet(news.getComments()) && news.getComments().trim().length() > 0 && URIUtils.looksLikeLink(news.getComments())) {
-      builder.append("<td class=\"subline\">");
-      builder.append("|");
-      builder.append("</td>");
+      builder.append("<td class=\"subline\">"); //$NON-NLS-1$
+      builder.append("|"); //$NON-NLS-1$
+      builder.append("</td>"); //$NON-NLS-1$
 
-      builder.append("<td class=\"subline\">");
+      builder.append("<td class=\"subline\">"); //$NON-NLS-1$
 
       String comments = news.getComments();
-      imageLink(builder, comments, "Read Comments", "Comments", "/icons/obj16/comments_light.gif", "comments_light.gif", null, null);
+      imageLink(builder, comments, Messages.NewsBrowserLabelProvider_READ_COMMENTS, Messages.NewsBrowserLabelProvider_COMMENTS, "/icons/obj16/comments_light.gif", "comments_light.gif", null, null); //$NON-NLS-1$ //$NON-NLS-2$
 
-      builder.append("</td>");
+      builder.append("</td>"); //$NON-NLS-1$
     }
 
     /* Go to Attachments */
     if (hasAttachments) {
-      builder.append("<td class=\"subline\">");
-      builder.append("|");
-      builder.append("</td>");
+      builder.append("<td class=\"subline\">"); //$NON-NLS-1$
+      builder.append("|"); //$NON-NLS-1$
+      builder.append("</td>"); //$NON-NLS-1$
 
-      builder.append("<td class=\"subline\">");
-      String link = HANDLER_PROTOCOL + ATTACHMENTS_MENU_HANDLER_ID + "?" + news.getId();
-      imageLink(builder, link, "Attachments", "Attachments", "/icons/obj16/attachment_light.gif", "attachment_light.gif", null, null);
-      builder.append("</td>");
+      builder.append("<td class=\"subline\">"); //$NON-NLS-1$
+      String link = HANDLER_PROTOCOL + ATTACHMENTS_MENU_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
+      imageLink(builder, link, Messages.NewsBrowserLabelProvider_ATTACHMENTS, Messages.NewsBrowserLabelProvider_ATTACHMENTS, "/icons/obj16/attachment_light.gif", "attachment_light.gif", null, null); //$NON-NLS-1$ //$NON-NLS-2$
+      builder.append("</td>"); //$NON-NLS-1$
     }
 
     /* Labels Separator  */
     if (labels.isEmpty())
-      builder.append("<td id=\"").append(Dynamic.LABELS_SEPARATOR.getId(news)).append("\" class=\"subline\" style=\"display: none;\">");
+      builder.append("<td id=\"").append(Dynamic.LABELS_SEPARATOR.getId(news)).append("\" class=\"subline\" style=\"display: none;\">"); //$NON-NLS-1$ //$NON-NLS-2$
     else
-      builder.append("<td id=\"").append(Dynamic.LABELS_SEPARATOR.getId(news)).append("\" class=\"subline\">");
-    builder.append("|");
-    builder.append("</td>");
+      builder.append("<td id=\"").append(Dynamic.LABELS_SEPARATOR.getId(news)).append("\" class=\"subline\">"); //$NON-NLS-1$ //$NON-NLS-2$
+    builder.append("|"); //$NON-NLS-1$
+    builder.append("</td>"); //$NON-NLS-1$
 
     /* Labels */
-    builder.append("<td id=\"").append(Dynamic.LABELS.getId(news)).append("\" class=\"subline\">");
+    builder.append("<td id=\"").append(Dynamic.LABELS.getId(news)).append("\" class=\"subline\">"); //$NON-NLS-1$ //$NON-NLS-2$
 
     if (!labels.isEmpty())
-      builder.append("Labels: ");
+      builder.append(Messages.NewsBrowserLabelProvider_LABELS);
 
     /* Append Labels to Footer */
     int c = 0;
     for (ILabel label : labels) {
       c++;
       if (c < labels.size())
-        span(builder, StringUtils.htmlEscape(label.getName()) + ", ", null, label.getColor());
+        span(builder, StringUtils.htmlEscape(label.getName()) + ", ", null, label.getColor()); //$NON-NLS-1$
       else
         span(builder, StringUtils.htmlEscape(label.getName()), null, label.getColor());
     }
 
-    builder.append("</td>");
+    builder.append("</td>"); //$NON-NLS-1$
 
     /* Close: NewsItem/Header/Actions */
-    builder.append("</tr>");
-    builder.append("</table>");
-    close(builder, "div");
+    builder.append("</tr>"); //$NON-NLS-1$
+    builder.append("</table>"); //$NON-NLS-1$
+    close(builder, "div"); //$NON-NLS-1$
 
     /* Close: NewsItem/Header */
-    close(builder, "div");
+    close(builder, "div"); //$NON-NLS-1$
 
     /* News Content */
     {
 
       /* DIV: NewsItem/Content */
-      div(builder, "content");
+      div(builder, "content"); //$NON-NLS-1$
 
       if (StringUtils.isSet(description) && !description.equals(news.getTitle()))
         builder.append(description);
       else {
-        builder.append("This article does not provide any content.");
+        builder.append(Messages.NewsBrowserLabelProvider_NO_CONTENT);
 
-        if (hasLink) {
-          builder.append(" Click ");
-          link(builder, newsLink, "here", null);
-          builder.append(" to open the article in the browser.");
-        }
+        if (hasLink)
+          link(builder, newsLink, Messages.NewsBrowserLabelProvider_OPEN_IN_BROWSER, null);
       }
 
       /* Close: NewsItem/Content */
-      close(builder, "div");
+      close(builder, "div"); //$NON-NLS-1$
     }
 
     /* News Footer */
@@ -613,16 +610,16 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       StringBuilder footer = new StringBuilder();
 
       /* DIV: NewsItem/Footer */
-      div(footer, news.isFlagged() ? "footerSticky" : "footer", Dynamic.FOOTER.getId(news));
+      div(footer, news.isFlagged() ? "footerSticky" : "footer", Dynamic.FOOTER.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
 
       /* Attachments */
       if (attachments.size() != 0) {
 
         /* DIV: NewsItem/Footer/Attachments */
-        div(footer, "attachments");
+        div(footer, "attachments"); //$NON-NLS-1$
 
         /* Label */
-        span(footer, attachments.size() == 1 ? "Attachment:" : "Attachments:", "label");
+        span(footer, attachments.size() == 1 ? Messages.NewsBrowserLabelProvider_ATTACHMENT : Messages.NewsBrowserLabelProvider_ATTACHMENTSS, "label"); //$NON-NLS-1$
 
         /* For each Attachment */
         boolean strip = false;
@@ -636,11 +633,11 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
             String size = OwlUI.getSize(attachment.getLength());
             if (size != null)
-              link(footer, link.toASCIIString(), StringUtils.htmlEscape(name) + " (" + size + ")", "attachment");
+              link(footer, link.toASCIIString(), StringUtils.htmlEscape(name) + " (" + size + ")", "attachment"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             else
-              link(footer, link.toASCIIString(), StringUtils.htmlEscape(name), "attachment");
+              link(footer, link.toASCIIString(), StringUtils.htmlEscape(name), "attachment"); //$NON-NLS-1$
 
-            footer.append(", ");
+            footer.append(", "); //$NON-NLS-1$
           }
         }
 
@@ -648,7 +645,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
           footer.delete(footer.length() - 2, footer.length());
 
         /* Close: NewsItem/Footer/Attachments */
-        close(footer, "div");
+        close(footer, "div"); //$NON-NLS-1$
       }
 
       /* Source */
@@ -658,20 +655,20 @@ public class NewsBrowserLabelProvider extends LabelProvider {
         String name = source.getName();
 
         /* DIV: NewsItem/Footer/Source */
-        div(footer, "source");
+        div(footer, "source"); //$NON-NLS-1$
 
         /* Label */
-        span(footer, "Source:", "label");
+        span(footer, Messages.NewsBrowserLabelProvider_SOURCE, "label"); //$NON-NLS-1$
 
         if (StringUtils.isSet(name) && link != null)
-          link(footer, link, StringUtils.htmlEscape(name), "source");
+          link(footer, link, StringUtils.htmlEscape(name), "source"); //$NON-NLS-1$
         else if (link != null)
-          link(footer, link, StringUtils.htmlEscape(link), "source");
+          link(footer, link, StringUtils.htmlEscape(link), "source"); //$NON-NLS-1$
         else if (StringUtils.isSet(name))
           footer.append(StringUtils.htmlEscape(name));
 
         /* Close: NewsItem/Footer/Source */
-        close(footer, "div");
+        close(footer, "div"); //$NON-NLS-1$
       }
 
       /* Add Categories to Search */
@@ -684,18 +681,18 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
           /* Add to Search */
           if (StringUtils.isSet(name)) {
-            String link = ILinkHandler.HANDLER_PROTOCOL + NewsBrowserViewer.CATEGORY_HANDLER_ID + "?" + URIUtils.urlEncode(name);
-            link(search, link, StringUtils.htmlEscape(name), "searchrelated");
-            search.append(", ");
+            String link = ILinkHandler.HANDLER_PROTOCOL + NewsBrowserViewer.CATEGORY_HANDLER_ID + "?" + URIUtils.urlEncode(name); //$NON-NLS-1$
+            link(search, link, StringUtils.htmlEscape(name), "searchrelated"); //$NON-NLS-1$
+            search.append(", "); //$NON-NLS-1$
           }
         }
       }
 
       /* Add Labels to Search */
       for (ILabel label : labels) {
-        String link = ILinkHandler.HANDLER_PROTOCOL + NewsBrowserViewer.LABEL_HANDLER_ID + "?" + URIUtils.urlEncode(label.getName());
-        link(search, link, StringUtils.htmlEscape(label.getName()), "searchrelated");
-        search.append(", ");
+        String link = ILinkHandler.HANDLER_PROTOCOL + NewsBrowserViewer.LABEL_HANDLER_ID + "?" + URIUtils.urlEncode(label.getName()); //$NON-NLS-1$
+        link(search, link, StringUtils.htmlEscape(label.getName()), "searchrelated"); //$NON-NLS-1$
+        search.append(", "); //$NON-NLS-1$
       }
 
       /* Find related News */
@@ -703,29 +700,29 @@ public class NewsBrowserLabelProvider extends LabelProvider {
         search.delete(search.length() - 2, search.length());
 
         /* DIV: NewsItem/Footer/SearchRelated */
-        div(footer, "searchrelated");
+        div(footer, "searchrelated"); //$NON-NLS-1$
 
         /* Label */
         if (withInternalLinks)
-          span(footer, "Find related News:", "label");
+          span(footer, Messages.NewsBrowserLabelProvider_FIND_RELATED, "label"); //$NON-NLS-1$
 
         /* Append to Footer */
         if (withInternalLinks)
           footer.append(search);
 
         /* Close: NewsItem/Footer/SearchRelated */
-        close(footer, "div");
+        close(footer, "div"); //$NON-NLS-1$
       }
 
       /* Close: NewsItem/Footer */
-      close(footer, "div");
+      close(footer, "div"); //$NON-NLS-1$
 
       /* Append */
       builder.append(footer);
     }
 
     /* Close: NewsItem */
-    close(builder, "div");
+    close(builder, "div"); //$NON-NLS-1$
 
     String result = builder.toString();
 
@@ -736,8 +733,8 @@ public class NewsBrowserLabelProvider extends LabelProvider {
         StringBuilder highlightedResult = new StringBuilder(result.length());
 
         RGB searchRGB = OwlUI.getThemeRGB(OwlUI.SEARCH_HIGHLIGHT_BG_COLOR_ID, new RGB(255, 255, 0));
-        String preHighlight = "<span style=\"background-color:rgb(" + OwlUI.toString(searchRGB) + ");\">";
-        String postHighlight = "</span>";
+        String preHighlight = "<span style=\"background-color:rgb(" + OwlUI.toString(searchRGB) + ");\">"; //$NON-NLS-1$ //$NON-NLS-2$
+        String postHighlight = "</span>"; //$NON-NLS-1$
 
         ExpandingReader resultHighlightReader = new ExpandingReader(new StringReader(result), wordsToHighlight, preHighlight, postHighlight, true);
 
@@ -758,15 +755,15 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   }
 
   private void div(StringBuilder builder, String cssClass) {
-    builder.append("<div class=\"").append(cssClass).append("\">\n");
+    builder.append("<div class=\"").append(cssClass).append("\">\n"); //$NON-NLS-1$ //$NON-NLS-2$
   }
 
   private void div(StringBuilder builder, String cssClass, String id) {
-    builder.append("<div id=\"").append(id).append("\" class=\"").append(cssClass).append("\">\n");
+    builder.append("<div id=\"").append(id).append("\" class=\"").append(cssClass).append("\">\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
   }
 
   private void close(StringBuilder builder, String tag) {
-    builder.append("</").append(tag).append(">\n");
+    builder.append("</").append(tag).append(">\n"); //$NON-NLS-1$ //$NON-NLS-2$
   }
 
   private void link(StringBuilder builder, String link, String content, String cssClass) {
@@ -778,31 +775,31 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   }
 
   private void link(StringBuilder builder, String link, String content, String cssClass, String id, String color) {
-    builder.append("<a href=\"").append(link).append("\"");
+    builder.append("<a href=\"").append(link).append("\""); //$NON-NLS-1$ //$NON-NLS-2$
 
     if (cssClass != null)
-      builder.append(" class=\"").append(cssClass).append("\"");
+      builder.append(" class=\"").append(cssClass).append("\""); //$NON-NLS-1$ //$NON-NLS-2$
 
     if (color != null)
-      builder.append(" style=\"color: rgb(").append(color).append(");\"");
+      builder.append(" style=\"color: rgb(").append(color).append(");\""); //$NON-NLS-1$ //$NON-NLS-2$
 
     if (id != null)
-      builder.append(" id=\"").append(id).append("\"");
+      builder.append(" id=\"").append(id).append("\""); //$NON-NLS-1$ //$NON-NLS-2$
 
-    builder.append(">").append(content).append("</a>");
+    builder.append(">").append(content).append("</a>"); //$NON-NLS-1$ //$NON-NLS-2$
   }
 
   private void imageLink(StringBuilder builder, String link, String tooltip, String alt, String imgPath, String imgName, String linkId, String imageId) {
-    builder.append("<a");
+    builder.append("<a"); //$NON-NLS-1$
 
     if (linkId != null)
-      builder.append(" id=\"").append(linkId).append("\"");
+      builder.append(" id=\"").append(linkId).append("\""); //$NON-NLS-1$ //$NON-NLS-2$
 
-    builder.append(" title=\"").append(tooltip).append("\" href=\"").append(link).append("\">");
-    builder.append("<img");
+    builder.append(" title=\"").append(tooltip).append("\" href=\"").append(link).append("\">"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    builder.append("<img"); //$NON-NLS-1$
 
     if (imageId != null)
-      builder.append(" id=\"").append(imageId).append("\"");
+      builder.append(" id=\"").append(imageId).append("\""); //$NON-NLS-1$ //$NON-NLS-2$
 
     String imageUri;
     if (fIsIE)
@@ -810,8 +807,8 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     else
       imageUri = ApplicationServer.getDefault().toResourceUrl(imgPath);
 
-    builder.append(" alt=\"").append(alt).append("\" border=\"0\" src=\"").append(imageUri).append("\" />");
-    builder.append("</a>");
+    builder.append(" alt=\"").append(alt).append("\" border=\"0\" src=\"").append(imageUri).append("\" />"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    builder.append("</a>"); //$NON-NLS-1$
   }
 
   private void span(StringBuilder builder, String content, String cssClass) {
@@ -823,14 +820,14 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   }
 
   private void span(StringBuilder builder, String content, String cssClass, String id, String color) {
-    builder.append("<span class=\"").append(cssClass).append("\"");
+    builder.append("<span class=\"").append(cssClass).append("\""); //$NON-NLS-1$ //$NON-NLS-2$
 
     if (color != null)
-      builder.append(" style=\"color: rgb(").append(color).append(");\"");
+      builder.append(" style=\"color: rgb(").append(color).append(");\""); //$NON-NLS-1$ //$NON-NLS-2$
 
     if (id != null)
-      builder.append(" id=\"").append(id).append("\"");
+      builder.append(" id=\"").append(id).append("\""); //$NON-NLS-1$ //$NON-NLS-2$
 
-    builder.append(">").append(content).append("</span>\n");
+    builder.append(">").append(content).append("</span>\n"); //$NON-NLS-1$ //$NON-NLS-2$
   }
 }

@@ -106,20 +106,20 @@ import java.util.StringTokenizer;
 public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
   /* ID for Link Handlers */
-  static final String AUTHOR_HANDLER_ID = "org.rssowl.ui.search.Author";
-  static final String CATEGORY_HANDLER_ID = "org.rssowl.ui.search.Category";
-  static final String LABEL_HANDLER_ID = "org.rssowl.ui.search.Label";
-  static final String TOGGLE_READ_HANDLER_ID = "org.rssowl.ui.ToggleRead";
-  static final String TOGGLE_STICKY_HANDLER_ID = "org.rssowl.ui.ToggleSticky";
-  static final String DELETE_HANDLER_ID = "org.rssowl.ui.Delete";
-  static final String ATTACHMENTS_MENU_HANDLER_ID = "org.rssowl.ui.AttachmentsMenu";
-  static final String LABELS_MENU_HANDLER_ID = "org.rssowl.ui.LabelsMenu";
-  static final String NEWS_MENU_HANDLER_ID = "org.rssowl.ui.NewsMenu";
-  static final String SHARE_NEWS_MENU_HANDLER_ID = "org.rssowl.ui.ShareNewsMenu";
-  static final String NEXT_NEWS_HANDLER_ID = "org.rssowl.ui.NextNews";
-  static final String NEXT_UNREAD_NEWS_HANDLER_ID = "org.rssowl.ui.NextUnreadNews";
-  static final String PREVIOUS_NEWS_HANDLER_ID = "org.rssowl.ui.PreviousNews";
-  static final String PREVIOUS_UNREAD_NEWS_HANDLER_ID = "org.rssowl.ui.PreviousUnreadNews";
+  static final String AUTHOR_HANDLER_ID = "org.rssowl.ui.search.Author"; //$NON-NLS-1$
+  static final String CATEGORY_HANDLER_ID = "org.rssowl.ui.search.Category"; //$NON-NLS-1$
+  static final String LABEL_HANDLER_ID = "org.rssowl.ui.search.Label"; //$NON-NLS-1$
+  static final String TOGGLE_READ_HANDLER_ID = "org.rssowl.ui.ToggleRead"; //$NON-NLS-1$
+  static final String TOGGLE_STICKY_HANDLER_ID = "org.rssowl.ui.ToggleSticky"; //$NON-NLS-1$
+  static final String DELETE_HANDLER_ID = "org.rssowl.ui.Delete"; //$NON-NLS-1$
+  static final String ATTACHMENTS_MENU_HANDLER_ID = "org.rssowl.ui.AttachmentsMenu"; //$NON-NLS-1$
+  static final String LABELS_MENU_HANDLER_ID = "org.rssowl.ui.LabelsMenu"; //$NON-NLS-1$
+  static final String NEWS_MENU_HANDLER_ID = "org.rssowl.ui.NewsMenu"; //$NON-NLS-1$
+  static final String SHARE_NEWS_MENU_HANDLER_ID = "org.rssowl.ui.ShareNewsMenu"; //$NON-NLS-1$
+  static final String NEXT_NEWS_HANDLER_ID = "org.rssowl.ui.NextNews"; //$NON-NLS-1$
+  static final String NEXT_UNREAD_NEWS_HANDLER_ID = "org.rssowl.ui.NextUnreadNews"; //$NON-NLS-1$
+  static final String PREVIOUS_NEWS_HANDLER_ID = "org.rssowl.ui.PreviousNews"; //$NON-NLS-1$
+  static final String PREVIOUS_UNREAD_NEWS_HANDLER_ID = "org.rssowl.ui.PreviousUnreadNews"; //$NON-NLS-1$
 
   private Object fInput;
   private CBrowser fBrowser;
@@ -201,14 +201,14 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
           /* Open in FeedView */
           if (!fIsEmbedded) {
-            manager.add(new Separator("internalopen"));
+            manager.add(new Separator("internalopen")); //$NON-NLS-1$
             if (!fCurrentSelection.isEmpty()) {
-              manager.appendToGroup("internalopen", new OpenNewsAction(fCurrentSelection, fBrowser.getControl().getShell()));
+              manager.appendToGroup("internalopen", new OpenNewsAction(fCurrentSelection, fBrowser.getControl().getShell())); //$NON-NLS-1$
               useSeparator = false;
             }
           }
 
-          manager.add(useSeparator ? new Separator("open") : new GroupMarker("open"));
+          manager.add(useSeparator ? new Separator("open") : new GroupMarker("open")); //$NON-NLS-1$ //$NON-NLS-2$
 
           /* Show only when internal browser is used */
           if (!fCurrentSelection.isEmpty() && !fPreferences.getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER) && !fPreferences.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER))
@@ -222,10 +222,10 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
         /* Mark / Label */
         {
-          manager.add(new Separator("mark"));
+          manager.add(new Separator("mark")); //$NON-NLS-1$
 
           /* Mark */
-          MenuManager markMenu = new MenuManager("M&ark", "mark");
+          MenuManager markMenu = new MenuManager(Messages.NewsBrowserViewer_MARK, "mark"); //$NON-NLS-1$
           manager.add(markMenu);
 
           /* Mark as Read */
@@ -249,7 +249,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
         /* Move To / Copy To */
         if (!fCurrentSelection.isEmpty()) {
-          manager.add(new Separator("movecopy"));
+          manager.add(new Separator("movecopy")); //$NON-NLS-1$
 
           /* Load all news bins and sort by name */
           List<INewsBin> newsbins = new ArrayList<INewsBin>(DynamicDAO.loadAll(INewsBin.class));
@@ -263,7 +263,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
           Collections.sort(newsbins, comparator);
 
           /* Move To */
-          MenuManager moveMenu = new MenuManager("&Move To", "moveto");
+          MenuManager moveMenu = new MenuManager(Messages.NewsBrowserViewer_MOVE_TO, "moveto"); //$NON-NLS-1$
           manager.add(moveMenu);
 
           for (INewsBin bin : newsbins) {
@@ -273,11 +273,11 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
             moveMenu.add(new MoveCopyNewsToBinAction(fCurrentSelection, bin, true));
           }
 
-          moveMenu.add(new Separator("movetonewbin"));
+          moveMenu.add(new Separator("movetonewbin")); //$NON-NLS-1$
           moveMenu.add(new MoveCopyNewsToBinAction(fCurrentSelection, null, true));
 
           /* Copy To */
-          MenuManager copyMenu = new MenuManager("&Copy To", "copyto");
+          MenuManager copyMenu = new MenuManager(Messages.NewsBrowserViewer_COPY_TO, "copyto"); //$NON-NLS-1$
           manager.add(copyMenu);
 
           for (INewsBin bin : newsbins) {
@@ -287,7 +287,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
             copyMenu.add(new MoveCopyNewsToBinAction(fCurrentSelection, bin, false));
           }
 
-          copyMenu.add(new Separator("copytonewbin"));
+          copyMenu.add(new Separator("copytonewbin")); //$NON-NLS-1$
           copyMenu.add(new MoveCopyNewsToBinAction(fCurrentSelection, null, false));
         }
 
@@ -296,9 +296,9 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
           ApplicationActionBarAdvisor.fillShareMenu(manager, fCurrentSelection, new SameShellProvider(fBrowser.getControl().getShell()), false);
         }
 
-        manager.add(new Separator("filter"));
-        manager.add(new Separator("edit"));
-        manager.add(new Separator("copy"));
+        manager.add(new Separator("filter")); //$NON-NLS-1$
+        manager.add(new Separator("edit")); //$NON-NLS-1$
+        manager.add(new Separator("copy")); //$NON-NLS-1$
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
         /* Fill Contributions if Context Menu not registered */
@@ -938,53 +938,53 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
         /* State (Bold/Plain Title, Mark Read Tooltip) */
         if (CoreUtils.isStateChange(newsEvent)) {
           boolean isRead = (INews.State.READ == news.getState());
-          js.append(getElementById(Dynamic.NEWS.getId(news)).append(isRead ? ".className='newsitemRead'; " : ".className='newsitemUnread'; "));
-          js.append(getElementById(Dynamic.TITLE.getId(news)).append(isRead ? ".className='read'; " : ".className='unread'; "));
-          js.append(getElementById(Dynamic.TOGGLE_READ_LINK.getId(news)).append(isRead ? ".title='Mark Unread'; " : ".title='Mark Read'; "));
-          js.append(getElementById(Dynamic.TOGGLE_READ_IMG.getId(news)).append(isRead ? ".alt='Mark Unread'; " : ".alt='Mark Read'; "));
+          js.append(getElementById(Dynamic.NEWS.getId(news)).append(isRead ? ".className='newsitemRead'; " : ".className='newsitemUnread'; ")); //$NON-NLS-1$ //$NON-NLS-2$
+          js.append(getElementById(Dynamic.TITLE.getId(news)).append(isRead ? ".className='read'; " : ".className='unread'; ")); //$NON-NLS-1$ //$NON-NLS-2$
+          js.append(getElementById(Dynamic.TOGGLE_READ_LINK.getId(news)).append(isRead ? ".title='Mark Unread'; " : ".title='Mark Read'; ")); //$NON-NLS-1$ //$NON-NLS-2$
+          js.append(getElementById(Dynamic.TOGGLE_READ_IMG.getId(news)).append(isRead ? ".alt='Mark Unread'; " : ".alt='Mark Read'; ")); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         /* Sticky (Title Background, Footer Background, Mark Sticky Image) */
         if (CoreUtils.isStickyStateChange(newsEvent)) {
           boolean isSticky = news.isFlagged();
-          js.append(getElementById(Dynamic.HEADER.getId(news)).append(isSticky ? ".className='headerSticky'; " : ".className='header'; "));
-          js.append(getElementById(Dynamic.FOOTER.getId(news)).append(isSticky ? ".className='footerSticky'; " : ".className='footer'; "));
+          js.append(getElementById(Dynamic.HEADER.getId(news)).append(isSticky ? ".className='headerSticky'; " : ".className='header'; ")); //$NON-NLS-1$ //$NON-NLS-2$
+          js.append(getElementById(Dynamic.FOOTER.getId(news)).append(isSticky ? ".className='footerSticky'; " : ".className='footer'; ")); //$NON-NLS-1$ //$NON-NLS-2$
 
           String stickyImgUri;
           if (fBrowser.isIE())
-            stickyImgUri = isSticky ? OwlUI.getImageUri("/icons/obj16/news_pinned_light.gif", "news_pinned_light.gif") : OwlUI.getImageUri("/icons/obj16/news_pin_light.gif", "news_pin_light.gif");
+            stickyImgUri = isSticky ? OwlUI.getImageUri("/icons/obj16/news_pinned_light.gif", "news_pinned_light.gif") : OwlUI.getImageUri("/icons/obj16/news_pin_light.gif", "news_pin_light.gif"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
           else
-            stickyImgUri = isSticky ? ApplicationServer.getDefault().toResourceUrl("/icons/obj16/news_pinned_light.gif") : ApplicationServer.getDefault().toResourceUrl("/icons/obj16/news_pin_light.gif");
+            stickyImgUri = isSticky ? ApplicationServer.getDefault().toResourceUrl("/icons/obj16/news_pinned_light.gif") : ApplicationServer.getDefault().toResourceUrl("/icons/obj16/news_pin_light.gif"); //$NON-NLS-1$ //$NON-NLS-2$
 
-          js.append(getElementById(Dynamic.TOGGLE_STICKY.getId(news)).append(".src='").append(stickyImgUri).append("'; "));
+          js.append(getElementById(Dynamic.TOGGLE_STICKY.getId(news)).append(".src='").append(stickyImgUri).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         /* Label (Title Foreground, Label List) */
         if (CoreUtils.isLabelChange(newsEvent)) {
           Set<ILabel> labels = CoreUtils.getSortedLabels(news);
-          String defaultColor = CoreUtils.getLink(news) != null ? "#009" : "rgb(0,0,0)";
-          String color = (labels.isEmpty()) ? defaultColor : "rgb(" + OwlUI.toString(OwlUI.getRGB(labels.iterator().next())) + ")";
-          if ("rgb(0,0,0)".equals(color)) //Don't let black override link color
+          String defaultColor = CoreUtils.getLink(news) != null ? "#009" : "rgb(0,0,0)"; //$NON-NLS-1$ //$NON-NLS-2$
+          String color = (labels.isEmpty()) ? defaultColor : "rgb(" + OwlUI.toString(OwlUI.getRGB(labels.iterator().next())) + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+          if ("rgb(0,0,0)".equals(color)) //Don't let black override link color //$NON-NLS-1$
             color = defaultColor;
-          js.append(getElementById(Dynamic.TITLE.getId(news)).append(".style.color='").append(color).append("'; "));
+          js.append(getElementById(Dynamic.TITLE.getId(news)).append(".style.color='").append(color).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$
 
           if (labels.isEmpty()) {
-            js.append(getElementById(Dynamic.LABELS_SEPARATOR.getId(news)).append(".style.display='none'; "));
-            js.append(getElementById(Dynamic.LABELS.getId(news)).append(".innerHTML=''; "));
+            js.append(getElementById(Dynamic.LABELS_SEPARATOR.getId(news)).append(".style.display='none'; ")); //$NON-NLS-1$
+            js.append(getElementById(Dynamic.LABELS.getId(news)).append(".innerHTML=''; ")); //$NON-NLS-1$
           } else {
-            js.append(getElementById(Dynamic.LABELS_SEPARATOR.getId(news)).append(".style.display='inline'; "));
+            js.append(getElementById(Dynamic.LABELS_SEPARATOR.getId(news)).append(".style.display='inline'; ")); //$NON-NLS-1$
 
-            StringBuilder labelsHtml = new StringBuilder("Labels: ");
+            StringBuilder labelsHtml = new StringBuilder(Messages.NewsBrowserViewer_LABELS);
             int c = 0;
             for (ILabel label : labels) {
               c++;
               if (c < labels.size())
-                span(labelsHtml, StringUtils.htmlEscape(label.getName()) + ", ", label.getColor());
+                span(labelsHtml, StringUtils.htmlEscape(label.getName()) + ", ", label.getColor()); //$NON-NLS-1$
               else
                 span(labelsHtml, StringUtils.htmlEscape(label.getName()), label.getColor());
             }
 
-            js.append(getElementById(Dynamic.LABELS.getId(news)).append(".innerHTML='").append(labelsHtml.toString()).append("'; "));
+            js.append(getElementById(Dynamic.LABELS.getId(news)).append(".innerHTML='").append(labelsHtml.toString()).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$
           }
         }
 
@@ -1003,12 +1003,12 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   }
 
   private void span(StringBuilder builder, String content, String color) {
-    builder.append("<span style=\"color: rgb(").append(color).append(");\"");
-    builder.append(">").append(content).append("</span>");
+    builder.append("<span style=\"color: rgb(").append(color).append(");\""); //$NON-NLS-1$ //$NON-NLS-2$
+    builder.append(">").append(content).append("</span>"); //$NON-NLS-1$ //$NON-NLS-2$
   }
 
   private StringBuilder getElementById(String id) {
-    return new StringBuilder("document.getElementById('" + id + "')");
+    return new StringBuilder("document.getElementById('" + id + "')"); //$NON-NLS-1$ //$NON-NLS-2$
   }
 
   private boolean internalRemove(Object[] elements) {
@@ -1021,10 +1021,10 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
         if (element instanceof INews) {
           INews news = (INews) element;
           StringBuilder js = new StringBuilder();
-          js.append("var node = ").append(getElementById(Dynamic.NEWS.getId(news))).append("; ");
-          js.append("if (node != null) { ");
-          js.append("node.className='hidden';");
-          js.append(" } ");
+          js.append("var node = ").append(getElementById(Dynamic.NEWS.getId(news))).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
+          js.append("if (node != null) { "); //$NON-NLS-1$
+          js.append("node.className='hidden';"); //$NON-NLS-1$
+          js.append(" } "); //$NON-NLS-1$
 
           boolean res = fBrowser.getControl().execute(js.toString());
           if (!res)
@@ -1067,8 +1067,8 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
         String pattern = fNewsFilter.getPatternString();
 
         /* News Filter always converts to wildcard query */
-        if (!pattern.endsWith("*"))
-          pattern = pattern + "*";
+        if (!pattern.endsWith("*")) //$NON-NLS-1$
+          pattern = pattern + "*"; //$NON-NLS-1$
 
         StringTokenizer tokenizer = new StringTokenizer(pattern);
         while (tokenizer.hasMoreElements())

@@ -87,10 +87,10 @@ import java.util.List;
 public class BrowserBar {
 
   /* Navigate Back */
-  private static final String BACK_ACTION = "org.rssowl.ui.internal.editors.feed.BackAction";
+  private static final String BACK_ACTION = "org.rssowl.ui.internal.editors.feed.BackAction"; //$NON-NLS-1$
 
   /* Navigate Forward */
-  private static final String FORWARD_ACTION = "org.rssowl.ui.internal.editors.feed.ForwardAction";
+  private static final String FORWARD_ACTION = "org.rssowl.ui.internal.editors.feed.ForwardAction"; //$NON-NLS-1$
 
   private CBrowser fBrowser;
   private Composite fParent;
@@ -188,7 +188,7 @@ public class BrowserBar {
     fNavigationToolBarManager = new ToolBarManager(SWT.FLAT);
 
     /* New Browser Tab */
-    IAction newBrowserTab = new Action("New Browser Tab") {
+    IAction newBrowserTab = new Action(Messages.BrowserBar_NEW_TAB) {
       @Override
       public void run() {
         BrowserUtils.openLinkInternal(URIUtils.ABOUT_BLANK, null);
@@ -199,7 +199,7 @@ public class BrowserBar {
 
     /* Navigate Backward */
     fNavigationToolBarManager.add(new Separator());
-    IAction navBackward = new Action("Back") {
+    IAction navBackward = new Action(Messages.BrowserBar_BACK) {
       @Override
       public void run() {
         fBrowser.back();
@@ -216,7 +216,7 @@ public class BrowserBar {
     fNavigationToolBarManager.add(navBackward);
 
     /* Navigate Forward */
-    IAction navForward = new Action("Forward") {
+    IAction navForward = new Action(Messages.BrowserBar_FORWARD) {
       @Override
       public void run() {
         fBrowser.forward();
@@ -233,7 +233,7 @@ public class BrowserBar {
     fNavigationToolBarManager.add(navForward);
 
     /* Stop */
-    IAction stopNav = new Action("Stop") {
+    IAction stopNav = new Action(Messages.BrowserBar_STOP) {
       @Override
       public void run() {
         fBrowser.getControl().stop();
@@ -244,7 +244,7 @@ public class BrowserBar {
     fNavigationToolBarManager.add(stopNav);
 
     /* Reload */
-    IAction reload = new Action("Reload") {
+    IAction reload = new Action(Messages.BrowserBar_RELOAD) {
       @Override
       public void run() {
         fBrowser.getControl().refresh();
@@ -255,7 +255,7 @@ public class BrowserBar {
     fNavigationToolBarManager.add(reload);
 
     /* Home */
-    IAction navHome = new Action("Home") {
+    IAction navHome = new Action(Messages.BrowserBar_HOME) {
       @Override
       public void run() {
         fFeedView.getNewsBrowserControl().getViewer().home();
@@ -266,7 +266,7 @@ public class BrowserBar {
 
     /* Share */
     fNavigationToolBarManager.add(new Separator());
-    IAction shareLink = new Action("Share Link", IAction.AS_DROP_DOWN_MENU) {
+    IAction shareLink = new Action(Messages.BrowserBar_SHARE_LINK, IAction.AS_DROP_DOWN_MENU) {
       @Override
       public void run() {
         getMenuCreator().getMenu(fNavigationToolBarManager.getControl()).setVisible(true);
@@ -331,7 +331,7 @@ public class BrowserBar {
 
         /* Configure Providers */
         shareMenu.add(new Separator());
-        shareMenu.add(new Action("&Configure...") {
+        shareMenu.add(new Action(Messages.BrowserBar_CONFIGURE) {
           @Override
           public void run() {
             PreferencesUtil.createPreferenceDialogOn(fBrowser.getControl().getShell(), SharingPreferencesPage.ID, null, null).open();
@@ -346,7 +346,7 @@ public class BrowserBar {
 
     /* Discover Feeds on Website */
     fNavigationToolBarManager.add(new Separator());
-    IAction discoverFeeds = new Action("Find more Feeds") {
+    IAction discoverFeeds = new Action(Messages.BrowserBar_FIND_FEEDS) {
       @Override
       public void run() {
         String url = fBrowser.getControl().getUrl();
@@ -357,7 +357,7 @@ public class BrowserBar {
       }
     };
     fNavigationToolBarManager.add(discoverFeeds);
-    discoverFeeds.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/new_bkmrk.gif"));
+    discoverFeeds.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/new_bkmrk.gif")); //$NON-NLS-1$
 
     fNavigationToolBarManager.createControl(parent);
   }
@@ -375,7 +375,7 @@ public class BrowserBar {
       fLocationInput = new Text(parent, SWT.BORDER | SWT.SINGLE | SWT.SEARCH);
     else
       fLocationInput = new Text(parent, SWT.BORDER | SWT.SINGLE);
-    fLocationInput.setMessage("Enter a website or search phrase");
+    fLocationInput.setMessage(Messages.BrowserBar_ENTER_WEBSITE_PHRASE);
     fLocationInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
     fLocationInput.addSelectionListener(new SelectionAdapter() {
       @Override
