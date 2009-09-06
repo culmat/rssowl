@@ -148,7 +148,7 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
   }
 
   private void setTextData(DragSourceEvent event) {
-    StringBuilder str = new StringBuilder("");
+    StringBuilder str = new StringBuilder(""); //$NON-NLS-1$
     IStructuredSelection selection = (IStructuredSelection) getViewer().getSelection();
     List<?> selectedObjects = selection.toList();
     for (Object selectedObject : selectedObjects) {
@@ -156,20 +156,20 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
       /* IBookMark */
       if (selectedObject instanceof IBookMark) {
         IBookMark bookmark = (IBookMark) selectedObject;
-        str.append(bookmark.getFeedLinkReference().getLinkAsText()).append("\n");
-        str.append(bookmark.getName()).append("\n\n");
+        str.append(bookmark.getFeedLinkReference().getLinkAsText()).append("\n"); //$NON-NLS-1$
+        str.append(bookmark.getName()).append("\n\n"); //$NON-NLS-1$
       }
 
       /* Any other Folder Child */
       else if (selectedObject instanceof IFolderChild) {
         IFolderChild folderchild = (IFolderChild) selectedObject;
-        str.append(folderchild.getName()).append("\n");
+        str.append(folderchild.getName()).append("\n"); //$NON-NLS-1$
       }
 
       /* Entity Group */
       else if (selectedObject instanceof EntityGroup) {
         EntityGroup entitygroup = (EntityGroup) selectedObject;
-        str.append(entitygroup.getName()).append("\n");
+        str.append(entitygroup.getName()).append("\n"); //$NON-NLS-1$
       }
     }
 
@@ -178,7 +178,7 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
   }
 
   private void setURLData(DragSourceEvent event) {
-    StringBuilder str = new StringBuilder("");
+    StringBuilder str = new StringBuilder(""); //$NON-NLS-1$
     IStructuredSelection selection = (IStructuredSelection) getViewer().getSelection();
     List<?> selectedObjects = selection.toList();
     for (Object selectedObject : selectedObjects) {
@@ -186,7 +186,7 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
       /* IBookMark */
       if (selectedObject instanceof IBookMark) {
         IBookMark bookmark = (IBookMark) selectedObject;
-        str.append(bookmark.getFeedLinkReference().getLinkAsText()).append("\n");
+        str.append(bookmark.getFeedLinkReference().getLinkAsText()).append("\n"); //$NON-NLS-1$
       }
     }
 

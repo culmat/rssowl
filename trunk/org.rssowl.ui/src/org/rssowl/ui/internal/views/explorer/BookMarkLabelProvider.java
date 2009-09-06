@@ -31,6 +31,7 @@ import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.DecorationOverlayIcon;
 import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -182,10 +183,10 @@ public class BookMarkLabelProvider extends CellLabelProvider {
         cell.setFont(fDefaultFont);
 
       /* Text */
-      StringBuilder str = new StringBuilder(folder.getName());
       if (unreadNewsCount > 0)
-        str.append(" (").append(unreadNewsCount).append(")");
-      cell.setText(str.toString());
+        cell.setText(NLS.bind(Messages.BookMarkLabelProvider_NAME_UNREAD, folder.getName(), unreadNewsCount));
+      else
+        cell.setText(folder.getName());
 
       /* Reset Foreground */
       cell.setForeground(null);
@@ -213,10 +214,10 @@ public class BookMarkLabelProvider extends CellLabelProvider {
         cell.setFont(fDefaultFont);
 
       /* Text */
-      StringBuilder str = new StringBuilder(newsmark.getName());
       if (unreadNewsCount > 0)
-        str.append(" (").append(unreadNewsCount).append(")");
-      cell.setText(str.toString());
+        cell.setText(NLS.bind(Messages.BookMarkLabelProvider_NAME_UNREAD, newsmark.getName(), unreadNewsCount));
+      else
+        cell.setText(newsmark.getName());
 
       /* Background for IBookMark (TODO Support All News Marks) */
       if (newsmark instanceof IBookMark && fIndicateState)
@@ -273,7 +274,7 @@ public class BookMarkLabelProvider extends CellLabelProvider {
       /* Overlay with Error Icon if required */
       if (favicon != null) {
         Image faviconImg = OwlUI.getImage(fResources, favicon);
-        DecorationOverlayIcon overlay = new DecorationOverlayIcon(faviconImg, OwlUI.getImageDescriptor("icons/ovr16/error.gif"), IDecoration.BOTTOM_RIGHT);
+        DecorationOverlayIcon overlay = new DecorationOverlayIcon(faviconImg, OwlUI.getImageDescriptor("icons/ovr16/error.gif"), IDecoration.BOTTOM_RIGHT); //$NON-NLS-1$
         return OwlUI.getImage(fResources, overlay);
       }
 
@@ -286,7 +287,7 @@ public class BookMarkLabelProvider extends CellLabelProvider {
 
     /* Overlay if News are *new* */
     if (hasNew) {
-      DecorationOverlayIcon overlay = new DecorationOverlayIcon(icon, OwlUI.getImageDescriptor("icons/ovr16/new.gif"), IDecoration.BOTTOM_RIGHT);
+      DecorationOverlayIcon overlay = new DecorationOverlayIcon(icon, OwlUI.getImageDescriptor("icons/ovr16/new.gif"), IDecoration.BOTTOM_RIGHT); //$NON-NLS-1$
       return OwlUI.getImage(fResources, overlay);
     }
 
