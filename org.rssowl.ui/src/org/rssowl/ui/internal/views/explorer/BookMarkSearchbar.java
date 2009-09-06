@@ -133,7 +133,7 @@ class BookMarkSearchbar extends Composite {
       }
     };
 
-    clearTextAction.setToolTipText("Clear");
+    clearTextAction.setToolTipText(Messages.BookMarkSearchbar_CLEAR);
     clearTextAction.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/clear.gif")); //$NON-NLS-1$
 
     fFilterToolBar.add(clearTextAction);
@@ -189,7 +189,7 @@ class BookMarkSearchbar extends Composite {
   private void createFilterTarget(Composite parent) {
     final ToolBarManager filterTargetManager = new ToolBarManager(SWT.FLAT);
 
-    IAction filterTargetAction = new Action("", IAction.AS_DROP_DOWN_MENU) {
+    IAction filterTargetAction = new Action("", IAction.AS_DROP_DOWN_MENU) { //$NON-NLS-1$
       @Override
       public void run() {
 
@@ -206,7 +206,7 @@ class BookMarkSearchbar extends Composite {
 
         /* Search on: Name */
         final MenuItem searchName = new MenuItem(menu, SWT.RADIO);
-        searchName.setText("Name");
+        searchName.setText(Messages.BookMarkSearchbar_NAME);
         searchName.setSelection(BookMarkFilter.SearchTarget.NAME == fPatternFilter.getSearchTarget());
         searchName.addSelectionListener(new SelectionAdapter() {
           @Override
@@ -218,7 +218,7 @@ class BookMarkSearchbar extends Composite {
 
         /* Search on: Link */
         final MenuItem searchLink = new MenuItem(menu, SWT.RADIO);
-        searchLink.setText("Link");
+        searchLink.setText(Messages.BookMarkSearchbar_LINK);
         searchLink.setSelection(BookMarkFilter.SearchTarget.LINK == fPatternFilter.getSearchTarget());
         searchLink.addSelectionListener(new SelectionAdapter() {
           @Override
@@ -236,7 +236,7 @@ class BookMarkSearchbar extends Composite {
       }
     });
 
-    filterTargetAction.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/find.gif"));
+    filterTargetAction.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/find.gif")); //$NON-NLS-1$
     filterTargetManager.add(filterTargetAction);
 
     filterTargetManager.createControl(parent);
@@ -249,9 +249,9 @@ class BookMarkSearchbar extends Composite {
 
     /* Set Message */
     if (fPatternFilter.getSearchTarget() == SearchTarget.NAME)
-      fFilterText.setMessage("Name");
+      fFilterText.setMessage(Messages.BookMarkSearchbar_NAME);
     else
-      fFilterText.setMessage("Link");
+      fFilterText.setMessage(Messages.BookMarkSearchbar_LINK);
 
     if (fFilterText.getText().length() > 0)
       textChanged();
@@ -264,9 +264,9 @@ class BookMarkSearchbar extends Composite {
 
     /* Set Message */
     if (fPatternFilter.getSearchTarget() == SearchTarget.NAME)
-      fFilterText.setMessage("Name");
+      fFilterText.setMessage(Messages.BookMarkSearchbar_NAME);
     else
-      fFilterText.setMessage("Link");
+      fFilterText.setMessage(Messages.BookMarkSearchbar_LINK);
 
     /* Register this Input Field to Context Service */
     Controller.getDefault().getContextService().registerInputField(fFilterText);

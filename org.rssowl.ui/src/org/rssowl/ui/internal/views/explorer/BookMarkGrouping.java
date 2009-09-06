@@ -59,7 +59,7 @@ public class BookMarkGrouping {
   private static final float FAIRLY_POPULAR_RATIO = 0.2f;
 
   /* ID of Group Category */
-  static final String GROUP_CATEGORY_ID = "org.rssowl.ui.internal.views.explorer.BookMarkGrouping";
+  static final String GROUP_CATEGORY_ID = "org.rssowl.ui.internal.views.explorer.BookMarkGrouping"; //$NON-NLS-1$
 
   /** Supported Grouping Types */
   public enum Type {
@@ -84,55 +84,55 @@ public class BookMarkGrouping {
   public enum Group {
 
     /** Group: Visited Today */
-    TODAY("Visited Today"),
+    TODAY(Messages.BookMarkGrouping_TODAY),
 
     /** Group: Visited Yesterday */
-    YESTERDAY("Visited Yesterday"),
+    YESTERDAY(Messages.BookMarkGrouping_YESTERDAY),
 
     /** Group: Visited Earlier this Week */
-    EARLIER_THIS_WEEK("Visited Earlier this Week"),
+    EARLIER_THIS_WEEK(Messages.BookMarkGrouping_EARLIER_WEEK),
 
     /** Group: Visited Last Week */
-    LAST_WEEK("Visited Last Week"),
+    LAST_WEEK(Messages.BookMarkGrouping_LAST_WEEK),
 
     /** Group: Older */
-    OLDER("Visited More Than a Week Ago"),
+    OLDER(Messages.BookMarkGrouping_MORE_THAN_WEEK),
 
     /** Group: Never Visited */
-    NEVER("Never Visited"),
+    NEVER(Messages.BookMarkGrouping_NEVER),
 
     /** Group: Very Popular */
-    VERY_POPULAR("Very Popular"),
+    VERY_POPULAR(Messages.BookMarkGrouping_VERY_POPULAR),
 
     /** Group: Popular */
-    POPULAR("Popular"),
+    POPULAR(Messages.BookMarkGrouping_POPULAR),
 
     /** Group: Fairly Popular */
-    FAIRLY_POPULAR("Fairly Popular"),
+    FAIRLY_POPULAR(Messages.BookMarkGrouping_FAILRY_POPULAR),
 
     /** Group: Unpopular */
-    UNPOPULAR("Unpopular"),
+    UNPOPULAR(Messages.BookMarkGrouping_UNPOPULAR),
 
     /** Group: Bins */
-    BIN("News Bins"),
+    BIN(Messages.BookMarkGrouping_NEWS_BINS),
 
     /** Group: Searches */
-    SEARCH("Saved Searches"),
+    SEARCH(Messages.BookMarkGrouping_SAVED_SEARCHES),
 
     /** Group: Bookmarks */
-    BOOKMARK("Bookmarks"),
+    BOOKMARK(Messages.BookMarkGrouping_BOOKMARKS),
 
     /** Group: Sticky */
-    STICKY("Sticky"),
+    STICKY(Messages.BookMarkGrouping_STICKY),
 
     /** Group: New */
-    NEW("New"),
+    NEW(Messages.BookMarkGrouping_NEW),
 
     /** Group: Unread */
-    UNREAD("Unread"),
+    UNREAD(Messages.BookMarkGrouping_UNREAD),
 
     /** Group: Other */
-    OTHER("Other");
+    OTHER(Messages.BookMarkGrouping_OTHER);
 
     String fName;
 

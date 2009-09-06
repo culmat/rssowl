@@ -177,8 +177,8 @@ public class BookMarkExplorer extends ViewPart {
   private static final String PREF_EXPANDED_NODES = "org.rssowl.ui.internal.views.explorer.ExpandedNodes"; //$NON-NLS-1$
 
   /* Local Actions */
-  private static final String GROUP_ACTION = "org.rssowl.ui.internal.views.explorer.GroupAction";
-  private static final String FILTER_ACTION = "org.rssowl.ui.internal.views.explorer.FilterAction";
+  private static final String GROUP_ACTION = "org.rssowl.ui.internal.views.explorer.GroupAction"; //$NON-NLS-1$
+  private static final String FILTER_ACTION = "org.rssowl.ui.internal.views.explorer.FilterAction"; //$NON-NLS-1$
 
   /* Settings */
   private IPreferenceScope fGlobalPreferences;
@@ -685,7 +685,7 @@ public class BookMarkExplorer extends ViewPart {
       public void menuAboutToShow(IMenuManager manager) {
 
         /* Manage Bookmark Sets */
-        IAction manageSets = new Action("&Manage Bookmark Sets...") {
+        IAction manageSets = new Action(Messages.BookMarkExplorer_MANAGE_SETS) {
           @Override
           public void run() {
             ManageSetsDialog instance = ManageSetsDialog.getVisibleInstance();
@@ -719,11 +719,11 @@ public class BookMarkExplorer extends ViewPart {
 
         /* Search Bar */
         manager.add(new Separator());
-        MenuManager searchMenu = new MenuManager("&Find");
+        MenuManager searchMenu = new MenuManager(Messages.BookMarkExplorer_FIND);
         manager.add(searchMenu);
 
         /* Search Bar - Always Show Bar */
-        IAction alwaysShow = new Action("&Always Show", IAction.AS_CHECK_BOX) {
+        IAction alwaysShow = new Action(Messages.BookMarkExplorer_ALWAYS_SHOW, IAction.AS_CHECK_BOX) {
           @Override
           public void run() {
             fAlwaysShowSearch = !fAlwaysShowSearch;
@@ -737,7 +737,7 @@ public class BookMarkExplorer extends ViewPart {
         searchMenu.add(alwaysShow);
 
         /* Search Bar - Begin Search when Typing */
-        IAction beginWhenTyping = new Action("&Begin When Typing", IAction.AS_CHECK_BOX) {
+        IAction beginWhenTyping = new Action(Messages.BookMarkExplorer_BEGIN_WHEN_TYPING, IAction.AS_CHECK_BOX) {
           @Override
           public void run() {
             fBeginSearchOnTyping = !fBeginSearchOnTyping;
@@ -748,7 +748,7 @@ public class BookMarkExplorer extends ViewPart {
 
         /* Misc. Settings */
         manager.add(new Separator());
-        IAction sortByName = new Action("&Sort By Name", IAction.AS_CHECK_BOX) {
+        IAction sortByName = new Action(Messages.BookMarkExplorer_SORT_BY_NAME, IAction.AS_CHECK_BOX) {
           @Override
           public void run() {
             fSortByName = !fSortByName;
@@ -765,7 +765,7 @@ public class BookMarkExplorer extends ViewPart {
         sortByName.setChecked(fSortByName);
         manager.add(sortByName);
 
-        IAction showFavicons = new Action("Show &Feed Icons", IAction.AS_CHECK_BOX) {
+        IAction showFavicons = new Action(Messages.BookMarkExplorer_SHOW_FAVICONS, IAction.AS_CHECK_BOX) {
           @Override
           public void run() {
             fFaviconsEnabled = isChecked();
@@ -785,7 +785,7 @@ public class BookMarkExplorer extends ViewPart {
         /* Allow Contributions */
         manager.add(new Separator());
 
-        IAction linkFeedView = new Action("&Link with Feed-View", IAction.AS_CHECK_BOX) {
+        IAction linkFeedView = new Action(Messages.BookMarkExplorer_LINKING, IAction.AS_CHECK_BOX) {
           @Override
           public void run() {
             fLinkingEnabled = isChecked();
@@ -799,7 +799,7 @@ public class BookMarkExplorer extends ViewPart {
           }
         };
         linkFeedView.setChecked(fLinkingEnabled);
-        linkFeedView.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/synced.gif"));
+        linkFeedView.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/synced.gif")); //$NON-NLS-1$
         manager.add(linkFeedView);
 
         /* Allow Contributions */
@@ -815,7 +815,7 @@ public class BookMarkExplorer extends ViewPart {
     fToolBarManager = fViewSite.getActionBars().getToolBarManager();
 
     /* BookMark Filter */
-    final IAction bookmarkFilter = new Action("Filter Elements", IAction.AS_DROP_DOWN_MENU) {
+    final IAction bookmarkFilter = new Action(Messages.BookMarkExplorer_FILTER_ELEMENTS, IAction.AS_DROP_DOWN_MENU) {
       @Override
       public void run() {
 
@@ -846,7 +846,7 @@ public class BookMarkExplorer extends ViewPart {
 
         /* Filter: None */
         final MenuItem showAll = new MenuItem(menu, SWT.RADIO);
-        showAll.setText("Show All");
+        showAll.setText(Messages.BookMarkExplorer_SHOW_ALL);
         showAll.setSelection(BookMarkFilter.Type.SHOW_ALL == fBookMarkFilter.getType());
         menu.setDefaultItem(showAll);
         showAll.addSelectionListener(new SelectionAdapter() {
@@ -862,7 +862,7 @@ public class BookMarkExplorer extends ViewPart {
 
         /* Filter: New */
         final MenuItem showNew = new MenuItem(menu, SWT.RADIO);
-        showNew.setText("Show New");
+        showNew.setText(Messages.BookMarkExplorer_SHOW_NEW);
         showNew.setSelection(BookMarkFilter.Type.SHOW_NEW == fBookMarkFilter.getType());
         showNew.addSelectionListener(new SelectionAdapter() {
 
@@ -875,7 +875,7 @@ public class BookMarkExplorer extends ViewPart {
 
         /* Filter: Unread */
         final MenuItem showUnread = new MenuItem(menu, SWT.RADIO);
-        showUnread.setText("Show Unread");
+        showUnread.setText(Messages.BookMarkExplorer_SHOW_UNREAD);
         showUnread.setSelection(BookMarkFilter.Type.SHOW_UNREAD == fBookMarkFilter.getType());
         showUnread.addSelectionListener(new SelectionAdapter() {
 
@@ -888,7 +888,7 @@ public class BookMarkExplorer extends ViewPart {
 
         /* Filter: Sticky */
         final MenuItem showSticky = new MenuItem(menu, SWT.RADIO);
-        showSticky.setText("Show Sticky");
+        showSticky.setText(Messages.BookMarkExplorer_SHOW_STICKY);
         showSticky.setSelection(BookMarkFilter.Type.SHOW_STICKY == fBookMarkFilter.getType());
         showSticky.addSelectionListener(new SelectionAdapter() {
 
@@ -904,7 +904,7 @@ public class BookMarkExplorer extends ViewPart {
 
         /* Filter: Erroneous */
         final MenuItem showErroneous = new MenuItem(menu, SWT.RADIO);
-        showErroneous.setText("Show Erroneous");
+        showErroneous.setText(Messages.BookMarkExplorer_SHOW_ERROR);
         showErroneous.setSelection(BookMarkFilter.Type.SHOW_ERRONEOUS == fBookMarkFilter.getType());
         showErroneous.addSelectionListener(new SelectionAdapter() {
           @Override
@@ -916,7 +916,7 @@ public class BookMarkExplorer extends ViewPart {
 
         /* Filter: Never Visited */
         final MenuItem showNeverVisited = new MenuItem(menu, SWT.RADIO);
-        showNeverVisited.setText("Show Never Visited");
+        showNeverVisited.setText(Messages.BookMarkExplorer_SHOW_NEVER_VISITED);
         showNeverVisited.setSelection(BookMarkFilter.Type.SHOW_NEVER_VISITED == fBookMarkFilter.getType());
         showNeverVisited.addSelectionListener(new SelectionAdapter() {
           @Override
@@ -938,7 +938,7 @@ public class BookMarkExplorer extends ViewPart {
 
     /* Bookmark Group */
     fToolBarManager.add(new Separator());
-    final IAction bookmarkGroup = new Action("Group Elements", IAction.AS_DROP_DOWN_MENU) {
+    final IAction bookmarkGroup = new Action(Messages.BookMarkExplorer_GROUP_ELEMENTS, IAction.AS_DROP_DOWN_MENU) {
       @Override
       public void run() {
 
@@ -969,7 +969,7 @@ public class BookMarkExplorer extends ViewPart {
 
         /* Group: None */
         final MenuItem noGrouping = new MenuItem(menu, SWT.RADIO);
-        noGrouping.setText("No Grouping");
+        noGrouping.setText(Messages.BookMarkExplorer_NO_GROUPING);
         noGrouping.setSelection(BookMarkGrouping.Type.NO_GROUPING == fBookMarkGrouping.getType());
         menu.setDefaultItem(noGrouping);
         noGrouping.addSelectionListener(new SelectionAdapter() {
@@ -985,7 +985,7 @@ public class BookMarkExplorer extends ViewPart {
 
         /* Group: By Type */
         final MenuItem groupByType = new MenuItem(menu, SWT.RADIO);
-        groupByType.setText("Group by Type");
+        groupByType.setText(Messages.BookMarkExplorer_GROUP_BY_TYPE);
         groupByType.setSelection(BookMarkGrouping.Type.GROUP_BY_TYPE == fBookMarkGrouping.getType());
         groupByType.addSelectionListener(new SelectionAdapter() {
           @Override
@@ -997,7 +997,7 @@ public class BookMarkExplorer extends ViewPart {
 
         /* Group: By State */
         final MenuItem groupByState = new MenuItem(menu, SWT.RADIO);
-        groupByState.setText("Group by State");
+        groupByState.setText(Messages.BookMarkExplorer_GROUP_BY_STATE);
         groupByState.setSelection(BookMarkGrouping.Type.GROUP_BY_STATE == fBookMarkGrouping.getType());
         groupByState.addSelectionListener(new SelectionAdapter() {
           @Override
@@ -1012,7 +1012,7 @@ public class BookMarkExplorer extends ViewPart {
 
         /* Group: By Last Visit */
         final MenuItem groupByLastVisit = new MenuItem(menu, SWT.RADIO);
-        groupByLastVisit.setText("Group by Last Visit");
+        groupByLastVisit.setText(Messages.BookMarkExplorer_GROUP_BY_LAST_VISIT);
         groupByLastVisit.setSelection(BookMarkGrouping.Type.GROUP_BY_LAST_VISIT == fBookMarkGrouping.getType());
         groupByLastVisit.addSelectionListener(new SelectionAdapter() {
           @Override
@@ -1024,7 +1024,7 @@ public class BookMarkExplorer extends ViewPart {
 
         /* Group: By Popularity */
         final MenuItem groupByPopularity = new MenuItem(menu, SWT.RADIO);
-        groupByPopularity.setText("Group by Popularity");
+        groupByPopularity.setText(Messages.BookMarkExplorer_GROUP_BY_POPULARITY);
         groupByPopularity.setSelection(BookMarkGrouping.Type.GROUP_BY_POPULARITY == fBookMarkGrouping.getType());
         groupByPopularity.addSelectionListener(new SelectionAdapter() {
           @Override
@@ -1046,7 +1046,7 @@ public class BookMarkExplorer extends ViewPart {
 
     /* Collapse All */
     fToolBarManager.add(new Separator());
-    IAction collapseAll = new Action("Collapse All") {
+    IAction collapseAll = new Action(Messages.BookMarkExplorer_COLLAPSE_ALL) {
       @Override
       public void run() {
         fViewer.collapseAll();
@@ -1057,7 +1057,7 @@ public class BookMarkExplorer extends ViewPart {
     fToolBarManager.add(collapseAll);
 
     /* BookmarkSet Navigation - TODO Consider showing dynamically */
-    IAction previousSet = new Action("Previous Bookmark Set") {
+    IAction previousSet = new Action(Messages.BookMarkExplorer_PREVIOUS_SET) {
       @Override
       public void run() {
         int index = getIndexOfRootFolder(fSelectedBookMarkSet);
@@ -1075,7 +1075,7 @@ public class BookMarkExplorer extends ViewPart {
     previousSet.setDisabledImageDescriptor(OwlUI.getImageDescriptor("icons/dtool16/backward.gif")); //$NON-NLS-1$
     fToolBarManager.add(previousSet);
 
-    IAction nextSet = new Action("Next Bookmark Set") {
+    IAction nextSet = new Action(Messages.BookMarkExplorer_NEXT_SET) {
       @Override
       public void run() {
         int index = getIndexOfRootFolder(fSelectedBookMarkSet);
@@ -1143,11 +1143,11 @@ public class BookMarkExplorer extends ViewPart {
       public void menuAboutToShow(IMenuManager manager) {
 
         /* New Menu */
-        MenuManager newMenu = new MenuManager("&New");
+        MenuManager newMenu = new MenuManager(Messages.BookMarkExplorer_NEW);
         manager.add(newMenu);
 
         /* New BookMark */
-        Action newBookmarkAction = new Action("&Bookmark...") {
+        Action newBookmarkAction = new Action(Messages.BookMarkExplorer_BOOKMARK) {
           @Override
           public void run() {
             IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
@@ -1161,12 +1161,12 @@ public class BookMarkExplorer extends ViewPart {
             return OwlUI.BOOKMARK;
           }
         };
-        newBookmarkAction.setId("org.rssowl.ui.actions.NewBookMark");
-        newBookmarkAction.setActionDefinitionId("org.rssowl.ui.actions.NewBookMark");
+        newBookmarkAction.setId("org.rssowl.ui.actions.NewBookMark"); //$NON-NLS-1$
+        newBookmarkAction.setActionDefinitionId("org.rssowl.ui.actions.NewBookMark"); //$NON-NLS-1$
         newMenu.add(newBookmarkAction);
 
         /* New NewsBin */
-        Action newNewsBinAction = new Action("&News Bin...") {
+        Action newNewsBinAction = new Action(Messages.BookMarkExplorer_NEWSBIN) {
           @Override
           public void run() {
             IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
@@ -1180,12 +1180,12 @@ public class BookMarkExplorer extends ViewPart {
             return OwlUI.NEWSBIN;
           }
         };
-        newNewsBinAction.setId("org.rssowl.ui.actions.NewNewsBin");
-        newNewsBinAction.setActionDefinitionId("org.rssowl.ui.actions.NewNewsBin");
+        newNewsBinAction.setId("org.rssowl.ui.actions.NewNewsBin"); //$NON-NLS-1$
+        newNewsBinAction.setActionDefinitionId("org.rssowl.ui.actions.NewNewsBin"); //$NON-NLS-1$
         newMenu.add(newNewsBinAction);
 
         /* New Saved Search */
-        Action newSavedSearchAction = new Action("&Saved Search...") {
+        Action newSavedSearchAction = new Action(Messages.BookMarkExplorer_SAVED_SEARCH) {
           @Override
           public void run() {
             IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
@@ -1199,13 +1199,13 @@ public class BookMarkExplorer extends ViewPart {
             return OwlUI.SEARCHMARK;
           }
         };
-        newSavedSearchAction.setId("org.rssowl.ui.actions.NewSearchMark");
-        newSavedSearchAction.setActionDefinitionId("org.rssowl.ui.actions.NewSearchMark");
+        newSavedSearchAction.setId("org.rssowl.ui.actions.NewSearchMark"); //$NON-NLS-1$
+        newSavedSearchAction.setActionDefinitionId("org.rssowl.ui.actions.NewSearchMark"); //$NON-NLS-1$
         newMenu.add(newSavedSearchAction);
 
         /* New Folder */
         newMenu.add(new Separator());
-        Action newFolderAction = new Action("&Folder...") {
+        Action newFolderAction = new Action(Messages.BookMarkExplorer_FOLDER) {
           @Override
           public void run() {
             IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
@@ -1219,8 +1219,8 @@ public class BookMarkExplorer extends ViewPart {
             return OwlUI.FOLDER;
           }
         };
-        newFolderAction.setId("org.rssowl.ui.actions.NewFolder");
-        newFolderAction.setActionDefinitionId("org.rssowl.ui.actions.NewFolder");
+        newFolderAction.setId("org.rssowl.ui.actions.NewFolder"); //$NON-NLS-1$
+        newFolderAction.setActionDefinitionId("org.rssowl.ui.actions.NewFolder"); //$NON-NLS-1$
         newMenu.add(newFolderAction);
 
         manager.add(new GroupMarker(IWorkbenchActionConstants.NEW_EXT));
@@ -1236,8 +1236,8 @@ public class BookMarkExplorer extends ViewPart {
         /* Share */
         final IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
         if (getBookMark(selection) != null) {
-          manager.add(new Separator("share"));
-          MenuManager shareMenu = new MenuManager("Share &Bookmark", OwlUI.SHARE, "sharebookmark");
+          manager.add(new Separator("share")); //$NON-NLS-1$
+          MenuManager shareMenu = new MenuManager(Messages.BookMarkExplorer_SHARING, OwlUI.SHARE, "sharebookmark"); //$NON-NLS-1$
           manager.add(shareMenu);
 
           List<ShareProvider> providers = Controller.getDefault().getShareProviders();
@@ -1287,7 +1287,7 @@ public class BookMarkExplorer extends ViewPart {
 
           /* Configure Providers */
           shareMenu.add(new Separator());
-          shareMenu.add(new Action("&Configure...") {
+          shareMenu.add(new Action(Messages.BookMarkExplorer_CONFIGURE) {
             @Override
             public void run() {
               PreferencesUtil.createPreferenceDialogOn(fViewer.getTree().getShell(), SharingPreferencesPage.ID, null, null).open();
@@ -1815,7 +1815,7 @@ public class BookMarkExplorer extends ViewPart {
 
     String selectedBookMarkSetPref = getSelectedBookMarkSetPref(fViewSite.getWorkbenchWindow());
     IPreference pref = fPrefDAO.load(selectedBookMarkSetPref);
-    Assert.isTrue(fRootFolders.size() > 0, "Could not find any Bookmark Set!");
+    Assert.isTrue(fRootFolders.size() > 0, Messages.BookMarkExplorer_ERROR_NO_SET_FOUND);
     if (pref != null)
       fSelectedBookMarkSet = new FolderReference(pref.getLong().longValue()).resolve();
     else {
