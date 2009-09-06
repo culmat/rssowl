@@ -26,6 +26,7 @@ package org.rssowl.ui.internal.dialogs.preferences;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -54,7 +55,7 @@ import org.rssowl.ui.internal.util.LayoutUtils;
 public class BrowserPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
 
   /** ID of the Page */
-  public static String ID = "org.rssowl.ui.BrowserPreferencesPage";
+  public static String ID = "org.rssowl.ui.BrowserPreferencesPage"; //$NON-NLS-1$
 
   private IPreferenceScope fGlobalScope;
   private Text fCustomBrowserInput;
@@ -73,7 +74,7 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
   public BrowserPreferencePage() {
     fGlobalScope = Owl.getPreferenceService().getGlobalScope();
     fEclipseScope = Owl.getPreferenceService().getEclipseScope();
-    setImageDescriptor(OwlUI.getImageDescriptor("icons/elcl16/browser.gif"));
+    setImageDescriptor(OwlUI.getImageDescriptor("icons/elcl16/browser.gif")); //$NON-NLS-1$
   }
 
   /*
@@ -103,7 +104,7 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
 
     /* Use internal Browser */
     fUseInternalBrowser = new Button(browserGroup, SWT.RADIO);
-    fUseInternalBrowser.setText("Use the &embedded Browser");
+    fUseInternalBrowser.setText(Messages.BrowserPreferencePage_USE_EMBEDDED_BROWSER);
     fUseInternalBrowser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
     fUseInternalBrowser.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -116,16 +117,16 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
     fUseDefaultExternalBrowser = new Button(browserGroup, SWT.RADIO);
     String name = getDefaultBrowserName();
     if (StringUtils.isSet(name))
-      fUseDefaultExternalBrowser.setText("Use the &standard external Browser (" + name + ")");
+      fUseDefaultExternalBrowser.setText(NLS.bind(Messages.BrowserPreferencePage_USE_STANDARD_BROWSER_N, name));
     else
-      fUseDefaultExternalBrowser.setText("Use the &standard external Browser");
+      fUseDefaultExternalBrowser.setText(Messages.BrowserPreferencePage_USE_STANDARD_BROWSER);
 
     fUseDefaultExternalBrowser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
     fUseDefaultExternalBrowser.setSelection(fGlobalScope.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER));
 
     /* Use custom external Browser */
     fUseCustomExternalBrowser = new Button(browserGroup, SWT.RADIO);
-    fUseCustomExternalBrowser.setText("Use the &following external Browser:");
+    fUseCustomExternalBrowser.setText(Messages.BrowserPreferencePage_USE_EXTERNAL_BROWSER);
     fUseCustomExternalBrowser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
     fUseCustomExternalBrowser.setSelection(fGlobalScope.getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER));
     fUseCustomExternalBrowser.addSelectionListener(new SelectionAdapter() {
@@ -147,7 +148,7 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
       fCustomBrowserInput.setText(customBrowserValue);
 
     fCustomBrowserSearchButton = new Button(browserGroup, SWT.PUSH);
-    fCustomBrowserSearchButton.setText("&Browse...");
+    fCustomBrowserSearchButton.setText(Messages.BrowserPreferencePage_BROWSE);
     Dialog.applyDialogFont(fCustomBrowserSearchButton);
     setButtonLayoutData(fCustomBrowserSearchButton);
     fCustomBrowserSearchButton.setEnabled(fUseCustomExternalBrowser.getSelection());
@@ -168,17 +169,17 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
     ((GridLayout) bottomContainer.getLayout()).marginTop = 10;
 
     fReOpenBrowserTabs = new Button(bottomContainer, SWT.CHECK);
-    fReOpenBrowserTabs.setText("&Reopen last opened websites on startup");
+    fReOpenBrowserTabs.setText(Messages.BrowserPreferencePage_REOPEN_WEBSITE);
     fReOpenBrowserTabs.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
     fReOpenBrowserTabs.setSelection(fGlobalScope.getBoolean(DefaultPreferences.REOPEN_BROWSER_TABS));
 
     fLoadBrowserTabInBackground = new Button(bottomContainer, SWT.CHECK);
-    fLoadBrowserTabInBackground.setText("&Open websites in the background");
+    fLoadBrowserTabInBackground.setText(Messages.BrowserPreferencePage_OPEN_IN_BACKGROUND);
     fLoadBrowserTabInBackground.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
     fLoadBrowserTabInBackground.setSelection(fGlobalScope.getBoolean(DefaultPreferences.OPEN_BROWSER_IN_BACKGROUND));
 
     fAlwaysReuseBrowser = new Button(bottomContainer, SWT.CHECK);
-    fAlwaysReuseBrowser.setText("&Always open websites in the same tab");
+    fAlwaysReuseBrowser.setText(Messages.BrowserPreferencePage_OPEN_IN_SAME_TAB);
     fAlwaysReuseBrowser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
     fAlwaysReuseBrowser.setSelection(fGlobalScope.getBoolean(DefaultPreferences.ALWAYS_REUSE_BROWSER));
 
@@ -189,7 +190,7 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
       jsContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
 
       fDisableJavaScriptCheck = new Button(jsContainer, SWT.CHECK);
-      fDisableJavaScriptCheck.setText("Disable &JavaScript in Browser");
+      fDisableJavaScriptCheck.setText(Messages.BrowserPreferencePage_DISABLE_JS);
       fDisableJavaScriptCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, true));
       fDisableJavaScriptCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.DISABLE_JAVASCRIPT));
       fDisableJavaScriptCheck.addSelectionListener(new SelectionAdapter() {
@@ -201,7 +202,7 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
 
       fDisableJavaScriptExceptionsButton = new Button(jsContainer, SWT.PUSH);
       fDisableJavaScriptExceptionsButton.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
-      fDisableJavaScriptExceptionsButton.setText("E&xceptions...");
+      fDisableJavaScriptExceptionsButton.setText(Messages.BrowserPreferencePage_EXCEPTIONS);
       Dialog.applyDialogFont(fDisableJavaScriptExceptionsButton);
       setButtonLayoutData(fDisableJavaScriptExceptionsButton);
       fDisableJavaScriptExceptionsButton.setEnabled(fDisableJavaScriptCheck.getSelection());
@@ -217,40 +218,40 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
   }
 
   private String getDefaultBrowserName() {
-    Program program = Program.findProgram("html");
+    Program program = Program.findProgram("html"); //$NON-NLS-1$
     if (program != null) {
       String name = program.getName();
       if (StringUtils.isSet(name)) {
         name = name.toLowerCase();
-        if (name.contains("firefox"))
-          return "Mozilla Firefox";
+        if (name.contains("firefox")) //$NON-NLS-1$
+          return "Mozilla Firefox"; //$NON-NLS-1$
 
-        if (name.contains("mozilla"))
-          return "Mozilla";
+        if (name.contains("mozilla")) //$NON-NLS-1$
+          return "Mozilla"; //$NON-NLS-1$
 
-        if (name.contains("opera"))
-          return "Opera";
+        if (name.contains("opera")) //$NON-NLS-1$
+          return "Opera"; //$NON-NLS-1$
 
-        if (name.contains("safari"))
-          return "Safari";
+        if (name.contains("safari")) //$NON-NLS-1$
+          return "Safari"; //$NON-NLS-1$
 
-        if (name.contains("chrome"))
-          return "Google Chrome";
+        if (name.contains("chrome")) //$NON-NLS-1$
+          return "Google Chrome"; //$NON-NLS-1$
 
-        if (name.equals("html document") && Application.IS_WINDOWS)
-          return "Internet Explorer";
+        if (name.equals("html document") && Application.IS_WINDOWS) //$NON-NLS-1$
+          return "Internet Explorer"; //$NON-NLS-1$
 
-        if (name.contains("internet explorer") && Application.IS_WINDOWS)
-          return "Internet Explorer";
+        if (name.contains("internet explorer") && Application.IS_WINDOWS) //$NON-NLS-1$
+          return "Internet Explorer"; //$NON-NLS-1$
 
-        if (name.contains("netscape"))
-          return "Netscape";
+        if (name.contains("netscape")) //$NON-NLS-1$
+          return "Netscape"; //$NON-NLS-1$
 
-        if (name.contains("konqueror"))
-          return "Konqueror";
+        if (name.contains("konqueror")) //$NON-NLS-1$
+          return "Konqueror"; //$NON-NLS-1$
 
-        if (name.contains("camino"))
-          return "Camino";
+        if (name.contains("camino")) //$NON-NLS-1$
+          return "Camino"; //$NON-NLS-1$
       }
     }
 

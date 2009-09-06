@@ -55,7 +55,7 @@ public class OverviewPreferencesPage extends PreferencePage implements IWorkbenc
   private LocalResourceManager fResources;
 
   /** ID of this Preference Page */
-  public static final String ID = "org.eclipse.ui.preferencePages.Workbench";
+  public static final String ID = "org.eclipse.ui.preferencePages.Workbench"; //$NON-NLS-1$
 
   /** Leave for reflection */
   public OverviewPreferencesPage() {
@@ -94,7 +94,7 @@ public class OverviewPreferencesPage extends PreferencePage implements IWorkbenc
     container.setFont(parent.getFont());
 
     Label titleLabel = new Label(container, SWT.None);
-    titleLabel.setText("The following links allow to open the related preferences page:");
+    titleLabel.setText(Messages.OverviewPreferencesPage_OVERVIEW_INFO);
     titleLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
 
     List<String> ids = new ArrayList<String>();
@@ -109,52 +109,52 @@ public class OverviewPreferencesPage extends PreferencePage implements IWorkbenc
     /* Feeds */
     ids.add(FeedsPreferencePage.ID);
     images.add(OwlUI.getImage(fResources, OwlUI.BOOKMARK));
-    labels.add("Configure Global Options for Feeds");
+    labels.add(Messages.OverviewPreferencesPage_FEED_OPTIONS);
 
     /* Browser */
     ids.add(BrowserPreferencePage.ID);
-    images.add(OwlUI.getImage(fResources, "icons/elcl16/browser.gif"));
-    labels.add("Configure the Integrated Web Browser");
+    images.add(OwlUI.getImage(fResources, "icons/elcl16/browser.gif")); //$NON-NLS-1$
+    labels.add(Messages.OverviewPreferencesPage_BROWSER_OPTIONS);
 
     /* Sharing */
     ids.add(SharingPreferencesPage.ID);
-    images.add(OwlUI.getImage(fResources, "icons/elcl16/share.gif"));
-    labels.add("Share Bookmarks and News with Others");
+    images.add(OwlUI.getImage(fResources, "icons/elcl16/share.gif")); //$NON-NLS-1$
+    labels.add(Messages.OverviewPreferencesPage_SHARE_OPTIONS);
 
     /* Key Bindings */
-    ids.add("org.rssowl.ui.preferences.Keys");
-    images.add(OwlUI.getImage(fResources, "icons/elcl16/keyspref.gif"));
-    labels.add("Assign Key Bindings for Common Actions");
+    ids.add("org.rssowl.ui.preferences.Keys"); //$NON-NLS-1$
+    images.add(OwlUI.getImage(fResources, "icons/elcl16/keyspref.gif")); //$NON-NLS-1$
+    labels.add(Messages.OverviewPreferencesPage_KEYS_OPTIONS);
 
     /* View */
     ids.add(MiscPreferencePage.ID);
-    images.add(OwlUI.getImage(fResources, "icons/elcl16/view.gif"));
-    labels.add("Change View and System Tray Settings");
+    images.add(OwlUI.getImage(fResources, "icons/elcl16/view.gif")); //$NON-NLS-1$
+    labels.add(Messages.OverviewPreferencesPage_VIEW_OPTIONS);
 
     /* Colors and Fonts */
-    ids.add("org.rssowl.ui.preferences.ColorsAndFonts");
-    images.add(OwlUI.getImage(fResources, "icons/elcl16/colors.gif"));
-    labels.add("Configure Colors && Fonts");
+    ids.add("org.rssowl.ui.preferences.ColorsAndFonts"); //$NON-NLS-1$
+    images.add(OwlUI.getImage(fResources, "icons/elcl16/colors.gif")); //$NON-NLS-1$
+    labels.add(Messages.OverviewPreferencesPage_COLOR_FONT_OPTIONS);
 
     /* Network */
-    ids.add("org.eclipse.ui.net.NetPreferences");
-    images.add(OwlUI.getImage(fResources, "icons/elcl16/network.gif"));
-    labels.add("Enable Connections via Proxy Server");
+    ids.add("org.eclipse.ui.net.NetPreferences"); //$NON-NLS-1$
+    images.add(OwlUI.getImage(fResources, "icons/elcl16/network.gif")); //$NON-NLS-1$
+    labels.add(Messages.OverviewPreferencesPage_CONNECTION_OPTIONS);
 
     /* Notifier */
     ids.add(NotifierPreferencesPage.ID);
-    images.add(OwlUI.getImage(fResources, "icons/elcl16/notification.gif"));
-    labels.add("Configure Notifications for Incoming News");
+    images.add(OwlUI.getImage(fResources, "icons/elcl16/notification.gif")); //$NON-NLS-1$
+    labels.add(Messages.OverviewPreferencesPage_NOTIFIER_OPTIONS);
 
     /* Labels */
     ids.add(ManageLabelsPreferencePage.ID);
-    images.add(OwlUI.getImage(fResources, "icons/elcl16/labels.gif"));
-    labels.add("Organize Labels for News");
+    images.add(OwlUI.getImage(fResources, "icons/elcl16/labels.gif")); //$NON-NLS-1$
+    labels.add(Messages.OverviewPreferencesPage_LABEL_OPTIONS);
 
     /* Passwords */
     ids.add(CredentialsPreferencesPage.ID);
-    images.add(OwlUI.getImage(fResources, "icons/elcl16/passwords.gif"));
-    labels.add("Manage Stored Passwords for Feeds");
+    images.add(OwlUI.getImage(fResources, "icons/elcl16/passwords.gif")); //$NON-NLS-1$
+    labels.add(Messages.OverviewPreferencesPage_PASSWORD_OPTIONS);
 
     /* Create */
     for (int i = 0; i < ids.size(); i++) {
@@ -165,7 +165,7 @@ public class OverviewPreferencesPage extends PreferencePage implements IWorkbenc
       imgLabel.setImage(images.get(i));
 
       Link link = new Link(linkContainer, SWT.None);
-      link.setText("<a>" + labels.get(i) + "</a>");
+      link.setText("<a>" + labels.get(i) + "</a>"); //$NON-NLS-1$ //$NON-NLS-2$
       link.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
       link.addSelectionListener(new SelectionAdapter() {
         @Override
@@ -182,11 +182,11 @@ public class OverviewPreferencesPage extends PreferencePage implements IWorkbenc
     ((GridLayout) infoContainer.getLayout()).marginBottom = 10;
 
     Label infoImg = new Label(infoContainer, SWT.NONE);
-    infoImg.setImage(OwlUI.getImage(fResources, "icons/obj16/info.gif"));
+    infoImg.setImage(OwlUI.getImage(fResources, "icons/obj16/info.gif")); //$NON-NLS-1$
     infoImg.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 
     Label infoText = new Label(infoContainer, SWT.WRAP);
-    infoText.setText("Tip: Use the text field on top to search in all preferences.");
+    infoText.setText(Messages.OverviewPreferencesPage_OVERVIEW_TIP);
     infoText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
     applyDialogFont(container);
