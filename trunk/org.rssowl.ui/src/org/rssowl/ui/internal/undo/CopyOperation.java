@@ -24,6 +24,7 @@
 
 package org.rssowl.ui.internal.undo;
 
+import org.eclipse.osgi.util.NLS;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DynamicDAO;
@@ -61,7 +62,7 @@ public class CopyOperation implements IUndoOperation {
    * @see org.rssowl.ui.internal.undo.IUndoOperation#getName()
    */
   public String getName() {
-    return "Copy " + fNewsCount + " News";
+    return NLS.bind(Messages.CopyOperation_COPY_N, fNewsCount);
   }
 
   /*

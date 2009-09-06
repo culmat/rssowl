@@ -24,6 +24,7 @@
 
 package org.rssowl.ui.internal.undo;
 
+import org.eclipse.osgi.util.NLS;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.reference.NewsReference;
@@ -77,7 +78,7 @@ public class StickyOperation implements IUndoOperation {
    * @see org.rssowl.ui.internal.undo.IUndoOperation#getName()
    */
   public String getName() {
-    return fMakeSticky ? "Mark " + fNewsCount + " News as Sticky" : "Mark " + fNewsCount + " News as not Sticky";
+    return fMakeSticky ? NLS.bind(Messages.StickyOperation_MARK_N_STICKY, fNewsCount) : NLS.bind(Messages.StickyOperation_MARK_N_UNSTICKY, fNewsCount);
   }
 
   /*

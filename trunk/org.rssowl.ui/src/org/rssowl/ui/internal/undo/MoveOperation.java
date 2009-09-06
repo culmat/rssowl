@@ -25,6 +25,7 @@
 package org.rssowl.ui.internal.undo;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.osgi.util.NLS;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DynamicDAO;
@@ -66,7 +67,7 @@ public class MoveOperation extends CopyOperation {
    */
   @Override
   public String getName() {
-    return "Move " + fNewsCount + " News";
+    return NLS.bind(Messages.MoveOperation_MOVE_N, fNewsCount);
   }
 
   /*
