@@ -40,6 +40,7 @@ public class Messages extends NLS {
   public static String DeleteTypesAction_CONFIRM_DELETE_SEARCH;
   public static String DeleteTypesAction_NO_UNDO;
   public static String DeleteTypesAction_WAIT_DELETE;
+  public static String EntityPropertyDialogAction_PROPERTIES_FOR_N;
   public static String FindAction_FIND;
   public static String FindExtensionsAction_RSSOWL_APPLICATION;
   public static String FindExtensionsAction_SEARCHING_EXTENSIONS;

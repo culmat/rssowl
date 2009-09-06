@@ -30,6 +30,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.IShellProvider;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 import org.rssowl.core.persist.IBookMark;
@@ -139,10 +140,10 @@ public class EntityPropertyDialogAction extends Action implements IObjectActionD
       IEntity entity = entities.get(0);
 
       if (entity instanceof IFolder)
-        return "'" + ((IFolder) entity).getName() + "'"; //$NON-NLS-1$ //$NON-NLS-2$
+        return NLS.bind(Messages.EntityPropertyDialogAction_PROPERTIES_FOR_N, ((IFolder) entity).getName());
 
       if (entity instanceof IMark)
-        return "'" + ((IMark) entity).getName() + "'"; //$NON-NLS-1$ //$NON-NLS-2$
+        return NLS.bind(Messages.EntityPropertyDialogAction_PROPERTIES_FOR_N, ((IMark) entity).getName());
     }
 
     /* Multi Entities selected */
