@@ -46,7 +46,7 @@ import java.io.Serializable;
  * @author bpasero
  */
 public class ShowGrowlActionPresentation implements INewsActionPresentation {
-  private static final String DEFAULT_GROWLNOTIFY_LOCATION = "/usr/local/bin/growlnotify";
+  private static final String DEFAULT_GROWLNOTIFY_LOCATION = "/usr/local/bin/growlnotify"; //$NON-NLS-1$
   private Link fGrowlPathLink;
   private Composite fContainer;
 
@@ -73,7 +73,7 @@ public class ShowGrowlActionPresentation implements INewsActionPresentation {
 
   private void onSelect() {
     FileDialog dialog = new FileDialog(fGrowlPathLink.getShell(), SWT.OPEN);
-    dialog.setText("Select 'growlnotify' on your Computer");
+    dialog.setText(Messages.ShowGrowlActionPresentation_SELECT_GROWL_TITLE);
 
     /* Preset with existing folder if present */
     if (fGrowlPathLink.getData() != null) {
@@ -99,7 +99,7 @@ public class ShowGrowlActionPresentation implements INewsActionPresentation {
     } else {
       File file = new File(data.toString());
       if (file.exists()) {
-        fGrowlPathLink.setText("<a>" + file.getAbsolutePath() + "</a>");
+        fGrowlPathLink.setText("<a>" + file.getAbsolutePath() + "</a>"); //$NON-NLS-1$ //$NON-NLS-2$
         fGrowlPathLink.setData(data);
       } else
         resetLink();
@@ -107,7 +107,7 @@ public class ShowGrowlActionPresentation implements INewsActionPresentation {
   }
 
   private void resetLink() {
-    fGrowlPathLink.setText("<a>Select 'growlnotify' on your Computer...</a>");
+    fGrowlPathLink.setText(Messages.ShowGrowlActionPresentation_SELECT_GROWL_LINK);
     fGrowlPathLink.setData(null);
   }
 

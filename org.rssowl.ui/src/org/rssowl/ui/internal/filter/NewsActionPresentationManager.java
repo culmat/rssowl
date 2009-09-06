@@ -84,7 +84,7 @@ public class NewsActionPresentationManager {
     try {
       IConfigurationElement element = fNewsActionPresentations.get(actionId);
       if (element != null)
-        return (INewsActionPresentation) element.createExecutableExtension("class");
+        return (INewsActionPresentation) element.createExecutableExtension("class"); //$NON-NLS-1$
     } catch (CoreException e) {
       Activator.getDefault().logError(e.getMessage(), e);
     }
@@ -126,16 +126,16 @@ public class NewsActionPresentationManager {
       try {
 
         /* Check if this Action is only available to a certain platform */
-        String platform = element.getAttribute("platform");
+        String platform = element.getAttribute("platform"); //$NON-NLS-1$
         if (StringUtils.isSet(platform) && !SWT.getPlatform().equals(platform))
           continue;
 
-        String id = element.getAttribute("id");
-        INewsAction newsAction = (INewsAction) element.createExecutableExtension("class");
-        String name = element.getAttribute("name");
-        String description = element.getAttribute("description");
-        String sortKey = element.getAttribute("sortKey");
-        String forcable = element.getAttribute("forcable");
+        String id = element.getAttribute("id"); //$NON-NLS-1$
+        INewsAction newsAction = (INewsAction) element.createExecutableExtension("class"); //$NON-NLS-1$
+        String name = element.getAttribute("name"); //$NON-NLS-1$
+        String description = element.getAttribute("description"); //$NON-NLS-1$
+        String sortKey = element.getAttribute("sortKey"); //$NON-NLS-1$
+        String forcable = element.getAttribute("forcable"); //$NON-NLS-1$
 
         NewsActionDescriptor filterAction = new NewsActionDescriptor(id, newsAction, name, description, sortKey, Boolean.parseBoolean(forcable));
         fNewsActions.put(id, filterAction);
@@ -153,7 +153,7 @@ public class NewsActionPresentationManager {
     IConfigurationElement elements[] = reg.getConfigurationElementsFor(NEWS_ACTION_PRESENTATION_EXTENSION_POINT);
     for (IConfigurationElement element : elements) {
       try {
-        String id = element.getAttribute("actionId");
+        String id = element.getAttribute("actionId"); //$NON-NLS-1$
         fNewsActionPresentations.put(id, element);
       } catch (InvalidRegistryObjectException e) {
         Activator.getDefault().logError(e.getMessage(), e);

@@ -24,6 +24,7 @@
 
 package org.rssowl.ui.internal.filter;
 
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -74,7 +75,7 @@ public class DownloadAttachmentsNewsActionPresentation implements INewsActionPre
 
   private void onSelect() {
     DirectoryDialog dialog = new DirectoryDialog(fFolderPathLink.getShell(), SWT.None);
-    dialog.setText("Select a Folder for Downloaded Attachments");
+    dialog.setText(Messages.DownloadAttachmentsNewsActionPresentation_SELECT_FOLDER);
 
     /* Preset with existing folder if present */
     if (fFolderPathLink.getData() != null) {
@@ -86,7 +87,7 @@ public class DownloadAttachmentsNewsActionPresentation implements INewsActionPre
     /* Preset with a good Location */
     if (!StringUtils.isSet(dialog.getFilterPath()) && !fgDownloadDirectorySet) {
       fgDownloadDirectorySet = true; //Only set once
-      String homeDirVal = System.getProperty("user.home");
+      String homeDirVal = System.getProperty("user.home"); //$NON-NLS-1$
       if (StringUtils.isSet(homeDirVal)) {
         boolean directorySet = false;
 
@@ -94,7 +95,7 @@ public class DownloadAttachmentsNewsActionPresentation implements INewsActionPre
         if (Application.IS_WINDOWS) {
 
           /* First try Download Folder */
-          File downloadsDir = new File(homeDirVal + "\\Downloads");
+          File downloadsDir = new File(homeDirVal + "\\Downloads"); //$NON-NLS-1$
           if (downloadsDir.exists()) {
             dialog.setFilterPath(downloadsDir.toString());
             directorySet = true;
@@ -102,7 +103,7 @@ public class DownloadAttachmentsNewsActionPresentation implements INewsActionPre
 
           /* Fallback to Desktop */
           else {
-            downloadsDir = new File(homeDirVal + "\\Desktop");
+            downloadsDir = new File(homeDirVal + "\\Desktop"); //$NON-NLS-1$
             if (downloadsDir.exists()) {
               dialog.setFilterPath(downloadsDir.toString());
               directorySet = true;
@@ -130,7 +131,7 @@ public class DownloadAttachmentsNewsActionPresentation implements INewsActionPre
     } else {
       File file = new File(data.toString());
       if (file.exists()) {
-        fFolderPathLink.setText("to: <a>" + file.getAbsolutePath() + "</a>");
+        fFolderPathLink.setText(NLS.bind(Messages.DownloadAttachmentsNewsActionPresentation_TO_N, file.getAbsolutePath()));
         fFolderPathLink.setData(data);
       } else
         resetLink();
@@ -138,7 +139,7 @@ public class DownloadAttachmentsNewsActionPresentation implements INewsActionPre
   }
 
   private void resetLink() {
-    fFolderPathLink.setText("to: <a>Select a Folder...</a>");
+    fFolderPathLink.setText(Messages.DownloadAttachmentsNewsActionPresentation_TO_SELECT_FOLDER);
     fFolderPathLink.setData(null);
   }
 
