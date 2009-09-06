@@ -24,45 +24,16 @@
 
 package org.rssowl.ui.internal.dialogs.welcome;
 
-import org.eclipse.jface.wizard.IWizardPage;
-import org.eclipse.jface.wizard.Wizard;
-import org.rssowl.ui.internal.dialogs.importer.ImportSourcePage;
-import org.rssowl.ui.internal.dialogs.importer.ImportWizard;
-import org.rssowl.ui.internal.dialogs.importer.ImportSourcePage.Source;
+import org.eclipse.osgi.util.NLS;
 
-/**
- * A {@link Wizard} that shows upon first start of RSSOwl introducing to the
- * user. It is basically the {@link ImportWizard} with some additional pages for
- * guidance.
- *
- * @author bpasero
- */
-public class WelcomeWizard extends ImportWizard {
+public class Messages extends NLS {
+  private static final String BUNDLE_NAME = "org.rssowl.ui.internal.dialogs.welcome.messages"; //$NON-NLS-1$
+  public static String WelcomeWizard_WELCOME;
 
-  /** Default Constructor */
-  public WelcomeWizard() {
-    super(true);
-  }
+  private Messages() {}
 
-  /*
-   * @see org.eclipse.jface.wizard.Wizard#addPages()
-   */
-  @Override
-  public void addPages() {
-    super.addPages();
-    setWindowTitle(Messages.WelcomeWizard_WELCOME);
-  }
-
-  /*
-   * @see org.rssowl.ui.internal.dialogs.importer.ImportWizard#getNextPage(org.eclipse.jface.wizard.IWizardPage)
-   */
-  @Override
-  public IWizardPage getNextPage(IWizardPage page) {
-
-    /* Directly Finish if user is not selecting to import Feeds */
-    if (page instanceof ImportSourcePage && ((ImportSourcePage) page).getSource() == Source.NONE)
-      return null;
-
-    return super.getNextPage(page);
+  static {
+    // initialize resource bundle
+    NLS.initializeMessages(BUNDLE_NAME, Messages.class);
   }
 }
