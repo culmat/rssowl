@@ -146,13 +146,13 @@ public class RetentionPropertyPage implements IEntityPropertyPage {
     /* Explanation Label */
     Label explanationLabel = new Label(container, SWT.WRAP);
     explanationLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false, 2, 1));
-    explanationLabel.setText("To recover disk space, old news can be permanently deleted.");
+    explanationLabel.setText(Messages.RetentionPropertyPage_CLEANUP_INFO);
 
     /* Delete by Count */
     fDeleteNewsByCountCheck = new Button(container, SWT.CHECK);
     fDeleteNewsByCountCheck.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
     fDeleteNewsByCountCheck.setSelection(fPrefDeleteNewsByCountState);
-    fDeleteNewsByCountCheck.setText("&Maximum number of news to keep: ");
+    fDeleteNewsByCountCheck.setText(Messages.RetentionPropertyPage_MAX_NUMBER);
     fDeleteNewsByCountCheck.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -171,7 +171,7 @@ public class RetentionPropertyPage implements IEntityPropertyPage {
     fDeleteNewsByAgeCheck = new Button(container, SWT.CHECK);
     fDeleteNewsByAgeCheck.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
     fDeleteNewsByAgeCheck.setSelection(fPrefDeleteNewsByAgeState);
-    fDeleteNewsByAgeCheck.setText("Maximum &age of news in days: ");
+    fDeleteNewsByAgeCheck.setText(Messages.RetentionPropertyPage_MAX_AGE);
     fDeleteNewsByAgeCheck.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -189,13 +189,13 @@ public class RetentionPropertyPage implements IEntityPropertyPage {
     /* Delete by State */
     fDeleteReadNewsCheck = new Button(container, SWT.CHECK);
     fDeleteReadNewsCheck.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false, 2, 1));
-    fDeleteReadNewsCheck.setText("Always &delete read news");
+    fDeleteReadNewsCheck.setText(Messages.RetentionPropertyPage_DELETE_READ);
     fDeleteReadNewsCheck.setSelection(fPrefDeleteReadNews);
 
     /* Never Delete Unread News State */
     fNeverDeleteUnreadNewsCheck = new Button(container, SWT.CHECK);
     fNeverDeleteUnreadNewsCheck.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false, 2, 1));
-    fNeverDeleteUnreadNewsCheck.setText("Never delete &unread news");
+    fNeverDeleteUnreadNewsCheck.setText(Messages.RetentionPropertyPage_DELETE_UNREAD);
     fNeverDeleteUnreadNewsCheck.setSelection(fPrefNeverDeleteUnReadNews);
 
     /* Info Container */
@@ -205,11 +205,11 @@ public class RetentionPropertyPage implements IEntityPropertyPage {
     ((GridLayout)infoContainer.getLayout()).marginTop = 5;
 
     Label infoImg = new Label(infoContainer, SWT.NONE);
-    infoImg.setImage(OwlUI.getImage(fSite.getResourceManager(), "icons/obj16/info.gif"));
+    infoImg.setImage(OwlUI.getImage(fSite.getResourceManager(), "icons/obj16/info.gif")); //$NON-NLS-1$
     infoImg.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 
     Label infoText = new Label(infoContainer, SWT.WRAP);
-    infoText.setText("Note: Sticky and labeled News will not be deleted.");
+    infoText.setText(Messages.RetentionPropertyPage_CLEANUP_NOTE);
     infoText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
     return container;
@@ -325,12 +325,12 @@ public class RetentionPropertyPage implements IEntityPropertyPage {
 
     /* Run Retention since settings changed */
     if (fSettingsChanged) {
-      Job retentionJob = new Job("Performing clean up...") {
+      Job retentionJob = new Job(Messages.RetentionPropertyPage_PERFORMING_CLEANUP) {
 
         @Override
         protected IStatus run(IProgressMonitor monitor) {
           try {
-            monitor.beginTask("Performing clean up...", fEntities.size());
+            monitor.beginTask(Messages.RetentionPropertyPage_PERFORMING_CLEANUP, fEntities.size());
 
             for (IEntity entity : fEntities) {
               if (entity instanceof IBookMark)

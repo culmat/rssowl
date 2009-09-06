@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -185,7 +186,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
       if (entity instanceof IBookMark) {
         Label feedLabel = new Label(container, SWT.None);
         feedLabel.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
-        feedLabel.setText("Link: ");
+        feedLabel.setText(Messages.GeneralPropertyPage_LINK);
 
         fFeedInput = new Text(container, SWT.BORDER);
         fFeedInput.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
@@ -195,7 +196,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
         /* Name */
         Label nameLabel = new Label(container, SWT.None);
         nameLabel.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
-        nameLabel.setText("Name: ");
+        nameLabel.setText(Messages.GeneralPropertyPage_NAME);
 
         Composite nameContainer = new Composite(container, SWT.BORDER);
         nameContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
@@ -210,8 +211,8 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
         grabTitleBar.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
         ToolItem grabTitleItem = new ToolItem(grabTitleBar, SWT.PUSH);
-        grabTitleItem.setImage(OwlUI.getImage(fSite.getResourceManager(), "icons/etool16/info.gif"));
-        grabTitleItem.setToolTipText("Load name from feed");
+        grabTitleItem.setImage(OwlUI.getImage(fSite.getResourceManager(), "icons/etool16/info.gif")); //$NON-NLS-1$
+        grabTitleItem.setToolTipText(Messages.GeneralPropertyPage_LOAD_NAME);
         grabTitleItem.addSelectionListener(new SelectionAdapter() {
           @Override
           public void widgetSelected(SelectionEvent e) {
@@ -226,7 +227,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
         /* Name */
         Label nameLabel = new Label(container, SWT.None);
         nameLabel.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
-        nameLabel.setText("Name: ");
+        nameLabel.setText(Messages.GeneralPropertyPage_NAME);
 
         fNameInput = new Text(container, SWT.BORDER);
         fNameInput.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
@@ -241,7 +242,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
 
       Label locationLabel = new Label(container, SWT.None);
       locationLabel.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
-      locationLabel.setText("Location: ");
+      locationLabel.setText(Messages.GeneralPropertyPage_LOCATION);
 
       /* Exclude Folders that are selected from Chooser */
       List<IFolder> excludes = new ArrayList<IFolder>();
@@ -271,7 +272,10 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
       autoReloadContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, true));
 
       fUpdateCheck = new Button(autoReloadContainer, SWT.CHECK);
-      fUpdateCheck.setText("&Automatically update the " + (fIsSingleBookMark ? "feed" : "feeds") + " every ");
+      if (fIsSingleBookMark)
+        fUpdateCheck.setText(Messages.GeneralPropertyPage_UPDATE_FEED);
+      else
+        fUpdateCheck.setText(Messages.GeneralPropertyPage_UPDATE_FEEDS);
       fUpdateCheck.setSelection(fPrefUpdateIntervalState);
       fUpdateCheck.addSelectionListener(new SelectionAdapter() {
         @Override
@@ -294,9 +298,9 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
         fReloadSpinner.setSelection((int) (fPrefUpdateInterval / DAY_IN_SECONDS));
 
       fReloadCombo = new Combo(autoReloadContainer, SWT.READ_ONLY);
-      fReloadCombo.add("Minutes");
-      fReloadCombo.add("Hours");
-      fReloadCombo.add("Days");
+      fReloadCombo.add(Messages.GeneralPropertyPage_MINUTES);
+      fReloadCombo.add(Messages.GeneralPropertyPage_HOURS);
+      fReloadCombo.add(Messages.GeneralPropertyPage_DAYS);
       fReloadCombo.select(fUpdateIntervalScope);
       fReloadCombo.setEnabled(fPrefUpdateIntervalState);
     }
@@ -304,7 +308,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
     /* Open on Startup */
     fOpenOnStartupCheck = new Button(otherSettingsContainer, SWT.CHECK);
     fOpenOnStartupCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-    fOpenOnStartupCheck.setText("&Display the " + getDisplayName() + " on start-up");
+    fOpenOnStartupCheck.setText(NLS.bind(Messages.GeneralPropertyPage_DISPLAY_ON_STARTUP, getDisplayName()));
     fOpenOnStartupCheck.setSelection(fPrefOpenOnStartup);
 
     return container;
@@ -320,12 +324,12 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
   private String getDisplayName() {
     if (fEntities.size() == 1) {
       if (fEntities.get(0) instanceof INewsBin)
-        return "news bin";
+        return "news bin"; //$NON-NLS-1$
 
       if (fEntities.get(0) instanceof IBookMark)
-        return "feed";
+        return "feed"; //$NON-NLS-1$
 
-      return "feeds";
+      return "feeds"; //$NON-NLS-1$
     }
 
     boolean containsBin = false;
@@ -339,11 +343,11 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
     }
 
     if (containsBin && containsBookMarkOrFolder)
-      return "elements";
+      return "elements"; //$NON-NLS-1$
     else if (containsBin)
-      return "news bins";
+      return "news bins"; //$NON-NLS-1$
 
-    return "feeds";
+    return "feeds"; //$NON-NLS-1$
   }
 
   private boolean containsNewsBin(List<IEntity> entities) {
@@ -432,7 +436,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
     if (entity instanceof IMark)
       return ((IMark) entity).getName();
 
-    return "";
+    return ""; //$NON-NLS-1$
   }
 
   /*
@@ -476,7 +480,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
       fSite.select(this);
       fFeedInput.setFocus();
 
-      fSite.setMessage("Please enter a link for the bookmark.", IPropertyDialogSite.MessageType.ERROR);
+      fSite.setMessage(Messages.GeneralPropertyPage_ENTER_LINK, IPropertyDialogSite.MessageType.ERROR);
 
       return false;
     }
@@ -487,11 +491,11 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
       fNameInput.setFocus();
 
       if (entity instanceof IFolder)
-        fSite.setMessage("Please enter a name for the folder.", IPropertyDialogSite.MessageType.ERROR);
+        fSite.setMessage(Messages.GeneralPropertyPage_ENTER_NAME_FOLDER, IPropertyDialogSite.MessageType.ERROR);
       else if (entity instanceof IBookMark)
-        fSite.setMessage("Please enter a name for the bookmark.", IPropertyDialogSite.MessageType.ERROR);
+        fSite.setMessage(Messages.GeneralPropertyPage_ENTER_NAME_BOOKMARK, IPropertyDialogSite.MessageType.ERROR);
       else if (entity instanceof INewsBin)
-        fSite.setMessage("Please enter a name for the news bin.", IPropertyDialogSite.MessageType.ERROR);
+        fSite.setMessage(Messages.GeneralPropertyPage_ENTER_NAME_BIN, IPropertyDialogSite.MessageType.ERROR);
 
       return false;
     }
@@ -528,8 +532,8 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
         /* Check if this operation has the potential of deleting existing news */
         boolean containsNews = bookmark.getNewsCount(INews.State.getVisible()) > 0;
         if (containsNews) {
-          String msg = "Changing the link of a bookmark will delete all news inside. Are you sure you want to continue?";
-          MessageDialog dialog = new MessageDialog(fParent.getShell(), "Warning", null, msg, MessageDialog.WARNING, new String[] { IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL }, 1);
+          String msg = Messages.GeneralPropertyPage_CHANGE_LINK_WARNING;
+          MessageDialog dialog = new MessageDialog(fParent.getShell(), Messages.GeneralPropertyPage_WARNING, null, msg, MessageDialog.WARNING, new String[] { IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL }, 1);
           if (dialog.open() == IDialogConstants.CANCEL_ID)
             return false;
         }
@@ -568,7 +572,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
           fSite.select(this);
           fFeedInput.selectAll();
           fFeedInput.setFocus();
-          fSite.setMessage("The feed's link is not valid (e.g. 'http://www.link.com').", IPropertyDialogSite.MessageType.ERROR);
+          fSite.setMessage(Messages.GeneralPropertyPage_INVALID_LINK, IPropertyDialogSite.MessageType.ERROR);
           return false;
         }
       }

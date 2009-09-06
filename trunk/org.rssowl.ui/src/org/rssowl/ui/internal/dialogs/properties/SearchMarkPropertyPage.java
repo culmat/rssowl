@@ -25,6 +25,7 @@
 package org.rssowl.ui.internal.dialogs.properties;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -119,7 +120,7 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
     /* Name */
     Label nameLabel = new Label(container, SWT.None);
     nameLabel.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
-    nameLabel.setText("Name: ");
+    nameLabel.setText(Messages.SearchMarkPropertyPage_NAME);
 
     Composite nameContainer = new Composite(container, SWT.BORDER);
     nameContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
@@ -134,8 +135,8 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
     generateTitleBar.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
     ToolItem generateTitleItem = new ToolItem(generateTitleBar, SWT.PUSH);
-    generateTitleItem.setImage(OwlUI.getImage(fSite.getResourceManager(), "icons/etool16/info.gif"));
-    generateTitleItem.setToolTipText("Create name from conditions");
+    generateTitleItem.setImage(OwlUI.getImage(fSite.getResourceManager(), "icons/etool16/info.gif")); //$NON-NLS-1$
+    generateTitleItem.setToolTipText(Messages.SearchMarkPropertyPage_NAME_FROM_CONDITION);
     generateTitleItem.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -146,7 +147,7 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
     /* Location */
     Label locationLabel = new Label(container, SWT.None);
     locationLabel.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
-    locationLabel.setText("Location: ");
+    locationLabel.setText(Messages.SearchMarkPropertyPage_LOCATION);
 
     fFolderChooser = new FolderChooser(container, mark.getParent(), SWT.BORDER, true);
     fFolderChooser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
@@ -159,11 +160,11 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
     ((GridLayout) topControlsContainer.getLayout()).marginTop = 10;
 
     fMatchAllRadio = new Button(topControlsContainer, SWT.RADIO);
-    fMatchAllRadio.setText("&Match all conditions");
+    fMatchAllRadio.setText(Messages.SearchMarkPropertyPage_MATCH_ALL);
     fMatchAllRadio.setSelection(mark.matchAllConditions());
 
     fMatchAnyRadio = new Button(topControlsContainer, SWT.RADIO);
-    fMatchAnyRadio.setText("Match &any condition");
+    fMatchAnyRadio.setText(Messages.SearchMarkPropertyPage_MATCH_ANY);
     fMatchAnyRadio.setSelection(!mark.matchAllConditions());
 
     /* Separator */
@@ -176,12 +177,12 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
     scopeContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0, 0, 0, false));
 
     Label scopeLabel = new Label(scopeContainer, SWT.NONE);
-    scopeLabel.setText("Search in: ");
+    scopeLabel.setText(Messages.SearchMarkPropertyPage_SEARCH_IN);
 
     fLocationControl = new LocationControl(scopeContainer, SWT.WRAP) {
       @Override
       protected String getDefaultLabel() {
-        return "All News";
+        return Messages.SearchMarkPropertyPage_ALL_NEWS;
       }
     };
     fLocationControl.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
@@ -203,7 +204,7 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
     fSearchConditionList.setVisibleItemCount(3);
 
     if (CoreUtils.isLocationConflict(mark.getSearchConditions()))
-      fSite.setMessage("You are using a location condition together with a value for \"Search in\".", IPropertyDialogSite.MessageType.WARNING);
+      fSite.setMessage(Messages.SearchMarkPropertyPage_LOCATION_WARNING, IPropertyDialogSite.MessageType.WARNING);
 
     return container;
   }
@@ -221,7 +222,7 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
 
       Label locationLabel = new Label(container, SWT.None);
       locationLabel.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
-      locationLabel.setText("Location: ");
+      locationLabel.setText(Messages.SearchMarkPropertyPage_LOCATION);
 
       fFolderChooser = new FolderChooser(container, sameParent, null, SWT.BORDER, true);
       fFolderChooser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
@@ -240,7 +241,7 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
     /* Name */
     Label nameLabel = new Label(otherSettingsContainer, SWT.None);
     nameLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, true, false, 2, 1));
-    nameLabel.setText("Add search conditions to all of the " + fEntities.size() + " selected saved searches: ");
+    nameLabel.setText(NLS.bind(Messages.SearchMarkPropertyPage_ADD_TO_ALL, fEntities.size()));
 
     Composite conditionsContainer = new Composite(otherSettingsContainer, SWT.BORDER);
     conditionsContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
@@ -279,7 +280,7 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
     IModelFactory factory = Owl.getModelFactory();
 
     ISearchField field = factory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
-    ISearchCondition condition = factory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "");
+    ISearchCondition condition = factory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, ""); //$NON-NLS-1$
 
     conditions.add(condition);
 
@@ -329,7 +330,7 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
     if (fNameInput.getText().length() == 0) {
       fSite.select(this);
       fNameInput.setFocus();
-      fSite.setMessage("Please enter a name for the saved search.", IPropertyDialogSite.MessageType.ERROR);
+      fSite.setMessage(Messages.SearchMarkPropertyPage_SEARCH_NAME, IPropertyDialogSite.MessageType.ERROR);
 
       return false;
     }
@@ -338,7 +339,7 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
     if (fSearchConditionList.isEmpty()) {
       fSite.select(this);
       fNameInput.setFocus();
-      fSite.setMessage("Please specify your search by defining some conditions.", IPropertyDialogSite.MessageType.ERROR);
+      fSite.setMessage(Messages.SearchMarkPropertyPage_DEFINE_SEARCH, IPropertyDialogSite.MessageType.ERROR);
 
       return false;
     }
