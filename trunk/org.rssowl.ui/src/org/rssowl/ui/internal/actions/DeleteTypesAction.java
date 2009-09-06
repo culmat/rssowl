@@ -33,6 +33,7 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Shell;
@@ -151,31 +152,26 @@ public class DeleteTypesAction extends Action implements IObjectActionDelegate {
   }
 
   private String getMessage(List<?> elements) {
-    StringBuilder message = new StringBuilder("Are you sure you want to delete "); //$NON-NLS-1$
 
     /* One Element */
     if (elements.size() == 1) {
       Object element = elements.get(0);
       if (element instanceof IFolder)
-        message.append("the folder '").append(((IFolder) element).getName()).append("'?"); //$NON-NLS-1$ //$NON-NLS-2$
+        return NLS.bind(Messages.DeleteTypesAction_CONFIRM_DELETE_FOLDER, ((IFolder) element).getName());
       else if (element instanceof IBookMark)
-        message.append("the bookmark '").append(((IMark) element).getName()).append("'?"); //$NON-NLS-1$ //$NON-NLS-2$
+        return NLS.bind(Messages.DeleteTypesAction_CONFIRM_DELETE_BOOKMARK, ((IMark) element).getName());
       else if (element instanceof INewsBin)
-        message.append("the news bin '").append(((IMark) element).getName()).append("'?"); //$NON-NLS-1$ //$NON-NLS-2$
+        return NLS.bind(Messages.DeleteTypesAction_CONFIRM_DELETE_NEWSBIN, ((IMark) element).getName());
       else if (element instanceof ISearchMark)
-        message.append("the saved search '").append(((IMark) element).getName()).append("'?"); //$NON-NLS-1$ //$NON-NLS-2$
+        return NLS.bind(Messages.DeleteTypesAction_CONFIRM_DELETE_SEARCH, ((IMark) element).getName());
       else if (element instanceof INews)
-        message.append("the selected News?"); //$NON-NLS-1$
+        return Messages.DeleteTypesAction_CONFIRM_DELETE_NEWS;
       else if (element instanceof EntityGroup)
-        message.append("all elements of the group '").append(((EntityGroup) element).getName()).append("'?"); //$NON-NLS-1$ //$NON-NLS-2$
+        return NLS.bind(Messages.DeleteTypesAction_CONFIRM_DELETE_GROUP, ((EntityGroup) element).getName());
     }
 
     /* N Elements */
-    else {
-      message.append("the selected elements?"); //$NON-NLS-1$
-    }
-
-    return message.toString();
+    return Messages.DeleteTypesAction_CONFIRM_DELETE_ELEMENTS;
   }
 
   /*
