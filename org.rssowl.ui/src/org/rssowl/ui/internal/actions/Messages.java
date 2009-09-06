@@ -31,6 +31,13 @@ public class Messages extends NLS {
   public static String AssignLabelsAction_ASSIGN_LABELS;
   public static String CopyLinkAction_COPY_LINK;
   public static String DeleteTypesAction_CONFIRM_DELETE;
+  public static String DeleteTypesAction_CONFIRM_DELETE_BOOKMARK;
+  public static String DeleteTypesAction_CONFIRM_DELETE_ELEMENTS;
+  public static String DeleteTypesAction_CONFIRM_DELETE_FOLDER;
+  public static String DeleteTypesAction_CONFIRM_DELETE_GROUP;
+  public static String DeleteTypesAction_CONFIRM_DELETE_NEWS;
+  public static String DeleteTypesAction_CONFIRM_DELETE_NEWSBIN;
+  public static String DeleteTypesAction_CONFIRM_DELETE_SEARCH;
   public static String DeleteTypesAction_NO_UNDO;
   public static String DeleteTypesAction_WAIT_DELETE;
   public static String FindAction_FIND;
