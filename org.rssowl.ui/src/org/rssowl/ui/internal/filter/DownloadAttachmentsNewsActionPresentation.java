@@ -39,7 +39,6 @@ import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.io.File;
-import java.io.Serializable;
 
 /**
  * An implementation of {@link INewsActionPresentation} to select a folder to
@@ -153,7 +152,7 @@ public class DownloadAttachmentsNewsActionPresentation implements INewsActionPre
   /*
    * @see org.rssowl.ui.filter.INewsActionPresentation#getData()
    */
-  public Serializable getData() {
-    return (String)fFolderPathLink.getData();
+  public Object getData() {
+    return fFolderPathLink.getData();
   }
 }

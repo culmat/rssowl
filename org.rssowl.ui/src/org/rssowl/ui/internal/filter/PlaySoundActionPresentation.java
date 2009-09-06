@@ -40,7 +40,6 @@ import org.rssowl.ui.internal.util.AudioUtils;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.io.File;
-import java.io.Serializable;
 
 /**
  * An implementation of {@link INewsActionPresentation} to select a sound to
@@ -135,7 +134,7 @@ public class PlaySoundActionPresentation implements INewsActionPresentation {
   /*
    * @see org.rssowl.ui.filter.INewsActionPresentation#getData()
    */
-  public Serializable getData() {
-    return (String)fSoundPathLink.getData();
+  public Object getData() {
+    return fSoundPathLink.getData();
   }
 }

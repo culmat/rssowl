@@ -27,8 +27,6 @@ package org.rssowl.ui.filter;
 import org.eclipse.swt.widgets.Composite;
 import org.rssowl.core.INewsAction;
 
-import java.io.Serializable;
-
 /**
  * Instances of {@link INewsActionPresentation} provide a custom UI presentation
  * for an {@link INewsAction}.
@@ -50,7 +48,7 @@ public interface INewsActionPresentation {
 
   /**
    * @return arbitrary data taken from changes the user made to the
-   * presentation. Must implement {@link Serializable}.
+   * presentation.
    */
-  Serializable getData();
+  Object getData();
 }
