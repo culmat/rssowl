@@ -33,37 +33,37 @@ package org.rssowl.ui.internal.editors.feed;
 public enum NewsColumn {
 
   /** Title of the News */
-  TITLE("Title", true, false, true, true, true, true, true),
+  TITLE(Messages.NewsColumn_TITLE, true, false, true, true, true, true, true),
 
   /** Date of the News */
-  DATE("Date", true, false, false, true, true, true, true),
+  DATE(Messages.NewsColumn_DATE, true, false, false, true, true, true, true),
 
   /** Author of the News */
-  AUTHOR("Author", true, false, true, true, true, true, true),
+  AUTHOR(Messages.NewsColumn_AUTHOR, true, false, true, true, true, true, true),
 
   /** Category of the News */
-  CATEGORY("Category", true, false, true, true, true, true, true),
+  CATEGORY(Messages.NewsColumn_CATEGORY, true, false, true, true, true, true, true),
 
   /** Labels */
-  LABELS("Label", true, false, true, true, true, true, true),
+  LABELS(Messages.NewsColumn_LABEL, true, false, true, true, true, true, true),
 
   /** Status */
-  STATUS("Status", true, false, true, true, true, true, true),
+  STATUS(Messages.NewsColumn_STATUS, true, false, true, true, true, true, true),
 
   /** Sticky-State of the News */
-  STICKY("Sticky", false, true, false, true, false, true, false),
+  STICKY(Messages.NewsColumn_STICKY, false, true, false, true, false, true, false),
 
   /** Attachments */
-  ATTACHMENTS("Attachments", false, true, false, true, false, true, false),
+  ATTACHMENTS(Messages.NewsColumn_ATTACHMENTS, false, true, false, true, false, true, false),
 
   /** Feed of a News */
-  FEED("Feed", false, true, false, true, false, true, false),
+  FEED(Messages.NewsColumn_FEED, false, true, false, true, false, true, false),
 
   /** Relevance of a News (not selectable) */
-  RELEVANCE("Relevance", false, true, false, false, false, true, false),
+  RELEVANCE(Messages.NewsColumn_RELEVANCE, false, true, false, false, false, true, false),
 
   /** Location of a News */
-  LOCATION("Location", true, false, true, true, true, true, true);
+  LOCATION(Messages.NewsColumn_LOCATION, true, false, true, true, true, true, true);
 
   private final String fName;
   private final boolean fShowName;

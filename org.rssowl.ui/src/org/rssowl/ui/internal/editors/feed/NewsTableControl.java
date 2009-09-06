@@ -803,7 +803,7 @@ public class NewsTableControl implements IFeedViewPart {
 
         /* Open */
         {
-          manager.add(new Separator("open"));
+          manager.add(new Separator("open")); //$NON-NLS-1$
 
           /* Show only when internal browser is used */
           if (!selection.isEmpty() && !fGlobalPreferences.getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER) && !fGlobalPreferences.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER))
@@ -817,10 +817,10 @@ public class NewsTableControl implements IFeedViewPart {
 
         /* Mark / Label */
         {
-          manager.add(new Separator("mark"));
+          manager.add(new Separator("mark")); //$NON-NLS-1$
 
           /* Mark */
-          MenuManager markMenu = new MenuManager("M&ark", "mark");
+          MenuManager markMenu = new MenuManager(Messages.NewsTableControl_MARK, "mark"); //$NON-NLS-1$
           manager.add(markMenu);
 
           /* Mark as Read */
@@ -844,7 +844,7 @@ public class NewsTableControl implements IFeedViewPart {
 
         /* Move To / Copy To */
         if (!selection.isEmpty()) {
-          manager.add(new Separator("movecopy"));
+          manager.add(new Separator("movecopy")); //$NON-NLS-1$
 
           /* Load all news bins and sort by name */
           List<INewsBin> newsbins = new ArrayList<INewsBin>(DynamicDAO.loadAll(INewsBin.class));
@@ -858,7 +858,7 @@ public class NewsTableControl implements IFeedViewPart {
           Collections.sort(newsbins, comparator);
 
           /* Move To */
-          MenuManager moveMenu = new MenuManager("&Move To", "moveto");
+          MenuManager moveMenu = new MenuManager(Messages.NewsTableControl_MOVE_TO, "moveto"); //$NON-NLS-1$
           manager.add(moveMenu);
 
           for (INewsBin bin : newsbins) {
@@ -868,11 +868,11 @@ public class NewsTableControl implements IFeedViewPart {
             moveMenu.add(new MoveCopyNewsToBinAction(selection, bin, true));
           }
 
-          moveMenu.add(new Separator("movetonewbin"));
+          moveMenu.add(new Separator("movetonewbin")); //$NON-NLS-1$
           moveMenu.add(new MoveCopyNewsToBinAction(selection, null, true));
 
           /* Copy To */
-          MenuManager copyMenu = new MenuManager("&Copy To", "copyto");
+          MenuManager copyMenu = new MenuManager(Messages.NewsTableControl_COPY_TO, "copyto"); //$NON-NLS-1$
           manager.add(copyMenu);
 
           for (INewsBin bin : newsbins) {
@@ -882,7 +882,7 @@ public class NewsTableControl implements IFeedViewPart {
             copyMenu.add(new MoveCopyNewsToBinAction(selection, bin, false));
           }
 
-          copyMenu.add(new Separator("copytonewbin"));
+          copyMenu.add(new Separator("copytonewbin")); //$NON-NLS-1$
           copyMenu.add(new MoveCopyNewsToBinAction(selection, null, false));
         }
 
@@ -891,9 +891,9 @@ public class NewsTableControl implements IFeedViewPart {
           ApplicationActionBarAdvisor.fillShareMenu(manager, selection, new SameShellProvider(fViewer.getTree().getShell()), false);
         }
 
-        manager.add(new Separator("filter"));
-        manager.add(new Separator("edit"));
-        manager.add(new Separator("copy"));
+        manager.add(new Separator("filter")); //$NON-NLS-1$
+        manager.add(new Separator("edit")); //$NON-NLS-1$
+        manager.add(new Separator("copy")); //$NON-NLS-1$
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
         /* Need a good Selection here */
@@ -903,8 +903,8 @@ public class NewsTableControl implements IFeedViewPart {
         /* Show in Feed (only for searchmarks) */
         if (fViewer.getInput() instanceof SearchMarkReference) {
           OpenNewsAction showInFeedAction = new OpenNewsAction(selection);
-          showInFeedAction.setText("&Show in Feed");
-          manager.appendToGroup("open", showInFeedAction);
+          showInFeedAction.setText(Messages.NewsTableControl_SHOW_IN_FEED);
+          manager.appendToGroup("open", showInFeedAction); //$NON-NLS-1$
         }
       }
     });

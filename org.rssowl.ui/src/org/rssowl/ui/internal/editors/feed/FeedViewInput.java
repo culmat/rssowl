@@ -43,11 +43,11 @@ import org.rssowl.ui.internal.OwlUI;
 public class FeedViewInput implements IEditorInput {
 
   /* Used to restore Editor if required */
-  private static final String FACTORY_ID = "org.rssowl.ui.FeedViewFactory";
-  private static final String RESTORE_QUALIFIER = "/instance/org.eclipse.ui.workbench/";
-  private static final String RESTORE_KEY = "USE_IPERSISTABLE_EDITORS";
-  static final String MARK_INPUT_CLASS = "org.rssowl.ui.internal.editors.feed.MarkInputClass";
-  static final String MARK_INPUT_ID = "org.rssowl.ui.internal.editors.feed.MarkInputId";
+  private static final String FACTORY_ID = "org.rssowl.ui.FeedViewFactory"; //$NON-NLS-1$
+  private static final String RESTORE_QUALIFIER = "/instance/org.eclipse.ui.workbench/"; //$NON-NLS-1$
+  private static final String RESTORE_KEY = "USE_IPERSISTABLE_EDITORS"; //$NON-NLS-1$
+  static final String MARK_INPUT_CLASS = "org.rssowl.ui.internal.editors.feed.MarkInputClass"; //$NON-NLS-1$
+  static final String MARK_INPUT_ID = "org.rssowl.ui.internal.editors.feed.MarkInputId"; //$NON-NLS-1$
 
   private final INewsMark fMark;
   private boolean fIsDeleted;

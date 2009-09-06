@@ -64,22 +64,22 @@ public class NewsFilter extends ViewerFilter {
   public enum Type {
 
     /** Show all News */
-    SHOW_ALL("Show All News", "All News"),
+    SHOW_ALL(Messages.NewsFilter_SHOW_ALL, Messages.NewsFilter_ALL_NEWS),
 
     /** Show New News */
-    SHOW_NEW("Show New News", "New News"),
+    SHOW_NEW(Messages.NewsFilter_SHOW_NEW, Messages.NewsFilter_NEW_NEWS),
 
     /** Show Unread News */
-    SHOW_UNREAD("Show Unread News", "Unread News"),
+    SHOW_UNREAD(Messages.NewsFilter_SHOW_UNREAD, Messages.NewsFilter_UNREAD_NEWS),
 
     /** Show Recent News */
-    SHOW_RECENT("Show Recent News", "Recent News"),
+    SHOW_RECENT(Messages.NewsFilter_SHOW_RECENT, Messages.NewsFilter_RECENT_NEWS),
 
     /** Show Sticky News */
-    SHOW_STICKY("Show Sticky News", "Sticky News"),
+    SHOW_STICKY(Messages.NewsFilter_SHOW_STICKY, Messages.NewsFilter_STICKY_NEWS),
 
     /** Show Recent News */
-    SHOW_LAST_5_DAYS("Show News of Last 5 Days", "Last 5 Days");
+    SHOW_LAST_5_DAYS(Messages.NewsFilter_SHOW_LAST_DAYS, Messages.NewsFilter_LAST_DAYS);
 
     String fName;
     String fDisplayName;
@@ -110,25 +110,25 @@ public class NewsFilter extends ViewerFilter {
   public enum SearchTarget {
 
     /** Search Headlines */
-    HEADLINE("Headline"),
+    HEADLINE(Messages.NewsFilter_HEADLINE),
 
     /** Search Entire News */
-    ALL("Entire News"),
+    ALL(Messages.NewsFilter_ENTIRE_NEWS),
 
     /** Search Author */
-    AUTHOR("Author"),
+    AUTHOR(Messages.NewsFilter_AUTHOR),
 
     /** Search Category */
-    CATEGORY("Category"),
+    CATEGORY(Messages.NewsFilter_CATEGORY),
 
     /** Search Source */
-    SOURCE("Source"),
+    SOURCE(Messages.NewsFilter_SOURCE),
 
     /** Search Attachments */
-    ATTACHMENTS("Attachments"),
+    ATTACHMENTS(Messages.NewsFilter_ATTACHMENTS),
 
     /** Search Labels */
-    LABELS("Labels");
+    LABELS(Messages.NewsFilter_LABELS);
 
     String fName;
 
@@ -406,8 +406,8 @@ public class NewsFilter extends ViewerFilter {
       return Collections.emptyList();
 
     /* Convert to Wildcard Query */
-    if (!pattern.endsWith("*"))
-      pattern = pattern + "*";
+    if (!pattern.endsWith("*")) //$NON-NLS-1$
+      pattern = pattern + "*"; //$NON-NLS-1$
 
     /* Match on Location (not supported for search marks and folder marks) */
     if (fNewsMark != null && !(fNewsMark instanceof ISearchMark) && !(fNewsMark instanceof FolderNewsMark)) {

@@ -73,40 +73,40 @@ public class NewsGrouping {
   private static final int AUTHOR_ID_BEGIN = 4000;
 
   /** ID of News Group Category */
-  public static final String GROUP_CATEGORY_ID = "org.rssowl.ui.internal.editors.feed.NewsGrouping";
+  public static final String GROUP_CATEGORY_ID = "org.rssowl.ui.internal.editors.feed.NewsGrouping"; //$NON-NLS-1$
 
   /** Supported Grouping Types */
   public enum Type {
 
     /** Grouping is Disabled */
-    NO_GROUPING("No Grouping", "Ungrouped"),
+    NO_GROUPING(Messages.NewsGrouping_NO_GROUPING, Messages.NewsGrouping_UNGROUPED),
 
     /** Group by Date */
-    GROUP_BY_DATE("Group by Date", "Grouped by Date"),
+    GROUP_BY_DATE(Messages.NewsGrouping_GROUP_BY_DATE, Messages.NewsGrouping_GROUPED_BY_DATE),
 
     /** Group by State */
-    GROUP_BY_STATE("Group by State", "Grouped by State"),
+    GROUP_BY_STATE(Messages.NewsGrouping_GROUP_BY_STATE, Messages.NewsGrouping_GROUPED_BY_STATE),
 
     /** Group by Author */
-    GROUP_BY_AUTHOR("Group by Author", "Grouped by Author"),
+    GROUP_BY_AUTHOR(Messages.NewsGrouping_GROUP_BY_AUTHOR, Messages.NewsGrouping_GROUPED_BY_AUTHOR),
 
     /** Group by Category */
-    GROUP_BY_CATEGORY("Group by Category", "Grouped by Category"),
+    GROUP_BY_CATEGORY(Messages.NewsGrouping_GROUP_BY_CATEGORY, Messages.NewsGrouping_GROUPED_BY_CATEGORY),
 
     /** Group by Title */
-    GROUP_BY_TOPIC("Group by Title", "Grouped by Title"),
+    GROUP_BY_TOPIC(Messages.NewsGrouping_GROUP_BY_TITLE, Messages.NewsGrouping_GROUPED_BY_TITLE),
 
     /** Group by Feed */
-    GROUP_BY_FEED("Group by Feed", "Grouped by Feed"),
+    GROUP_BY_FEED(Messages.NewsGrouping_GROUP_BY_FEED, Messages.NewsGrouping_GROUPED_BY_FEED),
 
     /** Group by Label */
-    GROUP_BY_LABEL("Group by Label", "Grouped by Label"),
+    GROUP_BY_LABEL(Messages.NewsGrouping_GROUP_BY_LABEL, Messages.NewsGrouping_GROUPED_BY_LABEL),
 
     /** Group by Rating */
-    GROUP_BY_RATING("Group by Rating", "Grouped by Rating"),
+    GROUP_BY_RATING(Messages.NewsGrouping_GROUP_BY_RATING, Messages.NewsGrouping_GROUPED_BY_RATING),
 
     /** Group by Stickyness */
-    GROUP_BY_STICKY("Group by Stickyness", "Grouped by Stickyness");
+    GROUP_BY_STICKY(Messages.NewsGrouping_GROUP_BY_STICKY, Messages.NewsGrouping_GROUPED_BY_STICKY);
 
     String fActionName;
     String fDisplayName;
@@ -137,64 +137,64 @@ public class NewsGrouping {
   public enum Group {
 
     /** Group: No Topic */
-    NO_TOPIC("No Topic"),
+    NO_TOPIC(Messages.NewsGrouping_NO_TOPIC),
 
     /** Group: Unknown Category */
-    UNKNOWN_CATEGORY("Unknown Category"),
+    UNKNOWN_CATEGORY(Messages.NewsGrouping_UNKNOWN_CATEGORY),
 
     /** Group: Unknown Author */
-    UNKNOWN_AUTHOR("Unknown Author"),
+    UNKNOWN_AUTHOR(Messages.NewsGrouping_UNKNOWN_AUTHOR),
 
     /** Group: None (alternative default) */
-    NONE("None"),
+    NONE(Messages.NewsGrouping_NONE),
 
     /** Group: Today */
-    TODAY("Today"),
+    TODAY(Messages.NewsGrouping_TODAY),
 
     /** Group: Yesterday */
-    YESTERDAY("Yesterday"),
+    YESTERDAY(Messages.NewsGrouping_YESTERDAY),
 
     /** Group: Earlier this Week */
-    EARLIER_THIS_WEEK("Earlier this Week"),
+    EARLIER_THIS_WEEK(Messages.NewsGrouping_EARLIER_THIS_WEEK),
 
     /** Group: Last Week */
-    LAST_WEEK("Last Week"),
+    LAST_WEEK(Messages.NewsGrouping_LAST_WEEK),
 
     /** Group: Older News */
-    OLDER("Older News"),
+    OLDER(Messages.NewsGrouping_OLDER_NEWS),
 
     /** Group: Fantastic */
-    FANTASTIC("Fantastic"),
+    FANTASTIC(Messages.NewsGrouping_FANTASTIC),
 
     /** Group: Good */
-    GOOD("Good"),
+    GOOD(Messages.NewsGrouping_GOOD),
 
     /** Group: Moderate */
-    MODERATE("Moderate"),
+    MODERATE(Messages.NewsGrouping_MODERATE),
 
     /** Group: Bad */
-    BAD("Bad"),
+    BAD(Messages.NewsGrouping_BAD),
 
     /** Group: Very Bad */
-    VERY_BAD("Unrated"),
+    VERY_BAD(Messages.NewsGrouping_UNRATED),
 
     /** Group: New */
-    NEW("New"),
+    NEW(Messages.NewsGrouping_NEW),
 
     /** Group: Updated */
-    UPDATED("Updated"),
+    UPDATED(Messages.NewsGrouping_UPDATED),
 
     /** Group: Unread */
-    UNREAD("Unread"),
+    UNREAD(Messages.NewsGrouping_UNREAD),
 
     /** Group: Read */
-    READ("Read"),
+    READ(Messages.NewsGrouping_READ),
 
     /** Group: Sticky */
-    STICKY("Sticky"),
+    STICKY(Messages.NewsGrouping_STICKY),
 
     /** Group: Not Sticky */
-    NOT_STICKY("Not Sticky");
+    NOT_STICKY(Messages.NewsGrouping_NOT_STICKY);
 
     String fName;
 
