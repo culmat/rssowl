@@ -75,6 +75,7 @@ import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.FolderNewsMark;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.dialogs.SearchMarkDialog;
+import org.rssowl.ui.internal.editors.feed.NewsFilter.SearchTarget;
 import org.rssowl.ui.internal.editors.feed.NewsFilter.Type;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.JobTracker;
@@ -315,6 +316,24 @@ public class FilterBar {
               doSearch(NewsFilter.SearchTarget.LABELS);
           }
         });
+
+        /* Offer to Save as Search */
+        INewsMark inputMark = ((FeedViewInput) fFeedView.getEditorInput()).getMark();
+        if (inputMark instanceof IBookMark || inputMark instanceof INewsBin || inputMark instanceof FolderNewsMark) {
+
+          /* Separator */
+          new MenuItem(menu, SWT.SEPARATOR);
+
+          /* Convert Filter to Saved Search */
+          final MenuItem createSavedSearch = new MenuItem(menu, SWT.RADIO);
+          createSavedSearch.setText(Messages.FilterBar_SAVE_SEARCH);
+          createSavedSearch.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+              onCreateSavedSearch(true);
+            }
+          });
+        }
 
         return menu;
       }
@@ -709,7 +728,7 @@ public class FilterBar {
           createSavedSearch.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-              onCreateSavedSearch();
+              onCreateSavedSearch(false);
             }
           });
         }
@@ -723,7 +742,7 @@ public class FilterBar {
     });
   }
 
-  private void onCreateSavedSearch() {
+  private void onCreateSavedSearch(boolean withQuickSearch) {
     IModelFactory factory = Owl.getModelFactory();
     List<ISearchCondition> conditions = new ArrayList<ISearchCondition>(2);
 
@@ -737,8 +756,10 @@ public class FilterBar {
     Type filterType = fFeedView.getFilter().getType();
     switch (filterType) {
       case SHOW_ALL:
-        field = factory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
-        conditions.add(factory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "")); //$NON-NLS-1$
+        if (!withQuickSearch) {
+          field = factory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
+          conditions.add(factory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "")); //$NON-NLS-1$
+        }
         break;
 
       case SHOW_NEW:
@@ -765,6 +786,48 @@ public class FilterBar {
         field = factory.createSearchField(INews.STATE, INews.class.getName());
         conditions.add(factory.createSearchCondition(field, SearchSpecifier.IS, EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)));
         break;
+    }
+
+    /* Also add Quick Search if required */
+    if (withQuickSearch) {
+      SearchTarget target = fFeedView.getFilter().getSearchTarget();
+      String text = fSearchInput.getText();
+      switch (target) {
+        case ALL:
+          field = factory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
+          conditions.add(factory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, text));
+          break;
+
+        case HEADLINE:
+          field = factory.createSearchField(INews.TITLE, INews.class.getName());
+          conditions.add(factory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, text));
+          break;
+
+        case ATTACHMENTS:
+          field = factory.createSearchField(INews.ATTACHMENTS_CONTENT, INews.class.getName());
+          conditions.add(factory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, text));
+          break;
+
+        case AUTHOR:
+          field = factory.createSearchField(INews.AUTHOR, INews.class.getName());
+          conditions.add(factory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, text));
+          break;
+
+        case CATEGORY:
+          field = factory.createSearchField(INews.CATEGORIES, INews.class.getName());
+          conditions.add(factory.createSearchCondition(field, SearchSpecifier.IS, text));
+          break;
+
+        case LABELS:
+          field = factory.createSearchField(INews.LABEL, INews.class.getName());
+          conditions.add(factory.createSearchCondition(field, SearchSpecifier.IS, text));
+          break;
+
+        case SOURCE:
+          field = factory.createSearchField(INews.SOURCE, INews.class.getName());
+          conditions.add(factory.createSearchCondition(field, SearchSpecifier.IS, text));
+          break;
+      }
     }
 
     /* Create and Show SM Dialog */
