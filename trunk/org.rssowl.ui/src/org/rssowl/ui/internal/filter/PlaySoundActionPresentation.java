@@ -24,6 +24,7 @@
 
 package org.rssowl.ui.internal.filter;
 
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -68,7 +69,7 @@ public class PlaySoundActionPresentation implements INewsActionPresentation {
     fSoundPathLink.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
-        if ("here".equals(e.text) && AudioUtils.isSupported())
+        if ("here".equals(e.text) && AudioUtils.isSupported()) //$NON-NLS-1$
           AudioUtils.play(fSoundPathLink.getData().toString());
         else
           onSelect();
@@ -78,8 +79,8 @@ public class PlaySoundActionPresentation implements INewsActionPresentation {
 
   private void onSelect() {
     FileDialog dialog = new FileDialog(fSoundPathLink.getShell(), SWT.OPEN);
-    dialog.setText("Select a Sound to Play");
-    dialog.setFilterExtensions(new String[] { "*.wav" });
+    dialog.setText(Messages.PlaySoundActionPresentation_SELECT_SOUND);
+    dialog.setFilterExtensions(new String[] { "*.wav" }); //$NON-NLS-1$
 
     /* Preset with existing sound if present */
     if (fSoundPathLink.getData() != null) {
@@ -91,9 +92,9 @@ public class PlaySoundActionPresentation implements INewsActionPresentation {
     /* Lookup Windows Media directory if on Windows */
     if (!StringUtils.isSet(dialog.getFileName()) && Application.IS_WINDOWS && !fgMediaDirectorySet) {
       fgMediaDirectorySet = true; //Only set once
-      String winDir = System.getenv("WinDir");
+      String winDir = System.getenv("WinDir"); //$NON-NLS-1$
       if (StringUtils.isSet(winDir)) {
-        File mediaDir = new File(winDir + "\\Media");
+        File mediaDir = new File(winDir + "\\Media"); //$NON-NLS-1$
         if (mediaDir.exists())
           dialog.setFilterPath(mediaDir.toString());
       }
@@ -110,7 +111,7 @@ public class PlaySoundActionPresentation implements INewsActionPresentation {
     } else {
       File file = new File(data.toString());
       if (file.exists()) {
-        fSoundPathLink.setText("Sound to play: <a>" + file.getName() + "</a>. Click <a>here</a> to play the sound now.");
+        fSoundPathLink.setText(NLS.bind(Messages.PlaySoundActionPresentation_SOUND_LINK, file.getName()));
         fSoundPathLink.setToolTipText(data.toString());
         fSoundPathLink.setData(data);
       } else
@@ -119,7 +120,7 @@ public class PlaySoundActionPresentation implements INewsActionPresentation {
   }
 
   private void resetLink() {
-    fSoundPathLink.setText("<a>Select a Sound to play...</a>");
+    fSoundPathLink.setText("<a>" + Messages.PlaySoundActionPresentation_SELECT_SOUND_TO_PLAY + "</a>"); //$NON-NLS-1$ //$NON-NLS-2$
     fSoundPathLink.setData(null);
     fSoundPathLink.setToolTipText(null);
   }

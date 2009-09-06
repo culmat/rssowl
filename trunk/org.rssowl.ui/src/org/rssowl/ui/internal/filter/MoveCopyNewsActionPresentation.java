@@ -55,7 +55,7 @@ public class MoveCopyNewsActionPresentation implements INewsActionPresentation {
     fContainer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
 
     Label label = new Label(fContainer, SWT.None);
-    label.setText("to News Bins: ");
+    label.setText(Messages.MoveCopyNewsActionPresentation_TO_NEWS_BINS);
     label.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
 
     fLocationControl = new LocationControl(fContainer, SWT.None, Mode.SELECT_BIN);

@@ -231,8 +231,8 @@ public class NewsActionList extends ScrolledComposite {
   }
 
   private void initResources() {
-    fAddIcon = OwlUI.getImage(fResources, "icons/etool16/add.gif");
-    fDeleteIcon = OwlUI.getImage(fResources, "icons/etool16/remove.gif");
+    fAddIcon = OwlUI.getImage(fResources, "icons/etool16/add.gif"); //$NON-NLS-1$
+    fDeleteIcon = OwlUI.getImage(fResources, "icons/etool16/remove.gif"); //$NON-NLS-1$
   }
 
   private void initComponents(List<IFilterAction> actions) {
@@ -287,7 +287,7 @@ public class NewsActionList extends ScrolledComposite {
     /* Button to add Action */
     ToolItem addButton = new ToolItem(buttonBar, SWT.DROP_DOWN);
     addButton.setImage(fAddIcon);
-    addButton.setToolTipText("Add Action");
+    addButton.setToolTipText(Messages.NewsActionList_ADD_ACTION);
 
     /* Add Menu */
     final Menu actionMenu = new Menu(buttonBar);
@@ -308,7 +308,7 @@ public class NewsActionList extends ScrolledComposite {
     /* Button to delete Action */
     ToolItem deleteButton = new ToolItem(buttonBar, SWT.PUSH);
     deleteButton.setImage(fDeleteIcon);
-    deleteButton.setToolTipText("Delete Action");
+    deleteButton.setToolTipText(Messages.NewsActionList_DELETE_ACTION);
     deleteButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {

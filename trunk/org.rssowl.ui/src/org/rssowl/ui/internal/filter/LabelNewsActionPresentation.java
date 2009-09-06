@@ -82,7 +82,7 @@ public class LabelNewsActionPresentation implements INewsActionPresentation {
       @Override
       public String getText(Object element) {
         if (element == NEW_LABEL_MARKER)
-          return "New Label...";
+          return Messages.LabelNewsActionPresentation_NEW_LABEL;
         return ((ILabel) element).getName();
       }
     });

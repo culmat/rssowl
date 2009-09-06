@@ -64,7 +64,7 @@ public class ShowNotifierNewsActionPresentation implements INewsActionPresentati
     fContainer.setLayoutData(new GridData(SWT.FILL, Application.IS_WINDOWS ? SWT.FILL : SWT.CENTER, true, true));
 
     Label nameLabel = new Label(fContainer, SWT.NONE);
-    nameLabel.setText("Select a Color: ");
+    nameLabel.setText(Messages.ShowNotifierNewsActionPresentation_SELECT_COLOR);
     nameLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
 
     fColorPicker = new ColorPicker(fContainer, SWT.FLAT);
