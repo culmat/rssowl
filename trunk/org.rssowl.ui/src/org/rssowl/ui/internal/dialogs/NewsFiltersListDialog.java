@@ -446,13 +446,18 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
       /* Ask for Confirmation */
       boolean multipleActions = forcableActions.size() > 1;
       String title = NLS.bind(Messages.NewsFiltersListDialog_RUN_SELECTED_FILTER_N, filter.getName());
-      StringBuilder message = new StringBuilder("The following " + (multipleActions ? "actions" : "action") + " will be performed on " + targetNews.size() + " matching news:\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+      StringBuilder message = new StringBuilder();
+      if (multipleActions)
+        message.append(NLS.bind(Messages.NewsFiltersListDialog_PERFORM_ACTIONS, targetNews.size())).append("\n"); //$NON-NLS-1$
+      else
+        message.append(NLS.bind(Messages.NewsFiltersListDialog_PERFORM_ACTION, targetNews.size())).append("\n"); //$NON-NLS-1$
+
       for (IFilterAction action : forcableActions) {
         NewsActionDescriptor newsActionDescriptor = fNewsActionPresentationManager.getNewsActionDescriptor(action.getActionId());
-        message.append("\n - ").append(newsActionDescriptor.getName()); //$NON-NLS-1$
+        message.append("\n").append(NLS.bind(Messages.NewsFiltersListDialog_FILTER_LIST_ELEMENT, newsActionDescriptor.getName())); //$NON-NLS-1$
       }
 
-      message.append("\n\nPress OK to to confirm."); //$NON-NLS-1$
+      message.append("\n\n").append(Messages.NewsFiltersListDialog_CONFIRM); //$NON-NLS-1$
 
       ConfirmDialog dialog = new ConfirmDialog(getShell(), title, Messages.NewsFiltersListDialog_NO_UNDO, message.toString(), IDialogConstants.OK_LABEL, null) {
         @Override
