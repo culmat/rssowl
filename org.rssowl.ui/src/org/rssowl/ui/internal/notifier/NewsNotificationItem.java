@@ -106,8 +106,8 @@ public class NewsNotificationItem extends NotificationItem {
     content = StringUtils.normalizeString(content);
     content = StringUtils.smartTrim(content, MAX_DESCRIPTION_LENGTH);
 
-    if (content.contains("&"))
-      content = StringUtils.replaceAll(content, "&", "&&");
+    if (content.contains("&")) //$NON-NLS-1$
+      content = StringUtils.replaceAll(content, "&", "&&"); //$NON-NLS-1$ //$NON-NLS-2$
 
     return content.length() > 0 ? content : null;
   }
@@ -125,8 +125,8 @@ public class NewsNotificationItem extends NotificationItem {
 
   private static String makeText(INews news) {
     String headline = CoreUtils.getHeadline(news, true);
-    if (headline.contains("&"))
-      headline = StringUtils.replaceAll(headline, "&", "&&");
+    if (headline.contains("&")) //$NON-NLS-1$
+      headline = StringUtils.replaceAll(headline, "&", "&&"); //$NON-NLS-1$ //$NON-NLS-2$
 
     return headline;
   }
