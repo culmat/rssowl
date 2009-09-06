@@ -32,6 +32,7 @@ import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.resource.ResourceManager;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.ControlAdapter;
@@ -106,7 +107,7 @@ public class NotificationPopup extends PopupDialog {
   private static boolean fgFadeSupported = true;
 
   /* System Property to disable Transparency for the Notifier */
-  private static final String DISABLE_TRANSPARENCY = "disableNotifierTransparency";
+  private static final String DISABLE_TRANSPARENCY = "disableNotifierTransparency"; //$NON-NLS-1$
   private static final boolean FADE_ENABLED = System.getProperty(DISABLE_TRANSPARENCY) == null;
 
   private Shell fShell;
@@ -150,7 +151,7 @@ public class NotificationPopup extends PopupDialog {
 
   private class FadeJob extends UIJob {
     FadeJob() {
-      super("Fade In Job");
+      super(""); //$NON-NLS-1$
       setSystem(true);
     }
 
@@ -301,7 +302,7 @@ public class NotificationPopup extends PopupDialog {
   }
 
   private void createAutoCloser() {
-    fAutoCloser = new UIJob(PlatformUI.getWorkbench().getDisplay(), "") {
+    fAutoCloser = new UIJob(PlatformUI.getWorkbench().getDisplay(), "") { //$NON-NLS-1$
       @Override
       public IStatus runInUIThread(IProgressMonitor monitor) {
         if (!fMouseOverNotifier && getShell() != null && !getShell().isDisposed())
@@ -373,12 +374,12 @@ public class NotificationPopup extends PopupDialog {
     int totalPages = (fDisplayedItems.size() / fItemLimit) + ((fDisplayedItems.size() % fItemLimit != 0) ? 1 : 0);
     int currentPage = (fDisplayOffset / fItemLimit) + 1;
 
-    String titlePart = fDisplayedItems.size() + " Incoming News";
-    String footerPart = "";
+    String titlePart = NLS.bind(Messages.NotificationPopup_N_INCOMING, fDisplayedItems.size());
+    String footerPart = ""; //$NON-NLS-1$
 
     /* More than one page */
     if (totalPages > 1)
-      footerPart = "Page " + currentPage + " of " + totalPages;
+      footerPart = NLS.bind(Messages.NotificationPopup_PAGE_N_OF_M, currentPage, totalPages);
 
     /* Apply Text */
     fTitleCircleLabel.setText(titlePart);
@@ -542,7 +543,7 @@ public class NotificationPopup extends PopupDialog {
     if (fGlobalScope.getBoolean(DefaultPreferences.SHOW_EXCERPT_IN_NOTIFIER)) {
       String description = item.getDescription();
       if (!StringUtils.isSet(description))
-        description = "This article does not provide any content.";
+        description = Messages.NotificationPopup_NO_CONTENT;
 
       final Composite descriptionContainer = new Composite(fInnerContentCircle, SWT.NONE);
       descriptionContainer.setLayout(LayoutUtils.createGridLayout(1));
@@ -596,19 +597,19 @@ public class NotificationPopup extends PopupDialog {
     fStickyBgColor = OwlUI.getThemeColor(OwlUI.STICKY_BG_COLOR_ID, fResources, new RGB(255, 255, 180));
 
     /* Icons */
-    fCloseImageNormal = OwlUI.getImage(fResources, "icons/etool16/close_normal.png");
-    fCloseImagePressed = OwlUI.getImage(fResources, "icons/etool16/close_pressed.png");
-    fMarkReadIcon = OwlUI.getImage(fResources, "icons/elcl16/mark_read.gif");
-    fMarkReadDisabledIcon = OwlUI.getImage(fResources, "icons/dlcl16/mark_read.gif");
+    fCloseImageNormal = OwlUI.getImage(fResources, "icons/etool16/close_normal.png"); //$NON-NLS-1$
+    fCloseImagePressed = OwlUI.getImage(fResources, "icons/etool16/close_pressed.png"); //$NON-NLS-1$
+    fMarkReadIcon = OwlUI.getImage(fResources, "icons/elcl16/mark_read.gif"); //$NON-NLS-1$
+    fMarkReadDisabledIcon = OwlUI.getImage(fResources, "icons/dlcl16/mark_read.gif"); //$NON-NLS-1$
     fItemStickyIcon = OwlUI.getImage(fResources, OwlUI.NEWS_PINNED);
     fItemNonStickyIcon = OwlUI.getImage(fResources, OwlUI.NEWS_PIN);
-    fItemNonStickyDisabledIcon = OwlUI.getImage(fResources, "icons/obj16/news_pin_disabled.gif");
-    fPrevImageNormal = OwlUI.getImage(fResources, "icons/etool16/prev_normal.png");
-    fPrevImagePressed = OwlUI.getImage(fResources, "icons/etool16/prev_pressed.png");
-    fPrevImageDisabled = OwlUI.getImage(fResources, "icons/etool16/prev_disabled.png");
-    fNextImageNormal = OwlUI.getImage(fResources, "icons/etool16/next_normal.png");
-    fNextImagePressed = OwlUI.getImage(fResources, "icons/etool16/next_pressed.png");
-    fNextImageDisabled = OwlUI.getImage(fResources, "icons/etool16/next_disabled.png");
+    fItemNonStickyDisabledIcon = OwlUI.getImage(fResources, "icons/obj16/news_pin_disabled.gif"); //$NON-NLS-1$
+    fPrevImageNormal = OwlUI.getImage(fResources, "icons/etool16/prev_normal.png"); //$NON-NLS-1$
+    fPrevImagePressed = OwlUI.getImage(fResources, "icons/etool16/prev_pressed.png"); //$NON-NLS-1$
+    fPrevImageDisabled = OwlUI.getImage(fResources, "icons/etool16/prev_disabled.png"); //$NON-NLS-1$
+    fNextImageNormal = OwlUI.getImage(fResources, "icons/etool16/next_normal.png"); //$NON-NLS-1$
+    fNextImagePressed = OwlUI.getImage(fResources, "icons/etool16/next_pressed.png"); //$NON-NLS-1$
+    fNextImageDisabled = OwlUI.getImage(fResources, "icons/etool16/next_disabled.png"); //$NON-NLS-1$
   }
 
   /*
@@ -690,8 +691,8 @@ public class NotificationPopup extends PopupDialog {
 
     /* Title Label displaying RSSOwl */
     fTitleCircleLabel = new CLabel(titleCircle, SWT.NO_FOCUS);
-    fTitleCircleLabel.setImage(OwlUI.getImage(fResources, "icons/product/24x24.png"));
-    fTitleCircleLabel.setText("RSSOwl");
+    fTitleCircleLabel.setImage(OwlUI.getImage(fResources, "icons/product/24x24.png")); //$NON-NLS-1$
+    fTitleCircleLabel.setText("RSSOwl"); //$NON-NLS-1$
     fTitleCircleLabel.setFont(fBoldTextFont);
     fTitleCircleLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
     fTitleCircleLabel.addMouseTrackListener(fMouseTrackListner);

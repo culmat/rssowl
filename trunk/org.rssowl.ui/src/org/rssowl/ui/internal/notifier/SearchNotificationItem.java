@@ -25,6 +25,7 @@
 package org.rssowl.ui.internal.notifier;
 
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
@@ -58,7 +59,7 @@ public class SearchNotificationItem extends NotificationItem {
   }
 
   private static String makeText(ISearchMark searchmark, int unreadResultCount) {
-    return searchmark.getName() + " (" + unreadResultCount + ")";
+    return NLS.bind(Messages.SearchNotificationItem_NAME_UNREAD_COUNT, searchmark.getName(), unreadResultCount);
   }
 
   /*
@@ -137,7 +138,7 @@ public class SearchNotificationItem extends NotificationItem {
    */
   @Override
   public String getDescription() {
-    return "New results are available for the search. The total number of results is " + fTotalResultCount + ".";
+    return NLS.bind(Messages.SearchNotificationItem_NEW_RESULTS, fTotalResultCount);
   }
 
   /*
