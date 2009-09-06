@@ -69,7 +69,7 @@ public class PlaySoundActionPresentation implements INewsActionPresentation {
     fSoundPathLink.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
-        if ("here".equals(e.text) && AudioUtils.isSupported()) //$NON-NLS-1$
+        if ("play".equals(e.text) && AudioUtils.isSupported()) //$NON-NLS-1$
           AudioUtils.play(fSoundPathLink.getData().toString());
         else
           onSelect();
