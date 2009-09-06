@@ -410,7 +410,7 @@ public class Indexer {
         for (LabelEvent labelEvent : events) {
           ILabel oldLabel = labelEvent.getOldLabel();
           ILabel updatedLabel = labelEvent.getEntity();
-          if (!oldLabel.getName().equals(updatedLabel.getName())) {
+          if (oldLabel != null && !oldLabel.getName().equals(updatedLabel.getName())) {
             ISearchCondition searchCondition = Owl.getModelFactory().createSearchCondition(searchField, SearchSpecifier.IS, oldLabel.getName());
             List<SearchHit<NewsReference>> hits = Owl.getPersistenceService().getModelSearch().searchNews(Collections.singletonList(searchCondition), true);
 
