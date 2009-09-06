@@ -84,7 +84,7 @@ public class SavedSearchService {
   }
 
   private Job createBatchJob() {
-    Job job = new Job("Batch Job") {
+    Job job = new Job("") { //$NON-NLS-1$
       @Override
       protected IStatus run(IProgressMonitor monitor) {
         fBatchInProcess.set(false);

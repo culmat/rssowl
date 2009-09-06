@@ -233,7 +233,7 @@ public class FeedReloadService {
   }
 
   private void scheduleUpdate(final IBookMark bookMark, Long intervalInSeconds) {
-    Job updateJob = new ReloadJob(bookMark, "Auto-Update Service");
+    Job updateJob = new ReloadJob(bookMark, ""); //$NON-NLS-1$
     updateJob.setSystem(true);
     updateJob.schedule(intervalInSeconds * 1000);
   }
