@@ -40,6 +40,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -88,7 +89,7 @@ import java.util.Set;
 public class ManageLabelsPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
 
   /** ID of the Page */
-  public static final String ID = "org.rssowl.ui.ManageLabels";
+  public static final String ID = "org.rssowl.ui.ManageLabels"; //$NON-NLS-1$
 
   private LocalResourceManager fResources;
   private TreeViewer fViewer;
@@ -100,7 +101,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
   /** Leave for reflection */
   public ManageLabelsPreferencePage() {
     fResources = new LocalResourceManager(JFaceResources.getResources());
-    setImageDescriptor(OwlUI.getImageDescriptor("icons/elcl16/labels.gif"));
+    setImageDescriptor(OwlUI.getImageDescriptor("icons/elcl16/labels.gif")); //$NON-NLS-1$
   }
 
   /*
@@ -120,7 +121,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
     /* Label */
     Label infoLabel = new Label(container, SWT.None);
     infoLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
-    infoLabel.setText("Labels can be used to categorize and prioritize your news.");
+    infoLabel.setText(Messages.ManageLabelsPreferencePage_LABEL_INFO);
 
     /* Label Viewer */
     createViewer(container);
@@ -134,11 +135,11 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
     infoContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
 
     Label infoImg = new Label(infoContainer, SWT.NONE);
-    infoImg.setImage(OwlUI.getImage(fResources, "icons/obj16/info.gif"));
+    infoImg.setImage(OwlUI.getImage(fResources, "icons/obj16/info.gif")); //$NON-NLS-1$
     infoImg.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 
     Link infoText = new Link(infoContainer, SWT.WRAP);
-    infoText.setText("You can automatically assign labels to news by adding <a>News Filters</a>.");
+    infoText.setText(Messages.ManageLabelsPreferencePage_LABEL_TIP);
     infoText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
     infoText.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -166,7 +167,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
     buttonBox.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
 
     Button addButton = new Button(buttonBox, SWT.PUSH);
-    addButton.setText("&New...");
+    addButton.setText(Messages.ManageLabelsPreferencePage_NEW);
     Dialog.applyDialogFont(addButton);
     setButtonLayoutData(addButton);
     addButton.addSelectionListener(new SelectionAdapter() {
@@ -177,7 +178,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
     });
 
     final Button editButton = new Button(buttonBox, SWT.PUSH);
-    editButton.setText("&Edit...");
+    editButton.setText(Messages.ManageLabelsPreferencePage_EDIT);
     editButton.setEnabled(!fViewer.getSelection().isEmpty());
     Dialog.applyDialogFont(editButton);
     setButtonLayoutData(editButton);
@@ -189,7 +190,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
     });
 
     final Button deleteButton = new Button(buttonBox, SWT.PUSH);
-    deleteButton.setText("&Delete...");
+    deleteButton.setText(Messages.ManageLabelsPreferencePage_DELETE);
     deleteButton.setEnabled(!fViewer.getSelection().isEmpty());
     Dialog.applyDialogFont(deleteButton);
     setButtonLayoutData(deleteButton);
@@ -205,7 +206,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
 
     /* Move Label Up */
     fMoveUpButton = new Button(buttonBox, SWT.PUSH);
-    fMoveUpButton.setText("Move &Up");
+    fMoveUpButton.setText(Messages.ManageLabelsPreferencePage_MOVE_UP);
     fMoveUpButton.setEnabled(false);
     Dialog.applyDialogFont(fMoveUpButton);
     setButtonLayoutData(fMoveUpButton);
@@ -218,7 +219,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
 
     /* Move Label Down */
     fMoveDownButton = new Button(buttonBox, SWT.PUSH);
-    fMoveDownButton.setText("Move &Down");
+    fMoveDownButton.setText(Messages.ManageLabelsPreferencePage_MOVE_DOWN);
     fMoveDownButton.setEnabled(false);
     Dialog.applyDialogFont(fMoveDownButton);
     setButtonLayoutData(fMoveDownButton);
@@ -348,11 +349,11 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
 
       String msg;
       if (selectedLabels.size() == 1)
-        msg = "Are you sure you want to delete the Label '" + selectedLabels.get(0).getName() + "'?";
+        msg = NLS.bind(Messages.ManageLabelsPreferencePage_DELETE_LABEL_N, selectedLabels.get(0).getName());
       else
-        msg = "Are you sure you want to delete " + selectedLabels.size() + " Labels?";
+        msg = NLS.bind(Messages.ManageLabelsPreferencePage_DELETE_N_LABELS, selectedLabels.size());
 
-      ConfirmDialog dialog = new ConfirmDialog(getShell(), "Confirm Delete", "This action can not be undone", msg, null);
+      ConfirmDialog dialog = new ConfirmDialog(getShell(), Messages.ManageLabelsPreferencePage_CONFIRM_DELETE, Messages.ManageLabelsPreferencePage_NO_UNDO, msg, null);
       if (dialog.open() == IDialogConstants.OK_ID) {
         for (ILabel label : selectedLabels) {
 

@@ -76,7 +76,7 @@ import java.util.List;
 public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
 
   /** ID of the Page */
-  public static String ID = "org.rssowl.ui.FeedsPreferences";
+  public static String ID = "org.rssowl.ui.FeedsPreferences"; //$NON-NLS-1$
 
   /* Interval-Scopes in Seconds */
   private static final long DAY_IN_SECONDS = 24 * 60 * 60;
@@ -167,11 +167,11 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     infoContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
 
     Label infoImg = new Label(infoContainer, SWT.NONE);
-    infoImg.setImage(OwlUI.getImage(fResources, "icons/obj16/info.gif"));
+    infoImg.setImage(OwlUI.getImage(fResources, "icons/obj16/info.gif")); //$NON-NLS-1$
     infoImg.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 
     Label infoText = new Label(infoContainer, SWT.WRAP);
-    infoText.setText("You can also define these properties per folder or bookmark.");
+    infoText.setText(Messages.FeedsPreferencePage_PROPERTY_INFO);
     infoText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
     applyDialogFont(container);
@@ -185,7 +185,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     group.setLayout(LayoutUtils.createGridLayout(1, 10, 10));
 
     TabItem item = new TabItem(parent, SWT.None);
-    item.setText("General");
+    item.setText(Messages.FeedsPreferencePage_GENERAL);
     item.setControl(group);
 
     /* Auto-Reload */
@@ -194,7 +194,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     autoReloadContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     fUpdateCheck = new Button(autoReloadContainer, SWT.CHECK);
-    fUpdateCheck.setText("Automatically &update the feeds every ");
+    fUpdateCheck.setText(Messages.FeedsPreferencePage_UPDATE_FEEDS);
     fUpdateCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.BM_UPDATE_INTERVAL_STATE));
     fUpdateCheck.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -220,22 +220,22 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
       fUpdateValueSpinner.setSelection((int) (updateInterval / DAY_IN_SECONDS));
 
     fUpdateScopeCombo = new Combo(autoReloadContainer, SWT.READ_ONLY);
-    fUpdateScopeCombo.add("Minutes");
-    fUpdateScopeCombo.add("Hours");
-    fUpdateScopeCombo.add("Days");
+    fUpdateScopeCombo.add(Messages.FeedsPreferencePage_MINUTES);
+    fUpdateScopeCombo.add(Messages.FeedsPreferencePage_HOURS);
+    fUpdateScopeCombo.add(Messages.FeedsPreferencePage_DAYS);
     fUpdateScopeCombo.select(updateScope);
     fUpdateScopeCombo.setEnabled(fUpdateCheck.getSelection());
 
     /* Reload Feeds on Startup */
     fReloadOnStartupCheck = new Button(group, SWT.CHECK);
     fReloadOnStartupCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-    fReloadOnStartupCheck.setText("Automatically update the feeds on &start-up");
+    fReloadOnStartupCheck.setText(Messages.FeedsPreferencePage_UPDATE_ON_STARTUP);
     fReloadOnStartupCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.BM_RELOAD_ON_STARTUP));
 
     /* Open on Startup */
     fOpenOnStartupCheck = new Button(group, SWT.CHECK);
     fOpenOnStartupCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-    fOpenOnStartupCheck.setText("Display the &feeds on start-up");
+    fOpenOnStartupCheck.setText(Messages.FeedsPreferencePage_DISPLAY_ON_STARTUP);
     fOpenOnStartupCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.BM_OPEN_ON_STARTUP));
   }
 
@@ -245,7 +245,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     group.setLayout(LayoutUtils.createGridLayout(1, 10, 10));
 
     TabItem item = new TabItem(parent, SWT.None);
-    item.setText("Reading");
+    item.setText(Messages.FeedsPreferencePage_READING);
     item.setControl(group);
 
     /* Mark read after millis */
@@ -254,7 +254,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
 
     /* Mark Read after Millis */
     fMarkReadStateCheck = new Button(markReadAfterContainer, SWT.CHECK);
-    fMarkReadStateCheck.setText("&Mark selected news as read after ");
+    fMarkReadStateCheck.setText(Messages.FeedsPreferencePage_MARK_READ_AFTER);
     fMarkReadStateCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.MARK_READ_STATE));
     fMarkReadStateCheck.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -270,21 +270,21 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     fMarkReadAfterSpinner.setEnabled(fMarkReadStateCheck.getSelection());
 
     Label label = new Label(markReadAfterContainer, SWT.None);
-    label.setText(" seconds");
+    label.setText(Messages.FeedsPreferencePage_SECONDS);
 
     /* Mark Read on changing displayed Feed */
     fMarkReadOnChange = new Button(group, SWT.CHECK);
-    fMarkReadOnChange.setText("Mark displayed &news as read when switching feeds");
+    fMarkReadOnChange.setText(Messages.FeedsPreferencePage_MARK_READ_ON_SWITCH);
     fMarkReadOnChange.setSelection(fGlobalScope.getBoolean(DefaultPreferences.MARK_READ_ON_CHANGE));
 
     /* Mark Read on closing the Feed Tab */
     fMarkReadOnTabClose = new Button(group, SWT.CHECK);
-    fMarkReadOnTabClose.setText("Mark displayed news as read when &closing the tab");
+    fMarkReadOnTabClose.setText(Messages.FeedsPreferencePage_MARK_READ_ON_CLOSE);
     fMarkReadOnTabClose.setSelection(fGlobalScope.getBoolean(DefaultPreferences.MARK_READ_ON_TAB_CLOSE));
 
     /* Mark Read on Minimize */
     fMarkReadOnMinimize = new Button(group, SWT.CHECK);
-    fMarkReadOnMinimize.setText("Mark displayed news as read on m&inimize");
+    fMarkReadOnMinimize.setText(Messages.FeedsPreferencePage_MARK_READ_ON_MINIMIZE);
     fMarkReadOnMinimize.setSelection(fGlobalScope.getBoolean(DefaultPreferences.MARK_READ_ON_MINIMIZE));
   }
 
@@ -294,16 +294,16 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     group.setLayout(LayoutUtils.createGridLayout(2, 10, 10));
 
     TabItem item = new TabItem(parent, SWT.None);
-    item.setText("Display");
+    item.setText(Messages.FeedsPreferencePage_DISPLAY);
     item.setControl(group);
 
     /* Filter Settings */
     Label filterLabel = new Label(group, SWT.None);
-    filterLabel.setText("Filter News: ");
+    filterLabel.setText(Messages.FeedsPreferencePage_FILTER_NEWS);
 
     fFilterCombo = new Combo(group, SWT.BORDER | SWT.READ_ONLY);
     fFilterCombo.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false));
-    fFilterCombo.add("");
+    fFilterCombo.add(""); //$NON-NLS-1$
 
     NewsFilter.Type[] filters = NewsFilter.Type.values();
     for (NewsFilter.Type filter : filters)
@@ -314,11 +314,11 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
 
     /* Group Settings */
     Label groupLabel = new Label(group, SWT.None);
-    groupLabel.setText("Group News: ");
+    groupLabel.setText(Messages.FeedsPreferencePage_GROUP_NEWS);
 
     fGroupCombo = new Combo(group, SWT.BORDER | SWT.READ_ONLY);
     fGroupCombo.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false));
-    fGroupCombo.add("");
+    fGroupCombo.add(""); //$NON-NLS-1$
 
     NewsGrouping.Type[] groups = NewsGrouping.Type.values();
     for (NewsGrouping.Type groupT : groups)
@@ -329,19 +329,19 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
 
     /* Open Site for News Settings */
     fOpenSiteForNewsCheck = new Button(group, SWT.CHECK);
-    fOpenSiteForNewsCheck.setText("&When a news is selected, open its link directly");
+    fOpenSiteForNewsCheck.setText(Messages.FeedsPreferencePage_OPEN_ON_SELECT);
     fOpenSiteForNewsCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
     fOpenSiteForNewsCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_NEWS));
 
     /* Open Site for empty News Settings */
     fOpenSiteForEmptyNewsCheck = new Button(group, SWT.CHECK);
-    fOpenSiteForEmptyNewsCheck.setText("When a news' &summary is empty, open its link directly");
+    fOpenSiteForEmptyNewsCheck.setText(Messages.FeedsPreferencePage_OPEN_WHEN_EMPTY);
     fOpenSiteForEmptyNewsCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
     fOpenSiteForEmptyNewsCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_EMPTY_NEWS));
 
     /* Load Images for News Settings */
     fLoadImagesForNewsCheck = new Button(group, SWT.CHECK);
-    fLoadImagesForNewsCheck.setText("Display &images and flash content from news");
+    fLoadImagesForNewsCheck.setText(Messages.FeedsPreferencePage_DISPLAY_IMAGE_FLASH);
     fLoadImagesForNewsCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
     fLoadImagesForNewsCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.BM_LOAD_IMAGES));
   }
@@ -352,7 +352,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     group.setLayout(LayoutUtils.createGridLayout(1, 10, 10));
 
     TabItem item = new TabItem(parent, SWT.None);
-    item.setText("Columns");
+    item.setText(Messages.FeedsPreferencePage_COLUMNS);
     item.setControl(group);
 
     fColumnSelectionControl = new NewsColumnSelectionControl(group, SWT.NONE);
@@ -366,19 +366,19 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     group.setLayout(LayoutUtils.createGridLayout(2, 10, 10, 5, 5, false));
 
     TabItem item = new TabItem(parent, SWT.None);
-    item.setText("Clean Up");
+    item.setText(Messages.FeedsPreferencePage_CLEAN_UP);
     item.setControl(group);
 
     /* Explanation Label */
     Label explanationLabel = new Label(group, SWT.WRAP);
     explanationLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false, 2, 1));
-    explanationLabel.setText("To recover disk space, old news can be permanently deleted.");
+    explanationLabel.setText(Messages.FeedsPreferencePage_CLEAN_UP_INFO);
 
     /* Delete by Count */
     fDeleteNewsByCountCheck = new Button(group, SWT.CHECK);
     fDeleteNewsByCountCheck.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
     fDeleteNewsByCountCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE));
-    fDeleteNewsByCountCheck.setText("&Maximum number of news to keep: ");
+    fDeleteNewsByCountCheck.setText(Messages.FeedsPreferencePage_MAX_NUMBER);
     fDeleteNewsByCountCheck.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -397,7 +397,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     fDeleteNewsByAgeCheck = new Button(group, SWT.CHECK);
     fDeleteNewsByAgeCheck.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
     fDeleteNewsByAgeCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE));
-    fDeleteNewsByAgeCheck.setText("Maximum &age of news in days: ");
+    fDeleteNewsByAgeCheck.setText(Messages.FeedsPreferencePage_MAX_AGE);
     fDeleteNewsByAgeCheck.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -415,13 +415,13 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     /* Delete by State */
     fDeleteReadNewsCheck = new Button(group, SWT.CHECK);
     fDeleteReadNewsCheck.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false, 2, 1));
-    fDeleteReadNewsCheck.setText("Always &delete read news");
+    fDeleteReadNewsCheck.setText(Messages.FeedsPreferencePage_DELETE_READ);
     fDeleteReadNewsCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.DEL_READ_NEWS_STATE));
 
     /* Never Delete Unread State */
     fNeverDeleteUnReadNewsCheck = new Button(group, SWT.CHECK);
     fNeverDeleteUnReadNewsCheck.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false, 2, 1));
-    fNeverDeleteUnReadNewsCheck.setText("&Never delete unread news");
+    fNeverDeleteUnReadNewsCheck.setText(Messages.FeedsPreferencePage_NEVER_DELETE_UNREAD);
     fNeverDeleteUnReadNewsCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.NEVER_DEL_UNREAD_NEWS_STATE));
 
     /* Info Container */
@@ -431,11 +431,11 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     ((GridLayout)infoContainer.getLayout()).marginTop = 5;
 
     Label infoImg = new Label(infoContainer, SWT.NONE);
-    infoImg.setImage(OwlUI.getImage(fResources, "icons/obj16/info.gif"));
+    infoImg.setImage(OwlUI.getImage(fResources, "icons/obj16/info.gif")); //$NON-NLS-1$
     infoImg.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 
     Label infoText = new Label(infoContainer, SWT.WRAP);
-    infoText.setText("Note: Sticky and labeled News will not be deleted.");
+    infoText.setText(Messages.FeedsPreferencePage_CLEAN_UP_NOTE);
     infoText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
   }
 
@@ -574,12 +574,12 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
 
     /* Peform clean-up on all BookMarks */
     if (runCleanup) {
-      Job retentionJob = new Job("Performing clean up...") {
+      Job retentionJob = new Job(Messages.FeedsPreferencePage_PERFORMNG_CLEANUP) {
 
         @Override
         protected IStatus run(IProgressMonitor monitor) {
           try {
-            monitor.beginTask("Performing clean up...", rootFolders.size());
+            monitor.beginTask(Messages.FeedsPreferencePage_PERFORMNG_CLEANUP, rootFolders.size());
 
             for (IFolder rootFolder : rootFolders) {
               RetentionStrategy.process(rootFolder);

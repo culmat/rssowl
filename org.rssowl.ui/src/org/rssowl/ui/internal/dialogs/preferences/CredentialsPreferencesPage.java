@@ -86,10 +86,10 @@ import java.util.Set;
 public class CredentialsPreferencesPage extends PreferencePage implements IWorkbenchPreferencePage {
 
   /** ID of the Page */
-  public static String ID = "org.rssowl.ui.CredentialsPreferences";
+  public static String ID = "org.rssowl.ui.CredentialsPreferences"; //$NON-NLS-1$
 
   /* Dummy for creating and changing the master password */
-  private static final String DUMMY_LINK = "http://www.rssowl.org";
+  private static final String DUMMY_LINK = "http://www.rssowl.org"; //$NON-NLS-1$
 
   private IConnectionService fConService = Owl.getConnectionService();
   private TableViewer fViewer;
@@ -128,7 +128,7 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
     ICredentials toCredentials() {
       return new ICredentials() {
         public String getDomain() {
-          return "";
+          return ""; //$NON-NLS-1$
         }
 
         public String getPassword() {
@@ -180,7 +180,7 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
 
   /** Leave for reflection */
   public CredentialsPreferencesPage() {
-    setImageDescriptor(OwlUI.getImageDescriptor("icons/elcl16/passwords.gif"));
+    setImageDescriptor(OwlUI.getImageDescriptor("icons/elcl16/passwords.gif")); //$NON-NLS-1$
   }
 
   /*
@@ -208,12 +208,12 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
     infoText.setBackground(masterContainer.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 
     if (Application.IS_WINDOWS || Application.IS_MAC)
-      infoText.setText("Set a master password to protect your passwords from unauthorized access. Note that passwords are automatically protected using your operating system password.");
+      infoText.setText(Messages.CredentialsPreferencesPage_MASTER_PW_INFO);
     else
-      infoText.setText("It is recommended to set a master password to protect your passwords from unauthorized access.");
+      infoText.setText(Messages.CredentialsPreferencesPage_MASTER_PW_MSG);
 
     fUseMasterPasswordCheck = new Button(masterContainer, SWT.CHECK);
-    fUseMasterPasswordCheck.setText("&Use a master password");
+    fUseMasterPasswordCheck.setText(Messages.CredentialsPreferencesPage_USE_MASTER_PW);
     fUseMasterPasswordCheck.setFocus();
     fUseMasterPasswordCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
     fUseMasterPasswordCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.USE_MASTER_PASSWORD));
@@ -227,7 +227,7 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
 
     fResetMasterPassword = new Button(masterContainer, SWT.PUSH);
     fResetMasterPassword.setEnabled(fUseMasterPasswordCheck.getSelection());
-    fResetMasterPassword.setText("&Change Master Password...");
+    fResetMasterPassword.setText(Messages.CredentialsPreferencesPage_CHANGE_MASTER_PW);
     Dialog.applyDialogFont(fResetMasterPassword);
     setButtonLayoutData(fResetMasterPassword);
     fResetMasterPassword.addSelectionListener(new SelectionAdapter() {
@@ -240,7 +240,7 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
     /* Label */
     Label infoLabel = new Label(container, SWT.NONE);
     infoLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
-    infoLabel.setText("RSSOwl has saved login information for the following sites and realms:");
+    infoLabel.setText(Messages.CredentialsPreferencesPage_SAVED_PWS);
 
     /* Viewer to display Passwords */
     int style = SWT.MULTI | SWT.FULL_SELECTION | SWT.BORDER;
@@ -255,15 +255,15 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
 
     /* Create Columns */
     TableViewerColumn col = new TableViewerColumn(fViewer, SWT.LEFT);
-    customTable.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FILL, 45), "Site", null, null, false, true);
+    customTable.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FILL, 45), Messages.CredentialsPreferencesPage_SITE, null, null, false, true);
     col.getColumn().setMoveable(false);
 
     col = new TableViewerColumn(fViewer, SWT.LEFT);
-    customTable.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FILL, 30), "Realm", null, null, false, true);
+    customTable.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FILL, 30), Messages.CredentialsPreferencesPage_REALM, null, null, false, true);
     col.getColumn().setMoveable(false);
 
     col = new TableViewerColumn(fViewer, SWT.LEFT);
-    customTable.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FILL, 25), "Username", null, null, false, true);
+    customTable.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FILL, 25), Messages.CredentialsPreferencesPage_USERNAME, null, null, false, true);
     col.getColumn().setMoveable(false);
 
     /* Content Provider */
@@ -316,7 +316,7 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
 
     /* Offer Buttons to remove Credentials */
     fRemoveSelected = new Button(container, SWT.PUSH);
-    fRemoveSelected.setText("&Remove");
+    fRemoveSelected.setText(Messages.CredentialsPreferencesPage_REMOVE);
     fRemoveSelected.setEnabled(false);
     fRemoveSelected.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -326,7 +326,7 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
     });
 
     fRemoveAll = new Button(container, SWT.PUSH);
-    fRemoveAll.setText("Re&move All");
+    fRemoveAll.setText(Messages.CredentialsPreferencesPage_REMOVE_ALL);
     fRemoveAll.setEnabled(fViewer.getTable().getItemCount() > 0);
     fRemoveAll.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -370,7 +370,7 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
   private void onRemoveAll() {
 
     /* Ask for Confirmation first */
-    ConfirmDialog dialog = new ConfirmDialog(getShell(), "Confirm Remove", "This action can not be undone", "Are you sure you want to remove all stored passwords?", null);
+    ConfirmDialog dialog = new ConfirmDialog(getShell(), Messages.CredentialsPreferencesPage_CONFIRM_REMOVE, Messages.CredentialsPreferencesPage_NO_UNDO, Messages.CredentialsPreferencesPage_REMOVE_ALL_CONFIRM, null);
     if (dialog.open() != IDialogConstants.OK_ID)
       return;
 
@@ -456,7 +456,7 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
   }
 
   private void showError() {
-    setErrorMessage("Wrong master password supplied.");
+    setErrorMessage(Messages.CredentialsPreferencesPage_WRONG_MASTER_PW);
 
     fUseMasterPasswordCheck.setEnabled(false);
     fResetMasterPassword.setEnabled(false);
@@ -524,7 +524,7 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
     CredentialsModelData dummyCredentials = null;
     if (credentials.isEmpty()) {
       try {
-        dummyCredentials = new CredentialsModelData("", "", new URI(DUMMY_LINK), "");
+        dummyCredentials = new CredentialsModelData("", "", new URI(DUMMY_LINK), ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         credentials.add(dummyCredentials);
       } catch (URISyntaxException e) {
         /* Should not happen */
