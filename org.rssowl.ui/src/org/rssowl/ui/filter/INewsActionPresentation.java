@@ -48,7 +48,8 @@ public interface INewsActionPresentation {
 
   /**
    * @return arbitrary data taken from changes the user made to the
-   * presentation.
+   * presentation. It is strongly recommended to use {@link String} as data type
+   * to support Import and Export of the news action.
    */
   Object getData();
 }
