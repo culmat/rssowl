@@ -100,13 +100,13 @@ import java.util.List;
 public class WebBrowserView extends EditorPart implements IReusableEditor {
 
   /** ID of this Editor */
-  public static final String EDITOR_ID = "org.rssowl.ui.WebBrowser";
+  public static final String EDITOR_ID = "org.rssowl.ui.WebBrowser"; //$NON-NLS-1$
 
   /* Navigate Back */
-  private static final String BACK_ACTION = "org.rssowl.ui.internal.editors.feed.BackAction";
+  private static final String BACK_ACTION = "org.rssowl.ui.internal.editors.feed.BackAction"; //$NON-NLS-1$
 
   /* Navigate Forward */
-  private static final String FORWARD_ACTION = "org.rssowl.ui.internal.editors.feed.ForwardAction";
+  private static final String FORWARD_ACTION = "org.rssowl.ui.internal.editors.feed.ForwardAction"; //$NON-NLS-1$
 
   private CBrowser fBrowser;
   private WebBrowserInput fInput;
@@ -223,7 +223,7 @@ public class WebBrowserView extends EditorPart implements IReusableEditor {
       if (fInput.getUrl() != null)
         fLocationInput.setText(fInput.getUrl());
       else
-        fLocationInput.setText("");
+        fLocationInput.setText(""); //$NON-NLS-1$
     }
   }
 
@@ -353,7 +353,7 @@ public class WebBrowserView extends EditorPart implements IReusableEditor {
     fNavigationToolBarManager = new ToolBarManager(SWT.FLAT);
 
     /* New Browser Tab */
-    IAction newBrowserTab = new Action("New Browser Tab") {
+    IAction newBrowserTab = new Action(Messages.WebBrowserView_NEW_TAB) {
       @Override
       public void run() {
         BrowserUtils.openLinkInternal(URIUtils.ABOUT_BLANK, null);
@@ -364,7 +364,7 @@ public class WebBrowserView extends EditorPart implements IReusableEditor {
 
     /* Navigate Backward */
     fNavigationToolBarManager.add(new Separator());
-    IAction navBackward = new Action("Back") {
+    IAction navBackward = new Action(Messages.WebBrowserView_BACK) {
       @Override
       public void run() {
         if (fBrowser != null && fBrowser.getControl().isBackEnabled())
@@ -384,7 +384,7 @@ public class WebBrowserView extends EditorPart implements IReusableEditor {
     fNavigationToolBarManager.add(navBackward);
 
     /* Navigate Forward */
-    IAction navForward = new Action("Forward") {
+    IAction navForward = new Action(Messages.WebBrowserView_FORWARD) {
       @Override
       public void run() {
         fBrowser.forward();
@@ -401,7 +401,7 @@ public class WebBrowserView extends EditorPart implements IReusableEditor {
     fNavigationToolBarManager.add(navForward);
 
     /* Stop */
-    IAction stopNav = new Action("Stop") {
+    IAction stopNav = new Action(Messages.WebBrowserView_STOP) {
       @Override
       public void run() {
         fBrowser.getControl().stop();
@@ -412,7 +412,7 @@ public class WebBrowserView extends EditorPart implements IReusableEditor {
     fNavigationToolBarManager.add(stopNav);
 
     /* Reload */
-    IAction reload = new Action("Reload") {
+    IAction reload = new Action(Messages.WebBrowserView_RELOAD) {
       @Override
       public void run() {
         fBrowser.getControl().refresh();
@@ -423,7 +423,7 @@ public class WebBrowserView extends EditorPart implements IReusableEditor {
     fNavigationToolBarManager.add(reload);
 
     /* Home */
-    IAction navHome = new Action("Home") {
+    IAction navHome = new Action(Messages.WebBrowserView_HOME) {
       @Override
       public void run() {
         if (fInput.getUrl() != null)
@@ -435,7 +435,7 @@ public class WebBrowserView extends EditorPart implements IReusableEditor {
 
     /* Share */
     fNavigationToolBarManager.add(new Separator());
-    IAction shareLink = new Action("Share Link", IAction.AS_DROP_DOWN_MENU) {
+    IAction shareLink = new Action(Messages.WebBrowserView_SHARE_LINK, IAction.AS_DROP_DOWN_MENU) {
       @Override
       public void run() {
         getMenuCreator().getMenu(fNavigationToolBarManager.getControl()).setVisible(true);
@@ -501,7 +501,7 @@ public class WebBrowserView extends EditorPart implements IReusableEditor {
 
         /* Configure Providers */
         shareMenu.add(new Separator());
-        shareMenu.add(new Action("&Configure...") {
+        shareMenu.add(new Action(Messages.WebBrowserView_CONFIGURE) {
           @Override
           public void run() {
             PreferencesUtil.createPreferenceDialogOn(fBrowser.getControl().getShell(), SharingPreferencesPage.ID, null, null).open();
@@ -516,7 +516,7 @@ public class WebBrowserView extends EditorPart implements IReusableEditor {
 
     /* Discover Feeds on Website */
     fNavigationToolBarManager.add(new Separator());
-    IAction discoverFeeds = new Action("Find more Feeds") {
+    IAction discoverFeeds = new Action(Messages.WebBrowserView_FIND_FEEDS) {
       @Override
       public void run() {
         String url = fBrowser.getControl().getUrl();
@@ -527,7 +527,7 @@ public class WebBrowserView extends EditorPart implements IReusableEditor {
       }
     };
     fNavigationToolBarManager.add(discoverFeeds);
-    discoverFeeds.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/new_bkmrk.gif"));
+    discoverFeeds.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/new_bkmrk.gif")); //$NON-NLS-1$
 
     fNavigationToolBarManager.createControl(parent);
   }
@@ -549,7 +549,7 @@ public class WebBrowserView extends EditorPart implements IReusableEditor {
       fLocationInput = new Text(parent, SWT.BORDER | SWT.SINGLE | SWT.SEARCH);
     else
       fLocationInput = new Text(parent, SWT.BORDER | SWT.SINGLE);
-    fLocationInput.setMessage("Enter a website or search phrase");
+    fLocationInput.setMessage(Messages.WebBrowserView_ENTER_WEBSITE_PHRASE);
     fLocationInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
     if (fInput.getUrl() != null)
       fLocationInput.setText(fInput.getUrl());
@@ -611,7 +611,7 @@ public class WebBrowserView extends EditorPart implements IReusableEditor {
     fBrowser.getControl().addTitleListener(new TitleListener() {
       public void changed(TitleEvent event) {
         if (URIUtils.ABOUT_BLANK.equals(event.title))
-          setPartName("Blank Page");
+          setPartName(Messages.WebBrowserView_BLANK_PAGE);
         else
           setPartName(event.title);
 
@@ -714,8 +714,8 @@ public class WebBrowserView extends EditorPart implements IReusableEditor {
     /* Ask user for File */
     FileDialog dialog = new FileDialog(getSite().getShell(), SWT.SAVE);
     dialog.setOverwrite(true);
-    dialog.setFilterExtensions(new String[] { ".html" });
-    dialog.setFileName("site.html");
+    dialog.setFilterExtensions(new String[] { ".html" }); //$NON-NLS-1$
+    dialog.setFileName("site.html"); //$NON-NLS-1$
 
     String fileName = dialog.open();
     if (fileName == null)

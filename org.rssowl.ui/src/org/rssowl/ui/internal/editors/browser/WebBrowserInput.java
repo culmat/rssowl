@@ -41,8 +41,8 @@ import org.rssowl.ui.internal.OwlUI;
  * @author bpasero
  */
 public class WebBrowserInput implements IEditorInput {
-  private static final String FACTORY_ID = "org.rssowl.ui.WebBrowserViewFactory";
-  static final String URL = "org.rssowl.ui.internal.editors.browser.Url";
+  private static final String FACTORY_ID = "org.rssowl.ui.WebBrowserViewFactory"; //$NON-NLS-1$
+  static final String URL = "org.rssowl.ui.internal.editors.browser.Url"; //$NON-NLS-1$
 
   private final String fUrl;
   private final WebBrowserContext fContext;
@@ -99,14 +99,14 @@ public class WebBrowserInput implements IEditorInput {
    * @see org.eclipse.ui.IEditorInput#getImageDescriptor()
    */
   public ImageDescriptor getImageDescriptor() {
-    return OwlUI.getImageDescriptor("icons/eview16/webbrowser.gif");
+    return OwlUI.getImageDescriptor("icons/eview16/webbrowser.gif"); //$NON-NLS-1$
   }
 
   /*
    * @see org.eclipse.ui.IEditorInput#getName()
    */
   public String getName() {
-    return fUrl != null ? fUrl : "Loading...";
+    return fUrl != null ? fUrl : Messages.WebBrowserInput_LOADING;
   }
 
   /*
@@ -138,7 +138,7 @@ public class WebBrowserInput implements IEditorInput {
    * @see org.eclipse.ui.IEditorInput#getToolTipText()
    */
   public String getToolTipText() {
-    return "";
+    return ""; //$NON-NLS-1$
   }
 
   /*
