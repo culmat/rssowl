@@ -161,7 +161,7 @@ public class SearchConditionItem extends Composite {
   }
 
   boolean hasValue() {
-    return fInputValue != null && !"".equals(fInputValue);
+    return fInputValue != null && !"".equals(fInputValue); //$NON-NLS-1$
   }
 
   void focusInput() {
@@ -173,16 +173,16 @@ public class SearchConditionItem extends Composite {
   ISearchCondition createCondition(ISearchMark searchmark, boolean filterEmpty) {
 
     /* Filter Bogus Conditions if requiered */
-    if (filterEmpty && (fInputValue == null || "".equals(fInputValue)))
+    if (filterEmpty && (fInputValue == null || "".equals(fInputValue))) //$NON-NLS-1$
       return null;
 
     ISearchField field = (ISearchField) ((IStructuredSelection) fFieldViewer.getSelection()).getFirstElement();
     SearchSpecifier specifier = (SearchSpecifier) ((IStructuredSelection) fSpecifierViewer.getSelection()).getFirstElement();
 
     if (searchmark != null)
-      return fFactory.createSearchCondition(null, searchmark, field, specifier, fInputValue != null ? fInputValue : "");
+      return fFactory.createSearchCondition(null, searchmark, field, specifier, fInputValue != null ? fInputValue : ""); //$NON-NLS-1$
 
-    return fFactory.createSearchCondition(field, specifier, fInputValue != null ? fInputValue : "");
+    return fFactory.createSearchCondition(field, specifier, fInputValue != null ? fInputValue : ""); //$NON-NLS-1$
   }
 
   private void initComponents() {
@@ -276,7 +276,7 @@ public class SearchConditionItem extends Composite {
     if (element instanceof SearchSpecifier) {
       SearchSpecifier specifier = (SearchSpecifier) element;
       if (specifier == SearchSpecifier.CONTAINS)
-        return "contains any of the words";
+        return Messages.SearchConditionItem_CONTAINS_ANY;
     }
 
     return null;
@@ -364,9 +364,9 @@ public class SearchConditionItem extends Composite {
       spinner.setMaximum(1000000);
 
       final Combo combo = new Combo(container, SWT.BORDER | SWT.READ_ONLY);
-      combo.add("Days");
-      combo.add("Hours");
-      combo.add("Minutes");
+      combo.add(Messages.SearchConditionItem_DAYS);
+      combo.add(Messages.SearchConditionItem_HOURS);
+      combo.add(Messages.SearchConditionItem_MINUTES);
 
       Listener listener = new Listener() {
         public void handleEvent(Event event) {
@@ -420,8 +420,8 @@ public class SearchConditionItem extends Composite {
         /* Type: Boolean */
         case ISearchValueType.BOOLEAN: {
           final Combo combo = new Combo(inputField, SWT.BORDER | SWT.READ_ONLY);
-          combo.add("true");
-          combo.add("false");
+          combo.add(Messages.SearchConditionItem_TRUE);
+          combo.add(Messages.SearchConditionItem_FALSE);
           combo.addListener(SWT.Modify, new Listener() {
             public void handleEvent(Event event) {
               fInputValue = Boolean.valueOf(combo.getItem(combo.getSelectionIndex()));
@@ -550,7 +550,7 @@ public class SearchConditionItem extends Composite {
 
           /* Provide auto-complete for Categories, Authors and Feeds */
           if (field.getId() == INews.CATEGORIES || field.getId() == INews.AUTHOR || field.getId() == INews.FEED) {
-            controlDeco.setDescriptionText("Content Assist Available (Press Arrow-Down Key)");
+            controlDeco.setDescriptionText(Messages.SearchConditionItem_CONTENT_ASSIST_INFO);
             final Pair<SimpleContentProposalProvider, ContentProposalAdapter> pair = OwlUI.hookAutoComplete(text, null, false);
 
             /* Load proposals in the Background */
@@ -580,7 +580,7 @@ public class SearchConditionItem extends Composite {
 
           /* Show UI Hint that Wildcards can be used */
           else {
-            controlDeco.setDescriptionText("Use \'?\' for any character and \'*\' for any character sequence in your search. Surround words with quotes to search for phrases.");
+            controlDeco.setDescriptionText(Messages.SearchConditionItem_SEARCH_HELP);
           }
 
           /* Pre-Select input if given */

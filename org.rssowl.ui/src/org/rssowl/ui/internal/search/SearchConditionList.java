@@ -269,8 +269,8 @@ public class SearchConditionList extends ScrolledComposite {
   }
 
   private void initResources() {
-    fAddIcon = OwlUI.getImage(fResources, "icons/etool16/add.gif");
-    fDeleteIcon = OwlUI.getImage(fResources, "icons/etool16/remove.gif");
+    fAddIcon = OwlUI.getImage(fResources, "icons/etool16/add.gif"); //$NON-NLS-1$
+    fDeleteIcon = OwlUI.getImage(fResources, "icons/etool16/remove.gif"); //$NON-NLS-1$
   }
 
   private void initComponents(List<ISearchCondition> conditions) {
@@ -303,7 +303,7 @@ public class SearchConditionList extends ScrolledComposite {
     IModelFactory factory = Owl.getModelFactory();
 
     ISearchField field = factory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
-    ISearchCondition condition = factory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "");
+    ISearchCondition condition = factory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, ""); //$NON-NLS-1$
 
     return condition;
   }
@@ -335,7 +335,7 @@ public class SearchConditionList extends ScrolledComposite {
     /* Button to add Condition */
     ToolItem addButton = new ToolItem(buttonBar, SWT.DROP_DOWN);
     addButton.setImage(fAddIcon);
-    addButton.setToolTipText("Add Condition");
+    addButton.setToolTipText(Messages.SearchConditionList_ADD_CONDITION);
 
     /* Add Menu */
     final Menu conditionMenu = new Menu(buttonBar);
@@ -356,7 +356,7 @@ public class SearchConditionList extends ScrolledComposite {
     /* Button to delete Condition */
     ToolItem deleteButton = new ToolItem(buttonBar, SWT.PUSH);
     deleteButton.setImage(fDeleteIcon);
-    deleteButton.setToolTipText("Delete Condition");
+    deleteButton.setToolTipText(Messages.SearchConditionList_DELETE_CONDITION);
     deleteButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -403,7 +403,7 @@ public class SearchConditionList extends ScrolledComposite {
 
     if (fFieldsToExclude == null || !fFieldsToExclude.contains(IEntity.ALL_FIELDS)) {
       MenuItem mItem = new MenuItem(menu, SWT.PUSH);
-      mItem.setText("Entire News");
+      mItem.setText(Messages.SearchConditionList_ENTIRE_NEWS);
       hookSelectionListener(mItem, item, factory.createSearchField(IEntity.ALL_FIELDS, news));
 
       new MenuItem(menu, SWT.SEPARATOR);
@@ -411,13 +411,13 @@ public class SearchConditionList extends ScrolledComposite {
 
     if (fFieldsToExclude == null || !fFieldsToExclude.contains(INews.STATE)) {
       MenuItem mItem = new MenuItem(menu, SWT.PUSH);
-      mItem.setText("State");
+      mItem.setText(Messages.SearchConditionList_STATE);
       hookSelectionListener(mItem, item, factory.createSearchField(INews.STATE, news));
     }
 
     if (fFieldsToExclude == null || !fFieldsToExclude.contains(INews.LOCATION)) {
       MenuItem mItem = new MenuItem(menu, SWT.PUSH);
-      mItem.setText("Location");
+      mItem.setText(Messages.SearchConditionList_LOCATION);
       hookSelectionListener(mItem, item, factory.createSearchField(INews.LOCATION, news));
 
       new MenuItem(menu, SWT.SEPARATOR);
@@ -425,37 +425,37 @@ public class SearchConditionList extends ScrolledComposite {
 
     if (fFieldsToExclude == null || !fFieldsToExclude.contains(INews.TITLE)) {
       MenuItem mItem = new MenuItem(menu, SWT.PUSH);
-      mItem.setText("Title");
+      mItem.setText(Messages.SearchConditionList_TITLE);
       hookSelectionListener(mItem, item, factory.createSearchField(INews.TITLE, news));
     }
 
     if (fFieldsToExclude == null || !fFieldsToExclude.contains(INews.DESCRIPTION)) {
       MenuItem mItem = new MenuItem(menu, SWT.PUSH);
-      mItem.setText("Description");
+      mItem.setText(Messages.SearchConditionList_DESCRIPTION);
       hookSelectionListener(mItem, item, factory.createSearchField(INews.DESCRIPTION, news));
     }
 
     if (fFieldsToExclude == null || !fFieldsToExclude.contains(INews.AUTHOR)) {
       MenuItem mItem = new MenuItem(menu, SWT.PUSH);
-      mItem.setText("Author");
+      mItem.setText(Messages.SearchConditionList_AUTHOR);
       hookSelectionListener(mItem, item, factory.createSearchField(INews.AUTHOR, news));
     }
 
     if (fFieldsToExclude == null || !fFieldsToExclude.contains(INews.CATEGORIES)) {
       MenuItem mItem = new MenuItem(menu, SWT.PUSH);
-      mItem.setText("Category");
+      mItem.setText(Messages.SearchConditionList_CATEGORY);
       hookSelectionListener(mItem, item, factory.createSearchField(INews.CATEGORIES, news));
     }
 
     MenuItem mItem = new MenuItem(menu, SWT.CASCADE);
-    mItem.setText("Date");
+    mItem.setText(Messages.SearchConditionList_DATE);
 
     Menu dateMenu = new Menu(mItem);
     mItem.setMenu(dateMenu);
 
     if (fFieldsToExclude == null || !fFieldsToExclude.contains(INews.AGE_IN_DAYS)) {
       mItem = new MenuItem(dateMenu, SWT.PUSH);
-      mItem.setText("Age");
+      mItem.setText(Messages.SearchConditionList_AGE);
       hookSelectionListener(mItem, item, factory.createSearchField(INews.AGE_IN_DAYS, news));
 
       new MenuItem(dateMenu, SWT.SEPARATOR);
@@ -463,39 +463,39 @@ public class SearchConditionList extends ScrolledComposite {
 
     if (fFieldsToExclude == null || !fFieldsToExclude.contains(INews.MODIFIED_DATE)) {
       mItem = new MenuItem(dateMenu, SWT.PUSH);
-      mItem.setText("Date Modified");
+      mItem.setText(Messages.SearchConditionList_DATE_MODIFIED);
       hookSelectionListener(mItem, item, factory.createSearchField(INews.MODIFIED_DATE, news));
     }
 
     if (fFieldsToExclude == null || !fFieldsToExclude.contains(INews.PUBLISH_DATE)) {
       mItem = new MenuItem(dateMenu, SWT.PUSH);
-      mItem.setText("Date Published");
+      mItem.setText(Messages.SearchConditionList_DATE_PUBLISHED);
       hookSelectionListener(mItem, item, factory.createSearchField(INews.PUBLISH_DATE, news));
     }
 
     if (fFieldsToExclude == null || !fFieldsToExclude.contains(INews.RECEIVE_DATE)) {
       mItem = new MenuItem(dateMenu, SWT.PUSH);
-      mItem.setText("Date Received");
+      mItem.setText(Messages.SearchConditionList_DATE_RECEIVED);
       hookSelectionListener(mItem, item, factory.createSearchField(INews.RECEIVE_DATE, news));
     }
 
     mItem = new MenuItem(menu, SWT.SEPARATOR);
 
     mItem = new MenuItem(menu, SWT.CASCADE);
-    mItem.setText("Other");
+    mItem.setText(Messages.SearchConditionList_OTHER);
 
     Menu otherMenu = new Menu(mItem);
     mItem.setMenu(otherMenu);
 
     if (fFieldsToExclude == null || !fFieldsToExclude.contains(INews.HAS_ATTACHMENTS)) {
       mItem = new MenuItem(otherMenu, SWT.PUSH);
-      mItem.setText("Has Attachments");
+      mItem.setText(Messages.SearchConditionList_HAS_ATTACHMENTS);
       hookSelectionListener(mItem, item, factory.createSearchField(INews.HAS_ATTACHMENTS, news));
     }
 
     if (fFieldsToExclude == null || !fFieldsToExclude.contains(INews.ATTACHMENTS_CONTENT)) {
       mItem = new MenuItem(otherMenu, SWT.PUSH);
-      mItem.setText("Attachment");
+      mItem.setText(Messages.SearchConditionList_ATTACHMENT);
       hookSelectionListener(mItem, item, factory.createSearchField(INews.ATTACHMENTS_CONTENT, news));
     }
 
@@ -503,31 +503,31 @@ public class SearchConditionList extends ScrolledComposite {
 
     if (fFieldsToExclude == null || !fFieldsToExclude.contains(INews.SOURCE)) {
       mItem = new MenuItem(otherMenu, SWT.PUSH);
-      mItem.setText("Source");
+      mItem.setText(Messages.SearchConditionList_SOURCE);
       hookSelectionListener(mItem, item, factory.createSearchField(INews.SOURCE, news));
     }
 
     if (fFieldsToExclude == null || !fFieldsToExclude.contains(INews.LINK)) {
       mItem = new MenuItem(otherMenu, SWT.PUSH);
-      mItem.setText("Link");
+      mItem.setText(Messages.SearchConditionList_LINK);
       hookSelectionListener(mItem, item, factory.createSearchField(INews.LINK, news));
     }
 
     if (fFieldsToExclude == null || !fFieldsToExclude.contains(INews.IS_FLAGGED)) {
       mItem = new MenuItem(otherMenu, SWT.PUSH);
-      mItem.setText("Is Sticky");
+      mItem.setText(Messages.SearchConditionList_IS_STICKY);
       hookSelectionListener(mItem, item, factory.createSearchField(INews.IS_FLAGGED, news));
     }
 
     if (fFieldsToExclude == null || !fFieldsToExclude.contains(INews.FEED)) {
       mItem = new MenuItem(otherMenu, SWT.PUSH);
-      mItem.setText("Feed");
+      mItem.setText(Messages.SearchConditionList_FEED);
       hookSelectionListener(mItem, item, factory.createSearchField(INews.FEED, news));
     }
 
     if (fFieldsToExclude == null || !fFieldsToExclude.contains(INews.LABEL)) {
       mItem = new MenuItem(otherMenu, SWT.PUSH);
-      mItem.setText("Label");
+      mItem.setText(Messages.SearchConditionList_LABEL);
       hookSelectionListener(mItem, item, factory.createSearchField(INews.LABEL, news));
     }
   }
@@ -581,7 +581,7 @@ public class SearchConditionList extends ScrolledComposite {
   private ISearchCondition createCondition(ISearchCondition current) {
     IModelFactory factory = Owl.getModelFactory();
     ISearchField field = factory.createSearchField(current.getField().getId(), current.getField().getEntityName());
-    return factory.createSearchCondition(field, current.getSpecifier(), "");
+    return factory.createSearchCondition(field, current.getSpecifier(), ""); //$NON-NLS-1$
   }
 
   void removeItem(SearchConditionItem item) {

@@ -161,11 +161,11 @@ public class LocationControl extends Composite {
 
       switch (fMode) {
         case SEARCH_LOCATION:
-          label.setText("Please choose the locations to search in:");
+          label.setText(Messages.LocationControl_CHOOSE_LOCATION_MSG);
           break;
 
         case SELECT_BIN:
-          label.setText("Please choose the news bins to copy or move news into:");
+          label.setText(Messages.LocationControl_CHOOSE_BINS_MSG);
           break;
       }
 
@@ -224,11 +224,11 @@ public class LocationControl extends Composite {
         }
       };
 
-      fFilteredTree.setInitialText("");
+      fFilteredTree.setInitialText(""); //$NON-NLS-1$
       if (fMode == Mode.SEARCH_LOCATION)
-        fFilteredTree.getFilterControl().setMessage("Type here to filter locations by name");
+        fFilteredTree.getFilterControl().setMessage(Messages.LocationControl_FILTER_LOCATIONS);
       else
-        fFilteredTree.getFilterControl().setMessage("Type here to filter news bins by name");
+        fFilteredTree.getFilterControl().setMessage(Messages.LocationControl_FILTER_BINS);
       fFilteredTree.getViewer().getControl().setFocus();
 
       /* Filter when Typing into Tree */
@@ -419,7 +419,7 @@ public class LocationControl extends Composite {
       /* Select All / Deselect All for Location Lookup */
       if (fMode == Mode.SEARCH_LOCATION) {
         Button selectAll = new Button(buttonContainer, SWT.PUSH);
-        selectAll.setText("&Select All");
+        selectAll.setText(Messages.LocationControl_SELECT_ALL);
         Dialog.applyDialogFont(selectAll);
         setButtonLayoutData(selectAll);
         selectAll.addSelectionListener(new SelectionAdapter() {
@@ -431,7 +431,7 @@ public class LocationControl extends Composite {
         });
 
         Button deselectAll = new Button(buttonContainer, SWT.PUSH);
-        deselectAll.setText("&Deselect All");
+        deselectAll.setText(Messages.LocationControl_DESELECT_ALL);
         Dialog.applyDialogFont(deselectAll);
         setButtonLayoutData(deselectAll);
         deselectAll.addSelectionListener(new SelectionAdapter() {
@@ -446,7 +446,7 @@ public class LocationControl extends Composite {
       /* Create Bin for Bin Selection */
       else {
         Button createBin = new Button(buttonContainer, SWT.PUSH);
-        createBin.setText("&New News Bin...");
+        createBin.setText(Messages.LocationControl_NEW_NEWSBIN);
         Dialog.applyDialogFont(createBin);
         setButtonLayoutData(createBin);
         createBin.addSelectionListener(new SelectionAdapter() {
@@ -482,8 +482,8 @@ public class LocationControl extends Composite {
       action.run(null);
       INewsBin newsbin = action.getNewsbin();
       if (newsbin != null) {
-        fFilteredTree.getPatternFilter().setPattern("");
-        fFilteredTree.getFilterControl().setText("");
+        fFilteredTree.getPatternFilter().setPattern(""); //$NON-NLS-1$
+        fFilteredTree.getFilterControl().setText(""); //$NON-NLS-1$
         fViewer.refresh();
         fViewer.expandAll();
         fViewer.setSelection(new StructuredSelection(newsbin), true);
@@ -564,10 +564,10 @@ public class LocationControl extends Composite {
       super.configureShell(newShell);
       switch (fMode) {
         case SEARCH_LOCATION:
-          newShell.setText("Choose Location");
+          newShell.setText(Messages.LocationControl_CHOOSE_LOCATION);
           break;
         case SELECT_BIN:
-          newShell.setText("Choose News Bins");
+          newShell.setText(Messages.LocationControl_CHOOSE_BINS);
           break;
       }
     }
@@ -666,19 +666,19 @@ public class LocationControl extends Composite {
    */
   protected String getDefaultLabel() {
     if (fMode == Mode.SELECT_BIN)
-      return "Choose News Bins...";
+      return Messages.LocationControl_CHOOSE_BINS_LABEL;
 
-    return "Choose Location...";
+    return Messages.LocationControl_CHOOSE_LOCATION_LABEL;
   }
 
   private String getLabel(List<IFolderChild> entities) {
     if (entities == null || entities.size() == 0) {
-      return "<a href=\"\">" + getDefaultLabel() + "</a>";
+      return "<a href=\"\">" + getDefaultLabel() + "</a>"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     StringBuilder strB = new StringBuilder();
     for (int i = 0; i < entities.size(); i++) {
-      strB.append("<a href=\"" + i + "\">").append(entities.get(i).getName()).append("</a>").append(", ");
+      strB.append("<a href=\"" + i + "\">").append(entities.get(i).getName()).append("</a>").append(", "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
     }
 
     if (strB.length() > 0)

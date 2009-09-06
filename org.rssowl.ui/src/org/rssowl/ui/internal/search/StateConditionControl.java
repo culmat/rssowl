@@ -119,23 +119,23 @@ public class StateConditionControl extends Composite {
 
     /* State: New */
     fNewState = new Button(this, SWT.CHECK);
-    fNewState.setText("&New");
-    fNewState.setToolTipText("News that have not yet been seen");
+    fNewState.setText(Messages.StateConditionControl_NEW);
+    fNewState.setToolTipText(Messages.StateConditionControl_NEW_INFO);
     fNewState.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
 
     /* State: Unread */
     fUnreadState = new Button(this, SWT.CHECK);
-    fUnreadState.setText("&Unread");
-    fUnreadState.setToolTipText("News that have been seen but not read");
+    fUnreadState.setText(Messages.StateConditionControl_UNREAD);
+    fUnreadState.setToolTipText(Messages.StateConditionControl_UNREAD_INFO);
     fUnreadState.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
 
     /* Use a Tooltip to help the user understand the State Semantic */
     final ToolTip newStateToolTip = new ToolTip(getShell(), SWT.BALLOON);
-    newStateToolTip.setMessage("Select 'New' to include News that have not yet been seen.");
+    newStateToolTip.setMessage(Messages.StateConditionControl_NEW_HINT);
     newStateToolTip.setAutoHide(false);
 
     final ToolTip unreadStateToolTip = new ToolTip(getShell(), SWT.BALLOON);
-    unreadStateToolTip.setMessage("Select 'Unread' to include News that have been seen but not read.");
+    unreadStateToolTip.setMessage(Messages.StateConditionControl_UNREAD_HINT);
     unreadStateToolTip.setAutoHide(false);
 
     fNewState.addSelectionListener(new SelectionAdapter() {
@@ -198,14 +198,14 @@ public class StateConditionControl extends Composite {
 
     /* State: Updated */
     fUpdatedState = new Button(this, SWT.CHECK);
-    fUpdatedState.setText("U&pdated");
-    fUpdatedState.setToolTipText("News with updated content");
+    fUpdatedState.setText(Messages.StateConditionControl_UPDATED);
+    fUpdatedState.setToolTipText(Messages.StateConditionControl_UPDATED_INFO);
     fUpdatedState.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
 
     /* State: Read */
     fReadState = new Button(this, SWT.CHECK);
-    fReadState.setText("&Read");
-    fReadState.setToolTipText("News that have been read");
+    fReadState.setText(Messages.StateConditionControl_READ);
+    fReadState.setToolTipText(Messages.StateConditionControl_READ_INFO);
     fReadState.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
 
     /* Selection Listener to issue modify events */
