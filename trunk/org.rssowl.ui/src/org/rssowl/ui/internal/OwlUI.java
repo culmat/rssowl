@@ -2012,25 +2012,32 @@ public class OwlUI {
       int hours = seconds / 3600;
       int minutes = (seconds / 60) % 60;
 
-      String hoursStr = (hours == 1) ? " Hour" : " Hours"; //$NON-NLS-1$ //$NON-NLS-2$
-      String minutesStr = (minutes == 1) ? " Minute" : " Minutes"; //$NON-NLS-1$ //$NON-NLS-2$
-      String secondsStr = (seconds == 1) ? " Second" : " Seconds"; //$NON-NLS-1$ //$NON-NLS-2$
-
       /* X Hours, Y Minutes */
-      if (hours > 0 && minutes > 0)
-        return hours + hoursStr + ", " + minutes + minutesStr; //$NON-NLS-1$
+      if (hours > 0 && minutes > 0) {
+        if (hours == 1) {
+          if (minutes == 1)
+            return NLS.bind(Messages.OwlUI_HOUR_MINUTE, hours, minutes);
+
+          return NLS.bind(Messages.OwlUI_HOUR_MINUTES, hours, minutes);
+        }
+
+        if (minutes == 1)
+          return NLS.bind(Messages.OwlUI_HOURS_MINUTE, hours, minutes);
+
+        return NLS.bind(Messages.OwlUI_HOURS_MINUTES, hours, minutes);
+      }
 
       /* X Hours */
       else if (hours > 0)
-        return hours + hoursStr;
+        return (hours == 1) ? NLS.bind(Messages.OwlUI_HOUR, hours) : NLS.bind(Messages.OwlUI_HOURS, hours);
 
       /* X Minutes */
       else if (hours == 0 && minutes > 0)
-        return minutes + minutesStr;
+        return (minutes == 1) ? NLS.bind(Messages.OwlUI_MINUTE, minutes) : NLS.bind(Messages.OwlUI_MINUTES, minutes);
 
       /* X Seconds */
       else if (seconds < 60)
-        return seconds + secondsStr;
+        return (seconds == 1) ? NLS.bind(Messages.OwlUI_SECOND, seconds) : NLS.bind(Messages.OwlUI_SECONDS, seconds);
     }
 
     return null;
