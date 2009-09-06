@@ -36,6 +36,8 @@ import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.ColorPicker;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
+import java.io.Serializable;
+
 /**
  * An implementation of {@link INewsActionPresentation} to select a color to be
  * used for the news in the notifier.
@@ -80,7 +82,7 @@ public class ShowNotifierNewsActionPresentation implements INewsActionPresentati
   /*
    * @see org.rssowl.ui.filter.INewsActionPresentation#getData()
    */
-  public Object getData() {
+  public Serializable getData() {
     return OwlUI.toString(fColorPicker.getColor());
   }
 }
