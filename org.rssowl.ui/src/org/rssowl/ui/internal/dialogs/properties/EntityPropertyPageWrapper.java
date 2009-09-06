@@ -37,7 +37,7 @@ import java.util.Set;
 /**
  * A Wrapper for instances of <code>IEntityPropertyPage</code> containing
  * additional information taken from the contributing extension-point.
- * 
+ *
  * @author bpasero
  */
 public class EntityPropertyPageWrapper implements Comparable<EntityPropertyPageWrapper> {
@@ -73,14 +73,14 @@ public class EntityPropertyPageWrapper implements Comparable<EntityPropertyPageW
    * @return The IEntityPropertyPage that is wrapped.
    */
   public IEntityPropertyPage getPage() {
-    Assert.isNotNull(fCachedPage, "Call createPage() first!");
+    Assert.isNotNull(fCachedPage, "Call createPage() first!"); //$NON-NLS-1$
     return fCachedPage;
   }
 
   /** Creates the page and stores it into the cache */
   public void createPage() {
     try {
-      fCachedPage = (IEntityPropertyPage) fPageTemplate.createExecutableExtension("class");
+      fCachedPage = (IEntityPropertyPage) fPageTemplate.createExecutableExtension("class"); //$NON-NLS-1$
     } catch (CoreException e) {
       Activator.getDefault().getLog().log(e.getStatus());
     }

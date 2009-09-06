@@ -30,6 +30,7 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.resource.ResourceManager;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.Point;
@@ -158,9 +159,9 @@ public class EntityPropertyDialog extends Dialog implements IPropertyDialogSite 
   protected void configureShell(Shell shell) {
     super.configureShell(shell);
     if (StringUtils.isSet(fTitle))
-      shell.setText("Properties for " + fTitle);
+      shell.setText(NLS.bind(Messages.EntityPropertyDialog_PROPERTIES_FOR_N, fTitle));
     else
-      shell.setText("Properties");
+      shell.setText(Messages.EntityPropertyDialog_PROPERTIES);
   }
 
   /*
@@ -288,7 +289,7 @@ public class EntityPropertyDialog extends Dialog implements IPropertyDialogSite 
 
     /* Mask NULL */
     if (message == null)
-      message = "";
+      message = ""; //$NON-NLS-1$
 
     /* Return early if not created yet */
     if (fMessageImage == null || fMessageText == null) {

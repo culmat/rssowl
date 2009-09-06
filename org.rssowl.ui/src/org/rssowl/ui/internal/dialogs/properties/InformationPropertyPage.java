@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -82,7 +83,7 @@ public class InformationPropertyPage implements IEntityPropertyPage {
     container.setLayout(LayoutUtils.createGridLayout(2, 10, 10));
 
     /* Status */
-    createLabel(container, "Status: ", true);
+    createLabel(container, Messages.InformationPropertyPage_STATUS, true);
 
     final IBookMark bm = (IBookMark) fEntities.get(0);
     String message;
@@ -91,18 +92,18 @@ public class InformationPropertyPage implements IEntityPropertyPage {
     if (bm.isErrorLoading()) {
       message = (String) bm.getProperty(Controller.LOAD_ERROR_KEY);
       if (!StringUtils.isSet(message))
-        message = "The last attempt to load this feed failed for an unknown reason.";
+        message = Messages.InformationPropertyPage_LOAD_FAILED_UNKNOWN;
       else
-        message = "The last attempt to load this feed failed. Reason: " + message;
+        message = NLS.bind(Messages.InformationPropertyPage_LOAD_FAILED_REASON, message);
     }
 
     /* Never Loaded */
     else if (bm.getMostRecentNewsDate() == null)
-      message = "This feed was not loaded yet.";
+      message = Messages.InformationPropertyPage_NOT_LOADED;
 
     /* Successfully Loaded */
     else
-      message = "The last attempt to load this feed was successful.";
+      message = Messages.InformationPropertyPage_LOADED_OK;
 
     Label msgLabel = new Label(container, SWT.WRAP);
     msgLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
@@ -110,14 +111,14 @@ public class InformationPropertyPage implements IEntityPropertyPage {
     msgLabel.setText(message);
 
     /* Feed: Description */
-    createLabel(container, "Description: ", true);
+    createLabel(container, Messages.InformationPropertyPage_DESCRIPTION, true);
 
     final Label descriptionLabel = new Label(container, SWT.WRAP);
     descriptionLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
     ((GridData) descriptionLabel.getLayoutData()).widthHint = 300;
 
     /* Feed: Homepage */
-    createLabel(container, "Homepage: ", true);
+    createLabel(container, Messages.InformationPropertyPage_HOMEPAGE, true);
 
     final Link homepageLink = new Link(container, SWT.NONE);
     homepageLink.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
@@ -138,8 +139,8 @@ public class InformationPropertyPage implements IEntityPropertyPage {
 
       @Override
       protected void runInUI(IProgressMonitor monitor) {
-        descriptionLabel.setText(StringUtils.isSet(description) ? description : "None");
-        homepageLink.setText(homepage != null ? "<a>" + homepage.toString() + "</a>" : "None");
+        descriptionLabel.setText(StringUtils.isSet(description) ? description : Messages.InformationPropertyPage_NONE);
+        homepageLink.setText(homepage != null ? "<a>" + homepage.toString() + "</a>" : Messages.InformationPropertyPage_NONE); //$NON-NLS-1$ //$NON-NLS-2$
         if (homepage != null) {
           homepageLink.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -155,26 +156,26 @@ public class InformationPropertyPage implements IEntityPropertyPage {
     });
 
     /* Created */
-    createLabel(container, "Created: ", true);
+    createLabel(container, Messages.InformationPropertyPage_CREATED, true);
     createLabel(container, fDateFormat.format(bm.getCreationDate()), false);
 
     /* Last Visited */
-    createLabel(container, "Last Visited: ", true);
+    createLabel(container, Messages.InformationPropertyPage_LAST_VISITED, true);
     if (bm.getLastVisitDate() != null)
       createLabel(container, fDateFormat.format(bm.getLastVisitDate()), false);
     else
-      createLabel(container, "Never", false);
+      createLabel(container, Messages.InformationPropertyPage_NEVER, false);
 
     /* News Count */
-    createLabel(container, "News Count: ", true);
+    createLabel(container, Messages.InformationPropertyPage_NEWS_COUNT, true);
     int totalCount = bm.getNewsCount(INews.State.getVisible());
     int newCount = bm.getNewsCount(EnumSet.of(INews.State.NEW));
     int unreadCount = bm.getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED));
 
     if (totalCount == 0)
-      createLabel(container, "0", false);
+      createLabel(container, "0", false); //$NON-NLS-1$
     else
-      createLabel(container, totalCount + " (" + newCount + " new, " + unreadCount + " unread)", false);
+      createLabel(container, NLS.bind(Messages.InformationPropertyPage_NEWS_COUNT_N_OF_M, new Object[] { totalCount, newCount, unreadCount }), false);
 
     return container;
   }
@@ -184,7 +185,7 @@ public class InformationPropertyPage implements IEntityPropertyPage {
    */
   public ImageDescriptor getImage() {
     if (!fEntities.isEmpty() && ((IBookMark) fEntities.get(0)).isErrorLoading())
-      return OwlUI.getImageDescriptor("icons/ovr16/error.gif");
+      return OwlUI.getImageDescriptor("icons/ovr16/error.gif"); //$NON-NLS-1$
 
     return null;
   }

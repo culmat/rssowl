@@ -124,11 +124,11 @@ public class DisplayPropertyPage implements IEntityPropertyPage {
 
     /* Filter Settings */
     Label filterLabel = new Label(container, SWT.None);
-    filterLabel.setText("Filter News: ");
+    filterLabel.setText(Messages.DisplayPropertyPage_FILTER);
 
     fFilterCombo = new Combo(container, SWT.BORDER | SWT.READ_ONLY);
     fFilterCombo.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false));
-    fFilterCombo.add("");
+    fFilterCombo.add(""); //$NON-NLS-1$
 
     NewsFilter.Type[] filters = NewsFilter.Type.values();
     for (NewsFilter.Type filter : filters)
@@ -139,11 +139,11 @@ public class DisplayPropertyPage implements IEntityPropertyPage {
 
     /* Group Settings */
     Label groupLabel = new Label(container, SWT.None);
-    groupLabel.setText("Group News: ");
+    groupLabel.setText(Messages.DisplayPropertyPage_GROUP);
 
     fGroupCombo = new Combo(container, SWT.BORDER | SWT.READ_ONLY);
     fGroupCombo.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false));
-    fGroupCombo.add("");
+    fGroupCombo.add(""); //$NON-NLS-1$
 
     NewsGrouping.Type[] groups = NewsGrouping.Type.values();
     for (NewsGrouping.Type group : groups)
@@ -154,13 +154,13 @@ public class DisplayPropertyPage implements IEntityPropertyPage {
 
     /* Open Site for News Settings */
     fOpenSiteForNewsCheck = new Button(container, SWT.CHECK);
-    fOpenSiteForNewsCheck.setText("&When a news is selected, open its link directly");
+    fOpenSiteForNewsCheck.setText(Messages.DisplayPropertyPage_OPEN_DIRECTLY);
     fOpenSiteForNewsCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
     fOpenSiteForNewsCheck.setSelection(fPrefOpenSiteForNews);
 
     /* Load Images for News Settings */
     fLoadImagesForNewsCheck = new Button(container, SWT.CHECK);
-    fLoadImagesForNewsCheck.setText("&Display images and flash content from news");
+    fLoadImagesForNewsCheck.setText(Messages.DisplayPropertyPage_DISPLAY_IMAGE_FLASH);
     fLoadImagesForNewsCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
     fLoadImagesForNewsCheck.setSelection(fPrefLoadImagesForNews);
 

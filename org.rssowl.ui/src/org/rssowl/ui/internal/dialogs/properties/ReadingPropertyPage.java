@@ -130,7 +130,7 @@ public class ReadingPropertyPage implements IEntityPropertyPage {
 
     /* Mark Read after Millis */
     fMarkReadStateCheck = new Button(markReadAfterContainer, SWT.CHECK);
-    fMarkReadStateCheck.setText("Mark selected news as &read after ");
+    fMarkReadStateCheck.setText(Messages.ReadingPropertyPage_MARK_READ_AFTER);
     fMarkReadStateCheck.setSelection(fPrefMarkReadState);
     fMarkReadStateCheck.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -146,21 +146,21 @@ public class ReadingPropertyPage implements IEntityPropertyPage {
     fMarkReadAfterSpinner.setEnabled(fMarkReadStateCheck.getSelection());
 
     Label label = new Label(markReadAfterContainer, SWT.None);
-    label.setText(" seconds");
+    label.setText(Messages.ReadingPropertyPage_SECONDS);
 
     /* Mark Read on changing displayed Feed */
     fMarkReadOnChange = new Button(container, SWT.CHECK);
-    fMarkReadOnChange.setText("Mark displayed news as read when &switching feeds");
+    fMarkReadOnChange.setText(Messages.ReadingPropertyPage_MARK_READ_ON_SWITCH);
     fMarkReadOnChange.setSelection(fPrefMarkReadOnFeedChange);
 
     /* Mark Read on closing Feed Tab */
     fMarkReadOnTabClose = new Button(container, SWT.CHECK);
-    fMarkReadOnTabClose.setText("Mark displayed news as read when &closing the tab");
+    fMarkReadOnTabClose.setText(Messages.ReadingPropertyPage_MARK_READ_ON_CLOSE);
     fMarkReadOnTabClose.setSelection(fPrefMarkReadOnTabClose);
 
     /* Mark Read on Minimize */
     fMarkReadOnMinimize = new Button(container, SWT.CHECK);
-    fMarkReadOnMinimize.setText("Mark displayed news as read on &minimize");
+    fMarkReadOnMinimize.setText(Messages.ReadingPropertyPage_MARK_READ_ON_MINIMIZE);
     fMarkReadOnMinimize.setSelection(fPrefMarkReadOnMinimize);
 
 
