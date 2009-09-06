@@ -37,6 +37,7 @@ import org.rssowl.ui.filter.INewsActionPresentation;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.io.File;
+import java.io.Serializable;
 
 /**
  * An implementation of {@link INewsActionPresentation} to configure the path to
@@ -120,7 +121,7 @@ public class ShowGrowlActionPresentation implements INewsActionPresentation {
   /*
    * @see org.rssowl.ui.filter.INewsActionPresentation#getData()
    */
-  public Object getData() {
-    return fGrowlPathLink.getData();
+  public Serializable getData() {
+    return (String)fGrowlPathLink.getData();
   }
 }
