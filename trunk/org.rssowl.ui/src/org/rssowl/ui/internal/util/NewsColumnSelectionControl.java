@@ -75,7 +75,7 @@ public class NewsColumnSelectionControl extends Composite {
 
   /* Sort Order */
   private enum Order {
-    ASCENDING("Ascending"), DESCENDING("Descending");
+    ASCENDING(Messages.NewsColumnSelectionControl_ASCENDING), DESCENDING(Messages.NewsColumnSelectionControl_DESCENDING);
 
     private String fName;
 
@@ -167,7 +167,7 @@ public class NewsColumnSelectionControl extends Composite {
 
     final Button addButton = new Button(buttonContainer, SWT.DOWN);
     setButtonLayoutData(addButton);
-    addButton.setText("&Add");
+    addButton.setText(Messages.NewsColumnSelectionControl_ADD);
     addButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -182,7 +182,7 @@ public class NewsColumnSelectionControl extends Composite {
     /* Remove */
     fRemoveButton = new Button(buttonContainer, SWT.PUSH);
     setButtonLayoutData(fRemoveButton);
-    fRemoveButton.setText("&Remove");
+    fRemoveButton.setText(Messages.NewsColumnSelectionControl_REMOVE);
     fRemoveButton.setEnabled(false);
     fRemoveButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -194,7 +194,7 @@ public class NewsColumnSelectionControl extends Composite {
     /* Move Up */
     fMoveUpButton = new Button(buttonContainer, SWT.PUSH);
     setButtonLayoutData(fMoveUpButton);
-    fMoveUpButton.setText("Move &Up");
+    fMoveUpButton.setText(Messages.NewsColumnSelectionControl_MOVE_UP);
     fMoveUpButton.setEnabled(false);
     fMoveUpButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -206,7 +206,7 @@ public class NewsColumnSelectionControl extends Composite {
     /* Move Down */
     fMoveDownButton = new Button(buttonContainer, SWT.PUSH);
     setButtonLayoutData(fMoveDownButton);
-    fMoveDownButton.setText("Move &Down");
+    fMoveDownButton.setText(Messages.NewsColumnSelectionControl_MOVE_DOWN);
     fMoveDownButton.setEnabled(false);
     fMoveDownButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -221,7 +221,7 @@ public class NewsColumnSelectionControl extends Composite {
     sortByContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
 
     Label sortByLabel = new Label(sortByContainer, SWT.NONE);
-    sortByLabel.setText("Sort By: ");
+    sortByLabel.setText(Messages.NewsColumnSelectionControl_SORT_BY);
 
     fSortByViewer = new ComboViewer(sortByContainer, SWT.READ_ONLY | SWT.BORDER);
     fSortByViewer.getCombo().setVisibleItemCount(20);

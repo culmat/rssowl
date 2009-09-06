@@ -47,7 +47,7 @@ import java.util.List;
 public class CTable {
 
   /* ID to store Layout-Data with TableColumns */
-  private static final String LAYOUT_DATA = "org.rssowl.ui.internal.CTreeLayoutData";
+  private static final String LAYOUT_DATA = "org.rssowl.ui.internal.CTreeLayoutData"; //$NON-NLS-1$
 
   private Table fTable;
   private List<TableColumn> fCols = new ArrayList<TableColumn>();

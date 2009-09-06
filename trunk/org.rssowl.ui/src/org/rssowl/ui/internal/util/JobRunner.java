@@ -175,7 +175,7 @@ public class JobRunner {
 
     /* Guard against Illegal-Thread-Access */
     if (display == null)
-      throw new IllegalStateException("Method was not called from the UI-Thread!");
+      throw new IllegalStateException("Method was not called from the UI-Thread!"); //$NON-NLS-1$
 
     /* Set the Cursor */
     Cursor cursor = display.getSystemCursor(SWT.CURSOR_APPSTARTING);

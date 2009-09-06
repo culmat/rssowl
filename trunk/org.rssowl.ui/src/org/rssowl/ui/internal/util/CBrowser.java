@@ -75,11 +75,11 @@ public class CBrowser {
   private static final int BROWSER_URL_DELAY = 500;
 
   /* JavaScript: print() Method */
-  private static final String JAVA_SCRIPT_PRINT = "window.print();";
+  private static final String JAVA_SCRIPT_PRINT = "window.print();"; //$NON-NLS-1$
 
   /* System Properties to configure proxy with XULRunner */
-  private static final String XULRUNNER_PROXY_HOST = "network.proxy_host";
-  private static final String XULRUNNER_PROXY_PORT = "network.proxy_port";
+  private static final String XULRUNNER_PROXY_HOST = "network.proxy_host"; //$NON-NLS-1$
+  private static final String XULRUNNER_PROXY_PORT = "network.proxy_port"; //$NON-NLS-1$
 
   /* Flag to check if Mozilla is available on Windows */
   private static boolean fgMozillaAvailable = true;
@@ -101,10 +101,10 @@ public class CBrowser {
       fBrowser = createBrowser(parent, style);
     } catch (SWTError e) {
       MessageBox box = new MessageBox(parent.getShell(), SWT.ICON_ERROR | SWT.OK | SWT.CANCEL);
-      box.setText("Error Creating Browser");
-      box.setMessage("RSSOwl was unable to create a browser for reading news. Please refer to the FAQ for further help.\n\nClick 'Ok' to open the FAQ now.");
+      box.setText(Messages.CBrowser_ERROR_CREATE_BROWSER);
+      box.setMessage(Messages.CBrowser_ERROR_CREATE_BROWSER_MSG);
       if (box.open() == SWT.OK)
-        BrowserUtils.openLinkExternal("http://boreal.rssowl.org/#faq");
+        BrowserUtils.openLinkExternal("http://boreal.rssowl.org/#faq"); //$NON-NLS-1$
 
       throw e;
     }
@@ -142,8 +142,8 @@ public class CBrowser {
         System.setProperty(XULRUNNER_PROXY_HOST, proxyHost);
         System.setProperty(XULRUNNER_PROXY_PORT, proxyPort);
       } else {
-        System.setProperty(XULRUNNER_PROXY_HOST, "");
-        System.setProperty(XULRUNNER_PROXY_PORT, "");
+        System.setProperty(XULRUNNER_PROXY_HOST, ""); //$NON-NLS-1$
+        System.setProperty(XULRUNNER_PROXY_PORT, ""); //$NON-NLS-1$
       }
     }
 
@@ -154,7 +154,7 @@ public class CBrowser {
       } catch (SWTError e) {
         fgMozillaAvailable = false;
 
-        if (!"No more handles [Could not detect registered XULRunner to use]".equals(e.getMessage())) //This happens too often to log it
+        if (!"No more handles [Could not detect registered XULRunner to use]".equals(e.getMessage())) //This happens too often to log it //$NON-NLS-1$
           Activator.getDefault().getLog().log(Activator.getDefault().createInfoStatus(e.getMessage(), null));
       }
     }
@@ -190,7 +190,7 @@ public class CBrowser {
       public void menuAboutToShow(IMenuManager manager) {
 
         /* Back */
-        manager.add(new Action("Back") {
+        manager.add(new Action(Messages.CBrowser_BACK) {
           @Override
           public void run() {
             fBrowser.back();
@@ -203,12 +203,12 @@ public class CBrowser {
 
           @Override
           public ImageDescriptor getImageDescriptor() {
-            return OwlUI.getImageDescriptor("icons/etool16/backward.gif");
+            return OwlUI.getImageDescriptor("icons/etool16/backward.gif"); //$NON-NLS-1$
           }
         });
 
         /* Forward */
-        manager.add(new Action("Forward") {
+        manager.add(new Action(Messages.CBrowser_FORWARD) {
           @Override
           public void run() {
             fBrowser.forward();
@@ -221,13 +221,13 @@ public class CBrowser {
 
           @Override
           public ImageDescriptor getImageDescriptor() {
-            return OwlUI.getImageDescriptor("icons/etool16/forward.gif");
+            return OwlUI.getImageDescriptor("icons/etool16/forward.gif"); //$NON-NLS-1$
           }
         });
 
         /* Reload */
         manager.add(new Separator());
-        manager.add(new Action("Reload") {
+        manager.add(new Action(Messages.CBrowser_RELOAD) {
           @Override
           public void run() {
             fBrowser.refresh();
@@ -235,12 +235,12 @@ public class CBrowser {
 
           @Override
           public ImageDescriptor getImageDescriptor() {
-            return OwlUI.getImageDescriptor("icons/elcl16/reload.gif");
+            return OwlUI.getImageDescriptor("icons/elcl16/reload.gif"); //$NON-NLS-1$
           }
         });
 
         /* Stop */
-        manager.add(new Action("Stop") {
+        manager.add(new Action(Messages.CBrowser_STOP) {
           @Override
           public void run() {
             fBrowser.stop();
@@ -248,7 +248,7 @@ public class CBrowser {
 
           @Override
           public ImageDescriptor getImageDescriptor() {
-            return OwlUI.getImageDescriptor("icons/etool16/cancel.gif");
+            return OwlUI.getImageDescriptor("icons/etool16/cancel.gif"); //$NON-NLS-1$
           }
         });
       }
@@ -337,7 +337,7 @@ public class CBrowser {
 
         /* Open internal Browser in a new Tab */
         if (fEclipsePreferences.getBoolean(DefaultPreferences.ECLIPSE_MULTIPLE_TABS)) {
-          WebBrowserView browserView = BrowserUtils.openLinkInternal(null, WebBrowserContext.createFrom("Loading..."));
+          WebBrowserView browserView = BrowserUtils.openLinkInternal(null, WebBrowserContext.createFrom(Messages.CBrowser_LOADING));
           if (browserView != null)
             event.browser = browserView.getBrowser().getControl();
         }
@@ -382,7 +382,7 @@ public class CBrowser {
 
     /* Toggle via Reflection due to patched SWT */
     try {
-      Method method = fBrowser.getClass().getMethod("setScriptDisabled", Boolean.class);
+      Method method = fBrowser.getClass().getMethod("setScriptDisabled", Boolean.class); //$NON-NLS-1$
       if (method != null)
         method.invoke(fBrowser, disabled);
     } catch (Exception e) {

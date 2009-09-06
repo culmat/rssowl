@@ -285,8 +285,8 @@ public class FolderChooser extends Composite implements DisposeListener {
     fAddFolderBar.setVisible(!fExpandable);
 
     ToolItem addFolderItem = new ToolItem(fAddFolderBar, SWT.PUSH);
-    addFolderItem.setImage(OwlUI.getImage(fResources, "icons/etool16/add_crop.gif"));
-    addFolderItem.setToolTipText("New Folder...");
+    addFolderItem.setImage(OwlUI.getImage(fResources, "icons/etool16/add_crop.gif")); //$NON-NLS-1$
+    addFolderItem.setToolTipText(Messages.FolderChooser_NEW_FOLDER);
     addFolderItem.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -302,8 +302,8 @@ public class FolderChooser extends Composite implements DisposeListener {
     toggleBar.setCursor(headerContainer.getDisplay().getSystemCursor(SWT.CURSOR_ARROW));
 
     fToggleItem = new ToolItem(toggleBar, SWT.PUSH);
-    fToggleItem.setImage(OwlUI.getImage(fResources, "icons/ovr16/arrow_down.gif"));
-    fToggleItem.setToolTipText("Show Folders");
+    fToggleItem.setImage(OwlUI.getImage(fResources, "icons/ovr16/arrow_down.gif")); //$NON-NLS-1$
+    fToggleItem.setToolTipText(Messages.FolderChooser_SHOW_FOLDERS);
     fToggleItem.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -428,7 +428,7 @@ public class FolderChooser extends Composite implements DisposeListener {
 
     /* Add Menu: "New Folder" */
     MenuManager menuManager = new MenuManager();
-    menuManager.add(new Action("New Folder...") {
+    menuManager.add(new Action(Messages.FolderChooser_NEW_FOLDER) {
       @Override
       public void run() {
         onNewFolder();
@@ -463,8 +463,8 @@ public class FolderChooser extends Composite implements DisposeListener {
   private void onToggle() {
     boolean excluded = ((GridData) fFolderViewerContainer.getLayoutData()).exclude;
 
-    fToggleItem.setImage(OwlUI.getImage(fResources, excluded ? "icons/ovr16/arrow_up.gif" : "icons/ovr16/arrow_down.gif"));
-    fToggleItem.setToolTipText(excluded ? "Hide Folders" : "Show Folders");
+    fToggleItem.setImage(OwlUI.getImage(fResources, excluded ? "icons/ovr16/arrow_up.gif" : "icons/ovr16/arrow_down.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+    fToggleItem.setToolTipText(excluded ? Messages.FolderChooser_HIDE_FOLDERS : Messages.FolderChooser_SHOW_FOLDERS);
 
     ((GridData) fFolderViewerContainer.getLayoutData()).exclude = !excluded;
     Shell shell = fFolderViewerContainer.getShell();

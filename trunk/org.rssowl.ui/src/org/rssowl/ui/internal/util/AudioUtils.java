@@ -44,7 +44,7 @@ public class AudioUtils {
 
   private static boolean getSupported() {
     try {
-      Class.forName("javax.sound.sampled.AudioSystem");
+      Class.forName("javax.sound.sampled.AudioSystem"); //$NON-NLS-1$
       return true;
     } catch (Exception e) {
       return false;

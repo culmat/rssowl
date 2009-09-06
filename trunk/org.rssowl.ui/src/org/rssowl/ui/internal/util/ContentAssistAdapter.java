@@ -59,14 +59,14 @@ public class ContentAssistAdapter implements IControlContentAdapter, IControlCon
     fExpectMultiValues = expectMultiValues;
     fSeparatorStr = new String(new char[] { fSeparator });
     if (fSeparator != ' ')
-      fSeparatorStr = fSeparatorStr + " ";
+      fSeparatorStr = fSeparatorStr + " "; //$NON-NLS-1$
 
     if (control instanceof Text)
       fTextAdapter = new TextContentAdapter();
     else if (control instanceof Combo)
       fComboAdapter = new ComboContentAdapter();
     else
-      throw new IllegalArgumentException("Can only be used for Text and Combo Widgets");
+      throw new IllegalArgumentException("Can only be used for Text and Combo Widgets"); //$NON-NLS-1$
   }
 
   /*
@@ -76,7 +76,7 @@ public class ContentAssistAdapter implements IControlContentAdapter, IControlCon
     String text = getText();
     int selectionOffset = getSelection().x;
     if (selectionOffset == 0)
-      return "";
+      return ""; //$NON-NLS-1$
 
     int previousSeparatorIndex = getPreviousSeparatorIndex(text, selectionOffset);
 

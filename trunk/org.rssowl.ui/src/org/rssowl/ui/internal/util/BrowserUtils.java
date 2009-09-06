@@ -129,19 +129,19 @@ public class BrowserUtils {
   public static void openLinkExternal(String href) {
 
     /* If href points to local file */
-    if (href.startsWith("file:")) {
+    if (href.startsWith("file:")) { //$NON-NLS-1$
       href = href.substring(5);
-      while (href.startsWith("/")) {
+      while (href.startsWith("/")) { //$NON-NLS-1$
         href = href.substring(1);
       }
-      href = "file:///" + href;
+      href = "file:///" + href; //$NON-NLS-1$
     }
 
     String localHref = href;
 
     /* Surround href with double quotes if it containes spaces */
-    if (localHref.contains(" "))
-      localHref = "\"" + localHref + "\"";
+    if (localHref.contains(" ")) //$NON-NLS-1$
+      localHref = "\"" + localHref + "\""; //$NON-NLS-1$ //$NON-NLS-2$
 
     /* Open Default External Browser */
     if (!Owl.getPreferenceService().getGlobalScope().getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER))
@@ -161,11 +161,11 @@ public class BrowserUtils {
    */
   public static void sendMail(String subject, String body) {
     StringBuilder str = new StringBuilder();
-    str.append("mailto:");
-    str.append("?body=");
-    str.append(body != null ? URIUtils.mailToUrllEncode(body) : "");
-    str.append("&subject=");
-    str.append(subject != null ? URIUtils.mailToUrllEncode(subject) : "");
+    str.append("mailto:"); //$NON-NLS-1$
+    str.append("?body="); //$NON-NLS-1$
+    str.append(body != null ? URIUtils.mailToUrllEncode(body) : ""); //$NON-NLS-1$
+    str.append("&subject="); //$NON-NLS-1$
+    str.append(subject != null ? URIUtils.mailToUrllEncode(subject) : ""); //$NON-NLS-1$
 
     openLinkExternal(str.toString());
   }
@@ -182,17 +182,17 @@ public class BrowserUtils {
     /* Try Netscape as default browser */
     if (webBrowser == null) {
       try {
-        webBrowser = "netscape";
-        p = Runtime.getRuntime().exec(webBrowser + "  " + href);
+        webBrowser = "netscape"; //$NON-NLS-1$
+        p = Runtime.getRuntime().exec(webBrowser + "  " + href); //$NON-NLS-1$
       } catch (IOException e) {
-        webBrowser = "mozilla";
+        webBrowser = "mozilla"; //$NON-NLS-1$
       }
     }
 
     /* Try Mozilla as default browser */
     if (p == null) {
       try {
-        p = Runtime.getRuntime().exec(webBrowser + " " + href);
+        p = Runtime.getRuntime().exec(webBrowser + " " + href); //$NON-NLS-1$
       } catch (IOException e) {
         Activator.getDefault().logError(e.getMessage(), e);
       }
@@ -217,7 +217,7 @@ public class BrowserUtils {
     /* Launch default browser on Mac */
     else if (Application.IS_MAC) {
       try {
-        Process proc = Runtime.getRuntime().exec("/usr/bin/open " + link);
+        Process proc = Runtime.getRuntime().exec("/usr/bin/open " + link); //$NON-NLS-1$
 
         /* Let StreamGobbler handle error message */
         StreamGobbler errorGobbler = new StreamGobbler(proc.getErrorStream());
@@ -241,14 +241,14 @@ public class BrowserUtils {
     else {
 
       /* Run browser in a seperate thread */
-      Thread launcher = new Thread("Browser Launcher") {
+      Thread launcher = new Thread("") { //$NON-NLS-1$
         @Override
         public void run() {
           try {
 
             /* The default browser was successfully launched once, use again */
             if (webBrowserSuccessfullyOpened) {
-              Process proc = Runtime.getRuntime().exec(webBrowser + " -remote openURL(" + link + ")");
+              Process proc = Runtime.getRuntime().exec(webBrowser + " -remote openURL(" + link + ")"); //$NON-NLS-1$ //$NON-NLS-2$
 
               /* Let StreamGobbler handle error message */
               StreamGobbler errorGobbler = new StreamGobbler(proc.getErrorStream());
@@ -311,8 +311,8 @@ public class BrowserUtils {
     JobRunner.runInUIThread(window.getShell(), new Runnable() {
       public void run() {
         MessageBox box = new MessageBox(window.getShell(), SWT.ICON_WARNING | SWT.OK | SWT.CANCEL);
-        box.setText("Unable to Launch External Browser");
-        box.setMessage("RSSOwl is unable to launch the external browser. Please configure it and try again.");
+        box.setText(Messages.BrowserUtils_ERROR_LAUNCH_BROWSER);
+        box.setMessage(Messages.BrowserUtils_ERROR_LAUNCH_BROWSER_MSG);
 
         if (box.open() == SWT.OK)
           PreferencesUtil.createPreferenceDialogOn(window.getShell(), BrowserPreferencePage.ID, null, null).open();
@@ -322,10 +322,10 @@ public class BrowserUtils {
 
   private static void useCustomBrowser(final String link) {
     String browser = Owl.getPreferenceService().getGlobalScope().getString(DefaultPreferences.CUSTOM_BROWSER_PATH);
-    final String executable = browser + " " + link;
+    final String executable = browser + " " + link; //$NON-NLS-1$
 
     /* Launch custom browser in seperate thread */
-    Thread launcher = new Thread("Browser Launcher") {
+    Thread launcher = new Thread("") { //$NON-NLS-1$
       @Override
       public void run() {
 
