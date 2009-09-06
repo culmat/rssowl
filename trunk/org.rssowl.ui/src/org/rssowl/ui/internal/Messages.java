@@ -163,6 +163,10 @@ public class Messages extends NLS {
   public static String EntityGroup_GROUP;
 
   public static String OwlUI_CONTENT_ASSIST;
+  public static String OwlUI_N_BYTES;
+  public static String OwlUI_N_KB;
+  public static String OwlUI_N_MB;
+  public static String OwlUI_SIZE_FORMAT;
   public static String OwlUI_TITLE;
   public static String OwlUI_UPDATED;
   public static String SplashHandler_BUILD;
