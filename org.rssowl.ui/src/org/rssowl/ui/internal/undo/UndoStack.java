@@ -26,6 +26,7 @@ package org.rssowl.ui.internal.undo;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.util.SafeRunnable;
+import org.eclipse.osgi.util.NLS;
 import org.rssowl.core.util.LoggingSafeRunnable;
 
 import java.util.ArrayList;
@@ -110,9 +111,9 @@ public class UndoStack {
    */
   public String getUndoName() {
     if (!isUndoSupported())
-      return "&Undo";
+      return Messages.UndoStack_UNDO;
 
-    return "&Undo '" + fOperations.get(fCurrentIndex).getName() + "'";
+    return NLS.bind(Messages.UndoStack_UNDO_N, fOperations.get(fCurrentIndex).getName());
   }
 
   /**
@@ -121,9 +122,9 @@ public class UndoStack {
    */
   public String getRedoName() {
     if (!isRedoSupported())
-      return "&Redo";
+      return Messages.UndoStack_REDO;
 
-    return "&Redo '" + fOperations.get(fCurrentIndex + 1).getName() + "'";
+    return NLS.bind(Messages.UndoStack_REDO_N, fOperations.get(fCurrentIndex + 1).getName());
   }
 
   /**

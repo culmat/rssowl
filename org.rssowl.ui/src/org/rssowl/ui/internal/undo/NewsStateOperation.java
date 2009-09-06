@@ -25,6 +25,7 @@
 package org.rssowl.ui.internal.undo;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.osgi.util.NLS;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DynamicDAO;
@@ -64,7 +65,7 @@ public class NewsStateOperation implements IUndoOperation {
    * @param affectEquivalentNews
    */
   public NewsStateOperation(Collection<INews> news, INews.State newState, boolean affectEquivalentNews) {
-    Assert.isTrue(SUPPORTED_STATES.contains(newState), "Unsupported Operation");
+    Assert.isTrue(SUPPORTED_STATES.contains(newState), Messages.NewsStateOperation_UNSUPPORTED);
 
     fOldStates = CoreUtils.toStateMap(news);
     fNewState = newState;
@@ -79,20 +80,20 @@ public class NewsStateOperation implements IUndoOperation {
   public String getName() {
     switch (fNewState) {
       case HIDDEN:
-        return "Delete " + fNewsCount + " News";
+        return NLS.bind(Messages.NewsStateOperation_DELETE_N_NEWS, fNewsCount);
 
       case READ:
-        return "Mark " + fNewsCount + " News as Read";
+        return NLS.bind(Messages.NewsStateOperation_MARK_N_READ, fNewsCount);
 
       case UNREAD: {
         if (fOnlyNewNewsAffected)
-          return "Mark " + fNewsCount + " New News as Unread";
+          return NLS.bind(Messages.NewsStateOperation_MARK_N_NEW_UNREAD, fNewsCount);
 
-        return "Mark " + fNewsCount + " News as Unread";
+        return NLS.bind(Messages.NewsStateOperation_MARK_N_UNREAD, fNewsCount);
       }
 
       default:
-        return "Unsupported Operation";
+        return Messages.NewsStateOperation_UNSUPPORTED;
     }
   }
 
