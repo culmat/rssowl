@@ -36,6 +36,7 @@ import org.rssowl.core.persist.ISource;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.MergeUtils;
+import org.rssowl.core.util.StringUtils;
 
 import java.io.Serializable;
 import java.net.URI;
@@ -343,7 +344,7 @@ public class News extends AbstractEntity implements INews {
     try {
       Assert.isNotNull(other, "other cannot be null"); //$NON-NLS-1$
 
-      Boolean guidMatch = isEquivalentCompare(fGuidValue, other.fGuidValue);
+      Boolean guidMatch = isEquivalentCompare(slashTrim(fGuidValue), slashTrim(other.fGuidValue));
 
       //TODO Consider simplifying this after M7. The case where one news
       //has permaLink == true and the other has permaLink == false with the
@@ -353,7 +354,7 @@ public class News extends AbstractEntity implements INews {
       else if (guidMatch != null && guidMatch.equals(Boolean.TRUE))
         return true;
 
-      Boolean linkMatch = isEquivalentCompare(fLinkText, other.fLinkText);
+      Boolean linkMatch = isEquivalentCompare(slashTrim(fLinkText), slashTrim(other.fLinkText));
       if (linkMatch != null) {
         if (linkMatch.equals(Boolean.TRUE))
           return true;
@@ -374,8 +375,18 @@ public class News extends AbstractEntity implements INews {
     }
   }
 
+  /* TODO Remove me in 2.1 (Pre 2.0 Support - see Bug 1092) */
+  private String slashTrim(String str) {
+    if (StringUtils.isSet(str) && str.length() > 1 && str.charAt(str.length() - 1) == '/')
+      return str.substring(0, str.length() - 1);
+
+    return str;
+  }
+
   /*
-   * @see org.rssowl.core.model.types.INews#addAttachment(org.rssowl.core.model.types.IAttachment)
+   * @see
+   * org.rssowl.core.model.types.INews#addAttachment(org.rssowl.core.model.types
+   * .IAttachment)
    */
   public void addAttachment(IAttachment attachment) {
     Assert.isNotNull(attachment, "Exception adding NULL as Attachment into News"); //$NON-NLS-1$

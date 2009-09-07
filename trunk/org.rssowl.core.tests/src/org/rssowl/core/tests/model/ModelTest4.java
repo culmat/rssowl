@@ -40,6 +40,7 @@ import org.rssowl.core.persist.ICategory;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
+import org.rssowl.core.persist.IGuid;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
@@ -481,5 +482,58 @@ public class ModelTest4 {
     search = DynamicDAO.save(search);
 
     assertEquals(search, search.toReference().resolve());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testNewsIsEquivlanet_IgnoreTrailingSlash() throws Exception {
+    IFeed feed = fFactory.createFeed(null, new URI("feed"));
+
+    INews news1 = fFactory.createNews(null, feed, new Date());
+    news1.setLink(new URI("http://www.rssowl.org/news"));
+
+    INews news2 = fFactory.createNews(null, feed, new Date());
+    news2.setLink(new URI("http://www.rssowl.org/news"));
+
+    assertTrue(news1.isEquivalent(news2));
+    assertTrue(news2.isEquivalent(news1));
+
+    news1.setLink(new URI("http://www.rssowl.org/news/"));
+
+    assertTrue(news1.isEquivalent(news2));
+    assertTrue(news2.isEquivalent(news1));
+
+    news2.setLink(new URI("http://www.rssowl.org/news/"));
+
+    assertTrue(news1.isEquivalent(news2));
+    assertTrue(news2.isEquivalent(news1));
+
+    news1.setLink(new URI("http://www.rssowl.org/new"));
+
+    assertFalse(news1.isEquivalent(news2));
+    assertFalse(news2.isEquivalent(news1));
+
+    IGuid guid1 = fFactory.createGuid(news1, "http://www.guid.org/", true);
+    news1.setGuid(guid1);
+
+    IGuid guid2 = fFactory.createGuid(news2, "http://www.guid.org/", true);
+    news2.setGuid(guid2);
+
+    assertTrue(news1.isEquivalent(news2));
+    assertTrue(news2.isEquivalent(news1));
+
+    guid1 = fFactory.createGuid(news1, "http://www.guid.org", true);
+    news1.setGuid(guid1);
+
+    assertTrue(news1.isEquivalent(news2));
+    assertTrue(news2.isEquivalent(news1));
+
+    guid1 = fFactory.createGuid(news1, "http://www.guid.or", true);
+    news1.setGuid(guid1);
+
+    assertFalse(news1.isEquivalent(news2));
+    assertFalse(news2.isEquivalent(news1));
   }
 }
