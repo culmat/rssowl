@@ -256,10 +256,10 @@
                icon="icons/elcl16/usearch_obj.gif"
                id="org.rssowl.ui.actions.FindExtensions"
                label="%action.label.18"
-               menubarPath="tools/extensions/findExtensions"
+               menubarPath="tools/end"
                style="push"
                tooltip="%action.tooltip.3"/>
-         <action
+         <!--<action
                class="org.rssowl.ui.internal.actions.ManageConfigurationAction"
                definitionId="org.rssowl.ui.actions.ManageConfiguration"
                icon="icons/elcl16/configs.gif"
@@ -267,8 +267,8 @@
                label="%action.label.19"
                menubarPath="tools/extensions/manageConfiguration"
                style="push"
-               tooltip="%action.tooltip.4"/>
-         <menu
+               tooltip="%action.tooltip.4"/>-->
+         <!--<menu
                id="extensions"
                label="%menu.label.2"
                path="tools/additions">
@@ -276,7 +276,7 @@
             <groupMarker name="findExtensions"/>
             <separator name="extensionsEnd"/>
             <groupMarker name="manageConfiguration"/>
-         </menu>
+         </menu>-->
       </actionSet>
       <actionSet
             id="orgrssowluisetc"
@@ -529,22 +529,18 @@
             description="%category.description"
             id="org.rssowl.ui.commands.category.RSSOwl"
             name="%category.name.0"/>
-      <category
-            description="%category.description.0"
-            id="org.rssowl.ui.commands.category.Extensions"
-            name="%category.name.1"/>
       <command
-            categoryId="org.rssowl.ui.commands.category.Extensions"
+            categoryId="org.rssowl.ui.commands.category.RSSOwl"
             id="org.rssowl.ui.actions.FindUpdates"
             name="%command.name"/>
       <command
-            categoryId="org.rssowl.ui.commands.category.Extensions"
+            categoryId="org.rssowl.ui.commands.category.RSSOwl"
             id="org.rssowl.ui.actions.FindExtensions"
             name="%command.name.0"/>
-      <command
+      <!--<command
             categoryId="org.rssowl.ui.commands.category.Extensions"
             id="org.rssowl.ui.actions.ManageConfiguration"
-            name="%command.name.1"/>
+            name="%command.name.1"/>-->
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             description="%command.description"
