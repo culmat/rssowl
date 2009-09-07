@@ -29,7 +29,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.apache.lucene.search.BooleanQuery;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.rssowl.core.internal.persist.News;
 import org.rssowl.core.persist.IAttachment;
@@ -1100,7 +1099,6 @@ public class ModelSearchTest4 extends AbstractModelSearchTest {
    * @throws Exception
    */
   @Test
-  @Ignore
   public void testReindexAll() throws Exception {
     IFeed feed = fFactory.createFeed(null, new URI("http://www.feed.com/feed.xml"));
     createNews(feed, "Foo", "http://www.news.com/news.html", State.NEW);
@@ -1119,6 +1117,9 @@ public class ModelSearchTest4 extends AbstractModelSearchTest {
     fModelSearch.optimize();
 
     waitForIndexer();
+
+    fModelSearch.shutdown(false);
+    fModelSearch.startup();
 
     result = fModelSearch.searchNews(list(condition), false);
     assertEquals(1, result.size());
