@@ -42,12 +42,13 @@ import org.rssowl.core.persist.pref.IPreferencesInitializer;
 import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.persist.service.IPersistenceService;
 import org.rssowl.core.persist.service.IPreferenceService;
+import org.rssowl.core.util.LongOperationMonitor;
 
 /**
- * The <code>Owl</code> class is the main facade to all API in RSSOwl. It
- * offers access to services, such as for persistence, search, model and
- * interpreter. Note that in some cases directly using the
- * <code>DynamicDAO</code> class might be shorter.
+ * The <code>Owl</code> class is the main facade to all API in RSSOwl. It offers
+ * access to services, such as for persistence, search, model and interpreter.
+ * Note that in some cases directly using the <code>DynamicDAO</code> class
+ * might be shorter.
  *
  * @author bpasero
  * @see DynamicDAO
@@ -63,9 +64,9 @@ public final class Owl {
    * </p>
    * Subclasses may override to provide their own implementation.
    *
-   * @return Returns the Implementation of <code>IApplicationService</code>
-   * that contains special Methods which are used through the Application and
-   * access the persistence layer.
+   * @return Returns the Implementation of <code>IApplicationService</code> that
+   * contains special Methods which are used through the Application and access
+   * the persistence layer.
    */
   public static IApplicationService getApplicationService() {
     return InternalOwl.getDefault().getApplicationService();
@@ -100,8 +101,8 @@ public final class Owl {
    * plugin. The work that is done by the layer includes:
    * <ul>
    * <li>Controlling the lifecycle of the persistence layer</li>
-   * <li>Providing the DAOService that contains DAOs for each persistable
-   * entity</li>
+   * <li>Providing the DAOService that contains DAOs for each persistable entity
+   * </li>
    * <li>Providing the model search to perform full-text searching</li>
    * </ul>
    *
@@ -120,9 +121,9 @@ public final class Owl {
    * It is also the central place to ask for credentials if a resource requires
    * authentication. Several extension points allow to customize the behavor of
    * this service, including the ability to register
-   * <code>IProtocolHandler</code> to define the lookup process on per
-   * protocol basis or contributing <code>ICredentialsProvider</code> to
-   * define how credentials should be stored and retrieved.
+   * <code>IProtocolHandler</code> to define the lookup process on per protocol
+   * basis or contributing <code>ICredentialsProvider</code> to define how
+   * credentials should be stored and retrieved.
    *
    * @return Returns the service responsible for all connection related tasks.
    * @see IProtocolHandler
@@ -142,9 +143,8 @@ public final class Owl {
    * <ul>
    * <li>Contribute a new format interpreter using the FormatInterpreter
    * extension point. This allows to display any XML in RSSOwl as Feed.</li>
-   * <li>Contribute a new namespace handler using the NamespaceHandler
-   * extension point. This allows to properly handle any new namespace in
-   * RSSOwl.</li>
+   * <li>Contribute a new namespace handler using the NamespaceHandler extension
+   * point. This allows to properly handle any new namespace in RSSOwl.</li>
    * <li>Contribute a new element handler using the ElementHandler extension
    * point. This makes RSSOwl understand new elements or even attributes.</li>
    * <li>Contribute a new xml parser using the XMLParser extension point if you
@@ -172,5 +172,25 @@ public final class Owl {
   public static IModelFactory getModelFactory() {
     Assert.isTrue(InternalOwl.getDefault().isStarted(), "The Owl facade  has not yet finished initialization"); //$NON-NLS-1$
     return InternalOwl.getDefault().getModelFactory();
+  }
+
+  /**
+   * Triggers the startup sequence of the Owl core. Will return immediately if
+   * the core has already been started.
+   *
+   * @param monitor A progress monitor to report progress on long running
+   * operations (e.g. migration).
+   */
+  public static void startup(LongOperationMonitor monitor) {
+    if (!InternalOwl.getDefault().isStarted())
+      InternalOwl.getDefault().startup(monitor);
+  }
+
+  /**
+   * @return <code>true</code> if {@link Owl#startup(LongOperationMonitor)} has
+   * been called already and <code>false</code> otherwise.
+   */
+  public static boolean isStarted() {
+    return InternalOwl.getDefault().isStarted();
   }
 }

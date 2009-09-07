@@ -44,7 +44,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 import org.rssowl.core.Owl;
-import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.LongOperationMonitor;
@@ -196,7 +195,7 @@ public class Activator extends AbstractUIPlugin {
 
         /* Start Core */
         try {
-          InternalOwl.getDefault().startup(callbackMonitor);
+          Owl.startup(callbackMonitor);
         }
 
         /* Handle OOM Error */
