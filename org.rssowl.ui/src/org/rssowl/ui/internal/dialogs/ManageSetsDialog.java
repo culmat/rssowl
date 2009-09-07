@@ -43,6 +43,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerDropAdapter;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.Transfer;
@@ -87,7 +88,7 @@ import java.util.Set;
 /**
  * The <code>ManageSetsDialog</code> allows to manage bookmark-sets. These are
  * root-leveld Folders containing other Folders and Marks.
- *
+ * 
  * @author bpasero
  */
 public class ManageSetsDialog extends TitleAreaDialog {
@@ -536,23 +537,23 @@ public class ManageSetsDialog extends TitleAreaDialog {
 
       count(bookmarkSet, counter);
 
-      StringBuilder str = new StringBuilder("Set contains "); //$NON-NLS-1$
+      StringBuilder itemBuilder = new StringBuilder();
       if (counter[0] > 0)
-        str.append(counter[0] == 1 ? "1 folder, " : (counter[0] + " folders, ")); //$NON-NLS-1$ //$NON-NLS-2$
+        itemBuilder.append(counter[0] == 1 ? Messages.ManageSetsDialog_1_FOLDER : (NLS.bind(Messages.ManageSetsDialog_N_FOLDERS, counter[0]))).append(", "); //$NON-NLS-1$
       if (counter[1] > 0)
-        str.append(counter[1] == 1 ? "1 bookmark, " : (counter[1] + " bookmarks, ")); //$NON-NLS-1$ //$NON-NLS-2$
+        itemBuilder.append(counter[1] == 1 ? Messages.ManageSetsDialog_1_BOOKMARK : (NLS.bind(Messages.ManageSetsDialog_N_BOOKMARKS, counter[1]))).append(", "); //$NON-NLS-1$
       if (counter[2] > 0)
-        str.append(counter[2] == 1 ? "1 saved search, " : (counter[2] + " saved searches, ")); //$NON-NLS-1$ //$NON-NLS-2$
+        itemBuilder.append(counter[2] == 1 ? Messages.ManageSetsDialog_1_SEARCH : (NLS.bind(Messages.ManageSetsDialog_N_SEARCHES, counter[2]))).append(", "); //$NON-NLS-1$
       if (counter[3] > 0)
-        str.append(counter[3] == 1 ? "1 news bin, " : (counter[3] + " news bins, ")); //$NON-NLS-1$ //$NON-NLS-2$
+        itemBuilder.append(counter[3] == 1 ? Messages.ManageSetsDialog_1_BIN : (NLS.bind(Messages.ManageSetsDialog_N_BINS, counter[3]))).append(", "); //$NON-NLS-1$
 
       /* Set is Empty */
       if (counter[0] == 0 && counter[1] == 0 && counter[2] == 0 && counter[3] == 0)
-        str = new StringBuilder("Set is empty."); //$NON-NLS-1$
+        itemBuilder = new StringBuilder(Messages.ManageSetsDialog_EMPTY_SET);
       else
-        str.delete(str.length() - 2, str.length()).append("."); //$NON-NLS-1$
+        itemBuilder.delete(itemBuilder.length() - 2, itemBuilder.length());
 
-      fStatusLabel.setText(str.toString());
+      fStatusLabel.setText(NLS.bind(Messages.ManageSetsDialog_SET_CONTENT, bookmarkSet.getName(), itemBuilder.toString()));
     }
   }
 

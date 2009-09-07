@@ -180,6 +180,20 @@ public class Messages extends NLS {
   public static String OwlUI_TITLE;
   public static String OwlUI_UPDATED;
   public static String SplashHandler_BUILD;
+  public static String StatusLineUpdater_ITEM_SELECTED;
+
+  public static String StatusLineUpdater_N_BIN;
+  public static String StatusLineUpdater_N_BINS;
+  public static String StatusLineUpdater_N_BOOKMARK;
+  public static String StatusLineUpdater_N_BOOKMARKS;
+  public static String StatusLineUpdater_N_FOLDER;
+  public static String StatusLineUpdater_N_FOLDERS;
+  public static String StatusLineUpdater_N_GROUP;
+  public static String StatusLineUpdater_N_GROUPS;
+  public static String StatusLineUpdater_N_ITEMS_SELECTED;
+  public static String StatusLineUpdater_N_NEWS;
+  public static String StatusLineUpdater_N_SEARCH;
+  public static String StatusLineUpdater_N_SEARCHES;
 
   private Messages() {}
 

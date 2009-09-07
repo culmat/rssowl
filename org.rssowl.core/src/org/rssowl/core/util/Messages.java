@@ -28,7 +28,17 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
   private static final String BUNDLE_NAME = "org.rssowl.core.util.messages"; //$NON-NLS-1$
+  public static String CoreUtils_ALL_IN_N;
+  public static String CoreUtils_AND;
+  public static String CoreUtils_IN_N;
+  public static String CoreUtils_N_DAY;
+  public static String CoreUtils_N_DAYS;
+  public static String CoreUtils_N_HOUR;
+  public static String CoreUtils_N_HOURS;
+  public static String CoreUtils_N_MINUTE;
+  public static String CoreUtils_N_MINUTES;
   public static String CoreUtils_NO_HEADLINE;
+  public static String CoreUtils_OR;
   public static String JobQueue_TASK_NAME;
 
   private Messages() {}

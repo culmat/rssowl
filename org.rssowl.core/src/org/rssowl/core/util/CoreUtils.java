@@ -24,6 +24,7 @@
 
 package org.rssowl.core.util;
 
+import org.eclipse.osgi.util.NLS;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.newsaction.CopyNewsAction;
@@ -204,11 +205,11 @@ public class CoreUtils {
           if (fieldId == INews.AGE_IN_DAYS || fieldId == INews.AGE_IN_MINUTES) {
             Integer value = Integer.valueOf(condValue);
             if (value >= 0)
-              fieldExpression.append(value).append(value == 1 ? " Day" : " Days"); //$NON-NLS-1$ //$NON-NLS-2$
+              fieldExpression.append(value == 1 ? NLS.bind(Messages.CoreUtils_N_DAY, value) : NLS.bind(Messages.CoreUtils_N_DAYS, value));
             else if (value % 60 == 0)
-              fieldExpression.append(Math.abs(value) / 60).append(value == -60 ? " Hour" : " Hours"); //$NON-NLS-1$ //$NON-NLS-2$
+              fieldExpression.append(value == -60 ? NLS.bind(Messages.CoreUtils_N_HOUR, Math.abs(value) / 60) : NLS.bind(Messages.CoreUtils_N_HOURS, Math.abs(value) / 60));
             else
-              fieldExpression.append(Math.abs(value)).append(value == -1 ? " Minute" : " Minutes"); //$NON-NLS-1$ //$NON-NLS-2$
+              fieldExpression.append(value == -1 ? NLS.bind(Messages.CoreUtils_N_MINUTE, Math.abs(value)) : NLS.bind(Messages.CoreUtils_N_MINUTES, Math.abs(value)));
           }
 
           /* Append Condition Value based on Type */
@@ -243,34 +244,35 @@ public class CoreUtils {
             }
           }
 
-          fieldExpression.append(matchAllConditions ? " and " : " or "); //$NON-NLS-1$ //$NON-NLS-2$
+          fieldExpression.append(" ").append(matchAllConditions ? Messages.CoreUtils_AND : Messages.CoreUtils_OR).append(" "); //$NON-NLS-1$ //$NON-NLS-2$
         }
       }
 
       if (fieldExpression.length() > 0)
-        fieldExpression.delete(fieldExpression.length() - (matchAllConditions ? " and ".length() : " or ".length()), fieldExpression.length()); //$NON-NLS-1$ //$NON-NLS-2$
+        fieldExpression.delete(fieldExpression.length() - (matchAllConditions ? (" " + Messages.CoreUtils_AND + " ").length() : (" " + Messages.CoreUtils_OR + " ").length()), fieldExpression.length()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
-      name.append(fieldExpression).append(matchAllConditions ? " and " : " or "); //$NON-NLS-1$ //$NON-NLS-2$
+      name.append(fieldExpression).append(" ").append(matchAllConditions ? Messages.CoreUtils_AND : Messages.CoreUtils_OR).append(" "); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     if (name.length() > 0)
-      name.delete(name.length() - (matchAllConditions ? " and ".length() : " or ".length()), name.length()); //$NON-NLS-1$ //$NON-NLS-2$
+      name.delete(name.length() - (matchAllConditions ? (" " + Messages.CoreUtils_AND + " ").length() : (" " + Messages.CoreUtils_OR + " ").length()), name.length()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
     /* Append location if provided */
     if (!locationConditions.isEmpty()) {
-      if (name.length() == 0)
-        name.append("All News in "); //$NON-NLS-1$
-      else
-        name.append(" in "); //$NON-NLS-1$
-
+      StringBuilder locationsValue = new StringBuilder();
       for (ISearchCondition locationCondition : locationConditions) {
         List<IFolderChild> locations = toEntities((Long[][]) locationCondition.getValue());
         for (IFolderChild location : locations) {
-          name.append("'").append(location.getName()).append("', "); //$NON-NLS-1$ //$NON-NLS-2$
+          locationsValue.append("'").append(location.getName()).append("', "); //$NON-NLS-1$ //$NON-NLS-2$
         }
       }
 
-      name.delete(name.length() - 2, name.length());
+      locationsValue.delete(locationsValue.length() - 2, locationsValue.length());
+
+      if (name.length() == 0)
+        name.append(NLS.bind(Messages.CoreUtils_ALL_IN_N, locationsValue.toString()));
+      else
+        name.append(" ").append(NLS.bind(Messages.CoreUtils_IN_N, locationsValue.toString())); //$NON-NLS-1$
     }
 
     return name.toString();
@@ -984,7 +986,7 @@ public class CoreUtils {
         String value = cond.getValue().toString();
 
         /* Ignore Wildcard Only Values (e.g. search for Labels) */
-        if ("?".equals(value) || "*".equals(value))  //$NON-NLS-1$//$NON-NLS-2$
+        if ("?".equals(value) || "*".equals(value)) //$NON-NLS-1$//$NON-NLS-2$
           continue;
 
         /* Split into Words */

@@ -29,7 +29,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -308,7 +307,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
     /* Open on Startup */
     fOpenOnStartupCheck = new Button(otherSettingsContainer, SWT.CHECK);
     fOpenOnStartupCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-    fOpenOnStartupCheck.setText(NLS.bind(Messages.GeneralPropertyPage_DISPLAY_ON_STARTUP, getDisplayName()));
+    fOpenOnStartupCheck.setText(getDisplaySettingName());
     fOpenOnStartupCheck.setSelection(fPrefOpenOnStartup);
 
     return container;
@@ -321,15 +320,15 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
     return null;
   }
 
-  private String getDisplayName() {
+  private String getDisplaySettingName() {
     if (fEntities.size() == 1) {
       if (fEntities.get(0) instanceof INewsBin)
-        return "news bin"; //$NON-NLS-1$
+        return Messages.GeneralPropertyPage_DISPLAY_BIN_ONSTARTUP;
 
       if (fEntities.get(0) instanceof IBookMark)
-        return "feed"; //$NON-NLS-1$
+        return Messages.GeneralPropertyPage_DISPLAY_FEED_ONSTARTUP;
 
-      return "feeds"; //$NON-NLS-1$
+      return Messages.GeneralPropertyPage_DISPLAY_FEEDS_ONSTARTUP;
     }
 
     boolean containsBin = false;
@@ -343,11 +342,11 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
     }
 
     if (containsBin && containsBookMarkOrFolder)
-      return "elements"; //$NON-NLS-1$
+      return Messages.GeneralPropertyPage_DISPLAY_ELEMENTS_ONSTARTUP;
     else if (containsBin)
-      return "news bins"; //$NON-NLS-1$
+      return Messages.GeneralPropertyPage_DISPLAY_BINS_ONSTARTUP;
 
-    return "feeds"; //$NON-NLS-1$
+    return Messages.GeneralPropertyPage_DISPLAY_FEEDS_ONSTARTUP;
   }
 
   private boolean containsNewsBin(List<IEntity> entities) {

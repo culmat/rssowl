@@ -28,6 +28,7 @@ import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.osgi.util.NLS;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IMark;
@@ -36,8 +37,8 @@ import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.ISearchMark;
 
 /**
- * Add the <code>StatusLineUpdater</code> to your ViewPart to have the
- * statusbar describing the selected elements.
+ * Add the <code>StatusLineUpdater</code> to your ViewPart to have the statusbar
+ * describing the selected elements.
  *
  * @author bpasero
  */
@@ -80,7 +81,7 @@ public class StatusLineUpdater implements ISelectionChangedListener {
       else if (element instanceof INews) // Ignore This
         return ""; //$NON-NLS-1$
 
-      return "Item selected"; //$NON-NLS-1$
+      return Messages.StatusLineUpdater_ITEM_SELECTED;
     }
 
     /* More than 1 Element selected */
@@ -106,30 +107,30 @@ public class StatusLineUpdater implements ISelectionChangedListener {
         newsCount++;
     }
 
-    StringBuilder buf = new StringBuilder();
-    buf.append(elements.length);
-    buf.append(" items selected ("); //$NON-NLS-1$
-
+    StringBuilder itemsBuf = new StringBuilder();
     if (folderCount > 0)
-      buf.append(folderCount).append(folderCount == 1 ? " Folder, " : " Folders, "); //$NON-NLS-1$ //$NON-NLS-2$
+      itemsBuf.append(folderCount == 1 ? NLS.bind(Messages.StatusLineUpdater_N_FOLDER, folderCount) : NLS.bind(Messages.StatusLineUpdater_N_FOLDERS, folderCount)).append(", "); //$NON-NLS-1$
 
     if (bookMarkCount > 0)
-      buf.append(bookMarkCount).append(bookMarkCount == 1 ? " Bookmark, " : " Bookmarks, "); //$NON-NLS-1$ //$NON-NLS-2$
+      itemsBuf.append(bookMarkCount == 1 ? NLS.bind(Messages.StatusLineUpdater_N_BOOKMARK, bookMarkCount) : NLS.bind(Messages.StatusLineUpdater_N_BOOKMARKS, bookMarkCount)).append(", "); //$NON-NLS-1$
 
     if (newsBinCount > 0)
-      buf.append(newsBinCount).append(newsBinCount == 1 ? " News Bin, " : " News Bins, "); //$NON-NLS-1$ //$NON-NLS-2$
+      itemsBuf.append(newsBinCount == 1 ? NLS.bind(Messages.StatusLineUpdater_N_BIN, newsBinCount) : NLS.bind(Messages.StatusLineUpdater_N_BINS, newsBinCount)).append(", "); //$NON-NLS-1$
 
     if (searchMarkCount > 0)
-      buf.append(searchMarkCount).append(searchMarkCount == 1 ? " Saved Search, " : " Saved Searches, "); //$NON-NLS-1$ //$NON-NLS-2$
+      itemsBuf.append(searchMarkCount == 1 ? NLS.bind(Messages.StatusLineUpdater_N_SEARCH, searchMarkCount) : NLS.bind(Messages.StatusLineUpdater_N_SEARCHES, searchMarkCount)).append(", "); //$NON-NLS-1$
 
     if (viewerGroupCount > 0)
-      buf.append(viewerGroupCount).append(viewerGroupCount == 1 ? " Group, " : " Groups, "); //$NON-NLS-1$ //$NON-NLS-2$
+      itemsBuf.append(viewerGroupCount == 1 ? NLS.bind(Messages.StatusLineUpdater_N_GROUP, viewerGroupCount) : NLS.bind(Messages.StatusLineUpdater_N_GROUPS, viewerGroupCount)).append(", "); //$NON-NLS-1$
 
     if (newsCount > 0)
-      buf.append(newsCount).append(" News, "); //$NON-NLS-1$
+      itemsBuf.append(NLS.bind(Messages.StatusLineUpdater_N_NEWS, newsCount)).append(", "); //$NON-NLS-1$
 
-    buf.delete(buf.length() - 2, buf.length());
-    buf.append(")"); //$NON-NLS-1$
+    itemsBuf.delete(itemsBuf.length() - 2, itemsBuf.length());
+
+    StringBuilder buf = new StringBuilder();
+    buf.append(NLS.bind(Messages.StatusLineUpdater_N_ITEMS_SELECTED, elements.length, itemsBuf.toString()));
+
     return buf.toString();
   }
 }

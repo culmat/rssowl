@@ -167,16 +167,16 @@ public class EntityPropertyDialogAction extends Action implements IObjectActionD
       StringBuilder buf = new StringBuilder();
 
       if (folderCount > 0)
-        buf.append(folderCount).append(folderCount == 1 ? " Folder, " : " Folders, "); //$NON-NLS-1$ //$NON-NLS-2$
+        buf.append(folderCount == 1 ? NLS.bind(Messages.EntityPropertyDialogAction_N_FOLDER, folderCount) : NLS.bind(Messages.EntityPropertyDialogAction_N_FOLDERS, folderCount)).append(", "); //$NON-NLS-1$
 
       if (bookMarkCount > 0)
-        buf.append(bookMarkCount).append(bookMarkCount == 1 ? " Bookmark, " : " Bookmarks, "); //$NON-NLS-1$ //$NON-NLS-2$
+        buf.append(bookMarkCount == 1 ? NLS.bind(Messages.EntityPropertyDialogAction_N_BOOKMARK, bookMarkCount) : NLS.bind(Messages.EntityPropertyDialogAction_N_BOOKMARKS, bookMarkCount)).append(", "); //$NON-NLS-1$
 
       if (searchMarkCount > 0)
-        buf.append(searchMarkCount).append(searchMarkCount == 1 ? " Saved Search, " : " Saved Searches, "); //$NON-NLS-1$ //$NON-NLS-2$
+        buf.append(searchMarkCount == 1 ? NLS.bind(Messages.EntityPropertyDialogAction_N_SEARCH, searchMarkCount) : NLS.bind(Messages.EntityPropertyDialogAction_N_SEARCHES, searchMarkCount)).append(", "); //$NON-NLS-1$
 
       if (newsBinCount > 0)
-        buf.append(newsBinCount).append(newsBinCount == 1 ? " News Bin, " : " News Bins, "); //$NON-NLS-1$ //$NON-NLS-2$
+        buf.append(newsBinCount == 1 ? NLS.bind(Messages.EntityPropertyDialogAction_N_BIN, newsBinCount) : NLS.bind(Messages.EntityPropertyDialogAction_N_BINS, newsBinCount)).append(", "); //$NON-NLS-1$
 
       buf.delete(buf.length() - 2, buf.length());
 

@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.osgi.util.NLS;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
@@ -96,14 +97,19 @@ public class CleanUpWizard extends Wizard {
     }
 
     if (bmCounter != 0 || newsCounter != 0) {
-      String msg = "Are you sure you want to delete "; //$NON-NLS-1$
-      String bmMsg = bmCounter > 1 ? bmCounter + " bookmarks" : bmCounter + " bookmark"; //$NON-NLS-1$ //$NON-NLS-2$
-      if (bmCounter != 0 && newsCounter != 0)
-        msg += bmMsg + " and " + newsCounter + " news?"; //$NON-NLS-1$ //$NON-NLS-2$
-      else if (bmCounter != 0)
-        msg += bmMsg + "?"; //$NON-NLS-1$
-      else
-        msg += newsCounter + " news?"; //$NON-NLS-1$
+      String msg;
+      if (bmCounter != 0 && newsCounter != 0) {
+        if (bmCounter > 1)
+          msg = NLS.bind(Messages.CleanUpWizard_CONFIRM_BOOKMARKS_NEWS, bmCounter, newsCounter);
+        else
+          msg = NLS.bind(Messages.CleanUpWizard_CONFIRM_BOOKMARK_NEWS, bmCounter, newsCounter);
+      } else if (bmCounter != 0) {
+        if (bmCounter > 1)
+          msg = NLS.bind(Messages.CleanUpWizard_CONFIRM_BOOKMARKS, bmCounter);
+        else
+          msg = NLS.bind(Messages.CleanUpWizard_CONFIRM_BOOKMARK, bmCounter);
+      } else
+        msg = NLS.bind(Messages.CleanUpWizard_CONFIRM_NEWS, newsCounter);
 
       ConfirmDialog dialog = new ConfirmDialog(getShell(), Messages.CleanUpWizard_CONFIRM_DELETE, Messages.CleanUpWizard_NO_UNDO, msg, null);
       if (dialog.open() != Window.OK)
