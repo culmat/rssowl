@@ -634,12 +634,17 @@ public class ApplicationServer {
     /* Write HTML to the Receiver */
     BufferedWriter writer = null;
     try {
+      boolean portable = Controller.getDefault().isPortable();
       writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 
       /* Send Headers (Bug on Mac: Header printed in Browser) */
       if (Application.IS_MAC)
         writer.append("<!--").append(CRLF); //$NON-NLS-1$
-      writer.append("HTTP/1.x 200 OK").append(CRLF); //$NON-NLS-1$
+
+      if (Application.IS_WINDOWS && portable)
+        writer.append("HTTP/1.x 205 OK").append(CRLF); //$NON-NLS-1$
+      else
+        writer.append("HTTP/1.x 200 OK").append(CRLF); //$NON-NLS-1$
 
       synchronized (RFC_1123_DATE) {
         writer.append("Date: ").append(RFC_1123_DATE.format(new Date())).append(CRLF); //$NON-NLS-1$
