@@ -182,6 +182,9 @@ public class Controller {
   /* System Property to import a file on first startup */
   private static final String IMPORT_PROPERTY = "import"; //$NON-NLS-1$
 
+  /* System Property indicating that the application is running portable */
+  private static final String PORTABLE_PROPERTY = "portable"; //$NON-NLS-1$
+
   /* Queue for reloading Feeds */
   private final JobQueue fReloadFeedQueue;
 
@@ -239,6 +242,7 @@ public class Controller {
   private Map<Long, Long> fDeletedBookmarksCache = new ConcurrentHashMap<Long, Long>();
   private String fFeedSearchUrl;
   private boolean fShowWelcome;
+  private boolean fPortable;
 
   /**
    * A listener that informs when a {@link IBookMark} is getting reloaded from
@@ -322,6 +326,7 @@ public class Controller {
     fAppService = Owl.getApplicationService();
     fFactory = Owl.getModelFactory();
     fConnectionTimeout = getSystemProperty(FEED_CON_TIMEOUT_PROPERTY, DEFAULT_FEED_CON_TIMEOUT, DEFAULT_FEED_CON_TIMEOUT);
+    fPortable = System.getProperty(PORTABLE_PROPERTY) != null;
   }
 
   private int getSystemProperty(String key, int minValue, int defaultValue) {
@@ -1338,5 +1343,13 @@ public class Controller {
    */
   public void stopUpdate() {
     fReloadFeedQueue.cancel(false);
+  }
+
+  /**
+   * @return <code>true</code> if this application runs in portable mode and
+   * <code>false</code> otherwise.
+   */
+  public boolean isPortable() {
+    return fPortable;
   }
 }
