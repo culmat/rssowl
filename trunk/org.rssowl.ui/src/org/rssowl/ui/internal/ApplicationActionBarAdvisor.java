@@ -114,10 +114,12 @@ import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 import org.rssowl.ui.internal.views.explorer.BookMarkFilter;
 import org.rssowl.ui.internal.views.explorer.BookMarkFilter.Type;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -328,9 +330,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
     /* Add dummy action to show the top level menu */
     viewMenu.add(new Action("") { //$NON-NLS-1$
-      @Override
-      public void run() {}
-    });
+          @Override
+          public void run() {}
+        });
 
     /* Build Menu dynamically */
     viewMenu.addMenuListener(new IMenuListener() {
@@ -865,7 +867,12 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         String file = dialog.open();
         if (StringUtils.isSet(file)) {
           try {
-            FileInputStream inS = new FileInputStream(Platform.getLogFileLocation().toFile());
+            File logFile = Platform.getLogFileLocation().toFile();
+            InputStream inS;
+            if (logFile.exists())
+              inS = new FileInputStream(logFile);
+            else
+              inS = new ByteArrayInputStream(new byte[0]);
             FileOutputStream outS = new FileOutputStream(new File(file));
             CoreUtils.copy(inS, outS);
           } catch (FileNotFoundException e) {
