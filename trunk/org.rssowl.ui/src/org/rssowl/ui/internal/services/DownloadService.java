@@ -368,7 +368,7 @@ public class DownloadService {
       int secondsRemaining = bytesToGo / bytesPerSecond;
       String period = OwlUI.getPeriod(secondsRemaining);
       if (period != null)
-        str.append(period).append(" Remaining - "); //$NON-NLS-1$
+        str.append(NLS.bind(Messages.DownloadService_BYTES_REMAINING, period)).append(" - "); //$NON-NLS-1$
     }
 
     /* "X MB of Y MB "*/
@@ -376,21 +376,16 @@ public class DownloadService {
     if (consumed == null)
       consumed = "0"; //$NON-NLS-1$
 
-    str.append(consumed);
-    str.append(" of "); //$NON-NLS-1$
-
     String total = OwlUI.getSize(totalBytes);
     if (total != null)
-      str.append(total);
+      str.append(NLS.bind(Messages.DownloadService_BYTES_OF_BYTES, consumed, total));
     else
-      str.append("Unknown Size"); //$NON-NLS-1$
+      str.append(NLS.bind(Messages.DownloadService_BYTES_OF_UNKNOWN, consumed));
 
     /* "(X MB/sec)" */
     if (bytesPerSecond > 0) {
-      str.append(" ("); //$NON-NLS-1$
-      str.append(OwlUI.getSize(bytesPerSecond));
-      str.append("/sec"); //$NON-NLS-1$
-      str.append(")"); //$NON-NLS-1$
+      str.append(" "); //$NON-NLS-1$
+      str.append(NLS.bind(Messages.DownloadService_BYTES_PER_SECOND, OwlUI.getSize(bytesPerSecond)));
     }
 
     return str.toString();

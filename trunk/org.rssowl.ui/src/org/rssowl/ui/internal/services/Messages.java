@@ -28,6 +28,10 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
   private static final String BUNDLE_NAME = "org.rssowl.ui.internal.services.messages"; //$NON-NLS-1$
+  public static String DownloadService_BYTES_OF_BYTES;
+  public static String DownloadService_BYTES_OF_UNKNOWN;
+  public static String DownloadService_BYTES_PER_SECOND;
+  public static String DownloadService_BYTES_REMAINING;
   public static String DownloadService_DOWNLOADING;
   public static String DownloadService_DOWNLOADING_N;
   public static String DownloadService_DOWNLOADING_TITLE;

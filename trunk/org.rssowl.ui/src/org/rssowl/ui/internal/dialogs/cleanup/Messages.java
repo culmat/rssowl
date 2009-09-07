@@ -57,7 +57,12 @@ public class Messages extends NLS {
   public static String CleanUpWizard_CHOOSE_BOOKMARKS;
   public static String CleanUpWizard_CLEAN_UP;
   public static String CleanUpWizard_CLEANUP_OPS;
+  public static String CleanUpWizard_CONFIRM_BOOKMARK_NEWS;
+  public static String CleanUpWizard_CONFIRM_BOOKMARK;
+  public static String CleanUpWizard_CONFIRM_BOOKMARKS;
+  public static String CleanUpWizard_CONFIRM_BOOKMARKS_NEWS;
   public static String CleanUpWizard_CONFIRM_DELETE;
+  public static String CleanUpWizard_CONFIRM_NEWS;
   public static String CleanUpWizard_NO_UNDO;
   public static String CleanUpWizard_SUMMARY;
   public static String CleanUpWizard_WAIT_CLEANUP;
