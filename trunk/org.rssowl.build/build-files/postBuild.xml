@@ -5,7 +5,7 @@
 	
     <target name="main">
 
-    	<!--<property name="UpdateSiteStagingLocation" value="${buildDirectory}/tmpUpdateSite/updateSite"/>
+    	<property name="UpdateSiteStagingLocation" value="${buildDirectory}/tmpUpdateSite/updateSite"/>
     	<property name="UpdateSiteFinalLocation" value="${buildResultsDirectory}/../updateSite"/>
     	<property name="siteXmlFile" value="${UpdateSiteStagingLocation}/site.xml"/>
     	
@@ -16,7 +16,7 @@
     	<copy todir="${UpdateSiteFinalLocation}">
     		<fileset dir="${UpdateSiteStagingLocation}" includes="**"/>
     	</copy>
-    	<delete dir="${UpdateSiteStagingLocation}/../.." includes="tmpUpdateSite/**" includeemptydirs="true"/>-->
+    	<delete dir="${UpdateSiteStagingLocation}/../.." includes="tmpUpdateSite/**" includeemptydirs="true"/>
     </target>
 	
 	<target name="deleteSiteXml" unless="isNightlyBuild">
