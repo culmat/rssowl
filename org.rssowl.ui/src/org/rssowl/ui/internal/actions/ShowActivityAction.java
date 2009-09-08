@@ -26,6 +26,9 @@ package org.rssowl.ui.internal.actions;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.window.IShellProvider;
+import org.eclipse.jface.window.SameShellProvider;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.rssowl.ui.internal.dialogs.ActivityDialog;
@@ -34,7 +37,7 @@ import org.rssowl.ui.internal.dialogs.ActivityDialog;
  * @author bpasero
  */
 public class ShowActivityAction implements IWorkbenchWindowActionDelegate {
-  private IWorkbenchWindow fWindow;
+  private IShellProvider fShellProvider;
 
   /*
    * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#dispose()
@@ -45,7 +48,14 @@ public class ShowActivityAction implements IWorkbenchWindowActionDelegate {
    * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#init(org.eclipse.ui.IWorkbenchWindow)
    */
   public void init(IWorkbenchWindow window) {
-    fWindow = window;
+    fShellProvider = window;
+  }
+
+  /**
+   * @param shell the {@link Shell} to open the Activity Dialog into.
+   */
+  public void init(Shell shell) {
+    fShellProvider = new SameShellProvider(shell);
   }
 
   /*
@@ -54,7 +64,7 @@ public class ShowActivityAction implements IWorkbenchWindowActionDelegate {
   public void run(IAction action) {
     ActivityDialog instance = ActivityDialog.getVisibleInstance();
     if (instance == null) {
-      ActivityDialog dialog = new ActivityDialog(fWindow.getShell());
+      ActivityDialog dialog = new ActivityDialog(fShellProvider.getShell());
       dialog.setBlockOnOpen(false);
       dialog.open();
     } else {
