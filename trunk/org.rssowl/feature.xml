@@ -244,36 +244,36 @@ litigation.
 
    <plugin
          id="org.rssowl.lib.jdom"
-         download-size="0"
-         install-size="0"
+         download-size="147"
+         install-size="147"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="org.rssowl.ui"
-         download-size="0"
-         install-size="0"
+         download-size="2038"
+         install-size="2038"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="org.rssowl.lib.db4o"
-         download-size="0"
-         install-size="0"
+         download-size="631"
+         install-size="631"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="org.rssowl.core"
-         download-size="0"
-         install-size="0"
+         download-size="632"
+         install-size="632"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="org.rssowl.lib.httpclient"
-         download-size="0"
-         install-size="0"
+         download-size="365"
+         install-size="365"
          version="0.0.0"
          unpack="false"/>
 
@@ -306,13 +306,6 @@ litigation.
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.update.scheduler"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="org.eclipse.update.ui"
          download-size="0"
          install-size="0"
@@ -321,8 +314,8 @@ litigation.
 
    <plugin
          id="org.rssowl.lib.lucene"
-         download-size="0"
-         install-size="0"
+         download-size="614"
+         install-size="614"
          version="0.0.0"
          unpack="false"/>
 
