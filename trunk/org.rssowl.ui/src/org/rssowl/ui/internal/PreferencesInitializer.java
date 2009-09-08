@@ -104,6 +104,7 @@ public class PreferencesInitializer implements IPreferencesInitializer {
     defaultScope.putBoolean(Preference.SHOW_TOOLBAR.id(), true);
     defaultScope.putBoolean(Preference.SHOW_STATUS.id(), true);
     defaultScope.putBoolean(Preference.BM_LOAD_TITLE_FROM_FEED.id(), true);
+    defaultScope.putBoolean(Preference.UPDATE_ON_STARTUP.id(), true);
 
     defaultScope.putIntegers(Preference.SEARCH_DIALOG_NEWS_COLUMNS.id(), new int[] {
       NewsColumn.RELEVANCE.ordinal(),

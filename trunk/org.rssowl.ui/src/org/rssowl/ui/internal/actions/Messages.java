@@ -52,7 +52,15 @@ public class Messages extends NLS {
   public static String FindAction_FIND;
   public static String FindExtensionsAction_RSSOWL_APPLICATION;
   public static String FindExtensionsAction_SEARCHING_EXTENSIONS;
-  public static String FindUpdatesAction_SEARCHING_FOR_UPDATES;
+  public static String FindUpdatesAction_CHECK_UPDATES;
+  public static String FindUpdatesAction_DOWNLOADING_UPDATES;
+  public static String FindUpdatesAction_NO_UPDATES_AVAILABLE;
+  public static String FindUpdatesAction_REASON;
+  public static String FindUpdatesAction_RESTART_AFTER_UPDATE;
+  public static String FindUpdatesAction_RESTART_RSSOWL;
+  public static String FindUpdatesAction_UPDATE_SEARCH;
+  public static String FindUpdatesAction_WARNING_SEARCH_FAILED;
+  public static String FindUpdatesAction_WARNING_UPDATE_FAILED;
 
   public static String LabelAction_LABEL_BINDING;
   public static String LabelAction_REMOVE_ALL_LABELS;

@@ -186,6 +186,15 @@ public class Messages extends NLS {
   public static String SearchNewsDialog_SHOW_PREVIEW;
   public static String SearchNewsDialog_SHOW_SAVED_SEARCH;
   public static String SearchNewsDialog_VISIBLE_COLUMNS;
+  public static String UpdateDialog_CURRENT_VERSION;
+  public static String UpdateDialog_DESCRIPTION;
+  public static String UpdateDialog_DL_SIZE;
+  public static String UpdateDialog_DOWNLOAD_INSTALL;
+  public static String UpdateDialog_NEW_VERSION;
+  public static String UpdateDialog_NEW_VERSION_MSG;
+  public static String UpdateDialog_UPDATE_AVAILABLE;
+  public static String UpdateDialog_UPDATE_ON_STARTUP;
+  public static String UpdateDialog_UPDATE_PROVIDER;
   public static String WebsiteListDialog_ADD;
   public static String WebsiteListDialog_ENTER_WEBSITE;
   public static String WebsiteListDialog_JS_EXCEPTIONS;

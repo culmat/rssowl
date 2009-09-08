@@ -90,6 +90,7 @@ import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.TaskAdapter;
 import org.rssowl.core.util.Triple;
 import org.rssowl.core.util.URIUtils;
+import org.rssowl.ui.internal.actions.FindUpdatesAction;
 import org.rssowl.ui.internal.dialogs.LoginDialog;
 import org.rssowl.ui.internal.dialogs.properties.EntityPropertyPageWrapper;
 import org.rssowl.ui.internal.dialogs.welcome.WelcomeWizard;
@@ -1079,6 +1080,17 @@ public class Controller {
       JobRunner.runInUIThread(200, OwlUI.getActiveShell(), new Runnable() {
         public void run() {
           showWelcomeWizard();
+        }
+      });
+    }
+
+    /* Check for Updates if Set */
+    if (!fShowWelcome && Owl.getPreferenceService().getGlobalScope().getBoolean(DefaultPreferences.UPDATE_ON_STARTUP)) {
+      JobRunner.runInUIThread(5000, OwlUI.getActiveShell(), new Runnable() {
+        public void run() {
+          FindUpdatesAction action = new FindUpdatesAction(false);
+          action.init(OwlUI.getWindow());
+          action.run();
         }
       });
     }
