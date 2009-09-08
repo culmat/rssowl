@@ -2629,37 +2629,6 @@ public class ModelTest3 {
    * @throws Exception
    */
   @Test
-  public void testDeleteFolderHierarchyWithBin() throws Exception {
-    IFolder root = fFactory.createFolder(null, null, "Root");
-    IFolder folder = fFactory.createFolder(null, root, "Folder");
-    IFolder childFolder = fFactory.createFolder(null, folder, "Child Folder");
-
-    IFeed feed = fFactory.createFeed(null, new URI("feed"));
-    INews news = fFactory.createNews(null, feed, new Date());
-    news.setLink(new URI("news"));
-
-    DynamicDAO.save(feed);
-
-    fFactory.createBookMark(null, childFolder, new FeedLinkReference(feed.getLink()), "Bookmark");
-    INewsBin bin = fFactory.createNewsBin(null, folder, "Bin");
-
-    DynamicDAO.save(root);
-
-    /* Move News to Bin */
-    INews copiedNews = fFactory.createNews(news, bin);
-    DynamicDAO.save(copiedNews);
-    DynamicDAO.save(bin);
-
-    DynamicDAO.getDAO(INewsDAO.class).setState(Collections.singletonList(news), INews.State.HIDDEN, false, false);
-
-    /* Delete Folder */
-    DynamicDAO.deleteAll(Collections.singleton(folder));
-  }
-
-  /**
-   * @throws Exception
-   */
-  @Test
   @Ignore
   public void testSaveBinCausesNoUnwantedEvents() throws Exception {
     SearchConditionListener listener = null;
