@@ -1085,12 +1085,14 @@ public class Controller {
     }
 
     /* Check for Updates if Set */
-    if (!fShowWelcome && Owl.getPreferenceService().getGlobalScope().getBoolean(DefaultPreferences.UPDATE_ON_STARTUP)) {
+    if (!fShowWelcome) {
       JobRunner.runInUIThread(5000, OwlUI.getActiveShell(), new Runnable() {
         public void run() {
-          FindUpdatesAction action = new FindUpdatesAction(false);
-          action.init(OwlUI.getWindow());
-          action.run();
+          if (Owl.getPreferenceService().getGlobalScope().getBoolean(DefaultPreferences.UPDATE_ON_STARTUP)) {
+            FindUpdatesAction action = new FindUpdatesAction(false);
+            action.init(OwlUI.getWindow());
+            action.run();
+          }
         }
       });
     }
