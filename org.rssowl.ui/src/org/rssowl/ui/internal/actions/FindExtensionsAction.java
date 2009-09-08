@@ -50,9 +50,6 @@ public class FindExtensionsAction extends Action implements IWorkbenchWindowActi
   /* RSSOwl.org Update Site */
   private static final String UPDATE_SITE = "http://boreal.rssowl.org"; //$NON-NLS-1$
 
-  /* RSSOwl Category */
-  private static final String RSSOWL_CATEGORY = Messages.FindExtensionsAction_RSSOWL_APPLICATION;
-
   private Shell fShell;
 
   /** Keep default constructor for reflection. */
@@ -74,7 +71,7 @@ public class FindExtensionsAction extends Action implements IWorkbenchWindowActi
     UpdateSearchScope scope = new UpdateSearchScope();
     try {
       URL url = new URL(UPDATE_SITE);
-      scope.addSearchSite("RSSOwl.org", url, new String[] { RSSOWL_CATEGORY }); //$NON-NLS-1$
+      scope.addSearchSite("RSSOwl.org", url, null); //$NON-NLS-1$
     } catch (MalformedURLException e) {
       // skip bad URLs
     }
