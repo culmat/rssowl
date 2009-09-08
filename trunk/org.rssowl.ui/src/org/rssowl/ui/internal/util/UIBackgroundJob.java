@@ -34,10 +34,9 @@ import org.eclipse.ui.progress.UIJob;
 import org.rssowl.core.util.LoggingSafeRunnable;
 
 /**
- * The <code>UIBackgroundJob</code> is capable of performing an operation in
- * the Background and updating the UI in the UI-Thread once this operation is
- * done.
- * 
+ * The <code>UIBackgroundJob</code> is capable of performing an operation in the
+ * Background and updating the UI in the UI-Thread once this operation is done.
+ *
  * @author bpasero
  */
 public abstract class UIBackgroundJob extends Job {
@@ -46,28 +45,42 @@ public abstract class UIBackgroundJob extends Job {
 
   /**
    * Creates a new instance of this kind. Use it like any other instance of
-   * <code>Job</code>. Asks the given Control for its disposed state as soon
-   * as the UI-Job is running, in order to cancel the Job when the Control is
+   * <code>Job</code>. Asks the given Control for its disposed state as soon as
+   * the UI-Job is running, in order to cancel the Job when the Control is
    * disposed.
-   * 
+   *
    * @param control Used to cancel the UI-Job in case the given Control is
    * disposed at that time.
    */
   public UIBackgroundJob(Control control) {
-    super(NAME);
+    this(control, NAME);
+  }
+
+  /**
+   * Creates a new instance of this kind. Use it like any other instance of
+   * <code>Job</code>. Asks the given Control for its disposed state as soon as
+   * the UI-Job is running, in order to cancel the Job when the Control is
+   * disposed.
+   *
+   * @param control Used to cancel the UI-Job in case the given Control is
+   * disposed at that time.
+   * @param name the name of the {@link Job} or <code>null</code> if none.
+   */
+  public UIBackgroundJob(Control control, String name) {
+    super(name);
     fControl = control;
   }
 
   /**
    * The task that is to run in the Background-Thread.
-   * 
+   *
    * @param monitor Progress-Monitor of the Job performing this task.
    */
   protected abstract void runInBackground(IProgressMonitor monitor);
 
   /**
    * The task that is to run in the UI-Thread.
-   * 
+   *
    * @param monitor Progress-Monitor of the Job performing this task.
    */
   protected abstract void runInUI(IProgressMonitor monitor);

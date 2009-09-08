@@ -160,9 +160,20 @@ public class JobRunner {
    * @param job
    */
   public static void runUIUpdater(UIBackgroundJob job) {
+    runUIUpdater(job, false);
+  }
+
+  /**
+   * @param job
+   * @param showProgress if <code>true</code> will show progress from the
+   * background operation to the user.
+   */
+  public static void runUIUpdater(UIBackgroundJob job, boolean showProgress) {
     Assert.isNotNull(job);
-    job.setSystem(true);
-    job.setUser(false);
+    if (!showProgress) {
+      job.setSystem(true);
+      job.setUser(false);
+    }
     job.schedule();
   }
 
