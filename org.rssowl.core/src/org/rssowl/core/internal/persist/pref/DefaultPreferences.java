@@ -316,6 +316,9 @@ public class DefaultPreferences {
   /** Global: Bookmark Menu Filter */
   public static final String BM_MENU_FILTER = Preference.BM_MENU_FILTER.id();
 
+  /** Global: Check for Updates on Startup */
+  public static final String UPDATE_ON_STARTUP = Preference.UPDATE_ON_STARTUP.id();
+
   /**
    * Eclipse Preferences Follow
    */

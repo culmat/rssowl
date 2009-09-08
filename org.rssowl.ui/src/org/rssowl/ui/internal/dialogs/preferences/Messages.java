@@ -108,6 +108,7 @@ public class Messages extends NLS {
   public static String MiscPreferencePage_TAB_LIMIT;
   public static String MiscPreferencePage_TABBED_BROWSING;
   public static String MiscPreferencePage_TABS;
+  public static String MiscPreferencePage_UPDATE_ON_STARTUP;
   public static String MiscPreferencePage_VERTICAL;
   public static String NotifierPreferencesPage_CLOSE_AUTOMATICALLY;
   public static String NotifierPreferencesPage_CLOSE_NOTIFIER_ON_OPEN;

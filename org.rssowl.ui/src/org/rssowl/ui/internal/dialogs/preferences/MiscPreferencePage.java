@@ -71,6 +71,7 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
   private Button fReopenFeedsOnStartupCheck;
   private Button fAlwaysReuseFeedView;
   private Button fOpenOnSingleClick;
+  private Button fUpdateOnStartup;
 
   /** Leave for reflection */
   public MiscPreferencePage() {
@@ -209,6 +210,10 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     fOpenOnSingleClick = new Button(miscGroup, SWT.CHECK);
     fOpenOnSingleClick.setText(Messages.MiscPreferencePage_SINGLE_CLICK);
     fOpenOnSingleClick.setSelection(fEclipseScope.getBoolean(DefaultPreferences.ECLIPSE_SINGLE_CLICK_OPEN));
+
+    fUpdateOnStartup = new Button(miscGroup, SWT.CHECK);
+    fUpdateOnStartup.setText(Messages.MiscPreferencePage_UPDATE_ON_STARTUP);
+    fUpdateOnStartup.setSelection(fGlobalScope.getBoolean(DefaultPreferences.UPDATE_ON_STARTUP));
   }
 
   private void createTrayOptions(Composite container) {
@@ -269,6 +274,7 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
       layoutChanged = true;
     }
 
+    fGlobalScope.putBoolean(DefaultPreferences.UPDATE_ON_STARTUP, fUpdateOnStartup.getSelection());
     fEclipseScope.putBoolean(DefaultPreferences.ECLIPSE_SINGLE_CLICK_OPEN, fOpenOnSingleClick.getSelection());
     fEclipseScope.putBoolean(DefaultPreferences.ECLIPSE_RESTORE_TABS, fReopenFeedsOnStartupCheck.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.ALWAYS_REUSE_FEEDVIEW, fAlwaysReuseFeedView.getSelection());
@@ -305,6 +311,7 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     fVerticalLayoutRadio.setSelection(!browserMaximized && !defaultScope.getBoolean(DefaultPreferences.FV_LAYOUT_CLASSIC));
     fBrowserMaximizedLayoutRadio.setSelection(browserMaximized);
 
+    fUpdateOnStartup.setSelection(defaultScope.getBoolean(DefaultPreferences.UPDATE_ON_STARTUP));
     fOpenOnSingleClick.setSelection(defaultScope.getBoolean(DefaultPreferences.ECLIPSE_SINGLE_CLICK_OPEN));
     fReopenFeedsOnStartupCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.ECLIPSE_RESTORE_TABS));
     fAlwaysReuseFeedView.setSelection(defaultScope.getBoolean(DefaultPreferences.ALWAYS_REUSE_FEEDVIEW));

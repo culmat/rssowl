@@ -313,6 +313,9 @@ public enum Preference {
   /** Global: Bookmark Menu Filter  */
   BM_MENU_FILTER("org.rssowl.pref.BMMenuFilter", IPreferenceType.INTEGER), //$NON-NLS-1$
 
+  /** Global: Check for Updates on Startup */
+  UPDATE_ON_STARTUP("org.rssowl.pref.UpdateOnStartup", IPreferenceType.BOOLEAN), //$NON-NLS-1$
+
   /******************************
    * Eclipse Preferences Follow *
    ******************************/
