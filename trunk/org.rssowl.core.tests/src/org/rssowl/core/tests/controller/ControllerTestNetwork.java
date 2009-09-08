@@ -29,16 +29,20 @@ import static org.junit.Assert.assertTrue;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.Feed;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.NewsCounter;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsCounterDAO;
+import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.reference.BookMarkReference;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.FeedReference;
@@ -47,6 +51,7 @@ import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.Controller.BookMarkLoadListener;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -114,6 +119,39 @@ public class ControllerTestNetwork {
       if (listener != null)
         Controller.getDefault().removeBookMarkLoadListener(listener);
     }
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @Ignore
+  public void testDeleteFolderHierarchyWithBin() throws Exception {
+    IModelFactory factory = Owl.getModelFactory();
+    IFolder root = factory.createFolder(null, null, "Root");
+    IFolder folder = factory.createFolder(null, root, "Folder");
+    IFolder childFolder = factory.createFolder(null, folder, "Child Folder");
+
+    IFeed feed = factory.createFeed(null, new URI("http://www.rssowl.org/rssowl2dg/tests/manager/rss_2_0.xml"));
+
+    DynamicDAO.save(feed);
+
+    IBookMark mark = factory.createBookMark(null, childFolder, new FeedLinkReference(feed.getLink()), "Bookmark");
+    INewsBin bin = factory.createNewsBin(null, folder, "Bin");
+
+    DynamicDAO.save(root);
+
+    Controller.getDefault().reload(mark, null, new NullProgressMonitor());
+
+    /* Move News to Bin */
+    INews copiedNews = factory.createNews(feed.getNews().get(0), bin);
+    DynamicDAO.save(copiedNews);
+    DynamicDAO.save(bin);
+
+    DynamicDAO.getDAO(INewsDAO.class).setState(Collections.singletonList(feed.getNews().get(0)), INews.State.HIDDEN, false, false);
+
+    /* Delete Folder */
+    DynamicDAO.deleteAll(Collections.singleton(folder));
   }
 
   /**
