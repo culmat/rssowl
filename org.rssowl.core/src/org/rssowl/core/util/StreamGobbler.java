@@ -83,7 +83,7 @@ public class StreamGobbler extends Job {
 
     /* Log any error */
     catch (IOException e) {
-      Activator.getDefault().logError(e.getMessage(), e);
+      Activator.safeLogError(e.getMessage(), e);
     }
 
     /* Close Stream */
@@ -92,7 +92,7 @@ public class StreamGobbler extends Job {
         if (br != null)
           br.close();
       } catch (IOException e) {
-        Activator.getDefault().logError(e.getMessage(), e);
+        Activator.safeLogError(e.getMessage(), e);
       }
     }
 

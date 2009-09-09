@@ -71,11 +71,11 @@ public class AudioUtils {
       doPlay(file);
       return true;
     } catch (javax.sound.sampled.UnsupportedAudioFileException e) {
-      Activator.getDefault().logError(e.getMessage(), e);
+      Activator.safeLogError(e.getMessage(), e);
     } catch (IOException e) {
-      Activator.getDefault().logError(e.getMessage(), e);
+      Activator.safeLogError(e.getMessage(), e);
     } catch (javax.sound.sampled.LineUnavailableException e) {
-      Activator.getDefault().logError(e.getMessage(), e);
+      Activator.safeLogError(e.getMessage(), e);
     }
 
     return false;

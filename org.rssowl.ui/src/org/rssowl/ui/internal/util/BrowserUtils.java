@@ -284,7 +284,7 @@ public class BrowserUtils {
                 if (proc != null)
                   proc.waitFor();
               } catch (InterruptedException e) {
-                Activator.getDefault().logError(e.getMessage(), e);
+                Activator.safeLogError(e.getMessage(), e);
               } finally {
                 webBrowserSuccessfullyOpened = false;
               }
@@ -293,7 +293,7 @@ public class BrowserUtils {
 
           /* Show error, default browser could not be launched */
           catch (IOException e) {
-            Activator.getDefault().logError(e.getMessage(), e);
+            Activator.safeLogError(e.getMessage(), e);
             showErrorIfExternalBrowserFails();
           }
         }
@@ -346,13 +346,13 @@ public class BrowserUtils {
           /* Wait for the process to terminate */
           proc.waitFor();
         } catch (IOException e) {
-          Activator.getDefault().logError(e.getMessage(), e);
+          Activator.safeLogError(e.getMessage(), e);
 
           /* Use default browser if custom browser is not working */
           useDefaultBrowser(link);
 
         } catch (InterruptedException e) {
-          Activator.getDefault().logError(e.getMessage(), e);
+          Activator.safeLogError(e.getMessage(), e);
         }
       }
     };

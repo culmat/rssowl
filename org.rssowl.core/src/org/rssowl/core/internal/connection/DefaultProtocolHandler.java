@@ -643,7 +643,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
       title = title.replaceAll(Pattern.quote("]]>"), ""); //$NON-NLS-1$ //$NON-NLS-2$
     } catch (IOException e) {
       error = e;
-      Activator.getDefault().logError(e.getMessage(), e);
+      Activator.safeLogError(e.getMessage(), e);
     }
 
     /* Finally close the Stream */
@@ -656,7 +656,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
         else
           inS.close();
       } catch (IOException e) {
-        Activator.getDefault().logError(e.getMessage(), e);
+        Activator.safeLogError(e.getMessage(), e);
       }
     }
 

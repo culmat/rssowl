@@ -1149,7 +1149,7 @@ public class Controller {
       }
     } catch (InterpreterException e) {
       if (!fShuttingDown)
-        Activator.getDefault().logError(e.getMessage(), e);
+        Activator.safeLogError(e.getMessage(), e);
     }
   }
 
@@ -1199,7 +1199,7 @@ public class Controller {
         initialImportFile(importFile);
         showWelcome = false;
       } catch (Exception e) {
-        Activator.getDefault().logError(e.getMessage(), e);
+        Activator.safeLogError(e.getMessage(), e);
       }
     }
 

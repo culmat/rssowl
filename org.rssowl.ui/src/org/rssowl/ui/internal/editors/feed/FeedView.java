@@ -318,13 +318,13 @@ public class FeedView extends EditorPart implements IReusableEditor {
               }
             } catch (FileNotFoundException e) {
               error = e;
-              Activator.getDefault().logError(e.getMessage(), e);
+              Activator.safeLogError(e.getMessage(), e);
             } catch (IOException e) {
               error = e;
-              Activator.getDefault().logError(e.getMessage(), e);
+              Activator.safeLogError(e.getMessage(), e);
             } catch (ConnectionException e) {
               error = e;
-              Activator.getDefault().logError(e.getMessage(), e);
+              Activator.safeLogError(e.getMessage(), e);
             } finally {
               monitor.done();
 
@@ -332,7 +332,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
                 try {
                   out.close();
                 } catch (IOException e) {
-                  Activator.getDefault().logError(e.getMessage(), e);
+                  Activator.safeLogError(e.getMessage(), e);
                 }
               }
 
@@ -343,7 +343,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
                   else
                     in.close();
                 } catch (IOException e) {
-                  Activator.getDefault().logError(e.getMessage(), e);
+                  Activator.safeLogError(e.getMessage(), e);
                 }
               }
             }
@@ -354,7 +354,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
         downloadJob.schedule();
       }
     } catch (ConnectionException e) {
-      Activator.getDefault().logError(e.getMessage(), e);
+      Activator.safeLogError(e.getMessage(), e);
     }
   }
 

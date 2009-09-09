@@ -1194,13 +1194,13 @@ public class CoreUtils {
       while ((nbytes = fis.read(buffer)) != -1)
         fos.write(buffer, 0, nbytes);
     } catch (IOException e) {
-      Activator.getDefault().logError(e.getMessage(), e);
+      Activator.safeLogError(e.getMessage(), e);
     } finally {
       if (fis != null) {
         try {
           fis.close();
         } catch (IOException e) {
-          Activator.getDefault().logError(e.getMessage(), e);
+          Activator.safeLogError(e.getMessage(), e);
         }
       }
 
@@ -1208,7 +1208,7 @@ public class CoreUtils {
         try {
           fos.close();
         } catch (IOException e) {
-          Activator.getDefault().logError(e.getMessage(), e);
+          Activator.safeLogError(e.getMessage(), e);
         }
       }
     }
@@ -1225,13 +1225,13 @@ public class CoreUtils {
       writer.write(content.toString());
       writer.close();
     } catch (IOException e) {
-      Activator.getDefault().logError(e.getMessage(), e);
+      Activator.safeLogError(e.getMessage(), e);
     } finally {
       if (writer != null) {
         try {
           writer.close();
         } catch (IOException e) {
-          Activator.getDefault().logError(e.getMessage(), e);
+          Activator.safeLogError(e.getMessage(), e);
         }
       }
     }
@@ -1498,9 +1498,9 @@ public class CoreUtils {
         }
       }
     } catch (IOException e) {
-      Activator.getDefault().logError(e.getMessage(), e);
+      Activator.safeLogError(e.getMessage(), e);
     } catch (URISyntaxException e) {
-      Activator.getDefault().logError(e.getMessage(), e);
+      Activator.safeLogError(e.getMessage(), e);
     }
 
     /* Finally close the Reader */
@@ -1508,7 +1508,7 @@ public class CoreUtils {
       try {
         reader.close();
       } catch (IOException e) {
-        Activator.getDefault().logError(e.getMessage(), e);
+        Activator.safeLogError(e.getMessage(), e);
       }
     }
 

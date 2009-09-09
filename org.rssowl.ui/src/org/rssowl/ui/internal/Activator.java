@@ -216,9 +216,9 @@ public class Activator extends AbstractUIPlugin {
     try {
       dialog.run(false, false, runnable);
     } catch (InvocationTargetException e) {
-      Activator.getDefault().logError(e.getMessage(), e);
+      logError(e.getMessage(), e);
     } catch (InterruptedException e) {
-      Activator.getDefault().logError(e.getMessage(), e);
+      logError(e.getMessage(), e);
     }
   }
 
@@ -312,9 +312,9 @@ public class Activator extends AbstractUIPlugin {
         System.exit(0);
       }
     } catch (UnknownHostException e) {
-      Activator.getDefault().logError(Messages.Activator_ERROR_STARTUP, e);
+      logError(Messages.Activator_ERROR_STARTUP, e);
     } catch (IOException e) {
-      Activator.getDefault().logError(Messages.Activator_ERROR_STARTUP, e);
+      logError(Messages.Activator_ERROR_STARTUP, e);
     }
   }
 
@@ -380,6 +380,17 @@ public class Activator extends AbstractUIPlugin {
   // TODO Need a better logging facility here
   // getLog().log(new Status(IStatus.INFO, getBundle().getSymbolicName(),
   // IStatus.OK, msg, null));
+  }
+
+  /**
+   * Log an Error Message.
+   *
+   * @param msg The message to log as Error.
+   * @param e The occuring Exception to log.
+   */
+  public static void safeLogError(String msg, Throwable e) {
+    if (fgPlugin != null)
+      fgPlugin.logError(msg, e);
   }
 
   /**
