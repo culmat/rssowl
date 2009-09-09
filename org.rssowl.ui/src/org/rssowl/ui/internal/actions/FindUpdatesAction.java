@@ -68,7 +68,7 @@ import java.net.URL;
  * @author bpasero
  */
 public class FindUpdatesAction extends Action implements IWorkbenchWindowActionDelegate {
-  private static final String UPDATE_SITE = "http://boreal.rssowl.org/update/nightly/site.xml"; //$NON-NLS-1$
+  private static final String UPDATE_SITE = "http://boreal.rssowl.org/update/nightly/"; //$NON-NLS-1$
   private Shell fShell;
   private final boolean fUserInitiated;
 
@@ -124,7 +124,7 @@ public class FindUpdatesAction extends Action implements IWorkbenchWindowActionD
       /* Schedule */
       job.schedule();
     } catch (MalformedURLException e) {
-      Activator.getDefault().logError(e.getMessage(), e);
+      Activator.safeLogError(e.getMessage(), e);
     }
   }
 
@@ -168,10 +168,10 @@ public class FindUpdatesAction extends Action implements IWorkbenchWindowActionD
             }
           } catch (CoreException e) {
             errorUpdating = true;
-            Activator.getDefault().logError(e.getMessage(), e);
+            Activator.safeLogError(e.getMessage(), e);
           } catch (InvocationTargetException e) {
             errorUpdating = true;
-            Activator.getDefault().logError(e.getMessage(), e);
+            Activator.safeLogError(e.getMessage(), e);
           }
         }
       }

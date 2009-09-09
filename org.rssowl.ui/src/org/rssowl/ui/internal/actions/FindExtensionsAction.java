@@ -48,7 +48,7 @@ import java.net.URL;
 public class FindExtensionsAction extends Action implements IWorkbenchWindowActionDelegate {
 
   /* RSSOwl.org Update Site */
-  private static final String UPDATE_SITE = "http://boreal.rssowl.org"; //$NON-NLS-1$
+  private static final String UPDATE_SITE = "http://boreal.rssowl.org/update/addons/"; //$NON-NLS-1$
 
   private Shell fShell;
 
