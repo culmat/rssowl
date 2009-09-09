@@ -420,7 +420,7 @@ public class BookMarkContentProvider implements ITreeContentProvider {
           public void run() {
 
             /* Ask Filter for a refresh */
-            if (fBookmarkFilter.needsRefresh(ISearchMark.class, events))
+            if (fBookmarkFilter.needsRefresh(ISearchMark.class, events, true))
               fViewer.refresh(false);
 
             /* Update SearchMarks */
