@@ -57,12 +57,13 @@ public class PlaySoundActionPresentation implements INewsActionPresentation {
    */
   public void create(Composite parent, Object data) {
     fContainer = new Composite(parent, SWT.NONE);
-    fContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0, 0, 0, false));
+    fContainer.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 0, 0, false));
     ((GridLayout) fContainer.getLayout()).marginLeft = 5;
     fContainer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
 
-    fSoundPathLink = new Link(fContainer, SWT.PUSH);
+    fSoundPathLink = new Link(fContainer, SWT.WRAP);
     fSoundPathLink.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+    ((GridData) fSoundPathLink.getLayoutData()).widthHint = 100;
     updateLink(data);
 
     fSoundPathLink.addSelectionListener(new SelectionAdapter() {
@@ -100,8 +101,12 @@ public class PlaySoundActionPresentation implements INewsActionPresentation {
     }
 
     String fileName = dialog.open();
-    if (fileName != null)
+    if (fileName != null) {
       updateLink(fileName);
+
+      /* Link might require more space now */
+      fSoundPathLink.getShell().layout(true, true);
+    }
   }
 
   private void updateLink(Object data) {
