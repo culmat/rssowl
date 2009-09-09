@@ -597,8 +597,10 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       else {
         builder.append(Messages.NewsBrowserLabelProvider_NO_CONTENT);
 
-        if (hasLink)
+        if (hasLink) {
+          builder.append(" "); //$NON-NLS-1$
           link(builder, newsLink, Messages.NewsBrowserLabelProvider_OPEN_IN_BROWSER, null);
+        }
       }
 
       /* Close: NewsItem/Content */
