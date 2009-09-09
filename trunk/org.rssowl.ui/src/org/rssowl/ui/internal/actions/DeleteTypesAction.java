@@ -310,9 +310,9 @@ public class DeleteTypesAction extends Action implements IObjectActionDelegate {
     try {
       dialog.run(true, false, runnableWithProgress);
     } catch (InvocationTargetException e) {
-      Activator.getDefault().logError(e.getMessage(), e);
+      Activator.safeLogError(e.getMessage(), e);
     } catch (InterruptedException e) {
-      Activator.getDefault().logError(e.getMessage(), e);
+      Activator.safeLogError(e.getMessage(), e);
     }
   }
 

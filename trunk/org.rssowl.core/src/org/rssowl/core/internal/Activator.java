@@ -42,7 +42,7 @@ public class Activator extends Plugin {
 
   private static final String CORE_NET_BUNDLE = "org.eclipse.core.net"; //$NON-NLS-1$
 
-  private static Activator fPlugin;
+  private static Activator fgPlugin;
   private BundleContext fContext;
   private String fVersion;
   private IProxyService fProxyService;
@@ -51,7 +51,7 @@ public class Activator extends Plugin {
    * The constructor.
    */
   public Activator() {
-    fPlugin = this;
+    fgPlugin = this;
   }
 
   /**
@@ -61,7 +61,7 @@ public class Activator extends Plugin {
   public void start(BundleContext context) throws Exception {
     super.start(context);
     fContext = context;
-    fVersion = (String) fPlugin.getBundle().getHeaders().get("Bundle-Version"); //$NON-NLS-1$
+    fVersion = (String) fgPlugin.getBundle().getHeaders().get("Bundle-Version"); //$NON-NLS-1$
 
     /* Load the Proxy Service */
     SafeRunner.run(new LoggingSafeRunnable() {
@@ -109,7 +109,7 @@ public class Activator extends Plugin {
     /* Proceed */
     super.stop(context);
     fContext = null;
-    fPlugin = null;
+    fgPlugin = null;
   }
 
   /**
@@ -118,7 +118,7 @@ public class Activator extends Plugin {
    * @return the shared instance
    */
   public static Activator getDefault() {
-    return fPlugin;
+    return fgPlugin;
   }
 
   /**
@@ -137,6 +137,17 @@ public class Activator extends Plugin {
    */
   public String getVersion() {
     return fVersion;
+  }
+
+  /**
+   * Log an Error Message.
+   *
+   * @param msg The message to log as Error.
+   * @param e The occuring Exception to log.
+   */
+  public static void safeLogError(String msg, Throwable e) {
+    if (fgPlugin != null)
+      fgPlugin.logError(msg, e);
   }
 
   /**

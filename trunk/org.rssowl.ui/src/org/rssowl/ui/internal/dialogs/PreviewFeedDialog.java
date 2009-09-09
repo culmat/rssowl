@@ -214,13 +214,13 @@ public class PreviewFeedDialog extends Dialog {
           Owl.getInterpreter().interpret(inS, feed, null);
         } catch (ConnectionException e) {
           error = e;
-          Activator.getDefault().logError(e.getMessage(), e);
+          Activator.safeLogError(e.getMessage(), e);
         } catch (ParserException e) {
           error = e;
-          Activator.getDefault().logError(e.getMessage(), e);
+          Activator.safeLogError(e.getMessage(), e);
         } catch (InterpreterException e) {
           error = e;
-          Activator.getDefault().logError(e.getMessage(), e);
+          Activator.safeLogError(e.getMessage(), e);
         }
       }
 

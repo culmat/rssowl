@@ -77,7 +77,7 @@ public class GrowlNotifyAction implements INewsAction {
 
         /* Log any error message */
         catch (IOException e) {
-          Activator.getDefault().logError(e.getMessage(), e);
+          Activator.safeLogError(e.getMessage(), e);
         }
       }
     };

@@ -163,11 +163,11 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
 
       return SecurePreferencesFactory.open(location, options);
     } catch (MalformedURLException e) {
-      Activator.getDefault().logError(e.getMessage(), e);
+      Activator.safeLogError(e.getMessage(), e);
     } catch (IllegalStateException e1) {
-      Activator.getDefault().logError(e1.getMessage(), e1);
+      Activator.safeLogError(e1.getMessage(), e1);
     } catch (IOException e2) {
-      Activator.getDefault().logError(e2.getMessage(), e2);
+      Activator.safeLogError(e2.getMessage(), e2);
     }
 
     /* Fallback to default location */

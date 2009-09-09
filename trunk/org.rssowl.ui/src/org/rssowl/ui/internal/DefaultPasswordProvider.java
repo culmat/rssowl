@@ -75,7 +75,7 @@ public class DefaultPasswordProvider extends PasswordProvider {
 
           /* Use the password as is bug log a warning */
           catch (NoSuchAlgorithmException e) {
-            Activator.getDefault().logError(e.getMessage(), e);
+            Activator.safeLogError(e.getMessage(), e);
             internalPassword = masterPassword;
           }
 

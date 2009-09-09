@@ -191,7 +191,7 @@ public class ModelSearchImpl implements IModelSearch {
         /* Add to List */
         fResultList.add(new NewsReference(newsId));
       } catch (IOException e) {
-        Activator.getDefault().logError(e.getMessage(), e);
+        Activator.safeLogError(e.getMessage(), e);
       }
     }
   }
@@ -375,7 +375,7 @@ public class ModelSearchImpl implements IModelSearch {
             /* Add to List */
             resultList.add(new SearchHit<NewsReference>(new NewsReference(newsId), score, data));
           } catch (IOException e) {
-            Activator.getDefault().logError(e.getMessage(), e);
+            Activator.safeLogError(e.getMessage(), e);
           }
         }
       };
