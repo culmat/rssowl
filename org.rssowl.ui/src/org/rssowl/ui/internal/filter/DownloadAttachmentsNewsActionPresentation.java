@@ -56,12 +56,13 @@ public class DownloadAttachmentsNewsActionPresentation implements INewsActionPre
    */
   public void create(Composite parent, Object data) {
     fContainer = new Composite(parent, SWT.NONE);
-    fContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0, 0, 0, false));
+    fContainer.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 0, 0, false));
     ((GridLayout) fContainer.getLayout()).marginLeft = 5;
     fContainer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
 
-    fFolderPathLink = new Link(fContainer, SWT.PUSH);
+    fFolderPathLink = new Link(fContainer, SWT.WRAP);
     fFolderPathLink.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+    ((GridData) fFolderPathLink.getLayoutData()).widthHint = 100;
     updateLink(data);
 
     fFolderPathLink.addSelectionListener(new SelectionAdapter() {
@@ -120,8 +121,12 @@ public class DownloadAttachmentsNewsActionPresentation implements INewsActionPre
     }
 
     String folderPath = dialog.open();
-    if (folderPath != null)
+    if (folderPath != null) {
       updateLink(folderPath);
+
+      /* Link might require more space now */
+      fFolderPathLink.getShell().layout(true, true);
+    }
   }
 
   private void updateLink(Object data) {

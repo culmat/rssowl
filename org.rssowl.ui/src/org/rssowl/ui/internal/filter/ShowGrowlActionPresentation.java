@@ -54,12 +54,13 @@ public class ShowGrowlActionPresentation implements INewsActionPresentation {
    */
   public void create(Composite parent, Object data) {
     fContainer = new Composite(parent, SWT.NONE);
-    fContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0, 0, 0, false));
+    fContainer.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 0, 0, false));
     ((GridLayout) fContainer.getLayout()).marginLeft = 5;
     fContainer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
 
-    fGrowlPathLink = new Link(fContainer, SWT.PUSH);
+    fGrowlPathLink = new Link(fContainer, SWT.WRAP);
     fGrowlPathLink.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+    ((GridData) fGrowlPathLink.getLayoutData()).widthHint = 100;
     updateLink(data);
 
     fGrowlPathLink.addSelectionListener(new SelectionAdapter() {
@@ -88,8 +89,12 @@ public class ShowGrowlActionPresentation implements INewsActionPresentation {
     }
 
     String folderPath = dialog.open();
-    if (folderPath != null)
+    if (folderPath != null) {
       updateLink(folderPath);
+
+      /* Link might require more space now */
+      fGrowlPathLink.getShell().layout(true, true);
+    }
   }
 
   private void updateLink(Object data) {
