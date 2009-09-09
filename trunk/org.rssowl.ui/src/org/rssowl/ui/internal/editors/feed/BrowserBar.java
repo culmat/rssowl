@@ -92,6 +92,9 @@ public class BrowserBar {
   /* Navigate Forward */
   private static final String FORWARD_ACTION = "org.rssowl.ui.internal.editors.feed.ForwardAction"; //$NON-NLS-1$
 
+  /* Share Link */
+  private static final String SHARE_ACTION = "org.rssowl.ui.internal.editors.feed.ShareLinkAction"; //$NON-NLS-1$
+
   private CBrowser fBrowser;
   private Composite fParent;
   private ToolBarManager fNavigationToolBarManager;
@@ -269,7 +272,12 @@ public class BrowserBar {
     IAction shareLink = new Action(Messages.BrowserBar_SHARE_LINK, IAction.AS_DROP_DOWN_MENU) {
       @Override
       public void run() {
-        getMenuCreator().getMenu(fNavigationToolBarManager.getControl()).setVisible(true);
+        OwlUI.positionDropDownMenu(this, fNavigationToolBarManager);
+      }
+
+      @Override
+      public String getId() {
+        return SHARE_ACTION;
       }
     };
     fNavigationToolBarManager.add(shareLink);

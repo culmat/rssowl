@@ -108,6 +108,9 @@ public class WebBrowserView extends EditorPart implements IReusableEditor {
   /* Navigate Forward */
   private static final String FORWARD_ACTION = "org.rssowl.ui.internal.editors.feed.ForwardAction"; //$NON-NLS-1$
 
+  /* Share Link */
+  private static final String SHARE_ACTION = "org.rssowl.ui.internal.editors.browser.ShareLinkAction"; //$NON-NLS-1$
+
   private CBrowser fBrowser;
   private WebBrowserInput fInput;
   private IEditorSite fEditorSite;
@@ -438,7 +441,12 @@ public class WebBrowserView extends EditorPart implements IReusableEditor {
     IAction shareLink = new Action(Messages.WebBrowserView_SHARE_LINK, IAction.AS_DROP_DOWN_MENU) {
       @Override
       public void run() {
-        getMenuCreator().getMenu(fNavigationToolBarManager.getControl()).setVisible(true);
+        OwlUI.positionDropDownMenu(this, fNavigationToolBarManager);
+      }
+
+      @Override
+      public String getId() {
+        return SHARE_ACTION;
       }
     };
     fNavigationToolBarManager.add(shareLink);

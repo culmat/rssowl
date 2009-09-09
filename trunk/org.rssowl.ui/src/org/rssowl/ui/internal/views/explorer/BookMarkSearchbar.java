@@ -83,6 +83,9 @@ class BookMarkSearchbar extends Composite {
   /* Delay before filtering takes place */
   private static final int FILTER_DELAY = 300;
 
+  /* Action Bar */
+  private static final String BAR_ACTION_ID = "org.rssowl.ui.internal.views.explorer.BarAction"; //$NON-NLS-1$
+
   private Composite fFilterComposite;
   private ToolBarManager fFilterToolBar;
   private Object fExpandedElements[];
@@ -192,9 +195,12 @@ class BookMarkSearchbar extends Composite {
     IAction filterTargetAction = new Action("", IAction.AS_DROP_DOWN_MENU) { //$NON-NLS-1$
       @Override
       public void run() {
+        OwlUI.positionDropDownMenu(this, filterTargetManager);
+      }
 
-        /* Show Menu */
-        getMenuCreator().getMenu(filterTargetManager.getControl()).setVisible(true);
+      @Override
+      public String getId() {
+        return BAR_ACTION_ID;
       }
     };
 

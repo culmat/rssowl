@@ -106,6 +106,9 @@ public class FilterBar {
   /* Maximize Browser */
   private static final String TOGGLE_MAXIMIZED_ACTION = "org.rssowl.ui.internal.editors.feed.ToggleMaximizedAction"; //$NON-NLS-1$
 
+  /* Action to Quicksearch */
+  private static final String QUICKSEARCH_ACTION = "org.rssowl.ui.internal.editors.feed.QuickSearchAction"; //$NON-NLS-1$
+
   private Composite fParent;
   private ToolBarManager fSecondToolBarManager;
   private ToolBarManager fFirstToolBarManager;
@@ -218,9 +221,12 @@ public class FilterBar {
     IAction quickSearch = new Action(Messages.FilterBar_QUICK_SEARCH, IAction.AS_DROP_DOWN_MENU) {
       @Override
       public void run() {
+        OwlUI.positionDropDownMenu(this, manager);
+      }
 
-        /* Show Menu */
-        getMenuCreator().getMenu(manager.getControl()).setVisible(true);
+      @Override
+      public String getId() {
+        return QUICKSEARCH_ACTION;
       }
     };
     quickSearch.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/find.gif")); //$NON-NLS-1$
@@ -457,7 +463,7 @@ public class FilterBar {
     IAction columnDropdown = new Action(Messages.FilterBar_VISIBLE_COLUMNS, IAction.AS_DROP_DOWN_MENU) {
       @Override
       public void run() {
-        getMenuCreator().getMenu(fSecondToolBarManager.getControl()).setVisible(true);
+        OwlUI.positionDropDownMenu(this, fSecondToolBarManager);
       }
 
       @Override
@@ -605,7 +611,7 @@ public class FilterBar {
 
         /* Show Menu */
         else
-          getMenuCreator().getMenu(fFirstToolBarManager.getControl()).setVisible(true);
+          OwlUI.positionDropDownMenu(this, fFirstToolBarManager);
       }
 
       @Override
@@ -883,7 +889,7 @@ public class FilterBar {
 
         /* Show Menu */
         else
-          getMenuCreator().getMenu(fSecondToolBarManager.getControl()).setVisible(true);
+          OwlUI.positionDropDownMenu(this, fFirstToolBarManager);
       }
 
       @Override

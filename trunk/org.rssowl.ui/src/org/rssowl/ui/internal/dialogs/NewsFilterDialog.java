@@ -101,6 +101,12 @@ public class NewsFilterDialog extends TitleAreaDialog {
   /* Section for Dialogs Settings */
   private static final String SETTINGS_SECTION = "org.rssowl.ui.internal.dialogs.NewsFilterDialog"; //$NON-NLS-1$
 
+  /* Action Searches */
+  private static final String SEARCHES_ACTION = "org.rssowl.ui.internal.dialogs.filter.SearchesAction"; //$NON-NLS-1$
+
+  /* Action Filters */
+  private static final String FILTERS_ACTION = "org.rssowl.ui.internal.dialogs.filter.FiltersAction"; //$NON-NLS-1$
+
   private LocalResourceManager fResources;
   private final ISearchFilter fEditedFilter;
   private final List<Integer> fExcludedConditions = getExcludedConditions();
@@ -504,12 +510,17 @@ public class NewsFilterDialog extends TitleAreaDialog {
       IAction existingFilters = new Action(Messages.NewsFilterDialog_SHOW_NEWS_FILTER, IAction.AS_DROP_DOWN_MENU) {
         @Override
         public void run() {
-          getMenuCreator().getMenu(dialogToolBar.getControl()).setVisible(true);
+          OwlUI.positionDropDownMenu(this, dialogToolBar);
         }
 
         @Override
         public ImageDescriptor getImageDescriptor() {
           return OwlUI.FILTER;
+        }
+
+        @Override
+        public String getId() {
+          return FILTERS_ACTION;
         }
       };
 
@@ -571,12 +582,17 @@ public class NewsFilterDialog extends TitleAreaDialog {
       IAction savedSearches = new Action(Messages.NewsFilterDialog_SHOW_SAVED_SEARCH, IAction.AS_DROP_DOWN_MENU) {
         @Override
         public void run() {
-          getMenuCreator().getMenu(dialogToolBar.getControl()).setVisible(true);
+          OwlUI.positionDropDownMenu(this, dialogToolBar);
         }
 
         @Override
         public ImageDescriptor getImageDescriptor() {
           return OwlUI.SEARCHMARK;
+        }
+
+        @Override
+        public String getId() {
+          return SEARCHES_ACTION;
         }
       };
 

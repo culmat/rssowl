@@ -825,7 +825,7 @@ public class BookMarkExplorer extends ViewPart {
 
         /* Show Menu */
         else if (fToolBarManager instanceof ToolBarManager)
-          getMenuCreator().getMenu(((ToolBarManager) fToolBarManager).getControl()).setVisible(true);
+          OwlUI.positionDropDownMenu(this, (ToolBarManager) fToolBarManager);
       }
 
       @Override
@@ -948,7 +948,7 @@ public class BookMarkExplorer extends ViewPart {
 
         /* Show Menu */
         else if (fToolBarManager instanceof ToolBarManager)
-          getMenuCreator().getMenu(((ToolBarManager) fToolBarManager).getControl()).setVisible(true);
+          OwlUI.positionDropDownMenu(this, (ToolBarManager) fToolBarManager);
       }
 
       @Override
