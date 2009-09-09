@@ -27,6 +27,10 @@ package org.rssowl.ui.internal;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ActionContributionItem;
+import org.eclipse.jface.action.IContributionItem;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
@@ -76,14 +80,17 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Scrollable;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IViewPart;
@@ -2127,6 +2134,32 @@ public class OwlUI {
           Activator.getDefault().logError(e.getMessage(), e);
         }
       }
+    }
+  }
+
+  /**
+   * @param action the dropdown action.
+   * @param manager the toolbar containing the action.
+   */
+  public static void positionDropDownMenu(Action action, ToolBarManager manager) {
+    Menu menu = action.getMenuCreator().getMenu(manager.getControl());
+    if (menu != null) {
+
+      /* Adjust Location */
+      IContributionItem contributionItem = manager.find(action.getId());
+      if (contributionItem != null && contributionItem instanceof ActionContributionItem) {
+        Widget widget = ((ActionContributionItem) contributionItem).getWidget();
+        if (widget != null && widget instanceof ToolItem) {
+          ToolItem item = (ToolItem) widget;
+          Rectangle rect = item.getBounds();
+          Point pt = new Point(rect.x, rect.y + rect.height);
+          pt = manager.getControl().toDisplay(pt);
+          menu.setLocation(pt.x, pt.y);
+        }
+      }
+
+      /* Set Visible */
+      menu.setVisible(true);
     }
   }
 }

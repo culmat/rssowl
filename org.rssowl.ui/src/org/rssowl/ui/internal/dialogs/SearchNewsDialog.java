@@ -193,6 +193,12 @@ public class SearchNewsDialog extends TitleAreaDialog {
   /* Preference: Sash Weights */
   private static final String PREF_SASH_WEIGHTS = "org.rssowl.ui.internal.dialogs.search.SashWeights"; //$NON-NLS-1$
 
+  /* Columns Action */
+  private static final String COLUMNS_ACTION = "org.rssowl.ui.internal.dialogs.search.ColumnsAction"; //$NON-NLS-1$
+
+  /* Searches Action */
+  private static final String SEARCHES_ACTION = "org.rssowl.ui.internal.dialogs.search.SearchesAction"; //$NON-NLS-1$
+
   /* Number of News to preload before showing as result */
   private static final int NUM_PRELOADED = 20;
 
@@ -834,12 +840,17 @@ public class SearchNewsDialog extends TitleAreaDialog {
     IAction columnDropdown = new Action(Messages.SearchNewsDialog_VISIBLE_COLUMNS, IAction.AS_DROP_DOWN_MENU) {
       @Override
       public void run() {
-        getMenuCreator().getMenu(dialogToolBar.getControl()).setVisible(true);
+        OwlUI.positionDropDownMenu(this, dialogToolBar);
       }
 
       @Override
       public ImageDescriptor getImageDescriptor() {
         return OwlUI.COLUMNS;
+      }
+
+      @Override
+      public String getId() {
+        return COLUMNS_ACTION;
       }
     };
 
@@ -949,12 +960,17 @@ public class SearchNewsDialog extends TitleAreaDialog {
     IAction savedSearches = new Action(Messages.SearchNewsDialog_SHOW_SAVED_SEARCH, IAction.AS_DROP_DOWN_MENU) {
       @Override
       public void run() {
-        getMenuCreator().getMenu(dialogToolBar.getControl()).setVisible(true);
+        OwlUI.positionDropDownMenu(this, dialogToolBar);
       }
 
       @Override
       public ImageDescriptor getImageDescriptor() {
         return OwlUI.SEARCHMARK;
+      }
+
+      @Override
+      public String getId() {
+        return SEARCHES_ACTION;
       }
     };
 

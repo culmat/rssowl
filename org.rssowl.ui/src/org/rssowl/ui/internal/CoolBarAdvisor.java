@@ -44,14 +44,10 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.CoolBar;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.ToolItem;
-import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
@@ -1040,61 +1036,39 @@ public class CoolBarAdvisor {
 
         /* History */
       case HISTORY: {
-        showMenu(wrappingAction, manager);
+        OwlUI.positionDropDownMenu(wrappingAction, manager);
         break;
       }
 
         /* Label */
       case LABEL: {
-        showMenu(wrappingAction, manager);
+        OwlUI.positionDropDownMenu(wrappingAction, manager);
         break;
       }
 
         /* Move */
       case MOVE: {
-        showMenu(wrappingAction, manager);
+        OwlUI.positionDropDownMenu(wrappingAction, manager);
         break;
       }
 
         /* Copy */
       case COPY: {
-        showMenu(wrappingAction, manager);
+        OwlUI.positionDropDownMenu(wrappingAction, manager);
         break;
       }
 
         /* Share */
       case SHARE: {
-        showMenu(wrappingAction, manager);
+        OwlUI.positionDropDownMenu(wrappingAction, manager);
         break;
       }
 
         /* Bookmarks */
       case BOOKMARKS: {
-        showMenu(wrappingAction, manager);
+        OwlUI.positionDropDownMenu(wrappingAction, manager);
         break;
       }
-    }
-  }
-
-  private void showMenu(Action wrappingAction, ToolBarManager manager) {
-    Menu menu = wrappingAction.getMenuCreator().getMenu(manager.getControl());
-    if (menu != null) {
-
-      /* Adjust Location */
-      IContributionItem contributionItem = manager.find(wrappingAction.getId());
-      if (contributionItem != null && contributionItem instanceof ActionContributionItem) {
-        Widget widget = ((ActionContributionItem) contributionItem).getWidget();
-        if (widget != null && widget instanceof ToolItem) {
-          ToolItem item = (ToolItem) widget;
-          Rectangle rect = item.getBounds();
-          Point pt = new Point(rect.x, rect.y + rect.height);
-          pt = manager.getControl().toDisplay(pt);
-          menu.setLocation(pt.x, pt.y);
-        }
-      }
-
-      /* Set Visible */
-      menu.setVisible(true);
     }
   }
 
