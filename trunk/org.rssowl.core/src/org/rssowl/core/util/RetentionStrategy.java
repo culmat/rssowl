@@ -103,13 +103,13 @@ public class RetentionStrategy {
   }
 
   /**
-   * Runs the Retention on the given <code>IBookMark</code>. The second
-   * argument speeds up this method, since it provides all the
-   * <code>INews</code> belonging to the Feed the Bookmark is referencing.
+   * Runs the Retention on the given <code>IBookMark</code>. The second argument
+   * speeds up this method, since it provides all the <code>INews</code>
+   * belonging to the Feed the Bookmark is referencing.
    *
    * @param bookmark The <code>IBookMark</code> to run the Retention on.
-   * @param news A List of <code>INews</code> belonging to the Feed the
-   * Bookmark is referencing.
+   * @param news A List of <code>INews</code> belonging to the Feed the Bookmark
+   * is referencing.
    * @return Returns a List of News that have been deleted due to the Retention
    * Processing.
    */
@@ -125,8 +125,8 @@ public class RetentionStrategy {
 
   /**
    * Runs the Retention on the given <code>IBookMark</code> and
-   * <code>IFeed</code>. The third parameter indicates the number of added
-   * News in the Feed. That is, those News that the user has not yet seen. The
+   * <code>IFeed</code>. The third parameter indicates the number of added News
+   * in the Feed. That is, those News that the user has not yet seen. The
    * Retention will not remove those to give the user a chance to read them.
    * This is important for Feeds that serve more News than the retention
    * strategy is set to keep.
@@ -194,7 +194,7 @@ public class RetentionStrategy {
 
   /* Keep sticky news or news with a label */
   private static boolean shouldKeep(INews news) {
-    return news.isFlagged() || !news.getLabels().isEmpty();
+    return news.isFlagged() || !news.getLabels().isEmpty() || news.getState() == INews.State.NEW;
   }
 
   private static void fillNewsToDeleteByCount(Collection<INews> targetNews, List<INews> newsToDelete, int limit, boolean keepUnread) {
