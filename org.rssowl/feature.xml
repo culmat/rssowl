@@ -7,7 +7,7 @@
       plugin="org.rssowl.ui">
 
    <description>
-      This is the RSSOwl Feature.
+      This is RSSOwl 2.0.
    </description>
 
    <copyright>
@@ -230,7 +230,7 @@ litigation.
    </license>
 
    <url>
-      <update label="RSSOwl.org" url="http://boreal.rssowl.org"/>
+      <update label="RSSOwl.org" url="http://boreal.rssowl.org/update/program/"/>
    </url>
 
    <requires>

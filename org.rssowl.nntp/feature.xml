@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="org.rssowl.contrib.nntp"
-      label="Experimental Newsgroup Support"
+      label="Simple Newsgroup Support"
       version="2.0.0.qualifier"
       provider-name="RSSOwl.org">
 
    <description>
-      Experimental support for newsgroups in RSSOwl. After installation
+      Simple support for newsgroups in RSSOwl. After installation
 you will be able to read newsgroups as if they where feeds. To
 add a new newsgroup, simply create a new bookmark and use the
 following format for the Link: news://server/groupname (e.g.
@@ -233,7 +233,7 @@ litigation.
    </license>
 
    <url>
-      <update label="RSSOwl.org" url="http://boreal.rssowl.org"/>
+      <update label="RSSOwl.org" url="http://boreal.rssowl.org/update/addons/"/>
    </url>
 
    <requires>
@@ -244,8 +244,8 @@ litigation.
 
    <plugin
          id="org.rssowl.contrib.nntp"
-         download-size="0"
-         install-size="0"
+         download-size="413"
+         install-size="413"
          version="0.0.0"
          unpack="false"/>
 

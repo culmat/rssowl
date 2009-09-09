@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/org.rssowl.contrib.nntp_2.0.0.qualifier.jar" id="org.rssowl.contrib.nntp" version="2.0.0.qualifier">
+   <feature url="features/org.rssowl.contrib.nntp_2.0.0.200909091024.jar" id="org.rssowl.contrib.nntp" version="2.0.0.200909091024">
       <category name="rssowl.addons"/>
    </feature>
    <category-def name="rssowl.addons" label="RSSOwl Add-ons"/>
