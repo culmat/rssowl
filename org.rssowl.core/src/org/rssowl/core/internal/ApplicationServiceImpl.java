@@ -193,7 +193,7 @@ public class ApplicationServiceImpl implements IApplicationService {
       updateStateOfUnsavedNewNews(newNewsAdded);
 
       /* Retention Policy */
-      final List<INews> deletedNews = RetentionStrategy.process(bookMark, feed, newNewsAdded.size());
+      final List<INews> deletedNews = RetentionStrategy.process(bookMark, feed);
 
       for (INews news : deletedNews)
         mergeResult.addUpdatedObject(news);
