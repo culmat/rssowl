@@ -25,6 +25,7 @@
 package org.rssowl.ui.internal.filter;
 
 import org.rssowl.core.INewsAction;
+import org.rssowl.core.internal.newsaction.DeleteNewsAction;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.INews;
 import org.rssowl.ui.internal.Controller;
@@ -58,6 +59,6 @@ public class ShowNotifierNewsAction implements INewsAction {
    * @see org.rssowl.core.INewsAction#isConflicting(org.rssowl.core.INewsAction)
    */
   public boolean conflictsWith(INewsAction otherAction) {
-    return false;
+    return otherAction instanceof DeleteNewsAction;
   }
 }
