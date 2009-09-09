@@ -50,7 +50,6 @@ public class Messages extends NLS {
   public static String EntityPropertyDialogAction_N_SEARCHES;
   public static String EntityPropertyDialogAction_PROPERTIES_FOR_N;
   public static String FindAction_FIND;
-  public static String FindExtensionsAction_RSSOWL_APPLICATION;
   public static String FindExtensionsAction_SEARCHING_EXTENSIONS;
   public static String FindUpdatesAction_CHECK_UPDATES;
   public static String FindUpdatesAction_DOWNLOADING_UPDATES;
