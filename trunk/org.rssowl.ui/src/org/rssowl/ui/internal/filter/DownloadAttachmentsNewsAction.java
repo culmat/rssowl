@@ -65,7 +65,7 @@ public class DownloadAttachmentsNewsAction implements INewsAction {
                 try {
                   link = URIUtils.resolve(newsitem.getFeedReference().getLink(), link);
                 } catch (URISyntaxException e) {
-                  Activator.getDefault().logError(e.getMessage(), e);
+                  Activator.safeLogError(e.getMessage(), e);
                   continue; //Proceed with other Attachments
                 }
               }
@@ -85,6 +85,6 @@ public class DownloadAttachmentsNewsAction implements INewsAction {
    * @see org.rssowl.core.INewsAction#conflictsWith(org.rssowl.core.INewsAction)
    */
   public boolean conflictsWith(INewsAction otherAction) {
-    return otherAction instanceof DownloadAttachmentsNewsAction;
+    return false;
   }
 }
