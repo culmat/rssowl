@@ -68,6 +68,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Importer for the popular OPML Format. Will create a new Folder that contains
@@ -210,6 +211,23 @@ public class OPMLImporter implements ITypeImporter {
         /* Any other Action */
         else {
           filterAction.setData(data);
+        }
+      }
+
+      /* Look for Action Properties */
+      else {
+        List<?> actionProperties = action.getChildren(Tag.ACTION_PROPERTY.get(), RSSOWL_NS);
+        if (!actionProperties.isEmpty()) {
+          Properties properties = new Properties();
+          for (Object actionProperty : actionProperties) {
+            Element actionPropertyElement = (Element) actionProperty;
+            String key = actionPropertyElement.getAttributeValue(Attributes.ID.get());
+            String value = actionPropertyElement.getAttributeValue(Attributes.VALUE.get());
+
+            properties.setProperty(key, value);
+          }
+
+          filterAction.setData(properties);
         }
       }
 

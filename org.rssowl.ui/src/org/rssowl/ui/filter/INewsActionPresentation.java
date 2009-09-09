@@ -27,6 +27,8 @@ package org.rssowl.ui.filter;
 import org.eclipse.swt.widgets.Composite;
 import org.rssowl.core.INewsAction;
 
+import java.util.Properties;
+
 /**
  * Instances of {@link INewsActionPresentation} provide a custom UI presentation
  * for an {@link INewsAction}.
@@ -48,8 +50,9 @@ public interface INewsActionPresentation {
 
   /**
    * @return arbitrary data taken from changes the user made to the
-   * presentation. It is strongly recommended to use {@link String} as data type
-   * to support Import and Export of the news action.
+   * presentation. It is strongly recommended to use {@link String} or
+   * {@link Properties} as data type to support Import and Export of the news
+   * action.
    */
   Object getData();
 }

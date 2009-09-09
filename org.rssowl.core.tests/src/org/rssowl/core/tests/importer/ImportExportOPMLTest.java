@@ -80,6 +80,7 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -305,6 +306,21 @@ public class ImportExportOPMLTest {
 
     action = fFactory.createFilterAction("org.rssowl.ui.PlaySoundAction");
     action.setData("C:\\ProgramData\\Microsoft\\Windows & Help\\Start Menu");
+    filter.addAction(action);
+
+    DynamicDAO.save(filter);
+
+    /* 8) Filter with Properties as Data */
+    filter = fFactory.createSearchFilter(null, null, "Filter 8");
+    filter.setMatchAllNews(true);
+    filter.setOrder(5);
+
+    action = fFactory.createFilterAction("org.rssowl.ui.PlaySoundAction");
+    Properties props = new Properties();
+    props.setProperty("foo", "bar");
+    props.setProperty("hello world", " world hello ");
+    props.setProperty("<some xml>tags</a>", "foo & bar");
+    action.setData(props);
     filter.addAction(action);
 
     DynamicDAO.save(filter);
@@ -826,7 +842,7 @@ public class ImportExportOPMLTest {
 
   private void assertFilters() {
     Collection<ISearchFilter> filters = DynamicDAO.loadAll(ISearchFilter.class);
-    assertEquals(7, filters.size());
+    assertEquals(8, filters.size());
 
     for (ISearchFilter filter : filters) {
       if ("Filter 1".equals(filter.getName())) {
@@ -941,6 +957,18 @@ public class ImportExportOPMLTest {
         data = filter.getActions().get(2).getData();
         assertNotNull(data);
         assertEquals("C:\\ProgramData\\Microsoft\\Windows & Help\\Start Menu", data);
+      }
+
+      else if ("Filter 8".equals(filter.getName())) {
+        assertEquals(1, filter.getActions().size());
+        assertEquals("org.rssowl.ui.PlaySoundAction", filter.getActions().get(0).getActionId());
+        Object data = filter.getActions().get(0).getData();
+        assertNotNull(data);
+        assertEquals(true, data instanceof Properties);
+        Properties props = (Properties) data;
+        assertEquals("bar", props.getProperty("foo"));
+        assertEquals(" world hello ", props.getProperty("hello world"));
+        assertEquals("foo & bar", props.getProperty("<some xml>tags</a>"));
       }
 
       else

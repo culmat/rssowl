@@ -49,7 +49,7 @@ public class OPMLConstants {
     /** Custom RSSOwl */
     PREFERENCE("pref"), BIN("newsbin"), SAVED_SEARCH("savedsearch"), LABEL("label"), STATE("newsstate"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
     SPECIFIER("searchspecifier"), LOCATION("location"), SEARCH_VALUE("searchvalue"), SEARCH_FIELD("searchfield"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-    FILTER("searchfilter"), SEARCH("search"), SEARCH_CONDITION("searchcondition"), ACTION("filteraction"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+    FILTER("searchfilter"), SEARCH("search"), SEARCH_CONDITION("searchcondition"), ACTION("filteraction"), ACTION_PROPERTY("filteractionproperty"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 
     private String fName;
 
