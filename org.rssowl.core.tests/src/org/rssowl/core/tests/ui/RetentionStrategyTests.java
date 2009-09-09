@@ -34,6 +34,7 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
@@ -72,6 +73,7 @@ public class RetentionStrategyTests {
   public void setUp() throws Exception {
     Owl.getPersistenceService().recreateSchema();
     fFactory = Owl.getModelFactory();
+    Owl.getPreferenceService().getGlobalScope().putBoolean(DefaultPreferences.NEVER_DEL_UNREAD_NEWS_STATE, false);
   }
 
   /**
@@ -90,6 +92,58 @@ public class RetentionStrategyTests {
     fFactory.createBookMark(null, folder, new FeedLinkReference(feed2.getLink()), "BookMark2");
 
     IFeed feed3 = createFeedWithNews(new URI("http://www.url3.com"), 100, 100, today - 31 * DAY, today - 25 * DAY, 0);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed3.getLink()), "BookMark3");
+
+    DynamicDAO.save(folder);
+
+    IBookMark bookMark1 = null, bookMark2 = null, bookMark3 = null;
+    List<IMark> marks = folder.getMarks();
+    for (IMark mark : marks) {
+      if (mark.getName().equals("BookMark1"))
+        bookMark1 = (IBookMark) mark;
+      else if (mark.getName().equals("BookMark2"))
+        bookMark2 = (IBookMark) mark;
+      else if (mark.getName().equals("BookMark3"))
+        bookMark3 = (IBookMark) mark;
+    }
+
+    /* Preferences */
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookMark1);
+    IPreferenceScope prefs2 = Owl.getPreferenceService().getEntityScope(bookMark2);
+    IPreferenceScope prefs3 = Owl.getPreferenceService().getEntityScope(bookMark3);
+
+    /* Setup Retention */
+    prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE, true);
+    prefs2.putBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE, true);
+    prefs3.putBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE, true);
+
+    /* Run and Validate Retention */
+    prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_AGE_VALUE, 20);
+    prefs2.putInteger(DefaultPreferences.DEL_NEWS_BY_AGE_VALUE, 20);
+    prefs3.putInteger(DefaultPreferences.DEL_NEWS_BY_AGE_VALUE, 20);
+    RetentionStrategy.process(folder);
+    assertEquals(200, countNews(folder));
+    assertEquals(100, countNews(bookMark1));
+    assertEquals(100, countNews(bookMark2));
+    assertEquals(0, countNews(bookMark3));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testProcessFolderByAgeKeepNew() throws Exception {
+    long today = DateUtils.getToday().getTimeInMillis();
+
+    IFolder folder = DynamicDAO.save(fFactory.createFolder(null, null, "Root"));
+
+    IFeed feed1 = createFeedWithNews(new URI("http://www.url1.com"), 100, 0, today - DAY, today + 5 * HOUR, 0, true);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed1.getLink()), "BookMark1");
+
+    IFeed feed2 = createFeedWithNews(new URI("http://www.url2.com"), 100, 50, today - 7 * DAY, today + 8 * HOUR, 0, true);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed2.getLink()), "BookMark2");
+
+    IFeed feed3 = createFeedWithNews(new URI("http://www.url3.com"), 100, 100, today - 31 * DAY, today - 25 * DAY, 0, true);
     fFactory.createBookMark(null, folder, new FeedLinkReference(feed3.getLink()), "BookMark3");
 
     DynamicDAO.save(folder);
@@ -185,6 +239,61 @@ public class RetentionStrategyTests {
    * @throws Exception
    */
   @Test
+  public void testProcessFolderByAge_NoDeleteUnreadKeepNew() throws Exception {
+    long today = DateUtils.getToday().getTimeInMillis();
+
+    IFolder folder = DynamicDAO.save(fFactory.createFolder(null, null, "Root"));
+
+    IFeed feed1 = createFeedWithNews(new URI("http://www.url1.com"), 100, 0, today - DAY, today + 5 * HOUR, 0, true);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed1.getLink()), "BookMark1");
+
+    IFeed feed2 = createFeedWithNews(new URI("http://www.url2.com"), 100, 50, today - 7 * DAY, today + 8 * HOUR, 0, true);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed2.getLink()), "BookMark2");
+
+    IFeed feed3 = createFeedWithNews(new URI("http://www.url3.com"), 100, 100, today - 31 * DAY, today - 25 * DAY, 0, true);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed3.getLink()), "BookMark3");
+
+    DynamicDAO.save(folder);
+
+    IBookMark bookMark1 = null, bookMark2 = null, bookMark3 = null;
+    List<IMark> marks = folder.getMarks();
+    for (IMark mark : marks) {
+      if (mark.getName().equals("BookMark1"))
+        bookMark1 = (IBookMark) mark;
+      else if (mark.getName().equals("BookMark2"))
+        bookMark2 = (IBookMark) mark;
+      else if (mark.getName().equals("BookMark3"))
+        bookMark3 = (IBookMark) mark;
+    }
+
+    /* Preferences */
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookMark1);
+    IPreferenceScope prefs2 = Owl.getPreferenceService().getEntityScope(bookMark2);
+    IPreferenceScope prefs3 = Owl.getPreferenceService().getEntityScope(bookMark3);
+
+    /* Setup Retention */
+    prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE, true);
+    prefs1.putBoolean(DefaultPreferences.NEVER_DEL_UNREAD_NEWS_STATE, true);
+    prefs2.putBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE, true);
+    prefs2.putBoolean(DefaultPreferences.NEVER_DEL_UNREAD_NEWS_STATE, true);
+    prefs3.putBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE, true);
+    prefs3.putBoolean(DefaultPreferences.NEVER_DEL_UNREAD_NEWS_STATE, true);
+
+    /* Run and Validate Retention */
+    prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_AGE_VALUE, 20);
+    prefs2.putInteger(DefaultPreferences.DEL_NEWS_BY_AGE_VALUE, 20);
+    prefs3.putInteger(DefaultPreferences.DEL_NEWS_BY_AGE_VALUE, 20);
+    RetentionStrategy.process(folder);
+    assertEquals(200, countNews(folder));
+    assertEquals(100, countNews(bookMark1));
+    assertEquals(100, countNews(bookMark2));
+    assertEquals(0, countNews(bookMark3));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
   public void testProcessFolderByState() throws Exception {
     long today = DateUtils.getToday().getTimeInMillis();
 
@@ -197,6 +306,55 @@ public class RetentionStrategyTests {
     fFactory.createBookMark(null, folder, new FeedLinkReference(feed2.getLink()), "BookMark2");
 
     IFeed feed3 = createFeedWithNews(new URI("http://www.url3.com"), 100, 100, today - 31 * DAY, today - 25 * DAY, 0);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed3.getLink()), "BookMark3");
+
+    DynamicDAO.save(folder);
+
+    IBookMark bookMark1 = null, bookMark2 = null, bookMark3 = null;
+    List<IMark> marks = folder.getMarks();
+    for (IMark mark : marks) {
+      if (mark.getName().equals("BookMark1"))
+        bookMark1 = (IBookMark) mark;
+      else if (mark.getName().equals("BookMark2"))
+        bookMark2 = (IBookMark) mark;
+      else if (mark.getName().equals("BookMark3"))
+        bookMark3 = (IBookMark) mark;
+    }
+
+    /* Preferences */
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookMark1);
+    IPreferenceScope prefs2 = Owl.getPreferenceService().getEntityScope(bookMark2);
+    IPreferenceScope prefs3 = Owl.getPreferenceService().getEntityScope(bookMark3);
+
+    /* Setup Retention */
+    prefs1.putBoolean(DefaultPreferences.DEL_READ_NEWS_STATE, true);
+    prefs2.putBoolean(DefaultPreferences.DEL_READ_NEWS_STATE, true);
+    prefs3.putBoolean(DefaultPreferences.DEL_READ_NEWS_STATE, true);
+
+    /* Run and Validate Retention */
+    RetentionStrategy.process(folder);
+    assertEquals(150, countNews(folder));
+    assertEquals(100, countNews(bookMark1));
+    assertEquals(50, countNews(bookMark2));
+    assertEquals(0, countNews(bookMark3));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testProcessFolderByStateKeepNew() throws Exception {
+    long today = DateUtils.getToday().getTimeInMillis();
+
+    IFolder folder = DynamicDAO.save(fFactory.createFolder(null, null, "Root"));
+
+    IFeed feed1 = createFeedWithNews(new URI("http://www.url1.com"), 100, 0, today - DAY, today + 5 * HOUR, 0, true);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed1.getLink()), "BookMark1");
+
+    IFeed feed2 = createFeedWithNews(new URI("http://www.url2.com"), 100, 50, today - 7 * DAY, today + 8 * HOUR, 0, true);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed2.getLink()), "BookMark2");
+
+    IFeed feed3 = createFeedWithNews(new URI("http://www.url3.com"), 100, 100, today - 31 * DAY, today - 25 * DAY, 0, true);
     fFactory.createBookMark(null, folder, new FeedLinkReference(feed3.getLink()), "BookMark3");
 
     DynamicDAO.save(folder);
@@ -286,6 +444,58 @@ public class RetentionStrategyTests {
    * @throws Exception
    */
   @Test
+  public void testProcessFolderByCountKeepNew() throws Exception {
+    long today = DateUtils.getToday().getTimeInMillis();
+
+    IFolder folder = DynamicDAO.save(fFactory.createFolder(null, null, "Root"));
+
+    IFeed feed1 = createFeedWithNews(new URI("http://www.url1.com"), 100, 0, today - DAY, today + 5 * HOUR, 0, true);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed1.getLink()), "BookMark1");
+
+    IFeed feed2 = createFeedWithNews(new URI("http://www.url2.com"), 100, 50, today - 7 * DAY, today + 8 * HOUR, 0, true);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed2.getLink()), "BookMark2");
+
+    IFeed feed3 = createFeedWithNews(new URI("http://www.url3.com"), 100, 100, today - 31 * DAY, today - 25 * DAY, 0, true);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed3.getLink()), "BookMark3");
+
+    DynamicDAO.save(folder);
+
+    IBookMark bookMark1 = null, bookMark2 = null, bookMark3 = null;
+    List<IMark> marks = folder.getMarks();
+    for (IMark mark : marks) {
+      if (mark.getName().equals("BookMark1"))
+        bookMark1 = (IBookMark) mark;
+      else if (mark.getName().equals("BookMark2"))
+        bookMark2 = (IBookMark) mark;
+      else if (mark.getName().equals("BookMark3"))
+        bookMark3 = (IBookMark) mark;
+    }
+
+    /* Preferences */
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookMark1);
+    IPreferenceScope prefs2 = Owl.getPreferenceService().getEntityScope(bookMark2);
+    IPreferenceScope prefs3 = Owl.getPreferenceService().getEntityScope(bookMark3);
+
+    /* Setup Retention */
+    prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
+    prefs2.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
+    prefs3.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
+
+    /* Run and Validate Retention */
+    prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 20);
+    prefs2.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 40);
+    prefs3.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 80);
+    RetentionStrategy.process(folder);
+    assertEquals(230, countNews(folder));
+    assertEquals(100, countNews(bookMark1));
+    assertEquals(50, countNews(bookMark2));
+    assertEquals(80, countNews(bookMark3));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
   public void testProcessFolderByCount_NoDeleteUnread() throws Exception {
     long today = DateUtils.getToday().getTimeInMillis();
 
@@ -298,6 +508,61 @@ public class RetentionStrategyTests {
     fFactory.createBookMark(null, folder, new FeedLinkReference(feed2.getLink()), "BookMark2");
 
     IFeed feed3 = createFeedWithNews(new URI("http://www.url3.com"), 100, 100, today - 31 * DAY, today - 25 * DAY, 0);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed3.getLink()), "BookMark3");
+
+    DynamicDAO.save(folder);
+
+    IBookMark bookMark1 = null, bookMark2 = null, bookMark3 = null;
+    List<IMark> marks = folder.getMarks();
+    for (IMark mark : marks) {
+      if (mark.getName().equals("BookMark1"))
+        bookMark1 = (IBookMark) mark;
+      else if (mark.getName().equals("BookMark2"))
+        bookMark2 = (IBookMark) mark;
+      else if (mark.getName().equals("BookMark3"))
+        bookMark3 = (IBookMark) mark;
+    }
+
+    /* Preferences */
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookMark1);
+    IPreferenceScope prefs2 = Owl.getPreferenceService().getEntityScope(bookMark2);
+    IPreferenceScope prefs3 = Owl.getPreferenceService().getEntityScope(bookMark3);
+
+    /* Setup Retention */
+    prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
+    prefs1.putBoolean(DefaultPreferences.NEVER_DEL_UNREAD_NEWS_STATE, true);
+    prefs2.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
+    prefs2.putBoolean(DefaultPreferences.NEVER_DEL_UNREAD_NEWS_STATE, true);
+    prefs3.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
+    prefs3.putBoolean(DefaultPreferences.NEVER_DEL_UNREAD_NEWS_STATE, true);
+
+    /* Run and Validate Retention */
+    prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 20);
+    prefs2.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 40);
+    prefs3.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 80);
+    RetentionStrategy.process(folder);
+    assertEquals(230, countNews(folder));
+    assertEquals(100, countNews(bookMark1));
+    assertEquals(50, countNews(bookMark2));
+    assertEquals(80, countNews(bookMark3));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testProcessFolderByCount_NoDeleteUnreadKeepNew() throws Exception {
+    long today = DateUtils.getToday().getTimeInMillis();
+
+    IFolder folder = DynamicDAO.save(fFactory.createFolder(null, null, "Root"));
+
+    IFeed feed1 = createFeedWithNews(new URI("http://www.url1.com"), 100, 0, today - DAY, today + 5 * HOUR, 0, true);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed1.getLink()), "BookMark1");
+
+    IFeed feed2 = createFeedWithNews(new URI("http://www.url2.com"), 100, 50, today - 7 * DAY, today + 8 * HOUR, 0, true);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed2.getLink()), "BookMark2");
+
+    IFeed feed3 = createFeedWithNews(new URI("http://www.url3.com"), 100, 100, today - 31 * DAY, today - 25 * DAY, 0, true);
     fFactory.createBookMark(null, folder, new FeedLinkReference(feed3.getLink()), "BookMark3");
 
     DynamicDAO.save(folder);
@@ -399,6 +664,64 @@ public class RetentionStrategyTests {
    * @throws Exception
    */
   @Test
+  public void testProcessFolderByAgeAndCountKeepNew() throws Exception {
+    long today = DateUtils.getToday().getTimeInMillis();
+
+    IFolder folder = DynamicDAO.save(fFactory.createFolder(null, null, "Root"));
+
+    IFeed feed1 = createFeedWithNews(new URI("http://www.url1.com"), 100, 0, today - DAY, today + 5 * HOUR, 0, true);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed1.getLink()), "BookMark1");
+
+    IFeed feed2 = createFeedWithNews(new URI("http://www.url2.com"), 100, 50, today - 7 * DAY, today + 8 * HOUR, 0, true);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed2.getLink()), "BookMark2");
+
+    IFeed feed3 = createFeedWithNews(new URI("http://www.url3.com"), 100, 100, today - 31 * DAY, today - 25 * DAY, 0, true);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed3.getLink()), "BookMark3");
+
+    DynamicDAO.save(folder);
+
+    IBookMark bookMark1 = null, bookMark2 = null, bookMark3 = null;
+    List<IMark> marks = folder.getMarks();
+    for (IMark mark : marks) {
+      if (mark.getName().equals("BookMark1"))
+        bookMark1 = (IBookMark) mark;
+      else if (mark.getName().equals("BookMark2"))
+        bookMark2 = (IBookMark) mark;
+      else if (mark.getName().equals("BookMark3"))
+        bookMark3 = (IBookMark) mark;
+    }
+
+    /* Preferences */
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookMark1);
+    IPreferenceScope prefs2 = Owl.getPreferenceService().getEntityScope(bookMark2);
+    IPreferenceScope prefs3 = Owl.getPreferenceService().getEntityScope(bookMark3);
+
+    /* Setup Retention */
+    prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE, true);
+    prefs2.putBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE, true);
+    prefs3.putBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE, true);
+    prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
+    prefs2.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
+    prefs3.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
+
+    /* Run and Validate Retention */
+    prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_AGE_VALUE, 20);
+    prefs2.putInteger(DefaultPreferences.DEL_NEWS_BY_AGE_VALUE, 20);
+    prefs3.putInteger(DefaultPreferences.DEL_NEWS_BY_AGE_VALUE, 20);
+    prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 20);
+    prefs2.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 40);
+    prefs3.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 80);
+    RetentionStrategy.process(folder);
+    assertEquals(150, countNews(folder));
+    assertEquals(100, countNews(bookMark1));
+    assertEquals(50, countNews(bookMark2));
+    assertEquals(0, countNews(bookMark3));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
   public void testProcessFolderByAgeAndCount_NoDeleteUnread() throws Exception {
     long today = DateUtils.getToday().getTimeInMillis();
 
@@ -411,6 +734,67 @@ public class RetentionStrategyTests {
     fFactory.createBookMark(null, folder, new FeedLinkReference(feed2.getLink()), "BookMark2");
 
     IFeed feed3 = createFeedWithNews(new URI("http://www.url3.com"), 100, 100, today - 31 * DAY, today - 25 * DAY, 0);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed3.getLink()), "BookMark3");
+
+    DynamicDAO.save(folder);
+
+    IBookMark bookMark1 = null, bookMark2 = null, bookMark3 = null;
+    List<IMark> marks = folder.getMarks();
+    for (IMark mark : marks) {
+      if (mark.getName().equals("BookMark1"))
+        bookMark1 = (IBookMark) mark;
+      else if (mark.getName().equals("BookMark2"))
+        bookMark2 = (IBookMark) mark;
+      else if (mark.getName().equals("BookMark3"))
+        bookMark3 = (IBookMark) mark;
+    }
+
+    /* Preferences */
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookMark1);
+    IPreferenceScope prefs2 = Owl.getPreferenceService().getEntityScope(bookMark2);
+    IPreferenceScope prefs3 = Owl.getPreferenceService().getEntityScope(bookMark3);
+
+    /* Setup Retention */
+    prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE, true);
+    prefs2.putBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE, true);
+    prefs3.putBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE, true);
+    prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
+    prefs2.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
+    prefs3.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
+    prefs1.putBoolean(DefaultPreferences.NEVER_DEL_UNREAD_NEWS_STATE, true);
+    prefs2.putBoolean(DefaultPreferences.NEVER_DEL_UNREAD_NEWS_STATE, true);
+    prefs3.putBoolean(DefaultPreferences.NEVER_DEL_UNREAD_NEWS_STATE, true);
+
+    /* Run and Validate Retention */
+    prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_AGE_VALUE, 20);
+    prefs2.putInteger(DefaultPreferences.DEL_NEWS_BY_AGE_VALUE, 20);
+    prefs3.putInteger(DefaultPreferences.DEL_NEWS_BY_AGE_VALUE, 20);
+    prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 20);
+    prefs2.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 40);
+    prefs3.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 80);
+    RetentionStrategy.process(folder);
+    assertEquals(150, countNews(folder));
+    assertEquals(100, countNews(bookMark1));
+    assertEquals(50, countNews(bookMark2));
+    assertEquals(0, countNews(bookMark3));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testProcessFolderByAgeAndCount_NoDeleteUnreadKeepNew() throws Exception {
+    long today = DateUtils.getToday().getTimeInMillis();
+
+    IFolder folder = DynamicDAO.save(fFactory.createFolder(null, null, "Root"));
+
+    IFeed feed1 = createFeedWithNews(new URI("http://www.url1.com"), 100, 0, today - DAY, today + 5 * HOUR, 0, true);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed1.getLink()), "BookMark1");
+
+    IFeed feed2 = createFeedWithNews(new URI("http://www.url2.com"), 100, 50, today - 7 * DAY, today + 8 * HOUR, 0, true);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed2.getLink()), "BookMark2");
+
+    IFeed feed3 = createFeedWithNews(new URI("http://www.url3.com"), 100, 100, today - 31 * DAY, today - 25 * DAY, 0, true);
     fFactory.createBookMark(null, folder, new FeedLinkReference(feed3.getLink()), "BookMark3");
 
     DynamicDAO.save(folder);
@@ -515,6 +899,61 @@ public class RetentionStrategyTests {
    * @throws Exception
    */
   @Test
+  public void testProcessFolderByAgeAndStateKeepNew() throws Exception {
+    long today = DateUtils.getToday().getTimeInMillis();
+
+    IFolder folder = DynamicDAO.save(fFactory.createFolder(null, null, "Root"));
+
+    IFeed feed1 = createFeedWithNews(new URI("http://www.url1.com"), 100, 0, today - DAY, today + 5 * HOUR, 0, true);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed1.getLink()), "BookMark1");
+
+    IFeed feed2 = createFeedWithNews(new URI("http://www.url2.com"), 100, 50, today - 7 * DAY, today + 8 * HOUR, 0, true);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed2.getLink()), "BookMark2");
+
+    IFeed feed3 = createFeedWithNews(new URI("http://www.url3.com"), 100, 100, today - 31 * DAY, today - 25 * DAY, 0, true);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed3.getLink()), "BookMark3");
+
+    DynamicDAO.save(folder);
+
+    IBookMark bookMark1 = null, bookMark2 = null, bookMark3 = null;
+    List<IMark> marks = folder.getMarks();
+    for (IMark mark : marks) {
+      if (mark.getName().equals("BookMark1"))
+        bookMark1 = (IBookMark) mark;
+      else if (mark.getName().equals("BookMark2"))
+        bookMark2 = (IBookMark) mark;
+      else if (mark.getName().equals("BookMark3"))
+        bookMark3 = (IBookMark) mark;
+    }
+
+    /* Preferences */
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookMark1);
+    IPreferenceScope prefs2 = Owl.getPreferenceService().getEntityScope(bookMark2);
+    IPreferenceScope prefs3 = Owl.getPreferenceService().getEntityScope(bookMark3);
+
+    /* Setup Retention */
+    prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE, true);
+    prefs2.putBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE, true);
+    prefs3.putBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE, true);
+    prefs1.putBoolean(DefaultPreferences.DEL_READ_NEWS_STATE, true);
+    prefs2.putBoolean(DefaultPreferences.DEL_READ_NEWS_STATE, true);
+    prefs3.putBoolean(DefaultPreferences.DEL_READ_NEWS_STATE, true);
+
+    /* Run and Validate Retention */
+    prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_AGE_VALUE, 20);
+    prefs2.putInteger(DefaultPreferences.DEL_NEWS_BY_AGE_VALUE, 20);
+    prefs3.putInteger(DefaultPreferences.DEL_NEWS_BY_AGE_VALUE, 20);
+    RetentionStrategy.process(folder);
+    assertEquals(150, countNews(folder));
+    assertEquals(100, countNews(bookMark1));
+    assertEquals(50, countNews(bookMark2));
+    assertEquals(0, countNews(bookMark3));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
   public void testProcessFolderByCountAndState() throws Exception {
     long today = DateUtils.getToday().getTimeInMillis();
 
@@ -563,6 +1002,61 @@ public class RetentionStrategyTests {
     assertEquals(60, countNews(folder));
     assertEquals(20, countNews(bookMark1));
     assertEquals(40, countNews(bookMark2));
+    assertEquals(0, countNews(bookMark3));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testProcessFolderByCountAndStateKeepNew() throws Exception {
+    long today = DateUtils.getToday().getTimeInMillis();
+
+    IFolder folder = DynamicDAO.save(fFactory.createFolder(null, null, "Root"));
+
+    IFeed feed1 = createFeedWithNews(new URI("http://www.url1.com"), 100, 0, today - DAY, today + 5 * HOUR, 0, true);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed1.getLink()), "BookMark1");
+
+    IFeed feed2 = createFeedWithNews(new URI("http://www.url2.com"), 100, 50, today - 7 * DAY, today + 8 * HOUR, 0, true);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed2.getLink()), "BookMark2");
+
+    IFeed feed3 = createFeedWithNews(new URI("http://www.url3.com"), 100, 100, today - 31 * DAY, today - 25 * DAY, 0, true);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed3.getLink()), "BookMark3");
+
+    DynamicDAO.save(folder);
+
+    IBookMark bookMark1 = null, bookMark2 = null, bookMark3 = null;
+    List<IMark> marks = folder.getMarks();
+    for (IMark mark : marks) {
+      if (mark.getName().equals("BookMark1"))
+        bookMark1 = (IBookMark) mark;
+      else if (mark.getName().equals("BookMark2"))
+        bookMark2 = (IBookMark) mark;
+      else if (mark.getName().equals("BookMark3"))
+        bookMark3 = (IBookMark) mark;
+    }
+
+    /* Preferences */
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookMark1);
+    IPreferenceScope prefs2 = Owl.getPreferenceService().getEntityScope(bookMark2);
+    IPreferenceScope prefs3 = Owl.getPreferenceService().getEntityScope(bookMark3);
+
+    /* Setup Retention */
+    prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
+    prefs2.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
+    prefs3.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
+    prefs1.putBoolean(DefaultPreferences.DEL_READ_NEWS_STATE, true);
+    prefs2.putBoolean(DefaultPreferences.DEL_READ_NEWS_STATE, true);
+    prefs3.putBoolean(DefaultPreferences.DEL_READ_NEWS_STATE, true);
+
+    /* Run and Validate Retention */
+    prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 20);
+    prefs2.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 40);
+    prefs3.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 80);
+    RetentionStrategy.process(folder);
+    assertEquals(150, countNews(folder));
+    assertEquals(100, countNews(bookMark1));
+    assertEquals(50, countNews(bookMark2));
     assertEquals(0, countNews(bookMark3));
   }
 
@@ -631,6 +1125,67 @@ public class RetentionStrategyTests {
    * @throws Exception
    */
   @Test
+  public void testProcessFolderByAgeAndCountAndStateKeepNew() throws Exception {
+    long today = DateUtils.getToday().getTimeInMillis();
+
+    IFolder folder = DynamicDAO.save(fFactory.createFolder(null, null, "Root"));
+
+    IFeed feed1 = createFeedWithNews(new URI("http://www.url1.com"), 100, 0, today - DAY, today + 5 * HOUR, 0, true);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed1.getLink()), "BookMark1");
+
+    IFeed feed2 = createFeedWithNews(new URI("http://www.url2.com"), 100, 50, today - 7 * DAY, today + 8 * HOUR, 0, true);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed2.getLink()), "BookMark2");
+
+    IFeed feed3 = createFeedWithNews(new URI("http://www.url3.com"), 100, 100, today - 31 * DAY, today - 25 * DAY, 0, true);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed3.getLink()), "BookMark3");
+
+    DynamicDAO.save(folder);
+
+    IBookMark bookMark1 = null, bookMark2 = null, bookMark3 = null;
+    List<IMark> marks = folder.getMarks();
+    for (IMark mark : marks) {
+      if (mark.getName().equals("BookMark1"))
+        bookMark1 = (IBookMark) mark;
+      else if (mark.getName().equals("BookMark2"))
+        bookMark2 = (IBookMark) mark;
+      else if (mark.getName().equals("BookMark3"))
+        bookMark3 = (IBookMark) mark;
+    }
+
+    /* Preferences */
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookMark1);
+    IPreferenceScope prefs2 = Owl.getPreferenceService().getEntityScope(bookMark2);
+    IPreferenceScope prefs3 = Owl.getPreferenceService().getEntityScope(bookMark3);
+
+    /* Setup Retention */
+    prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE, true);
+    prefs2.putBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE, true);
+    prefs3.putBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE, true);
+    prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
+    prefs2.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
+    prefs3.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
+    prefs1.putBoolean(DefaultPreferences.DEL_READ_NEWS_STATE, true);
+    prefs2.putBoolean(DefaultPreferences.DEL_READ_NEWS_STATE, true);
+    prefs3.putBoolean(DefaultPreferences.DEL_READ_NEWS_STATE, true);
+
+    /* Run and Validate Retention */
+    prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_AGE_VALUE, 20);
+    prefs2.putInteger(DefaultPreferences.DEL_NEWS_BY_AGE_VALUE, 20);
+    prefs3.putInteger(DefaultPreferences.DEL_NEWS_BY_AGE_VALUE, 20);
+    prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 20);
+    prefs2.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 40);
+    prefs3.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 80);
+    RetentionStrategy.process(folder);
+    assertEquals(150, countNews(folder));
+    assertEquals(100, countNews(bookMark1));
+    assertEquals(50, countNews(bookMark2));
+    assertEquals(0, countNews(bookMark3));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
   public void testProcessBookMarkByAge() throws Exception {
     long today = DateUtils.getToday().getTimeInMillis();
 
@@ -661,12 +1216,73 @@ public class RetentionStrategyTests {
    * @throws Exception
    */
   @Test
+  public void testProcessBookMarkByAgeKeepNew() throws Exception {
+    long today = DateUtils.getToday().getTimeInMillis();
+
+    IFolder folder = DynamicDAO.save(fFactory.createFolder(null, null, "Root"));
+
+    IFeed feed = createFeedWithNews(new URI("http://www.url.com"), 100, 20, today - 7 * DAY, today - 6 * DAY, 0, true);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark1");
+
+    DynamicDAO.save(folder);
+
+    IBookMark bookmark = (IBookMark) folder.getMarks().get(0);
+    assertEquals(100, countNews(bookmark));
+
+    /* Preferences */
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookmark);
+
+    /* Setup Retention */
+    prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE, true);
+
+    /* Run and Validate Retention */
+    prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_AGE_VALUE, 5);
+    RetentionStrategy.process(bookmark);
+    assertEquals(80, countNews(folder));
+    assertEquals(80, countNews(bookmark));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
   public void testProcessBookMarkByAge_NoDeleteUnread() throws Exception {
     long today = DateUtils.getToday().getTimeInMillis();
 
     IFolder folder = DynamicDAO.save(fFactory.createFolder(null, null, "Root"));
 
     IFeed feed = createFeedWithNews(new URI("http://www.url.com"), 100, 20, today - 7 * DAY, today - 6 * DAY, 0);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark1");
+
+    DynamicDAO.save(folder);
+
+    IBookMark bookmark = (IBookMark) folder.getMarks().get(0);
+    assertEquals(100, countNews(bookmark));
+
+    /* Preferences */
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookmark);
+
+    /* Setup Retention */
+    prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE, true);
+    prefs1.putBoolean(DefaultPreferences.NEVER_DEL_UNREAD_NEWS_STATE, true);
+
+    /* Run and Validate Retention */
+    prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_AGE_VALUE, 5);
+    RetentionStrategy.process(bookmark);
+    assertEquals(80, countNews(folder));
+    assertEquals(80, countNews(bookmark));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testProcessBookMarkByAge_NoDeleteUnreadKeepNew() throws Exception {
+    long today = DateUtils.getToday().getTimeInMillis();
+
+    IFolder folder = DynamicDAO.save(fFactory.createFolder(null, null, "Root"));
+
+    IFeed feed = createFeedWithNews(new URI("http://www.url.com"), 100, 20, today - 7 * DAY, today - 6 * DAY, 0, true);
     fFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark1");
 
     DynamicDAO.save(folder);
@@ -721,6 +1337,35 @@ public class RetentionStrategyTests {
    * @throws Exception
    */
   @Test
+  public void testProcessBookMarkByStateKeepNew() throws Exception {
+    long today = DateUtils.getToday().getTimeInMillis();
+
+    IFolder folder = DynamicDAO.save(fFactory.createFolder(null, null, "Root"));
+
+    IFeed feed = createFeedWithNews(new URI("http://www.url.com"), 100, 20, today - 7 * DAY, today - 6 * DAY, 0, true);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark1");
+
+    DynamicDAO.save(folder);
+
+    IBookMark bookmark = (IBookMark) folder.getMarks().get(0);
+    assertEquals(100, countNews(bookmark));
+
+    /* Preferences */
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookmark);
+
+    /* Setup Retention */
+    prefs1.putBoolean(DefaultPreferences.DEL_READ_NEWS_STATE, true);
+
+    /* Run and Validate Retention */
+    RetentionStrategy.process(bookmark);
+    assertEquals(80, countNews(folder));
+    assertEquals(80, countNews(bookmark));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
   public void testProcessBookMarkByCount() throws Exception {
     long today = DateUtils.getToday().getTimeInMillis();
 
@@ -751,12 +1396,73 @@ public class RetentionStrategyTests {
    * @throws Exception
    */
   @Test
+  public void testProcessBookMarkByCountKeepNew() throws Exception {
+    long today = DateUtils.getToday().getTimeInMillis();
+
+    IFolder folder = DynamicDAO.save(fFactory.createFolder(null, null, "Root"));
+
+    IFeed feed = createFeedWithNews(new URI("http://www.url.com"), 100, 20, today - 7 * DAY, today - 6 * DAY, 0, true);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark1");
+
+    DynamicDAO.save(folder);
+
+    IBookMark bookmark = (IBookMark) folder.getMarks().get(0);
+    assertEquals(100, countNews(bookmark));
+
+    /* Preferences */
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookmark);
+
+    /* Setup Retention */
+    prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
+
+    /* Run and Validate Retention */
+    prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 50);
+    RetentionStrategy.process(bookmark);
+    assertEquals(80, countNews(folder));
+    assertEquals(80, countNews(bookmark));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
   public void testProcessBookMarkByCount_NoDeleteUnread() throws Exception {
     long today = DateUtils.getToday().getTimeInMillis();
 
     IFolder folder = DynamicDAO.save(fFactory.createFolder(null, null, "Root"));
 
     IFeed feed = createFeedWithNews(new URI("http://www.url.com"), 100, 20, today - 7 * DAY, today - 6 * DAY, 0);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark1");
+
+    DynamicDAO.save(folder);
+
+    IBookMark bookmark = (IBookMark) folder.getMarks().get(0);
+    assertEquals(100, countNews(bookmark));
+
+    /* Preferences */
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookmark);
+
+    /* Setup Retention */
+    prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
+    prefs1.putBoolean(DefaultPreferences.NEVER_DEL_UNREAD_NEWS_STATE, true);
+
+    /* Run and Validate Retention */
+    prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 50);
+    RetentionStrategy.process(bookmark);
+    assertEquals(80, countNews(folder));
+    assertEquals(80, countNews(bookmark));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testProcessBookMarkByCount_NoDeleteUnreadKeepNew() throws Exception {
+    long today = DateUtils.getToday().getTimeInMillis();
+
+    IFolder folder = DynamicDAO.save(fFactory.createFolder(null, null, "Root"));
+
+    IFeed feed = createFeedWithNews(new URI("http://www.url.com"), 100, 20, today - 7 * DAY, today - 6 * DAY, 0, true);
     fFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark1");
 
     DynamicDAO.save(folder);
@@ -814,12 +1520,77 @@ public class RetentionStrategyTests {
    * @throws Exception
    */
   @Test
+  public void testProcessBookMarkByAgeAndCountKeepNew() throws Exception {
+    long today = DateUtils.getToday().getTimeInMillis();
+
+    IFolder folder = DynamicDAO.save(fFactory.createFolder(null, null, "Root"));
+
+    IFeed feed = createFeedWithNews(new URI("http://www.url.com"), 100, 20, today - 7 * DAY, today - 6 * DAY, 0, true);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark1");
+
+    DynamicDAO.save(folder);
+
+    IBookMark bookmark = (IBookMark) folder.getMarks().get(0);
+    assertEquals(100, countNews(bookmark));
+
+    /* Preferences */
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookmark);
+
+    /* Setup Retention */
+    prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE, true);
+    prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
+
+    /* Run and Validate Retention */
+    prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_AGE_VALUE, 5);
+    prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 50);
+    RetentionStrategy.process(bookmark);
+    assertEquals(80, countNews(folder));
+    assertEquals(80, countNews(bookmark));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
   public void testProcessBookMarkByAgeAndCount_NoDeleteUnread() throws Exception {
     long today = DateUtils.getToday().getTimeInMillis();
 
     IFolder folder = DynamicDAO.save(fFactory.createFolder(null, null, "Root"));
 
     IFeed feed = createFeedWithNews(new URI("http://www.url.com"), 100, 20, today - 7 * DAY, today - 6 * DAY, 0);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark1");
+
+    DynamicDAO.save(folder);
+
+    IBookMark bookmark = (IBookMark) folder.getMarks().get(0);
+    assertEquals(100, countNews(bookmark));
+
+    /* Preferences */
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookmark);
+
+    /* Setup Retention */
+    prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE, true);
+    prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
+    prefs1.putBoolean(DefaultPreferences.NEVER_DEL_UNREAD_NEWS_STATE, true);
+
+    /* Run and Validate Retention */
+    prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_AGE_VALUE, 5);
+    prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 50);
+    RetentionStrategy.process(bookmark);
+    assertEquals(80, countNews(folder));
+    assertEquals(80, countNews(bookmark));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testProcessBookMarkByAgeAndCount_NoDeleteUnreadKeepNew() throws Exception {
+    long today = DateUtils.getToday().getTimeInMillis();
+
+    IFolder folder = DynamicDAO.save(fFactory.createFolder(null, null, "Root"));
+
+    IFeed feed = createFeedWithNews(new URI("http://www.url.com"), 100, 20, today - 7 * DAY, today - 6 * DAY, 0, true);
     fFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark1");
 
     DynamicDAO.save(folder);
@@ -878,6 +1649,37 @@ public class RetentionStrategyTests {
    * @throws Exception
    */
   @Test
+  public void testProcessBookMarkByAgeAndStateKeepNew() throws Exception {
+    long today = DateUtils.getToday().getTimeInMillis();
+
+    IFolder folder = DynamicDAO.save(fFactory.createFolder(null, null, "Root"));
+
+    IFeed feed = createFeedWithNews(new URI("http://www.url.com"), 100, 20, today - 7 * DAY, today - 6 * DAY, 0, true);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark1");
+
+    DynamicDAO.save(folder);
+
+    IBookMark bookmark = (IBookMark) folder.getMarks().get(0);
+    assertEquals(100, countNews(bookmark));
+
+    /* Preferences */
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookmark);
+
+    /* Setup Retention */
+    prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE, true);
+    prefs1.putBoolean(DefaultPreferences.DEL_READ_NEWS_STATE, true);
+
+    /* Run and Validate Retention */
+    prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_AGE_VALUE, 5);
+    RetentionStrategy.process(bookmark);
+    assertEquals(80, countNews(folder));
+    assertEquals(80, countNews(bookmark));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
   public void testProcessBookMarkByCountAndState() throws Exception {
     long today = DateUtils.getToday().getTimeInMillis();
 
@@ -903,6 +1705,37 @@ public class RetentionStrategyTests {
     RetentionStrategy.process(bookmark);
     assertEquals(50, countNews(folder));
     assertEquals(50, countNews(bookmark));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testProcessBookMarkByCountAndStateKeepNew() throws Exception {
+    long today = DateUtils.getToday().getTimeInMillis();
+
+    IFolder folder = DynamicDAO.save(fFactory.createFolder(null, null, "Root"));
+
+    IFeed feed = createFeedWithNews(new URI("http://www.url.com"), 100, 20, today - 7 * DAY, today - 6 * DAY, 0, true);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark1");
+
+    DynamicDAO.save(folder);
+
+    IBookMark bookmark = (IBookMark) folder.getMarks().get(0);
+    assertEquals(100, countNews(bookmark));
+
+    /* Preferences */
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookmark);
+
+    /* Setup Retention */
+    prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
+    prefs1.putBoolean(DefaultPreferences.DEL_READ_NEWS_STATE, true);
+
+    /* Run and Validate Retention */
+    prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 50);
+    RetentionStrategy.process(bookmark);
+    assertEquals(80, countNews(folder));
+    assertEquals(80, countNews(bookmark));
   }
 
   /**
@@ -942,6 +1775,39 @@ public class RetentionStrategyTests {
    * @throws Exception
    */
   @Test
+  public void testProcessBookMarkByAgeAndCountAndStateKeepNew() throws Exception {
+    long today = DateUtils.getToday().getTimeInMillis();
+
+    IFolder folder = DynamicDAO.save(fFactory.createFolder(null, null, "Root"));
+
+    IFeed feed = createFeedWithNews(new URI("http://www.url.com"), 100, 20, today - 7 * DAY, today - 6 * DAY, 0, true);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark1");
+
+    DynamicDAO.save(folder);
+
+    IBookMark bookmark = (IBookMark) folder.getMarks().get(0);
+    assertEquals(100, countNews(bookmark));
+
+    /* Preferences */
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookmark);
+
+    /* Setup Retention */
+    prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE, true);
+    prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
+    prefs1.putBoolean(DefaultPreferences.DEL_READ_NEWS_STATE, true);
+
+    /* Run and Validate Retention */
+    prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_AGE_VALUE, 5);
+    prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 50);
+    RetentionStrategy.process(bookmark);
+    assertEquals(80, countNews(folder));
+    assertEquals(80, countNews(bookmark));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
   public void testProcessBookMarkByAgeAndCountAndStateWithStickyNews() throws Exception {
     long today = DateUtils.getToday().getTimeInMillis();
 
@@ -975,6 +1841,39 @@ public class RetentionStrategyTests {
    * @throws Exception
    */
   @Test
+  public void testProcessBookMarkByAgeAndCountAndStateWithStickyNewsKeepNew() throws Exception {
+    long today = DateUtils.getToday().getTimeInMillis();
+
+    IFolder folder = DynamicDAO.save(fFactory.createFolder(null, null, "Root"));
+
+    IFeed feed = createFeedWithNews(new URI("http://www.url.com"), 100, 20, today - 7 * DAY, today - 6 * DAY, 10, true);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark1");
+
+    DynamicDAO.save(folder);
+
+    IBookMark bookmark = (IBookMark) folder.getMarks().get(0);
+    assertEquals(100, countNews(bookmark));
+
+    /* Preferences */
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookmark);
+
+    /* Setup Retention */
+    prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE, true);
+    prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
+    prefs1.putBoolean(DefaultPreferences.DEL_READ_NEWS_STATE, true);
+
+    /* Run and Validate Retention */
+    prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_AGE_VALUE, 5);
+    prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 50);
+    RetentionStrategy.process(bookmark);
+    assertEquals(90, countNews(folder));
+    assertEquals(90, countNews(bookmark));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
   public void testProcessFeedWithUnpersistedNewsByAge() throws Exception {
     long today = DateUtils.getToday().getTimeInMillis();
 
@@ -991,8 +1890,11 @@ public class RetentionStrategyTests {
     news1.setState(INews.State.READ);
     INews news2 = fFactory.createNews(null, feed, new Date());
     news2.setTitle("News #2");
+    news2.setState(INews.State.UNREAD);
     news2.setPublishDate(new Date(today - 7 * DAY));
-    fFactory.createNews(null, feed, new Date()).setTitle("News #3");
+    INews news3 = fFactory.createNews(null, feed, new Date());
+    news3.setState(INews.State.UNREAD);
+    news3.setTitle("News #3");
 
     IBookMark bookmark = (IBookMark) folder.getMarks().get(0);
     assertEquals(103, countNews(feed));
@@ -1030,8 +1932,11 @@ public class RetentionStrategyTests {
     news1.setState(INews.State.READ);
     INews news2 = fFactory.createNews(null, feed, new Date());
     news2.setTitle("News #2");
+    news2.setState(INews.State.UNREAD);
     news2.setPublishDate(new Date(today - 7 * DAY));
-    fFactory.createNews(null, feed, new Date()).setTitle("News #3");
+    INews news3 = fFactory.createNews(null, feed, new Date());
+    news3.setTitle("News #3");
+    news3.setState(INews.State.UNREAD);
 
     IBookMark bookmark = (IBookMark) folder.getMarks().get(0);
     assertEquals(103, countNews(feed));
@@ -1069,8 +1974,11 @@ public class RetentionStrategyTests {
     news1.setState(INews.State.READ);
     INews news2 = fFactory.createNews(null, feed, new Date());
     news2.setTitle("News #2");
+    news2.setState(INews.State.UNREAD);
     news2.setPublishDate(new Date(today - 7 * DAY));
-    fFactory.createNews(null, feed, new Date()).setTitle("News #3");
+    INews news3 = fFactory.createNews(null, feed, new Date());
+    news3.setTitle("News #3");
+    news3.setState(INews.State.UNREAD);
 
     IBookMark bookmark = (IBookMark) folder.getMarks().get(0);
     assertEquals(103, countNews(feed));
@@ -1108,8 +2016,11 @@ public class RetentionStrategyTests {
     news1.setState(INews.State.READ);
     INews news2 = fFactory.createNews(null, feed, new Date());
     news2.setTitle("News #2");
+    news2.setState(INews.State.UNREAD);
     news2.setPublishDate(new Date(today - 7 * DAY));
-    fFactory.createNews(null, feed, new Date()).setTitle("News #3");
+    INews news3 = fFactory.createNews(null, feed, new Date());
+    news3.setTitle("News #3");
+    news3.setState(INews.State.UNREAD);
 
     IBookMark bookmark = (IBookMark) folder.getMarks().get(0);
     assertEquals(103, countNews(feed));
@@ -1146,8 +2057,11 @@ public class RetentionStrategyTests {
     news1.setState(INews.State.READ);
     INews news2 = fFactory.createNews(null, feed, new Date());
     news2.setTitle("News #2");
+    news2.setState(INews.State.UNREAD);
     news2.setPublishDate(new Date(today - 7 * DAY));
-    fFactory.createNews(null, feed, new Date()).setTitle("News #3");
+    INews news3 = fFactory.createNews(null, feed, new Date());
+    news3.setTitle("News #3");
+    news3.setState(INews.State.UNREAD);
 
     IBookMark bookmark = (IBookMark) folder.getMarks().get(0);
     assertEquals(103, countNews(feed));
@@ -1187,8 +2101,11 @@ public class RetentionStrategyTests {
     news1.setState(INews.State.READ);
     INews news2 = fFactory.createNews(null, feed, new Date());
     news2.setTitle("News #2");
+    news2.setState(INews.State.UNREAD);
     news2.setPublishDate(new Date(today - 7 * DAY));
-    fFactory.createNews(null, feed, new Date()).setTitle("News #3");
+    INews news3 = fFactory.createNews(null, feed, new Date());
+    news3.setTitle("News #3");
+    news3.setState(INews.State.UNREAD);
 
     IBookMark bookmark = (IBookMark) folder.getMarks().get(0);
     assertEquals(103, countNews(feed));
@@ -1227,8 +2144,11 @@ public class RetentionStrategyTests {
     news1.setState(INews.State.READ);
     INews news2 = fFactory.createNews(null, feed, new Date());
     news2.setTitle("News #2");
+    news2.setState(INews.State.UNREAD);
     news2.setPublishDate(new Date(today - 7 * DAY));
-    fFactory.createNews(null, feed, new Date()).setTitle("News #3");
+    INews news3 = fFactory.createNews(null, feed, new Date());
+    news3.setTitle("News #3");
+    news3.setState(INews.State.UNREAD);
 
     IBookMark bookmark = (IBookMark) folder.getMarks().get(0);
     assertEquals(103, countNews(feed));
@@ -1267,8 +2187,11 @@ public class RetentionStrategyTests {
     news1.setState(INews.State.READ);
     INews news2 = fFactory.createNews(null, feed, new Date());
     news2.setTitle("News #2");
+    news2.setState(INews.State.UNREAD);
     news2.setPublishDate(new Date(today - 7 * DAY));
-    fFactory.createNews(null, feed, new Date()).setTitle("News #3");
+    INews news3 = fFactory.createNews(null, feed, new Date());
+    news3.setTitle("News #3");
+    news3.setState(INews.State.UNREAD);
 
     IBookMark bookmark = (IBookMark) folder.getMarks().get(0);
     assertEquals(103, countNews(feed));
@@ -1289,7 +2212,343 @@ public class RetentionStrategyTests {
     assertEquals(1, countNews(feed));
   }
 
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testProcessFeedWithStickyNewsByCount() throws Exception {
+    long today = DateUtils.getToday().getTimeInMillis();
+
+    IFolder folder = DynamicDAO.save(fFactory.createFolder(null, null, "Root"));
+
+    IFeed feed = createFeedWithNews(new URI("http://www.url.com"), 100, 100, today - 7 * DAY, today - 6 * DAY, 100);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark1");
+
+    DynamicDAO.save(folder);
+
+    /* Add unpersisted *new* News */
+    INews news1 = fFactory.createNews(null, feed, new Date());
+    news1.setTitle("News #1");
+    news1.setState(INews.State.UNREAD);
+    INews news2 = fFactory.createNews(null, feed, new Date());
+    news2.setTitle("News #2");
+    news2.setState(INews.State.UNREAD);
+    news2.setPublishDate(new Date(today - 7 * DAY));
+    INews news3 = fFactory.createNews(null, feed, new Date());
+    news3.setState(INews.State.UNREAD);
+    news3.setTitle("News #3");
+
+    IBookMark bookmark = (IBookMark) folder.getMarks().get(0);
+    assertEquals(103, countNews(feed));
+
+    /* Preferences */
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookmark);
+
+    /* Setup Retention */
+    prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
+
+    /* Run and Validate Retention */
+    prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 100);
+    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed, 3);
+    assertEquals(3, updatedNews.size());
+    assertEquals(100, countNews(feed));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testProcessFeedWithStickyNewsByCountKeepNew() throws Exception {
+    long today = DateUtils.getToday().getTimeInMillis();
+
+    IFolder folder = DynamicDAO.save(fFactory.createFolder(null, null, "Root"));
+
+    IFeed feed = createFeedWithNews(new URI("http://www.url.com"), 100, 100, today - 7 * DAY, today - 6 * DAY, 100, true);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark1");
+
+    DynamicDAO.save(folder);
+
+    /* Add unpersisted *new* News */
+    INews news1 = fFactory.createNews(null, feed, new Date());
+    news1.setTitle("News #1");
+    INews news2 = fFactory.createNews(null, feed, new Date());
+    news2.setTitle("News #2");
+    news2.setPublishDate(new Date(today - 7 * DAY));
+    fFactory.createNews(null, feed, new Date()).setTitle("News #3");
+
+    IBookMark bookmark = (IBookMark) folder.getMarks().get(0);
+    assertEquals(103, countNews(feed));
+
+    /* Preferences */
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookmark);
+
+    /* Setup Retention */
+    prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
+
+    /* Run and Validate Retention */
+    prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 100);
+    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed, 3);
+    assertEquals(0, updatedNews.size());
+    assertEquals(103, countNews(feed));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testProcessFeedWithLabeledNewsByCount() throws Exception {
+    long today = DateUtils.getToday().getTimeInMillis();
+
+    ILabel label = DynamicDAO.save(fFactory.createLabel(null, "Label"));
+
+    IFolder folder = DynamicDAO.save(fFactory.createFolder(null, null, "Root"));
+
+    IFeed feed = createFeedWithNews(new URI("http://www.url.com"), 100, 100, today - 7 * DAY, today - 6 * DAY, 0, false, label);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark1");
+
+    DynamicDAO.save(folder);
+
+    /* Add unpersisted *new* News */
+    INews news1 = fFactory.createNews(null, feed, new Date());
+    news1.setTitle("News #1");
+    news1.setState(INews.State.UNREAD);
+    INews news2 = fFactory.createNews(null, feed, new Date());
+    news2.setTitle("News #2");
+    news2.setState(INews.State.UNREAD);
+    news2.setPublishDate(new Date(today - 7 * DAY));
+    INews news3 = fFactory.createNews(null, feed, new Date());
+    news3.setState(INews.State.UNREAD);
+    news3.setTitle("News #3");
+
+    IBookMark bookmark = (IBookMark) folder.getMarks().get(0);
+    assertEquals(103, countNews(feed));
+
+    /* Preferences */
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookmark);
+
+    /* Setup Retention */
+    prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
+
+    /* Run and Validate Retention */
+    prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 100);
+    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed, 3);
+    assertEquals(3, updatedNews.size());
+    assertEquals(100, countNews(feed));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testProcessFeedWithLabeledNewsByCountKeepNew() throws Exception {
+    long today = DateUtils.getToday().getTimeInMillis();
+
+    ILabel label = DynamicDAO.save(fFactory.createLabel(null, "Label"));
+
+    IFolder folder = DynamicDAO.save(fFactory.createFolder(null, null, "Root"));
+
+    IFeed feed = createFeedWithNews(new URI("http://www.url.com"), 100, 100, today - 7 * DAY, today - 6 * DAY, 0, true, label);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark1");
+
+    DynamicDAO.save(folder);
+
+    /* Add unpersisted *new* News */
+    INews news1 = fFactory.createNews(null, feed, new Date());
+    news1.setTitle("News #1");
+    INews news2 = fFactory.createNews(null, feed, new Date());
+    news2.setTitle("News #2");
+    news2.setPublishDate(new Date(today - 7 * DAY));
+    fFactory.createNews(null, feed, new Date()).setTitle("News #3");
+
+    IBookMark bookmark = (IBookMark) folder.getMarks().get(0);
+    assertEquals(103, countNews(feed));
+
+    /* Preferences */
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookmark);
+
+    /* Setup Retention */
+    prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
+
+    /* Run and Validate Retention */
+    prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 100);
+    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed, 3);
+    assertEquals(0, updatedNews.size());
+    assertEquals(103, countNews(feed));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testProcessFeedWithStickyNewsByCountKeepUnread() throws Exception {
+    long today = DateUtils.getToday().getTimeInMillis();
+
+    IFolder folder = DynamicDAO.save(fFactory.createFolder(null, null, "Root"));
+
+    IFeed feed = createFeedWithNews(new URI("http://www.url.com"), 100, 100, today - 7 * DAY, today - 6 * DAY, 100, false, null);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark1");
+
+    DynamicDAO.save(folder);
+
+    /* Add unpersisted *new* News */
+    INews news1 = fFactory.createNews(null, feed, new Date());
+    news1.setTitle("News #1");
+    news1.setState(INews.State.UNREAD);
+    INews news2 = fFactory.createNews(null, feed, new Date());
+    news2.setTitle("News #2");
+    news2.setState(INews.State.UNREAD);
+    news2.setPublishDate(new Date(today - 7 * DAY));
+    INews news3 = fFactory.createNews(null, feed, new Date());
+    news3.setState(INews.State.UNREAD);
+    news3.setTitle("News #3");
+
+    IBookMark bookmark = (IBookMark) folder.getMarks().get(0);
+    assertEquals(103, countNews(feed));
+
+    /* Preferences */
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookmark);
+
+    /* Setup Retention */
+    prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
+    prefs1.putBoolean(DefaultPreferences.NEVER_DEL_UNREAD_NEWS_STATE, true);
+
+    /* Run and Validate Retention */
+    prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 100);
+    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed, 3);
+    assertEquals(0, updatedNews.size());
+    assertEquals(103, countNews(feed));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testProcessFeedWithStickyNewsByCountKeepUnreadKeepNew() throws Exception {
+    long today = DateUtils.getToday().getTimeInMillis();
+
+    IFolder folder = DynamicDAO.save(fFactory.createFolder(null, null, "Root"));
+
+    IFeed feed = createFeedWithNews(new URI("http://www.url.com"), 100, 100, today - 7 * DAY, today - 6 * DAY, 100, true, null);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark1");
+
+    DynamicDAO.save(folder);
+
+    /* Add unpersisted *new* News */
+    INews news1 = fFactory.createNews(null, feed, new Date());
+    news1.setTitle("News #1");
+    INews news2 = fFactory.createNews(null, feed, new Date());
+    news2.setTitle("News #2");
+    news2.setPublishDate(new Date(today - 7 * DAY));
+    fFactory.createNews(null, feed, new Date()).setTitle("News #3");
+
+    IBookMark bookmark = (IBookMark) folder.getMarks().get(0);
+    assertEquals(103, countNews(feed));
+
+    /* Preferences */
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookmark);
+
+    /* Setup Retention */
+    prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
+    prefs1.putBoolean(DefaultPreferences.NEVER_DEL_UNREAD_NEWS_STATE, true);
+
+    /* Run and Validate Retention */
+    prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 100);
+    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed, 3);
+    assertEquals(0, updatedNews.size());
+    assertEquals(103, countNews(feed));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testProcessFeedWithLabeledNewsByCountKeepUnread() throws Exception {
+    long today = DateUtils.getToday().getTimeInMillis();
+
+    ILabel label = DynamicDAO.save(fFactory.createLabel(null, "Label"));
+
+    IFolder folder = DynamicDAO.save(fFactory.createFolder(null, null, "Root"));
+
+    IFeed feed = createFeedWithNews(new URI("http://www.url.com"), 100, 100, today - 7 * DAY, today - 6 * DAY, 0, true, label);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark1");
+
+    DynamicDAO.save(folder);
+
+    /* Add unpersisted *new* News */
+    INews news1 = fFactory.createNews(null, feed, new Date());
+    news1.setTitle("News #1");
+    INews news2 = fFactory.createNews(null, feed, new Date());
+    news2.setTitle("News #2");
+    news2.setPublishDate(new Date(today - 7 * DAY));
+    fFactory.createNews(null, feed, new Date()).setTitle("News #3");
+
+    IBookMark bookmark = (IBookMark) folder.getMarks().get(0);
+    assertEquals(103, countNews(feed));
+
+    /* Preferences */
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookmark);
+
+    /* Setup Retention */
+    prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
+    prefs1.putBoolean(DefaultPreferences.NEVER_DEL_UNREAD_NEWS_STATE, true);
+
+    /* Run and Validate Retention */
+    prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 100);
+    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed, 3);
+    assertEquals(0, updatedNews.size());
+    assertEquals(103, countNews(feed));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testProcessFeedWithLabeledNewsByCountKeepUnreadKeepNew() throws Exception {
+    long today = DateUtils.getToday().getTimeInMillis();
+
+    ILabel label = DynamicDAO.save(fFactory.createLabel(null, "Label"));
+
+    IFolder folder = DynamicDAO.save(fFactory.createFolder(null, null, "Root"));
+
+    IFeed feed = createFeedWithNews(new URI("http://www.url.com"), 100, 100, today - 7 * DAY, today - 6 * DAY, 0, true, label);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark1");
+
+    DynamicDAO.save(folder);
+
+    /* Add unpersisted *new* News */
+    INews news1 = fFactory.createNews(null, feed, new Date());
+    news1.setTitle("News #1");
+    INews news2 = fFactory.createNews(null, feed, new Date());
+    news2.setTitle("News #2");
+    news2.setPublishDate(new Date(today - 7 * DAY));
+    fFactory.createNews(null, feed, new Date()).setTitle("News #3");
+
+    IBookMark bookmark = (IBookMark) folder.getMarks().get(0);
+    assertEquals(103, countNews(feed));
+
+    /* Preferences */
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookmark);
+
+    /* Setup Retention */
+    prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
+    prefs1.putBoolean(DefaultPreferences.NEVER_DEL_UNREAD_NEWS_STATE, true);
+
+    /* Run and Validate Retention */
+    prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 100);
+    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed, 3);
+    assertEquals(0, updatedNews.size());
+    assertEquals(103, countNews(feed));
+  }
+
   private IFeed createFeedWithNews(URI link, int total, int read, long from, long to, int sticky) throws PersistenceException {
+    return createFeedWithNews(link, total, read, from, to, sticky, false);
+  }
+
+  private IFeed createFeedWithNews(URI link, int total, int read, long from, long to, int sticky, boolean keepNew) throws PersistenceException {
+    return createFeedWithNews(link, total, read, from, to, sticky, keepNew, null);
+  }
+
+  private IFeed createFeedWithNews(URI link, int total, int read, long from, long to, int sticky, boolean keepNew, ILabel label) throws PersistenceException {
     long dateDif = to - from;
     IFeed feed = fFactory.createFeed(null, link);
 
@@ -1299,9 +2558,14 @@ public class RetentionStrategyTests {
 
       if (read > i)
         news.setState(INews.State.READ);
+      else if (!keepNew)
+        news.setState(INews.State.UNREAD);
 
       if (sticky > i)
         news.setFlagged(true);
+
+      if (label != null)
+        news.addLabel(label);
 
       news.setPublishDate(new Date(from + (dateDif * i / total)));
     }
