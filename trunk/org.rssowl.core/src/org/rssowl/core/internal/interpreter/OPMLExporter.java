@@ -69,6 +69,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.Map.Entry;
 
@@ -392,12 +393,31 @@ public class OPMLExporter implements ITypeExporter {
       List<IFilterAction> actions = filter.getActions();
       for (IFilterAction action : actions) {
         String actionId = action.getActionId();
-        String data = toString(action.getData());
 
         Element actionElement = new Element(Tag.ACTION.get(), RSSOWL_NS);
         actionElement.setAttribute(Attributes.ID.get(), actionId);
-        if (data != null)
-          actionElement.setAttribute(Attributes.DATA.get(), data);
+
+        /* Action Data as Properties */
+        if (action.getData() instanceof Properties) {
+          Properties data = (Properties) action.getData();
+          Set<Entry<Object, Object>> entries = data.entrySet();
+          for (Entry<Object, Object> entry : entries) {
+            String key = entry.getKey().toString();
+            String value = entry.getValue().toString();
+
+            Element actionProperty = new Element(Tag.ACTION_PROPERTY.get(), RSSOWL_NS);
+            actionProperty.setAttribute(Attributes.ID.get(), key);
+            actionProperty.setAttribute(Attributes.VALUE.get(), value);
+            actionElement.addContent(actionProperty);
+          }
+        }
+
+        /* Action Data as Primitive */
+        else {
+          String data = toString(action.getData());
+          if (data != null)
+            actionElement.setAttribute(Attributes.DATA.get(), data);
+        }
 
         filterElement.addContent(actionElement);
       }
