@@ -1077,6 +1077,7 @@ public class Controller {
 
     /* Show the Welcome Wizard if this is the first startup */
     if (fShowWelcome) {
+      fShowWelcome = false; //Set to false to avoid another Wizard when opening new window
       JobRunner.runInUIThread(200, OwlUI.getActiveShell(), new Runnable() {
         public void run() {
           showWelcomeWizard();
@@ -1085,7 +1086,7 @@ public class Controller {
     }
 
     /* Check for Updates if Set */
-    if (!fShowWelcome) {
+    else {
       JobRunner.runInUIThread(5000, OwlUI.getActiveShell(), new Runnable() {
         public void run() {
           if (Owl.getPreferenceService().getGlobalScope().getBoolean(DefaultPreferences.UPDATE_ON_STARTUP)) {
