@@ -133,15 +133,12 @@ public class RetentionStrategy {
    *
    * @param bookmark The <code>IBookMark</code> to run the Retention on.
    * @param feed The <code>IFeed</code> to run the Retention on.
-   * @param addedNewsCount The number of added News. The Retention will not
-   * remove the added News as part of its work to avoid removing News that the
-   * user has never seen.
    * @return Returns a List of <code>INews</code> whose state has been changed
    * to DELETED during the process. It's important that the caller persists
    * these changes to the persistence layer.
    */
-  public static List<INews> process(IBookMark bookmark, IFeed feed, int addedNewsCount) {
-    List<INews> newsToDelete = getNewsToDelete(bookmark, feed.getVisibleNews(), addedNewsCount);
+  public static List<INews> process(IBookMark bookmark, IFeed feed) {
+    List<INews> newsToDelete = getNewsToDelete(bookmark, feed.getVisibleNews());
 
     for (INews news : newsToDelete)
       news.setState(INews.State.DELETED);
@@ -150,10 +147,6 @@ public class RetentionStrategy {
   }
 
   private static List<INews> getNewsToDelete(IBookMark bookmark, Collection<INews> targetNews) {
-    return getNewsToDelete(bookmark, targetNews, -1);
-  }
-
-  private static List<INews> getNewsToDelete(IBookMark bookmark, Collection<INews> targetNews, int minCountToKeep) {
     List<INews> newsToDelete = new ArrayList<INews>();
     IPreferenceScope prefs = Owl.getPreferenceService().getEntityScope(bookmark);
     boolean keepUnread = prefs.getBoolean(DefaultPreferences.NEVER_DEL_UNREAD_NEWS_STATE);
@@ -168,7 +161,7 @@ public class RetentionStrategy {
 
     /* Delete by Count if set */
     if (prefs.getBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE))
-      fillNewsToDeleteByCount(targetNews, newsToDelete, Math.max(minCountToKeep, prefs.getInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE)), keepUnread);
+      fillNewsToDeleteByCount(targetNews, newsToDelete, prefs.getInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE), keepUnread);
 
     return newsToDelete;
   }

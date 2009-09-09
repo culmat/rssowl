@@ -1907,7 +1907,7 @@ public class RetentionStrategyTests {
 
     /* Run and Validate Retention */
     prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_AGE_VALUE, 5);
-    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed, -1);
+    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed);
     assertEquals(101, updatedNews.size());
     assertEquals(2, countNews(feed));
   }
@@ -1949,7 +1949,7 @@ public class RetentionStrategyTests {
 
     /* Run and Validate Retention */
     prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 50);
-    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed, -1);
+    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed);
     assertEquals(53, updatedNews.size());
     assertEquals(50, countNews(feed));
   }
@@ -1991,9 +1991,9 @@ public class RetentionStrategyTests {
 
     /* Run and Validate Retention */
     prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 50);
-    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed, 60);
-    assertEquals(43, updatedNews.size());
-    assertEquals(60, countNews(feed));
+    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed);
+    assertEquals(53, updatedNews.size());
+    assertEquals(50, countNews(feed));
   }
 
   /**
@@ -2032,7 +2032,7 @@ public class RetentionStrategyTests {
     prefs1.putBoolean(DefaultPreferences.DEL_READ_NEWS_STATE, true);
 
     /* Run and Validate Retention */
-    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed, -1);
+    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed);
     assertEquals(21, updatedNews.size());
     assertEquals(82, countNews(feed));
   }
@@ -2076,7 +2076,7 @@ public class RetentionStrategyTests {
     /* Run and Validate Retention */
     prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_AGE_VALUE, 5);
     prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 50);
-    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed, -1);
+    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed);
     assertEquals(101, updatedNews.size());
     assertEquals(2, countNews(feed));
   }
@@ -2119,7 +2119,7 @@ public class RetentionStrategyTests {
 
     /* Run and Validate Retention */
     prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_AGE_VALUE, 5);
-    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed, -1);
+    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed);
     assertEquals(102, updatedNews.size());
     assertEquals(1, countNews(feed));
   }
@@ -2162,7 +2162,7 @@ public class RetentionStrategyTests {
 
     /* Run and Validate Retention */
     prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 50);
-    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed, -1);
+    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed);
     assertEquals(53, updatedNews.size());
     assertEquals(50, countNews(feed));
   }
@@ -2207,7 +2207,7 @@ public class RetentionStrategyTests {
     /* Run and Validate Retention */
     prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_AGE_VALUE, 5);
     prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 50);
-    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed, -1);
+    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed);
     assertEquals(102, updatedNews.size());
     assertEquals(1, countNews(feed));
   }
@@ -2249,7 +2249,7 @@ public class RetentionStrategyTests {
 
     /* Run and Validate Retention */
     prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 100);
-    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed, 3);
+    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed);
     assertEquals(3, updatedNews.size());
     assertEquals(100, countNews(feed));
   }
@@ -2287,7 +2287,7 @@ public class RetentionStrategyTests {
 
     /* Run and Validate Retention */
     prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 100);
-    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed, 3);
+    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed);
     assertEquals(0, updatedNews.size());
     assertEquals(103, countNews(feed));
   }
@@ -2331,7 +2331,7 @@ public class RetentionStrategyTests {
 
     /* Run and Validate Retention */
     prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 100);
-    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed, 3);
+    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed);
     assertEquals(3, updatedNews.size());
     assertEquals(100, countNews(feed));
   }
@@ -2371,7 +2371,7 @@ public class RetentionStrategyTests {
 
     /* Run and Validate Retention */
     prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 100);
-    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed, 3);
+    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed);
     assertEquals(0, updatedNews.size());
     assertEquals(103, countNews(feed));
   }
@@ -2414,7 +2414,7 @@ public class RetentionStrategyTests {
 
     /* Run and Validate Retention */
     prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 100);
-    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed, 3);
+    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed);
     assertEquals(0, updatedNews.size());
     assertEquals(103, countNews(feed));
   }
@@ -2453,7 +2453,7 @@ public class RetentionStrategyTests {
 
     /* Run and Validate Retention */
     prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 100);
-    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed, 3);
+    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed);
     assertEquals(0, updatedNews.size());
     assertEquals(103, countNews(feed));
   }
@@ -2494,7 +2494,7 @@ public class RetentionStrategyTests {
 
     /* Run and Validate Retention */
     prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 100);
-    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed, 3);
+    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed);
     assertEquals(0, updatedNews.size());
     assertEquals(103, countNews(feed));
   }
@@ -2535,7 +2535,7 @@ public class RetentionStrategyTests {
 
     /* Run and Validate Retention */
     prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 100);
-    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed, 3);
+    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed);
     assertEquals(0, updatedNews.size());
     assertEquals(103, countNews(feed));
   }
