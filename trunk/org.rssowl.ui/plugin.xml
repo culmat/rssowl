@@ -256,10 +256,10 @@
                icon="icons/elcl16/usearch_obj.gif"
                id="org.rssowl.ui.actions.FindExtensions"
                label="%action.label.18"
-               menubarPath="tools/end"
+               menubarPath="tools/extensions/findExtensions"
                style="push"
                tooltip="%action.tooltip.3"/>
-         <!--<action
+         <action
                class="org.rssowl.ui.internal.actions.ManageConfigurationAction"
                definitionId="org.rssowl.ui.actions.ManageConfiguration"
                icon="icons/elcl16/configs.gif"
@@ -267,8 +267,8 @@
                label="%action.label.19"
                menubarPath="tools/extensions/manageConfiguration"
                style="push"
-               tooltip="%action.tooltip.4"/>-->
-         <!--<menu
+               tooltip="%action.tooltip.4"/>
+         <menu
                id="extensions"
                label="%menu.label.2"
                path="tools/additions">
@@ -537,10 +537,10 @@
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             id="org.rssowl.ui.actions.FindExtensions"
             name="%command.name.0"/>
-      <!--<command
-            categoryId="org.rssowl.ui.commands.category.Extensions"
+      <command
+            categoryId="org.rssowl.ui.commands.category.RSSOwl"
             id="org.rssowl.ui.actions.ManageConfiguration"
-            name="%command.name.1"/>-->
+            name="%command.name.1"/>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             description="%command.description"
