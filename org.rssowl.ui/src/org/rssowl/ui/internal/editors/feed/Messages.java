@@ -54,6 +54,7 @@ public class Messages extends NLS {
   public static String NewsBrowserLabelProvider_ATTACHMENT;
   public static String NewsBrowserLabelProvider_ATTACHMENTS;
   public static String NewsBrowserLabelProvider_ATTACHMENTSS;
+  public static String NewsBrowserLabelProvider_BY_AUTHOR;
   public static String NewsBrowserLabelProvider_COMMENTS;
   public static String NewsBrowserLabelProvider_DELETE;
   public static String NewsBrowserLabelProvider_FIND_RELATED;
@@ -62,6 +63,7 @@ public class Messages extends NLS {
   public static String NewsBrowserLabelProvider_MARK_READ;
   public static String NewsBrowserLabelProvider_MARK_UNREAD;
   public static String NewsBrowserLabelProvider_MENU;
+  public static String NewsBrowserLabelProvider_NAME_SIZE;
   public static String NewsBrowserLabelProvider_NO_CONTENT;
   public static String NewsBrowserLabelProvider_OPEN_IN_BROWSER;
   public static String NewsBrowserLabelProvider_READ_COMMENTS;
