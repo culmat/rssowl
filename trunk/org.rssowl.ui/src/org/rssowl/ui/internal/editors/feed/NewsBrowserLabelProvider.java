@@ -36,6 +36,7 @@ import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.TOGGLE_STICK
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
@@ -284,6 +285,13 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.write("div.title a:hover { color: #009; text-decoration: none; }\n"); //$NON-NLS-1$
     writer.write("div.title a:visited { color: #009; text-decoration: none; }\n"); //$NON-NLS-1$
 
+    /* Author */
+    writer.write("a.author { color: rgb(80,80,80); text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.write("a.author:hover { color: rgb(80,80,80); text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.write("a.author:active { color: rgb(80,80,80); text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.write("a.author:visited { color: rgb(80,80,80); text-decoration: none; }\n"); //$NON-NLS-1$
+
+    /* Comments */
     writer.write("a.comments { color: rgb(80,80,80); text-decoration: none; }\n"); //$NON-NLS-1$
     writer.write("a.comments:hover { color: rgb(80,80,80); text-decoration: none; }\n"); //$NON-NLS-1$
     writer.write("a.comments:active { color: rgb(80,80,80); text-decoration: none; }\n"); //$NON-NLS-1$
@@ -452,14 +460,14 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       /* Toggle Read */
       builder.append("<td class=\"subline\">"); //$NON-NLS-1$
       String link = HANDLER_PROTOCOL + TOGGLE_READ_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
-      String text= (news.getState() == INews.State.READ) ? Messages.NewsBrowserLabelProvider_MARK_UNREAD : Messages.NewsBrowserLabelProvider_MARK_READ;
+      String text = (news.getState() == INews.State.READ) ? Messages.NewsBrowserLabelProvider_MARK_UNREAD : Messages.NewsBrowserLabelProvider_MARK_READ;
       imageLink(builder, link, text, text, "/icons/elcl16/mark_read_light.gif", "mark_read_light.gif", Dynamic.TOGGLE_READ_LINK.getId(news), Dynamic.TOGGLE_READ_IMG.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
       builder.append("</td>"); //$NON-NLS-1$
 
       /* Toggle Sticky */
       builder.append("<td class=\"subline\">"); //$NON-NLS-1$
       link = HANDLER_PROTOCOL + TOGGLE_STICKY_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
-      imageLink(builder, link, Messages.NewsBrowserLabelProvider_STICKY, Messages.NewsBrowserLabelProvider_STICKY, news.isFlagged() ? "/icons/obj16/news_pinned_light.gif" : "/icons/obj16/news_pin_light.gif", news.isFlagged() ? "news_pinned_light.gif" : "news_pin_light.gif", null, Dynamic.TOGGLE_STICKY.getId(news));   //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$ //$NON-NLS-4$
+      imageLink(builder, link, Messages.NewsBrowserLabelProvider_STICKY, Messages.NewsBrowserLabelProvider_STICKY, news.isFlagged() ? "/icons/obj16/news_pinned_light.gif" : "/icons/obj16/news_pin_light.gif", news.isFlagged() ? "news_pinned_light.gif" : "news_pin_light.gif", null, Dynamic.TOGGLE_STICKY.getId(news)); //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$ //$NON-NLS-4$
       builder.append("</td>"); //$NON-NLS-1$
 
       /* Assign Labels */
@@ -497,7 +505,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       builder.append("|"); //$NON-NLS-1$
       builder.append("</td>"); //$NON-NLS-1$
 
-      builder.append("<td class=\"subline\">By "); //$NON-NLS-1$
+      builder.append("<td class=\"subline\">"); //$NON-NLS-1$
       String name = author.getName();
       String email = (author.getEmail() != null) ? author.getEmail().toASCIIString() : null;
       if (email != null && !email.contains("mail:")) //$NON-NLS-1$
@@ -508,11 +516,11 @@ public class NewsBrowserLabelProvider extends LabelProvider {
         email = name;
 
       if (StringUtils.isSet(name) && email != null)
-        link(builder, email, StringUtils.htmlEscape(name), "author"); //$NON-NLS-1$
+        link(builder, email, NLS.bind(Messages.NewsBrowserLabelProvider_BY_AUTHOR, StringUtils.htmlEscape(name)), "author"); //$NON-NLS-1$
       else if (StringUtils.isSet(name))
-        builder.append(StringUtils.htmlEscape(name));
+        builder.append(NLS.bind(Messages.NewsBrowserLabelProvider_BY_AUTHOR, StringUtils.htmlEscape(name)));
       else if (email != null)
-        link(builder, email, StringUtils.htmlEscape(email), "author"); //$NON-NLS-1$
+        link(builder, email, NLS.bind(Messages.NewsBrowserLabelProvider_BY_AUTHOR, StringUtils.htmlEscape(email)), "author"); //$NON-NLS-1$
       else
         builder.append(Messages.NewsBrowserLabelProvider_UNKNOWN);
 
@@ -635,7 +643,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
             String size = OwlUI.getSize(attachment.getLength());
             if (size != null)
-              link(footer, link.toASCIIString(), StringUtils.htmlEscape(name) + " (" + size + ")", "attachment"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+              link(footer, link.toASCIIString(), NLS.bind(Messages.NewsBrowserLabelProvider_NAME_SIZE, StringUtils.htmlEscape(name), size), "attachment"); //$NON-NLS-1$
             else
               link(footer, link.toASCIIString(), StringUtils.htmlEscape(name), "attachment"); //$NON-NLS-1$
 
