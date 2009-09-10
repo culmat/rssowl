@@ -32,6 +32,7 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.dao.DynamicDAO;
@@ -377,7 +378,6 @@ public class CleanUpTests {
     }
   }
 
-
   /**
    * Test: Delete BookMarks that have Last Update > X Days ago and Last Visit >
    * X Days ago
@@ -670,6 +670,153 @@ public class CleanUpTests {
 
     news1.setState(INews.State.READ);
     DynamicDAO.save(news1);
+
+    {
+      CleanUpModel model = new CleanUpModel(ops, marks);
+      model.generate();
+      List<CleanUpGroup> groups = model.getTasks();
+
+      /* Assert Filled */
+      assertEquals(2, groups.size());
+
+      List<CleanUpTask> tasks = groups.get(1).getTasks();
+      assertEquals(1, tasks.size());
+      assertEquals(true, tasks.get(0) instanceof NewsTask);
+
+      assertEquals(news1, ((NewsTask) tasks.get(0)).getNews().iterator().next().resolve());
+    }
+  }
+
+  /**
+   * Test: Delete News that have Age > X Days but Keep Labeled
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testCleanUpNewsByAgeButKeepLabeled() throws Exception {
+    IFolder rootFolder = fFactory.createFolder(null, null, "Root");
+    DynamicDAO.save(rootFolder);
+
+    ILabel label = DynamicDAO.save(fFactory.createLabel(null, "Label"));
+
+    IFeed feed1 = fFactory.createFeed(null, new URI("http://www.feed1.com"));
+    IFeed feed2 = fFactory.createFeed(null, new URI("http://www.feed2.com"));
+    IFeed feed3 = fFactory.createFeed(null, new URI("http://www.feed3.com"));
+
+    INews news1 = fFactory.createNews(null, feed1, new Date());
+    news1.setPublishDate(new Date(System.currentTimeMillis() - 4 * DAY));
+    news1.addLabel(label);
+
+    INews news2 = fFactory.createNews(null, feed2, new Date());
+    news2.setPublishDate(new Date(System.currentTimeMillis() - 3 * DAY));
+    news2.addLabel(label);
+
+    DynamicDAO.save(feed1);
+    DynamicDAO.save(feed2);
+    DynamicDAO.save(feed3);
+
+    IBookMark bm1 = fFactory.createBookMark(null, rootFolder, new FeedLinkReference(feed1.getLink()), "BM1");
+    IBookMark bm2 = fFactory.createBookMark(null, rootFolder, new FeedLinkReference(feed2.getLink()), "BM2");
+    IBookMark bm3 = fFactory.createBookMark(null, rootFolder, new FeedLinkReference(feed3.getLink()), "BM3");
+
+    DynamicDAO.save(bm1);
+    DynamicDAO.save(bm2);
+    DynamicDAO.save(bm3);
+
+    List<IBookMark> marks = new ArrayList<IBookMark>();
+    marks.add(bm1);
+    marks.add(bm2);
+    marks.add(bm3);
+
+    /* Max News Age = 3 days and keep unread */
+    CleanUpOperations ops = new CleanUpOperations(false, 0, false, 0, false, false, false, 0, true, 3, false, false, true);
+
+    {
+      CleanUpModel model = new CleanUpModel(ops, marks);
+      model.generate();
+      List<CleanUpGroup> groups = model.getTasks();
+
+      /* Assert Empty */
+      assertEquals(1, groups.size());
+    }
+
+    news1.removeLabel(label);
+    news2.removeLabel(label);
+    DynamicDAO.save(news1);
+    DynamicDAO.save(news2);
+
+    {
+      CleanUpModel model = new CleanUpModel(ops, marks);
+      model.generate();
+      List<CleanUpGroup> groups = model.getTasks();
+
+      /* Assert Filled */
+      assertEquals(2, groups.size());
+
+      List<CleanUpTask> tasks = groups.get(1).getTasks();
+      assertEquals(1, tasks.size());
+      assertEquals(true, tasks.get(0) instanceof NewsTask);
+
+      assertEquals(news1, ((NewsTask) tasks.get(0)).getNews().iterator().next().resolve());
+    }
+  }
+
+  /**
+   * Test: Delete News that have Age > X Days but Keep Labeled and Unread
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testCleanUpNewsByAgeButKeepLabeledAndUnread() throws Exception {
+    IFolder rootFolder = fFactory.createFolder(null, null, "Root");
+    DynamicDAO.save(rootFolder);
+
+    ILabel label = DynamicDAO.save(fFactory.createLabel(null, "Label"));
+
+    IFeed feed1 = fFactory.createFeed(null, new URI("http://www.feed1.com"));
+    IFeed feed2 = fFactory.createFeed(null, new URI("http://www.feed2.com"));
+    IFeed feed3 = fFactory.createFeed(null, new URI("http://www.feed3.com"));
+
+    INews news1 = fFactory.createNews(null, feed1, new Date());
+    news1.setPublishDate(new Date(System.currentTimeMillis() - 4 * DAY));
+    news1.addLabel(label);
+
+    INews news2 = fFactory.createNews(null, feed2, new Date());
+    news2.setPublishDate(new Date(System.currentTimeMillis() - 3 * DAY));
+
+    DynamicDAO.save(feed1);
+    DynamicDAO.save(feed2);
+    DynamicDAO.save(feed3);
+
+    IBookMark bm1 = fFactory.createBookMark(null, rootFolder, new FeedLinkReference(feed1.getLink()), "BM1");
+    IBookMark bm2 = fFactory.createBookMark(null, rootFolder, new FeedLinkReference(feed2.getLink()), "BM2");
+    IBookMark bm3 = fFactory.createBookMark(null, rootFolder, new FeedLinkReference(feed3.getLink()), "BM3");
+
+    DynamicDAO.save(bm1);
+    DynamicDAO.save(bm2);
+    DynamicDAO.save(bm3);
+
+    List<IBookMark> marks = new ArrayList<IBookMark>();
+    marks.add(bm1);
+    marks.add(bm2);
+    marks.add(bm3);
+
+    /* Max News Age = 3 days and keep unread */
+    CleanUpOperations ops = new CleanUpOperations(false, 0, false, 0, false, false, false, 0, true, 3, false, false, true);
+
+    {
+      CleanUpModel model = new CleanUpModel(ops, marks);
+      model.generate();
+      List<CleanUpGroup> groups = model.getTasks();
+
+      /* Assert Empty */
+      assertEquals(1, groups.size());
+    }
+
+    news1.removeLabel(label);
+    news2.setState(INews.State.READ);
+    DynamicDAO.save(news1);
+    DynamicDAO.save(news2);
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
