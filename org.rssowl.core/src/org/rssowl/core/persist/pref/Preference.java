@@ -97,6 +97,9 @@ public enum Preference {
   /** Retention Policy: Never Delete Unread News (boolean) */
   NEVER_DEL_UNREAD_NEWS_STATE("org.rssowl.pref.NeverDelUnreadNewsState", IPreferenceType.BOOLEAN), //$NON-NLS-1$
 
+  /** Retention Policy: Never Delete Labeled News (boolean) */
+  NEVER_DEL_LABELED_NEWS_STATE("org.rssowl.pref.NeverDelLabeledNewsState", IPreferenceType.BOOLEAN), //$NON-NLS-1$
+
   /** BookMarks: Visible Columns */
   BM_NEWS_COLUMNS("org.rssowl.pref.BMNewsColumns", IPreferenceType.INTEGERS), //$NON-NLS-1$
 
@@ -249,6 +252,9 @@ public enum Preference {
 
   /** Global: Clean Up: Never Delete Unread News (boolean) */
   CLEAN_UP_NEVER_DEL_UNREAD_NEWS_STATE("org.rssowl.pref.CleanUpNeverDelUnreadNewsState", IPreferenceType.BOOLEAN), //$NON-NLS-1$
+
+  /** Global: Clean Up: Never Delete Labeled News (boolean) */
+  CLEAN_UP_NEVER_DEL_LABELED_NEWS_STATE("org.rssowl.pref.CleanUpNeverDelLabeledNewsState", IPreferenceType.BOOLEAN), //$NON-NLS-1$
 
   /** Global: Clean Up: The Date of the next reminder for Clean-Up as Long */
   CLEAN_UP_REMINDER_DATE_MILLIES("org.rssowl.pref.CleanUpReminderDateMillies", IPreferenceType.LONG), //$NON-NLS-1$
