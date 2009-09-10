@@ -24,10 +24,16 @@
 
 package org.rssowl.ui.internal.actions;
 
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -37,7 +43,6 @@ import org.eclipse.update.search.EnvironmentFilter;
 import org.eclipse.update.search.UpdateSearchRequest;
 import org.eclipse.update.search.UpdateSearchScope;
 import org.eclipse.update.ui.UpdateJob;
-import org.eclipse.update.ui.UpdateManagerUI;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -55,6 +60,9 @@ public class FindExtensionsAction extends Action implements IWorkbenchWindowActi
   /** Keep default constructor for reflection. */
   public FindExtensionsAction() {}
 
+  /*
+   * @see org.eclipse.jface.action.Action#run()
+   */
   @Override
   public void run() {
     BusyIndicator.showWhile(fShell.getDisplay(), new Runnable() {
@@ -62,7 +70,7 @@ public class FindExtensionsAction extends Action implements IWorkbenchWindowActi
         UpdateJob job = new UpdateJob(Messages.FindExtensionsAction_SEARCHING_EXTENSIONS, getSearchRequest());
         job.setUser(true);
         job.setPriority(Job.INTERACTIVE);
-        UpdateManagerUI.openInstaller(fShell, job);
+        new InstallWizardOperation().run(fShell, job);
       }
     });
   }
@@ -106,4 +114,93 @@ public class FindExtensionsAction extends Action implements IWorkbenchWindowActi
    * org.eclipse.jface.viewers.ISelection)
    */
   public void selectionChanged(IAction action, ISelection selection) {}
+
+  /*
+   * Class copied intentionally to override some UI specific settings.
+   */
+  @SuppressWarnings("restriction")
+  private static class InstallWizardOperation {
+    private UpdateJob fJob;
+    private IJobChangeListener fJobListener;
+    private Shell fShell;
+    private Shell fParentShell;
+
+    void run(Shell parent, UpdateJob task) {
+      fShell = parent;
+
+      if (fShell.getParent() != null && fShell.getParent() instanceof Shell)
+        fParentShell = (Shell) fShell.getParent();
+
+      if (fJobListener != null)
+        Job.getJobManager().removeJobChangeListener(fJobListener);
+
+      if (fJob != null)
+        Job.getJobManager().cancel(fJob);
+
+      fJob = task;
+      fJobListener = new UpdateJobChangeListener();
+      Job.getJobManager().addJobChangeListener(fJobListener);
+      fJob.schedule();
+    }
+
+    private Shell getValidShell() {
+      if (fShell.isDisposed())
+        return fParentShell;
+
+      return fShell;
+    }
+
+    private class UpdateJobChangeListener extends JobChangeAdapter {
+      @Override
+      public void done(final IJobChangeEvent event) {
+        final Shell validShell = getValidShell();
+
+        if (event.getJob() == fJob) {
+          Job.getJobManager().removeJobChangeListener(this);
+          Job.getJobManager().cancel(fJob);
+          if (fJob.getStatus() == Status.CANCEL_STATUS)
+            return;
+
+          if (fJob.getStatus() != Status.OK_STATUS)
+            getValidShell().getDisplay().syncExec(new Runnable() {
+              public void run() {
+                org.eclipse.update.internal.ui.UpdateUI.log(fJob.getStatus(), true);
+              }
+            });
+
+          validShell.getDisplay().asyncExec(new Runnable() {
+            public void run() {
+              validShell.getDisplay().beep();
+              BusyIndicator.showWhile(validShell.getDisplay(), new Runnable() {
+                public void run() {
+                  openInstallWizard2();
+                }
+              });
+            }
+          });
+        }
+      }
+
+      private void openInstallWizard2() {
+        if (org.eclipse.update.internal.ui.wizards.InstallWizard2.isRunning()) {
+          MessageDialog.openInformation(getValidShell(), Messages.FindExtensionsAction_FIND_ADDONS, Messages.FindExtensionsAction_UPDATE_IN_PROGRESS);
+          return;
+        }
+
+        if (fJob.getUpdates() == null || fJob.getUpdates().length == 0) {
+          if (fJob.isUpdate())
+            MessageDialog.openInformation(getValidShell(), Messages.FindExtensionsAction_FIND_ADDONS, Messages.FindExtensionsAction_NO_UPDATES_FOUND);
+          else
+            MessageDialog.openInformation(getValidShell(), Messages.FindExtensionsAction_FIND_ADDONS, Messages.FindExtensionsAction_NO_ADDONS_FOUND);
+
+          return;
+        }
+
+        org.eclipse.update.internal.ui.wizards.InstallWizard2 wizard = new org.eclipse.update.internal.ui.wizards.InstallWizard2(fJob.getSearchRequest(), fJob.getUpdates(), fJob.isUpdate());
+        WizardDialog dialog = new org.eclipse.update.internal.ui.wizards.ResizableInstallWizardDialog(getValidShell(), wizard, Messages.FindExtensionsAction_RSSOWL_ADDONS);
+        dialog.create();
+        dialog.open();
+      }
+    }
+  }
 }
