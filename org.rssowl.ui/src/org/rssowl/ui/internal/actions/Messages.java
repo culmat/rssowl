@@ -50,7 +50,12 @@ public class Messages extends NLS {
   public static String EntityPropertyDialogAction_N_SEARCHES;
   public static String EntityPropertyDialogAction_PROPERTIES_FOR_N;
   public static String FindAction_FIND;
+  public static String FindExtensionsAction_FIND_ADDONS;
+  public static String FindExtensionsAction_NO_ADDONS_FOUND;
+  public static String FindExtensionsAction_NO_UPDATES_FOUND;
+  public static String FindExtensionsAction_RSSOWL_ADDONS;
   public static String FindExtensionsAction_SEARCHING_EXTENSIONS;
+  public static String FindExtensionsAction_UPDATE_IN_PROGRESS;
   public static String FindUpdatesAction_CHECK_UPDATES;
   public static String FindUpdatesAction_DOWNLOADING_UPDATES;
   public static String FindUpdatesAction_NO_UPDATES_AVAILABLE;
@@ -66,6 +71,7 @@ public class Messages extends NLS {
 
   public static String MakeNewsStickyAction_NEWS_STICKY;
   public static String MakeNewsStickyAction_NEWS_STICKY_BINDING;
+  public static String ManageConfigurationAction_MANAGE_ADDONS;
   public static String MarkAllNewsReadAction_MARK_ALL_READ;
   public static String MoveCopyNewsToBinAction_NEW_NEWSBIN;
 

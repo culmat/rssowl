@@ -24,31 +24,56 @@
 
 package org.rssowl.ui.internal.actions;
 
+import org.eclipse.core.runtime.Preferences;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
-import org.eclipse.update.ui.UpdateManagerUI;
 
 /**
  * @author bpasero
  */
 public class ManageConfigurationAction extends Action implements IWorkbenchWindowActionDelegate {
+  private static final String CONFIGURATION_VIEW_SHOW_NESTED_FEATURES = "ConfigurationView.showNestedFeatures"; //$NON-NLS-1$
+  private static final String CONFIGURATION_VIEW_SHOW_SITES = "ConfigurationView.showSites"; //$NON-NLS-1$
+  private static final String CONFIGURATION_VIEW_SHOW_UNCONF = "ConfigurationView.showUnconf"; //$NON-NLS-1$
+
   private Shell fShell;
 
   /** Keep default constructor for reflection. */
   public ManageConfigurationAction() {}
 
+  /*
+   * @see org.eclipse.jface.action.Action#run()
+   */
+  @SuppressWarnings("restriction")
   @Override
   public void run() {
-    BusyIndicator.showWhile(fShell.getDisplay(), new Runnable() {
-      public void run() {
-        UpdateManagerUI.openConfigurationManager(fShell);
+
+    /* Properly Set Preferences to Control Configuration UI */
+    Preferences pluginPreferences = org.eclipse.update.internal.ui.UpdateUI.getDefault().getPluginPreferences();
+    pluginPreferences.setValue(CONFIGURATION_VIEW_SHOW_UNCONF, true);
+    pluginPreferences.setDefault(CONFIGURATION_VIEW_SHOW_SITES, true);
+    pluginPreferences.setValue(CONFIGURATION_VIEW_SHOW_SITES, false);
+    pluginPreferences.setDefault(CONFIGURATION_VIEW_SHOW_NESTED_FEATURES, true);
+    pluginPreferences.setValue(CONFIGURATION_VIEW_SHOW_NESTED_FEATURES, false);
+    org.eclipse.update.internal.ui.UpdateUI.getDefault().savePluginPreferences();
+
+    /* Open Config Dialog */
+    ApplicationWindow appWindow = new org.eclipse.update.internal.ui.ConfigurationManagerWindow(fShell) {
+      @Override
+      public MenuManager getMenuBarManager() {
+        return new MenuManager(); //Disables the Menu Bar
       }
-    });
+    };
+    appWindow.create();
+    appWindow.getShell().setText(Messages.ManageConfigurationAction_MANAGE_ADDONS);
+    appWindow.getShell().setImages(fShell.getImages());
+    appWindow.open();
   }
 
   /*
