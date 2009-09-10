@@ -71,6 +71,7 @@ public class RetentionPropertyPage implements IEntityPropertyPage {
   private Button fDeleteNewsByAgeCheck;
   private Button fDeleteReadNewsCheck;
   private Button fNeverDeleteUnreadNewsCheck;
+  private Button fNeverDeleteLabeledNewsCheck;
   private boolean fSettingsChanged;
 
   /* Settings */
@@ -81,6 +82,7 @@ public class RetentionPropertyPage implements IEntityPropertyPage {
   private int fPrefDeleteNewsByAgeValue;
   private boolean fPrefDeleteReadNews;
   private boolean fPrefNeverDeleteUnReadNews;
+  private boolean fPrefNeverDeleteLabeledNews;
 
   /*
    * @see org.rssowl.ui.dialogs.properties.IEntityPropertyPage#init(org.rssowl.ui.dialogs.properties.IPropertyDialogSite,
@@ -110,6 +112,7 @@ public class RetentionPropertyPage implements IEntityPropertyPage {
     fPrefDeleteNewsByAgeValue = firstScope.getInteger(DefaultPreferences.DEL_NEWS_BY_AGE_VALUE);
     fPrefDeleteReadNews = firstScope.getBoolean(DefaultPreferences.DEL_READ_NEWS_STATE);
     fPrefNeverDeleteUnReadNews = firstScope.getBoolean(DefaultPreferences.NEVER_DEL_UNREAD_NEWS_STATE);
+    fPrefNeverDeleteLabeledNews = firstScope.getBoolean(DefaultPreferences.NEVER_DEL_LABELED_NEWS_STATE);
 
     /* For any other scope not sharing the initial values, use the default */
     IPreferenceScope defaultScope = Owl.getPreferenceService().getDefaultScope();
@@ -133,6 +136,9 @@ public class RetentionPropertyPage implements IEntityPropertyPage {
 
       if (otherScope.getBoolean(DefaultPreferences.NEVER_DEL_UNREAD_NEWS_STATE) != fPrefNeverDeleteUnReadNews)
         fPrefNeverDeleteUnReadNews = defaultScope.getBoolean(DefaultPreferences.NEVER_DEL_UNREAD_NEWS_STATE);
+
+      if (otherScope.getBoolean(DefaultPreferences.NEVER_DEL_LABELED_NEWS_STATE) != fPrefNeverDeleteLabeledNews)
+        fPrefNeverDeleteLabeledNews = defaultScope.getBoolean(DefaultPreferences.NEVER_DEL_LABELED_NEWS_STATE);
     }
   }
 
@@ -198,11 +204,17 @@ public class RetentionPropertyPage implements IEntityPropertyPage {
     fNeverDeleteUnreadNewsCheck.setText(Messages.RetentionPropertyPage_DELETE_UNREAD);
     fNeverDeleteUnreadNewsCheck.setSelection(fPrefNeverDeleteUnReadNews);
 
+    /* Never Delete Labeled News State */
+    fNeverDeleteLabeledNewsCheck = new Button(container, SWT.CHECK);
+    fNeverDeleteLabeledNewsCheck.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false, 2, 1));
+    fNeverDeleteLabeledNewsCheck.setText(Messages.RetentionPropertyPage_NEVER_DELETE_LABELED);
+    fNeverDeleteLabeledNewsCheck.setSelection(fPrefNeverDeleteLabeledNews);
+
     /* Info Container */
     Composite infoContainer = new Composite(container, SWT.None);
     infoContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
     infoContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
-    ((GridLayout)infoContainer.getLayout()).marginTop = 5;
+    ((GridLayout) infoContainer.getLayout()).marginTop = 5;
 
     Label infoImg = new Label(infoContainer, SWT.NONE);
     infoImg.setImage(OwlUI.getImage(fSite.getResourceManager(), "icons/obj16/info.gif")); //$NON-NLS-1$
@@ -312,6 +324,13 @@ public class RetentionPropertyPage implements IEntityPropertyPage {
     bVal = fNeverDeleteUnreadNewsCheck.getSelection();
     if (fPrefNeverDeleteUnReadNews != bVal) {
       scope.putBoolean(DefaultPreferences.NEVER_DEL_UNREAD_NEWS_STATE, bVal);
+      changed = true;
+    }
+
+    /* Never Delete Labeled News */
+    bVal = fNeverDeleteLabeledNewsCheck.getSelection();
+    if (fPrefNeverDeleteLabeledNews != bVal) {
+      scope.putBoolean(DefaultPreferences.NEVER_DEL_LABELED_NEWS_STATE, bVal);
       changed = true;
     }
 
