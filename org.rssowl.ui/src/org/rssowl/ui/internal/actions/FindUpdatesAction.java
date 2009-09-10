@@ -119,6 +119,9 @@ public class FindUpdatesAction extends Action implements IWorkbenchWindowActionD
       if (fUserInitiated) {
         job.setUser(true);
         job.setPriority(Job.INTERACTIVE);
+      } else {
+        job.setUser(false);
+        job.setSystem(true);
       }
 
       /* Schedule */
