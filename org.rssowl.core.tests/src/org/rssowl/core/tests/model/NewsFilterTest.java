@@ -781,6 +781,8 @@ public class NewsFilterTest {
     IPreferenceScope preferences = Owl.getPreferenceService().getEntityScope(bm);
     preferences.putBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE, true);
     preferences.putInteger(DefaultPreferences.DEL_NEWS_BY_AGE_VALUE, 2);
+    preferences.putBoolean(DefaultPreferences.NEVER_DEL_UNREAD_NEWS_STATE, false);
+    preferences.putBoolean(DefaultPreferences.NEVER_DEL_LABELED_NEWS_STATE, false);
 
     DynamicDAO.save(bm);
 
@@ -791,19 +793,19 @@ public class NewsFilterTest {
     Date oldDate = cal.getTime();
 
     INews news1 = createNews(feed, "News1");
-    news1.setState(INews.State.NEW);
+    news1.setState(INews.State.UNREAD);
     news1.setReceiveDate(oldDate);
     news1.setPublishDate(oldDate);
     news1.setModifiedDate(oldDate);
 
     INews news2 = createNews(feed, "News2");
-    news2.setState(INews.State.NEW);
+    news2.setState(INews.State.UNREAD);
     news2.setReceiveDate(oldDate);
     news2.setPublishDate(oldDate);
     news2.setModifiedDate(oldDate);
 
     INews news3 = createNews(feed, "News3");
-    news3.setState(INews.State.NEW);
+    news3.setState(INews.State.UNREAD);
     news3.setReceiveDate(oldDate);
     news3.setPublishDate(oldDate);
     news3.setModifiedDate(oldDate);
