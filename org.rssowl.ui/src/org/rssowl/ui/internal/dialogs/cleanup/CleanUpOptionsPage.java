@@ -60,6 +60,7 @@ public class CleanUpOptionsPage extends WizardPage {
   private Spinner fMaxAgeSpinner;
   private Button fDeleteReadNewsCheck;
   private Button fNeverDeleteUnreadNewsCheck;
+  private Button fNeverDeleteLabeledNewsCheck;
   private IPreferenceScope fGlobalScope;
   private LocalResourceManager fResources;
 
@@ -94,8 +95,9 @@ public class CleanUpOptionsPage extends WizardPage {
 
     boolean deleteReadNews = fDeleteReadNewsCheck.getSelection();
     boolean keepUnreadNews = fNeverDeleteUnreadNewsCheck.getSelection();
+    boolean keepLabeledNews = fNeverDeleteLabeledNewsCheck.getSelection();
 
-    return new CleanUpOperations(lastVisitInDaysState, lastVisitInDays, lastUpdateInDaysState, lastUpdateInDays, deleteFeedsByConError, deleteFeedsByDuplicates, maxNewsCountPerFeedState, maxNewsCountPerFeed, maxNewsAgeState, maxNewsAge, deleteReadNews, keepUnreadNews);
+    return new CleanUpOperations(lastVisitInDaysState, lastVisitInDays, lastUpdateInDaysState, lastUpdateInDays, deleteFeedsByConError, deleteFeedsByDuplicates, maxNewsCountPerFeedState, maxNewsCountPerFeed, maxNewsAgeState, maxNewsAge, deleteReadNews, keepUnreadNews, keepLabeledNews);
   }
 
   /*
@@ -249,6 +251,14 @@ public class CleanUpOptionsPage extends WizardPage {
       fNeverDeleteUnreadNewsCheck.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false, 2, 1));
       fNeverDeleteUnreadNewsCheck.setText(Messages.CleanUpOptionsPage_DONT_DELETE_UNREAD);
       fNeverDeleteUnreadNewsCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.CLEAN_UP_NEVER_DEL_UNREAD_NEWS_STATE));
+    }
+
+    /* 8.) Do not delete Labeled News */
+    {
+      fNeverDeleteLabeledNewsCheck = new Button(container, SWT.CHECK);
+      fNeverDeleteLabeledNewsCheck.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false, 2, 1));
+      fNeverDeleteLabeledNewsCheck.setText(Messages.CleanUpOptionsPage_DONT_DELETE_LABELED);
+      fNeverDeleteLabeledNewsCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.CLEAN_UP_NEVER_DEL_LABELED_NEWS_STATE));
     }
 
     /* Info Container */

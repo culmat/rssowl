@@ -263,7 +263,8 @@ public class CleanUpModel {
         conditions.add(getLocationCondition(mark));
         conditions.add(stickyCondition);
         conditions.add(stateCondition);
-        conditions.addAll(labelConditions);
+        if (fOps.keepLabeledNews())
+          conditions.addAll(labelConditions);
 
         /* Check if result count exceeds limit */
         List<SearchHit<NewsReference>> results = filterInvalidResults(fModelSearch.searchNews(conditions, true));
@@ -316,7 +317,8 @@ public class CleanUpModel {
         conditions.add(ageCond);
         conditions.add(stateCondition);
         conditions.add(stickyCondition);
-        conditions.addAll(labelConditions);
+        if (fOps.keepLabeledNews())
+          conditions.addAll(labelConditions);
 
         List<SearchHit<NewsReference>> results = filterInvalidResults(fModelSearch.searchNews(conditions, true));
         Set<NewsReference> newsOfMarkToDelete = new HashSet<NewsReference>();
@@ -366,7 +368,8 @@ public class CleanUpModel {
         conditions.add(getLocationCondition(mark));
         conditions.add(stateCond);
         conditions.add(stickyCondition);
-        conditions.addAll(labelConditions);
+        if (fOps.keepLabeledNews())
+          conditions.addAll(labelConditions);
 
         List<SearchHit<NewsReference>> results = filterInvalidResults(fModelSearch.searchNews(conditions, true));
         Set<NewsReference> newsOfMarkToDelete = new HashSet<NewsReference>();

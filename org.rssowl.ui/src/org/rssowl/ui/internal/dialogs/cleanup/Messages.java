@@ -49,6 +49,7 @@ public class Messages extends NLS {
   public static String CleanUpOptionsPage_DELETE_DUPLICATES;
   public static String CleanUpOptionsPage_DELETE_NEWS_BY_AGE;
   public static String CleanUpOptionsPage_DELETE_READ;
+  public static String CleanUpOptionsPage_DONT_DELETE_LABELED;
   public static String CleanUpOptionsPage_DONT_DELETE_UNREAD;
   public static String CleanUpSummaryPage_DESELECT_ALL;
   public static String CleanUpSummaryPage_REVIEW_OPS;

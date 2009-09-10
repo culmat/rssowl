@@ -50,6 +50,7 @@ public class CleanUpOperations {
 
   private boolean fDeleteReadNews;
   private boolean fKeepUnreadNews;
+  private boolean fKeepLabeledNews;
 
   /**
    * @param lastVisitState
@@ -64,8 +65,9 @@ public class CleanUpOperations {
    * @param maxNewsAge
    * @param deleteReadNews
    * @param keepUnreadNews
+   * @param keepLabeledNews
    */
-  public CleanUpOperations(boolean lastVisitState, int lastVisitInDays, boolean lastUpdateState, int lastUpdateInDays, boolean deleteFeedsByConError, boolean deleteFeedsByDuplicates, boolean maxNewsCountPerFeedState, int maxNewsCountPerFeed, boolean maxNewsAgeState, int maxNewsAge, boolean deleteReadNews, boolean keepUnreadNews) {
+  public CleanUpOperations(boolean lastVisitState, int lastVisitInDays, boolean lastUpdateState, int lastUpdateInDays, boolean deleteFeedsByConError, boolean deleteFeedsByDuplicates, boolean maxNewsCountPerFeedState, int maxNewsCountPerFeed, boolean maxNewsAgeState, int maxNewsAge, boolean deleteReadNews, boolean keepUnreadNews, boolean keepLabeledNews) {
     fLastVisitInDaysState = lastVisitState;
     fLastVisitInDays = lastVisitInDays;
     fLastUpdateInDaysState = lastUpdateState;
@@ -78,6 +80,7 @@ public class CleanUpOperations {
     fMaxNewsAge = maxNewsAge;
     fDeleteReadNews = deleteReadNews;
     fKeepUnreadNews = keepUnreadNews;
+    fKeepLabeledNews = keepLabeledNews;
   }
 
   boolean deleteFeedByLastVisit() {
@@ -126,5 +129,9 @@ public class CleanUpOperations {
 
   boolean keepUnreadNews() {
     return fKeepUnreadNews;
+  }
+
+  boolean keepLabeledNews() {
+    return fKeepLabeledNews;
   }
 }
