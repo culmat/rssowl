@@ -2503,6 +2503,88 @@ public class RetentionStrategyTests {
    * @throws Exception
    */
   @Test
+  public void testProcessFeedWithLabeledNewsByCountDoNotKeepLabeled() throws Exception {
+    long today = DateUtils.getToday().getTimeInMillis();
+
+    ILabel label = DynamicDAO.save(fFactory.createLabel(null, "Label"));
+
+    IFolder folder = DynamicDAO.save(fFactory.createFolder(null, null, "Root"));
+
+    IFeed feed = createFeedWithNews(new URI("http://www.url.com"), 100, 100, today - 7 * DAY, today - 6 * DAY, 0, false, label);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark1");
+
+    DynamicDAO.save(folder);
+
+    /* Add unpersisted *new* News */
+    INews news1 = fFactory.createNews(null, feed, new Date());
+    news1.setTitle("News #1");
+    INews news2 = fFactory.createNews(null, feed, new Date());
+    news2.setTitle("News #2");
+    news2.setPublishDate(new Date(today - 7 * DAY));
+    fFactory.createNews(null, feed, new Date()).setTitle("News #3");
+
+    IBookMark bookmark = (IBookMark) folder.getMarks().get(0);
+    assertEquals(103, countNews(feed));
+
+    /* Preferences */
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookmark);
+
+    /* Setup Retention */
+    prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
+    prefs1.putBoolean(DefaultPreferences.NEVER_DEL_LABELED_NEWS_STATE, false);
+
+    /* Run and Validate Retention */
+    prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 50);
+    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed);
+    assertEquals(53, updatedNews.size());
+    assertEquals(50, countNews(feed));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testProcessFeedWithLabeledNewsByCountKeepLabeled() throws Exception {
+    long today = DateUtils.getToday().getTimeInMillis();
+
+    ILabel label = DynamicDAO.save(fFactory.createLabel(null, "Label"));
+
+    IFolder folder = DynamicDAO.save(fFactory.createFolder(null, null, "Root"));
+
+    IFeed feed = createFeedWithNews(new URI("http://www.url.com"), 100, 100, today - 7 * DAY, today - 6 * DAY, 0, false, label);
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark1");
+
+    DynamicDAO.save(folder);
+
+    /* Add unpersisted *new* News */
+    INews news1 = fFactory.createNews(null, feed, new Date());
+    news1.setTitle("News #1");
+    INews news2 = fFactory.createNews(null, feed, new Date());
+    news2.setTitle("News #2");
+    news2.setPublishDate(new Date(today - 7 * DAY));
+    fFactory.createNews(null, feed, new Date()).setTitle("News #3");
+
+    IBookMark bookmark = (IBookMark) folder.getMarks().get(0);
+    assertEquals(103, countNews(feed));
+
+    /* Preferences */
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookmark);
+
+    /* Setup Retention */
+    prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
+    prefs1.putBoolean(DefaultPreferences.NEVER_DEL_LABELED_NEWS_STATE, true);
+
+    /* Run and Validate Retention */
+    prefs1.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 50);
+    List<INews> updatedNews = RetentionStrategy.process(bookmark, feed);
+    assertEquals(0, updatedNews.size());
+    assertEquals(103, countNews(feed));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
   public void testProcessFeedWithLabeledNewsByCountKeepUnreadKeepNew() throws Exception {
     long today = DateUtils.getToday().getTimeInMillis();
 
