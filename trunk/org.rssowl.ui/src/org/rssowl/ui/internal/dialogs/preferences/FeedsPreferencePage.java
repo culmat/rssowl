@@ -100,6 +100,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
   private Spinner fDeleteNewsByAgeValue;
   private Button fDeleteReadNewsCheck;
   private Button fNeverDeleteUnReadNewsCheck;
+  private Button fNeverDeleteLabeledNewsCheck;
   private Button fReloadOnStartupCheck;
   private Combo fFilterCombo;
   private Combo fGroupCombo;
@@ -424,11 +425,17 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     fNeverDeleteUnReadNewsCheck.setText(Messages.FeedsPreferencePage_NEVER_DELETE_UNREAD);
     fNeverDeleteUnReadNewsCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.NEVER_DEL_UNREAD_NEWS_STATE));
 
+    /* Never Delete Labeled State */
+    fNeverDeleteLabeledNewsCheck = new Button(group, SWT.CHECK);
+    fNeverDeleteLabeledNewsCheck.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false, 2, 1));
+    fNeverDeleteLabeledNewsCheck.setText(Messages.FeedsPreferencePage_NEVER_DELETE_LABELED);
+    fNeverDeleteLabeledNewsCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.NEVER_DEL_LABELED_NEWS_STATE));
+
     /* Info Container */
     Composite infoContainer = new Composite(group, SWT.None);
     infoContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
     infoContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
-    ((GridLayout)infoContainer.getLayout()).marginTop = 5;
+    ((GridLayout) infoContainer.getLayout()).marginTop = 5;
 
     Label infoImg = new Label(infoContainer, SWT.NONE);
     infoImg.setImage(OwlUI.getImage(fResources, "icons/obj16/info.gif")); //$NON-NLS-1$
@@ -547,6 +554,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     }
 
     fGlobalScope.putBoolean(DefaultPreferences.NEVER_DEL_UNREAD_NEWS_STATE, fNeverDeleteUnReadNewsCheck.getSelection());
+    fGlobalScope.putBoolean(DefaultPreferences.NEVER_DEL_LABELED_NEWS_STATE, fNeverDeleteLabeledNewsCheck.getSelection());
 
     /* Run certain tasks now */
     finish(autoUpdateChange, displayChange, columnChange, runCleanUp);
@@ -665,6 +673,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     fDeleteNewsByAgeValue.setEnabled(fDeleteNewsByAgeCheck.getSelection());
     fDeleteReadNewsCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.DEL_READ_NEWS_STATE));
     fNeverDeleteUnReadNewsCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.NEVER_DEL_UNREAD_NEWS_STATE));
+    fNeverDeleteLabeledNewsCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.NEVER_DEL_LABELED_NEWS_STATE));
   }
 
   private int getUpdateIntervalScope() {

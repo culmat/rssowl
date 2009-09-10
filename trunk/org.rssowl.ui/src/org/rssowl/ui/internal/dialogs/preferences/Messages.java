@@ -72,6 +72,7 @@ public class Messages extends NLS {
   public static String FeedsPreferencePage_MAX_AGE;
   public static String FeedsPreferencePage_MAX_NUMBER;
   public static String FeedsPreferencePage_MINUTES;
+  public static String FeedsPreferencePage_NEVER_DELETE_LABELED;
   public static String FeedsPreferencePage_NEVER_DELETE_UNREAD;
   public static String FeedsPreferencePage_OPEN_ON_SELECT;
   public static String FeedsPreferencePage_OPEN_WHEN_EMPTY;
