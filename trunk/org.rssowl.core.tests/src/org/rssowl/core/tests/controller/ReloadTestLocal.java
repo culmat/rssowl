@@ -1453,6 +1453,7 @@ public class ReloadTestLocal {
     IPreferenceScope preferences = Owl.getPreferenceService().getEntityScope(bookmark);
     preferences.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 0);
     preferences.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
+    preferences.putBoolean(DefaultPreferences.NEVER_DEL_UNREAD_NEWS_STATE, false);
 
     /* First Reload */
     InMemoryProtocolHandler.FEED = generateFeed("Title", "http://www.link.de", null, null);
