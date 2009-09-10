@@ -177,6 +177,7 @@ public class CleanUpWizard extends Wizard {
 
         preferences.putBoolean(DefaultPreferences.CLEAN_UP_READ_NEWS_STATE, operations.deleteReadNews());
         preferences.putBoolean(DefaultPreferences.CLEAN_UP_NEVER_DEL_UNREAD_NEWS_STATE, operations.keepUnreadNews());
+        preferences.putBoolean(DefaultPreferences.CLEAN_UP_NEVER_DEL_LABELED_NEWS_STATE, operations.keepLabeledNews());
 
         monitor.done();
       }
