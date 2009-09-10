@@ -100,6 +100,9 @@ public class DefaultPreferences {
   /** Retention Policy: Never Delete Unread News (boolean) */
   public static final String NEVER_DEL_UNREAD_NEWS_STATE = Preference.NEVER_DEL_UNREAD_NEWS_STATE.id();
 
+  /** Retention Policy: Never Delete Labeled News (boolean) */
+  public static final String NEVER_DEL_LABELED_NEWS_STATE = Preference.NEVER_DEL_LABELED_NEWS_STATE.id();
+
   /** BookMarks: Visible Columns */
   public static final String BM_NEWS_COLUMNS = Preference.BM_NEWS_COLUMNS.id();
 
@@ -252,6 +255,9 @@ public class DefaultPreferences {
 
   /** Global: Clean Up: Never Delete Unread News (boolean) */
   public static final String CLEAN_UP_NEVER_DEL_UNREAD_NEWS_STATE = Preference.CLEAN_UP_NEVER_DEL_UNREAD_NEWS_STATE.id();
+
+  /** Global: Clean Up: Never Delete Labeled News (boolean) */
+  public static final String CLEAN_UP_NEVER_DEL_LABELED_NEWS_STATE = Preference.CLEAN_UP_NEVER_DEL_LABELED_NEWS_STATE.id();
 
   /** Global: Clean Up: The Date of the next reminder for Clean-Up as Long */
   public static final String CLEAN_UP_REMINDER_DATE_MILLIES = Preference.CLEAN_UP_REMINDER_DATE_MILLIES.id();
