@@ -150,47 +150,57 @@ public class RetentionStrategy {
     List<INews> newsToDelete = new ArrayList<INews>();
     IPreferenceScope prefs = Owl.getPreferenceService().getEntityScope(bookmark);
     boolean keepUnread = prefs.getBoolean(DefaultPreferences.NEVER_DEL_UNREAD_NEWS_STATE);
+    boolean keepLabeled = prefs.getBoolean(DefaultPreferences.NEVER_DEL_LABELED_NEWS_STATE);
 
     /* Delete Read News if set */
     if (prefs.getBoolean(DefaultPreferences.DEL_READ_NEWS_STATE))
-      fillReadNewsToDelete(targetNews, newsToDelete);
+      fillReadNewsToDelete(targetNews, newsToDelete, keepUnread, keepLabeled);
 
     /* Delete by Age if set */
     if (prefs.getBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE))
-      fillNewsToDeleteByAge(targetNews, newsToDelete, prefs.getInteger(DefaultPreferences.DEL_NEWS_BY_AGE_VALUE), keepUnread);
+      fillNewsToDeleteByAge(targetNews, newsToDelete, prefs.getInteger(DefaultPreferences.DEL_NEWS_BY_AGE_VALUE), keepUnread, keepLabeled);
 
     /* Delete by Count if set */
     if (prefs.getBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE))
-      fillNewsToDeleteByCount(targetNews, newsToDelete, prefs.getInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE), keepUnread);
+      fillNewsToDeleteByCount(targetNews, newsToDelete, prefs.getInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE), keepUnread, keepLabeled);
 
     return newsToDelete;
   }
 
-  private static void fillReadNewsToDelete(Collection<INews> targetNews, List<INews> newsToDelete) {
+  private static void fillReadNewsToDelete(Collection<INews> targetNews, List<INews> newsToDelete, boolean keepUnread, boolean keepLabeled) {
     for (INews newsItem : targetNews) {
-      if (!shouldKeep(newsItem) && newsItem.getState() == INews.State.READ)
+      if (!shouldKeep(newsItem, keepUnread, keepLabeled) && newsItem.getState() == INews.State.READ)
         newsToDelete.add(newsItem);
     }
   }
 
-  private static void fillNewsToDeleteByAge(Collection<INews> targetNews, List<INews> newsToDelete, int days, boolean keepUnread) {
+  private static void fillNewsToDeleteByAge(Collection<INews> targetNews, List<INews> newsToDelete, int days, boolean keepUnread, boolean keepLabeled) {
     long maxAge = DateUtils.getToday().getTimeInMillis() - (days * DAY);
     for (INews newsItem : targetNews) {
-      State state = newsItem.getState();
-      boolean isUnread = (state == INews.State.NEW || state == INews.State.UPDATED || state == INews.State.UNREAD);
-
-      /* Keep Sticky and Unread (if set) */
-      if (!shouldKeep(newsItem) && !(isUnread && keepUnread) && !newsToDelete.contains(newsItem) && DateUtils.getRecentDate(newsItem).getTime() <= maxAge)
+      if (!shouldKeep(newsItem, keepUnread, keepLabeled) && !newsToDelete.contains(newsItem) && DateUtils.getRecentDate(newsItem).getTime() <= maxAge)
         newsToDelete.add(newsItem);
     }
   }
 
-  /* Keep sticky news or news with a label */
-  private static boolean shouldKeep(INews news) {
-    return news.isFlagged() || !news.getLabels().isEmpty() || news.getState() == INews.State.NEW;
+  private static boolean shouldKeep(INews news, boolean keepUnread, boolean keepLabeled) {
+
+    /* Always keep Sticky and New News */
+    if (news.isFlagged() || news.getState() == INews.State.NEW)
+      return true;
+
+    /* Keep Unread if Set */
+    State state = news.getState();
+    if (keepUnread && (state == INews.State.UPDATED || state == INews.State.UNREAD))
+      return true;
+
+    /* Keep Labeled if Set */
+    if (keepLabeled && !news.getLabels().isEmpty())
+      return true;
+
+    return false;
   }
 
-  private static void fillNewsToDeleteByCount(Collection<INews> targetNews, List<INews> newsToDelete, int limit, boolean keepUnread) {
+  private static void fillNewsToDeleteByCount(Collection<INews> targetNews, List<INews> newsToDelete, int limit, boolean keepUnread, boolean keepLabeled) {
 
     /* Ignore News that are in List of Deleted News already */
     int actualSize = targetNews.size() - newsToDelete.size();
@@ -220,11 +230,7 @@ public class RetentionStrategy {
     int toDeleteValue = actualSize - limit;
     int deletedCounter = 0;
     for (i = 0; i < newsArray.length && deletedCounter != toDeleteValue; i++) {
-      State state = newsArray[i].getState();
-      boolean isUnread = (state == INews.State.NEW || state == INews.State.UPDATED || state == INews.State.UNREAD);
-
-      /* Keep Flagged and Unread (if set) */
-      if (!shouldKeep(newsArray[i]) && !(isUnread && keepUnread)) {
+      if (!shouldKeep(newsArray[i], keepUnread, keepLabeled)) {
         newsToDelete.add(newsArray[i]);
         deletedCounter++;
       }
