@@ -62,6 +62,7 @@ public class Messages extends NLS {
   public static String ApplicationActionBarAdvisor_MARK;
   public static String ApplicationActionBarAdvisor_MARK_UNREAD_COUNT;
   public static String ApplicationActionBarAdvisor_MOVE_TO;
+  public static String ApplicationActionBarAdvisor_NEW_LABEL;
   public static String ApplicationActionBarAdvisor_NEW_WINDOW;
   public static String ApplicationActionBarAdvisor_NEWS;
   public static String ApplicationActionBarAdvisor_ORGANIZE_LABELS;
