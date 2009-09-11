@@ -97,6 +97,7 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
   private Button fRemoveSelected;
   private Button fUseMasterPasswordCheck;
   private IPreferenceScope fGlobalScope = Owl.getPreferenceService().getGlobalScope();
+  private Button fChangeMasterPassword;
   private Button fResetMasterPassword;
 
   /* Model used in the Viewer */
@@ -198,13 +199,14 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
     /* Use a master password */
     Composite masterContainer = new Composite(container, SWT.NONE);
     masterContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
-    masterContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
+    masterContainer.setLayout(LayoutUtils.createGridLayout(3, 0, 0));
     ((GridLayout) masterContainer.getLayout()).marginBottom = 15;
     ((GridLayout) masterContainer.getLayout()).verticalSpacing = 10;
 
     StyledText infoText = new StyledText(masterContainer, SWT.WRAP | SWT.READ_ONLY);
-    infoText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
+    infoText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1));
     ((GridData) infoText.getLayoutData()).widthHint = 200;
+    infoText.setEnabled(false);
     infoText.setBackground(masterContainer.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 
     if (Application.IS_WINDOWS || Application.IS_MAC)
@@ -212,6 +214,7 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
     else
       infoText.setText(Messages.CredentialsPreferencesPage_MASTER_PW_MSG);
 
+    /* Use Own Master Password */
     fUseMasterPasswordCheck = new Button(masterContainer, SWT.CHECK);
     fUseMasterPasswordCheck.setText(Messages.CredentialsPreferencesPage_USE_MASTER_PW);
     fUseMasterPasswordCheck.setFocus();
@@ -221,19 +224,33 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
       @Override
       public void widgetSelected(SelectionEvent e) {
         if (!fUseMasterPasswordCheck.getSelection())
-          fResetMasterPassword.setEnabled(false);
+          fChangeMasterPassword.setEnabled(false);
       }
     });
 
+    /* Change Own Master Password */
+    fChangeMasterPassword = new Button(masterContainer, SWT.PUSH);
+    fChangeMasterPassword.setEnabled(fUseMasterPasswordCheck.getSelection());
+    fChangeMasterPassword.setText(Messages.CredentialsPreferencesPage_CHANGE_MASTER_PW);
+    Dialog.applyDialogFont(fChangeMasterPassword);
+    setButtonLayoutData(fChangeMasterPassword);
+    fChangeMasterPassword.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        onChangeMasterPassword();
+      }
+    });
+
+    /* Reset Master Password */
     fResetMasterPassword = new Button(masterContainer, SWT.PUSH);
-    fResetMasterPassword.setEnabled(fUseMasterPasswordCheck.getSelection());
-    fResetMasterPassword.setText(Messages.CredentialsPreferencesPage_CHANGE_MASTER_PW);
+    fResetMasterPassword.setEnabled(false);
+    fResetMasterPassword.setText(Messages.CredentialsPreferencesPage_RESET);
     Dialog.applyDialogFont(fResetMasterPassword);
     setButtonLayoutData(fResetMasterPassword);
     fResetMasterPassword.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
-        reSetAllCredentials();
+        onResetMasterPassword();
       }
     });
 
@@ -353,6 +370,30 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
     return container;
   }
 
+  private void onChangeMasterPassword() {
+    reSetAllCredentials();
+  }
+
+  private void onResetMasterPassword() {
+
+    /* Ask for Confirmation */
+    ConfirmDialog dialog = new ConfirmDialog(getShell(), Messages.CredentialsPreferencesPage_CONFIRM_RESET, Messages.CredentialsPreferencesPage_NO_UNDO, Messages.CredentialsPreferencesPage_RESET_PASSWORDS, Messages.CredentialsPreferencesPage_RESET_TITLE, null) {
+      @Override
+      public void setTitle(String newTitle) {
+        super.setTitle(Messages.CredentialsPreferencesPage_RESET_TITLE);
+      }
+    };
+
+    /* Bring Back Security to Default State resetting everything */
+    if (dialog.open() == IDialogConstants.OK_ID) {
+      ICredentialsProvider provider = Owl.getConnectionService().getCredentialsProvider(URI.create(DUMMY_LINK));
+      ((PlatformCredentialsProvider) provider).clear();
+      reSetAllCredentials();
+      setShowError(false);
+      fResetMasterPassword.setEnabled(false);
+    }
+  }
+
   private void onRemove() {
     IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
     List<?> credentialsToRemove = selection.toList();
@@ -447,7 +488,7 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
         }
       } catch (CredentialsException e) {
         Activator.getDefault().logError(e.getMessage(), e);
-        showError();
+        setShowError(true);
         break;
       }
     }
@@ -455,12 +496,16 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
     return credentials;
   }
 
-  private void showError() {
-    setErrorMessage(Messages.CredentialsPreferencesPage_WRONG_MASTER_PW);
+  private void setShowError(boolean isError) {
+    if (isError)
+      setErrorMessage(Messages.CredentialsPreferencesPage_WRONG_MASTER_PW);
+    else
+      setErrorMessage(null);
 
-    fUseMasterPasswordCheck.setEnabled(false);
-    fResetMasterPassword.setEnabled(false);
-    fViewer.getTable().setEnabled(false);
+    fUseMasterPasswordCheck.setEnabled(!isError);
+    fChangeMasterPassword.setEnabled(!isError && fUseMasterPasswordCheck.getSelection());
+    fViewer.getTable().setEnabled(!isError);
+    fResetMasterPassword.setEnabled(isError);
   }
 
   private Composite createComposite(Composite parent) {
@@ -501,7 +546,7 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
   @Override
   protected void performApply() {
     super.performApply();
-    fResetMasterPassword.setEnabled(fUseMasterPasswordCheck.getSelection());
+    fChangeMasterPassword.setEnabled(fUseMasterPasswordCheck.getSelection());
   }
 
   /*
@@ -513,7 +558,7 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
 
     IPreferenceScope defaultScope = Owl.getPreferenceService().getDefaultScope();
     fUseMasterPasswordCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.USE_MASTER_PASSWORD));
-    fResetMasterPassword.setEnabled(fUseMasterPasswordCheck.getSelection());
+    fChangeMasterPassword.setEnabled(fUseMasterPasswordCheck.getSelection());
   }
 
   private void reSetAllCredentials() {

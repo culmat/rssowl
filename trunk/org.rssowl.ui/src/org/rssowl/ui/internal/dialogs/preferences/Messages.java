@@ -40,6 +40,7 @@ public class Messages extends NLS {
   public static String BrowserPreferencePage_USE_STANDARD_BROWSER_N;
   public static String CredentialsPreferencesPage_CHANGE_MASTER_PW;
   public static String CredentialsPreferencesPage_CONFIRM_REMOVE;
+  public static String CredentialsPreferencesPage_CONFIRM_RESET;
   public static String CredentialsPreferencesPage_MASTER_PW_INFO;
   public static String CredentialsPreferencesPage_MASTER_PW_MSG;
   public static String CredentialsPreferencesPage_NO_UNDO;
@@ -47,6 +48,9 @@ public class Messages extends NLS {
   public static String CredentialsPreferencesPage_REMOVE;
   public static String CredentialsPreferencesPage_REMOVE_ALL;
   public static String CredentialsPreferencesPage_REMOVE_ALL_CONFIRM;
+  public static String CredentialsPreferencesPage_RESET;
+  public static String CredentialsPreferencesPage_RESET_PASSWORDS;
+  public static String CredentialsPreferencesPage_RESET_TITLE;
   public static String CredentialsPreferencesPage_SAVED_PWS;
   public static String CredentialsPreferencesPage_SITE;
   public static String CredentialsPreferencesPage_USE_MASTER_PW;
