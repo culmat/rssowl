@@ -48,6 +48,7 @@ import org.eclipse.jface.window.IShellProvider;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.MessageBox;
@@ -101,6 +102,8 @@ import org.rssowl.ui.internal.actions.SendLinkAction;
 import org.rssowl.ui.internal.actions.ToggleReadStateAction;
 import org.rssowl.ui.internal.actions.UndoAction;
 import org.rssowl.ui.internal.dialogs.CustomizeToolbarDialog;
+import org.rssowl.ui.internal.dialogs.LabelDialog;
+import org.rssowl.ui.internal.dialogs.LabelDialog.DialogMode;
 import org.rssowl.ui.internal.dialogs.preferences.ManageLabelsPreferencePage;
 import org.rssowl.ui.internal.dialogs.preferences.NotifierPreferencesPage;
 import org.rssowl.ui.internal.dialogs.preferences.OverviewPreferencesPage;
@@ -1209,7 +1212,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     });
 
     /* Load Labels */
-    Collection<ILabel> labels = CoreUtils.loadSortedLabels();
+    final Collection<ILabel> labels = CoreUtils.loadSortedLabels();
 
     /* Retrieve Labels that all selected News contain */
     labelMenu.add(new Separator());
@@ -1219,6 +1222,31 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
       labelAction.setChecked(selectedLabels.contains(label));
       labelMenu.add(labelAction);
     }
+
+    /* New Label */
+    labelMenu.add(new Action(Messages.ApplicationActionBarAdvisor_NEW_LABEL) {
+      @Override
+      public void run() {
+        LabelDialog dialog = new LabelDialog(shellProvider.getShell(), DialogMode.ADD, null);
+        if (dialog.open() == IDialogConstants.OK_ID) {
+          String name = dialog.getName();
+          RGB color = dialog.getColor();
+
+          ILabel newLabel = Owl.getModelFactory().createLabel(null, name);
+          newLabel.setColor(OwlUI.toString(color));
+          newLabel.setOrder(labels.size());
+          DynamicDAO.save(newLabel);
+
+          LabelAction labelAction = new LabelAction(newLabel, selection);
+          labelAction.run();
+        }
+      }
+
+      @Override
+      public boolean isEnabled() {
+        return !selection.isEmpty();
+      }
+    });
 
     /* Remove All Labels */
     labelMenu.add(new Separator());
