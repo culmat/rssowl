@@ -140,7 +140,6 @@ public class PreferencesInitializer implements IPreferencesInitializer {
     defaultScope.putBoolean(Preference.DEL_NEWS_BY_COUNT_STATE.id(), true);
     defaultScope.putInteger(Preference.DEL_NEWS_BY_COUNT_VALUE.id(), 200);
     defaultScope.putInteger(Preference.DEL_NEWS_BY_AGE_VALUE.id(), 30);
-    defaultScope.putBoolean(Preference.NEVER_DEL_UNREAD_NEWS_STATE.id(), true);
     defaultScope.putBoolean(Preference.NEVER_DEL_LABELED_NEWS_STATE.id(), true);
   }
 
