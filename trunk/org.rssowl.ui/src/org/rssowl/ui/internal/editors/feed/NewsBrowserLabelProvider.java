@@ -663,22 +663,24 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       if (source != null) {
         String link = (source.getLink() != null) ? source.getLink().toASCIIString() : null;
         String name = source.getName();
+        if (StringUtils.isSet(link) || StringUtils.isSet(name)) {
 
-        /* DIV: NewsItem/Footer/Source */
-        div(footer, "source"); //$NON-NLS-1$
+          /* DIV: NewsItem/Footer/Source */
+          div(footer, "source"); //$NON-NLS-1$
 
-        /* Label */
-        span(footer, Messages.NewsBrowserLabelProvider_SOURCE, "label"); //$NON-NLS-1$
+          /* Label */
+          span(footer, Messages.NewsBrowserLabelProvider_SOURCE, "label"); //$NON-NLS-1$
 
-        if (StringUtils.isSet(name) && link != null)
-          link(footer, link, StringUtils.htmlEscape(name), "source"); //$NON-NLS-1$
-        else if (link != null)
-          link(footer, link, StringUtils.htmlEscape(link), "source"); //$NON-NLS-1$
-        else if (StringUtils.isSet(name))
-          footer.append(StringUtils.htmlEscape(name));
+          if (StringUtils.isSet(name) && link != null)
+            link(footer, link, StringUtils.htmlEscape(name), "source"); //$NON-NLS-1$
+          else if (link != null)
+            link(footer, link, StringUtils.htmlEscape(link), "source"); //$NON-NLS-1$
+          else if (StringUtils.isSet(name))
+            footer.append(StringUtils.htmlEscape(name));
 
-        /* Close: NewsItem/Footer/Source */
-        close(footer, "div"); //$NON-NLS-1$
+          /* Close: NewsItem/Footer/Source */
+          close(footer, "div"); //$NON-NLS-1$
+        }
       }
 
       /* Add Categories to Search */
