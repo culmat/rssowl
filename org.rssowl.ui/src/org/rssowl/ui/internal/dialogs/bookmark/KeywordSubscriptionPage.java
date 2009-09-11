@@ -85,7 +85,7 @@ public class KeywordSubscriptionPage extends WizardPage {
     }
 
     String getLabel(String keywords) {
-      return NLS.bind(Messages.KeywordSubscriptionPage_N_ON_M, fName, keywords);
+      return NLS.bind(Messages.KeywordSubscriptionPage_N_ON_M, StringUtils.replaceAll(fName, "&", ""), keywords); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     String getIconPath() {
