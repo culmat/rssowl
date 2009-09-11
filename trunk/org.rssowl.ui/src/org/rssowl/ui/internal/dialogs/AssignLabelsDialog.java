@@ -139,7 +139,7 @@ public class AssignLabelsDialog extends Dialog {
   @Override
   protected Control createDialogArea(Composite parent) {
     Composite composite = new Composite(parent, SWT.NONE);
-    composite.setLayout(LayoutUtils.createGridLayout(2, 10, 10));
+    composite.setLayout(LayoutUtils.createGridLayout(2, 10, 10, 5, 6, false));
     composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
     /* Name */
