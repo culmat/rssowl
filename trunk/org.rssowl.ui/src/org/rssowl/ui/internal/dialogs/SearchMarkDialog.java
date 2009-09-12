@@ -404,7 +404,6 @@ public class SearchMarkDialog extends TitleAreaDialog {
     /* OK */
     Button okButton = createButton(buttonBar, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL, true);
     ((GridData) okButton.getLayoutData()).horizontalAlignment = SWT.END;
-    ((GridData) okButton.getLayoutData()).grabExcessHorizontalSpace = true;
 
     /* Cancel */
     createButton(buttonBar, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
