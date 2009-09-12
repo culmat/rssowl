@@ -39,7 +39,6 @@ Visit http://www.rssowl.org
       </win>
    </launcher>
 
-
    <vm>
    </vm>
 
@@ -49,6 +48,7 @@ Visit http://www.rssowl.org
    <features>
       <feature id="org.rssowl" version="2.0.0.qualifier"/>
       <feature id="org.eclipse.rcp" version="3.4.200.R342_v20090122-989JESTEbig-SVaL8UJHcYBr4A63"/>
+      <feature id="org.rssowl.eclipse.dependencies" version="2.0.0.qualifier"/>
    </features>
 
 
