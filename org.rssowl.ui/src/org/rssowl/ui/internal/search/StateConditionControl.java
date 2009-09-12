@@ -146,6 +146,8 @@ public class StateConditionControl extends Composite {
           toolTipLocation.y += fUnreadState.getSize().y;
           if (Application.IS_WINDOWS)
             toolTipLocation.x += 5;
+          else if (Application.IS_LINUX)
+            toolTipLocation.x += 12;
 
           unreadStateToolTip.setLocation(toolTipLocation);
           unreadStateToolTip.setVisible(true);
@@ -163,6 +165,8 @@ public class StateConditionControl extends Composite {
           toolTipLocation.y += fNewState.getSize().y;
           if (Application.IS_WINDOWS)
             toolTipLocation.x += 5;
+          else if (Application.IS_LINUX)
+            toolTipLocation.x += 12;
 
           newStateToolTip.setLocation(toolTipLocation);
           newStateToolTip.setVisible(true);
