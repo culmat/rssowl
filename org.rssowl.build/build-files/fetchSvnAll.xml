@@ -66,5 +66,11 @@
       <param name="project.name" value="/trunk/org.rssowl.core.tests"/>
       <param name="url" value="https://rssowl.svn.sourceforge.net/svnroot/rssowl"/>
     </antcall>
+    <antcall target="svn.co">
+      <param name="target" value="features"/>
+      <param name="element.id" value="org.rssowl.eclipse.dependencies"/>
+      <param name="project.name" value="/trunk/org.rssowl.rcp.dependencies"/>
+      <param name="url" value="https://rssowl.svn.sourceforge.net/svnroot/rssowl"/>
+    </antcall>
   </target>
 </project>
