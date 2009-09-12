@@ -31,14 +31,12 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.util.LocalSelectionTransfer;
-import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -191,18 +189,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       setToolBarVisible(false);
     if (!preferences.getBoolean(DefaultPreferences.SHOW_STATUS))
       setStatusVisible(false, true);
-
-    /* Use PNG on Windows and Linux */
-    if (Application.IS_WINDOWS || Application.IS_LINUX) {
-      Image[] shellImg = new Image[3];
-      shellImg[0] = new Image(shell.getDisplay(), getClass().getResourceAsStream("/icons/product/16x16.png")); //$NON-NLS-1$
-      shellImg[1] = new Image(shell.getDisplay(), getClass().getResourceAsStream("/icons/product/24x24.png")); //$NON-NLS-1$
-      shellImg[2] = new Image(shell.getDisplay(), getClass().getResourceAsStream("/icons/product/32x32.png")); //$NON-NLS-1$
-      shell.setImages(shellImg);
-
-      /* Apply to all Dialogs */
-      Window.setDefaultImages(shellImg);
-    }
 
     /* System Tray */
     SafeRunner.run(new LoggingSafeRunnable() {
