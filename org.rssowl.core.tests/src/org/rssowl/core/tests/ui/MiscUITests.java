@@ -136,7 +136,7 @@ public class MiscUITests {
     assertEquals(childFolder.getId(), mark.getId());
     assertEquals(childFolder, mark.getFolder());
     assertEquals("bar", mark.getProperty("foo"));
-    assertEquals(childFolder.getId(), mark.toReference().getId());
+    assertTrue(Long.valueOf(mark.toReference().getId()).equals(childFolder.getId()));
 
     assertEquals(2, mark.getNews().size());
     assertEquals(2, mark.getNews(EnumSet.of(INews.State.NEW, INews.State.READ)).size());
