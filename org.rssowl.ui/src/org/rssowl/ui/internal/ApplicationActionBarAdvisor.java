@@ -85,6 +85,7 @@ import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.actions.AssignLabelsAction;
+import org.rssowl.ui.internal.actions.AutomateFilterAction;
 import org.rssowl.ui.internal.actions.CopyLinkAction;
 import org.rssowl.ui.internal.actions.CreateFilterAction;
 import org.rssowl.ui.internal.actions.FindAction;
@@ -101,6 +102,7 @@ import org.rssowl.ui.internal.actions.SearchNewsAction;
 import org.rssowl.ui.internal.actions.SendLinkAction;
 import org.rssowl.ui.internal.actions.ToggleReadStateAction;
 import org.rssowl.ui.internal.actions.UndoAction;
+import org.rssowl.ui.internal.actions.CreateFilterAction.PresetAction;
 import org.rssowl.ui.internal.dialogs.CustomizeToolbarDialog;
 import org.rssowl.ui.internal.dialogs.LabelDialog;
 import org.rssowl.ui.internal.dialogs.LabelDialog.DialogMode;
@@ -663,6 +665,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
           moveMenu.add(new Separator("movetonewbin")); //$NON-NLS-1$
           moveMenu.add(new MoveCopyNewsToBinAction(selection, null, true));
+          moveMenu.add(new AutomateFilterAction(PresetAction.MOVE, selection));
 
           /* Copy To */
           MenuManager copyMenu = new MenuManager(Messages.ApplicationActionBarAdvisor_COPY_TO, "copyto"); //$NON-NLS-1$
@@ -677,6 +680,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
           copyMenu.add(new Separator("copytonewbin")); //$NON-NLS-1$
           copyMenu.add(new MoveCopyNewsToBinAction(selection, null, false));
+          copyMenu.add(new AutomateFilterAction(PresetAction.COPY, selection));
         }
 
         /* Share */
@@ -1085,20 +1089,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
       /* Offer to Automize Downloading */
       attachmentMenu.add(new Separator());
-      attachmentMenu.add(new Action(Messages.ApplicationActionBarAdvisor_AUTOMATE_DOWNLOAD) {
-        @Override
-        public void run() {
-          CreateFilterAction action = new CreateFilterAction();
-          action.setAutomateDownload(true);
-          action.selectionChanged(null, selection);
-          action.run(null);
-        }
-
-        @Override
-        public ImageDescriptor getImageDescriptor() {
-          return OwlUI.FILTER;
-        }
-      });
+      attachmentMenu.add(new AutomateFilterAction(PresetAction.DOWNLOAD, selection));
     }
   }
 

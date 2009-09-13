@@ -74,6 +74,7 @@ import org.rssowl.ui.internal.ApplicationServer;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.ILinkHandler;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.actions.AutomateFilterAction;
 import org.rssowl.ui.internal.actions.MakeNewsStickyAction;
 import org.rssowl.ui.internal.actions.MarkAllNewsReadAction;
 import org.rssowl.ui.internal.actions.MoveCopyNewsToBinAction;
@@ -81,6 +82,7 @@ import org.rssowl.ui.internal.actions.NavigationActionFactory;
 import org.rssowl.ui.internal.actions.OpenInExternalBrowserAction;
 import org.rssowl.ui.internal.actions.OpenNewsAction;
 import org.rssowl.ui.internal.actions.ToggleReadStateAction;
+import org.rssowl.ui.internal.actions.CreateFilterAction.PresetAction;
 import org.rssowl.ui.internal.dialogs.SearchNewsDialog;
 import org.rssowl.ui.internal.editors.feed.NewsBrowserLabelProvider.Dynamic;
 import org.rssowl.ui.internal.undo.NewsStateOperation;
@@ -275,6 +277,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
           moveMenu.add(new Separator("movetonewbin")); //$NON-NLS-1$
           moveMenu.add(new MoveCopyNewsToBinAction(fCurrentSelection, null, true));
+          moveMenu.add(new AutomateFilterAction(PresetAction.MOVE, fCurrentSelection));
 
           /* Copy To */
           MenuManager copyMenu = new MenuManager(Messages.NewsBrowserViewer_COPY_TO, "copyto"); //$NON-NLS-1$
@@ -289,6 +292,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
           copyMenu.add(new Separator("copytonewbin")); //$NON-NLS-1$
           copyMenu.add(new MoveCopyNewsToBinAction(fCurrentSelection, null, false));
+          copyMenu.add(new AutomateFilterAction(PresetAction.COPY, fCurrentSelection));
         }
 
         /* Share */

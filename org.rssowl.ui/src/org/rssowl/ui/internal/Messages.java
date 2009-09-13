@@ -33,7 +33,6 @@ public class Messages extends NLS {
   public static String Application_STARTUP_ERROR;
   public static String ApplicationActionBarAdvisor_ABOUT_RSSOWL;
   public static String ApplicationActionBarAdvisor_ATTACHMENTS;
-  public static String ApplicationActionBarAdvisor_AUTOMATE_DOWNLOAD;
   public static String ApplicationActionBarAdvisor_BOOKMARKS;
   public static String ApplicationActionBarAdvisor_CONFIGURE;
   public static String ApplicationActionBarAdvisor_CONFIGURE_NOTIFICATIONS;
