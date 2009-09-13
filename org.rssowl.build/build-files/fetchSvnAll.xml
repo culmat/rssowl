@@ -3,7 +3,7 @@
     <antcall target="svn.co">
       <param name="target" value="features"/>
       <param name="element.id" value="org.rssowl"/>
-      <param name="project.name" value="/trunk/org.rssowl"/>
+      <param name="project.name" value="/trunk/org.rssowl.feature"/>
       <param name="url" value="https://rssowl.svn.sourceforge.net/svnroot/rssowl"/>
     </antcall>
     <antcall target="svn.co">
@@ -45,7 +45,7 @@
     <antcall target="svn.co">
       <param name="target" value="features"/>
       <param name="element.id" value="org.rssowl.contrib.nntp"/>
-      <param name="project.name" value="/trunk/org.rssowl.nntp"/>
+      <param name="project.name" value="/trunk/org.rssowl.feature.nntp"/>
       <param name="url" value="https://rssowl.svn.sourceforge.net/svnroot/rssowl"/>
     </antcall>
     <antcall target="svn.co">
@@ -57,7 +57,7 @@
     <antcall target="svn.co">
       <param name="target" value="features"/>
       <param name="element.id" value="org.rssowl.tests"/>
-      <param name="project.name" value="/trunk/org.rssowl.tests"/>
+      <param name="project.name" value="/trunk/org.rssowl.feature.tests"/>
       <param name="url" value="https://rssowl.svn.sourceforge.net/svnroot/rssowl"/>
     </antcall>
     <antcall target="svn.co">
@@ -68,8 +68,8 @@
     </antcall>
     <antcall target="svn.co">
       <param name="target" value="features"/>
-      <param name="element.id" value="org.rssowl.eclipse.dependencies"/>
-      <param name="project.name" value="/trunk/org.rssowl.rcp.dependencies"/>
+      <param name="element.id" value="org.rssowl.dependencies"/>
+      <param name="project.name" value="/trunk/org.rssowl.feature.dependencies"/>
       <param name="url" value="https://rssowl.svn.sourceforge.net/svnroot/rssowl"/>
     </antcall>
   </target>
