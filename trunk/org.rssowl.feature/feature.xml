@@ -235,7 +235,7 @@ litigation.
 
    <requires>
       <import feature="org.eclipse.rcp" version="3.4.200.R342_v20090122-989JESTEbig-SVaL8UJHcYBr4A63"/>
-      <import feature="org.rssowl.eclipse.dependencies" version="2.0.0"/>
+      <import feature="org.rssowl.dependencies" version="2.0.0"/>
    </requires>
 
    <plugin
