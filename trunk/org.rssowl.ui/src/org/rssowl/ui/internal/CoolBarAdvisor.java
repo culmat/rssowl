@@ -71,6 +71,7 @@ import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.ui.internal.Controller.BookMarkLoadListener;
+import org.rssowl.ui.internal.actions.AutomateFilterAction;
 import org.rssowl.ui.internal.actions.ExportAction;
 import org.rssowl.ui.internal.actions.ImportAction;
 import org.rssowl.ui.internal.actions.MakeNewsStickyAction;
@@ -90,6 +91,7 @@ import org.rssowl.ui.internal.actions.SearchNewsAction;
 import org.rssowl.ui.internal.actions.ShowActivityAction;
 import org.rssowl.ui.internal.actions.ToggleReadStateAction;
 import org.rssowl.ui.internal.actions.UndoAction;
+import org.rssowl.ui.internal.actions.CreateFilterAction.PresetAction;
 import org.rssowl.ui.internal.actions.NavigationActionFactory.NavigationAction;
 import org.rssowl.ui.internal.actions.NavigationActionFactory.NavigationActionType;
 import org.rssowl.ui.internal.editors.browser.WebBrowserContext;
@@ -1331,6 +1333,7 @@ public class CoolBarAdvisor {
 
         manager.add(new Separator("movetonewbin")); //$NON-NLS-1$
         manager.add(new MoveCopyNewsToBinAction(selection, null, isMove));
+        manager.add(new AutomateFilterAction(isMove ? PresetAction.MOVE : PresetAction.COPY, selection));
 
         return manager.createContextMenu(parent);
       }

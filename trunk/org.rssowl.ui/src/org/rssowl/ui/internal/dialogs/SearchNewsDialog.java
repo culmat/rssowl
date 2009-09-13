@@ -138,11 +138,13 @@ import org.rssowl.ui.internal.ApplicationActionBarAdvisor;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.actions.AutomateFilterAction;
 import org.rssowl.ui.internal.actions.MakeNewsStickyAction;
 import org.rssowl.ui.internal.actions.MoveCopyNewsToBinAction;
 import org.rssowl.ui.internal.actions.OpenInExternalBrowserAction;
 import org.rssowl.ui.internal.actions.OpenNewsAction;
 import org.rssowl.ui.internal.actions.ToggleReadStateAction;
+import org.rssowl.ui.internal.actions.CreateFilterAction.PresetAction;
 import org.rssowl.ui.internal.editors.feed.NewsBrowserLabelProvider;
 import org.rssowl.ui.internal.editors.feed.NewsBrowserViewer;
 import org.rssowl.ui.internal.editors.feed.NewsColumn;
@@ -1833,6 +1835,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
           moveMenu.add(new Separator("movetonewbin")); //$NON-NLS-1$
           moveMenu.add(new MoveCopyNewsToBinAction(selection, null, true));
+          moveMenu.add(new AutomateFilterAction(PresetAction.MOVE, selection));
 
           /* Copy To */
           MenuManager copyMenu = new MenuManager(Messages.SearchNewsDialog_COPY, "copyto"); //$NON-NLS-1$
@@ -1844,6 +1847,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
           copyMenu.add(new Separator("copytonewbin")); //$NON-NLS-1$
           copyMenu.add(new MoveCopyNewsToBinAction(selection, null, false));
+          copyMenu.add(new AutomateFilterAction(PresetAction.COPY, selection));
         }
 
         /* Share */

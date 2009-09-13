@@ -32,6 +32,9 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 import org.rssowl.core.Owl;
+import org.rssowl.core.internal.newsaction.CopyNewsAction;
+import org.rssowl.core.internal.newsaction.LabelNewsAction;
+import org.rssowl.core.internal.newsaction.MoveNewsAction;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ICategory;
 import org.rssowl.core.persist.IFilterAction;
@@ -67,7 +70,26 @@ import java.util.List;
  */
 public class CreateFilterAction implements IObjectActionDelegate {
   private IStructuredSelection fSelection;
-  private boolean fAutomateDownload = false;
+  private PresetAction fPresetAction = PresetAction.NONE;
+
+  /** A enum of actions to preset when opening the Filter Dialog */
+  public enum PresetAction {
+
+    /** No Preset Action */
+    NONE,
+
+    /** Automate Download */
+    DOWNLOAD,
+
+    /** Automate Label */
+    LABEL,
+
+    /** Automate Move */
+    MOVE,
+
+    /** Automate Copy */
+    COPY
+  }
 
   /*
    * @see org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface.action.IAction, org.eclipse.ui.IWorkbenchPart)
@@ -75,11 +97,11 @@ public class CreateFilterAction implements IObjectActionDelegate {
   public void setActivePart(IAction action, IWorkbenchPart targetPart) {}
 
   /**
-   * @param automateDownload if <code>true</code> creates a new filter for
-   * automatic download, <code>false</code> to create a normal filter.
+   * @param action one of the {@link PresetAction} to preset in the filter
+   * dialog.
    */
-  public void setAutomateDownload(boolean automateDownload) {
-    fAutomateDownload = automateDownload;
+  public void setPresetAction(PresetAction action) {
+    fPresetAction = action;
   }
 
   /*
@@ -92,13 +114,32 @@ public class CreateFilterAction implements IObjectActionDelegate {
       fillSearchConditions(presetSearch);
       presetSearch.setMatchAllConditions(true);
 
-      NewsFilterDialog dialog;
+      /* Preset with Action if Set */
+      List<IFilterAction> presetActions = null;
+      boolean matchAll = false;
+      switch (fPresetAction) {
+        case DOWNLOAD:
+          presetActions = Collections.singletonList(Owl.getModelFactory().createFilterAction(DownloadAttachmentsNewsAction.ID));
+          matchAll = true;
+          break;
 
-      /* Preset with Automatic Download Filter */
-      if (fAutomateDownload) {
-        IFilterAction downloadAction = Owl.getModelFactory().createFilterAction(DownloadAttachmentsNewsAction.ID);
-        dialog = new NewsFilterDialog(shell, presetSearch, Collections.singletonList(downloadAction), true);
+        case LABEL:
+          presetActions = Collections.singletonList(Owl.getModelFactory().createFilterAction(LabelNewsAction.ID));
+          break;
+
+        case MOVE:
+          presetActions = Collections.singletonList(Owl.getModelFactory().createFilterAction(MoveNewsAction.ID));
+          break;
+
+        case COPY:
+          presetActions = Collections.singletonList(Owl.getModelFactory().createFilterAction(CopyNewsAction.ID));
+          break;
       }
+
+      /* Use preset Actions in Dialog */
+      NewsFilterDialog dialog;
+      if (presetActions != null && !presetActions.isEmpty())
+        dialog = new NewsFilterDialog(shell, presetSearch, presetActions, matchAll);
 
       /* Preset with Normal Filter */
       else
@@ -160,7 +201,7 @@ public class CreateFilterAction implements IObjectActionDelegate {
     }
 
     /* Category and Author are not used for automated Download */
-    if (fAutomateDownload)
+    if (fPresetAction == PresetAction.DOWNLOAD)
       return;
 
     /* Category (only first one) */

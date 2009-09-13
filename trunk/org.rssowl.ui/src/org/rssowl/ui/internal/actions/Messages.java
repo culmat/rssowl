@@ -29,6 +29,10 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
   private static final String BUNDLE_NAME = "org.rssowl.ui.internal.actions.messages"; //$NON-NLS-1$
   public static String AssignLabelsAction_ASSIGN_LABELS;
+  public static String AutomateFilterAction_AUTOMATE_COPY;
+  public static String AutomateFilterAction_AUTOMATE_DOWNLOAD;
+  public static String AutomateFilterAction_AUTOMATE_LABEL;
+  public static String AutomateFilterAction_AUTOMATE_MOVE;
   public static String CopyLinkAction_COPY_LINK;
   public static String DeleteTypesAction_CONFIRM_DELETE;
   public static String DeleteTypesAction_CONFIRM_DELETE_BOOKMARK;
