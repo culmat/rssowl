@@ -11,6 +11,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -289,5 +290,25 @@ public class AssignLabelsDialog extends Dialog {
   protected void configureShell(Shell newShell) {
     super.configureShell(newShell);
     newShell.setText(Messages.AssignLabelsDialog_ASSIGN_LABELS);
+  }
+
+  /*
+   * @see org.eclipse.jface.dialogs.Dialog#initializeBounds()
+   */
+  @Override
+  protected void initializeBounds() {
+    super.initializeBounds();
+
+    Shell shell = getShell();
+
+    /* Minimum Size */
+    int minWidth = convertHorizontalDLUsToPixels(OwlUI.MIN_DIALOG_WIDTH_DLU);
+    int minHeight = shell.computeSize(minWidth, SWT.DEFAULT).y;
+
+    /* Required Size */
+    Point requiredSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+
+    shell.setSize(Math.max(minWidth, requiredSize.x), Math.max(minHeight, requiredSize.y));
+    LayoutUtils.positionShell(shell, false);
   }
 }
