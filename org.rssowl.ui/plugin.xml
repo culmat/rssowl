@@ -1086,6 +1086,12 @@
             schemeId="org.rssowl.ui.KeyScheme"
             sequence="M1+B">
       </key>
+      <key
+            commandId="org.rssowl.ui.AggregateFolderAction"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.rssowl.ui.KeyScheme"
+            sequence="M1+ENTER">
+      </key>
    </extension>
    <extension
          point="org.eclipse.ui.popupMenus">
