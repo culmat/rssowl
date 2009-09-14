@@ -212,14 +212,17 @@ public class LocationControl extends Composite {
 
         @Override
         protected void updateToolbar(boolean visible) {
-          filterToolBar.getControl().setEnabled(visible);
+          if (filterToolBar != null)
+            filterToolBar.getControl().setEnabled(visible);
         }
 
         @Override
         protected Composite createFilterControls(Composite parent) {
           Composite filterControls = super.createFilterControls(parent);
-          filterToolBar.getControl().setVisible(true);
-          filterToolBar.getControl().setEnabled(false);
+          if (filterToolBar != null) {
+            filterToolBar.getControl().setVisible(true);
+            filterToolBar.getControl().setEnabled(false);
+          }
           return filterControls;
         }
       };
