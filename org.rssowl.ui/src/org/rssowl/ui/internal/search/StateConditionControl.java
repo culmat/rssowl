@@ -24,6 +24,7 @@
 
 package org.rssowl.ui.internal.search;
 
+import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
@@ -38,6 +39,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.ToolTip;
 import org.rssowl.core.persist.INews;
 import org.rssowl.ui.internal.Application;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.util.EnumSet;
@@ -129,76 +131,135 @@ public class StateConditionControl extends Composite {
     fUnreadState.setToolTipText(Messages.StateConditionControl_UNREAD_INFO);
     fUnreadState.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
 
-    /* Use a Tooltip to help the user understand the State Semantic */
-    final ToolTip newStateToolTip = new ToolTip(getShell(), SWT.BALLOON);
-    newStateToolTip.setMessage(Messages.StateConditionControl_NEW_HINT);
-    newStateToolTip.setAutoHide(false);
+    /* Use Control Decoration on Mac */
+    if (Application.IS_MAC) {
 
-    final ToolTip unreadStateToolTip = new ToolTip(getShell(), SWT.BALLOON);
-    unreadStateToolTip.setMessage(Messages.StateConditionControl_UNREAD_HINT);
-    unreadStateToolTip.setAutoHide(false);
+      /* Use a decoration to help the user understand the State Semantic */
+      final ControlDecoration newControlDeco = new ControlDecoration(fNewState, SWT.LEFT | SWT.TOP);
+      newControlDeco.setImage(OwlUI.getImage(fNewState, "icons/obj16/dotempty.gif")); //$NON-NLS-1$
+      newControlDeco.hide();
 
-    fNewState.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        if (fNewState.getSelection() && !fUnreadState.getSelection()) {
-          Point toolTipLocation = toDisplay(fUnreadState.getLocation());
-          toolTipLocation.y += fUnreadState.getSize().y;
-          if (Application.IS_WINDOWS)
-            toolTipLocation.x += 5;
-          else if (Application.IS_LINUX)
-            toolTipLocation.x += 12;
+      final ControlDecoration unreadControlDeco = new ControlDecoration(fUnreadState, SWT.LEFT | SWT.TOP);
+      unreadControlDeco.setImage(OwlUI.getImage(fUnreadState, "icons/obj16/dotempty.gif")); //$NON-NLS-1$
+      unreadControlDeco.hide();
 
-          unreadStateToolTip.setLocation(toolTipLocation);
-          unreadStateToolTip.setVisible(true);
-        } else {
-          unreadStateToolTip.setVisible(false);
+      fNewState.addSelectionListener(new SelectionAdapter() {
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+          if (fNewState.getSelection() && !fUnreadState.getSelection()) {
+            unreadControlDeco.show();
+            unreadControlDeco.showHoverText(Messages.StateConditionControl_UNREAD_HINT);
+          } else {
+            unreadControlDeco.hide();
+            unreadControlDeco.hideHover();
+          }
         }
-      }
-    });
+      });
 
-    fUnreadState.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        if (fUnreadState.getSelection() && !fNewState.getSelection()) {
-          Point toolTipLocation = toDisplay(fNewState.getLocation());
-          toolTipLocation.y += fNewState.getSize().y;
-          if (Application.IS_WINDOWS)
-            toolTipLocation.x += 5;
-          else if (Application.IS_LINUX)
-            toolTipLocation.x += 12;
+      fUnreadState.addSelectionListener(new SelectionAdapter() {
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+          if (fUnreadState.getSelection() && !fNewState.getSelection()) {
+            newControlDeco.show();
+            newControlDeco.showHoverText(Messages.StateConditionControl_NEW_HINT);
+          } else {
+            newControlDeco.hide();
+            newControlDeco.hideHover();
+          }
+        }
+      });
 
-          newStateToolTip.setLocation(toolTipLocation);
-          newStateToolTip.setVisible(true);
-        } else {
+      fNewState.addFocusListener(new FocusAdapter() {
+        @Override
+        public void focusLost(FocusEvent e) {
+          newControlDeco.hide();
+          newControlDeco.hideHover();
+        }
+      });
+
+      fUnreadState.addFocusListener(new FocusAdapter() {
+        @Override
+        public void focusLost(FocusEvent e) {
+          unreadControlDeco.hide();
+          unreadControlDeco.hideHover();
+        }
+      });
+    }
+
+    /* Use Balloon Tooltip on Windows and Linux */
+    else {
+
+      /* Use a Tooltip to help the user understand the State Semantic */
+      final ToolTip newStateToolTip = new ToolTip(getShell(), SWT.BALLOON);
+      newStateToolTip.setMessage(Messages.StateConditionControl_NEW_HINT);
+      newStateToolTip.setAutoHide(false);
+
+      final ToolTip unreadStateToolTip = new ToolTip(getShell(), SWT.BALLOON);
+      unreadStateToolTip.setMessage(Messages.StateConditionControl_UNREAD_HINT);
+      unreadStateToolTip.setAutoHide(false);
+
+      fNewState.addSelectionListener(new SelectionAdapter() {
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+          if (fNewState.getSelection() && !fUnreadState.getSelection()) {
+            Point toolTipLocation = toDisplay(fUnreadState.getLocation());
+            toolTipLocation.y += fUnreadState.getSize().y;
+            if (Application.IS_WINDOWS)
+              toolTipLocation.x += 5;
+            else if (Application.IS_LINUX)
+              toolTipLocation.x += 12;
+
+            unreadStateToolTip.setLocation(toolTipLocation);
+            unreadStateToolTip.setVisible(true);
+          } else {
+            unreadStateToolTip.setVisible(false);
+          }
+        }
+      });
+
+      fUnreadState.addSelectionListener(new SelectionAdapter() {
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+          if (fUnreadState.getSelection() && !fNewState.getSelection()) {
+            Point toolTipLocation = toDisplay(fNewState.getLocation());
+            toolTipLocation.y += fNewState.getSize().y;
+            if (Application.IS_WINDOWS)
+              toolTipLocation.x += 5;
+            else if (Application.IS_LINUX)
+              toolTipLocation.x += 12;
+
+            newStateToolTip.setLocation(toolTipLocation);
+            newStateToolTip.setVisible(true);
+          } else {
+            newStateToolTip.setVisible(false);
+          }
+        }
+      });
+
+      fNewState.addFocusListener(new FocusAdapter() {
+        @Override
+        public void focusGained(FocusEvent e) {
           newStateToolTip.setVisible(false);
         }
-      }
-    });
 
-    fNewState.addFocusListener(new FocusAdapter() {
-      @Override
-      public void focusGained(FocusEvent e) {
-        newStateToolTip.setVisible(false);
-      }
+        @Override
+        public void focusLost(FocusEvent e) {
+          unreadStateToolTip.setVisible(false);
+        }
+      });
 
-      @Override
-      public void focusLost(FocusEvent e) {
-        unreadStateToolTip.setVisible(false);
-      }
-    });
+      fUnreadState.addFocusListener(new FocusAdapter() {
+        @Override
+        public void focusGained(FocusEvent e) {
+          unreadStateToolTip.setVisible(false);
+        }
 
-    fUnreadState.addFocusListener(new FocusAdapter() {
-      @Override
-      public void focusGained(FocusEvent e) {
-        unreadStateToolTip.setVisible(false);
-      }
-
-      @Override
-      public void focusLost(FocusEvent e) {
-        newStateToolTip.setVisible(false);
-      }
-    });
+        @Override
+        public void focusLost(FocusEvent e) {
+          newStateToolTip.setVisible(false);
+        }
+      });
+    }
 
     /* State: Updated */
     fUpdatedState = new Button(this, SWT.CHECK);
