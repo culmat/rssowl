@@ -479,8 +479,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       }
     });
 
-    /* Handle DefaultSelection */
-    fTrayItem.addListener(SWT.DefaultSelection, new Listener() {
+    /* Handle Selection */
+    fTrayItem.addListener(Application.IS_MAC ? SWT.Selection : SWT.DefaultSelection, new Listener() {
       public void handleEvent(Event event) {
 
         /* Restore from Tray */
@@ -544,12 +544,16 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
    */
   public void restoreFromTray(Shell shell) {
 
+    /* Mac: Un-Minimize if minimized */
+    if (Application.IS_MAC && shell.getMinimized())
+      shell.setMinimized(false);
+
     /* Restore Shell */
     shell.setVisible(true);
     shell.setActive();
 
-    /* Un-Minimize if minimized */
-    if (shell.getMinimized())
+    /* Non Mac: Un-Minimize if minimized */
+    if (!Application.IS_MAC && shell.getMinimized())
       shell.setMinimized(false);
 
     if (Application.IS_WINDOWS)
