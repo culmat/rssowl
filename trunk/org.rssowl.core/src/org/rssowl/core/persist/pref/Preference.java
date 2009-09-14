@@ -322,6 +322,12 @@ public enum Preference {
   /** Global: Check for Updates on Startup */
   UPDATE_ON_STARTUP("org.rssowl.pref.UpdateOnStartup", IPreferenceType.BOOLEAN), //$NON-NLS-1$
 
+  /** Global: Remember selection for Aggregate News */
+  REMEMBER_AGGREGATE_NEWS_OPTION("org.rssowl.pref.RememberAggregateNewsOption", IPreferenceType.BOOLEAN), //$NON-NLS-1$
+
+  /** Global: Aggregate News as Search */
+  AGGREGATE_NEWS_AS_SEARCH("org.rssowl.pref.AggregateNewsAsSearch", IPreferenceType.BOOLEAN), //$NON-NLS-1$
+
   /******************************
    * Eclipse Preferences Follow *
    ******************************/

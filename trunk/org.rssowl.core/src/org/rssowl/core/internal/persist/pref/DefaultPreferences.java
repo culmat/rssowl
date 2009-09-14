@@ -325,6 +325,12 @@ public class DefaultPreferences {
   /** Global: Check for Updates on Startup */
   public static final String UPDATE_ON_STARTUP = Preference.UPDATE_ON_STARTUP.id();
 
+  /** Global: Remember selection for Aggregate News */
+  public static final String REMEMBER_AGGREGATE_NEWS_OPTION = Preference.REMEMBER_AGGREGATE_NEWS_OPTION.id();
+
+  /** Global: Aggregate News as Saved Search */
+  public static final String AGGREGATE_NEWS_AS_SEARCH = Preference.AGGREGATE_NEWS_AS_SEARCH.id();
+
   /**
    * Eclipse Preferences Follow
    */
