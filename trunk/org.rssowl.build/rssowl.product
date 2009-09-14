@@ -29,7 +29,6 @@ Visit http://www.rssowl.org
 
    <windowImages i16="/org.rssowl.ui/icons/product/16x16.png" i32="/org.rssowl.ui/icons/product/32x32.png" i48="/org.rssowl.ui/icons/product/48x48.png" i64="/org.rssowl.ui/icons/product/64x64.png" i128="/org.rssowl.ui/icons/product/128x128.png"/>
 
-
    <launcher name="RSSOwl">
       <linux icon="/org.rssowl.ui/icons/product/rssowl.xpm"/>
       <macosx icon="/org.rssowl.ui/icons/product/rssowl.icns"/>
@@ -40,7 +39,6 @@ Visit http://www.rssowl.org
       </win>
    </launcher>
 
-
    <vm>
    </vm>
 
@@ -48,7 +46,7 @@ Visit http://www.rssowl.org
         <url>http://www.rssowl.org/legal/epl-v10.html</url>
         <text>
    Copyright notice                                            
-(c) 2005-2008 RSSOwl Development Team                       
+(c) 2005-2009 RSSOwl Development Team                       
 http://www.rssowl.org/                                      
 All rights reserved                                         
 This program and the accompanying materials are made available
