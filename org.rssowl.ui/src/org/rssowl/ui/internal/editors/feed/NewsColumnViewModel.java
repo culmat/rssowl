@@ -63,7 +63,7 @@ public class NewsColumnViewModel {
    */
   public NewsColumnViewModel(NewsColumnViewModel copyFrom) {
     fColumns.addAll(copyFrom.getColumns());
-    fSortColumn= copyFrom.getSortColumn();
+    fSortColumn = copyFrom.getSortColumn();
     fAscending = copyFrom.isAscending();
   }
 
@@ -242,6 +242,8 @@ public class NewsColumnViewModel {
    * the column.
    */
   public CColumnLayoutData getLayoutData(NewsColumn column) {
+    boolean useLargeColumns = Application.IS_LINUX || Application.IS_MAC;
+
     switch (column) {
       case TITLE:
         return new CColumnLayoutData(CColumnLayoutData.Size.FILL, 60);
@@ -259,16 +261,16 @@ public class NewsColumnViewModel {
         return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, OwlUI.getDateWidth());
 
       case ATTACHMENTS:
-        return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, Application.IS_LINUX ? 20 : 18);
+        return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, useLargeColumns ? 20 : 18);
 
       case FEED:
-        return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, Application.IS_LINUX ? 20 : 18);
+        return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, useLargeColumns ? 20 : 18);
 
       case RELEVANCE:
         return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, 24);
 
       case STICKY:
-        return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, Application.IS_LINUX ? 20 : 18);
+        return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, useLargeColumns ? 20 : 18);
 
       case STATUS:
         return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, OwlUI.getStateWidth());
