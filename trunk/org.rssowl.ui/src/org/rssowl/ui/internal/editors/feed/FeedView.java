@@ -107,6 +107,7 @@ import org.rssowl.core.util.RetentionStrategy;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.TreeTraversal;
 import org.rssowl.ui.internal.Activator;
+import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.FolderNewsMark;
 import org.rssowl.ui.internal.OwlUI;
@@ -1743,8 +1744,10 @@ public class FeedView extends EditorPart implements IReusableEditor {
     fFilterBar = new FilterBar(this, rootComposite);
 
     /* Separate from SashForm */
-    Label sep = new Label(rootComposite, SWT.SEPARATOR | SWT.HORIZONTAL);
-    sep.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+    if (!Application.IS_MAC) {
+      Label sep = new Label(rootComposite, SWT.SEPARATOR | SWT.HORIZONTAL);
+      sep.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+    }
 
     /* SashForm dividing Feed and News View */
     fSashForm = new SashForm(rootComposite, (fInitialLayoutClassic ? SWT.VERTICAL : SWT.HORIZONTAL) | SWT.SMOOTH);
