@@ -50,6 +50,7 @@ import org.eclipse.swt.widgets.ToolItem;
 import org.rssowl.core.Owl;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
@@ -96,13 +97,14 @@ public class SearchMarkDialog extends TitleAreaDialog {
   private IDialogSettings fDialogSettings;
   private boolean fFirstTimeOpen;
   private IFolder fParent;
-  private IMark fPosition;
+  private IFolderChild fPosition;
   private ISearchCondition fInitialLocation;
   private List<ISearchCondition> fInitialSearchConditions;
   private boolean fInitialMatchAllConditions;
   private FolderChooser fFolderChooser;
   private LocationControl fLocationControl;
   private boolean fShowLocationConflict;
+  private ISearchMark fCreatedSearchMark;
 
   /**
    * @param shell
@@ -120,7 +122,7 @@ public class SearchMarkDialog extends TitleAreaDialog {
    * @param initialConditions
    * @param matchAllConditions
    */
-  public SearchMarkDialog(Shell shell, IFolder parent, IMark position, List<ISearchCondition> initialConditions, boolean matchAllConditions) {
+  public SearchMarkDialog(Shell shell, IFolder parent, IFolderChild position, List<ISearchCondition> initialConditions, boolean matchAllConditions) {
     super(shell);
     fParent = parent;
     fPosition = position;
@@ -161,22 +163,29 @@ public class SearchMarkDialog extends TitleAreaDialog {
     if (!StringUtils.isSet(fNameInput.getText()))
       onGenerateName();
 
-    /* Create new Searchmark */
-    ISearchMark searchMark = Owl.getModelFactory().createSearchMark(null, fParent, fNameInput.getText(), fPosition, fPosition != null ? true : null);
-    searchMark.setMatchAllConditions(fMatchAllRadio.getSelection());
+    /* Create New Search */
+    fCreatedSearchMark = Owl.getModelFactory().createSearchMark(null, fParent, fNameInput.getText(), fPosition, fPosition != null ? true : null);
+    fCreatedSearchMark.setMatchAllConditions(fMatchAllRadio.getSelection());
 
     /* Create Conditions and save in DB */
-    fSearchConditionList.createConditions(searchMark);
+    fSearchConditionList.createConditions(fCreatedSearchMark);
     ISearchCondition locationCondition = fLocationControl.toScopeCondition();
     if (locationCondition != null)
-      searchMark.addSearchCondition(locationCondition);
+      fCreatedSearchMark.addSearchCondition(locationCondition);
 
     DynamicDAO.save(fParent);
 
     /* Update the Search */
-    Controller.getDefault().getSavedSearchService().updateSavedSearches(Collections.singleton(searchMark), true);
+    Controller.getDefault().getSavedSearchService().updateSavedSearches(Collections.singleton(fCreatedSearchMark), true);
 
     super.okPressed();
+  }
+
+  /**
+   * @return the newly created {@link ISearchMark}.
+   */
+  public ISearchMark getSearchMark() {
+    return fCreatedSearchMark;
   }
 
   private IFolder getDefaultParent() {
