@@ -81,6 +81,7 @@ import org.rssowl.core.util.RegExUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
+import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.dialogs.CustomWizardDialog;
@@ -335,9 +336,11 @@ public class ImportElementsPage extends WizardPage {
       }
     });
 
-    Label sep = new Label(buttonContainer, SWT.SEPARATOR | SWT.VERTICAL);
-    sep.setLayoutData(new GridData(SWT.BEGINNING, SWT.FILL, false, false));
-    ((GridData) sep.getLayoutData()).heightHint = 20;
+    if (!Application.IS_MAC) {
+      Label sep = new Label(buttonContainer, SWT.SEPARATOR | SWT.VERTICAL);
+      sep.setLayoutData(new GridData(SWT.BEGINNING, SWT.FILL, false, false));
+      ((GridData) sep.getLayoutData()).heightHint = 20;
+    }
 
     fPreviewButton = new Button(buttonContainer, SWT.PUSH);
     fPreviewButton.setText(Messages.ImportElementsPage_PREVIEW);
