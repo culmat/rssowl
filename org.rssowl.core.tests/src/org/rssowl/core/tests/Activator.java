@@ -11,7 +11,7 @@ import org.rssowl.ui.internal.Controller;
 /*   **********************************************************************  **
  **   Copyright notice                                                       **
  **                                                                          **
- **   (c) 2005-2008 RSSOwl Development Team                                  **
+ **   (c) 2005-2009 RSSOwl Development Team                                  **
  **   http://www.rssowl.org/                                                 **
  **                                                                          **
  **   All rights reserved                                                    **
