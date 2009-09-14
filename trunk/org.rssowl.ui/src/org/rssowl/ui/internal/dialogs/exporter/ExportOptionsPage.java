@@ -76,6 +76,7 @@ public class ExportOptionsPage extends WizardPage {
     container.setLayout(new GridLayout(1, false));
 
     StyledText infoText = new StyledText(container, SWT.WRAP | SWT.READ_ONLY);
+    infoText.setEnabled(false);
     infoText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
     ((GridData) infoText.getLayoutData()).widthHint = 200;
     infoText.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
