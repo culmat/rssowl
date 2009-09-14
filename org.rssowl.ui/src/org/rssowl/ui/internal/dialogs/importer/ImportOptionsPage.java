@@ -75,6 +75,7 @@ public class ImportOptionsPage extends WizardPage {
 
     /* Info Text */
     StyledText infoText = new StyledText(container, SWT.WRAP | SWT.READ_ONLY);
+    infoText.setEnabled(false);
     infoText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
     ((GridData) infoText.getLayoutData()).widthHint = 300;
     infoText.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));

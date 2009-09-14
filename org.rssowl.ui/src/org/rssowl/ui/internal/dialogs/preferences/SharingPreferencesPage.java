@@ -116,6 +116,7 @@ public class SharingPreferencesPage extends PreferencePage implements IWorkbench
     Composite container = createContainer(parent);
 
     StyledText infoText = new StyledText(container, SWT.WRAP | SWT.READ_ONLY);
+    infoText.setEnabled(false);
     infoText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
     ((GridData) infoText.getLayoutData()).widthHint = 200;
     infoText.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
