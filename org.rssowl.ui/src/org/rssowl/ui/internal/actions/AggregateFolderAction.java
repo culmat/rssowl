@@ -53,6 +53,7 @@ import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.dialogs.AggregateNewsDialog;
 import org.rssowl.ui.internal.dialogs.SearchMarkDialog;
 import org.rssowl.ui.internal.util.ModelUtils;
+import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -134,8 +135,17 @@ public class AggregateFolderAction implements IObjectActionDelegate {
 
     /* Open Search and Reload Bookmarks that have never been reloaded before */
     if (locationSearch != null) {
-      OwlUI.openInFeedView(fTargetPart.getSite().getPage(), new StructuredSelection(locationSearch));
+      StructuredSelection selection = new StructuredSelection(locationSearch);
 
+      /* Ensure Selected */
+      BookMarkExplorer explorer = OwlUI.getOpenedBookMarkExplorer();
+      if (explorer != null)
+        explorer.getViewSite().getSelectionProvider().setSelection(selection);
+
+      /* Open */
+      OwlUI.openInFeedView(fTargetPart.getSite().getPage(), selection);
+
+      /* Reload if necessary */
       List<IBookMark> bookMarksToReload = new ArrayList<IBookMark>();
       fillBookMarksToReload(bookMarksToReload, folder);
       if (!bookMarksToReload.isEmpty())
