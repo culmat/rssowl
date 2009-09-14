@@ -2154,6 +2154,8 @@ public class OwlUI {
           Rectangle rect = item.getBounds();
           Point pt = new Point(rect.x, rect.y + rect.height);
           pt = manager.getControl().toDisplay(pt);
+          if (Application.IS_MAC)
+            pt.y += 5;
           menu.setLocation(pt.x, pt.y);
         }
       }
