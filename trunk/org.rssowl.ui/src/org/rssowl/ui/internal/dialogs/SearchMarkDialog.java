@@ -455,6 +455,8 @@ public class SearchMarkDialog extends TitleAreaDialog {
       /* Bug in SWT: The preferred width of the state condition is wrong */
       if (Application.IS_LINUX)
         requiredSize.x = requiredSize.x + 100;
+      else if (Application.IS_MAC)
+        requiredSize.x = requiredSize.x + 50;
 
       getShell().setSize(requiredSize);
       LayoutUtils.positionShell(getShell(), false);

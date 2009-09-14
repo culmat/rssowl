@@ -258,8 +258,12 @@ public class EntityPropertyDialog extends Dialog implements IPropertyDialogSite 
     Point requiredSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 
     /* Bug in SWT: The preferred width of the state condition is wrong */
-    if (Application.IS_LINUX && displaysSavedSearch())
-      requiredSize.x = requiredSize.x + 100;
+    if (displaysSavedSearch()) {
+      if (Application.IS_LINUX)
+        requiredSize.x = requiredSize.x + 100;
+      else if (Application.IS_MAC)
+        requiredSize.x = requiredSize.x + 50;
+    }
 
     shell.setSize(Math.max(minWidth, requiredSize.x), Math.max(minHeight, requiredSize.y));
     LayoutUtils.positionShell(shell, true);
