@@ -39,8 +39,8 @@ import java.util.List;
 
 /**
  * A wrapper around <code>Table</code> that allows to apply
- * <code>CTreeLayoutData</code> to Columns of the underlying Table. The
- * Wrapper is making sure to avoid horizontal scrollbars if possible.
+ * <code>CTreeLayoutData</code> to Columns of the underlying Table. The Wrapper
+ * is making sure to avoid horizontal scrollbars if possible.
  *
  * @author bpasero
  */
@@ -128,8 +128,12 @@ public class CTable {
       totalWidth -= verticalBar.getSize().x;
 
     /* Bug on Mac: Width is too big */
-    if (Application.IS_MAC)
+    if (Application.IS_MAC) {
       totalWidth -= 3;
+
+      if ((fTable.getStyle() & SWT.CHECK) != 0)
+        totalWidth -= 24;
+    }
 
     /* Bug on Linux: Margin from Bar to TableItem not returned */
     else if (Application.IS_LINUX)
