@@ -773,6 +773,11 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     IAction preferences = getAction(ActionFactory.PREFERENCES.getId());
     preferences.setImageDescriptor(OwlUI.getImageDescriptor("icons/elcl16/preferences.gif")); //$NON-NLS-1$
     toolsMenu.add(preferences);
+    if (Application.IS_MAC) {
+      IContributionItem item = toolsMenu.find(ActionFactory.PREFERENCES.getId());
+      if (item != null)
+        item.setVisible(false);
+    }
   }
 
   /* Menu: Window */
@@ -915,6 +920,11 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     helpMenu.add(new Separator());
 
     helpMenu.add(getAction(ActionFactory.ABOUT.getId()));
+    if (Application.IS_MAC) {
+      IContributionItem item = helpMenu.find(ActionFactory.ABOUT.getId());
+      if (item != null)
+        item.setVisible(false);
+    }
   }
 
   /*
