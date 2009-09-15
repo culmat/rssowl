@@ -214,10 +214,10 @@ public class NewsComparator extends ViewerComparator implements Comparator<INews
 
   private int compareByDate(Date date1, Date date2, boolean forceDescending) {
     if (date1 == null)
-      return fAscending && !forceDescending ? 1 : -1;
+      return fAscending && !forceDescending ? -1 : 1;
 
     if (date2 == null)
-      return fAscending && !forceDescending ? -1 : 1;
+      return fAscending && !forceDescending ? 1 : -1;
 
     int result = date1.compareTo(date2);
 
