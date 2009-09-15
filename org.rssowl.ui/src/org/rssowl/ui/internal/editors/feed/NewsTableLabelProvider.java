@@ -247,6 +247,24 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
           text = fDateFormat.format(date);
           break;
 
+        case PUBLISHED:
+          Date published = news.getPublishDate();
+          if (published != null)
+            text = fDateFormat.format(published);
+          break;
+
+        case MODIFIED:
+          Date modified = news.getModifiedDate();
+          if (modified != null)
+            text = fDateFormat.format(modified);
+          break;
+
+        case RECEIVED:
+          Date received = news.getReceiveDate();
+          if (received != null)
+            text = fDateFormat.format(received);
+          break;
+
         case AUTHOR:
           IPerson author = news.getAuthor();
           if (author != null) {

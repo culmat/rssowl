@@ -38,6 +38,15 @@ public enum NewsColumn {
   /** Date of the News */
   DATE(Messages.NewsColumn_DATE, true, false, false, true, true, true, true),
 
+  /** Publish Date of the News */
+  PUBLISHED(Messages.NewsColumn_PUBLISHED, true, false, false, true, true, true, true),
+
+  /** Modified Date of the News */
+  MODIFIED(Messages.NewsColumn_MODIFIED, true, false, false, true, true, true, true),
+
+  /** Received Date of the News */
+  RECEIVED(Messages.NewsColumn_RECEIVED, true, false, false, true, true, true, true),
+
   /** Author of the News */
   AUTHOR(Messages.NewsColumn_AUTHOR, true, false, true, true, true, true, true),
 

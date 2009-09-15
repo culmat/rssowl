@@ -941,7 +941,7 @@ public class NewsTableControl implements IFeedViewPart {
     Tree tree = fViewer.getTree();
     int itemCount = tree.getItemCount();
     if (itemCount > 0) {
-      if (fNewsSorter.getSortBy() == NewsColumn.DATE && fNewsSorter.isAscending()) {
+      if ((fNewsSorter.getSortBy() == NewsColumn.DATE || fNewsSorter.getSortBy() == NewsColumn.PUBLISHED || fNewsSorter.getSortBy() == NewsColumn.MODIFIED || fNewsSorter.getSortBy() == NewsColumn.RECEIVED) && fNewsSorter.isAscending()) {
         TreeItem item = tree.getItem(itemCount - 1);
         int childCount = item.getItemCount();
         if (childCount != 0)

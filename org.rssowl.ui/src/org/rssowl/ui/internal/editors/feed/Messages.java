@@ -83,6 +83,9 @@ public class Messages extends NLS {
   public static String NewsColumn_FEED;
   public static String NewsColumn_LABEL;
   public static String NewsColumn_LOCATION;
+  public static String NewsColumn_MODIFIED;
+  public static String NewsColumn_PUBLISHED;
+  public static String NewsColumn_RECEIVED;
   public static String NewsColumn_RELEVANCE;
   public static String NewsColumn_STATUS;
   public static String NewsColumn_STICKY;

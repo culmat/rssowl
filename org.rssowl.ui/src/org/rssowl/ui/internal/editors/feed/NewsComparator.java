@@ -110,7 +110,7 @@ public class NewsComparator extends ViewerComparator implements Comparator<INews
   private int compare(EntityGroup e1, @SuppressWarnings("unused") EntityGroup e2) {
 
     /* Support sorting Entity Groups of type DATE */
-    if (fSortBy != null && fSortBy == NewsColumn.DATE && fAscending) {
+    if (fSortBy != null && (fSortBy == NewsColumn.DATE || fSortBy == NewsColumn.PUBLISHED || fSortBy == NewsColumn.MODIFIED || fSortBy == NewsColumn.RECEIVED) && fAscending) {
       long id = e1.getId();
       if (id == Group.TODAY.ordinal() || id == Group.YESTERDAY.ordinal() || id == Group.EARLIER_THIS_WEEK.ordinal() || id == Group.LAST_WEEK.ordinal() || id == Group.OLDER.ordinal())
         return fAscending ? 1 : -1;
@@ -132,7 +132,19 @@ public class NewsComparator extends ViewerComparator implements Comparator<INews
         case DATE:
           return compareByDate(news1, news2, false);
 
-          /* Sort by Title */
+        /* Sort by Publish Date */
+        case PUBLISHED:
+          return compareByDate(news1.getPublishDate(), news2.getPublishDate(), false);
+
+        /* Sort by Modified Date */
+        case MODIFIED:
+          return compareByDate(news1.getModifiedDate(), news2.getModifiedDate(), false);
+
+        /* Sort by Received Date */
+        case RECEIVED:
+          return compareByDate(news1.getReceiveDate(), news2.getReceiveDate(), false);
+
+        /* Sort by Title */
         case TITLE:
           result = compareByTitle(CoreUtils.getHeadline(news1, true), CoreUtils.getHeadline(news2, true));
           break;
@@ -194,12 +206,20 @@ public class NewsComparator extends ViewerComparator implements Comparator<INews
   }
 
   private int compareByDate(INews news1, INews news2, boolean forceDescending) {
-    int result = 0;
-
     Date date1 = DateUtils.getRecentDate(news1);
     Date date2 = DateUtils.getRecentDate(news2);
 
-    result = date1.compareTo(date2);
+    return compareByDate(date1, date2, forceDescending);
+  }
+
+  private int compareByDate(Date date1, Date date2, boolean forceDescending) {
+    if (date1 == null)
+      return fAscending && !forceDescending ? 1 : -1;
+
+    if (date2 == null)
+      return fAscending && !forceDescending ? -1 : 1;
+
+    int result = date1.compareTo(date2);
 
     /* Respect ascending / descending Order */
     return fAscending && !forceDescending ? result : result * -1;
