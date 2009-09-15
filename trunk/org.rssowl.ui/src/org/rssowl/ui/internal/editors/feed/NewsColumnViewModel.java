@@ -260,6 +260,15 @@ public class NewsColumnViewModel {
       case DATE:
         return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, OwlUI.getDateWidth());
 
+      case PUBLISHED:
+        return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, OwlUI.getDateWidth());
+
+      case MODIFIED:
+        return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, OwlUI.getDateWidth());
+
+      case RECEIVED:
+        return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, OwlUI.getDateWidth());
+
       case ATTACHMENTS:
         return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, useLargeColumns ? 20 : 18);
 
