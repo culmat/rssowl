@@ -48,6 +48,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.CoolBar;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
@@ -144,6 +146,15 @@ public class CoolBarAdvisor {
      */
     public void update(ISelection selection, IWorkbenchPart part) {
       CoolBarAdvisor.this.update(getAction(), fItem, selection, part);
+
+      /* Windows: Workaround for Disabled Toolitems getting cropped (see Eclipse Bug 148532) */
+      Widget widget = getWidget();
+      if (Application.IS_WINDOWS && widget != null && !widget.isDisposed() && widget instanceof ToolItem && !((ToolItem) widget).isEnabled()) {
+        ToolItem item = (ToolItem) widget;
+        String text = item.getText();
+        item.setText(""); //$NON-NLS-1$
+        item.setText(text);
+      }
     }
   }
 
@@ -166,13 +177,13 @@ public class CoolBarAdvisor {
     EXPORT(ExportAction.ID, Messages.CoolBarAdvisor_EXPORT, null, OwlUI.getImageDescriptor("icons/etool16/export.gif"), null, 1), //$NON-NLS-1$
 
     /** Undo */
-    UNDO(UndoAction.ID, Messages.CoolBarAdvisor_UNDO, null, OwlUI.getImageDescriptor("icons/elcl16/undo_edit.gif"), OwlUI.getImageDescriptor("icons/dlcl16/undo_edit.gif"), 2),  //$NON-NLS-1$//$NON-NLS-2$
+    UNDO(UndoAction.ID, Messages.CoolBarAdvisor_UNDO, null, OwlUI.getImageDescriptor("icons/elcl16/undo_edit.gif"), OwlUI.getImageDescriptor("icons/dlcl16/undo_edit.gif"), 2), //$NON-NLS-1$//$NON-NLS-2$
 
     /** Redo */
-    REDO(RedoAction.ID, Messages.CoolBarAdvisor_REDO, null, OwlUI.getImageDescriptor("icons/elcl16/redo_edit.gif"), OwlUI.getImageDescriptor("icons/dlcl16/redo_edit.gif"), 2),  //$NON-NLS-1$//$NON-NLS-2$
+    REDO(RedoAction.ID, Messages.CoolBarAdvisor_REDO, null, OwlUI.getImageDescriptor("icons/elcl16/redo_edit.gif"), OwlUI.getImageDescriptor("icons/dlcl16/redo_edit.gif"), 2), //$NON-NLS-1$//$NON-NLS-2$
 
     /** Update */
-    UPDATE(ReloadTypesAction.ID, Messages.CoolBarAdvisor_UPDATE, null, OwlUI.getImageDescriptor("icons/elcl16/reload.gif"), OwlUI.getImageDescriptor("icons/dlcl16/reload.gif"), 3),  //$NON-NLS-1$//$NON-NLS-2$
+    UPDATE(ReloadTypesAction.ID, Messages.CoolBarAdvisor_UPDATE, null, OwlUI.getImageDescriptor("icons/elcl16/reload.gif"), OwlUI.getImageDescriptor("icons/dlcl16/reload.gif"), 3), //$NON-NLS-1$//$NON-NLS-2$
 
     /** Update All */
     UPDATE_ALL(ReloadAllAction.ID, Messages.CoolBarAdvisor_UPDATE_ALL, null, OwlUI.getImageDescriptor("icons/elcl16/reload_all.gif"), null, 3), //$NON-NLS-1$
@@ -184,10 +195,10 @@ public class CoolBarAdvisor {
     SEARCH(SearchNewsAction.ID, Messages.CoolBarAdvisor_SEARCH, null, OwlUI.SEARCHMARK, null, 4),
 
     /** Mark Read */
-    MARK_READ(ToggleReadStateAction.ID, Messages.CoolBarAdvisor_MARK_READ, null, OwlUI.getImageDescriptor("icons/elcl16/mark_read.gif"), OwlUI.getImageDescriptor("icons/dlcl16/mark_read.gif"), 5),  //$NON-NLS-1$//$NON-NLS-2$
+    MARK_READ(ToggleReadStateAction.ID, Messages.CoolBarAdvisor_MARK_READ, null, OwlUI.getImageDescriptor("icons/elcl16/mark_read.gif"), OwlUI.getImageDescriptor("icons/dlcl16/mark_read.gif"), 5), //$NON-NLS-1$//$NON-NLS-2$
 
     /** Mark All Read */
-    MARK_ALL_READ(MarkAllNewsReadAction.ID, Messages.CoolBarAdvisor_MARK_ALL_READ, null, OwlUI.getImageDescriptor("icons/elcl16/mark_all_read.gif"), OwlUI.getImageDescriptor("icons/dlcl16/mark_all_read.gif"), 5),  //$NON-NLS-1$//$NON-NLS-2$
+    MARK_ALL_READ(MarkAllNewsReadAction.ID, Messages.CoolBarAdvisor_MARK_ALL_READ, null, OwlUI.getImageDescriptor("icons/elcl16/mark_all_read.gif"), OwlUI.getImageDescriptor("icons/dlcl16/mark_all_read.gif"), 5), //$NON-NLS-1$//$NON-NLS-2$
 
     /** Label */
     LABEL("org.rssowl.ui.Label", Messages.CoolBarAdvisor_LABEL, Messages.CoolBarAdvisor_LABEL_NEWS, OwlUI.getImageDescriptor("icons/elcl16/labels.gif"), null, IAction.AS_DROP_DOWN_MENU, false, 6), //$NON-NLS-1$ //$NON-NLS-2$
@@ -569,11 +580,11 @@ public class CoolBarAdvisor {
           /* Spacer */
           else if (item == CoolBarItem.SPACER) {
             ActionContributionItem contribItem = new ActionContributionItem(new Action("") { //$NON-NLS-1$
-              @Override
-              public boolean isEnabled() {
-                return false;
-              }
-            });
+                  @Override
+                  public boolean isEnabled() {
+                    return false;
+                  }
+                });
             currentToolBar.add(contribItem);
           }
 
