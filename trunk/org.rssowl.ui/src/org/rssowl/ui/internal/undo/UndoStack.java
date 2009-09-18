@@ -60,6 +60,13 @@ public class UndoStack {
   }
 
   /**
+   * Clears all Operations from the Stack.
+   */
+  public void clear() {
+    fOperations.clear();
+  }
+
+  /**
    * @param listener the listener to be notified when Undo or Redo was
    * performed, or when an operation was added to the stack.
    */
@@ -87,15 +94,21 @@ public class UndoStack {
     if (fCurrentIndex < (fOperations.size() - 1)) {
 
       /* Remove all following Undo-Operations */
+      List<IUndoOperation> toDelete = new ArrayList<IUndoOperation>();
       for (int i = fCurrentIndex + 1; i < fOperations.size(); i++)
-        fOperations.remove(i);
+        toDelete.add(fOperations.get(i));
+
+      fOperations.removeAll(toDelete);
     }
 
     /* Add operation and constrain size */
     fOperations.add(operation);
     if (fOperations.size() > MAX_SIZE) {
+      List<IUndoOperation> toDelete = new ArrayList<IUndoOperation>();
       for (int i = 0; i < fOperations.size() - MAX_SIZE; i++)
-        fOperations.remove(i);
+        toDelete.add(fOperations.get(i));
+
+      fOperations.removeAll(toDelete);
     }
 
     /* Set pointer to last element */
