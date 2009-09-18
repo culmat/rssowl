@@ -26,6 +26,8 @@ package org.rssowl.ui.internal.search;
 
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -257,6 +259,13 @@ public class StateConditionControl extends Composite {
         @Override
         public void focusLost(FocusEvent e) {
           newStateToolTip.setVisible(false);
+        }
+      });
+
+      addDisposeListener(new DisposeListener() {
+        public void widgetDisposed(DisposeEvent e) {
+          unreadStateToolTip.dispose();
+          newStateToolTip.dispose();
         }
       });
     }
