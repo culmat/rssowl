@@ -122,7 +122,6 @@ import org.rssowl.core.persist.event.LabelEvent;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.NewsListener;
 import org.rssowl.core.persist.pref.IPreferenceScope;
-import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.persist.service.PersistenceException;
@@ -453,14 +452,14 @@ public class SearchNewsDialog extends TitleAreaDialog {
     public String getToolTipText(Object element) {
       ScoredNews scoredNews = (ScoredNews) element;
       INews news = scoredNews.getNews();
-      FeedLinkReference feedRef = news.getFeedReference();
+      String feedRef = news.getFeedLinkAsText();
       IBookMark bookMark = CoreUtils.getBookMark(feedRef);
 
       String name = null;
       if (bookMark != null)
         name = bookMark.getName();
       else
-        name = feedRef.getLinkAsText();
+        name = feedRef;
 
       if (news.getParentId() != 0) {
         INewsBin bin = DynamicDAO.load(INewsBin.class, news.getParentId());

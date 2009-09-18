@@ -53,7 +53,6 @@ import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DynamicDAO;
-import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.DateUtils;
@@ -107,9 +106,10 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
   /* Pre-Cache some Fonts being used */
   private Font fBoldFont;
 
-  /* A cache for the Location Column */
+  /* A cache for the Feed and Location Column */
   private Map<Long, String> fMapBinIdToLocation = new HashMap<Long, String>();
   private Map<String, String> fMapFeedLinkToLocation = new HashMap<String, String>();
+  private Map<String, ImageDescriptor> fMapFeedLinkToFeedIcon = new HashMap<String, ImageDescriptor>();
 
   /**
    * Creates a new instance of this LabelProvider
@@ -205,14 +205,14 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
   @Override
   public String getToolTipText(Object element) {
     INews news = (INews) element;
-    FeedLinkReference feedRef = news.getFeedReference();
+    String feedRef = news.getFeedLinkAsText();
     IBookMark bookMark = CoreUtils.getBookMark(feedRef);
 
     String name = null;
     if (bookMark != null)
       name = bookMark.getName();
     else
-      name = feedRef.getLinkAsText();
+      name = feedRef;
 
     if (news.getParentId() != 0) {
       INewsBin bin = DynamicDAO.load(INewsBin.class, news.getParentId());
@@ -330,7 +330,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
           /* Location: Bookmark */
           String location = fMapFeedLinkToLocation.get(news.getFeedLinkAsText());
           if (location == null) {
-            IBookMark bookmark = CoreUtils.getBookMark(news.getFeedReference());
+            IBookMark bookmark = CoreUtils.getBookMark(news.getFeedLinkAsText());
             if (bookmark != null) {
               location = bookmark.getName();
               fMapFeedLinkToLocation.put(news.getFeedLinkAsText(), location);
@@ -375,14 +375,17 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
 
       /* Feed Column */
       else if (newsColumn == NewsColumn.FEED) {
-        FeedLinkReference feedRef = news.getFeedReference();
-        IBookMark bookMark = CoreUtils.getBookMark(feedRef);
-        if (bookMark != null) {
-          ImageDescriptor favicon = OwlUI.getFavicon(bookMark);
-          return OwlUI.getImage(fResources, favicon != null ? favicon : OwlUI.BOOKMARK);
+        String feedRef = news.getFeedLinkAsText();
+        ImageDescriptor feedIcon = fMapFeedLinkToFeedIcon.get(feedRef);
+        if (feedIcon == null) {
+          IBookMark bookMark = CoreUtils.getBookMark(feedRef);
+          if (bookMark != null)
+            feedIcon = OwlUI.getFavicon(bookMark);
+
+          fMapFeedLinkToFeedIcon.put(feedRef, feedIcon != null ? feedIcon : OwlUI.BOOKMARK);
         }
 
-        return OwlUI.getImage(fResources, OwlUI.BOOKMARK);
+        return OwlUI.getImage(fResources, feedIcon);
       }
 
       /* Sticky State */

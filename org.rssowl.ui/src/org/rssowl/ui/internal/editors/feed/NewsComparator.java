@@ -281,7 +281,7 @@ public class NewsComparator extends ViewerComparator implements Comparator<INews
     /* Location: Bookmark */
     String location = fMapFeedLinkToLocation.get(news.getFeedLinkAsText());
     if (location == null) {
-      IBookMark bookmark = CoreUtils.getBookMark(news.getFeedReference());
+      IBookMark bookmark = CoreUtils.getBookMark(news.getFeedLinkAsText());
       if (bookmark != null) {
         location = bookmark.getName();
         fMapFeedLinkToLocation.put(news.getFeedLinkAsText(), location);
