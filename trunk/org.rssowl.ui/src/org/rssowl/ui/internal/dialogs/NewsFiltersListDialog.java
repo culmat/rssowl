@@ -318,16 +318,13 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
       }
     });
 
-    /* Separator */
-    Label sep = new Label(buttonContainer, SWT.SEPARATOR | SWT.HORIZONTAL);
-    sep.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-
     /* Move Filter Up */
     fMoveUpButton = new Button(buttonContainer, SWT.PUSH);
     fMoveUpButton.setText(Messages.NewsFiltersListDialog_MOVE_UP);
     fMoveUpButton.setEnabled(false);
     applyDialogFont(fMoveUpButton);
     setButtonLayoutData(fMoveUpButton);
+    ((GridData)fMoveUpButton.getLayoutData()).verticalIndent= 10;
     fMoveUpButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {

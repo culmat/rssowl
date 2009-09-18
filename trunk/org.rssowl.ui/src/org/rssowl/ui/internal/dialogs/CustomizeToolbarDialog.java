@@ -456,16 +456,13 @@ public class CustomizeToolbarDialog extends Dialog {
       }
     });
 
-    /* Separator */
-    Label sep = new Label(buttonContainer, SWT.SEPARATOR | SWT.HORIZONTAL);
-    sep.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-
     /* Move Provider Up */
     fMoveUpButton = new Button(buttonContainer, SWT.PUSH);
     fMoveUpButton.setText(Messages.CustomizeToolbarDialog_MOVE_UP);
     fMoveUpButton.setEnabled(false);
     applyDialogFont(fMoveUpButton);
     setButtonLayoutData(fMoveUpButton);
+    ((GridData)fMoveUpButton.getLayoutData()).verticalIndent= 10;
     fMoveUpButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {

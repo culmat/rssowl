@@ -284,15 +284,12 @@ public class SharingPreferencesPage extends PreferencePage implements IWorkbench
       }
     });
 
-    /* Separator */
-    Label sep = new Label(buttonContainer, SWT.SEPARATOR | SWT.HORIZONTAL);
-    sep.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-
     /* Select All */
     Button selectAllButton = new Button(buttonContainer, SWT.PUSH);
     selectAllButton.setText(Messages.SharingPreferencesPage_SELECT_ALL);
     Dialog.applyDialogFont(selectAllButton);
     setButtonLayoutData(selectAllButton);
+    ((GridData)selectAllButton.getLayoutData()).verticalIndent= 10;
     selectAllButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {

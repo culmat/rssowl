@@ -201,15 +201,13 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
       }
     });
 
-    Label sep = new Label(buttonBox, SWT.SEPARATOR | SWT.HORIZONTAL);
-    sep.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-
     /* Move Label Up */
     fMoveUpButton = new Button(buttonBox, SWT.PUSH);
     fMoveUpButton.setText(Messages.ManageLabelsPreferencePage_MOVE_UP);
     fMoveUpButton.setEnabled(false);
     Dialog.applyDialogFont(fMoveUpButton);
     setButtonLayoutData(fMoveUpButton);
+    ((GridData)fMoveUpButton.getLayoutData()).verticalIndent= 10;
     fMoveUpButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
