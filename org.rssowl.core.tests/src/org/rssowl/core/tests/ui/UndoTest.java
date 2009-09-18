@@ -64,6 +64,7 @@ public class UndoTest {
   public void setUp() throws Exception {
     fFactory = Owl.getModelFactory();
     Owl.getPersistenceService().recreateSchema();
+    UndoStack.getInstance().clear();
   }
 
   /**
@@ -237,7 +238,7 @@ public class UndoTest {
    */
   @Test
   public void testUndoDeleteAndSticky() throws Exception {
-    IFolder root= fFactory.createFolder(null, null, "Root");
+    IFolder root = fFactory.createFolder(null, null, "Root");
 
     IFeed feed = fFactory.createFeed(null, new URI("http://www.foo1.com"));
     INews news = fFactory.createNews(null, feed, new Date());
@@ -292,5 +293,102 @@ public class UndoTest {
     UndoStack.getInstance().addOperation(new StickyOperation(Collections.singletonList(news), true));
 
     assertEquals(false, UndoStack.getInstance().isRedoSupported());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testUndoRedoNewsState() throws Exception {
+    IFeed feed = fFactory.createFeed(null, new URI("http://www.foo1.com"));
+    INews news = fFactory.createNews(null, feed, new Date());
+    news.setLink(new URI("http://www.news.com"));
+    news.setState(INews.State.READ);
+
+    DynamicDAO.save(feed);
+
+    UndoStack.getInstance().addOperation(new NewsStateOperation(Collections.singletonList(news), INews.State.UNREAD, false));
+    DynamicDAO.getDAO(INewsDAO.class).setState(Collections.singletonList(news), INews.State.UNREAD, false, false);
+    assertEquals(INews.State.UNREAD, news.getState());
+
+    UndoStack.getInstance().addOperation(new NewsStateOperation(Collections.singletonList(news), INews.State.READ, false));
+    DynamicDAO.getDAO(INewsDAO.class).setState(Collections.singletonList(news), INews.State.READ, false, false);
+    assertEquals(INews.State.READ, news.getState());
+
+    UndoStack.getInstance().undo();
+    UndoStack.getInstance().undo();
+    assertEquals(INews.State.READ, news.getState());
+
+    UndoStack.getInstance().addOperation(new NewsStateOperation(Collections.singletonList(news), INews.State.UNREAD, false));
+    DynamicDAO.getDAO(INewsDAO.class).setState(Collections.singletonList(news), INews.State.UNREAD, false, false);
+    assertEquals(INews.State.UNREAD, news.getState());
+
+    UndoStack.getInstance().addOperation(new NewsStateOperation(Collections.singletonList(news), INews.State.READ, false));
+    DynamicDAO.getDAO(INewsDAO.class).setState(Collections.singletonList(news), INews.State.READ, false, false);
+    assertEquals(INews.State.READ, news.getState());
+
+    UndoStack.getInstance().undo();
+    UndoStack.getInstance().undo();
+    assertEquals(INews.State.READ, news.getState());
+    assertEquals(false, UndoStack.getInstance().isUndoSupported());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testUndoRedoExceedsMaxLimit() throws Exception {
+    IFeed feed = fFactory.createFeed(null, new URI("http://www.foo1.com"));
+    INews news = fFactory.createNews(null, feed, new Date());
+    news.setLink(new URI("http://www.news.com"));
+    news.setState(INews.State.READ);
+
+    DynamicDAO.save(feed);
+
+    UndoStack.getInstance().addOperation(new StickyOperation(Collections.singletonList(news), true));
+    news.setFlagged(true);
+    DynamicDAO.save(news);
+
+    for (int i = 0; i < 20; i++) {
+      UndoStack.getInstance().addOperation(new NewsStateOperation(Collections.singletonList(news), i % 2 == 0 ? INews.State.UNREAD : INews.State.READ, false));
+      DynamicDAO.getDAO(INewsDAO.class).setState(Collections.singletonList(news), i % 2 == 0 ? INews.State.UNREAD : INews.State.READ, false, false);
+    }
+
+    int undos = 0;
+    while (UndoStack.getInstance().isUndoSupported()) {
+      UndoStack.getInstance().undo();
+      undos++;
+    }
+
+    assertEquals(true, news.toReference().resolve().isFlagged());
+    assertEquals(20, undos);
+
+    assertEquals(true, UndoStack.getInstance().isRedoSupported());
+
+    int redos = 0;
+    while (UndoStack.getInstance().isRedoSupported()) {
+      UndoStack.getInstance().redo();
+      redos++;
+    }
+
+    assertEquals(20, redos);
+
+    while (UndoStack.getInstance().isUndoSupported()) {
+      UndoStack.getInstance().undo();
+    }
+
+    UndoStack.getInstance().addOperation(new StickyOperation(Collections.singletonList(news), false));
+    news.setFlagged(false);
+    DynamicDAO.save(news);
+
+    undos = 0;
+    while (UndoStack.getInstance().isUndoSupported()) {
+      UndoStack.getInstance().undo();
+      undos++;
+    }
+
+    assertEquals(1, undos);
+    assertEquals(true, UndoStack.getInstance().isRedoSupported());
+    assertEquals(true, news.toReference().resolve().isFlagged());
   }
 }
