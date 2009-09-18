@@ -344,6 +344,110 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
       public void menuAboutToShow(IMenuManager manager) {
         manager.add(new GroupMarker(M_VIEW_START));
 
+        /* Layout */
+        MenuManager layoutMenu = new MenuManager(Messages.ApplicationActionBarAdvisor_LAYOUT);
+        layoutMenu.add(new Action(Messages.ApplicationActionBarAdvisor_CLASSIC_VIEW, IAction.AS_RADIO_BUTTON) {
+          @Override
+          public void run() {
+            preferences.putBoolean(DefaultPreferences.FV_LAYOUT_CLASSIC, true);
+            preferences.putBoolean(DefaultPreferences.FV_BROWSER_MAXIMIZED, false);
+            List<FeedView> feedViews = OwlUI.getFeedViews();
+            for (FeedView feedView : feedViews) {
+              feedView.updateLayout();
+            }
+          }
+
+          @Override
+          public boolean isChecked() {
+            return preferences.getBoolean(DefaultPreferences.FV_LAYOUT_CLASSIC) && !preferences.getBoolean(DefaultPreferences.FV_BROWSER_MAXIMIZED);
+          }
+        });
+
+        layoutMenu.add(new Action(Messages.ApplicationActionBarAdvisor_VERTICAL_VIEW, IAction.AS_RADIO_BUTTON) {
+          @Override
+          public void run() {
+            preferences.putBoolean(DefaultPreferences.FV_LAYOUT_CLASSIC, false);
+            preferences.putBoolean(DefaultPreferences.FV_BROWSER_MAXIMIZED, false);
+            List<FeedView> feedViews = OwlUI.getFeedViews();
+            for (FeedView feedView : feedViews) {
+              feedView.updateLayout();
+            }
+          }
+
+          @Override
+          public boolean isChecked() {
+            return !preferences.getBoolean(DefaultPreferences.FV_LAYOUT_CLASSIC) && !preferences.getBoolean(DefaultPreferences.FV_BROWSER_MAXIMIZED);
+          }
+        });
+
+        layoutMenu.add(new Action(Messages.ApplicationActionBarAdvisor_NEWSPAPER_VIEW, IAction.AS_RADIO_BUTTON) {
+          @Override
+          public void run() {
+            preferences.putBoolean(DefaultPreferences.FV_BROWSER_MAXIMIZED, true);
+            List<FeedView> feedViews = OwlUI.getFeedViews();
+            for (FeedView feedView : feedViews) {
+              feedView.updateLayout();
+            }
+          }
+
+          @Override
+          public boolean isChecked() {
+            return preferences.getBoolean(DefaultPreferences.FV_BROWSER_MAXIMIZED);
+          }
+        });
+
+        layoutMenu.add(new Separator());
+        layoutMenu.add(new Action(Messages.ApplicationActionBarAdvisor_TABBED_BROWSING, IAction.AS_CHECK_BOX) {
+          @Override
+          public void run() {
+            boolean tabbedBrowsingEnabled = isChecked();
+
+            /* Disable Tabbed Browsing */
+            if (tabbedBrowsingEnabled) {
+
+              /* Close other Tabs if necessary */
+              boolean doit = true;
+              IWorkbenchPage page = OwlUI.getPage();
+              if (page != null) {
+                IEditorReference[] editorReferences = page.getEditorReferences();
+                if (editorReferences.length > 1) {
+                  MessageBox confirmDialog = new MessageBox(page.getWorkbenchWindow().getShell(), SWT.ICON_QUESTION | SWT.YES | SWT.NO);
+                  confirmDialog.setText(Messages.ApplicationActionBarAdvisor_DISABLE_TABBED_BROWSING);
+                  confirmDialog.setMessage(NLS.bind(Messages.ApplicationActionBarAdvisor_TABS_MESSAGE, editorReferences.length));
+                  if (confirmDialog.open() == SWT.YES)
+                    OwlUI.closeOtherEditors();
+                  else
+                    doit = false;
+                }
+              }
+
+              /* Update Preferences */
+              if (doit) {
+                eclipsePrefs.putBoolean(DefaultPreferences.ECLIPSE_MULTIPLE_TABS, false);
+                eclipsePrefs.putBoolean(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS, true);
+                eclipsePrefs.putInteger(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS_THRESHOLD, 1);
+              }
+            }
+
+            /* Enable Tabbed Browsing */
+            else {
+              eclipsePrefs.putBoolean(DefaultPreferences.ECLIPSE_MULTIPLE_TABS, true);
+              eclipsePrefs.putBoolean(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS, false);
+              eclipsePrefs.putInteger(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS_THRESHOLD, 5);
+            }
+          }
+
+          @Override
+          public boolean isChecked() {
+            boolean autoCloseTabs = eclipsePrefs.getBoolean(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS);
+            int autoCloseTabsThreshold = eclipsePrefs.getInteger(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS_THRESHOLD);
+            return !autoCloseTabs || autoCloseTabsThreshold > 1;
+          }
+        });
+
+        manager.add(layoutMenu);
+        manager.add(new Separator());
+
         /* Toggle State of Toolbar Visibility */
         manager.add(new Action(Messages.ApplicationActionBarAdvisor_TOOLBAR, IAction.AS_CHECK_BOX) {
           @Override
@@ -424,86 +528,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
             CustomizeToolbarDialog dialog = new CustomizeToolbarDialog(getActionBarConfigurer().getWindowConfigurer().getWindow().getShell());
             if (dialog.open() == IDialogConstants.OK_ID)
               fCoolBarAdvisor.advise(true);
-          }
-        });
-
-        /* Tabbed Browsing */
-        manager.add(new Separator());
-        manager.add(new Action(Messages.ApplicationActionBarAdvisor_TABBED_BROWSING, IAction.AS_CHECK_BOX) {
-          @Override
-          public void run() {
-            boolean tabbedBrowsingEnabled = isChecked();
-
-            /* Disable Tabbed Browsing */
-            if (tabbedBrowsingEnabled) {
-
-              /* Close other Tabs if necessary */
-              boolean doit = true;
-              IWorkbenchPage page = OwlUI.getPage();
-              if (page != null) {
-                IEditorReference[] editorReferences = page.getEditorReferences();
-                if (editorReferences.length > 1) {
-                  MessageBox confirmDialog = new MessageBox(page.getWorkbenchWindow().getShell(), SWT.ICON_QUESTION | SWT.YES | SWT.NO);
-                  confirmDialog.setText(Messages.ApplicationActionBarAdvisor_DISABLE_TABBED_BROWSING);
-                  confirmDialog.setMessage(NLS.bind(Messages.ApplicationActionBarAdvisor_TABS_MESSAGE, editorReferences.length));
-                  if (confirmDialog.open() == SWT.YES)
-                    OwlUI.closeOtherEditors();
-                  else
-                    doit = false;
-                }
-              }
-
-              /* Update Preferences */
-              if (doit) {
-                eclipsePrefs.putBoolean(DefaultPreferences.ECLIPSE_MULTIPLE_TABS, false);
-                eclipsePrefs.putBoolean(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS, true);
-                eclipsePrefs.putInteger(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS_THRESHOLD, 1);
-              }
-            }
-
-            /* Enable Tabbed Browsing */
-            else {
-              eclipsePrefs.putBoolean(DefaultPreferences.ECLIPSE_MULTIPLE_TABS, true);
-              eclipsePrefs.putBoolean(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS, false);
-              eclipsePrefs.putInteger(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS_THRESHOLD, 5);
-            }
-          }
-
-          @Override
-          public boolean isChecked() {
-            boolean autoCloseTabs = eclipsePrefs.getBoolean(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS);
-            int autoCloseTabsThreshold = eclipsePrefs.getInteger(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS_THRESHOLD);
-            return !autoCloseTabs || autoCloseTabsThreshold > 1;
-          }
-        });
-
-        /* Hide Headlines */
-        final boolean headlinesHidden = preferences.getBoolean(DefaultPreferences.FV_BROWSER_MAXIMIZED);
-        manager.add(new Action(Messages.ApplicationActionBarAdvisor_HIDE_HEADLINES, IAction.AS_CHECK_BOX) {
-          @Override
-          public void run() {
-            preferences.putBoolean(DefaultPreferences.FV_BROWSER_MAXIMIZED, !headlinesHidden);
-
-            /* Update Visible Feedviews */
-            List<FeedView> feedViews = OwlUI.getFeedViews();
-            for (FeedView feedView : feedViews) {
-              feedView.updateBrowserViewMaximized();
-            }
-          }
-
-          @Override
-          public String getActionDefinitionId() {
-            return "org.rssowl.ui.ToggleHeadlinesCommand"; //$NON-NLS-1$
-          }
-
-          @Override
-          public String getId() {
-            return "org.rssowl.ui.ToggleHeadlinesCommand"; //$NON-NLS-1$
-          }
-
-          @Override
-          public boolean isChecked() {
-            return headlinesHidden;
           }
         });
 

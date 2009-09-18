@@ -34,6 +34,7 @@ public class Messages extends NLS {
   public static String ApplicationActionBarAdvisor_ABOUT_RSSOWL;
   public static String ApplicationActionBarAdvisor_ATTACHMENTS;
   public static String ApplicationActionBarAdvisor_BOOKMARKS;
+  public static String ApplicationActionBarAdvisor_CLASSIC_VIEW;
   public static String ApplicationActionBarAdvisor_CONFIGURE;
   public static String ApplicationActionBarAdvisor_CONFIGURE_NOTIFICATIONS;
   public static String ApplicationActionBarAdvisor_COPY_TO;
@@ -56,6 +57,7 @@ public class Messages extends NLS {
   public static String ApplicationActionBarAdvisor_HIDE_TOOLBAR;
   public static String ApplicationActionBarAdvisor_HOMEPAGE;
   public static String ApplicationActionBarAdvisor_LABEL;
+  public static String ApplicationActionBarAdvisor_LAYOUT;
   public static String ApplicationActionBarAdvisor_LICENSE;
   public static String ApplicationActionBarAdvisor_LOCK_TOOLBAR;
   public static String ApplicationActionBarAdvisor_MARK;
@@ -64,6 +66,7 @@ public class Messages extends NLS {
   public static String ApplicationActionBarAdvisor_NEW_LABEL;
   public static String ApplicationActionBarAdvisor_NEW_WINDOW;
   public static String ApplicationActionBarAdvisor_NEWS;
+  public static String ApplicationActionBarAdvisor_NEWSPAPER_VIEW;
   public static String ApplicationActionBarAdvisor_ORGANIZE_LABELS;
   public static String ApplicationActionBarAdvisor_PREFERENCES;
   public static String ApplicationActionBarAdvisor_REPORT_PROBLEMS;
@@ -82,6 +85,7 @@ public class Messages extends NLS {
   public static String ApplicationActionBarAdvisor_TOOLBAR;
   public static String ApplicationActionBarAdvisor_TOOLS;
   public static String ApplicationActionBarAdvisor_UPDATE;
+  public static String ApplicationActionBarAdvisor_VERTICAL_VIEW;
   public static String ApplicationActionBarAdvisor_VIEW;
   public static String ApplicationActionBarAdvisor_WINDOW;
   public static String ApplicationServer_INFO_UNABLE_OPEN_PORT;
