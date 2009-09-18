@@ -597,6 +597,26 @@ public class CoreUtilsTest {
    * @throws Exception
    */
   @Test
+  public void testGetBookMarkByLinkText() throws Exception {
+    IFeed feed1 = DynamicDAO.save(fFactory.createFeed(null, new URI("feed1")));
+    IFeed feed2 = DynamicDAO.save(fFactory.createFeed(null, new URI("feed2")));
+
+    IFolder root = fFactory.createFolder(null, null, "root");
+    fFactory.createBookMark(null, root, new FeedLinkReference(feed1.getLink()), "Mark 1");
+    fFactory.createBookMark(null, root, new FeedLinkReference(feed2.getLink()), "Mark 2");
+    fFactory.createBookMark(null, root, new FeedLinkReference(feed2.getLink()), "Mark 3");
+
+    DynamicDAO.save(root);
+
+    assertEquals("Mark 1", CoreUtils.getBookMark(feed1.getLink().toString()).getName());
+    assertNotNull(CoreUtils.getBookMark(feed2.getLink().toString()));
+    assertNull(CoreUtils.getBookMark("feed3"));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
   public void testExtractWords() throws Exception {
     ISearchField field1 = fFactory.createSearchField(INews.TITLE, INews.class.getName());
     ISearchField field2 = fFactory.createSearchField(INews.DESCRIPTION, INews.class.getName());

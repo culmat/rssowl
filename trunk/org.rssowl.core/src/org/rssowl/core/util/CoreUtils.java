@@ -933,6 +933,25 @@ public class CoreUtils {
   }
 
   /**
+   * Returns the first <code>IBookMark</code> that references the same feed as
+   * <code>feedRef</code> or <code>null</code> if none.
+   *
+   * @param feedRef The desired Feed.
+   * @return Returns the first <code>IBookMark</code> that references the given
+   * Feed or <code>null</code> if none.
+   */
+  public static IBookMark getBookMark(String feedRef) {
+    IBookMarkDAO bookMarkDAO = Owl.getPersistenceService().getDAOService().getBookMarkDAO();
+    Collection<IBookMark> bookMarks = bookMarkDAO.loadAll();
+    for (IBookMark bookMark : bookMarks) {
+      if (bookMark.getFeedLinkReference().getLinkAsText().equals(feedRef))
+        return bookMark;
+    }
+
+    return null;
+  }
+
+  /**
    * @param news
    * @return Returns a Map mapping from a news-state to a list of
    * news-references.
