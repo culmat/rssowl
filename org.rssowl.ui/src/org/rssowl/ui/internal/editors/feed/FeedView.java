@@ -1440,13 +1440,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
   void toggleBrowserViewMaximized() {
     final boolean isMaximized = !isTableViewerVisible();
     setBrowserMaximized(!isMaximized);
-
-    /* Update Settings */
-    JobRunner.runInBackgroundThread(new Runnable() {
-      public void run() {
-        fPreferences.putBoolean(DefaultPreferences.FV_BROWSER_MAXIMIZED, !isMaximized);
-      }
-    });
+    fPreferences.putBoolean(DefaultPreferences.FV_BROWSER_MAXIMIZED, !isMaximized);
   }
 
   private void setBrowserMaximized(boolean maximized) {
