@@ -276,7 +276,7 @@
             <groupMarker name="findExtensions"/>
             <separator name="extensionsEnd"/>
             <groupMarker name="manageConfiguration"/>
-         </menu>-->
+         </menu>
       </actionSet>
       <actionSet
             id="orgrssowluisetc"
