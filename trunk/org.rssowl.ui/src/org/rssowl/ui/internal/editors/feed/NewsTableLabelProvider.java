@@ -57,6 +57,7 @@ import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.StringUtils;
+import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.OwlUI;
 
@@ -324,20 +325,30 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
               fMapBinIdToLocation.put(news.getParentId(), location);
             }
 
-            return location;
+            text = location;
           }
 
           /* Location: Bookmark */
-          String location = fMapFeedLinkToLocation.get(news.getFeedLinkAsText());
-          if (location == null) {
-            IBookMark bookmark = CoreUtils.getBookMark(news.getFeedLinkAsText());
-            if (bookmark != null) {
-              location = bookmark.getName();
-              fMapFeedLinkToLocation.put(news.getFeedLinkAsText(), location);
+          else {
+            String location = fMapFeedLinkToLocation.get(news.getFeedLinkAsText());
+            if (location == null) {
+              IBookMark bookmark = CoreUtils.getBookMark(news.getFeedLinkAsText());
+              if (bookmark != null) {
+                location = bookmark.getName();
+                fMapFeedLinkToLocation.put(news.getFeedLinkAsText(), location);
+              }
             }
-          }
 
-          return location;
+            text = location;
+          }
+          break;
+
+        case LINK:
+          text = CoreUtils.getLink(news);
+          if (StringUtils.isSet(text)) {
+            text = StringUtils.replaceAll(text, URIUtils.HTTP, ""); //$NON-NLS-1$
+            text = StringUtils.replaceAll(text, "www.", ""); //$NON-NLS-1$ //$NON-NLS-2$
+          }
       }
     }
 

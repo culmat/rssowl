@@ -188,6 +188,11 @@ public class NewsComparator extends ViewerComparator implements Comparator<INews
         case LOCATION:
           result = compareByLocation(news1, news2);
           break;
+
+        /* Sort by Link */
+        case LINK:
+          result = compareByLink(news1, news2);
+          break;
       }
     }
 
@@ -258,6 +263,13 @@ public class NewsComparator extends ViewerComparator implements Comparator<INews
 
   private int compareByLocation(INews n1, INews n2) {
     int result = compareByString(getLocation(n1), getLocation(n2));
+
+    /* Respect ascending / descending Order */
+    return fAscending ? result : result * -1;
+  }
+
+  private int compareByLink(INews n1, INews n2) {
+    int result = compareByString(CoreUtils.getLink(n1), CoreUtils.getLink(n2));
 
     /* Respect ascending / descending Order */
     return fAscending ? result : result * -1;

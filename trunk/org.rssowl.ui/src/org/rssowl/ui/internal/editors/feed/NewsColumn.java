@@ -72,7 +72,10 @@ public enum NewsColumn {
   RELEVANCE(Messages.NewsColumn_RELEVANCE, false, true, false, false, false, true, false),
 
   /** Location of a News */
-  LOCATION(Messages.NewsColumn_LOCATION, true, false, true, true, true, true, true);
+  LOCATION(Messages.NewsColumn_LOCATION, true, false, true, true, true, true, true),
+
+  /** Link of a News */
+  LINK(Messages.NewsColumn_LINK, true, false, true, true, true, true, true);
 
   private final String fName;
   private final boolean fShowName;
