@@ -127,10 +127,90 @@
             id="org.rssowl.ui.GoSet"
             label="%actionSet.label.1"
             visible="true">
+         <action
+               class="org.rssowl.ui.internal.actions.NavigationActionFactory:nextUnreadNews"
+               definitionId="org.rssowl.ui.NextUnreadNews"
+               id="org.rssowl.ui.NextUnreadNews"
+               label="%action.label.7"
+               menubarPath="navigate/org.rssowl.ui.NextMenu/next.news"
+               style="push">
+         </action>
+         <action
+               class="org.rssowl.ui.internal.actions.NavigationActionFactory:nextNews"
+               definitionId="org.rssowl.ui.NextNews"
+               id="org.rssowl.ui.NextNews"
+               label="%action.label.8"
+               menubarPath="navigate/org.rssowl.ui.NextMenu/next.news"
+               style="push">
+         </action>
+         <action
+               class="org.rssowl.ui.internal.actions.NavigationActionFactory:nextUnreadFeed"
+               definitionId="org.rssowl.ui.NextUnreadFeed"
+               id="org.rssowl.ui.NextUnreadFeed"
+               label="%action.label.9"
+               menubarPath="navigate/org.rssowl.ui.NextMenu/next.feed"
+               style="push">
+         </action>
+         <action
+               class="org.rssowl.ui.internal.actions.NavigationActionFactory:nextFeed"
+               definitionId="org.rssowl.ui.NextFeed"
+               id="org.rssowl.ui.NextFeed"
+               label="%action.label.10"
+               menubarPath="navigate/org.rssowl.ui.NextMenu/next.feed"
+               style="push">
+         </action>
+         <action
+               class="org.rssowl.ui.internal.actions.NavigationActionFactory:nextTab"
+               definitionId="org.rssowl.ui.NextTab"
+               id="org.rssowl.ui.NextTab"
+               label="%action.label.11"
+               menubarPath="navigate/org.rssowl.ui.NextMenu/next.tab"
+               style="push">
+         </action>
+         <action
+               class="org.rssowl.ui.internal.actions.NavigationActionFactory:previousUnreadNews"
+               definitionId="org.rssowl.ui.PreviousUnreadNews"
+               id="org.rssowl.ui.PreviousUnreadNews"
+               label="%action.label.12"
+               menubarPath="navigate/org.rssowl.ui.PreviousMenu/previous.news"
+               style="push">
+         </action>
+         <action
+               class="org.rssowl.ui.internal.actions.NavigationActionFactory:previousNews"
+               definitionId="org.rssowl.ui.PreviousNews"
+               id="org.rssowl.ui.PreviousNews"
+               label="%action.label.13"
+               menubarPath="navigate/org.rssowl.ui.PreviousMenu/previous.news"
+               style="push">
+         </action>
+         <action
+               class="org.rssowl.ui.internal.actions.NavigationActionFactory:previousUnreadFeed"
+               definitionId="org.rssowl.ui.PreviousUnreadFeed"
+               id="org.rssowl.ui.PreviousUnreadFeed"
+               label="%action.label.14"
+               menubarPath="navigate/org.rssowl.ui.PreviousMenu/previous.feed"
+               style="push">
+         </action>
+         <action
+               class="org.rssowl.ui.internal.actions.NavigationActionFactory:previousFeed"
+               definitionId="org.rssowl.ui.PreviousFeed"
+               id="org.rssowl.ui.PreviousFeed"
+               label="%action.label.15"
+               menubarPath="navigate/org.rssowl.ui.PreviousMenu/previous.feed"
+               style="push">
+         </action>
+         <action
+               class="org.rssowl.ui.internal.actions.NavigationActionFactory:previousTab"
+               definitionId="org.rssowl.ui.PreviousTab"
+               id="org.rssowl.ui.PreviousTab"
+               label="%action.label.16"
+               menubarPath="navigate/org.rssowl.ui.PreviousMenu/previous.tab"
+               style="push">
+         </action>
          <menu
-               id="previous"
+               id="org.rssowl.ui.PreviousMenu"
                label="%menu.label.0"
-               path="navigate/previous.ext">
+               path="navigate/additions">
             <separator
                   name="previous.news">
             </separator>
@@ -142,9 +222,9 @@
             </separator>
          </menu>
          <menu
-               id="next"
+               id="org.rssowl.ui.NextMenu"
                label="%menu.label.1"
-               path="navigate/next.ext">
+               path="navigate/additions">
             <separator
                   name="next.news">
             </separator>
@@ -155,86 +235,6 @@
                   name="next.tab">
             </separator>
          </menu>
-         <action
-               class="org.rssowl.ui.internal.actions.NavigationActionFactory:nextUnreadNews"
-               definitionId="org.rssowl.ui.NextUnreadNews"
-               id="org.rssowl.ui.NextUnreadNews"
-               label="%action.label.7"
-               menubarPath="navigate/next/next.news"
-               style="push">
-         </action>
-         <action
-               class="org.rssowl.ui.internal.actions.NavigationActionFactory:nextNews"
-               definitionId="org.rssowl.ui.NextNews"
-               id="org.rssowl.ui.NextNews"
-               label="%action.label.8"
-               menubarPath="navigate/next/next.news"
-               style="push">
-         </action>
-         <action
-               class="org.rssowl.ui.internal.actions.NavigationActionFactory:nextUnreadFeed"
-               definitionId="org.rssowl.ui.NextUnreadFeed"
-               id="org.rssowl.ui.NextUnreadFeed"
-               label="%action.label.9"
-               menubarPath="navigate/next/next.feed"
-               style="push">
-         </action>
-         <action
-               class="org.rssowl.ui.internal.actions.NavigationActionFactory:nextFeed"
-               definitionId="org.rssowl.ui.NextFeed"
-               id="org.rssowl.ui.NextFeed"
-               label="%action.label.10"
-               menubarPath="navigate/next/next.feed"
-               style="push">
-         </action>
-         <action
-               class="org.rssowl.ui.internal.actions.NavigationActionFactory:nextTab"
-               definitionId="org.rssowl.ui.NextTab"
-               id="org.rssowl.ui.NextTab"
-               label="%action.label.11"
-               menubarPath="navigate/next/next.tab"
-               style="push">
-         </action>
-         <action
-               class="org.rssowl.ui.internal.actions.NavigationActionFactory:previousUnreadNews"
-               definitionId="org.rssowl.ui.PreviousUnreadNews"
-               id="org.rssowl.ui.PreviousUnreadNews"
-               label="%action.label.12"
-               menubarPath="navigate/previous/previous.news"
-               style="push">
-         </action>
-         <action
-               class="org.rssowl.ui.internal.actions.NavigationActionFactory:previousNews"
-               definitionId="org.rssowl.ui.PreviousNews"
-               id="org.rssowl.ui.PreviousNews"
-               label="%action.label.13"
-               menubarPath="navigate/previous/previous.news"
-               style="push">
-         </action>
-         <action
-               class="org.rssowl.ui.internal.actions.NavigationActionFactory:previousUnreadFeed"
-               definitionId="org.rssowl.ui.PreviousUnreadFeed"
-               id="org.rssowl.ui.PreviousUnreadFeed"
-               label="%action.label.14"
-               menubarPath="navigate/previous/previous.feed"
-               style="push">
-         </action>
-         <action
-               class="org.rssowl.ui.internal.actions.NavigationActionFactory:previousFeed"
-               definitionId="org.rssowl.ui.PreviousFeed"
-               id="org.rssowl.ui.PreviousFeed"
-               label="%action.label.15"
-               menubarPath="navigate/previous/previous.feed"
-               style="push">
-         </action>
-         <action
-               class="org.rssowl.ui.internal.actions.NavigationActionFactory:previousTab"
-               definitionId="org.rssowl.ui.PreviousTab"
-               id="org.rssowl.ui.PreviousTab"
-               label="%action.label.16"
-               menubarPath="navigate/previous/previous.tab"
-               style="push">
-         </action>
       </actionSet>
       <actionSet
             id="org.rssowl.ui.ManageExtensions"
