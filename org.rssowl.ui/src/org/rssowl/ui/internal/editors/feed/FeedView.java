@@ -1965,6 +1965,14 @@ public class FeedView extends EditorPart implements IReusableEditor {
   }
 
   /**
+   * @return <code>true</code> if this feedview is currently visible or
+   * <code>false</code> otherwise.
+   */
+  public boolean isVisible() {
+    return fEditorSite.getPage().isPartVisible(fEditorSite.getPart());
+  }
+
+  /**
    * Returns the <code>Composite</code> that is the Parent Control of this
    * Editor Part.
    *

@@ -327,27 +327,33 @@ public class NewsContentProvider implements ITreeContentProvider {
           ISearchMark searchMark = event.getEntity();
 
           if (fInput.equals(searchMark)) {
-            JobRunner.runUIUpdater(new UIBackgroundJob(fFeedView.getEditorControl()) {
-              private List<INews> fAddedNews;
+            JobRunner.runInUIThread(fFeedView.getEditorControl(), new Runnable() {
+              public void run() {
+                final boolean onlyHandleAddedNews = fFeedView.isVisible();
 
-              @Override
-              protected void runInBackground(IProgressMonitor monitor) {
-                fAddedNews = refreshCache(fInput, true);
-              }
+                JobRunner.runUIUpdater(new UIBackgroundJob(fFeedView.getEditorControl()) {
+                  private List<INews> fAddedNews;
 
-              @Override
-              protected void runInUI(IProgressMonitor monitor) {
+                  @Override
+                  protected void runInBackground(IProgressMonitor monitor) {
+                    fAddedNews = refreshCache(fInput, onlyHandleAddedNews);
+                  }
 
-                /* Event not interesting for us or we are disposed */
-                if (fAddedNews == null || fAddedNews.size() == 0)
-                  return;
+                  @Override
+                  protected void runInUI(IProgressMonitor monitor) {
 
-                /* Refresh Viewer to reflect changes */
-                fFeedView.refresh(true, true); //TODO Seems some JFace Caching Problem here
+                    /* Check if we need to Refresh at all */
+                    if (onlyHandleAddedNews && (fAddedNews == null || fAddedNews.size() == 0))
+                      return;
 
-                /* Add to Browser-Viewer if showing entire Feed */
-                if (fBrowserViewer.getInput() instanceof BookMarkReference)
-                  fBrowserViewer.add(fBrowserViewer.getInput(), fAddedNews.toArray());
+                    /* Refresh Viewer to reflect changes */
+                    fFeedView.refresh(true, true);
+
+                    /* Add to Browser-Viewer if showing entire Feed */
+                    if (fAddedNews != null && !fAddedNews.isEmpty() && fBrowserViewer.getInput() instanceof BookMarkReference)
+                      fBrowserViewer.add(fBrowserViewer.getInput(), fAddedNews.toArray());
+                  }
+                });
               }
             });
 

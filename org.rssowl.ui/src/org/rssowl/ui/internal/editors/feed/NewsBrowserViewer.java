@@ -871,7 +871,8 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     Assert.isNotNull(parentElement);
     assertElementsNotNull(childElements);
 
-    refresh(); // TODO Optimize
+    if (childElements.length > 0)
+      refresh(); // TODO Optimize
   }
 
   /**
