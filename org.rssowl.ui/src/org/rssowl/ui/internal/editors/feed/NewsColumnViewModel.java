@@ -287,6 +287,9 @@ public class NewsColumnViewModel {
       case LOCATION:
         return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, 150);
 
+      case LINK:
+        return new CColumnLayoutData(CColumnLayoutData.Size.FILL, 25);
+
       default: //Never Reached
         return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, 100);
     }
