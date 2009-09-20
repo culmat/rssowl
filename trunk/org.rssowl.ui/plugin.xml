@@ -1867,6 +1867,9 @@
             icon="icons/obj16/bookmark.gif"
             id="org.rssowl.ui.ImportWizard"
             name="%wizard.name">
+         <description>
+            %wizard.description.4
+         </description>
       </wizard>
    </extension>
    <extension
@@ -1881,6 +1884,9 @@
             icon="icons/obj16/bookmark.gif"
             id="org.rssowl.ui.ExportWizard"
             name="%wizard.name.0">
+         <description>
+            %wizard.description.3
+         </description>
       </wizard>
    </extension>
    <extension
@@ -1897,6 +1903,45 @@
             id="org.rssowl.ui.BookmarkWizard"
             name="%wizard.name.1"
             project="false">
+         <description>
+            %wizard.description
+         </description>
+      </wizard>
+      <wizard
+            category="org.rssowl.ui.RSSOwlNewCategory"
+            class="org.rssowl.ui.internal.dialogs.SearchMarkWizard"
+            hasPages="true"
+            icon="icons/obj16/searchmark.gif"
+            id="org.rssowl.ui.SearchMarkWizard"
+            name="%wizard.name.2"
+            project="false">
+         <description>
+            %wizard.description.0
+         </description>
+      </wizard>
+      <wizard
+            category="org.rssowl.ui.RSSOwlNewCategory"
+            class="org.rssowl.ui.internal.dialogs.NewsBinWizard"
+            hasPages="true"
+            icon="icons/obj16/newsbin.gif"
+            id="org.rssowl.ui.NewsBinWizard"
+            name="%wizard.name.3"
+            project="false">
+         <description>
+            %wizard.description.1
+         </description>
+      </wizard>
+      <wizard
+            category="org.rssowl.ui.RSSOwlNewCategory"
+            class="org.rssowl.ui.internal.dialogs.FolderWizard"
+            hasPages="true"
+            icon="icons/obj16/folder.gif"
+            id="org.rssowl.ui.FolderWizard"
+            name="%wizard.name.4"
+            project="false">
+         <description>
+            %wizard.description.2
+         </description>
       </wizard>
    </extension>
 </plugin>
