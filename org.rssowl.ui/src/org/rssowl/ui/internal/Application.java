@@ -66,6 +66,9 @@ public class Application implements IApplication {
   /** Constant for the application being run on Mac or not */
   public static final boolean IS_MAC = "carbon".equals(SWT.getPlatform()); //$NON-NLS-1$
 
+  /** Flag to indicate RSSOwl integrated to Eclipse or not */
+  public static final boolean IS_ECLIPSE= false;
+
   /*
    * @see org.eclipse.equinox.app.IApplication#start(org.eclipse.equinox.app.IApplicationContext)
    */

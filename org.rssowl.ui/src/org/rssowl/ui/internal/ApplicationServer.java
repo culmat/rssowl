@@ -94,7 +94,7 @@ public class ApplicationServer {
   /* Local URL Parts */
   static final String PROTOCOL = "http"; //$NON-NLS-1$
   static final String LOCALHOST = "127.0.0.1"; //$NON-NLS-1$
-  static final int DEFAULT_SOCKET_PORT = 8795;
+  static final int DEFAULT_SOCKET_PORT = Application.IS_ECLIPSE ? 8775 : 8795;
 
   /* Handshake Message */
   static final String STARTUP_HANDSHAKE = "org.rssowl.ui.internal.StartupHandshake"; //$NON-NLS-1$
@@ -166,7 +166,7 @@ public class ApplicationServer {
       return;
 
     /* Server not yet running */
-    boolean usePortRange = System.getProperty(MULTI_INSTANCE_PROPERTY) != null;
+    boolean usePortRange = Application.IS_ECLIPSE || System.getProperty(MULTI_INSTANCE_PROPERTY) != null;
     fSocket = createServerSocket(usePortRange);
     if (fSocket != null)
       listen();
