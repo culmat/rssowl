@@ -53,7 +53,6 @@ public class Messages extends NLS {
   public static String ApplicationActionBarAdvisor_FULL_SCREEN;
   public static String ApplicationActionBarAdvisor_GO;
   public static String ApplicationActionBarAdvisor_HELP;
-  public static String ApplicationActionBarAdvisor_HIDE_HEADLINES;
   public static String ApplicationActionBarAdvisor_HIDE_TOOLBAR;
   public static String ApplicationActionBarAdvisor_HOMEPAGE;
   public static String ApplicationActionBarAdvisor_LABEL;
