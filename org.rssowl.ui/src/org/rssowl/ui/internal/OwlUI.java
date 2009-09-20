@@ -109,6 +109,7 @@ import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.INewsMark;
+import org.rssowl.core.persist.IPreference;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IPreferenceDAO;
@@ -1898,16 +1899,25 @@ public class OwlUI {
    */
   public static IFolder getSelectedParent(IFolder folder) throws PersistenceException {
     String selectedBookMarkSetPref = BookMarkExplorer.getSelectedBookMarkSetPref(OwlUI.getWindow());
-    Long selectedRootFolderID = DynamicDAO.getDAO(IPreferenceDAO.class).load(selectedBookMarkSetPref).getLong();
+    IPreference preference = DynamicDAO.getDAO(IPreferenceDAO.class).load(selectedBookMarkSetPref);
+    if (preference != null) {
+      Long selectedRootFolderID = preference.getLong();
 
-    /* Check if available Parent is still valid */
-    if (folder != null) {
-      if (hasParent(folder, new FolderReference(selectedRootFolderID)))
-        return folder;
+      /* Check if available Parent is still valid */
+      if (folder != null) {
+        if (hasParent(folder, new FolderReference(selectedRootFolderID)))
+          return folder;
+      }
+
+      /* Otherwise return visible root-folder */
+      return new FolderReference(selectedRootFolderID).resolve();
     }
 
-    /* Otherwise return visible root-folder */
-    return new FolderReference(selectedRootFolderID).resolve();
+    Set<IFolder> roots = CoreUtils.loadRootFolders();
+    if (!roots.isEmpty())
+      return roots.iterator().next();
+
+    return null;
   }
 
   private static boolean hasParent(IFolder folder, FolderReference folderRef) {

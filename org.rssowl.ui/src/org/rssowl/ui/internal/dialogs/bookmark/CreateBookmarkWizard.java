@@ -28,10 +28,13 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.DialogPage;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.ui.INewWizard;
+import org.eclipse.ui.IWorkbench;
 import org.rssowl.core.Owl;
 import org.rssowl.core.connection.AuthenticationRequiredException;
 import org.rssowl.core.connection.ConnectionException;
@@ -49,6 +52,7 @@ import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Controller;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.ReloadTypesAction;
 import org.rssowl.ui.internal.dialogs.LoginDialog;
 import org.rssowl.ui.internal.util.JobRunner;
@@ -69,10 +73,10 @@ import java.util.Map;
  * TODO Make loading the feed from the website independent from the checkbox
  * about loading the title from the feed.
  * </p>
- * 
+ *
  * @author bpasero
  */
-public class CreateBookmarkWizard extends Wizard {
+public class CreateBookmarkWizard extends Wizard implements INewWizard {
   private FeedDefinitionPage fFeedDefinitionPage;
   private KeywordSubscriptionPage fKeywordPage;
   private BookmarkDefinitionPage fBookMarkDefinitionPage;
@@ -80,6 +84,11 @@ public class CreateBookmarkWizard extends Wizard {
   private final String fInitialLink;
   private final IMark fPosition;
   private String fLastRealm;
+
+  /** Leave for Reflection */
+  public CreateBookmarkWizard() {
+    this(OwlUI.getSelectedParent(null), null, null);
+  }
 
   /**
    * @param parent
@@ -91,6 +100,11 @@ public class CreateBookmarkWizard extends Wizard {
     fPosition = position;
     fInitialLink = initialLink;
   }
+
+  /*
+   * @see org.eclipse.ui.IWorkbenchWizard#init(org.eclipse.ui.IWorkbench, org.eclipse.jface.viewers.IStructuredSelection)
+   */
+  public void init(IWorkbench workbench, IStructuredSelection selection) {}
 
   /*
    * @see org.eclipse.jface.wizard.Wizard#addPages()
