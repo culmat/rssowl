@@ -26,9 +26,12 @@ package org.rssowl.ui.internal.dialogs.importer;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.ui.IImportWizard;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
@@ -72,7 +75,7 @@ import java.util.Set;
  *
  * @author bpasero
  */
-public class ImportWizard extends Wizard {
+public class ImportWizard extends Wizard implements IImportWizard {
   private ImportSourcePage fImportSourcePage;
   private ImportElementsPage fImportElementsPage;
   private ImportTargetPage fImportTargetPage;
@@ -85,6 +88,11 @@ public class ImportWizard extends Wizard {
   public ImportWizard() {
     this(null, false);
   }
+
+  /*
+   * @see org.eclipse.ui.IWorkbenchWizard#init(org.eclipse.ui.IWorkbench, org.eclipse.jface.viewers.IStructuredSelection)
+   */
+  public void init(IWorkbench workbench, IStructuredSelection selection) {}
 
   /**
    * @param isWelcome if <code>true</code>, this wizard is used from the
