@@ -62,6 +62,9 @@ public class Messages extends NLS {
   public static String CustomizeToolbarDialog_TEXT;
   public static String CustomizeToolbarDialog_USE_MOUSE_INFO;
   public static String CustomizeToolbarDialog_VISIBLE_ITEMS;
+  public static String FolderWizard_FOLDER;
+  public static String FolderWizard_FOLDER_WIZ_TITLE;
+  public static String FolderWizard_NEW_FOLDER;
   public static String LabelDialog_COLOR;
   public static String LabelDialog_EDIT_LABEL;
   public static String LabelDialog_EDIT_LABEL_INFO;
@@ -101,6 +104,9 @@ public class Messages extends NLS {
   public static String MasterPasswordDialog_PASSWORD;
   public static String MasterPasswordDialog_PASSWORD_QUALITY;
   public static String MasterPasswordDialog_REMEMBER_PASSWORD;
+  public static String NewsBinWizard_BIN_WIZ_TITLE;
+  public static String NewsBinWizard_NEW_NEWS_BIN;
+  public static String NewsBinWizard_NEWS_BIN;
   public static String NewsFilterDialog_ALL_NEWS;
   public static String NewsFilterDialog_CHOOSE_ACTION;
   public static String NewsFilterDialog_CREATE_NAME_FROM_CONDITIONS;
@@ -166,6 +172,9 @@ public class Messages extends NLS {
   public static String SearchMarkDialog_SAVED_SEARCH;
   public static String SearchMarkDialog_SEARCH_HELP;
   public static String SearchMarkDialog_SEARCH_IN;
+  public static String SearchMarkWizard_NEW_SEARCH;
+  public static String SearchMarkWizard_SAVED_SEARCH;
+  public static String SearchMarkWizard_SEARCH_WIZ_TITLE;
   public static String SearchNewsDialog_ALL_NEWS;
   public static String SearchNewsDialog_BIN_NAME;
   public static String SearchNewsDialog_CLEAR;
