@@ -24,9 +24,12 @@
 
 package org.rssowl.ui.internal.dialogs.exporter;
 
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.ui.IExportWizard;
+import org.eclipse.ui.IWorkbench;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.newsaction.CopyNewsAction;
 import org.rssowl.core.internal.newsaction.MoveNewsAction;
@@ -67,9 +70,12 @@ import java.util.Set;
  *
  * @author bpasero
  */
-public class ExportWizard extends Wizard {
+public class ExportWizard extends Wizard implements IExportWizard {
   private ExportElementsPage fExportElementsPage;
   private ExportOptionsPage fExportOptionsPage;
+
+  /** Leave for Reflection */
+  public ExportWizard() {}
 
   /*
    * @see org.eclipse.jface.wizard.Wizard#addPages()
@@ -86,6 +92,11 @@ public class ExportWizard extends Wizard {
     fExportOptionsPage = new ExportOptionsPage(Messages.ExportWizard_EXPORT_OPTIONS);
     addPage(fExportOptionsPage);
   }
+
+  /*
+   * @see org.eclipse.ui.IWorkbenchWizard#init(org.eclipse.ui.IWorkbench, org.eclipse.jface.viewers.IStructuredSelection)
+   */
+  public void init(IWorkbench workbench, IStructuredSelection selection) {}
 
   /*
    * @see org.eclipse.jface.wizard.Wizard#canFinish()
