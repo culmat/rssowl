@@ -28,7 +28,7 @@
    <extension
          point="org.eclipse.ui.actionSets">
       <actionSet
-            id="orgrssowluiseta"
+            id="org.rssowl.ui.FileSet"
             label="%actionSet.label"
             visible="true">
          <action
@@ -111,7 +111,7 @@
          </menu>
       </actionSet>
       <actionSet
-            id="orgrssowluisetb"
+            id="org.rssowl.ui.EditSet"
             label="%actionSet.label.0"
             visible="true">
          <action
@@ -279,7 +279,7 @@
          </menu>
       </actionSet>
       <actionSet
-            id="orgrssowluisetc"
+            id="org.rssowl.ui.NewsSet"
             label="%actionSet.label.3"
             visible="true">
          <action
@@ -1824,5 +1824,79 @@
       <preferencesInitializer
             class="org.rssowl.ui.internal.PreferencesInitializer">
       </preferencesInitializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.actionSetPartAssociations">
+      <actionSetPartAssociation
+            targetID="org.rssowl.ui.GoSet">
+         <part
+               id="org.rssowl.ui.FeedView">
+         </part>
+         <part
+               id="org.rssowl.ui.BookMarkExplorer">
+         </part>
+      </actionSetPartAssociation>
+      <actionSetPartAssociation
+            targetID="org.rssowl.ui.NewsSet">
+         <part
+               id="org.rssowl.ui.FeedView">
+         </part>
+         <part
+               id="org.rssowl.ui.BookMarkExplorer">
+         </part>
+      </actionSetPartAssociation>
+      <actionSetPartAssociation
+            targetID="org.rssowl.ui.EditSet">
+         <part
+               id="org.rssowl.ui.FeedView">
+         </part>
+         <part
+               id="org.rssowl.ui.BookMarkExplorer">
+         </part>
+      </actionSetPartAssociation>
+   </extension>
+   <extension
+         point="org.eclipse.ui.importWizards">
+      <category
+            id="org.rssowl.ui.RSSOwlImportCategory"
+            name="%category.name.2">
+      </category>
+      <wizard
+            category="org.rssowl.ui.RSSOwlImportCategory"
+            class="org.rssowl.ui.internal.dialogs.importer.ImportWizard"
+            icon="icons/obj16/bookmark.gif"
+            id="org.rssowl.ui.ImportWizard"
+            name="%wizard.name">
+      </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.ui.exportWizards">
+      <category
+            id="org.rssowl.ui.RSSOwlExportCategory"
+            name="%category.name.3">
+      </category>
+      <wizard
+            category="org.rssowl.ui.RSSOwlExportCategory"
+            class="org.rssowl.ui.internal.dialogs.exporter.ExportWizard"
+            icon="icons/obj16/bookmark.gif"
+            id="org.rssowl.ui.ExportWizard"
+            name="%wizard.name.0">
+      </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            id="org.rssowl.ui.RSSOwlNewCategory"
+            name="%category.name.4">
+      </category>
+      <wizard
+            category="org.rssowl.ui.RSSOwlNewCategory"
+            class="org.rssowl.ui.internal.dialogs.bookmark.CreateBookmarkWizard"
+            hasPages="true"
+            icon="icons/obj16/bookmark.gif"
+            id="org.rssowl.ui.BookmarkWizard"
+            name="%wizard.name.1"
+            project="false">
+      </wizard>
    </extension>
 </plugin>
