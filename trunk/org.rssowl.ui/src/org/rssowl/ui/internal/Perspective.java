@@ -47,6 +47,17 @@ public class Perspective implements IPerspectiveFactory {
     /* Bookmark Explorer */
     layout.addView(BookMarkExplorer.VIEW_ID, IPageLayout.LEFT, getRatio(), layout.getEditorArea());
     layout.getViewLayout(BookMarkExplorer.VIEW_ID).setCloseable(false);
+
+    /* Add RSSOwl Action Sets (Eclipe Integration) */
+    layout.addActionSet("org.rssowl.ui.EditSet"); //$NON-NLS-1$
+    layout.addActionSet("org.rssowl.ui.GoSet"); //$NON-NLS-1$
+    layout.addActionSet("org.rssowl.ui.NewsSet"); //$NON-NLS-1$
+
+    /* Add RSSOwl Wizards (Eclipe Integration) */
+    layout.addNewWizardShortcut("org.rssowl.ui.BookmarkWizard"); //$NON-NLS-1$
+    layout.addNewWizardShortcut("org.rssowl.ui.SearchMarkWizard"); //$NON-NLS-1$
+    layout.addNewWizardShortcut("org.rssowl.ui.NewsBinWizard"); //$NON-NLS-1$
+    layout.addNewWizardShortcut("org.rssowl.ui.FolderWizard"); //$NON-NLS-1$
   }
 
   private float getRatio() {
