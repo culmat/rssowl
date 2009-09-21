@@ -71,7 +71,9 @@ public class SearchConditionList extends ScrolledComposite {
   private Composite fContainer;
   private LocalResourceManager fResources;
   private Image fAddIcon;
+  private Image fAddDisabledIcon;
   private Image fDeleteIcon;
+  private Image fDeleteDisabledIcon;
   private boolean fModified;
   private int fVisibleItemCount = 3;
 
@@ -270,7 +272,9 @@ public class SearchConditionList extends ScrolledComposite {
 
   private void initResources() {
     fAddIcon = OwlUI.getImage(fResources, "icons/etool16/add.gif"); //$NON-NLS-1$
+    fAddDisabledIcon = OwlUI.getImage(fResources, "icons/dtool16/add.gif"); //$NON-NLS-1$
     fDeleteIcon = OwlUI.getImage(fResources, "icons/etool16/remove.gif"); //$NON-NLS-1$
+    fDeleteDisabledIcon = OwlUI.getImage(fResources, "icons/dtool16/remove.gif"); //$NON-NLS-1$
   }
 
   private void initComponents(List<ISearchCondition> conditions) {
@@ -335,6 +339,7 @@ public class SearchConditionList extends ScrolledComposite {
     /* Button to add Condition */
     ToolItem addButton = new ToolItem(buttonBar, SWT.DROP_DOWN);
     addButton.setImage(fAddIcon);
+    addButton.setDisabledImage(fAddDisabledIcon);
     addButton.setToolTipText(Messages.SearchConditionList_ADD_CONDITION);
 
     /* Add Menu */
@@ -356,6 +361,7 @@ public class SearchConditionList extends ScrolledComposite {
     /* Button to delete Condition */
     ToolItem deleteButton = new ToolItem(buttonBar, SWT.PUSH);
     deleteButton.setImage(fDeleteIcon);
+    deleteButton.setDisabledImage(fDeleteDisabledIcon);
     deleteButton.setToolTipText(Messages.SearchConditionList_DELETE_CONDITION);
     deleteButton.addSelectionListener(new SelectionAdapter() {
       @Override
