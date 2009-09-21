@@ -73,6 +73,7 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
   private Button fAlwaysReuseFeedView;
   private Button fOpenOnSingleClick;
   private Button fUpdateOnStartup;
+  private Button fAggregateNewsAsSearch;
 
   /** Leave for reflection */
   public MiscPreferencePage() {
@@ -213,6 +214,10 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     fOpenOnSingleClick.setText(Messages.MiscPreferencePage_SINGLE_CLICK);
     fOpenOnSingleClick.setSelection(fEclipseScope.getBoolean(DefaultPreferences.ECLIPSE_SINGLE_CLICK_OPEN));
 
+    fAggregateNewsAsSearch = new Button(miscGroup, SWT.CHECK);
+    fAggregateNewsAsSearch.setText(Messages.MiscPreferencePage_AGGREGATE_AS_SEARCH);
+    fAggregateNewsAsSearch.setSelection(fGlobalScope.getBoolean(DefaultPreferences.AGGREGATE_NEWS_AS_SEARCH));
+
     if (!Application.IS_ECLIPSE) {
       fUpdateOnStartup = new Button(miscGroup, SWT.CHECK);
       fUpdateOnStartup.setText(Messages.MiscPreferencePage_UPDATE_ON_STARTUP);
@@ -281,6 +286,7 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     if (!Application.IS_ECLIPSE)
       fGlobalScope.putBoolean(DefaultPreferences.UPDATE_ON_STARTUP, fUpdateOnStartup.getSelection());
 
+    fGlobalScope.putBoolean(DefaultPreferences.AGGREGATE_NEWS_AS_SEARCH, fAggregateNewsAsSearch.getSelection());
     fEclipseScope.putBoolean(DefaultPreferences.ECLIPSE_SINGLE_CLICK_OPEN, fOpenOnSingleClick.getSelection());
     fEclipseScope.putBoolean(DefaultPreferences.ECLIPSE_RESTORE_TABS, fReopenFeedsOnStartupCheck.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.ALWAYS_REUSE_FEEDVIEW, fAlwaysReuseFeedView.getSelection());
@@ -322,6 +328,7 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     if (!Application.IS_ECLIPSE)
       fUpdateOnStartup.setSelection(defaultScope.getBoolean(DefaultPreferences.UPDATE_ON_STARTUP));
 
+    fAggregateNewsAsSearch.setSelection(defaultScope.getBoolean(DefaultPreferences.AGGREGATE_NEWS_AS_SEARCH));
     fOpenOnSingleClick.setSelection(defaultScope.getBoolean(DefaultPreferences.ECLIPSE_SINGLE_CLICK_OPEN));
     fReopenFeedsOnStartupCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.ECLIPSE_RESTORE_TABS));
     fAlwaysReuseFeedView.setSelection(defaultScope.getBoolean(DefaultPreferences.ALWAYS_REUSE_FEEDVIEW));
