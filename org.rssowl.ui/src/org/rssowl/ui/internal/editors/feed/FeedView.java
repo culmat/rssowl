@@ -113,6 +113,7 @@ import org.rssowl.ui.internal.FolderNewsMark;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.Controller.BookMarkLoadListener;
 import org.rssowl.ui.internal.actions.DeleteTypesAction;
+import org.rssowl.ui.internal.actions.FindAction;
 import org.rssowl.ui.internal.actions.ReloadTypesAction;
 import org.rssowl.ui.internal.actions.RetargetActions;
 import org.rssowl.ui.internal.undo.NewsStateOperation;
@@ -230,6 +231,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
   private IAction fPrintAction;
   private IAction fUndoAction;
   private IAction fRedoAction;
+  private IAction fFindAction;
 
   /* Misc. */
   private Composite fParent;
@@ -896,6 +898,9 @@ public class FeedView extends EditorPart implements IReusableEditor {
         UndoStack.getInstance().redo();
       }
     };
+
+    /* Find (Eclipse Integration) */
+    fFindAction = new FindAction();
   }
 
   /**
@@ -926,6 +931,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
     fEditorSite.getActionBars().setGlobalActionHandler(ActionFactory.PRINT.getId(), fPrintAction);
     fEditorSite.getActionBars().setGlobalActionHandler(ActionFactory.UNDO.getId(), fUndoAction);
     fEditorSite.getActionBars().setGlobalActionHandler(ActionFactory.REDO.getId(), fRedoAction);
+    fEditorSite.getActionBars().setGlobalActionHandler(ActionFactory.FIND.getId(), fFindAction);
 
     /* Disable some Edit-Actions at first */
     fEditorSite.getActionBars().getGlobalActionHandler(ActionFactory.CUT.getId()).setEnabled(false);

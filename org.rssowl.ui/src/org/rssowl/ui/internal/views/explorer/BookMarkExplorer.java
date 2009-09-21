@@ -125,6 +125,7 @@ import org.rssowl.ui.internal.ShareProvider;
 import org.rssowl.ui.internal.StatusLineUpdater;
 import org.rssowl.ui.internal.actions.DeleteTypesAction;
 import org.rssowl.ui.internal.actions.EntityPropertyDialogAction;
+import org.rssowl.ui.internal.actions.FindAction;
 import org.rssowl.ui.internal.actions.NewBookMarkAction;
 import org.rssowl.ui.internal.actions.NewFolderAction;
 import org.rssowl.ui.internal.actions.NewNewsBinAction;
@@ -1534,6 +1535,9 @@ public class BookMarkExplorer extends ViewPart {
         UndoStack.getInstance().redo();
       }
     });
+
+    /* Find (Eclipse Integration) */
+    fViewSite.getActionBars().setGlobalActionHandler(ActionFactory.FIND.getId(), new FindAction());
 
     /* Properties */
     fViewSite.getActionBars().setGlobalActionHandler(ActionFactory.PROPERTIES.getId(), new EntityPropertyDialogAction(fViewSite, fViewer));
