@@ -61,14 +61,11 @@ import java.net.URL;
 /**
  * An action to check for updates to RSSOwl. Will not include updates to
  * installed extensions.
- * <p>
- * TODO Change to real update site once nightly testing phase is done.
- * </p>
  *
  * @author bpasero
  */
 public class FindUpdatesAction extends Action implements IWorkbenchWindowActionDelegate {
-  private static final String UPDATE_SITE = "http://boreal.rssowl.org/update/nightly/"; //$NON-NLS-1$
+  private static final String UPDATE_SITE = "http://boreal.rssowl.org/update/program/"; //$NON-NLS-1$
   private Shell fShell;
   private final boolean fUserInitiated;
 
