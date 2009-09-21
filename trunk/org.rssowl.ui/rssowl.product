@@ -9,7 +9,7 @@
          RSSOwl 2.0
 
 Version: 2.0.0
-Build id: Milestone 10 Nightly
+Build id: RC1
 
 RSSOwl is licensed under the terms of the Eclipse Public License version 1.0.
 http://www.rssowl.org/legal/epl-v10.html
@@ -31,6 +31,7 @@ http://www.rssowl.org/legal/epl-v10.html
 
    <windowImages i16="/org.rssowl.ui/icons/product/16x16.png" i32="/org.rssowl.ui/icons/product/32x32.png" i48="/org.rssowl.ui/icons/product/48x48.png" i64="/org.rssowl.ui/icons/product/64x64.png" i128="/org.rssowl.ui/icons/product/128x128.png"/>
 
+
    <launcher name="RSSOwl">
       <linux icon="/org.rssowl.ui/icons/product/rssowl.xpm"/>
       <macosx icon="/org.rssowl.ui/icons/product/rssowl.icns"/>
@@ -40,6 +41,7 @@ http://www.rssowl.org/legal/epl-v10.html
          <bmp/>
       </win>
    </launcher>
+
 
    <vm>
    </vm>
