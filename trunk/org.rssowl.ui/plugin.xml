@@ -396,7 +396,7 @@
             allowMultiple="false"
             category="org.rssowl.ui.category"
             class="org.rssowl.ui.internal.views.explorer.BookMarkExplorer"
-            icon="icons/eview16/bkmrk_explorer.gif"
+            icon="icons/obj16/bookmark.gif"
             id="org.rssowl.ui.BookMarkExplorer"
             name="%view.name"/>
       <category
