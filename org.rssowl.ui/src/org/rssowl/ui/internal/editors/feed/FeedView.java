@@ -228,6 +228,8 @@ public class FeedView extends EditorPart implements IReusableEditor {
   private IAction fCopyAction;
   private IAction fPasteAction;
   private IAction fPrintAction;
+  private IAction fUndoAction;
+  private IAction fRedoAction;
 
   /* Misc. */
   private Composite fParent;
@@ -878,6 +880,22 @@ public class FeedView extends EditorPart implements IReusableEditor {
         print();
       }
     };
+
+    /* Undo (Eclipse Integration) */
+    fUndoAction = new Action() {
+      @Override
+      public void run() {
+        UndoStack.getInstance().undo();
+      }
+    };
+
+    /* Redo (Eclipse Integration) */
+    fRedoAction = new Action() {
+      @Override
+      public void run() {
+        UndoStack.getInstance().redo();
+      }
+    };
   }
 
   /**
@@ -906,6 +924,8 @@ public class FeedView extends EditorPart implements IReusableEditor {
     fEditorSite.getActionBars().setGlobalActionHandler(ActionFactory.COPY.getId(), fCopyAction);
     fEditorSite.getActionBars().setGlobalActionHandler(ActionFactory.PASTE.getId(), fPasteAction);
     fEditorSite.getActionBars().setGlobalActionHandler(ActionFactory.PRINT.getId(), fPrintAction);
+    fEditorSite.getActionBars().setGlobalActionHandler(ActionFactory.UNDO.getId(), fUndoAction);
+    fEditorSite.getActionBars().setGlobalActionHandler(ActionFactory.REDO.getId(), fRedoAction);
 
     /* Disable some Edit-Actions at first */
     fEditorSite.getActionBars().getGlobalActionHandler(ActionFactory.CUT.getId()).setEnabled(false);
