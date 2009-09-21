@@ -1086,7 +1086,7 @@ public class Controller {
     }
 
     /* Check for Updates if Set */
-    else {
+    else if (!Application.IS_ECLIPSE) {
       JobRunner.runInUIThread(5000, OwlUI.getActiveShell(), new Runnable() {
         public void run() {
           if (Owl.getPreferenceService().getGlobalScope().getBoolean(DefaultPreferences.UPDATE_ON_STARTUP)) {
