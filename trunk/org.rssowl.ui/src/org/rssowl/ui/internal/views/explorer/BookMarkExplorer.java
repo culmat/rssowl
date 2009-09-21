@@ -138,6 +138,7 @@ import org.rssowl.ui.internal.dialogs.ManageSetsDialog;
 import org.rssowl.ui.internal.dialogs.preferences.SharingPreferencesPage;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
 import org.rssowl.ui.internal.editors.feed.PerformAfterInputSet;
+import org.rssowl.ui.internal.undo.UndoStack;
 import org.rssowl.ui.internal.util.EditorUtils;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.WidgetTreeNode;
@@ -1515,6 +1516,22 @@ public class BookMarkExplorer extends ViewPart {
         /* Paste in Text Widget */
         if (focusControl instanceof Text)
           ((Text) focusControl).paste();
+      }
+    });
+
+    /* Undo (Eclipse Integration) */
+    fViewSite.getActionBars().setGlobalActionHandler(ActionFactory.UNDO.getId(), new Action() {
+      @Override
+      public void run() {
+        UndoStack.getInstance().undo();
+      }
+    });
+
+    /* Redo (Eclipse Integration) */
+    fViewSite.getActionBars().setGlobalActionHandler(ActionFactory.REDO.getId(), new Action() {
+      @Override
+      public void run() {
+        UndoStack.getInstance().redo();
       }
     });
 
