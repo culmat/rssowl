@@ -42,12 +42,14 @@ import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IFeedDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.FeedReference;
+import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
@@ -80,14 +82,14 @@ public class CreateBookmarkWizard extends Wizard implements INewWizard {
   private FeedDefinitionPage fFeedDefinitionPage;
   private KeywordSubscriptionPage fKeywordPage;
   private BookmarkDefinitionPage fBookMarkDefinitionPage;
-  private final IFolder fSelection;
+  private IFolder fParent;
   private final String fInitialLink;
-  private final IMark fPosition;
+  private IFolderChild fPosition;
   private String fLastRealm;
 
   /** Leave for Reflection */
   public CreateBookmarkWizard() {
-    this(OwlUI.getSelectedParent(null), null, null);
+    this(null, null, null);
   }
 
   /**
@@ -96,7 +98,7 @@ public class CreateBookmarkWizard extends Wizard implements INewWizard {
    * @param initialLink
    */
   public CreateBookmarkWizard(IFolder parent, IMark position, String initialLink) {
-    fSelection = parent;
+    fParent = parent;
     fPosition = position;
     fInitialLink = initialLink;
   }
@@ -104,7 +106,11 @@ public class CreateBookmarkWizard extends Wizard implements INewWizard {
   /*
    * @see org.eclipse.ui.IWorkbenchWizard#init(org.eclipse.ui.IWorkbench, org.eclipse.jface.viewers.IStructuredSelection)
    */
-  public void init(IWorkbench workbench, IStructuredSelection selection) {}
+  public void init(IWorkbench workbench, IStructuredSelection selection) {
+    Pair<IFolder, IFolderChild> pair = OwlUI.getLocationAndPosition(selection);
+    fParent = pair.getFirst();
+    fPosition = pair.getSecond();
+  }
 
   /*
    * @see org.eclipse.jface.wizard.Wizard#addPages()
@@ -122,7 +128,7 @@ public class CreateBookmarkWizard extends Wizard implements INewWizard {
     addPage(fKeywordPage);
 
     /* Page 2: Define Name and Location */
-    fBookMarkDefinitionPage = new BookmarkDefinitionPage(Messages.CreateBookmarkWizard_BOOKMARK, fSelection);
+    fBookMarkDefinitionPage = new BookmarkDefinitionPage(Messages.CreateBookmarkWizard_BOOKMARK, fParent);
     addPage(fBookMarkDefinitionPage);
   }
 
