@@ -105,6 +105,7 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INewsBin;
@@ -2173,5 +2174,43 @@ public class OwlUI {
       /* Set Visible */
       menu.setVisible(true);
     }
+  }
+
+  /**
+   * @param selection the {@link IStructuredSelection} to look for
+   * {@link IFolder} and {@link IFolderChild}. Never <code>null</code>.
+   * @return a {@link Pair} of location as {@link IFolder} and position as
+   * {@link IFolderChild} or <code>null</code> if no position can be determined.
+   */
+  public static Pair<IFolder, IFolderChild> getLocationAndPosition(IStructuredSelection selection) {
+    IFolder folder = null;
+    IFolderChild position = null;
+
+    /* Check Selection */
+    if (!selection.isEmpty()) {
+      Object firstElement = selection.getFirstElement();
+      if (firstElement instanceof IFolder)
+        folder = (IFolder) firstElement;
+      else if (firstElement instanceof IFolderChild) {
+        folder = ((IFolderChild) firstElement).getParent();
+        position = ((IFolderChild) firstElement);
+      }
+    }
+
+    /* Otherwise use visible root-folder */
+    if (folder == null) {
+      String selectedBookMarkSetPref = BookMarkExplorer.getSelectedBookMarkSetPref(OwlUI.getWindow());
+      IPreference preference = DynamicDAO.getDAO(IPreferenceDAO.class).load(selectedBookMarkSetPref);
+      if (preference != null) {
+        Long selectedRootFolderID = preference.getLong();
+        if (selectedRootFolderID != null)
+          folder = new FolderReference(selectedRootFolderID).resolve();
+      }
+
+      /* Finally use the first root folder */
+      folder = CoreUtils.loadRootFolders().iterator().next();
+    }
+
+    return Pair.create(folder, position);
   }
 }
