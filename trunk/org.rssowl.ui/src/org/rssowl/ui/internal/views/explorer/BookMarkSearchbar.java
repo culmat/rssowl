@@ -372,7 +372,7 @@ class BookMarkSearchbar extends Composite {
 
   /* Create the Job that refreshes the TreeViewer */
   private void createRefreshJob() {
-    fRefreshJob = new WorkbenchJob("Refresh BookMarkSearchbar") {//$NON-NLS-1$
+    fRefreshJob = new WorkbenchJob("") {//$NON-NLS-1$
       @Override
       public IStatus runInUIThread(IProgressMonitor monitor) {
 

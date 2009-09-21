@@ -46,7 +46,7 @@ import java.util.List;
 
 /**
  * A Subclass of <code>TreeViewer</code> to display Folders and all kinds of
- * Marks in the "BookMark Explorer".
+ * Marks in the "Feeds" view.
  *
  * @author bpasero
  */
