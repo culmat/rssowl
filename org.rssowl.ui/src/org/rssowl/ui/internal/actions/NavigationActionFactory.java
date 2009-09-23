@@ -142,8 +142,8 @@ public class NavigationActionFactory implements IExecutableExtensionFactory, IEx
       if (fType.isNewsScoped() && activeFeedView != null) {
         boolean success = activeFeedView.navigate(true, false, fType.isNext(), fType.isUnread());
 
-        /* For unread news, consider all news of the active feed (see Bug 1064) */
-        if (!success && fType.isNewsScoped() && fType.isUnread())
+        /* For unread & next news, consider all news of the active feed */
+        if (!success && fType.isNewsScoped() && fType.isUnread() && fType.isNext())
           success = activeFeedView.navigate(false, false, fType.isNext(), fType.isUnread());
 
         if (success) {
