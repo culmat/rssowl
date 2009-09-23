@@ -197,62 +197,64 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
     Composite container = createComposite(parent);
 
     /* Use a master password */
-    Composite masterContainer = new Composite(container, SWT.NONE);
-    masterContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
-    masterContainer.setLayout(LayoutUtils.createGridLayout(3, 0, 0));
-    ((GridLayout) masterContainer.getLayout()).marginBottom = 15;
-    ((GridLayout) masterContainer.getLayout()).verticalSpacing = 10;
+    if (!Application.IS_ECLIPSE) {
+      Composite masterContainer = new Composite(container, SWT.NONE);
+      masterContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
+      masterContainer.setLayout(LayoutUtils.createGridLayout(3, 0, 0));
+      ((GridLayout) masterContainer.getLayout()).marginBottom = 15;
+      ((GridLayout) masterContainer.getLayout()).verticalSpacing = 10;
 
-    StyledText infoText = new StyledText(masterContainer, SWT.WRAP | SWT.READ_ONLY);
-    infoText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1));
-    ((GridData) infoText.getLayoutData()).widthHint = 200;
-    infoText.setEnabled(false);
-    infoText.setBackground(masterContainer.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+      StyledText infoText = new StyledText(masterContainer, SWT.WRAP | SWT.READ_ONLY);
+      infoText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1));
+      ((GridData) infoText.getLayoutData()).widthHint = 200;
+      infoText.setEnabled(false);
+      infoText.setBackground(masterContainer.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 
-    if (Application.IS_WINDOWS || Application.IS_MAC)
-      infoText.setText(Messages.CredentialsPreferencesPage_MASTER_PW_INFO);
-    else
-      infoText.setText(Messages.CredentialsPreferencesPage_MASTER_PW_MSG);
+      if (Application.IS_WINDOWS || Application.IS_MAC)
+        infoText.setText(Messages.CredentialsPreferencesPage_MASTER_PW_INFO);
+      else
+        infoText.setText(Messages.CredentialsPreferencesPage_MASTER_PW_MSG);
 
-    /* Use Own Master Password */
-    fUseMasterPasswordCheck = new Button(masterContainer, SWT.CHECK);
-    fUseMasterPasswordCheck.setText(Messages.CredentialsPreferencesPage_USE_MASTER_PW);
-    fUseMasterPasswordCheck.setFocus();
-    fUseMasterPasswordCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
-    fUseMasterPasswordCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.USE_MASTER_PASSWORD));
-    fUseMasterPasswordCheck.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        if (!fUseMasterPasswordCheck.getSelection())
-          fChangeMasterPassword.setEnabled(false);
-      }
-    });
+      /* Use Own Master Password */
+      fUseMasterPasswordCheck = new Button(masterContainer, SWT.CHECK);
+      fUseMasterPasswordCheck.setText(Messages.CredentialsPreferencesPage_USE_MASTER_PW);
+      fUseMasterPasswordCheck.setFocus();
+      fUseMasterPasswordCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+      fUseMasterPasswordCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.USE_MASTER_PASSWORD));
+      fUseMasterPasswordCheck.addSelectionListener(new SelectionAdapter() {
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+          if (!fUseMasterPasswordCheck.getSelection())
+            fChangeMasterPassword.setEnabled(false);
+        }
+      });
 
-    /* Change Own Master Password */
-    fChangeMasterPassword = new Button(masterContainer, SWT.PUSH);
-    fChangeMasterPassword.setEnabled(fUseMasterPasswordCheck.getSelection());
-    fChangeMasterPassword.setText(Messages.CredentialsPreferencesPage_CHANGE_MASTER_PW);
-    Dialog.applyDialogFont(fChangeMasterPassword);
-    setButtonLayoutData(fChangeMasterPassword);
-    fChangeMasterPassword.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        onChangeMasterPassword();
-      }
-    });
+      /* Change Own Master Password */
+      fChangeMasterPassword = new Button(masterContainer, SWT.PUSH);
+      fChangeMasterPassword.setEnabled(fUseMasterPasswordCheck.getSelection());
+      fChangeMasterPassword.setText(Messages.CredentialsPreferencesPage_CHANGE_MASTER_PW);
+      Dialog.applyDialogFont(fChangeMasterPassword);
+      setButtonLayoutData(fChangeMasterPassword);
+      fChangeMasterPassword.addSelectionListener(new SelectionAdapter() {
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+          onChangeMasterPassword();
+        }
+      });
 
-    /* Reset Master Password */
-    fResetMasterPassword = new Button(masterContainer, SWT.PUSH);
-    fResetMasterPassword.setEnabled(false);
-    fResetMasterPassword.setText(Messages.CredentialsPreferencesPage_RESET);
-    Dialog.applyDialogFont(fResetMasterPassword);
-    setButtonLayoutData(fResetMasterPassword);
-    fResetMasterPassword.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        onResetMasterPassword();
-      }
-    });
+      /* Reset Master Password */
+      fResetMasterPassword = new Button(masterContainer, SWT.PUSH);
+      fResetMasterPassword.setEnabled(false);
+      fResetMasterPassword.setText(Messages.CredentialsPreferencesPage_RESET);
+      Dialog.applyDialogFont(fResetMasterPassword);
+      setButtonLayoutData(fResetMasterPassword);
+      fResetMasterPassword.addSelectionListener(new SelectionAdapter() {
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+          onResetMasterPassword();
+        }
+      });
+    }
 
     /* Label */
     Label infoLabel = new Label(container, SWT.NONE);
@@ -390,7 +392,9 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
       ((PlatformCredentialsProvider) provider).clear();
       reSetAllCredentials();
       setShowError(false);
-      fResetMasterPassword.setEnabled(false);
+
+      if (!Application.IS_ECLIPSE)
+        fResetMasterPassword.setEnabled(false);
     }
   }
 
@@ -502,10 +506,13 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
     else
       setErrorMessage(null);
 
-    fUseMasterPasswordCheck.setEnabled(!isError);
-    fChangeMasterPassword.setEnabled(!isError && fUseMasterPasswordCheck.getSelection());
+    if (!Application.IS_ECLIPSE) {
+      fUseMasterPasswordCheck.setEnabled(!isError);
+      fChangeMasterPassword.setEnabled(!isError && fUseMasterPasswordCheck.getSelection());
+      fResetMasterPassword.setEnabled(isError);
+    }
+
     fViewer.getTable().setEnabled(!isError);
-    fResetMasterPassword.setEnabled(isError);
   }
 
   private Composite createComposite(Composite parent) {
@@ -524,18 +531,20 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
    */
   @Override
   public boolean performOk() {
-    boolean oldUseMasterPassword = fGlobalScope.getBoolean(DefaultPreferences.USE_MASTER_PASSWORD);
-    boolean newUseMasterPassword = fUseMasterPasswordCheck.getSelection();
+    if (!Application.IS_ECLIPSE) {
+      boolean oldUseMasterPassword = fGlobalScope.getBoolean(DefaultPreferences.USE_MASTER_PASSWORD);
+      boolean newUseMasterPassword = fUseMasterPasswordCheck.getSelection();
 
-    fGlobalScope.putBoolean(DefaultPreferences.USE_MASTER_PASSWORD, fUseMasterPasswordCheck.getSelection());
+      fGlobalScope.putBoolean(DefaultPreferences.USE_MASTER_PASSWORD, fUseMasterPasswordCheck.getSelection());
 
-    /*
-     * Hack: There does not seem to be any API to update the stored credentials in Equinox Secure Storage.
-     * In order to enable/disable the master password, the workaround is to save all known credentials again.
-     * The provider will automatically prompt for the new master password to use for the credentials.
-     */
-    if (oldUseMasterPassword != newUseMasterPassword)
-      reSetAllCredentials();
+      /*
+       * Hack: There does not seem to be any API to update the stored credentials in Equinox Secure Storage.
+       * In order to enable/disable the master password, the workaround is to save all known credentials again.
+       * The provider will automatically prompt for the new master password to use for the credentials.
+       */
+      if (oldUseMasterPassword != newUseMasterPassword)
+        reSetAllCredentials();
+    }
 
     return super.performOk();
   }
@@ -546,7 +555,9 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
   @Override
   protected void performApply() {
     super.performApply();
-    fChangeMasterPassword.setEnabled(fUseMasterPasswordCheck.getSelection());
+
+    if (!Application.IS_ECLIPSE)
+      fChangeMasterPassword.setEnabled(fUseMasterPasswordCheck.getSelection());
   }
 
   /*
@@ -556,9 +567,11 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
   protected void performDefaults() {
     super.performDefaults();
 
-    IPreferenceScope defaultScope = Owl.getPreferenceService().getDefaultScope();
-    fUseMasterPasswordCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.USE_MASTER_PASSWORD));
-    fChangeMasterPassword.setEnabled(fUseMasterPasswordCheck.getSelection());
+    if (!Application.IS_ECLIPSE) {
+      IPreferenceScope defaultScope = Owl.getPreferenceService().getDefaultScope();
+      fUseMasterPasswordCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.USE_MASTER_PASSWORD));
+      fChangeMasterPassword.setEnabled(fUseMasterPasswordCheck.getSelection());
+    }
   }
 
   private void reSetAllCredentials() {
