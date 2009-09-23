@@ -36,6 +36,7 @@ import org.eclipse.equinox.security.storage.StorageException;
 import org.eclipse.equinox.security.storage.provider.IProviderHints;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.Activator;
+import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 
@@ -136,38 +137,40 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
   }
 
   private ISecurePreferences getSecurePreferences() {
-    IPreferenceScope prefs = Owl.getPreferenceService().getGlobalScope();
-    boolean useOSPasswordProvider = prefs.getBoolean(DefaultPreferences.USE_OS_PASSWORD);
+    if (!InternalOwl.IS_ECLIPSE) {
+      IPreferenceScope prefs = Owl.getPreferenceService().getGlobalScope();
+      boolean useOSPasswordProvider = prefs.getBoolean(DefaultPreferences.USE_OS_PASSWORD);
 
-    /* Disable OS Password if Master Password shall be used */
-    if (prefs.getBoolean(DefaultPreferences.USE_MASTER_PASSWORD))
-      useOSPasswordProvider = false;
+      /* Disable OS Password if Master Password shall be used */
+      if (prefs.getBoolean(DefaultPreferences.USE_MASTER_PASSWORD))
+        useOSPasswordProvider = false;
 
-    /* Try storing credentials in profile folder */
-    try {
-      IPath stateLocation = Activator.getDefault().getStateLocation();
-      stateLocation = stateLocation.append(SECURE_STORAGE_FILE);
-      URL location = stateLocation.toFile().toURI().toURL();
-      Map<String, String> options = null;
+      /* Try storing credentials in profile folder */
+      try {
+        IPath stateLocation = Activator.getDefault().getStateLocation();
+        stateLocation = stateLocation.append(SECURE_STORAGE_FILE);
+        URL location = stateLocation.toFile().toURI().toURL();
+        Map<String, String> options = null;
 
-      /* Use OS dependent password provider if available */
-      if (useOSPasswordProvider) {
-        if (Platform.OS_WIN32.equals(Platform.getOS())) {
-          options = new HashMap<String, String>();
-          options.put(IProviderHints.REQUIRED_MODULE_ID, WIN_PW_PROVIDER_ID);
-        } else if (Platform.OS_MACOSX.equals(Platform.getOS())) {
-          options = new HashMap<String, String>();
-          options.put(IProviderHints.REQUIRED_MODULE_ID, MACOS_PW_PROVIDER_ID);
+        /* Use OS dependent password provider if available */
+        if (useOSPasswordProvider) {
+          if (Platform.OS_WIN32.equals(Platform.getOS())) {
+            options = new HashMap<String, String>();
+            options.put(IProviderHints.REQUIRED_MODULE_ID, WIN_PW_PROVIDER_ID);
+          } else if (Platform.OS_MACOSX.equals(Platform.getOS())) {
+            options = new HashMap<String, String>();
+            options.put(IProviderHints.REQUIRED_MODULE_ID, MACOS_PW_PROVIDER_ID);
+          }
         }
-      }
 
-      return SecurePreferencesFactory.open(location, options);
-    } catch (MalformedURLException e) {
-      Activator.safeLogError(e.getMessage(), e);
-    } catch (IllegalStateException e1) {
-      Activator.safeLogError(e1.getMessage(), e1);
-    } catch (IOException e2) {
-      Activator.safeLogError(e2.getMessage(), e2);
+        return SecurePreferencesFactory.open(location, options);
+      } catch (MalformedURLException e) {
+        Activator.safeLogError(e.getMessage(), e);
+      } catch (IllegalStateException e1) {
+        Activator.safeLogError(e1.getMessage(), e1);
+      } catch (IOException e2) {
+        Activator.safeLogError(e2.getMessage(), e2);
+      }
     }
 
     /* Fallback to default location */
@@ -351,9 +354,9 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
   }
 
   /**
-   * An internal method only available for the {@link
-   * PlatformCredentialsProvider} to clear all secure preferences nodes. This
-   * method is called e.g. when the master password is to be changed or
+   * An internal method only available for the
+   * {@link PlatformCredentialsProvider} to clear all secure preferences nodes.
+   * This method is called e.g. when the master password is to be changed or
    * disabled.
    */
   public void clear() {

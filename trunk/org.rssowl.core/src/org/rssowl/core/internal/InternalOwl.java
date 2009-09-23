@@ -80,6 +80,9 @@ public final class InternalOwl {
   /** Flag indicating JUnit-Tests are running */
   public volatile static boolean TESTING = false;
 
+  /** Flag indicating we are running from Eclipse */
+  public static final  boolean IS_ECLIPSE = false;
+
   private InternalOwl() {}
 
   /**

@@ -38,6 +38,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.rssowl.core.Owl;
 import org.rssowl.core.connection.ConnectionException;
+import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IBookMarkDAO;
@@ -67,7 +68,7 @@ public class Application implements IApplication {
   public static final boolean IS_MAC = "carbon".equals(SWT.getPlatform()); //$NON-NLS-1$
 
   /** Flag to indicate RSSOwl integrated to Eclipse or not */
-  public static final boolean IS_ECLIPSE= false;
+  public static final boolean IS_ECLIPSE= InternalOwl.IS_ECLIPSE;
 
   /*
    * @see org.eclipse.equinox.app.IApplication#start(org.eclipse.equinox.app.IApplicationContext)
