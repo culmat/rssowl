@@ -1590,11 +1590,11 @@
       </statusHandlerProductBinding>
    </extension>
    <extension
-         id="SecureStorage"
+         id="RSSOwlPasswordProvider"
          point="org.eclipse.equinox.security.secureStorage">
       <provider
             class="org.rssowl.ui.internal.DefaultPasswordProvider"
-            priority="8">
+            priority="3">
       </provider>
    </extension>
    <extension

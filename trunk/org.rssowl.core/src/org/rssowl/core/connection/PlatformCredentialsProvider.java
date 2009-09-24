@@ -67,6 +67,9 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
   /* ID of the Win32 dependent password provider (win32) */
   private static final String WIN_PW_PROVIDER_ID = "org.eclipse.equinox.security.WindowsPasswordProvider"; //$NON-NLS-1$
 
+  /* ID of the RSSOwl password provider (Dialog asking for Master Password) */
+  private static final String RSSOWL_PW_PROVIDER_ID = "org.rssowl.ui.RSSOwlPasswordProvider"; //$NON-NLS-1$
+
   /* ID of the MacOS dependent password provider */
   private static final String MACOS_PW_PROVIDER_ID = "org.eclipse.equinox.security.OSXKeystoreIntegration"; //$NON-NLS-1$
 
@@ -161,6 +164,12 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
             options = new HashMap<String, String>();
             options.put(IProviderHints.REQUIRED_MODULE_ID, MACOS_PW_PROVIDER_ID);
           }
+        }
+
+        /* Use RSSOwl password provider */
+        else {
+          options = new HashMap<String, String>();
+          options.put(IProviderHints.REQUIRED_MODULE_ID, RSSOWL_PW_PROVIDER_ID);
         }
 
         return SecurePreferencesFactory.open(location, options);
