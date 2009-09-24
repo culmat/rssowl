@@ -32,6 +32,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.swt.widgets.TreeItem;
 import org.rssowl.ui.internal.Application;
 
 import java.util.ArrayList;
@@ -71,6 +72,17 @@ public class CTree {
    */
   public Tree getControl() {
     return fTree;
+  }
+
+  /* Returns true if the first item has a child (when grouping is enabled) */
+  private boolean showsParentWithChilds() {
+    if (!fTree.isDisposed()) {
+      TreeItem[] items = fTree.getItems();
+      if (items.length > 0)
+        return items[0].getItemCount() != 0;
+    }
+
+    return false;
   }
 
   /**
@@ -142,8 +154,12 @@ public class CTree {
       totalWidth -= verticalBar.getSize().x;
 
     /* Bug on Mac: Width is too big */
-    if (Application.IS_MAC)
+    if (Application.IS_MAC) {
       totalWidth -= 3;
+
+      if (showsParentWithChilds())
+        totalWidth -= 24;
+    }
 
     /* Bug on Linux: Margin from Bar to TableItem not returned */
     else if (Application.IS_LINUX)
