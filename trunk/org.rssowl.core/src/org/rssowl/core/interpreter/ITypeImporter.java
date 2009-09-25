@@ -33,6 +33,9 @@ import java.util.List;
  * This interface allows to contribute Importers for various XML Formats. The
  * application is deciding which Importer to use based on the name of the root
  * Element of the XML.
+ * <p>
+ * Contributed via <code>org.rssowl.core.TypeImporter</code> Extension Point.
+ * </p>
  *
  * @author bpasero
  */

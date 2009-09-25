@@ -35,7 +35,10 @@ import org.rssowl.core.persist.IPersistable;
  * Note: Use this Handler with caution. It will override the applications
  * Element-Handler for the given Format.
  * </p>
- * 
+ * <p>
+ * Contributed via <code>org.rssowl.core.ElementHandler</code> Extension Point.
+ * </p>
+ *
  * @author bpasero
  */
 public interface IElementHandler {
@@ -44,7 +47,7 @@ public interface IElementHandler {
    * This Method is called whenever an Element of the given Format has been
    * reached that has the defined Name. The type-parameter is the current
    * Interpreter-Model at the time the Element was reached.
-   * 
+   *
    * @param element The Element to process.
    * @param type The Interpreter Type the given Element belongs to.
    */

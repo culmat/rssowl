@@ -31,7 +31,11 @@ import org.rssowl.core.persist.IPersistable;
 /**
  * The Namespace Handler allows to contribute processing of Namespaces. Use this
  * mechanism if you want to interpret Elements or Attributes with Namespaces.
- * 
+ * <p>
+ * Contributed via <code>org.rssowl.core.NamespaceHandler</code> Extension
+ * Point.
+ * </p>
+ *
  * @author bpasero
  */
 public interface INamespaceHandler {
@@ -40,7 +44,7 @@ public interface INamespaceHandler {
    * This Method is called whenever an Element has been reached that makes use
    * of the defined NamespaceURI. The type-parameter is the current
    * Interpreter-Model at the time the Element was reached.
-   * 
+   *
    * @param element The Element to process.
    * @param type The Interpreter Type the given Element belongs to.
    */
@@ -55,7 +59,7 @@ public interface INamespaceHandler {
    * Attribute is belonging to does not itself use a Namespace. In that case,
    * only the processElement-Method belonging to that Namespace is called.
    * </p>
-   * 
+   *
    * @param attribute The Attribute to process.
    * @param type The Interpreter Type the given Element belongs to.
    */

@@ -1,16 +1,23 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.rssowl.core.interpreter">
+<schema targetNamespace="org.rssowl.core.interpreter" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
-      <appInfo>
+      <appinfo>
          <meta.schema plugin="org.rssowl.core.interpreter" id="TypeImporter" name="Type Importer"/>
-      </appInfo>
+      </appinfo>
       <documentation>
-         
+         &lt;p&gt;
+This extension point allows to contribute implementations to import data into RSSOwl from various XML formats. RSSOwl supports OPML. Use this extension point if you need more formats to support during import into RSSOwl.
+&lt;/p&gt;
       </documentation>
    </annotation>
 
    <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
       <complexType>
          <sequence>
             <element ref="typeImporter" minOccurs="1" maxOccurs="unbounded"/>
@@ -34,9 +41,9 @@
                <documentation>
                   
                </documentation>
-               <appInfo>
+               <appinfo>
                   <meta.attribute translatable="true"/>
-               </appInfo>
+               </appinfo>
             </annotation>
          </attribute>
       </complexType>
@@ -44,25 +51,25 @@
 
    <element name="typeImporter">
       <annotation>
-         <appInfo>
+         <appinfo>
             <meta.element labelAttribute="rootElement"/>
-         </appInfo>
+         </appinfo>
       </annotation>
       <complexType>
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  A class that implements &lt;samp&gt;org.rssowl.core.interpreter.ITypeImporter&lt;/samp&gt;.
                </documentation>
-               <appInfo>
+               <appinfo>
                   <meta.attribute kind="java" basedOn="org.rssowl.core.interpreter.ITypeImporter"/>
-               </appInfo>
+               </appinfo>
             </annotation>
          </attribute>
          <attribute name="rootElement" type="string" use="required">
             <annotation>
                <documentation>
-                  The root element of the XML document this importer should be responsible for.
+                  The root element of the XML document this importer is responsible for for import.
                </documentation>
             </annotation>
          </attribute>
@@ -70,45 +77,36 @@
    </element>
 
    <annotation>
-      <appInfo>
+      <appinfo>
          <meta.section type="since"/>
-      </appInfo>
+      </appinfo>
       <documentation>
          2.0
       </documentation>
    </annotation>
 
    <annotation>
-      <appInfo>
+      <appinfo>
          <meta.section type="examples"/>
-      </appInfo>
+      </appinfo>
       <documentation>
-         
+         &lt;p&gt;
+The following is an example for using the extension point by supporting the RDF XML format:
+&lt;pre&gt;&lt;extension point=&quot;org.rssowl.core.TypeImporter&quot;&gt;
+      &lt;typeImporter
+            class=&quot;org.rssowl.core.internal.interpreter.OPMLImporter&quot;
+            rootElement=&quot;rdf&quot;/&gt;
+&lt;/extension&gt;&lt;/pre&gt;
+&lt;/p&gt;
       </documentation>
    </annotation>
 
-   <annotation>
-      <appInfo>
-         <meta.section type="apiInfo"/>
-      </appInfo>
-      <documentation>
-         
-      </documentation>
-   </annotation>
+
 
    <annotation>
-      <appInfo>
-         <meta.section type="implementation"/>
-      </appInfo>
-      <documentation>
-         
-      </documentation>
-   </annotation>
-
-   <annotation>
-      <appInfo>
+      <appinfo>
          <meta.section type="copyright"/>
-      </appInfo>
+      </appinfo>
       <documentation>
          Copyright notice (c) 2005-2009 RSSOwl Development Team.                            
 All rights reserved´. This program and the accompanying 

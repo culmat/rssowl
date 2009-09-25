@@ -38,6 +38,9 @@ import java.util.Map;
 /**
  * This interface allows to contribute Handlers for Protocols. The application
  * is calling the contributor that is matching the URL's protocol.
+ * <p>
+ * Contributed via <code>org.rssowl.core.ProtocolHandler</code> Extension Point.
+ * </p>
  *
  * @author bpasero
  */

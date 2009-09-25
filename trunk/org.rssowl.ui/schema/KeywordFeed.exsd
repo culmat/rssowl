@@ -6,7 +6,9 @@
          <meta.schema plugin="org.rssowl.ui" id="OnlineFeedEngine" name="Online Feed Engine"/>
       </appInfo>
       <documentation>
-         This extension point allows to register a search engine that can be selected when creating a new bookmark from a key word.
+         &lt;p&gt;
+This extension point allows to register a feed engine that can be selected when creating a new bookmark from a key word.
+&lt;/p&gt;
       </documentation>
    </annotation>
 
@@ -52,14 +54,14 @@
          <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  The unique ID of the contribution.
                </documentation>
             </annotation>
          </attribute>
          <attribute name="name" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  A human readable name for the feed engine.
                </documentation>
                <appInfo>
                   <meta.attribute translatable="true"/>
@@ -69,7 +71,7 @@
          <attribute name="icon" type="string">
             <annotation>
                <documentation>
-                  
+                  An icon for the feed engine.
                </documentation>
                <appInfo>
                   <meta.attribute kind="resource"/>
@@ -100,27 +102,21 @@
          <meta.section type="examples"/>
       </appInfo>
       <documentation>
-         [Enter extension point usage example here.]
+         &lt;p&gt;
+The following is an example for using the extension point for a Google News keyword feed:
+&lt;pre&gt;&lt;extension point=&quot;org.rssowl.ui.KeywordFeed&quot;&gt;
+      &lt;keywordFeed
+            icon=&quot;icons/obj16/fav_google.gif&quot;
+            id=&quot;org.rssowl.ui.GoogleNewsKeywordFeed&quot;
+            name=&quot;Google News&quot;
+            url=&quot;http://news.google.com/news?q=[:]&amp;amp;output=rss&quot;&gt;
+      &lt;/keywordFeed&gt;
+&lt;/extension&gt;&lt;/pre&gt;
+&lt;/p&gt;
       </documentation>
    </annotation>
 
-   <annotation>
-      <appInfo>
-         <meta.section type="apiInfo"/>
-      </appInfo>
-      <documentation>
-         [Enter API information here.]
-      </documentation>
-   </annotation>
 
-   <annotation>
-      <appInfo>
-         <meta.section type="implementation"/>
-      </appInfo>
-      <documentation>
-         [Enter information about supplied implementation of this extension point.]
-      </documentation>
-   </annotation>
 
    <annotation>
       <appInfo>

@@ -31,8 +31,10 @@ import java.util.Date;
 
 /**
  * Provides access to the model factory of RSSOwl. This factory is used
- * everywhere when new entities are created. The factory can be replaced using
- * the ModelFactory extension point.
+ * everywhere when new entities are created.
+ * <p>
+ * Contributed via <code>org.rssowl.core.ModelFactory</code> Extension Point.
+ * </p>
  *
  * @author Ismael Juma (ismael@juma.uk)
  */

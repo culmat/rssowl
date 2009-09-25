@@ -31,14 +31,18 @@ import org.rssowl.core.persist.IFeed;
  * This interface allows to contribute Interpreters for various XML Formats. The
  * application is deciding which Interpreter to use based on the name of the
  * root Element of the XML.
- * 
+ * <p>
+ * Contributed via <code>org.rssowl.core.FormatInterpreter</code> Extension
+ * Point.
+ * </p>
+ *
  * @author bpasero
  */
 public interface IFormatInterpreter {
 
   /**
    * Interpret the given <code>org.jdom.Document</code> as Feed.
-   * 
+   *
    * @param document The Document to be interpreted as Feed.
    * @param feed An instanceof IFeed that stores the interpreted Feed.
    * @throws InterpreterException Checked Exception to be used in case of any

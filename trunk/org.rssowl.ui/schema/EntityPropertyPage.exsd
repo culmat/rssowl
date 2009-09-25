@@ -6,9 +6,11 @@
          <meta.schema plugin="org.rssowl.ui" id="entityPropertyPage" name="Entity Property Page"/>
       </appInfo>
       <documentation>
-         This extension point allows to contribute property pages to the property dialog being used for
+         &lt;p&gt;
+This extension point allows to contribute property pages to the property dialog being used for
 all entities in RSSOwl. Pages can be registered for any entity and will show up in the dialog
 as separate tabs.
+&lt;/p&gt;
       </documentation>
    </annotation>
 
@@ -62,14 +64,14 @@ as separate tabs.
          <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  The unique ID of the entity property page.
                </documentation>
             </annotation>
          </attribute>
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  A class that implements &lt;samp&gt;org.rssowl.ui.dialogs.properties.IEntityPropertyPage&lt;/samp&gt;.
                </documentation>
                <appInfo>
                   <meta.attribute kind="java" basedOn="org.rssowl.ui.dialogs.properties.IEntityPropertyPage"/>
@@ -116,7 +118,7 @@ as separate tabs.
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  A class that implements &lt;samp&gt;org.rssowl.core.model.persist.IEntity&lt;/samp&gt;.
                </documentation>
                <appInfo>
                   <meta.attribute kind="java" basedOn="org.rssowl.core.model.persist.IEntity"/>
@@ -140,11 +142,10 @@ as separate tabs.
          <meta.section type="examples"/>
       </appInfo>
       <documentation>
-         The following is an example of the extension point that registers a property
+         &lt;p&gt;
+The following is an example of the extension point that registers a property
 page for the entities &lt;samp&gt;IFolder&lt;/samp&gt; and &lt;samp&gt;IBookMark&lt;/samp&gt;: 
-&lt;p&gt;
-&lt;pre&gt;
-   &lt;extension point=&quot;org.rssowl.ui.entityPropertyPage&quot;&gt; 
+&lt;pre&gt;&lt;extension point=&quot;org.rssowl.ui.entityPropertyPage&quot;&gt; 
       &lt;entityPropertyPage
           class=&quot;org.rssowl.ui.internal.dialogs.properties.GeneralPropertyPage&quot;
           handlesMultipleEntities=&quot;true&quot;
@@ -160,7 +161,7 @@ page for the entities &lt;samp&gt;IFolder&lt;/samp&gt; and &lt;samp&gt;IBookMark
             class=&quot;org.rssowl.core.persist.IBookMark&quot;&gt;
          &lt;/targetEntity&gt;
       &lt;/entityPropertyPage&gt;
-   &lt;/extension&gt; 
+&lt;/extension&gt; 
 &lt;/pre&gt;
 &lt;/p&gt;
       </documentation>

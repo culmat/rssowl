@@ -6,7 +6,9 @@
          <meta.schema plugin="org.rssowl.ui" id="FilterActionPresentation" name="Filter Action Presentation"/>
       </appInfo>
       <documentation>
-         
+         &lt;p&gt;
+This extension point allows to contribute a presentation for a news action. This is useful when extra input from the user is required for the news action to function properly.
+&lt;/p&gt;
       </documentation>
    </annotation>
 
@@ -52,14 +54,14 @@
          <attribute name="actionId" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  The ID of the news action this presentation is used for.
                </documentation>
             </annotation>
          </attribute>
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  A class that implements &lt;samp&gt;org.rssowl.ui.filter.INewsActionPresentation&lt;/samp&gt;.
                </documentation>
                <appInfo>
                   <meta.attribute kind="java" basedOn=":org.rssowl.ui.filter.INewsActionPresentation"/>
@@ -78,6 +80,22 @@
       </documentation>
    </annotation>
 
+   <annotation>
+      <appInfo>
+         <meta.section type="examples"/>
+      </appInfo>
+      <documentation>
+         &lt;p&gt;
+The following is an example for using the extension point for the news action with the ID &apos;org.rssowl.core.LabelNewsAction&apos;:
+&lt;pre&gt;&lt;extension
+         point=&quot;org.rssowl.ui.NewsActionPresentation&quot;&gt;
+      &lt;newsActionPresentation
+            class=&quot;org.rssowl.ui.internal.filter.LabelNewsActionPresentation&quot;
+            actionId=&quot;org.rssowl.core.LabelNewsAction&quot;&gt;
+      &lt;/newsActionPresentation&gt;
+&lt;/extension&gt;&lt;/pre&gt;
+      </documentation>
+   </annotation>
 
 
 

@@ -42,6 +42,9 @@ import java.util.List;
  * rather return the list of entities that have been changed from the
  * {@link #run(List, Object)} method.
  * </p>
+ * <p>
+ * Contributed via <code>org.rssowl.core.NewsAction</code> Extension Point.
+ * </p>
  *
  * @author bpasero
  */

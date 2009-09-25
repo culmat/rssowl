@@ -39,6 +39,10 @@ import org.rssowl.core.util.LongOperationMonitor;
  * <li>Providing the DAOService that contains DAOs for each persistable entity</li>
  * <li>Providing the model search to perform full-text searching</li>
  * </ul>
+ * <p>
+ * Contributed via <code>org.rssowl.core.PersistenceService</code> Extension
+ * Point.
+ * </p>
  *
  * @author bpasero
  * @see AbstractPersistenceService
@@ -50,6 +54,7 @@ public interface IPersistenceService {
   /**
    * Startup the persistence layer. In case of a Database, this would be the
    * right place to open the connection.
+   *
    * @param monitor
    */
   void startup(LongOperationMonitor monitor);
@@ -61,27 +66,27 @@ public interface IPersistenceService {
   IStatus getStartupStatus();
 
   /**
-   * Gets the implementation of <code>DAOService</code> that provides access
-   * to all DAOs per entity in RSSOwl. DAOs allow to load and save entities as
-   * well as some more advanced operations (e.g. reparenting for folders). The
+   * Gets the implementation of <code>DAOService</code> that provides access to
+   * all DAOs per entity in RSSOwl. DAOs allow to load and save entities as well
+   * as some more advanced operations (e.g. reparenting for folders). The
    * implementation is looked up using the DAOService extension point.
    * <p>
    * Note that for most simple operations like saving or loading entities, using
    * <code>DynamicDAO</code> requires less code.
    * </p>
    *
-   * @return Returns the implementation of <code>DAOService</code> that
-   * provides access to all DAOs per entity in RSSOwl. DAOs allow to load and
-   * save entities as well as some more advanced operations (e.g. reparenting
-   * for folders).
+   * @return Returns the implementation of <code>DAOService</code> that provides
+   * access to all DAOs per entity in RSSOwl. DAOs allow to load and save
+   * entities as well as some more advanced operations (e.g. reparenting for
+   * folders).
    * @see IEntityDAO
    * @see DynamicDAO
    */
   DAOService getDAOService();
 
   /**
-   * Gets the implementation of <code>IDGenerator</code> that generates IDs
-   * that have not yet been used by the persistence layer. The implementation is
+   * Gets the implementation of <code>IDGenerator</code> that generates IDs that
+   * have not yet been used by the persistence layer. The implementation is
    * looked up using the IDGenerator extension point.
    *
    * @return An implementation of IDGenerator.
@@ -96,8 +101,8 @@ public interface IPersistenceService {
    * full-text-search engine.
    * </p>
    *
-   * @return Returns the Implementation of <code>IModelSearch</code> that
-   * allows to search model types.
+   * @return Returns the Implementation of <code>IModelSearch</code> that allows
+   * to search model types.
    */
   IModelSearch getModelSearch();
 
@@ -105,8 +110,8 @@ public interface IPersistenceService {
    * Shutdown the persistence layer. In case of a Database, this would be the
    * right place to save the relations.
    *
-   * @param emergency If set to <code>TRUE</code>, this method is called from
-   * a shutdown hook that got triggered from a non-normal shutdown (e.g. System
+   * @param emergency If set to <code>TRUE</code>, this method is called from a
+   * shutdown hook that got triggered from a non-normal shutdown (e.g. System
    * Shutdown).
    * @throws PersistenceException In case of an error while starting up the
    * persistence layer.
@@ -124,10 +129,10 @@ public interface IPersistenceService {
 
   /**
    * Instructs the persistence service to schedule an optimization run during
-   * the next time the application is started. The actual optimization type
-   * is dependent on the persistence system being used and implementors are
-   * free to leave this as a no-op in case the the persistence system tunes
-   * itself automatically during runtime.
+   * the next time the application is started. The actual optimization type is
+   * dependent on the persistence system being used and implementors are free to
+   * leave this as a no-op in case the the persistence system tunes itself
+   * automatically during runtime.
    *
    * @throws PersistenceException in case a problem occurs while trying to
    * schedule this operation.

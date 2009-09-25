@@ -6,7 +6,9 @@
          <meta.schema plugin="org.rssowl.ui" id="ShareProvider" name="Share Provider"/>
       </appInfo>
       <documentation>
-         
+         &lt;p&gt;
+This extension point allows to contribute communities that are used to share feeds and news with others.
+&lt;/p&gt;
       </documentation>
    </annotation>
 
@@ -52,14 +54,14 @@
          <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  The unique ID of this contribution.
                </documentation>
             </annotation>
          </attribute>
          <attribute name="name" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  A human readable name for the community.
                </documentation>
                <appInfo>
                   <meta.attribute translatable="true"/>
@@ -69,7 +71,7 @@
          <attribute name="icon" type="string">
             <annotation>
                <documentation>
-                  
+                  An icon for the community.
                </documentation>
                <appInfo>
                   <meta.attribute kind="resource"/>
@@ -86,14 +88,14 @@
          <attribute name="maxTitleLength" type="string">
             <annotation>
                <documentation>
-                  
+                  If the community has a length restriction on the title, you can configure the limit here and RSSOwl will automatically perform the necessary truncation before sharing the information.
                </documentation>
             </annotation>
          </attribute>
          <attribute name="enabled" type="boolean">
             <annotation>
                <documentation>
-                  
+                  A flag indicating if this community should be enabled by default.
                </documentation>
             </annotation>
          </attribute>
@@ -109,6 +111,25 @@
       </documentation>
    </annotation>
 
+   <annotation>
+      <appInfo>
+         <meta.section type="examples"/>
+      </appInfo>
+      <documentation>
+         &lt;p&gt;
+The following is an example for using the extension point for a Delicious share provider:
+&lt;pre&gt;&lt;extension
+         point=&quot;org.rssowl.ui.ShareProvider&quot;&gt;
+      &lt;shareProvider
+            enabled=&quot;true&quot;
+            icon=&quot;icons/obj16/share_delicious.gif&quot;
+            id=&quot;org.rssowl.ui.DeliciousShareProvider&quot;
+            name=&quot;Delicious&quot;
+            url=&quot;http://delicious.com/save?url=[L]&amp;amp;title=[T]&quot;&gt;
+      &lt;/shareProvider&gt;
+&lt;/extension&gt;&lt;/pre&gt;
+      </documentation>
+   </annotation>
 
 
 

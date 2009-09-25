@@ -32,6 +32,10 @@ import java.util.Properties;
 /**
  * Instances of {@link INewsActionPresentation} provide a custom UI presentation
  * for an {@link INewsAction}.
+ * <p>
+ * Contributed via <code>org.rssowl.ui.NewsActionPresentation</code> Extension
+ * Point.
+ * </p>
  *
  * @author bpasero
  */

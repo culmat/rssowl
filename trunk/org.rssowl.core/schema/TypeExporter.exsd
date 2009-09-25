@@ -6,7 +6,9 @@
          <meta.schema plugin="org.rssowl.core" id="TypeExporter" name="Type Exporter"/>
       </appInfo>
       <documentation>
-         [Enter description of this extension point.]
+         &lt;p&gt;
+This extension point allows to contribute implementations to export data in RSSOwl to various output formats. RSSOwl supports XML and OPML. Use this extension point if you need more formats to interchange data between RSSOwl and other applications.
+&lt;/p&gt;
       </documentation>
    </annotation>
 
@@ -55,7 +57,7 @@
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  A class that implements &lt;samp&gt;org.rssowl.core.interpreter.ITypeExporter&lt;/samp&gt;.
                </documentation>
                <appInfo>
                   <meta.attribute kind="java" basedOn=":org.rssowl.core.interpreter.ITypeExporter"/>
@@ -70,7 +72,7 @@
          <attribute name="name" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  The format this exporter supports. Usually the file extension of the resulting output (e.g. xml or opml).
                </documentation>
             </annotation>
          </attribute>
@@ -82,7 +84,7 @@
          <meta.section type="since"/>
       </appInfo>
       <documentation>
-         [Enter the first release in which this extension point appears.]
+         2.0
       </documentation>
    </annotation>
 
@@ -91,27 +93,36 @@
          <meta.section type="examples"/>
       </appInfo>
       <documentation>
-         [Enter extension point usage example here.]
+         &lt;p&gt;
+The following is an example for using the extension point by supporting RDF and ATOM as export format:
+&lt;pre&gt;&lt;extension point=&quot;org.rssowl.core.TypeExporter&quot;&gt;
+      &lt;typeExporter
+            class=&quot;org.rssowl.core.internal.interpreter.OPMLExporter&quot;&gt;
+         &lt;format
+               name=&quot;atom&quot;&gt;
+         &lt;/format&gt;
+         &lt;format
+               name=&quot;rdf&quot;&gt;
+         &lt;/format&gt;
+      &lt;/typeExporter&gt;
+&lt;/extension&gt;&lt;/pre&gt;
+&lt;/p&gt;
       </documentation>
    </annotation>
+
+
 
    <annotation>
       <appInfo>
-         <meta.section type="apiinfo"/>
+         <meta.section type="copyright"/>
       </appInfo>
       <documentation>
-         [Enter API information here.]
+         Copyright notice (c) 2005-2009 RSSOwl Development Team.                            
+All rights reserved´. This program and the accompanying 
+materials are made available under the terms of the Eclipse 
+Public License v1.0 which accompanies this distribution, and 
+is available at: &lt;a href=&quot;http://www.rssowl.org/legal/epl-v10.html&quot;&gt;http://www.rssowl.org/legal/epl-v10.html&lt;/a&gt;
       </documentation>
    </annotation>
-
-   <annotation>
-      <appInfo>
-         <meta.section type="implementation"/>
-      </appInfo>
-      <documentation>
-         [Enter information about supplied implementation of this extension point.]
-      </documentation>
-   </annotation>
-
 
 </schema>
