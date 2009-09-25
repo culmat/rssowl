@@ -26,6 +26,9 @@ package org.rssowl.core.persist.service;
 
 /**
  * Generates unique ids.
+ * <p>
+ * Contributed via <code>org.rssowl.core.IDGenerator</code> Extension Point.
+ * </p>
  */
 public interface IDGenerator {
 
@@ -39,8 +42,8 @@ public interface IDGenerator {
 
   /**
    * @return an id that has not been returned from this method before as long as
-   * the persistence layer used by the generator has not been cleared. The number
-   * returned should be >= 1.
+   * the persistence layer used by the generator has not been cleared. The
+   * number returned should be >= 1.
    */
   long getNext();
 }

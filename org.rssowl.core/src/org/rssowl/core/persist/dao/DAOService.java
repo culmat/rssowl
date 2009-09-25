@@ -31,6 +31,9 @@ import org.rssowl.core.persist.IPersistable;
  * data access objects of all <code>IPersistable</code> model types in RSSOwl.
  * This service can be contributed by using the DAOService extension point
  * provided in this bundle.
+ * <p>
+ * Contributed via <code>org.rssowl.core.DAOService</code> Extension Point.
+ * </p>
  *
  * @author Ismael Juma (ismael@juma.me.uk)
  */

@@ -34,6 +34,9 @@ import java.util.Set;
  * This interface allows to contribute Exporters for {@link IFolderChild}. The
  * application is deciding which Exporter to use based on the name of the file
  * extension choosed.
+ * <p>
+ * Contributed via <code>org.rssowl.core.TypeExporter</code> Extension Point.
+ * </p>
  *
  * @author bpasero
  */

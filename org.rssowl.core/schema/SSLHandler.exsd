@@ -1,16 +1,23 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.rssowl.contrib.httpclient">
+<schema targetNamespace="org.rssowl.contrib.httpclient" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
-      <appInfo>
+      <appinfo>
          <meta.schema plugin="org.rssowl.contrib.httpclient" id="SSLHandler" name="SSL Handler"/>
-      </appInfo>
+      </appinfo>
       <documentation>
-         By default, RSSOwl will not validate SSL connections. Use this extension point to implement SSL certificate validation and more if required.
+         &lt;p&gt;
+By default, RSSOwl will not validate SSL connections. Use this extension point to implement SSL certificate validation and more if required.
+&lt;/p&gt;
       </documentation>
    </annotation>
 
    <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
       <complexType>
          <sequence>
             <element ref="sslhandler"/>
@@ -34,9 +41,9 @@
                <documentation>
                   
                </documentation>
-               <appInfo>
+               <appinfo>
                   <meta.attribute translatable="true"/>
-               </appInfo>
+               </appinfo>
             </annotation>
          </attribute>
       </complexType>
@@ -47,56 +54,46 @@
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  A class that extends &lt;samp&gt;org.apache.commons.httpclient.protocol.SecureProtocolSocketFactory&lt;/samp&gt;.
                </documentation>
-               <appInfo>
+               <appinfo>
                   <meta.attribute kind="java" basedOn="org.apache.commons.httpclient.protocol.SecureProtocolSocketFactory"/>
-               </appInfo>
+               </appinfo>
             </annotation>
          </attribute>
       </complexType>
    </element>
 
    <annotation>
-      <appInfo>
+      <appinfo>
          <meta.section type="since"/>
-      </appInfo>
+      </appinfo>
       <documentation>
          2.0
       </documentation>
    </annotation>
 
    <annotation>
-      <appInfo>
+      <appinfo>
          <meta.section type="examples"/>
-      </appInfo>
+      </appinfo>
       <documentation>
-         
+         &lt;p&gt;
+The following is an example for using the extension point:
+&lt;pre&gt;&lt;extension point=&quot;org.rssowl.core.SSLHandler&quot;&gt;
+      &lt;sslhandler
+            class=&quot;org.rssowl.core.internal.connection.EasySSLProtocolSocketFactory&quot;&gt;
+      &lt;/sslhandler&gt;
+&lt;/extension&gt;&lt;/pre&gt;
       </documentation>
    </annotation>
 
-   <annotation>
-      <appInfo>
-         <meta.section type="apiInfo"/>
-      </appInfo>
-      <documentation>
-         
-      </documentation>
-   </annotation>
+
 
    <annotation>
-      <appInfo>
-         <meta.section type="implementation"/>
-      </appInfo>
-      <documentation>
-         
-      </documentation>
-   </annotation>
-
-   <annotation>
-      <appInfo>
+      <appinfo>
          <meta.section type="copyright"/>
-      </appInfo>
+      </appinfo>
       <documentation>
          Copyright notice (c) 2005-2009 RSSOwl Development Team.                            
 All rights reserved´. This program and the accompanying 

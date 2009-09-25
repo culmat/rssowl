@@ -27,8 +27,13 @@ package org.rssowl.core.connection;
 import java.net.URI;
 
 /**
- * This interface allows to contribute authentication and proxy Credentials for
- * the given Link and knows how to store credentials.
+ * The {@link ICredentialsProvider} interface allows to contribute a provider
+ * that knows how to provide and store authentication and proxy credentials for
+ * a given link.
+ * <p>
+ * Contributed via <code>org.rssowl.core.CredentialsProvider</code> Extension
+ * Point.
+ * </p>
  *
  * @author bpasero
  */
@@ -38,8 +43,7 @@ public interface ICredentialsProvider {
    * Get the Credentials to be used to authenticate on the given Feed.
    *
    * @param link The Link to supply authentication Credentials for
-   * @param realm The Realm to get credentials for or <code>null</code> if
-   * none.
+   * @param realm The Realm to get credentials for or <code>null</code> if none.
    * @return Credentials to use or NULL in case none are to be used for the
    * Feed.
    * @throws CredentialsException Checked Exception to be used in case of any
@@ -64,8 +68,7 @@ public interface ICredentialsProvider {
    *
    * @param credentials The Credentials to use for the given Link
    * @param link The Link to supply authentication Credentials for
-   * @param realm The Realm to set credentials for or <code>null</code> if
-   * none.
+   * @param realm The Realm to set credentials for or <code>null</code> if none.
    * @throws CredentialsException Checked Exception to be used in case of any
    * Exception.
    */

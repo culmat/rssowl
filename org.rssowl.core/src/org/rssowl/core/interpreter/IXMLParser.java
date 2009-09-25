@@ -33,6 +33,9 @@ import java.util.Map;
  * This interface allows to contribute the XML-Parser that is to be used. It is
  * also responsible to parse a given InputStream into an instance of
  * <code>org.jdom.Document</code>.
+ * <p>
+ * Contributed via <code>org.rssowl.core.XMLParser</code> Extension Point.
+ * </p>
  *
  * @author bpasero
  */

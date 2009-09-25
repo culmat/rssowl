@@ -25,17 +25,21 @@
 package org.rssowl.core.persist.pref;
 
 /**
- * Instances of <code>IPreferencesInitializer</code> provide preferences to
- * the default scope. The default scope provides the default-preferences for all
+ * Instances of <code>IPreferencesInitializer</code> provide preferences to the
+ * default scope. The default scope provides the default-preferences for all
  * other Scopes.
- * 
+ * <p>
+ * Contributed via <code>org.rssowl.core.PreferencesInitializer</code> Extension
+ * Point.
+ * </p>
+ *
  * @author bpasero
  */
 public interface IPreferencesInitializer {
 
   /**
    * Initializes the given scope of default preferences with values.
-   * 
+   *
    * @param defaultScope The default-scope containing initial preferences. These
    * serve as the default-preferences for all other Scopes.
    */

@@ -36,6 +36,10 @@ import java.util.Set;
  * Instances of <code>IEntityPropertyPage</code> provide a Property-Page for
  * entites. These pages are created in the Property-Dialog and participate in
  * the dialog lifecycle.
+ * <p>
+ * Contributed via <code>org.rssowl.ui.EntityPropertyPage</code> Extension
+ * Point.
+ * </p>
  *
  * @author bpasero
  */

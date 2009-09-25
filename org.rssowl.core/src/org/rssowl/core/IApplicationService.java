@@ -29,9 +29,13 @@ import org.rssowl.core.persist.IConditionalGet;
 import org.rssowl.core.persist.IFeed;
 
 /**
- * The <code>IApplicationService</code> interface is providing methods that
- * access the Persistance Layer as required by the Application. It is very
- * important that implementors optimize the performance of all these methods.
+ * The {@link IApplicationService} interface is providing methods that access
+ * the Persistance Layer as required by the Application. It is very important
+ * that implementors optimize the performance of all these methods.
+ * <p>
+ * Contributed via <code>org.rssowl.core.ApplicationService</code> Extension
+ * Point.
+ * </p>
  *
  * @author bpasero
  */
@@ -39,11 +43,10 @@ public interface IApplicationService {
 
   /**
    * Handles all the persistence-related operations for a feed that has been
-   * provided by the interpreter. This includes:
-   * <li>Merging the contents of the interpreted feed with the currently saved
-   * one.</li>
-   * <li>Running the retention policy.</li>
-   * <li>Updating the ConditionalGet object associated with the feed.</li>
+   * provided by the interpreter. This includes: <li>Merging the contents of the
+   * interpreted feed with the currently saved one.</li> <li>Running the
+   * retention policy.</li> <li>Updating the ConditionalGet object associated
+   * with the feed.</li>
    *
    * @param bookMark The BookMark that contains the feed that has been reloaded.
    * @param interpretedFeed The IFeed object that has been supplied by the

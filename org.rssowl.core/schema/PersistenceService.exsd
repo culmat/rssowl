@@ -1,16 +1,28 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.rssowl.core.model">
+<schema targetNamespace="org.rssowl.core.model" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
-      <appInfo>
+      <appinfo>
          <meta.schema plugin="org.rssowl.core.model" id="PersistenceService" name="Persistence Service"/>
-      </appInfo>
+      </appinfo>
       <documentation>
-         
+         &lt;p&gt;
+This extension point allows to contribute an implementation of the service that provides access to ther persistence layer of RSSOwl. This includes:
+&lt;ul&gt;
+&lt;li&gt;Controlling the lifecycle of the persistence layer&lt;/li&gt;
+&lt;li&gt;Providing the DAOService that contains DAOs for each persistable entity&lt;/li&gt;
+&lt;li&gt;Providing the model search to perform full-text searching&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/p&gt;
       </documentation>
    </annotation>
 
    <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
       <complexType>
          <sequence>
             <element ref="persistenceservice"/>
@@ -34,9 +46,9 @@
                <documentation>
                   
                </documentation>
-               <appInfo>
+               <appinfo>
                   <meta.attribute translatable="true"/>
-               </appInfo>
+               </appinfo>
             </annotation>
          </attribute>
       </complexType>
@@ -47,56 +59,45 @@
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  A class that implements &lt;samp&gt;org.rssowl.core.persist.service.IPersistenceService&lt;/samp&gt;.
                </documentation>
-               <appInfo>
+               <appinfo>
                   <meta.attribute kind="java" basedOn="org.rssowl.core.persist.service.IPersistenceService"/>
-               </appInfo>
+               </appinfo>
             </annotation>
          </attribute>
       </complexType>
    </element>
 
    <annotation>
-      <appInfo>
+      <appinfo>
          <meta.section type="since"/>
-      </appInfo>
+      </appinfo>
       <documentation>
          2.0
       </documentation>
    </annotation>
 
    <annotation>
-      <appInfo>
+      <appinfo>
          <meta.section type="examples"/>
-      </appInfo>
+      </appinfo>
       <documentation>
-         
+         &lt;p&gt;
+The following is an example for using the extension point:
+&lt;pre&gt;&lt;extension point=&quot;org.rssowl.core.PersistenceService&quot;&gt;
+      &lt;persistenceservice class=&quot;org.rssowl.core.internal.persist.service.PersistenceServiceImpl&quot;/&gt;
+&lt;/extension&gt;&lt;/pre&gt;
+&lt;/p&gt;
       </documentation>
    </annotation>
 
-   <annotation>
-      <appInfo>
-         <meta.section type="apiInfo"/>
-      </appInfo>
-      <documentation>
-         
-      </documentation>
-   </annotation>
+
 
    <annotation>
-      <appInfo>
-         <meta.section type="implementation"/>
-      </appInfo>
-      <documentation>
-         
-      </documentation>
-   </annotation>
-
-   <annotation>
-      <appInfo>
+      <appinfo>
          <meta.section type="copyright"/>
-      </appInfo>
+      </appinfo>
       <documentation>
          Copyright notice (c) 2005-2009 RSSOwl Development Team.                            
 All rights reserved´. This program and the accompanying 

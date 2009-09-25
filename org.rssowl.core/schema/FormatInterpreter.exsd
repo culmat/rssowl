@@ -1,16 +1,23 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.rssowl.core.interpreter">
+<schema targetNamespace="org.rssowl.core.interpreter" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
-      <appInfo>
+      <appinfo>
          <meta.schema plugin="org.rssowl.core.interpreter" id="FormatInterpreter" name="Format Interpreter"/>
-      </appInfo>
+      </appinfo>
       <documentation>
-         A format interpreter knows how to interprete a XML document of a certain format. The format is identified by the name of the root element. Use this extension point if you want to let RSSOwl handle new formats, e.g. being able to display an XML event log as feed.
+         &lt;p&gt;
+A format interpreter knows how to interprete a XML document of a certain format. The format is identified by the name of the root element. Use this extension point if you want to let RSSOwl handle new formats, e.g. being able to display an XML event log as feed.
+&lt;/p&gt;
       </documentation>
    </annotation>
 
    <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
       <complexType>
          <sequence>
             <element ref="formatInterpreter" minOccurs="1" maxOccurs="unbounded"/>
@@ -34,9 +41,9 @@
                <documentation>
                   
                </documentation>
-               <appInfo>
+               <appinfo>
                   <meta.attribute translatable="true"/>
-               </appInfo>
+               </appinfo>
             </annotation>
          </attribute>
       </complexType>
@@ -44,19 +51,19 @@
 
    <element name="formatInterpreter">
       <annotation>
-         <appInfo>
+         <appinfo>
             <meta.element labelAttribute="rootElement"/>
-         </appInfo>
+         </appinfo>
       </annotation>
       <complexType>
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  A class that implements &lt;samp&gt;org.rssowl.core.interpreter.IFormatInterpreter&lt;/samp&gt;.
                </documentation>
-               <appInfo>
+               <appinfo>
                   <meta.attribute kind="java" basedOn="org.rssowl.core.interpreter.IFormatInterpreter"/>
-               </appInfo>
+               </appinfo>
             </annotation>
          </attribute>
          <attribute name="rootElement" type="string" use="required">
@@ -70,24 +77,23 @@
    </element>
 
    <annotation>
-      <appInfo>
+      <appinfo>
          <meta.section type="since"/>
-      </appInfo>
+      </appinfo>
       <documentation>
          2.0
       </documentation>
    </annotation>
 
    <annotation>
-      <appInfo>
+      <appinfo>
          <meta.section type="examples"/>
-      </appInfo>
+      </appinfo>
       <documentation>
-         The following is an example of the extension point that registers a format
+         &lt;p&gt;
+The following is an example of the extension point that registers a format
 interpreter for RSS documents: 
-&lt;p&gt;
-&lt;pre&gt;
-&lt;extension point=&quot;org.rssowl.core.FormatInterpreter&quot;&gt;
+&lt;pre&gt;&lt;extension point=&quot;org.rssowl.core.FormatInterpreter&quot;&gt;
    &lt;formatInterpreter
       class=&quot;org.rssowl.core.internal.interpreter.RSSInterpreter&quot;
       rootElement=&quot;rss&quot;/&gt;
@@ -97,28 +103,12 @@ interpreter for RSS documents:
       </documentation>
    </annotation>
 
-   <annotation>
-      <appInfo>
-         <meta.section type="apiInfo"/>
-      </appInfo>
-      <documentation>
-         
-      </documentation>
-   </annotation>
+
 
    <annotation>
-      <appInfo>
-         <meta.section type="implementation"/>
-      </appInfo>
-      <documentation>
-         
-      </documentation>
-   </annotation>
-
-   <annotation>
-      <appInfo>
+      <appinfo>
          <meta.section type="copyright"/>
-      </appInfo>
+      </appinfo>
       <documentation>
          Copyright notice (c) 2005-2009 RSSOwl Development Team.                            
 All rights reserved´. This program and the accompanying 
