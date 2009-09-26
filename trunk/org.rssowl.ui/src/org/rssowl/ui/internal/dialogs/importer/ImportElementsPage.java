@@ -108,6 +108,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -597,7 +598,7 @@ public class ImportElementsPage extends WizardPage {
             return;
 
           /* Open Stream */
-          in = openStream(link, monitor, INITIAL_CON_TIMEOUT);
+          in = openStream(link, monitor, INITIAL_CON_TIMEOUT, false);
 
           /* Return on Cancellation */
           if (monitor.isCanceled() || Controller.getDefault().isShuttingDown()) {
@@ -848,7 +849,7 @@ public class ImportElementsPage extends WizardPage {
           break;
 
         /* Open Stream to potential Feed */
-        in = openStream(feedLink, monitor, FEED_CON_TIMEOUT);
+        in = openStream(feedLink, monitor, FEED_CON_TIMEOUT, false);
 
         /* Return on Cancellation */
         if (monitor.isCanceled() || Controller.getDefault().isShuttingDown()) {
@@ -934,7 +935,7 @@ public class ImportElementsPage extends WizardPage {
         return null;
 
       /* Open Stream */
-      in = openStream(link, monitor, INITIAL_CON_TIMEOUT);
+      in = openStream(link, monitor, INITIAL_CON_TIMEOUT, true);
 
       /* Return on Cancellation */
       if (monitor.isCanceled() || Controller.getDefault().isShuttingDown())
@@ -957,11 +958,13 @@ public class ImportElementsPage extends WizardPage {
     }
   }
 
-  private InputStream openStream(URI link, IProgressMonitor monitor, int timeout) throws ConnectionException {
+  private InputStream openStream(URI link, IProgressMonitor monitor, int timeout, boolean setAcceptLanguage) throws ConnectionException {
     IProtocolHandler handler = Owl.getConnectionService().getHandler(link);
 
     Map<Object, Object> properties = new HashMap<Object, Object>();
     properties.put(IConnectionPropertyConstants.CON_TIMEOUT, timeout);
+    if (setAcceptLanguage && StringUtils.isSet(Locale.getDefault().getLanguage()))
+      properties.put(IConnectionPropertyConstants.ACCEPT_LANGUAGE, Locale.getDefault().getLanguage());
     return handler.openStream(link, monitor, properties);
   }
 
