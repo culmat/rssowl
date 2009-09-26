@@ -28,7 +28,7 @@ package org.rssowl.core.connection;
  * Constants for connection related properties. Can be used as keys inside a
  * <code>HashMap</code> when calling
  * <code>ConnectionManager#load(URL url, HashMap properties)</code>
- * 
+ *
  * @author bpasero
  */
 public interface IConnectionPropertyConstants {
@@ -44,6 +44,9 @@ public interface IConnectionPropertyConstants {
 
   /** Key for storing the Connection Timeout in millis as <code>Integer</code> */
   public static final String CON_TIMEOUT = "CON_TIMEOUT"; //$NON-NLS-1$
+
+  /** Key for storing the Accept-Language value */
+  public static final String ACCEPT_LANGUAGE = "ACCEPT_LANGUAGE"; //$NON-NLS-1$
 
   /**
    * Key for storing an instance of <code>IProgressMonitor</code> to support

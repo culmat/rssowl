@@ -103,6 +103,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
   private static final int HTTP_ERROR_PROXY_AUTH_REQUIRED = 407;
 
   /* Response Header */
+  private static final String HEADER_ACCEPT_LANGUAGE = "Accept-Language"; //$NON-NLS-1$
   private static final String HEADER_RESPOND_USER_AGENT = "User-Agent"; //$NON-NLS-1$
   private static final String HEADER_RESPOND_ACCEPT_ENCODING = "Accept-Encoding"; //$NON-NLS-1$
   private static final String HEADER_RESPOND_IF_NONE_MATCH = "If-None-Match"; //$NON-NLS-1$
@@ -491,6 +492,10 @@ public class DefaultProtocolHandler implements IProtocolHandler {
       if (ifNoneMatch != null)
         getMethod.setRequestHeader(HEADER_RESPOND_IF_NONE_MATCH, ifNoneMatch);
     }
+
+    /* Add Accept-Language Header if present */
+    if (properties != null && properties.containsKey(IConnectionPropertyConstants.ACCEPT_LANGUAGE))
+      getMethod.setRequestHeader(HEADER_ACCEPT_LANGUAGE, (String) properties.get(IConnectionPropertyConstants.ACCEPT_LANGUAGE));
   }
 
   private HttpClient initClient(Map<Object, Object> properties) {
