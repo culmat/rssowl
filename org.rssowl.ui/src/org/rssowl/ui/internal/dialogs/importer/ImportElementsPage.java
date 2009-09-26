@@ -1001,5 +1001,6 @@ public class ImportElementsPage extends WizardPage {
     ((List) input).add(child);
     fViewer.add(input, child);
     fViewer.setChecked(child, true);
+    fViewer.reveal(child);
   }
 }
