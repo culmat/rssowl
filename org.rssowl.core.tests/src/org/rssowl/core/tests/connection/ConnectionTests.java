@@ -419,12 +419,12 @@ public class ConnectionTests {
    * @throws Exception
    */
   @Test
-  public void testFeedSearch() throws Exception {
+  public void testFeedSearch_SingleLanguage() throws Exception {
     String link = Controller.getDefault().toFeedSearchLink("blog");
 
     Map<Object, Object> properties = new HashMap<Object, Object>();
     properties.put(IConnectionPropertyConstants.CON_TIMEOUT, 60000);
-    properties.put(IConnectionPropertyConstants.ACCEPT_LANGUAGE, "en, de");
+    properties.put(IConnectionPropertyConstants.ACCEPT_LANGUAGE, "de");
 
     InputStream inS = Owl.getConnectionService().getHandler(new URI(link)).openStream(new URI(link), null, properties);
     String content = StringUtils.readString(new BufferedReader(new InputStreamReader(inS)));
@@ -432,6 +432,46 @@ public class ConnectionTests {
 
     List<String> links = RegExUtils.extractLinksFromText(content, false);
     assertTrue(!links.isEmpty());
-    assertTrue(links.size() > 30);
+    assertTrue(links.size() > 50);
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testFeedSearch_DoubleLanguage() throws Exception {
+    String link = Controller.getDefault().toFeedSearchLink("blog");
+
+    Map<Object, Object> properties = new HashMap<Object, Object>();
+    properties.put(IConnectionPropertyConstants.CON_TIMEOUT, 60000);
+    properties.put(IConnectionPropertyConstants.ACCEPT_LANGUAGE, "en,de");
+
+    InputStream inS = Owl.getConnectionService().getHandler(new URI(link)).openStream(new URI(link), null, properties);
+    String content = StringUtils.readString(new BufferedReader(new InputStreamReader(inS)));
+    assertNotNull(content);
+
+    List<String> links = RegExUtils.extractLinksFromText(content, false);
+    assertTrue(!links.isEmpty());
+    assertTrue(links.size() > 50);
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testFeedSearch_WrongLanguage() throws Exception {
+    String link = Controller.getDefault().toFeedSearchLink("blog");
+
+    Map<Object, Object> properties = new HashMap<Object, Object>();
+    properties.put(IConnectionPropertyConstants.CON_TIMEOUT, 60000);
+    properties.put(IConnectionPropertyConstants.ACCEPT_LANGUAGE, "en-us,de_de");
+
+    InputStream inS = Owl.getConnectionService().getHandler(new URI(link)).openStream(new URI(link), null, properties);
+    String content = StringUtils.readString(new BufferedReader(new InputStreamReader(inS)));
+    assertNotNull(content);
+
+    List<String> links = RegExUtils.extractLinksFromText(content, false);
+    assertTrue(!links.isEmpty());
+    assertTrue(links.size() > 50);
   }
 }
