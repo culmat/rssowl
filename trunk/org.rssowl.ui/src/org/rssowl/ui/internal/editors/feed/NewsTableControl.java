@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -896,8 +897,8 @@ public class NewsTableControl implements IFeedViewPart {
         }
 
         manager.add(new Separator("filter")); //$NON-NLS-1$
-        manager.add(new Separator("edit")); //$NON-NLS-1$
         manager.add(new Separator("copy")); //$NON-NLS-1$
+        manager.add(new GroupMarker("edit")); //$NON-NLS-1$
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
         /* Need a good Selection here */
