@@ -328,6 +328,9 @@ public enum Preference {
   /** Global: Aggregate News as Search */
   AGGREGATE_NEWS_AS_SEARCH("org.rssowl.pref.AggregateNewsAsSearch", IPreferenceType.BOOLEAN), //$NON-NLS-1$
 
+  /** Global: Language Specific Feed Search */
+  LOCALIZED_FEED_SEARCH("org.rssowl.pref.LocalizedFeedSearch", IPreferenceType.BOOLEAN), //$NON-NLS-1$
+
   /******************************
    * Eclipse Preferences Follow *
    ******************************/

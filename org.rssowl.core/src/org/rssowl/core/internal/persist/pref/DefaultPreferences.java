@@ -331,6 +331,9 @@ public class DefaultPreferences {
   /** Global: Aggregate News as Saved Search */
   public static final String AGGREGATE_NEWS_AS_SEARCH = Preference.AGGREGATE_NEWS_AS_SEARCH.id();
 
+  /** Global: Localized Feed Search */
+  public static final String LOCALIZED_FEED_SEARCH = Preference.LOCALIZED_FEED_SEARCH.id();
+
   /**
    * Eclipse Preferences Follow
    */

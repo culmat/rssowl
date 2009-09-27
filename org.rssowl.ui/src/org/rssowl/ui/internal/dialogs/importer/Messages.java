@@ -66,6 +66,8 @@ public class Messages extends NLS {
   public static String ImportSourcePage_IMPORT_BY_KEYWORD;
   public static String ImportSourcePage_IMPORT_FROM_FILE_OR_WEBSITE;
   public static String ImportSourcePage_IMPORT_RECOMMENDED;
+  public static String ImportSourcePage_MATCH_LANGUAGE;
+  public static String ImportSourcePage_MATCH_LANGUAGE_N;
   public static String ImportSourcePage_NO_MPORT;
   public static String ImportSourcePage_WELCOME;
   public static String ImportSourcePage_WELCOME_INFO;
