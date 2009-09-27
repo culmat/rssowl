@@ -25,10 +25,12 @@
 package org.rssowl.ui.internal.actions;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.ui.IActionDelegate;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.util.CoreUtils;
@@ -42,7 +44,7 @@ import java.util.List;
  *
  * @author bpasero
  */
-public class CopyLinkAction extends Action {
+public class CopyLinkAction extends Action implements IActionDelegate {
 
   /** ID of this Action */
   public static final String ID = "org.rssowl.ui.CopyLinkAction"; //$NON-NLS-1$
@@ -109,4 +111,16 @@ public class CopyLinkAction extends Action {
         OwlUI.getClipboard().setContents(new Object[] { str.toString() }, new Transfer[] { TextTransfer.getInstance() });
     }
   }
+
+  /*
+   * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
+   */
+  public void run(IAction action) {
+    run();
+  }
+
+  /*
+   * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction, org.eclipse.jface.viewers.ISelection)
+   */
+  public void selectionChanged(IAction action, ISelection selection) {}
 }

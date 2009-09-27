@@ -1297,6 +1297,9 @@ public class BookMarkExplorer extends ViewPart {
           });
         }
 
+        manager.add(new Separator("copy")); //$NON-NLS-1$
+        manager.add(new GroupMarker("edit")); //$NON-NLS-1$
+
         /* Allow Contributions */
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
       }

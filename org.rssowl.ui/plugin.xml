@@ -1299,6 +1299,30 @@
             </objectClass>
          </visibility>
       </objectContribution>
+      <objectContribution
+            adaptable="false"
+            id="org.rssowl.ui.CopyLinkContribution"
+            objectClass="java.lang.Object">
+         <action
+               class="org.rssowl.ui.internal.actions.CopyLinkAction"
+               definitionId="org.rssowl.ui.CopyLinkAction"
+               enablesFor="+"
+               icon="icons/elcl16/copy_link.gif"
+               id="org.rssowl.ui.CopyLinkAction"
+               label="%action.label.37"
+               menubarPath="copy">
+         </action>
+         <visibility>
+            <or>
+               <objectClass
+                     name="org.rssowl.core.persist.INews">
+               </objectClass>
+               <objectClass
+                     name="org.rssowl.core.persist.IBookMark">
+               </objectClass>
+            </or>
+         </visibility>
+      </objectContribution>
    </extension>
    <extension
          point="org.eclipse.ui.editors">
