@@ -94,6 +94,7 @@ public class ApplicationServer {
   /* Local URL Parts */
   static final String PROTOCOL = "http"; //$NON-NLS-1$
   static final String LOCALHOST = "127.0.0.1"; //$NON-NLS-1$
+  @SuppressWarnings("all")
   static final int DEFAULT_SOCKET_PORT = Application.IS_ECLIPSE ? 8775 : 8795;
 
   /* Handshake Message */
