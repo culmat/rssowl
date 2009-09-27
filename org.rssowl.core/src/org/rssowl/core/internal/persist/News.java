@@ -285,6 +285,7 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.internal.persist.AbstractEntity#getProperties()
    */
   @Override
+  @SuppressWarnings("all")
   public Map<String, Serializable> getProperties() {
     fLock.acquireReadLock();
     try {
@@ -298,6 +299,7 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.internal.persist.AbstractEntity#getProperty(java.lang.String)
    */
   @Override
+  @SuppressWarnings("all")
   public Object getProperty(String key) {
     fLock.acquireReadLock();
     try {
@@ -311,6 +313,7 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.internal.persist.AbstractEntity#removeProperty(java.lang.String)
    */
   @Override
+  @SuppressWarnings("all")
   public Object removeProperty(String key) {
     fLock.acquireWriteLock();
     try {
@@ -324,6 +327,7 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.internal.persist.AbstractEntity#setProperty(java.lang.String, java.lang.Object)
    */
   @Override
+  @SuppressWarnings("all")
   public void setProperty(String key, Serializable value) {
     fLock.acquireWriteLock();
     try {
