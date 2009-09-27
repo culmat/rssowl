@@ -474,4 +474,23 @@ public class ConnectionTests {
     assertTrue(!links.isEmpty());
     assertTrue(links.size() > 50);
   }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testWebsite() throws Exception {
+    String link= "http://www.rssowl.org";
+
+    Map<Object, Object> properties = new HashMap<Object, Object>();
+    properties.put(IConnectionPropertyConstants.CON_TIMEOUT, 60000);
+
+    InputStream inS = Owl.getConnectionService().getHandler(new URI(link)).openStream(new URI(link), null, properties);
+    String content = StringUtils.readString(new BufferedReader(new InputStreamReader(inS)));
+    assertNotNull(content);
+
+    List<String> links = RegExUtils.extractLinksFromText(content, false);
+    assertTrue(!links.isEmpty());
+    assertTrue(links.size() > 50);
+  }
 }
