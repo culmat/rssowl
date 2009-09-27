@@ -424,6 +424,7 @@ public class ConnectionTests {
 
     Map<Object, Object> properties = new HashMap<Object, Object>();
     properties.put(IConnectionPropertyConstants.CON_TIMEOUT, 60000);
+    properties.put(IConnectionPropertyConstants.ACCEPT_LANGUAGE, "en, de");
 
     InputStream inS = Owl.getConnectionService().getHandler(new URI(link)).openStream(new URI(link), null, properties);
     String content = StringUtils.readString(new BufferedReader(new InputStreamReader(inS)));
