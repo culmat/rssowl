@@ -431,5 +431,6 @@ public class ConnectionTests {
 
     List<String> links = RegExUtils.extractLinksFromText(content, false);
     assertTrue(!links.isEmpty());
+    assertTrue(links.size() > 30);
   }
 }
