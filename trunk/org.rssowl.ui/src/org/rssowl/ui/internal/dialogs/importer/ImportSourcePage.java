@@ -28,6 +28,7 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
 import org.eclipse.jface.fieldassist.SimpleContentProposalProvider;
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -60,6 +61,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -84,6 +86,7 @@ public class ImportSourcePage extends WizardPage {
   private boolean fIsAutoCompleteKeywordHooked;
   private final String fWebsite;
   private final boolean fIsKewordSearch;
+  private Button fLocalizedFeedSearch;
 
   /** Sources for Import */
   public enum Source {
@@ -147,6 +150,11 @@ public class ImportSourcePage extends WizardPage {
     }
 
     return false;
+  }
+
+  /* Returns whether the feed search should respect the client language */
+  boolean isLocalizedFeedSearch() {
+    return fLocalizedFeedSearch.getSelection();
   }
 
   /*
@@ -274,6 +282,7 @@ public class ImportSourcePage extends WizardPage {
         updatePageComplete();
         boolean importFromKeyword = fImportFromKeywordRadio.getSelection();
         fKeywordInput.setEnabled(importFromKeyword);
+        fLocalizedFeedSearch.setEnabled(importFromKeyword);
         if (importFromKeyword) {
           hookKeywordAutocomplete(false);
           fKeywordInput.setFocus();
@@ -308,6 +317,16 @@ public class ImportSourcePage extends WizardPage {
         updatePageComplete();
       }
     });
+
+    fLocalizedFeedSearch = new Button(keywordInputContainer, SWT.CHECK);
+    fLocalizedFeedSearch.setSelection(fPreferences.getBoolean(DefaultPreferences.LOCALIZED_FEED_SEARCH));
+    fLocalizedFeedSearch.setEnabled(fImportFromKeywordRadio.getSelection());
+
+    String clientLanguage = Locale.getDefault().getDisplayLanguage(Locale.ENGLISH);
+    if (StringUtils.isSet(clientLanguage))
+      fLocalizedFeedSearch.setText(NLS.bind(Messages.ImportSourcePage_MATCH_LANGUAGE_N, clientLanguage));
+    else
+      fLocalizedFeedSearch.setText(Messages.ImportSourcePage_MATCH_LANGUAGE);
   }
 
   private void createImportRecommendedControls(Composite container) {
@@ -420,6 +439,7 @@ public class ImportSourcePage extends WizardPage {
 
     /* Import Keywords */
     saveComboSettings(fImportFromKeywordRadio.getSelection() ? fKeywordInput.getText() : null, DefaultPreferences.IMPORT_KEYWORDS);
+    fPreferences.putBoolean(DefaultPreferences.LOCALIZED_FEED_SEARCH, fLocalizedFeedSearch.getSelection());
   }
 
   private void saveComboSettings(String valueToAdd, String prefKey) {

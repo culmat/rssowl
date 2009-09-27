@@ -125,6 +125,9 @@ public class ImportElementsPage extends WizardPage {
   /* Connection Timeout when testing for Feeds remotely */
   private static final int FEED_CON_TIMEOUT = 7000;
 
+  /* Default Feed Search Language */
+  private static final String DEFAULT_LANGUAGE = "en"; //$NON-NLS-1$
+
   private CheckboxTreeViewer fViewer;
   private FolderChildCheckboxTree fFolderChildTree;
   private Button fDeselectAll;
@@ -140,6 +143,7 @@ public class ImportElementsPage extends WizardPage {
   private Source fCurrentSourceKind;
   private String fCurrentSourceResource;
   private String fCurrentSourceKeywords;
+  private boolean fCurrentSourceLocalizedFeedSearch;
   private long fCurrentSourceFileModified;
 
   /* Imported Entities */
@@ -485,7 +489,7 @@ public class ImportElementsPage extends WizardPage {
     /* Return if the Source did not Change */
     if (source == Source.RECOMMENDED && fCurrentSourceKind == Source.RECOMMENDED)
       return;
-    else if (source == Source.KEYWORD && fCurrentSourceKind == Source.KEYWORD && importSourcePage.getImportKeywords().equals(fCurrentSourceKeywords))
+    else if (source == Source.KEYWORD && fCurrentSourceKind == Source.KEYWORD && importSourcePage.getImportKeywords().equals(fCurrentSourceKeywords) && fCurrentSourceLocalizedFeedSearch == importSourcePage.isLocalizedFeedSearch())
       return;
     else if (source == Source.RESOURCE && fCurrentSourceKind == Source.RESOURCE) {
       String importResource = importSourcePage.getImportResource();
@@ -508,6 +512,7 @@ public class ImportElementsPage extends WizardPage {
     final File sourceFile = (source == Source.RESOURCE) ? new File(importSourcePage.getImportResource()) : null;
     fCurrentSourceFileModified = (sourceFile != null && sourceFile.exists()) ? sourceFile.lastModified() : 0;
     fCurrentSourceKeywords = importSourcePage.getImportKeywords();
+    fCurrentSourceLocalizedFeedSearch = importSourcePage.isLocalizedFeedSearch();
 
     /* Reset Fields */
     fLabels.clear();
@@ -537,7 +542,7 @@ public class ImportElementsPage extends WizardPage {
 
           /* Import by Keyword Search */
           else if (source == Source.KEYWORD)
-            importFromKeywordSearch(fCurrentSourceKeywords);
+            importFromKeywordSearch(fCurrentSourceKeywords, fCurrentSourceLocalizedFeedSearch);
 
           /* Import from Default OPML File */
           else if (source == Source.RECOMMENDED)
@@ -598,7 +603,7 @@ public class ImportElementsPage extends WizardPage {
             return;
 
           /* Open Stream */
-          in = openStream(link, monitor, INITIAL_CON_TIMEOUT, false);
+          in = openStream(link, monitor, INITIAL_CON_TIMEOUT, false, false);
 
           /* Return on Cancellation */
           if (monitor.isCanceled() || Controller.getDefault().isShuttingDown()) {
@@ -709,7 +714,7 @@ public class ImportElementsPage extends WizardPage {
         /* Scan remote Resource for Links and valid Feeds */
         if (bruteForce && !monitor.isCanceled() && !Controller.getDefault().isShuttingDown()) {
           try {
-            importFromOnlineResourceBruteforce(link, monitor, false);
+            importFromOnlineResourceBruteforce(link, monitor, false, false);
           } catch (Exception e) {
             throw new InvocationTargetException(e);
           }
@@ -725,7 +730,7 @@ public class ImportElementsPage extends WizardPage {
     getContainer().run(true, true, runnable);
   }
 
-  private void importFromKeywordSearch(final String keywords) throws Exception {
+  private void importFromKeywordSearch(final String keywords, final boolean isLocalizedSearch) throws Exception {
     IRunnableWithProgress runnable = new IRunnableWithProgress() {
       public void run(IProgressMonitor monitor) throws InvocationTargetException {
         try {
@@ -741,7 +746,7 @@ public class ImportElementsPage extends WizardPage {
             return;
 
           /* Scan remote Resource for Links and valid Feeds */
-          importFromOnlineResourceBruteforce(new URI(linkVal), monitor, true);
+          importFromOnlineResourceBruteforce(new URI(linkVal), monitor, true, isLocalizedSearch);
         } catch (Exception e) {
           throw new InvocationTargetException(e);
         } finally {
@@ -756,10 +761,10 @@ public class ImportElementsPage extends WizardPage {
   }
 
   @SuppressWarnings("null")
-  private void importFromOnlineResourceBruteforce(URI resourceLink, IProgressMonitor monitor, final boolean isKeywordSearch) throws ConnectionException, IOException {
+  private void importFromOnlineResourceBruteforce(URI resourceLink, IProgressMonitor monitor, final boolean isKeywordSearch, boolean isLocalizedSearch) throws ConnectionException, IOException {
 
     /* Read Content */
-    Pair<String, URI> result = readContent(resourceLink, monitor);
+    Pair<String, URI> result = readContent(resourceLink, isLocalizedSearch, monitor);
     if (result == null)
       return;
 
@@ -849,7 +854,7 @@ public class ImportElementsPage extends WizardPage {
           break;
 
         /* Open Stream to potential Feed */
-        in = openStream(feedLink, monitor, FEED_CON_TIMEOUT, false);
+        in = openStream(feedLink, monitor, FEED_CON_TIMEOUT, false, false);
 
         /* Return on Cancellation */
         if (monitor.isCanceled() || Controller.getDefault().isShuttingDown()) {
@@ -926,7 +931,7 @@ public class ImportElementsPage extends WizardPage {
     }
   }
 
-  private Pair<String, URI> readContent(URI link, IProgressMonitor monitor) throws ConnectionException, IOException {
+  private Pair<String, URI> readContent(URI link, boolean isLocalizedSearch, IProgressMonitor monitor) throws ConnectionException, IOException {
     InputStream in = null;
     try {
 
@@ -935,7 +940,7 @@ public class ImportElementsPage extends WizardPage {
         return null;
 
       /* Open Stream */
-      in = openStream(link, monitor, INITIAL_CON_TIMEOUT, true);
+      in = openStream(link, monitor, INITIAL_CON_TIMEOUT, true, isLocalizedSearch);
 
       /* Return on Cancellation */
       if (monitor.isCanceled() || Controller.getDefault().isShuttingDown())
@@ -958,13 +963,35 @@ public class ImportElementsPage extends WizardPage {
     }
   }
 
-  private InputStream openStream(URI link, IProgressMonitor monitor, int timeout, boolean setAcceptLanguage) throws ConnectionException {
+  private InputStream openStream(URI link, IProgressMonitor monitor, int timeout, boolean setAcceptLanguage, boolean isLocalized) throws ConnectionException {
     IProtocolHandler handler = Owl.getConnectionService().getHandler(link);
 
     Map<Object, Object> properties = new HashMap<Object, Object>();
     properties.put(IConnectionPropertyConstants.CON_TIMEOUT, timeout);
-    if (setAcceptLanguage && StringUtils.isSet(Locale.getDefault().getLanguage()))
-      properties.put(IConnectionPropertyConstants.ACCEPT_LANGUAGE, Locale.getDefault().getLanguage());
+
+    /* Set the Accept-Language Header */
+    if (setAcceptLanguage) {
+      StringBuilder languageHeader = new StringBuilder();
+      String clientLanguage = Locale.getDefault().getLanguage();
+
+      /* Set Both English and Client Locale */
+      if (!isLocalized) {
+        languageHeader.append(DEFAULT_LANGUAGE);
+        if (StringUtils.isSet(clientLanguage) && !DEFAULT_LANGUAGE.equals(clientLanguage))
+          languageHeader.append(",").append(clientLanguage); //$NON-NLS-1$
+      }
+
+      /* Only set Client Locale */
+      else {
+        if (StringUtils.isSet(clientLanguage))
+          languageHeader.append(clientLanguage);
+        else
+          languageHeader.append(DEFAULT_LANGUAGE);
+      }
+
+      properties.put(IConnectionPropertyConstants.ACCEPT_LANGUAGE, languageHeader.toString());
+    }
+
     return handler.openStream(link, monitor, properties);
   }
 
