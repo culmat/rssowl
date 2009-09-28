@@ -273,8 +273,11 @@ public class CleanUpModel {
 
           /* Resolve News */
           List<INews> resolvedNews = new ArrayList<INews>(results.size());
-          for (SearchHit<NewsReference> result : results)
-            resolvedNews.add(result.getResult().resolve());
+          for (SearchHit<NewsReference> result : results) {
+            INews resolvedNewsItem = result.getResult().resolve();
+            if (resolvedNewsItem != null)
+              resolvedNews.add(resolvedNewsItem);
+          }
 
           /* Sort by Date */
           Collections.sort(resolvedNews, new Comparator<INews>() {
