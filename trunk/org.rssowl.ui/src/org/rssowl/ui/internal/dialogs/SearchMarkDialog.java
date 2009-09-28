@@ -315,7 +315,7 @@ public class SearchMarkDialog extends TitleAreaDialog {
     /* Scope */
     Composite scopeContainer = new Composite(topControlsContainer, SWT.None);
     scopeContainer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
-    scopeContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0, 0, 0, false));
+    scopeContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0, 0, 5, false));
 
     Label locationLabel = new Label(scopeContainer, SWT.NONE);
     locationLabel.setText(Messages.SearchMarkDialog_SEARCH_IN);
