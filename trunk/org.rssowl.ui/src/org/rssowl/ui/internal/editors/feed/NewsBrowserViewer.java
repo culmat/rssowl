@@ -980,6 +980,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
             js.append(getElementById(Dynamic.LABELS_SEPARATOR.getId(news)).append(".style.display='inline'; ")); //$NON-NLS-1$
 
             StringBuilder labelsHtml = new StringBuilder(Messages.NewsBrowserViewer_LABELS);
+            labelsHtml.append(" "); //$NON-NLS-1$
             int c = 0;
             for (ILabel label : labels) {
               c++;
