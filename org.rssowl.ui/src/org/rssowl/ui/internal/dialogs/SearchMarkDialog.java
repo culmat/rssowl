@@ -430,6 +430,7 @@ public class SearchMarkDialog extends TitleAreaDialog {
       JobRunner.runInUIThread(getShell(), new Runnable() {
         public void run() {
           SearchNewsDialog dialog = new SearchNewsDialog(getShell(), conditions, fMatchAllRadio.getSelection(), true);
+          dialog.setBlockOnOpen(false);
           dialog.open();
         }
       });
