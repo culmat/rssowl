@@ -572,7 +572,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     builder.append("<td id=\"").append(Dynamic.LABELS.getId(news)).append("\" class=\"subline\">"); //$NON-NLS-1$ //$NON-NLS-2$
 
     if (!labels.isEmpty())
-      builder.append(Messages.NewsBrowserLabelProvider_LABELS);
+      builder.append(Messages.NewsBrowserLabelProvider_LABELS).append(" "); //$NON-NLS-1$
 
     /* Append Labels to Footer */
     int c = 0;
