@@ -55,6 +55,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
@@ -84,6 +85,7 @@ import org.rssowl.ui.internal.filter.NewsActionList;
 import org.rssowl.ui.internal.filter.NewsActionPresentationManager;
 import org.rssowl.ui.internal.search.LocationControl;
 import org.rssowl.ui.internal.search.SearchConditionList;
+import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.util.ArrayList;
@@ -429,6 +431,73 @@ public class NewsFilterDialog extends TitleAreaDialog {
     return parent;
   }
 
+  /*
+   * @see org.eclipse.jface.dialogs.TrayDialog#createButtonBar(org.eclipse.swt.widgets.Composite)
+   */
+  @Override
+  protected Control createButtonBar(Composite parent) {
+    GridLayout layout = new GridLayout(1, false);
+    layout.marginWidth = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_MARGIN);
+    layout.marginHeight = convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_MARGIN);
+    layout.horizontalSpacing = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_SPACING);
+    layout.verticalSpacing = convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_SPACING);
+
+    Composite buttonBar = new Composite(parent, SWT.NONE);
+    buttonBar.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+    buttonBar.setLayout(layout);
+
+    /* Preview Link */
+    Link previewLink = new Link(buttonBar, SWT.NONE);
+    previewLink.setText(Messages.NewsFilterDialog_PREVIEW_SEARCH);
+    applyDialogFont(previewLink);
+    previewLink.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+    previewLink.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        onPreview();
+      }
+    });
+
+    /* Create Buttons */
+    createButtonsForButtonBar(buttonBar);
+
+    return buttonBar;
+  }
+
+  private void onPreview() {
+    final List<ISearchCondition> conditions = new ArrayList<ISearchCondition>();
+
+    /* Create Condition from Scope */
+    if (fMatchAllNewsRadio.getSelection()) {
+      ISearchCondition locationCondition = fLocationControl.toScopeCondition();
+      if (locationCondition != null) {
+        locationCondition.setSpecifier(SearchSpecifier.IS);
+        conditions.add(locationCondition);
+      }
+    }
+
+    /* Create Conditions from List */
+    else {
+      conditions.addAll(fSearchConditionList.createConditions());
+      if (!conditions.isEmpty()) {
+        ISearchCondition locationCondition = fLocationControl.toScopeCondition();
+        if (locationCondition != null)
+          conditions.add(locationCondition);
+      }
+    }
+
+    /* Show if conditions are present */
+    if (!conditions.isEmpty()) {
+      JobRunner.runInUIThread(getShell(), new Runnable() {
+        public void run() {
+          SearchNewsDialog dialog = new SearchNewsDialog(getShell(), conditions, fMatchAllRadio.getSelection(), true);
+          dialog.setBlockOnOpen(false);
+          dialog.open();
+        }
+      });
+    }
+  }
+
   void onGenerateName() {
     String name;
     ISearchCondition locationCondition = fLocationControl.toScopeCondition();
@@ -533,7 +602,7 @@ public class NewsFilterDialog extends TitleAreaDialog {
 
           /* Show Something if Collection is Empty */
           if (filters.isEmpty()) {
-            MenuItem item= new MenuItem(menu, SWT.None);
+            MenuItem item = new MenuItem(menu, SWT.None);
             item.setText(Messages.NewsFilterDialog_NO_FILTER);
             item.setEnabled(false);
           }
@@ -605,7 +674,7 @@ public class NewsFilterDialog extends TitleAreaDialog {
 
           /* Show Something if Collection is Empty */
           if (searchMarks.isEmpty()) {
-            MenuItem item= new MenuItem(menu, SWT.None);
+            MenuItem item = new MenuItem(menu, SWT.None);
             item.setText(Messages.NewsFilterDialog_NO_SAVED_SEARCH);
             item.setEnabled(false);
           }
