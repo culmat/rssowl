@@ -50,7 +50,7 @@ public class MoveCopyNewsActionPresentation implements INewsActionPresentation {
    */
   public void create(Composite parent, Object data) {
     fContainer = new Composite(parent, SWT.NONE);
-    fContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0, 0, 0, false));
+    fContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0, 0, 5, false));
     ((GridLayout) fContainer.getLayout()).marginLeft = 5;
     fContainer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
 

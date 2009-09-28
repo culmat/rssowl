@@ -57,7 +57,7 @@ public class ShowNotifierNewsActionPresentation implements INewsActionPresentati
       fSelectedColor = new RGB(200, 118, 10);
 
     fContainer = new Composite(parent, SWT.NONE);
-    fContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0, 0, 0, false));
+    fContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0, 0, 5, false));
     ((GridLayout) fContainer.getLayout()).marginLeft = 5;
     fContainer.setLayoutData(new GridData(SWT.FILL, Application.IS_WINDOWS ? SWT.FILL : SWT.CENTER, true, true));
 
