@@ -349,7 +349,7 @@ public class NewsFilterDialog extends TitleAreaDialog {
 
     /* Name Input Filed */
     Composite container = new Composite(parent, SWT.None);
-    container.setLayout(LayoutUtils.createGridLayout(2, 10, 5, 0, 0, false));
+    container.setLayout(LayoutUtils.createGridLayout(2, 10, 5, 0, 5, false));
     container.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     Label nameLabel = new Label(container, SWT.NONE);
