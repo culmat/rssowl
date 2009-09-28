@@ -129,13 +129,8 @@ public class NewNewsBinAction implements IWorkbenchWindowActionDelegate, IObject
       Label l1 = new Label(container, SWT.NONE);
       l1.setText(Messages.NewNewsBinAction_NAME);
 
-      Composite nameContainer = new Composite(container, SWT.BORDER);
-      nameContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-      nameContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
-      nameContainer.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
-
-      fNameInput = new Text(nameContainer, SWT.SINGLE);
-      fNameInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+      fNameInput = new Text(container, SWT.SINGLE | SWT.BORDER);
+      fNameInput.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
       fNameInput.addModifyListener(new ModifyListener() {
         public void modifyText(ModifyEvent e) {
           validateInput();

@@ -81,13 +81,8 @@ public class NewsBinWizard extends Wizard implements INewWizard {
       Label l1 = new Label(control, SWT.NONE);
       l1.setText(Messages.NewsBinWizard_NAME);
 
-      Composite nameContainer = new Composite(control, SWT.BORDER);
-      nameContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-      nameContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
-      nameContainer.setBackground(control.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
-
-      fNameInput = new Text(nameContainer, SWT.SINGLE);
-      fNameInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+      fNameInput = new Text(control, SWT.SINGLE | SWT.BORDER);
+      fNameInput.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
       fNameInput.addModifyListener(new ModifyListener() {
         public void modifyText(ModifyEvent e) {
           setErrorMessage(null);
