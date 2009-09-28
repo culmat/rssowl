@@ -1250,9 +1250,9 @@ public class Controller {
     msg.append(NLS.bind(Messages.Controller_ERROR_LOADING, bookmark.getName()));
 
     if (StringUtils.isSet(status.getMessage()))
-      msg.append("\n").append(Messages.Controller_PROBLEM).append(status.getMessage()); //$NON-NLS-1$
+      msg.append("\n").append(NLS.bind(Messages.Controller_PROBLEM, status.getMessage())); //$NON-NLS-1$
 
-    msg.append("\n").append(Messages.Controller_LINK).append(feedLink); //$NON-NLS-1$
+    msg.append("\n").append(NLS.bind(Messages.Controller_LINK, feedLink)); //$NON-NLS-1$
 
     return new Status(IStatus.WARNING, status.getPlugin(), status.getCode(), msg.toString(), null);
   }
