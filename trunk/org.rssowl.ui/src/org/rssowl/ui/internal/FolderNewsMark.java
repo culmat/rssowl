@@ -221,7 +221,7 @@ public class FolderNewsMark extends Mark implements INewsMark {
     synchronized (this) {
       newsRefs = fNewsContainer.getNews(states);
     }
-    return getNews(newsRefs, false);
+    return getNews(newsRefs);
   }
 
   /*

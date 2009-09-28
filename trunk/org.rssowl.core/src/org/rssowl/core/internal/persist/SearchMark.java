@@ -172,7 +172,7 @@ public class SearchMark extends Mark implements ISearchMark {
     synchronized (this) {
       newsRefs = fNewsContainer.getNews(states);
     }
-    return getNews(newsRefs, true);
+    return getNews(newsRefs);
   }
 
   public synchronized int getNewsCount(Set<State> states) {

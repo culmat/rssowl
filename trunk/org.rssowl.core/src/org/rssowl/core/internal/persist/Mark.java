@@ -140,15 +140,11 @@ public abstract class Mark extends AbstractEntity implements IMark {
     fParent = parent;
   }
 
-  protected static List<INews> getNews(List<NewsReference> newsRefs, boolean ignoreNullResolve) {
+  protected static List<INews> getNews(List<NewsReference> newsRefs) {
     List<INews> news = new ArrayList<INews>(newsRefs.size());
 
     for (NewsReference newsRef : newsRefs) {
       INews newsItem = newsRef.resolve();
-
-      if (!ignoreNullResolve)
-        Assert.isNotNull(newsItem, "newsItem"); //$NON-NLS-1$
-
       if (newsItem != null)
         news.add(newsItem);
     }
