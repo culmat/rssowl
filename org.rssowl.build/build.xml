@@ -154,7 +154,7 @@
 		</java>
 		
 		<!-- save stderr for scrutinizing later -->
-		<echo file="${buildDirectory}/stderr.txt">${build.stderr}</echo>
+		<echo file="${buildDirectory}/stderr.txt" append="true">${build.stderr}</echo>
 		
 		<echo taskname="stderr">${build.stderr}</echo>
 		
