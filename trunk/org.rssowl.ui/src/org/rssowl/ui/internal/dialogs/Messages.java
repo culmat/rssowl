@@ -130,6 +130,7 @@ public class Messages extends NLS {
   public static String NewsFilterDialog_NO_FILTER;
   public static String NewsFilterDialog_NO_SAVED_SEARCH;
   public static String NewsFilterDialog_PERFORM_ACTIONS;
+  public static String NewsFilterDialog_PREVIEW_SEARCH;
   public static String NewsFilterDialog_REMOVE_ACTION_N;
   public static String NewsFilterDialog_SHOW_NEWS_FILTER;
   public static String NewsFilterDialog_SHOW_SAVED_SEARCH;
