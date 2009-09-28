@@ -152,6 +152,7 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
         NewsFiltersListDialog dialog = NewsFiltersListDialog.getVisibleInstance();
         if (dialog == null) {
           dialog = new NewsFiltersListDialog(getShell());
+          dialog.setBlockOnOpen(false);
           dialog.open();
         } else {
           dialog.getShell().forceActive();

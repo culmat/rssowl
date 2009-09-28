@@ -147,6 +147,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
         NewsFiltersListDialog dialog = NewsFiltersListDialog.getVisibleInstance();
         if (dialog == null) {
           dialog = new NewsFiltersListDialog(getShell());
+          dialog.setBlockOnOpen(false);
           dialog.open();
         } else {
           dialog.getShell().forceActive();
