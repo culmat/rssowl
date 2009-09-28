@@ -134,8 +134,11 @@ public class CleanUpWizard extends Wizard {
           else if (task instanceof NewsTask) {
             Collection<NewsReference> news = ((NewsTask) task).getNews();
             List<INews> resolvedNews = new ArrayList<INews>(news.size());
-            for (NewsReference newsRef : news)
-              resolvedNews.add(newsRef.resolve());
+            for (NewsReference newsRef : news) {
+              INews resolvedNewsItem = newsRef.resolve();
+              if (resolvedNewsItem != null)
+                resolvedNews.add(resolvedNewsItem);
+            }
 
             newsDao.setState(resolvedNews, INews.State.DELETED, false, false);
           }
