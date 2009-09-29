@@ -76,4 +76,11 @@ public interface INewsAction {
    * together and <code>false</code> otherwise.
    */
   boolean conflictsWith(INewsAction otherAction);
+
+  /**
+   * @param data arbitrary data associated with the action.
+   * @return a human readable for the news action with the given data or
+   * <code>null</code> to use the label of the action itself.
+   */
+  String getLabel(Object data);
 }

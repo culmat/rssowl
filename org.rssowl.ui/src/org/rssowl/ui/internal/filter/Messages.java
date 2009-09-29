@@ -28,6 +28,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
   private static final String BUNDLE_NAME = "org.rssowl.ui.internal.filter.messages"; //$NON-NLS-1$
+  public static String DownloadAttachmentsNewsAction_DOWNLOAD_TO_N;
   public static String DownloadAttachmentsNewsActionPresentation_SELECT_FOLDER;
   public static String DownloadAttachmentsNewsActionPresentation_TO_N;
   public static String DownloadAttachmentsNewsActionPresentation_TO_SELECT_FOLDER;

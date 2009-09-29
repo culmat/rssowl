@@ -81,6 +81,7 @@ import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.SearchHit;
+import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.filter.NewsActionDescriptor;
@@ -451,7 +452,11 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
 
       for (IFilterAction action : forcableActions) {
         NewsActionDescriptor newsActionDescriptor = fNewsActionPresentationManager.getNewsActionDescriptor(action.getActionId());
-        message.append("\n").append(NLS.bind(Messages.NewsFiltersListDialog_FILTER_LIST_ELEMENT, newsActionDescriptor.getName())); //$NON-NLS-1$
+        String label = newsActionDescriptor.getNewsAction() != null ? newsActionDescriptor.getNewsAction().getLabel(action.getData()) : null;
+        if (StringUtils.isSet(label))
+          message.append("\n").append(NLS.bind(Messages.NewsFiltersListDialog_FILTER_LIST_ELEMENT, label)); //$NON-NLS-1$
+        else
+          message.append("\n").append(NLS.bind(Messages.NewsFiltersListDialog_FILTER_LIST_ELEMENT, newsActionDescriptor.getName())); //$NON-NLS-1$
       }
 
       message.append("\n\n").append(Messages.NewsFiltersListDialog_CONFIRM); //$NON-NLS-1$

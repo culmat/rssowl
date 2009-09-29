@@ -60,4 +60,11 @@ public class DeleteNewsAction implements INewsAction {
   public boolean conflictsWith(INewsAction otherAction) {
     return otherAction instanceof DeleteNewsAction;
   }
+
+  /*
+   * @see org.rssowl.core.INewsAction#getLabel(java.lang.Object)
+   */
+  public String getLabel(Object data) {
+    return null;
+  }
 }
