@@ -24,6 +24,7 @@
 
 package org.rssowl.core.internal.newsaction;
 
+import org.eclipse.osgi.util.NLS;
 import org.rssowl.core.INewsAction;
 import org.rssowl.core.Owl;
 import org.rssowl.core.persist.IEntity;
@@ -82,5 +83,27 @@ public class CopyNewsAction implements INewsAction {
    */
   public boolean conflictsWith(INewsAction otherAction) {
     return otherAction instanceof DeleteNewsAction || otherAction instanceof MoveNewsAction || otherAction instanceof CopyNewsAction;
+  }
+
+  /*
+   * @see org.rssowl.core.INewsAction#getLabel(java.lang.Object)
+   */
+  public String getLabel(Object data) {
+    if (data != null && data instanceof Long[]) {
+      Long[] binIds = (Long[]) data;
+      List<INewsBin> bins = CoreUtils.toBins(binIds);
+      if (!bins.isEmpty()) {
+        StringBuilder binBuilder = new StringBuilder();
+        for (INewsBin bin : bins)
+          binBuilder.append("'").append(bin.getName()).append("', "); //$NON-NLS-1$ //$NON-NLS-2$
+
+        if (binBuilder.length() > 0)
+          binBuilder.delete(binBuilder.length() - 2, binBuilder.length());
+
+        return NLS.bind(Messages.CopyNewsAction_COPY_NEWS_TO_N, binBuilder.toString());
+      }
+    }
+
+    return null;
   }
 }

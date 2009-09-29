@@ -24,6 +24,7 @@
 
 package org.rssowl.ui.internal.filter;
 
+import org.eclipse.osgi.util.NLS;
 import org.rssowl.core.INewsAction;
 import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IEntity;
@@ -86,5 +87,15 @@ public class DownloadAttachmentsNewsAction implements INewsAction {
    */
   public boolean conflictsWith(INewsAction otherAction) {
     return false;
+  }
+
+  /*
+   * @see org.rssowl.core.INewsAction#getLabel(java.lang.Object)
+   */
+  public String getLabel(Object data) {
+    if (data != null && data instanceof String)
+      return NLS.bind(Messages.DownloadAttachmentsNewsAction_DOWNLOAD_TO_N, data);
+
+    return null;
   }
 }

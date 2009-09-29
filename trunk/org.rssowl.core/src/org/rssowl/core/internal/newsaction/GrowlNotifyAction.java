@@ -166,4 +166,11 @@ public class GrowlNotifyAction implements INewsAction {
   public boolean conflictsWith(INewsAction otherAction) {
     return false;
   }
+
+  /*
+   * @see org.rssowl.core.INewsAction#getLabel(java.lang.Object)
+   */
+  public String getLabel(Object data) {
+    return null;
+  }
 }

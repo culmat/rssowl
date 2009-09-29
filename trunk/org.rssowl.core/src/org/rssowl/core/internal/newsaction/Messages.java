@@ -28,8 +28,11 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
   private static final String BUNDLE_NAME = "org.rssowl.core.internal.newsaction.messages"; //$NON-NLS-1$
+  public static String CopyNewsAction_COPY_NEWS_TO_N;
   public static String GrowlNotifyAction_N_INCOMING_NEWS;
   public static String GrowlNotifyAction_N_MORE;
+  public static String LabelNewsAction_LABEL_NEWS_N;
+  public static String MoveNewsAction_MOVE_NEWS_TO_N;
 
   private Messages() {}
 
