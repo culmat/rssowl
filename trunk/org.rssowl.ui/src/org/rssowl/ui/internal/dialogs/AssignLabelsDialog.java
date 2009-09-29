@@ -28,6 +28,7 @@ import org.rssowl.core.persist.dao.ICategoryDAO;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.StringUtils;
+import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.ContentAssistAdapter;
 import org.rssowl.ui.internal.util.JobRunner;
@@ -118,6 +119,9 @@ public class AssignLabelsDialog extends Dialog {
         }
       }
     }
+
+    /* Mark Saved Search Service as in need for a quick Update */
+    Controller.getDefault().getSavedSearchService().forceQuickUpdate();
 
     /* Save News */
     DynamicDAO.saveAll(fNews);
