@@ -301,8 +301,8 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
         }
 
         manager.add(new Separator("filter")); //$NON-NLS-1$
-        manager.add(new Separator("edit")); //$NON-NLS-1$
         manager.add(new Separator("copy")); //$NON-NLS-1$
+        manager.add(new GroupMarker("edit")); //$NON-NLS-1$
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
         /* Fill Contributions if Context Menu not registered */
