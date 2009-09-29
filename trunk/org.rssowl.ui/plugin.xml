@@ -640,6 +640,7 @@
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            defaultHandler="org.rssowl.ui.internal.handler.SearchNewsHandler"
             description="%command.description.9"
             id="org.rssowl.ui.SearchNewsAction"
             name="%command.name.20">
@@ -938,7 +939,7 @@
       </key>
       <key
             commandId="org.rssowl.ui.SearchNewsAction"
-            contextId="org.eclipse.ui.contexts.window"
+            contextId="org.eclipse.ui.contexts.dialogAndWindow"
             schemeId="org.rssowl.ui.KeyScheme"
             sequence="M1+M2+F">
       </key>
