@@ -587,29 +587,31 @@ public class FeedView extends EditorPart implements IReusableEditor {
       }
 
       private void refreshIfRequired(Set<SearchConditionEvent> events) {
-        ISearchMarkDAO dao = DynamicDAO.getDAO(ISearchMarkDAO.class);
-        for (SearchConditionEvent event : events) {
-          ISearchCondition condition = event.getEntity();
-          ISearchMark searchMark = dao.load(condition);
-          if (searchMark != null && searchMark.equals(fInput.getMark())) {
-            JobRunner.runUIUpdater(new UIBackgroundJob(fParent) {
-              @Override
-              protected void runInBackground(IProgressMonitor monitor) {
-                fContentProvider.refreshCache(fInput.getMark(), false);
-              }
+        if (fInput.getMark() instanceof ISearchMark) {
+          ISearchMarkDAO dao = DynamicDAO.getDAO(ISearchMarkDAO.class);
+          for (SearchConditionEvent event : events) {
+            ISearchCondition condition = event.getEntity();
+            ISearchMark searchMark = dao.load(condition);
+            if (searchMark != null && searchMark.equals(fInput.getMark())) {
+              JobRunner.runUIUpdater(new UIBackgroundJob(fParent) {
+                @Override
+                protected void runInBackground(IProgressMonitor monitor) {
+                  fContentProvider.refreshCache(fInput.getMark(), false);
+                }
 
-              @Override
-              protected void runInUI(IProgressMonitor monitor) {
-                refresh(true, true);
-              }
+                @Override
+                protected void runInUI(IProgressMonitor monitor) {
+                  refresh(true, true);
+                }
 
-              @Override
-              public boolean belongsTo(Object family) {
-                return fCacheJobIdentifier.equals(family);
-              }
-            });
+                @Override
+                public boolean belongsTo(Object family) {
+                  return fCacheJobIdentifier.equals(family);
+                }
+              });
 
-            break;
+              break;
+            }
           }
         }
       }
