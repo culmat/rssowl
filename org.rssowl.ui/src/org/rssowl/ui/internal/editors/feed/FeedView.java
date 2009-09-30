@@ -579,13 +579,14 @@ public class FeedView extends EditorPart implements IReusableEditor {
       }
 
       public void entitiesDeleted(Set<SearchConditionEvent> events) {
-        refreshIfRequired(events);
+        /* Ignore Due to Bug 1140 (http://dev.rssowl.org/show_bug.cgi?id=1140) */
       }
 
       public void entitiesUpdated(Set<SearchConditionEvent> events) {
-        refreshIfRequired(events);
+        /* Ignore Due to Bug 1140 (http://dev.rssowl.org/show_bug.cgi?id=1140) */
       }
 
+      /* We rely on the implementation detail that updating a SM means deleting/adding conditions */
       private void refreshIfRequired(Set<SearchConditionEvent> events) {
         if (fInput.getMark() instanceof ISearchMark) {
           ISearchMarkDAO dao = DynamicDAO.getDAO(ISearchMarkDAO.class);
