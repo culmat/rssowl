@@ -29,7 +29,6 @@ import static org.junit.Assert.assertTrue;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.Feed;
@@ -125,7 +124,6 @@ public class ControllerTestNetwork {
    * @throws Exception
    */
   @Test
-  @Ignore
   public void testDeleteFolderHierarchyWithBin() throws Exception {
     IModelFactory factory = Owl.getModelFactory();
     IFolder root = factory.createFolder(null, null, "Root");
