@@ -166,16 +166,18 @@ public final class NewsCounterService {
           continue;
 
         NewsCounterItem counterItem = fNewsCounter.get(news.getFeedReference().getLink());
+        if (counterItem != null) { //See Bug 1107 (http://dev.rssowl.org/show_bug.cgi?id=1107)
 
-        /* Update Counter */
-        if (news.getState() == INews.State.NEW)
-          counterItem.decrementNewCounter();
-        if (isUnread(news.getState()))
-          counterItem.decrementUnreadCounter();
-        if (news.isFlagged() && (!EnumSet.of(INews.State.DELETED, INews.State.HIDDEN).contains(news.getState())))
-          counterItem.decrementStickyCounter();
+          /* Update Counter */
+          if (news.getState() == INews.State.NEW)
+            counterItem.decrementNewCounter();
+          if (isUnread(news.getState()))
+            counterItem.decrementUnreadCounter();
+          if (news.isFlagged() && (!EnumSet.of(INews.State.DELETED, INews.State.HIDDEN).contains(news.getState())))
+            counterItem.decrementStickyCounter();
 
-        updatedCounterItems.put(news.getFeedReference().getLink().toString(), counterItem);
+          updatedCounterItems.put(news.getFeedReference().getLink().toString(), counterItem);
+        }
       }
       for (NewsCounterItem counterItem : updatedCounterItems.values())
         fDb.set(counterItem);
