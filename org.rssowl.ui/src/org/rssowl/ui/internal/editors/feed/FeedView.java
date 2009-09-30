@@ -1114,10 +1114,6 @@ public class FeedView extends EditorPart implements IReusableEditor {
           newsToUpdate.add(newsItem);
       }
 
-      /* Support Undo */
-      if (!newsToUpdate.isEmpty())
-        UndoStack.getInstance().addOperation(new NewsStateOperation(newsToUpdate, INews.State.UNREAD, true));
-
       /* Perform Operation */
       fNewsDao.setState(newsToUpdate, INews.State.UNREAD, true, false);
 
