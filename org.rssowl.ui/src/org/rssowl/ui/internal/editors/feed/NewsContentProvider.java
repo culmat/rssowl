@@ -276,10 +276,6 @@ public class NewsContentProvider implements ITreeContentProvider {
     return fInput;
   }
 
-  synchronized Set<INews> getCachedNews() {
-    return fCachedNews;
-  }
-
   synchronized Collection<INews> getCachedNewsCopy() {
     if (fCachedNews == null)
       return null;
