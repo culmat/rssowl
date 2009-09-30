@@ -989,7 +989,6 @@ public class FeedView extends EditorPart implements IReusableEditor {
   @Override
   public void setInput(IEditorInput input) {
     Assert.isTrue(input instanceof FeedViewInput);
-    super.setInput(input);
 
     /* Handle Old being hidden now */
     if (fInput != null) {
@@ -997,7 +996,8 @@ public class FeedView extends EditorPart implements IReusableEditor {
       rememberSelection(fInput.getMark(), fNewsTableControl.getLastSelection());
     }
 
-    /* Remember New */
+    /* Set New */
+    super.setInput(input);
     fInput = (FeedViewInput) input;
 
     /* Update UI of Feed-View if new Editor */
@@ -1087,7 +1087,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
    */
   public void notifyUIEvent(final UIEvent event) {
     final IMark inputMark = fInput.getMark();
-    final Collection<INews> news = fContentProvider.getCachedNews();
+    final Collection<INews> news = fContentProvider.getCachedNewsCopy();
     IPreferenceScope inputPreferences = Owl.getPreferenceService().getEntityScope(inputMark);
     final IStructuredSelection lastSelection = fNewsTableControl.getLastSelection();
 

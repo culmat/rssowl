@@ -280,6 +280,13 @@ public class NewsContentProvider implements ITreeContentProvider {
     return fCachedNews;
   }
 
+  synchronized Collection<INews> getCachedNewsCopy() {
+    if (fCachedNews == null)
+      return null;
+
+    return new ArrayList<INews>(fCachedNews);
+  }
+
   synchronized boolean hasCachedNews() {
     return fCachedNews != null && !fCachedNews.isEmpty();
   }
