@@ -30,6 +30,7 @@ import org.eclipse.core.commands.IHandler;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.MarkTypesReadAction;
+import org.rssowl.ui.internal.actions.ToggleReadStateAction;
 
 /**
  * This {@link IHandler} is required to support key-bindings for programmatic
@@ -46,8 +47,8 @@ public class MarkReadHandler extends AbstractHandler {
     IStructuredSelection selection = OwlUI.getActiveFeedViewSelection();
 
     if (selection != null && !selection.isEmpty())
-      new MarkTypesReadAction(selection).run();
+      new ToggleReadStateAction(selection).run();
 
-    return null;
+    return null; //As per JavaDoc
   }
 }
