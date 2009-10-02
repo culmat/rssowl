@@ -129,6 +129,7 @@ public class MarkTypesReadAction extends Action implements IWorkbenchWindowActio
     Map<IBookMark, Collection<INews>> retentionHelperMap = new HashMap<IBookMark, Collection<INews>>();
 
     /* Retrieve affected News */
+    EnumSet<State> enumSet = EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED);
     Set<INews> news = new HashSet<INews>();
     for (IEntity element : entities) {
       if (element instanceof IFolder)
@@ -139,7 +140,7 @@ public class MarkTypesReadAction extends Action implements IWorkbenchWindowActio
         fillNews(((FolderNewsMark) element).getFolder(), news, retentionHelperMap);
       else if (element instanceof INewsMark)
         fillNews((INewsMark) element, news);
-      else if (element instanceof INews)
+      else if (element instanceof INews && enumSet.contains(((INews)element).getState()))
         news.add((INews) element);
     }
 

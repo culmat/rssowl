@@ -57,7 +57,7 @@ public class ToggleReadStateAction extends Action implements IWorkbenchWindowAct
   public static final String ID = "org.rssowl.ui.ToggleReadState"; //$NON-NLS-1$
 
   /* Unread States (New, Unread, Updated) */
-  private static final EnumSet<INews.State> STATES = EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED);
+  private static final EnumSet<INews.State> UNREAD_STATES = EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED);
 
   private IStructuredSelection fSelection;
   private boolean fMarkRead;
@@ -70,8 +70,7 @@ public class ToggleReadStateAction extends Action implements IWorkbenchWindowAct
    */
   public ToggleReadStateAction(IStructuredSelection selection) {
     fSelection = selection;
-
-    init();
+    fMarkRead = shouldMarkRead(fSelection);
   }
 
   /*
@@ -82,16 +81,15 @@ public class ToggleReadStateAction extends Action implements IWorkbenchWindowAct
     return IAction.AS_CHECK_BOX;
   }
 
-  private void init() {
-    List<INews> entities = ModelUtils.getEntities(fSelection, INews.class);
+  private boolean shouldMarkRead(IStructuredSelection selection) {
+    List<INews> entities = ModelUtils.getEntities(selection, INews.class);
     for (INews entity : entities) {
-
-      /* News which is unread */
-      if (STATES.contains(entity.getState())) {
-        fMarkRead = true;
-        break;
+      if (UNREAD_STATES.contains(entity.getState())) {
+        return true;
       }
     }
+
+    return false;
   }
 
   /*
@@ -126,30 +124,7 @@ public class ToggleReadStateAction extends Action implements IWorkbenchWindowAct
    */
   @Override
   public void run() {
-
-    /* Nothing to do */
-    if (fSelection.isEmpty())
-      return;
-
-    /* Mark Read */
-    if (fMarkRead)
-      new MarkTypesReadAction(fSelection).run();
-
-    /* Mark Unread */
-    else {
-
-      /* Mark Saved Search Service as in need for a quick Update */
-      Controller.getDefault().getSavedSearchService().forceQuickUpdate();
-
-      /* Only consider INews */
-      List<INews> newsList = ModelUtils.getEntities(fSelection, INews.class);
-
-      /* Support Undo */
-      UndoStack.getInstance().addOperation(new NewsStateOperation(newsList, INews.State.UNREAD, true));
-
-      /* Perform Operation */
-      DynamicDAO.getDAO(INewsDAO.class).setState(newsList, INews.State.UNREAD, true, false);
-    }
+    internalRun(fSelection, fMarkRead);
   }
 
   /*
@@ -159,7 +134,35 @@ public class ToggleReadStateAction extends Action implements IWorkbenchWindowAct
     FeedView activeFeedView = OwlUI.getActiveFeedView();
     if (activeFeedView != null) {
       IStructuredSelection selection = (IStructuredSelection) activeFeedView.getSite().getSelectionProvider().getSelection();
+      if (selection != null && !selection.isEmpty())
+        internalRun(selection, shouldMarkRead(selection));
+    }
+  }
+
+  private void internalRun(IStructuredSelection selection, boolean markRead) {
+
+    /* Nothing to do */
+    if (selection.isEmpty())
+      return;
+
+    /* Mark Read */
+    if (markRead)
       new MarkTypesReadAction(selection).run();
+
+    /* Mark Unread */
+    else {
+
+      /* Mark Saved Search Service as in need for a quick Update */
+      Controller.getDefault().getSavedSearchService().forceQuickUpdate();
+
+      /* Only consider INews */
+      List<INews> newsList = ModelUtils.getEntities(selection, INews.class);
+
+      /* Support Undo */
+      UndoStack.getInstance().addOperation(new NewsStateOperation(newsList, INews.State.UNREAD, true));
+
+      /* Perform Operation */
+      DynamicDAO.getDAO(INewsDAO.class).setState(newsList, INews.State.UNREAD, true, false);
     }
   }
 
