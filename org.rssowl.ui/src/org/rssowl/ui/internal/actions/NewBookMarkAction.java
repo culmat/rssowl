@@ -99,7 +99,7 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
 
     /* Show Dialog */
     CreateBookmarkWizard wizard = new CreateBookmarkWizard(parent, fPosition, fPreSetLink);
-    OwlUI.openWizard(fShell, wizard, true, SETTINGS_SECTION);
+    OwlUI.openWizard(fShell, wizard, true, true, SETTINGS_SECTION);
   }
 
   /*

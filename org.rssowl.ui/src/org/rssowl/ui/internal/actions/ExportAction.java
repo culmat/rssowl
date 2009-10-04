@@ -73,7 +73,7 @@ public class ExportAction implements IWorkbenchWindowActionDelegate {
    */
   public void openWizard(Shell shell) {
     ExportWizard exportWizard = new ExportWizard();
-    OwlUI.openWizard(shell, exportWizard, false, SETTINGS_SECTION);
+    OwlUI.openWizard(shell, exportWizard, true, false, SETTINGS_SECTION);
   }
 
   /*

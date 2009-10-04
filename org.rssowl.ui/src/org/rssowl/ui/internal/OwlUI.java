@@ -1839,11 +1839,12 @@ public class OwlUI {
   /**
    * @param shell the {@link Shell} as parent of the {@link WizardDialog}.
    * @param wizard the {@link Wizard} to use in the {@link WizardDialog}.
+   * @param modal if <code>false</code>, the wizard will not be a modal dialog.
    * @param needsProgressPart <code>true</code> to leave some room for the
    * {@link ProgressMonitorPart} and <code>false</code> otherwise.
    * @param dialogSettingsKey the key to use to store dialog settings.
    */
-  public static void openWizard(Shell shell, Wizard wizard, final boolean needsProgressPart, final String dialogSettingsKey) {
+  public static void openWizard(Shell shell, Wizard wizard, final boolean modal, final boolean needsProgressPart, final String dialogSettingsKey) {
     CustomWizardDialog dialog = new CustomWizardDialog(shell, wizard) {
       private ProgressMonitorPart progressMonitorPart;
 
@@ -1874,12 +1875,24 @@ public class OwlUI {
 
       @Override
       protected IDialogSettings getDialogBoundsSettings() {
-        IDialogSettings settings = Activator.getDefault().getDialogSettings();
-        IDialogSettings section = settings.getSection(dialogSettingsKey);
-        if (section != null)
-          return section;
+        if (dialogSettingsKey != null) {
+          IDialogSettings settings = Activator.getDefault().getDialogSettings();
+          IDialogSettings section = settings.getSection(dialogSettingsKey);
+          if (section != null)
+            return section;
 
-        return settings.addNewSection(dialogSettingsKey);
+          return settings.addNewSection(dialogSettingsKey);
+        }
+
+        return super.getDialogBoundsSettings();
+      }
+
+      @Override
+      protected int getShellStyle() {
+        if (modal)
+          return super.getShellStyle();
+
+        return SWT.TITLE | SWT.BORDER | SWT.MIN | SWT.RESIZE | SWT.CLOSE | getDefaultOrientation();
       }
 
       @Override

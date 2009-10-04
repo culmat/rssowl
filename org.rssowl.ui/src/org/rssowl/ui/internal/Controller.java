@@ -1104,7 +1104,7 @@ public class Controller {
 
   private void showWelcomeWizard() {
     WelcomeWizard wizard = new WelcomeWizard();
-    OwlUI.openWizard(OwlUI.getActiveShell(), wizard, true, null);
+    OwlUI.openWizard(OwlUI.getActiveShell(), wizard, true, true, null);
   }
 
   private void backupSubscriptions() {
