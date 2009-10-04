@@ -83,6 +83,7 @@ public class Messages extends NLS {
   public static String ApplicationActionBarAdvisor_TABS_MESSAGE;
   public static String ApplicationActionBarAdvisor_TOOLBAR;
   public static String ApplicationActionBarAdvisor_TOOLS;
+  public static String ApplicationActionBarAdvisor_TUTORIAL;
   public static String ApplicationActionBarAdvisor_UPDATE;
   public static String ApplicationActionBarAdvisor_VERTICAL_VIEW;
   public static String ApplicationActionBarAdvisor_VIEW;
