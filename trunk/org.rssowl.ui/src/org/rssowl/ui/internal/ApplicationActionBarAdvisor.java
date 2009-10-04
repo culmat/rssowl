@@ -114,6 +114,7 @@ import org.rssowl.ui.internal.dialogs.welcome.TutorialWizard;
 import org.rssowl.ui.internal.editors.browser.WebBrowserContext;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
+import org.rssowl.ui.internal.handler.TutorialHandler;
 import org.rssowl.ui.internal.util.BrowserUtils;
 import org.rssowl.ui.internal.util.ModelUtils;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
@@ -864,6 +865,16 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
       @Override
       public ImageDescriptor getImageDescriptor() {
         return OwlUI.getImageDescriptor("icons/elcl16/help.gif"); //$NON-NLS-1$
+      }
+
+      @Override
+      public String getId() {
+        return TutorialHandler.ID;
+      }
+
+      @Override
+      public String getActionDefinitionId() {
+        return TutorialHandler.ID;
       }
     });
 
