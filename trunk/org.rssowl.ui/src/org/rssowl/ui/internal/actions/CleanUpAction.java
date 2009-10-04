@@ -66,7 +66,7 @@ public class CleanUpAction implements IWorkbenchWindowActionDelegate {
    */
   public void openWizard(Shell shell) {
     CleanUpWizard cleanUpWizard = new CleanUpWizard();
-    OwlUI.openWizard(shell, cleanUpWizard, true, SETTINGS_SECTION);
+    OwlUI.openWizard(shell, cleanUpWizard, true, true, SETTINGS_SECTION);
   }
 
   /*
