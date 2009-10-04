@@ -110,6 +110,7 @@ import org.rssowl.ui.internal.dialogs.preferences.ManageLabelsPreferencePage;
 import org.rssowl.ui.internal.dialogs.preferences.NotifierPreferencesPage;
 import org.rssowl.ui.internal.dialogs.preferences.OverviewPreferencesPage;
 import org.rssowl.ui.internal.dialogs.preferences.SharingPreferencesPage;
+import org.rssowl.ui.internal.dialogs.welcome.TutorialWizard;
 import org.rssowl.ui.internal.editors.browser.WebBrowserContext;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
@@ -852,16 +853,25 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
     helpMenu.add(new GroupMarker(IWorkbenchActionConstants.HELP_START));
 
-    /* Link to boreal.rssowl.org */
-    helpMenu.add(new Action(Messages.ApplicationActionBarAdvisor_FAQ) {
+    /* Tutorial Wizard */
+    helpMenu.add(new Action(Messages.ApplicationActionBarAdvisor_TUTORIAL) {
       @Override
       public void run() {
-        BrowserUtils.openLinkExternal("http://boreal.rssowl.org/#faq"); //$NON-NLS-1$
+        TutorialWizard wizard = new TutorialWizard();
+        OwlUI.openWizard(getActionBarConfigurer().getWindowConfigurer().getWindow().getShell(), wizard, false, false, null);
       }
 
       @Override
       public ImageDescriptor getImageDescriptor() {
         return OwlUI.getImageDescriptor("icons/elcl16/help.gif"); //$NON-NLS-1$
+      }
+    });
+
+    /* Link to boreal.rssowl.org */
+    helpMenu.add(new Action(Messages.ApplicationActionBarAdvisor_FAQ) {
+      @Override
+      public void run() {
+        BrowserUtils.openLinkExternal("http://boreal.rssowl.org/#faq"); //$NON-NLS-1$
       }
     });
 
