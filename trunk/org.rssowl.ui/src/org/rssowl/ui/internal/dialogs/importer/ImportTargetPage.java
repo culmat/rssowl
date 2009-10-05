@@ -46,6 +46,7 @@ import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.dialogs.welcome.WelcomeWizard;
 import org.rssowl.ui.internal.util.FolderChooser;
 import org.rssowl.ui.internal.util.LayoutUtils;
 import org.rssowl.ui.internal.util.FolderChooser.ExpandStrategy;
@@ -63,6 +64,7 @@ public class ImportTargetPage extends WizardPage {
   private Button fChooseExistingRadio;
   private Button fCreateNewSetRadio;
   private Text fSetNameInput;
+  private Label fSetNameLabel;
 
   ImportTargetPage() {
     super(Messages.ImportTargetPage_CHOOSE_TARGET, Messages.ImportTargetPage_CHOOSE_TARGET, OwlUI.getImageDescriptor("icons/wizban/import_wiz.png")); //$NON-NLS-1$
@@ -103,6 +105,8 @@ public class ImportTargetPage extends WizardPage {
    * @see org.eclipse.jface.dialogs.IDialogPage#createControl(org.eclipse.swt.widgets.Composite)
    */
   public void createControl(Composite parent) {
+    boolean isWelcome = (getWizard() instanceof WelcomeWizard);
+
     Composite container = new Composite(parent, SWT.NONE);
     container.setLayout(new GridLayout(1, false));
 
@@ -140,6 +144,7 @@ public class ImportTargetPage extends WizardPage {
           fChooseExistingRadio.setSelection(true);
           fNoSpecificLocationRadio.setSelection(false);
           fCreateNewSetRadio.setSelection(false);
+          fSetNameLabel.setEnabled(false);
           fSetNameInput.setEnabled(false);
           updatePageComplete();
         }
@@ -148,12 +153,14 @@ public class ImportTargetPage extends WizardPage {
 
     /* Create new Bookmark Set */
     fCreateNewSetRadio = new Button(container, SWT.RADIO);
+    fCreateNewSetRadio.setEnabled(!isWelcome);
     fCreateNewSetRadio.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     ((GridData) fCreateNewSetRadio.getLayoutData()).verticalIndent = 10;
     fCreateNewSetRadio.setText(Messages.ImportTargetPage_IMPORT_TO_NEW_SET);
     fCreateNewSetRadio.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
+        fSetNameLabel.setEnabled(fCreateNewSetRadio.getSelection());
         fSetNameInput.setEnabled(fCreateNewSetRadio.getSelection());
         if (fCreateNewSetRadio.getSelection())
           fSetNameInput.setFocus();
@@ -166,8 +173,9 @@ public class ImportTargetPage extends WizardPage {
     ((GridLayout) newBookmarkSetContainer.getLayout()).marginLeft = 15;
     newBookmarkSetContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
-    Label nameLabel = new Label(newBookmarkSetContainer, SWT.None);
-    nameLabel.setText(Messages.ImportTargetPage_NAME);
+    fSetNameLabel = new Label(newBookmarkSetContainer, SWT.None);
+    fSetNameLabel.setText(Messages.ImportTargetPage_NAME);
+    fSetNameLabel.setEnabled(false);
 
     fSetNameInput = new Text(newBookmarkSetContainer, SWT.SINGLE | SWT.BORDER);
     fSetNameInput.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
