@@ -54,6 +54,7 @@ public class Messages extends NLS {
   public static String TutorialPage_OVERVIEW_TITLE;
   public static String TutorialPage_PREFERENCES;
   public static String TutorialPage_PREFERENCES_TEXT;
+  public static String TutorialPage_REPORT_BUGS;
   public static String TutorialPage_SAVED_SEARCHES;
   public static String TutorialPage_SAVED_SEARCHES_TEXT;
   public static String TutorialPage_SAVING_SEARCH_RESULTS;

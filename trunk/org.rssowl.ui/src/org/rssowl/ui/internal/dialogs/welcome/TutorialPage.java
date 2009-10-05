@@ -24,7 +24,9 @@
 
 package org.rssowl.ui.internal.dialogs.welcome;
 
+import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
@@ -35,6 +37,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Link;
+import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.BrowserUtils;
 import org.rssowl.ui.internal.util.LayoutUtils;
@@ -51,6 +54,9 @@ import java.util.List;
  * @author bpasero
  */
 public class TutorialPage extends WizardPage {
+  private static final char BOLD = '#';
+  private static final char BLUE = '%';
+
   private final Chapter fChapter;
 
   /** Chapters of the Tutorial */
@@ -135,10 +141,27 @@ public class TutorialPage extends WizardPage {
     setImageDescriptor(OwlUI.getImageDescriptor("icons/wizban/welcome_wiz.gif"));//$NON-NLS-1$
 
     /* Container */
-    Composite container = new Composite(parent, SWT.BORDER);
+    final Composite container = new Composite(parent, SWT.BORDER);
     container.setLayout(new GridLayout(1, false));
     container.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 
+    /* Contents */
+    SafeRunnable.run(new ISafeRunnable() {
+      public void run() throws Exception {
+        createContents(container);
+      }
+
+      public void handleException(Throwable th) {
+        Activator.safeLogError(th.getMessage(), th);
+      }
+    });
+
+    Dialog.applyDialogFont(container);
+
+    setControl(container);
+  }
+
+  private void createContents(Composite container) {
     switch (fChapter) {
       case INTRO:
         createIntroPage(container);
@@ -177,94 +200,66 @@ public class TutorialPage extends WizardPage {
         createFinishPage(container);
         break;
     }
-
-    Dialog.applyDialogFont(container);
-
-    setControl(container);
   }
 
   private void createIntroPage(Composite container) {
     StyledText text = createStyledText(container);
-
-    String str = Messages.TutorialPage_WELCOME_TEXT;
-    applyRichText(str, text);
+    applyRichText(Messages.TutorialPage_WELCOME_TEXT, text);
   }
 
   private void createOverviewPage(Composite container) {
     StyledText text = createStyledText(container);
-
-    String str = Messages.TutorialPage_LAYOUT_TEXT;
-    applyRichText(str, text);
+    applyRichText(Messages.TutorialPage_LAYOUT_TEXT, text);
   }
 
   private void createNewsPage(Composite container) {
     StyledText text = createStyledText(container);
-
-    String str = Messages.TutorialPage_NEWS_TEXT;
-    applyRichText(str, text);
+    applyRichText(Messages.TutorialPage_NEWS_TEXT, text);
   }
 
   private void createSavedSearchPage(Composite container) {
     StyledText text = createStyledText(container);
-
-    String str = Messages.TutorialPage_SAVED_SEARCHES_TEXT;
-    applyRichText(str, text);
+    applyRichText(Messages.TutorialPage_SAVED_SEARCHES_TEXT, text);
   }
 
   private void createNewsBinPage(Composite container) {
     StyledText text = createStyledText(container);
-
-    String str = Messages.TutorialPage_NEWS_BIN_TEXT;
-    applyRichText(str, text);
+    applyRichText(Messages.TutorialPage_NEWS_BIN_TEXT, text);
   }
 
   private void createNewsFilterPage(Composite container) {
     StyledText text = createStyledText(container);
-
-    String str = Messages.TutorialPage_NEWS_FILTER_TEXT;
-    applyRichText(str, text);
+    applyRichText(Messages.TutorialPage_NEWS_FILTER_TEXT, text);
   }
 
   private void createNotificationsPage(Composite container) {
     StyledText text = createStyledText(container);
-
-    String str = Messages.TutorialPage_NOTIFIER_TEXT;
-    applyRichText(str, text);
+    applyRichText(Messages.TutorialPage_NOTIFIER_TEXT, text);
   }
 
   private void createSharingPage(Composite container) {
     StyledText text = createStyledText(container);
-
-    String str = Messages.TutorialPage_SHARING_TEXT;
-    applyRichText(str, text);
+    applyRichText(Messages.TutorialPage_SHARING_TEXT, text);
   }
 
   private void createImportExportPage(Composite container) {
     StyledText text = createStyledText(container);
-
-    String str = Messages.TutorialPage_IMPORT_EXPORT_TEXT;
-    applyRichText(str, text);
+    applyRichText(Messages.TutorialPage_IMPORT_EXPORT_TEXT, text);
   }
 
   private void createPreferencesPage(Composite container) {
     StyledText text = createStyledText(container);
-
-    String str = Messages.TutorialPage_PREFERENCES_TEXT;
-    applyRichText(str, text);
+    applyRichText(Messages.TutorialPage_PREFERENCES_TEXT, text);
   }
 
   private void createTipsPage(Composite container) {
     StyledText text = createStyledText(container);
-
-    String str = Messages.TutorialPage_TIPS_TEXT;
-    applyRichText(str, text);
+    applyRichText(Messages.TutorialPage_TIPS_TEXT, text);
   }
 
   private void createFinishPage(Composite container) {
     StyledText text = createStyledText(container, false);
-
-    String str = Messages.TutorialPage_FINISH_TEXT;
-    applyRichText(str, text);
+    applyRichText(Messages.TutorialPage_FINISH_TEXT, text);
 
     Composite linkContainer = new Composite(container, SWT.NONE);
     linkContainer.setLayout(LayoutUtils.createGridLayout(1, 0, 0));
@@ -274,6 +269,7 @@ public class TutorialPage extends WizardPage {
     /* Further Links */
     createHyperLink(linkContainer, Messages.TutorialPage_FAQ, "http://www.rssowl.org/help"); //$NON-NLS-1$
     createHyperLink(linkContainer, Messages.TutorialPage_FORUMS, "http://sourceforge.net/projects/rssowl/forums"); //$NON-NLS-1$
+    createHyperLink(linkContainer, Messages.TutorialPage_REPORT_BUGS, "http://dev.rssowl.org"); //$NON-NLS-1$
     createHyperLink(linkContainer, Messages.TutorialPage_CONTACT, "http://www.rssowl.org/contact"); //$NON-NLS-1$
     createHyperLink(linkContainer, Messages.TutorialPage_WEBSITE, "http://www.rssowl.org"); //$NON-NLS-1$
   }
@@ -318,25 +314,25 @@ public class TutorialPage extends WizardPage {
       while ((character = reader.read()) != -1) {
 
         /* Bold Start */
-        if (character == '#' && !inBold) {
+        if (character == BOLD && !inBold) {
           inBold = true;
           boldStartIndex = index;
         }
 
         /* Bold End */
-        else if (character == '#' && inBold) {
+        else if (character == BOLD && inBold) {
           inBold = false;
           ranges.add(new StyleRange(boldStartIndex, index - boldStartIndex, null, null, SWT.BOLD));
         }
 
         /* Blue Start */
-        else if (character == '%' && !inBlue) {
+        else if (character == BLUE && !inBlue) {
           inBlue = true;
           blueStartIndex = index;
         }
 
         /* Blue End */
-        else if (character == '%' && inBlue) {
+        else if (character == BLUE && inBlue) {
           inBlue = false;
           StyleRange range = new StyleRange();
           range.foreground = widget.getDisplay().getSystemColor(SWT.COLOR_DARK_BLUE);
