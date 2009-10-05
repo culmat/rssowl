@@ -93,6 +93,7 @@ import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.actions.FindUpdatesAction;
 import org.rssowl.ui.internal.dialogs.LoginDialog;
 import org.rssowl.ui.internal.dialogs.properties.EntityPropertyPageWrapper;
+import org.rssowl.ui.internal.dialogs.welcome.TutorialWizard;
 import org.rssowl.ui.internal.dialogs.welcome.WelcomeWizard;
 import org.rssowl.ui.internal.handler.LabelNewsHandler;
 import org.rssowl.ui.internal.notifier.NotificationService;
@@ -1075,12 +1076,12 @@ public class Controller {
       });
     }
 
-    /* Show the Welcome Wizard if this is the first startup */
+    /* Show the Welcome & Tutorial Wizard if this is the first startup */
     if (fShowWelcome) {
       fShowWelcome = false; //Set to false to avoid another Wizard when opening new window
       JobRunner.runInUIThread(200, OwlUI.getActiveShell(), new Runnable() {
         public void run() {
-          showWelcomeWizard();
+          showWelcomeAndTutorial();
         }
       });
     }
@@ -1102,9 +1103,18 @@ public class Controller {
     fIsStarted = true;
   }
 
-  private void showWelcomeWizard() {
-    WelcomeWizard wizard = new WelcomeWizard();
-    OwlUI.openWizard(OwlUI.getActiveShell(), wizard, true, true, null);
+  private void showWelcomeAndTutorial() {
+    Shell activeShell = OwlUI.getActiveShell();
+
+    /* Show Welcome */
+    WelcomeWizard welcomeWizard = new WelcomeWizard();
+    OwlUI.openWizard(activeShell, welcomeWizard, true, true, null);
+
+    /* Show Tutorial */
+    if (PlatformUI.isWorkbenchRunning() && !fShuttingDown) { //Do not show if User asked to Restart
+      TutorialWizard tutorialWizard = new TutorialWizard();
+      OwlUI.openWizard(activeShell, tutorialWizard, false, false, null);
+    }
   }
 
   private void backupSubscriptions() {
