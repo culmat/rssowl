@@ -37,7 +37,7 @@
 
 ;#####   Installer Configuration   ######
 Name "RSSOwl 2.0"
-OutFile "RSSOwl Setup.exe"
+OutFile "RSSOwl Setup 2.0.exe"
 InstallDir $PROGRAMFILES\RSSOwl
 InstallDirRegKey HKCU "Software\RSSOwl" ""
 AllowRootDirInstall true
