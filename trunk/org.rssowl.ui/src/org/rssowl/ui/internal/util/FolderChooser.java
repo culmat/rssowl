@@ -480,9 +480,10 @@ public class FolderChooser extends Composite implements DisposeListener {
 
     /* Pack Shell and expect enough room to fit the Control */
     else {
-      Point desiredSize = shell.computeSize(shell.getSize().x, SWT.DEFAULT);
+      int currentWidth = shell.getSize().x;
+      Point desiredSize = shell.computeSize(currentWidth, SWT.DEFAULT);
       if (desiredSize.y > shell.getSize().y)
-        shell.pack();
+        shell.setSize(currentWidth, desiredSize.y);
       else
         shell.layout(true, true);
     }
