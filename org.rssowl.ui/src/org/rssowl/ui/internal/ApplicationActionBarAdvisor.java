@@ -878,11 +878,11 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
       }
     });
 
-    /* Link to boreal.rssowl.org */
+    /* Link to Help */
     helpMenu.add(new Action(Messages.ApplicationActionBarAdvisor_FAQ) {
       @Override
       public void run() {
-        BrowserUtils.openLinkExternal("http://boreal.rssowl.org/#faq"); //$NON-NLS-1$
+        BrowserUtils.openLinkExternal("http://www.rssowl.org/help"); //$NON-NLS-1$
       }
     });
 
