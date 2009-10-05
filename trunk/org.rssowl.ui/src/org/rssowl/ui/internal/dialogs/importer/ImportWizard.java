@@ -129,10 +129,8 @@ public class ImportWizard extends Wizard implements IImportWizard {
     addPage(fImportElementsPage);
 
     /* Page 3: Target to Import */
-    if (!fIsWelcome) {
-      fImportTargetPage = new ImportTargetPage();
-      addPage(fImportTargetPage);
-    }
+    fImportTargetPage = new ImportTargetPage();
+    addPage(fImportTargetPage);
 
     /* Page 4: Import Options */
     fImportOptionsPage = new ImportOptionsPage();
@@ -145,14 +143,12 @@ public class ImportWizard extends Wizard implements IImportWizard {
   @Override
   public IWizardPage getNextPage(IWizardPage page) {
 
-    /* Check if the ImportTargetPage needs to be shown */
+    /* Jump to Options Page if required and skip Target if nothing selected */
     if (page instanceof ImportElementsPage && !fImportSourcePage.isRemoteSource() && fImportElementsPage.getFolderChildsToImport().isEmpty() && fImportElementsPage.showOptionsPage())
       return fImportOptionsPage;
 
-    /* Check if the ImportOptionsPage needs to be shown */
+    /* Skip Options Page if not required after Target Page */
     if (page instanceof ImportTargetPage && !fImportElementsPage.showOptionsPage())
-      return null;
-    else if (page instanceof ImportElementsPage && !fImportElementsPage.showOptionsPage() && fIsWelcome)
       return null;
 
     return super.getNextPage(page);
@@ -230,7 +226,7 @@ public class ImportWizard extends Wizard implements IImportWizard {
       preferences = null;
 
     /* Show warning and ask for confirmation if preferences should be imported */
-    if (importPreferences && preferences != null && !preferences.isEmpty()) {
+    if (!fIsWelcome && importPreferences && preferences != null && !preferences.isEmpty()) {
       MessageDialog dialog = new MessageDialog(getShell(), Messages.ImportWizard_ATTENTION, null, Messages.ImportWizard_PREFERENCE_OVERWRITE, MessageDialog.WARNING, new String[] { IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL }, 0);
       if (dialog.open() != 0)
         return false;
