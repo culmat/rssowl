@@ -157,14 +157,6 @@ Section ""
   File bin\*.*
   WriteUninstaller "$INSTDIR\Uninstall.exe"
 
-  ;### Startmenu ###
-  !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
-    CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\RSSOwl.lnk" "$INSTDIR\rssowl.exe" "" "$INSTDIR\rssowl.ico"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
-    CreateShortcut "$QUICKLAUNCH\RSSOwl.lnk" "$INSTDIR\rssowl.exe" "" "$INSTDIR\rssowl.ico"
-  !insertmacro MUI_STARTMENU_WRITE_END
-  
   SetOutPath $INSTDIR\configuration
   File bin\configuration\*.*
   
@@ -181,8 +173,7 @@ Section ""
   SetOutPath $INSTDIR\features\org.rssowl_2.0.0.200909212303
   File bin\features\org.rssowl_2.0.0.200909212303\*.*
   
-  
-  #Plugins
+  # Plugins
   SetOutPath $INSTDIR\plugins\org.eclipse.equinox.launcher.win32.win32.x86_1.0.101.R34x_v20080731\META-INF
   File bin\plugins\org.eclipse.equinox.launcher.win32.win32.x86_1.0.101.R34x_v20080731\META-INF\*.*
   
@@ -191,6 +182,14 @@ Section ""
   
   SetOutPath $INSTDIR\plugins
   File bin\plugins\*.*
+  
+  ;### Startmenu ###
+  !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
+    CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\RSSOwl.lnk" "$INSTDIR\rssowl.exe" "" "$INSTDIR\rssowl.ico"
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
+    CreateShortcut "$QUICKLAUNCH\RSSOwl.lnk" "$INSTDIR\rssowl.exe" "" "$INSTDIR\rssowl.ico"
+  !insertmacro MUI_STARTMENU_WRITE_END
   
   WriteRegStr HKCU "Software\RSSOwl" "" $INSTDIR
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\RSSOwl" "DisplayName" "RSSOwl"
