@@ -94,7 +94,7 @@ public class SplashHandler extends AbstractSplashHandler {
     versionLabel.setLayoutData(new GridData(SWT.END, SWT.BEGINNING, true, false));
     versionLabel.setFont(fVersionFont);
     versionLabel.setForeground(fVersionColor);
-    versionLabel.setText(NLS.bind(Messages.SplashHandler_BUILD, System.getProperty("rssowl.buildId"))); //$NON-NLS-1$
+    versionLabel.setText(NLS.bind(Messages.SplashHandler_BUILD, "2.0 RC2")); //$NON-NLS-1$
 
     /* Layout All */
     shell.layout(true, true);
