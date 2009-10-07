@@ -18,7 +18,7 @@
         <outline title="sub_category_1_feed_1_title" xmlUrl="http://www.sub_category_1_feed_1_url.com" />
         <outline xmlUrl="http://www.sub_category_1_feed_2_url.com" />
       	<outline text="sub_sub_category_1">
-          <outline title="sub_sub_category_1_feed_1_title" xmlUrl="http://www.sub_sub_category_1_feed_1_url.com" />
+          <outline title="sub_sub_category_1_feed_1_title" xmlUrl="www.sub_sub_category_1_feed_1_url.com" />
         </outline>
       </outline>
     </outline>
