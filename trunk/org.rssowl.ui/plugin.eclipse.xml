@@ -491,6 +491,7 @@
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             description="%command.description.9"
             id="org.rssowl.ui.SearchNewsAction"
+            defaultHandler="org.rssowl.ui.internal.handler.SearchNewsHandler"
             name="%command.name.20">
       </command>
       <command
@@ -687,6 +688,13 @@
             id="org.rssowl.ui.SearchFeedsAction"
             name="%command.name.52">
       </command>
+      <command
+            categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            defaultHandler="org.rssowl.ui.internal.handler.TutorialHandler"
+            description="%command.description.33"
+            id="org.rssowl.ui.TutorialCommand"
+            name="%command.name.53">
+      </command>
    </extension>
    <extension
          id="product"
@@ -721,7 +729,7 @@
             sequence="M1+M2+C"/>
       <key
             commandId="org.rssowl.ui.SearchNewsAction"
-            contextId="org.eclipse.ui.contexts.window"
+            contextId="org.eclipse.ui.contexts.dialogAndWindow"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M2+F">
       </key>
@@ -942,6 +950,30 @@
             <objectClass
                   name="org.rssowl.core.persist.INews">
             </objectClass>
+         </visibility>
+      </objectContribution>
+      <objectContribution
+            adaptable="false"
+            id="org.rssowl.ui.CopyLinkContribution"
+            objectClass="java.lang.Object">
+         <action
+               class="org.rssowl.ui.internal.actions.CopyLinkAction"
+               definitionId="org.rssowl.ui.CopyLinkAction"
+               enablesFor="+"
+               icon="icons/elcl16/copy_link.gif"
+               id="org.rssowl.ui.CopyLinkAction"
+               label="%action.label.37"
+               menubarPath="copy">
+         </action>
+         <visibility>
+            <or>
+               <objectClass
+                     name="org.rssowl.core.persist.INews">
+               </objectClass>
+               <objectClass
+                     name="org.rssowl.core.persist.IBookMark">
+               </objectClass>
+            </or>
          </visibility>
       </objectContribution>
       <objectContribution
