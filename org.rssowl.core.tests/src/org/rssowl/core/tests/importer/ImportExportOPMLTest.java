@@ -778,7 +778,7 @@ public class ImportExportOPMLTest {
     }
 
     assertNotNull(bookmark1);
-    assertEquals("feed1", bookmark1.getFeedLinkReference().getLink().toString());
+    assertEquals("http://feed1", bookmark1.getFeedLinkReference().getLink().toString());
     if (useBackup)
       assertProperties(Owl.getPreferenceService().getEntityScope(bookmark1));
 
@@ -802,7 +802,7 @@ public class ImportExportOPMLTest {
     }
 
     assertNotNull(bookmark2);
-    assertEquals("feed2", bookmark2.getFeedLinkReference().getLink().toString());
+    assertEquals("http://feed2", bookmark2.getFeedLinkReference().getLink().toString());
 
     List<IMark> marks = defaultFolder1.getMarks();
     assertEquals(1, marks.size());
@@ -814,7 +814,7 @@ public class ImportExportOPMLTest {
     }
 
     assertNotNull(bookmark3);
-    assertEquals("feed3", bookmark3.getFeedLinkReference().getLink().toString());
+    assertEquals("http://feed3", bookmark3.getFeedLinkReference().getLink().toString());
 
     marks = customFolder1.getMarks();
     assertEquals(1, marks.size());
@@ -826,7 +826,7 @@ public class ImportExportOPMLTest {
     }
 
     assertNotNull(bookmark4);
-    assertEquals("feed4", bookmark4.getFeedLinkReference().getLink().toString());
+    assertEquals("http://feed4", bookmark4.getFeedLinkReference().getLink().toString());
 
     assertSearchMarks(defaultSet, useBackup);
     assertSearchMarks(customSet, useBackup);
