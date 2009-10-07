@@ -153,35 +153,10 @@ FunctionEnd
 ;#####   Installer Section   ######
 Section ""
 
+  ;### Copy / Create Files ###
   SetOutPath $INSTDIR
-  File bin\*.*
+  File /r bin\*.*
   WriteUninstaller "$INSTDIR\Uninstall.exe"
-
-  SetOutPath $INSTDIR\configuration
-  File bin\configuration\*.*
-  
-  # Features
-  SetOutPath $INSTDIR\features\org.eclipse.rcp_3.4.200.R342_v20090122-989JESTEbig-SVaL8UJHcYBr4A63\META-INF
-  File bin\features\org.eclipse.rcp_3.4.200.R342_v20090122-989JESTEbig-SVaL8UJHcYBr4A63\META-INF\*.*
-  
-  SetOutPath $INSTDIR\features\org.eclipse.rcp_3.4.200.R342_v20090122-989JESTEbig-SVaL8UJHcYBr4A63
-  File bin\features\org.eclipse.rcp_3.4.200.R342_v20090122-989JESTEbig-SVaL8UJHcYBr4A63\*.*
-  
-  SetOutPath $INSTDIR\features\org.rssowl.dependencies_2.0.0
-  File bin\features\org.rssowl.dependencies_2.0.0\*.*
-  
-  SetOutPath $INSTDIR\features\org.rssowl_2.0.0.200909212303
-  File bin\features\org.rssowl_2.0.0.200909212303\*.*
-  
-  # Plugins
-  SetOutPath $INSTDIR\plugins\org.eclipse.equinox.launcher.win32.win32.x86_1.0.101.R34x_v20080731\META-INF
-  File bin\plugins\org.eclipse.equinox.launcher.win32.win32.x86_1.0.101.R34x_v20080731\META-INF\*.*
-  
-  SetOutPath $INSTDIR\plugins\org.eclipse.equinox.launcher.win32.win32.x86_1.0.101.R34x_v20080731
-  File bin\plugins\org.eclipse.equinox.launcher.win32.win32.x86_1.0.101.R34x_v20080731\*.*
-  
-  SetOutPath $INSTDIR\plugins
-  File bin\plugins\*.*
   
   ;### Startmenu ###
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
@@ -196,6 +171,7 @@ Section ""
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\RSSOwl" "UninstallString" "$INSTDIR\Uninstall.exe"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\RSSOwl" "DisplayIcon" "$INSTDIR\rssowl.ico"
 
+  ;### Register to feed Protocol ###
   WriteRegStr HKCR "feed" "" "URL:feed Protocol"
   WriteRegStr HKCR "feed" "URL Protocol" ""
   WriteRegStr HKCR "feed\DefaultIcon" "" "$\"$INSTDIR\rssowl.exe$\""
@@ -206,26 +182,16 @@ SectionEnd
 ;#####   Uninstaller Section   ######
 Section "Uninstall"
 
-  Delete "$INSTDIR\*.*"
-  Delete "$INSTDIR\configuration\*.*"
-  Delete "$INSTDIR\features\org.eclipse.rcp_3.4.200.R342_v20090122-989JESTEbig-SVaL8UJHcYBr4A63\META-INF\*.*"
-  Delete "$INSTDIR\features\org.eclipse.rcp_3.4.200.R342_v20090122-989JESTEbig-SVaL8UJHcYBr4A63\*.*"
-  Delete "$INSTDIR\features\org.rssowl.dependencies_2.0.0\*.*"
-  Delete "$INSTDIR\features\org.rssowl_2.0.0.200909212303\*.*"
-  Delete "$INSTDIR\features\*.*"
-  Delete "$INSTDIR\plugins\org.eclipse.equinox.launcher.win32.win32.x86_1.0.101.R34x_v20080731\META-INF\*.*"
-  Delete "$INSTDIR\plugins\org.eclipse.equinox.launcher.win32.win32.x86_1.0.101.R34x_v20080731\*.*"
-  Delete "$INSTDIR\plugins\*.*"
+  ;### Uninstall Files ###
+  Delete "$INSTDIR\.eclipseproduct"
+  Delete "$INSTDIR\RSSOwl.exe"
+  Delete "$INSTDIR\rssowl.ico"
+  Delete "$INSTDIR\RSSOwl.ini"
+  Delete "$INSTDIR\Uninstall.exe"
 
-  RMDir "$INSTDIR\configuration"
-  RMDir "$INSTDIR\features\org.eclipse.rcp_3.4.200.R342_v20090122-989JESTEbig-SVaL8UJHcYBr4A63\META-INF"
-  RMDir "$INSTDIR\features\org.eclipse.rcp_3.4.200.R342_v20090122-989JESTEbig-SVaL8UJHcYBr4A63"
-  RMDir "$INSTDIR\features\org.rssowl.dependencies_2.0.0"
-  RMDir "$INSTDIR\features\org.rssowl_2.0.0.200909212303"
-  RMDir "$INSTDIR\features"
-  RMDir "$INSTDIR\plugins\org.eclipse.equinox.launcher.win32.win32.x86_1.0.101.R34x_v20080731\META-INF"
-  RMDir "$INSTDIR\plugins\org.eclipse.equinox.launcher.win32.win32.x86_1.0.101.R34x_v20080731"
-  RMDir "$INSTDIR\plugins"
+  RMDir /r "$INSTDIR\configuration"
+  RMDir /r "$INSTDIR\features"
+  RMDir /r "$INSTDIR\plugins"
   RMDir "$INSTDIR"
 
   ;### Uninstall Startmenu ###
@@ -236,7 +202,7 @@ Section "Uninstall"
   Delete "$DESKTOP\RSSOwl.lnk"
   Delete "$QUICKLAUNCH\RSSOwl.lnk"
 
-  ;Delete empty start menu parent diretories
+  ;### Delete empty start menu parent diretories ###
   StrCpy $MUI_TEMP "$SMPROGRAMS\$MUI_TEMP"
 
   startMenuDeleteLoop:
