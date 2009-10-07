@@ -334,6 +334,9 @@ public class DefaultPreferences {
   /** Global: Localized Feed Search */
   public static final String LOCALIZED_FEED_SEARCH = Preference.LOCALIZED_FEED_SEARCH.id();
 
+  /** Global: Last Used Folder for Downloads */
+  public static final String DOWNLOAD_FOLDER = Preference.DOWNLOAD_FOLDER.id();
+
   /**
    * Eclipse Preferences Follow
    */
