@@ -69,7 +69,7 @@ public class Messages extends NLS {
   public static String ApplicationActionBarAdvisor_ORGANIZE_LABELS;
   public static String ApplicationActionBarAdvisor_PREFERENCES;
   public static String ApplicationActionBarAdvisor_REPORT_PROBLEMS;
-  public static String ApplicationActionBarAdvisor_SELECT_FOLDER_FOR_DOWNLOAD;
+  public static String ApplicationActionBarAdvisor_SELECT_FILE_FOR_DOWNLOAD;
   public static String ApplicationActionBarAdvisor_SELECT_FOLDER_FOR_DOWNLOADS;
   public static String ApplicationActionBarAdvisor_SHARE_NEWS;
   public static String ApplicationActionBarAdvisor_SHOW_ALL;

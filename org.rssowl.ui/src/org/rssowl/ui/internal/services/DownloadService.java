@@ -45,6 +45,7 @@ import org.rssowl.core.connection.IProtocolHandler;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Controller;
@@ -89,17 +90,19 @@ public class DownloadService {
     private final URI fFile;
     private final File fFolder;
     private final boolean fUserInitiated;
+    private final String fName;
 
-    private AttachmentDownloadTask(IAttachment attachment, URI file, File folder, boolean userInitiated) {
+    private AttachmentDownloadTask(IAttachment attachment, URI file, String name, File folder, boolean userInitiated) {
       fAttachment = attachment;
       fFile = file;
+      fName = name;
       fFolder = folder;
       fUserInitiated = userInitiated;
     }
 
     @Override
     public IStatus run(Job job, IProgressMonitor monitor) {
-      return internalDownload(job, fAttachment, fFile, fFolder, monitor, fUserInitiated);
+      return internalDownload(job, fAttachment, fFile, fName, fFolder, monitor, fUserInitiated);
     }
 
     public String getName() {
@@ -145,13 +148,32 @@ public class DownloadService {
    * filter).
    */
   public void download(IAttachment attachment, URI file, File folder, boolean userInitiated) {
-    AttachmentDownloadTask task = new AttachmentDownloadTask(attachment, file, folder, userInitiated);
+    download(attachment, file, null, folder, userInitiated);
+  }
+
+  /**
+   * @param attachment the {@link IAttachment} to download.
+   * @param file the file to download as {@link URI}.
+   * @param name the name of the file to use or <code>null</code> to take this
+   * information from the link.
+   * @param folder the folder to download to as {@link File}.
+   * @param userInitiated if <code>true</code> the user explicitly asked for a
+   * download and <code>false</code> otherwise (e.g. if download is from a
+   * filter).
+   */
+  public void download(IAttachment attachment, URI file, String name, File folder, boolean userInitiated) {
+    AttachmentDownloadTask task = new AttachmentDownloadTask(attachment, file, name, folder, userInitiated);
     if (!fDownloadQueue.isQueued(task))
       fDownloadQueue.schedule(task);
   }
 
-  private IStatus internalDownload(Job job, final IAttachment attachment, final URI link, final File folder, final IProgressMonitor monitor, final boolean userInitiated) {
-    String downloadFileName = URIUtils.getFile(link);
+  private IStatus internalDownload(Job job, final IAttachment attachment, final URI link, final String fileName, final File folder, final IProgressMonitor monitor, final boolean userInitiated) {
+    String downloadFileName;
+    if (StringUtils.isSet(fileName))
+      downloadFileName = fileName;
+    else
+      downloadFileName = URIUtils.getFile(link);
+
     File downloadFile = new File(folder, downloadFileName);
     job.setName(NLS.bind(Messages.DownloadService_DOWNLOADING, downloadFileName));
     job.setProperty(IProgressConstants.ICON_PROPERTY, OwlUI.getAttachmentImage(downloadFileName, attachment.getType()));
@@ -255,7 +277,7 @@ public class DownloadService {
                     try {
                       URI normalizedUri = URIUtils.normalizeUri(link, true);
                       if (Owl.getConnectionService().getAuthCredentials(normalizedUri, authEx.getRealm()) != null) {
-                        fDownloadQueue.schedule(new AttachmentDownloadTask(attachment, link, folder, userInitiated));
+                        fDownloadQueue.schedule(new AttachmentDownloadTask(attachment, link, fileName, folder, userInitiated));
                         showError[0] = false;
                         return;
                       }
@@ -266,7 +288,7 @@ public class DownloadService {
                     /* Show Login Dialog */
                     LoginDialog login = new LoginDialog(shell, link, authEx.getRealm());
                     if (login.open() == Window.OK && !monitor.isCanceled() && !Controller.getDefault().isShuttingDown()) {
-                      fDownloadQueue.schedule(new AttachmentDownloadTask(attachment, link, folder, userInitiated));
+                      fDownloadQueue.schedule(new AttachmentDownloadTask(attachment, link, fileName, folder, userInitiated));
                       showError[0] = false;
                     }
                   }
@@ -298,7 +320,7 @@ public class DownloadService {
               job.setName(NLS.bind(Messages.DownloadService_ERROR_DOWNLOADING, downloadFileName));
 
             job.setProperty(IProgressConstants.ICON_PROPERTY, OwlUI.ERROR);
-            job.setProperty(IProgressConstants.ACTION_PROPERTY, getRedownloadAction(new AttachmentDownloadTask(attachment, link, folder, true)));
+            job.setProperty(IProgressConstants.ACTION_PROPERTY, getRedownloadAction(new AttachmentDownloadTask(attachment, link, fileName, folder, true)));
             monitor.setTaskName(Messages.DownloadService_TRY_AGAIN);
           }
 

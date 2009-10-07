@@ -331,6 +331,9 @@ public enum Preference {
   /** Global: Language Specific Feed Search */
   LOCALIZED_FEED_SEARCH("org.rssowl.pref.LocalizedFeedSearch", IPreferenceType.BOOLEAN), //$NON-NLS-1$
 
+  /** Global: Last Used Folder for Downloads */
+  DOWNLOAD_FOLDER("org.rssowl.pref.DownloadFolder", IPreferenceType.STRING), //$NON-NLS-1$
+
   /******************************
    * Eclipse Preferences Follow *
    ******************************/

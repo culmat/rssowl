@@ -1092,6 +1092,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         manager.add(attachmentMenu);
       }
 
+      final IPreferenceScope preferences = Owl.getPreferenceService().getGlobalScope();
+
       /* Offer to Download All */
       if (attachments.size() > 1) {
         int sumBytes = 0;
@@ -1110,11 +1112,19 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
           public void run() {
             DirectoryDialog dialog = new DirectoryDialog(shellProvider.getShell(), SWT.None);
             dialog.setText(Messages.ApplicationActionBarAdvisor_SELECT_FOLDER_FOR_DOWNLOADS);
+
+            String downloadFolder = preferences.getString(DefaultPreferences.DOWNLOAD_FOLDER);
+            if (StringUtils.isSet(downloadFolder) && new File(downloadFolder).exists())
+              dialog.setFilterPath(downloadFolder);
+
             String folder = dialog.open();
             if (StringUtils.isSet(folder)) {
               for (Pair<IAttachment, URI> attachment : attachments) {
                 Controller.getDefault().getDownloadService().download(attachment.getFirst(), attachment.getSecond(), new File(folder), true);
               }
+
+              /* Remember Download Folder in Settings */
+              preferences.putString(DefaultPreferences.DOWNLOAD_FOLDER, folder);
             }
           }
         });
@@ -1124,17 +1134,29 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
       /* Offer Download Action for each */
       for (final Pair<IAttachment, URI> attachmentPair : attachments) {
         IAttachment attachment = attachmentPair.getFirst();
-        String fileName = URIUtils.getFile(attachmentPair.getSecond());
+        final String fileName = URIUtils.getFile(attachmentPair.getSecond());
         String size = OwlUI.getSize(attachment.getLength());
 
         Action action = new Action(size != null ? (NLS.bind(Messages.ApplicationActionBarAdvisor_FILE_SIZE, fileName, size)) : (fileName)) {
           @Override
           public void run() {
-            DirectoryDialog dialog = new DirectoryDialog(shellProvider.getShell(), SWT.None);
-            dialog.setText(Messages.ApplicationActionBarAdvisor_SELECT_FOLDER_FOR_DOWNLOAD);
-            String folder = dialog.open();
-            if (StringUtils.isSet(folder))
-              Controller.getDefault().getDownloadService().download(attachmentPair.getFirst(), attachmentPair.getSecond(), new File(folder), true);
+            FileDialog dialog = new FileDialog(shellProvider.getShell(), SWT.SAVE);
+            dialog.setText(Messages.ApplicationActionBarAdvisor_SELECT_FILE_FOR_DOWNLOAD);
+            dialog.setFileName(fileName);
+            dialog.setOverwrite(true);
+
+            String downloadFolder = preferences.getString(DefaultPreferences.DOWNLOAD_FOLDER);
+            if (StringUtils.isSet(downloadFolder) && new File(downloadFolder).exists())
+              dialog.setFilterPath(downloadFolder);
+
+            String selectedFileName = dialog.open();
+            if (StringUtils.isSet(selectedFileName)) {
+              File file = new File(selectedFileName);
+              Controller.getDefault().getDownloadService().download(attachmentPair.getFirst(), attachmentPair.getSecond(), file.getName(), file.getParentFile(), true);
+
+              /* Remember Download Folder in Settings */
+              preferences.putString(DefaultPreferences.DOWNLOAD_FOLDER, file.getParentFile().toString());
+            }
           }
         };
 

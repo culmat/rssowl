@@ -33,9 +33,11 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Link;
+import org.rssowl.core.Owl;
+import org.rssowl.core.internal.persist.pref.DefaultPreferences;
+import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.filter.INewsActionPresentation;
-import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.io.File;
@@ -47,7 +49,6 @@ import java.io.File;
  * @author bpasero
  */
 public class DownloadAttachmentsNewsActionPresentation implements INewsActionPresentation {
-  private static boolean fgDownloadDirectorySet = false;
   private Link fFolderPathLink;
   private Composite fContainer;
 
@@ -74,6 +75,8 @@ public class DownloadAttachmentsNewsActionPresentation implements INewsActionPre
   }
 
   private void onSelect() {
+    IPreferenceScope preferences = Owl.getPreferenceService().getGlobalScope();
+
     DirectoryDialog dialog = new DirectoryDialog(fFolderPathLink.getShell(), SWT.None);
     dialog.setText(Messages.DownloadAttachmentsNewsActionPresentation_SELECT_FOLDER);
 
@@ -84,48 +87,22 @@ public class DownloadAttachmentsNewsActionPresentation implements INewsActionPre
         dialog.setFilterPath(file.toString());
     }
 
-    /* Preset with a good Location */
-    if (!StringUtils.isSet(dialog.getFilterPath()) && !fgDownloadDirectorySet) {
-      fgDownloadDirectorySet = true; //Only set once
-      String homeDirVal = System.getProperty("user.home"); //$NON-NLS-1$
-      if (StringUtils.isSet(homeDirVal)) {
-        boolean directorySet = false;
-
-        /* On Windows try "Downloads" and "Desktop" */
-        if (Application.IS_WINDOWS) {
-
-          /* First try Download Folder */
-          File downloadsDir = new File(homeDirVal + "\\Downloads"); //$NON-NLS-1$
-          if (downloadsDir.exists()) {
-            dialog.setFilterPath(downloadsDir.toString());
-            directorySet = true;
-          }
-
-          /* Fallback to Desktop */
-          else {
-            downloadsDir = new File(homeDirVal + "\\Desktop"); //$NON-NLS-1$
-            if (downloadsDir.exists()) {
-              dialog.setFilterPath(downloadsDir.toString());
-              directorySet = true;
-            }
-          }
-        }
-
-        /* Use the home directory as fallback */
-        if (!directorySet) {
-          File homeDir = new File(homeDirVal);
-          if (homeDir.exists())
-            dialog.setFilterPath(homeDir.toString());
-        }
-      }
+    /* Preset with a good Location from Preferences if present */
+    if (!StringUtils.isSet(dialog.getFilterPath())) {
+      String downloadFolder = preferences.getString(DefaultPreferences.DOWNLOAD_FOLDER);
+      if (StringUtils.isSet(downloadFolder) && new File(downloadFolder).exists())
+        dialog.setFilterPath(downloadFolder);
     }
 
     String folderPath = dialog.open();
-    if (folderPath != null) {
+    if (StringUtils.isSet(folderPath)) {
       updateLink(folderPath);
 
       /* Link might require more space now */
       fFolderPathLink.getShell().layout(true, true);
+
+      /* Remember Download Folder in Settings */
+      preferences.putString(DefaultPreferences.DOWNLOAD_FOLDER, folderPath);
     }
   }
 
