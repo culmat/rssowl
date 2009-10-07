@@ -223,7 +223,10 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
       public void update(ViewerCell cell) {
         ISearchFilter filter = (ISearchFilter) cell.getElement();
         Display display = fViewer.getControl().getDisplay();
-        cell.setText(filter.getName());
+        if (filter.isEnabled())
+          cell.setText(filter.getName());
+        else
+          cell.setText(NLS.bind(Messages.NewsFiltersListDialog_FILTER_DISABLED, filter.getName()));
         cell.setImage(fFilterIcon);
         if (!OwlUI.isHighContrast())
           cell.setForeground(filter.isEnabled() ? display.getSystemColor(SWT.COLOR_BLACK) : display.getSystemColor(SWT.COLOR_DARK_GRAY));
