@@ -295,7 +295,8 @@ public class OPMLImporter implements ITypeImporter {
     ISearchField searchField;
     if (StringUtils.isSet(fieldName)) //Pre 2.0 M10
       searchField = Owl.getModelFactory().createSearchField(getFieldID(fieldName), entityName);
-    else //Since 2.0 M10
+    else
+      //Since 2.0 M10
       searchField = Owl.getModelFactory().createSearchField(Integer.parseInt(fieldId), entityName);
 
     /*
@@ -527,6 +528,10 @@ public class OPMLImporter implements ITypeImporter {
     else {
       URI uri = link != null ? URIUtils.createURI(link) : null;
       if (uri != null) {
+
+        /* If no Scheme is Provided, use HTTP as default */
+        if (uri.getScheme() == null)
+          uri = URIUtils.createURI(URIUtils.HTTP + link);
 
         /* Create the BookMark */
         FeedLinkReference feedLinkRef = new FeedLinkReference(uri);
