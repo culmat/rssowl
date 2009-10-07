@@ -142,6 +142,7 @@ public class Messages extends NLS {
   public static String NewsFiltersListDialog_DELETE;
   public static String NewsFiltersListDialog_EDIT;
   public static String NewsFiltersListDialog_ENABLED_FILTERS;
+  public static String NewsFiltersListDialog_FILTER_DISABLED;
   public static String NewsFiltersListDialog_FILTER_LIST_ELEMENT;
   public static String NewsFiltersListDialog_FILTER_MATCHES_ALL_NEWS;
   public static String NewsFiltersListDialog_FILTERED_N_OF_M_NEWS;
