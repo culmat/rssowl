@@ -324,7 +324,8 @@ public class WebBrowserView extends EditorPart implements IReusableEditor {
   @Override
   public void createPartControl(Composite parent) {
     fCreated = true;
-    parent.setLayout(LayoutUtils.createGridLayout(1, 0, 5, 0, 0, false));
+    parent.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 0, 0, false));
+    ((GridLayout)parent.getLayout()).marginTop = 5;
 
     /* Browser Bar */
     createBrowserBar(parent);
