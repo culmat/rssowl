@@ -36,7 +36,7 @@
 !include "MUI.nsh"
 
 ;#####   Installer Configuration   ######
-Name "RSSOwl 2.0"
+Name "RSSOwl"
 OutFile "RSSOwl Setup 2.0.exe"
 InstallDir $PROGRAMFILES\RSSOwl
 InstallDirRegKey HKCU "Software\RSSOwl" ""
