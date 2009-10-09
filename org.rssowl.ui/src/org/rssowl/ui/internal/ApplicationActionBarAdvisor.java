@@ -729,6 +729,16 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
             public ImageDescriptor getImageDescriptor() {
               return OwlUI.FILTER;
             }
+
+            @Override
+            public String getActionDefinitionId() {
+              return CreateFilterAction.ID;
+            };
+
+            @Override
+            public String getId() {
+              return CreateFilterAction.ID;
+            };
           });
         }
 

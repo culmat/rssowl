@@ -688,6 +688,7 @@
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            defaultHandler="org.rssowl.ui.internal.handler.SortByNameHandler"
             id="org.rssowl.ui.SortByNameAction"
             name="%command.name.28">
       </command>
@@ -766,12 +767,14 @@
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            defaultHandler="org.rssowl.ui.internal.handler.CreateFilterHandler"
             description="%command.description.25"
             id="org.rssowl.ui.CreateFilterAction"
             name="%command.name.40">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            defaultHandler="org.rssowl.ui.internal.handler.CreateFilterHandler"
             description="%command.description.26"
             id="org.rssowl.ui.FilterNewsAction"
             name="%command.name.41">

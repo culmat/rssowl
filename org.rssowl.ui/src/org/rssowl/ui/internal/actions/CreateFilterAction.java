@@ -69,6 +69,10 @@ import java.util.List;
  * @author bpasero
  */
 public class CreateFilterAction implements IObjectActionDelegate {
+
+  /** This Actions ID */
+  public static final String ID = "org.rssowl.ui.CreateFilterAction"; //$NON-NLS-1$
+
   private IStructuredSelection fSelection;
   private PresetAction fPresetAction = PresetAction.NONE;
 
