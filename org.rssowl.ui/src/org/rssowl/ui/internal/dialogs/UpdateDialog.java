@@ -77,19 +77,12 @@ public class UpdateDialog extends TitleAreaDialog {
   }
 
   /*
-   * @see org.eclipse.jface.dialogs.Dialog#okPressed()
-   */
-  @Override
-  protected void okPressed() {
-    fPreferences.putBoolean(DefaultPreferences.UPDATE_ON_STARTUP, fUpdateOnStartupCheck.getSelection());
-    super.okPressed();
-  }
-
-  /*
    * @see org.eclipse.jface.dialogs.TitleAreaDialog#close()
    */
   @Override
   public boolean close() {
+    if (!fUpdateOnStartupCheck.isDisposed())
+      fPreferences.putBoolean(DefaultPreferences.UPDATE_ON_STARTUP, fUpdateOnStartupCheck.getSelection());
     fResources.dispose();
     return super.close();
   }
@@ -145,6 +138,7 @@ public class UpdateDialog extends TitleAreaDialog {
 
     fUpdateInfoTextBottom = new StyledText(updateInfoContainer, SWT.READ_ONLY | SWT.MULTI | SWT.WRAP);
     fUpdateInfoTextBottom.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
+    ((GridData) fUpdateInfoTextBottom.getLayoutData()).widthHint = 300;
     fUpdateInfoTextBottom.setLineSpacing(5);
     fUpdateInfoTextBottom.setEnabled(false);
     fUpdateInfoTextBottom.setBackground(composite.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
