@@ -393,7 +393,10 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
           if (bookMark != null)
             feedIcon = OwlUI.getFavicon(bookMark);
 
-          fMapFeedLinkToFeedIcon.put(feedRef, feedIcon != null ? feedIcon : OwlUI.BOOKMARK);
+          if (feedIcon == null)
+            feedIcon = OwlUI.BOOKMARK;
+
+          fMapFeedLinkToFeedIcon.put(feedRef, feedIcon);
         }
 
         return OwlUI.getImage(fResources, feedIcon);
