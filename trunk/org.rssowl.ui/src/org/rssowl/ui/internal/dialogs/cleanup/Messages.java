@@ -52,6 +52,8 @@ public class Messages extends NLS {
   public static String CleanUpOptionsPage_DONT_DELETE_LABELED;
   public static String CleanUpOptionsPage_DONT_DELETE_UNREAD;
   public static String CleanUpSummaryPage_DESELECT_ALL;
+  public static String CleanUpSummaryPage_DISPLAY;
+  public static String CleanUpSummaryPage_DISPLAY_FEED;
   public static String CleanUpSummaryPage_REVIEW_OPS;
   public static String CleanUpSummaryPage_SELECT_ALL;
   public static String CleanUpSummaryPage_WAIT_GENERATE_PREVIEW;
@@ -70,6 +72,8 @@ public class Messages extends NLS {
   public static String DefragDatabaseTask_IMPROVE_DB_PERFORMANCE;
   public static String FeedSelectionPage_CHOOSE_BOOKMARKS;
   public static String FeedSelectionPage_DESELECT_ALL;
+  public static String FeedSelectionPage_DISPLAY;
+  public static String FeedSelectionPage_DISPLAY_FEEDS;
   public static String FeedSelectionPage_SELECT_ALL;
   public static String NewsTask_DELETE_N_NEWS_FROM_M;
   public static String OptimizeSearchTask_IMPROVE_PERFORMANCE;

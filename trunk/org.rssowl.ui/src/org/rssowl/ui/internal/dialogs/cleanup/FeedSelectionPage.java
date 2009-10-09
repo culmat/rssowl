@@ -26,21 +26,30 @@ package org.rssowl.ui.internal.dialogs.cleanup;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.util.CoreUtils;
+import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.dialogs.PreviewFeedDialog;
 import org.rssowl.ui.internal.util.FolderChildCheckboxTree;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
@@ -56,6 +65,7 @@ public class FeedSelectionPage extends WizardPage {
   private CheckboxTreeViewer fViewer;
   private Button fSelectAll;
   private Button fDeselectAll;
+  private Button fDisplayFeedButton;
 
   /**
    * @param pageName
@@ -108,7 +118,7 @@ public class FeedSelectionPage extends WizardPage {
     container.setLayout(new GridLayout(1, false));
 
     /* Viewer for Folder Child Selection */
-    fFolderChildTree = new FolderChildCheckboxTree(container);
+    fFolderChildTree = new FolderChildCheckboxTree(container, true);
     fViewer = fFolderChildTree.getViewer();
 
     /* Filter out any non Bookmarks and empty folders */
@@ -122,13 +132,27 @@ public class FeedSelectionPage extends WizardPage {
       }
     });
 
+    /* Update Display Button on Selection */
+    fViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+      public void selectionChanged(SelectionChangedEvent event) {
+        fDisplayFeedButton.setEnabled(((IStructuredSelection) event.getSelection()).getFirstElement() instanceof IBookMark);
+      }
+    });
+
+    /* Show Feed on Doubleclick */
+    fViewer.addDoubleClickListener(new IDoubleClickListener() {
+      public void doubleClick(DoubleClickEvent event) {
+        showFeeds((IStructuredSelection) event.getSelection());
+      }
+    });
+
     /* Set Input */
     fFolderChildTree.getViewer().setInput(CoreUtils.loadRootFolders());
     fFolderChildTree.setAllChecked(true);
 
     /* Select All / Deselect All */
     Composite buttonContainer = new Composite(container, SWT.NONE);
-    buttonContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
+    buttonContainer.setLayout(LayoutUtils.createGridLayout(4, 0, 0));
     buttonContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     fSelectAll = new Button(buttonContainer, SWT.PUSH);
@@ -153,9 +177,51 @@ public class FeedSelectionPage extends WizardPage {
       }
     });
 
+    if (!Application.IS_MAC) {
+      Label sep = new Label(buttonContainer, SWT.SEPARATOR | SWT.VERTICAL);
+      sep.setLayoutData(new GridData(SWT.BEGINNING, SWT.FILL, false, false));
+      ((GridData) sep.getLayoutData()).heightHint = 20;
+    }
+
+    fDisplayFeedButton = new Button(buttonContainer, SWT.PUSH);
+    fDisplayFeedButton.setText(Messages.FeedSelectionPage_DISPLAY);
+    fDisplayFeedButton.setEnabled(false);
+    fDisplayFeedButton.setToolTipText(Messages.FeedSelectionPage_DISPLAY_FEEDS);
+    Dialog.applyDialogFont(fDisplayFeedButton);
+    setButtonLayoutData(fDisplayFeedButton);
+    fDisplayFeedButton.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        showFeeds((IStructuredSelection) fViewer.getSelection());
+      }
+    });
+
     Dialog.applyDialogFont(container);
 
     setControl(container);
+  }
+
+  private void showFeeds(IStructuredSelection selection) {
+    if (!selection.isEmpty()) {
+      Object[] elements = selection.toArray();
+      int offset = 0;
+      for (Object element : elements) {
+        if (element instanceof IBookMark) {
+          IBookMark bookmark = (IBookMark) element;
+
+          PreviewFeedDialog dialog = new PreviewFeedDialog(getShell(), bookmark, bookmark.getFeedLinkReference().resolve());
+          dialog.setBlockOnOpen(false);
+          dialog.open();
+
+          if (offset != 0) {
+            Point location = dialog.getShell().getLocation();
+            dialog.getShell().setLocation(location.x + offset, location.y + offset);
+          }
+
+          offset += 20;
+        }
+      }
+    }
   }
 
   private boolean hasBookMarks(IFolder folder) {
