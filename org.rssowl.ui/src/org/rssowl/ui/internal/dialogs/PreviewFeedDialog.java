@@ -171,7 +171,7 @@ public class PreviewFeedDialog extends Dialog {
   private void loadFeed() {
 
     /* Show Info that Feed is loading */
-    if (fLoadedFeed == null) {
+    if (fLoadedFeed == null || fLoadedFeed.getVisibleNews().isEmpty()) {
       if (StringUtils.isSet(fBookmark.getName()))
         showMessage(NLS.bind(Messages.PreviewFeedDialog_LOAD_FEED_N, fBookmark.getName()), false);
       else
