@@ -190,7 +190,11 @@ public class ApplicationServiceImpl implements IApplicationService {
       }
 
       /* Update state of added news if equivalent news already exists */
-      updateStateOfUnsavedNewNews(newNewsAdded);
+      SafeRunner.run(new LoggingSafeRunnable() {
+        public void run() throws Exception { //See Bug 1216 (NPE in ModelSearchImpl.getCurrentSearcher)
+          updateStateOfUnsavedNewNews(newNewsAdded);
+        }
+      });
 
       /* Retention Policy */
       final List<INews> deletedNews = RetentionStrategy.process(bookMark, feed);
