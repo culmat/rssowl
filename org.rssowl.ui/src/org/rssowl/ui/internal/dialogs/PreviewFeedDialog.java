@@ -187,7 +187,7 @@ public class PreviewFeedDialog extends Dialog {
       protected void runInBackground(IProgressMonitor monitor) {
 
         /* First Check if a Feed was already provided */
-        if (fLoadedFeed != null) {
+        if (fLoadedFeed != null && !fLoadedFeed.getVisibleNews().isEmpty()) {
           feed = fLoadedFeed;
           return;
         }

@@ -35,10 +35,12 @@ import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IFontProvider;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ITreeViewerListener;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.wizard.WizardPage;
@@ -55,13 +57,16 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Scrollable;
 import org.eclipse.swt.widgets.TreeItem;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.ui.internal.Activator;
+import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.dialogs.PreviewFeedDialog;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
@@ -78,6 +83,7 @@ public class CleanUpSummaryPage extends WizardPage {
   private ResourceManager fResources;
   private Button fSelectAll;
   private Button fDeselectAll;
+  private Button fDisplayFeedButton;
 
   /* Summary Label Provider */
   class SummaryLabelProvider extends LabelProvider implements IFontProvider, IColorProvider {
@@ -254,6 +260,13 @@ public class CleanUpSummaryPage extends WizardPage {
       }
     });
 
+    /* Update Display Button on Selection */
+    fViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+      public void selectionChanged(SelectionChangedEvent event) {
+        fDisplayFeedButton.setEnabled(((IStructuredSelection) event.getSelection()).getFirstElement() instanceof BookMarkTask);
+      }
+    });
+
     /* Update Checks on Expand */
     fViewer.addTreeListener(new ITreeViewerListener() {
       public void treeExpanded(TreeExpansionEvent event) {
@@ -265,7 +278,7 @@ public class CleanUpSummaryPage extends WizardPage {
 
     /* Select All / Deselect All */
     Composite buttonContainer = new Composite(container, SWT.NONE);
-    buttonContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
+    buttonContainer.setLayout(LayoutUtils.createGridLayout(4, 0, 0));
     buttonContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     fSelectAll = new Button(buttonContainer, SWT.PUSH);
@@ -287,6 +300,25 @@ public class CleanUpSummaryPage extends WizardPage {
       @Override
       public void widgetSelected(SelectionEvent e) {
         OwlUI.setAllChecked(fViewer.getTree(), false);
+      }
+    });
+
+    if (!Application.IS_MAC) {
+      Label sep = new Label(buttonContainer, SWT.SEPARATOR | SWT.VERTICAL);
+      sep.setLayoutData(new GridData(SWT.BEGINNING, SWT.FILL, false, false));
+      ((GridData) sep.getLayoutData()).heightHint = 20;
+    }
+
+    fDisplayFeedButton = new Button(buttonContainer, SWT.PUSH);
+    fDisplayFeedButton.setText(Messages.CleanUpSummaryPage_DISPLAY);
+    fDisplayFeedButton.setEnabled(false);
+    fDisplayFeedButton.setToolTipText(Messages.CleanUpSummaryPage_DISPLAY_FEED);
+    Dialog.applyDialogFont(fDisplayFeedButton);
+    setButtonLayoutData(fDisplayFeedButton);
+    fDisplayFeedButton.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        showFeeds((IStructuredSelection) fViewer.getSelection());
       }
     });
 
@@ -369,6 +401,24 @@ public class CleanUpSummaryPage extends WizardPage {
 
       if (expandedState && fViewer.getChecked(group))
         setChildsChecked(group, true, true);
+    }
+
+    /* Display Bookmark */
+    else if (selection.getFirstElement() instanceof BookMarkTask) {
+      showFeeds(selection);
+    }
+  }
+
+  private void showFeeds(IStructuredSelection selection) {
+    if (!selection.isEmpty()) {
+      Object firstElement = selection.getFirstElement();
+      if (firstElement instanceof BookMarkTask) {
+        IBookMark bookmark = ((BookMarkTask) firstElement).getMark();
+
+        PreviewFeedDialog dialog = new PreviewFeedDialog(getShell(), bookmark, bookmark.getFeedLinkReference().resolve());
+        dialog.setBlockOnOpen(false);
+        dialog.open();
+      }
     }
   }
 
