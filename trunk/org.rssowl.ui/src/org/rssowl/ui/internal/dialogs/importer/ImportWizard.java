@@ -176,7 +176,7 @@ public class ImportWizard extends Wizard implements IImportWizard {
 
     /* Prohibit direct Finish from Sources that require a remote connection or include recommended feeds */
     if (getContainer().getCurrentPage() == fImportSourcePage) {
-      if (fImportSourcePage.isRemoteSource() || (fImportSourcePage.getSource() == Source.RECOMMENDED && !fIsWelcome))
+      if (fImportSourcePage.isRemoteSource() || (fImportSourcePage.getSource() == Source.RECOMMENDED))
         return false;
     }
 
