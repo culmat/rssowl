@@ -62,12 +62,23 @@ public class FolderChildCheckboxTree {
   private Composite fParent;
   private CheckboxTreeViewer fViewer;
   private boolean fFlat;
+  private final boolean fFullLabels;
 
   /**
    * @param parent the parent for the {@link CheckboxTreeViewer}.
    */
   public FolderChildCheckboxTree(Composite parent) {
+    this(parent, false);
+  }
+
+  /**
+   * @param parent the parent for the {@link CheckboxTreeViewer}.
+   * @param fullLabels if <code>true</code> indicate unread count and sticky
+   * news.
+   */
+  public FolderChildCheckboxTree(Composite parent, boolean fullLabels) {
     fParent = parent;
+    fFullLabels = fullLabels;
     initComponents();
   }
 
@@ -169,7 +180,7 @@ public class FolderChildCheckboxTree {
 
     /* LabelProvider */
     boolean usedInDialog = (fParent.getShell().getParent() != null);
-    fViewer.setLabelProvider(new BookMarkLabelProvider(false, usedInDialog));
+    fViewer.setLabelProvider(new BookMarkLabelProvider(fFullLabels, usedInDialog));
 
     /* Listen on Doubleclick */
     fViewer.addDoubleClickListener(new IDoubleClickListener() {
