@@ -54,9 +54,5 @@ public abstract class LoggingSafeRunnable implements ISafeRunnable {
     /* Log Exception */
     if (e instanceof CoreException)
       Activator.getDefault().getLog().log(((CoreException) e).getStatus());
-    // else if (e instanceof Exception)
-    // Activator.getDefault().logError(e.getMessage(), e);
-    // else
-    // Activator.getDefault().logError(e.getMessage(), null);
   }
 }
