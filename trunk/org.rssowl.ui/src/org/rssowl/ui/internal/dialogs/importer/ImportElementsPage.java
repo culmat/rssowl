@@ -416,7 +416,7 @@ public class ImportElementsPage extends WizardPage {
   }
 
   private void onCancel() {
-    if (fCurrentProgressMonitor != null) {
+    if (fCurrentProgressMonitor != null && !getShell().isDisposed()) {
       IProgressMonitor monitor = fCurrentProgressMonitor;
       monitor.setTaskName(Messages.ImportElementsPage_CANCEL_SEARCH);
       monitor.subTask(""); //$NON-NLS-1$
