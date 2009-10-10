@@ -1652,7 +1652,7 @@ public class OwlUI {
     proposalProvider.setFiltering(true);
     final ContentProposalAdapter adapter = new ContentProposalAdapter(control, contentAdapter, proposalProvider, activationKey, null);
     adapter.setPropagateKeys(true);
-    adapter.setAutoActivationDelay(200);
+    adapter.setAutoActivationDelay(500);
     adapter.setProposalAcceptanceStyle(ContentProposalAdapter.PROPOSAL_INSERT);
 
     /* Apply Proposals */
