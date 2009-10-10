@@ -31,6 +31,7 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.ICoolBarManager;
 import org.eclipse.jface.action.IMenuCreator;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarContributionItem;
@@ -795,9 +796,12 @@ public class CoolBarAdvisor {
     IContributionItem[] items = fManager.getItems();
     for (IContributionItem item : items) {
       if (item instanceof ToolBarContributionItem) {
-        IContributionItem result = ((ToolBarContributionItem) item).getToolBarManager().find(id);
-        if (result != null && result instanceof CoolBarActionContributionitem)
-          return (CoolBarActionContributionitem) result;
+        IToolBarManager toolBarManager = ((ToolBarContributionItem) item).getToolBarManager();
+        if (toolBarManager != null) {
+          IContributionItem result = toolBarManager.find(id);
+          if (result != null && result instanceof CoolBarActionContributionitem)
+            return (CoolBarActionContributionitem) result;
+        }
       }
     }
 
