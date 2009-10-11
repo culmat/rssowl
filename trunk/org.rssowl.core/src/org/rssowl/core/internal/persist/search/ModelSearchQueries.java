@@ -700,6 +700,10 @@ public class ModelSearchQueries {
   }
 
   private static String prepareForParsing(String s) {
+    int doubleQuoteCount = 0;
+    boolean startsWithDoubleQuote = false;
+    boolean endsWithDoubleQuote = false;
+
     StringBuilder sb = new StringBuilder();
     for (int i = 0; i < s.length(); i++) {
       char c = s.charAt(i);
@@ -708,8 +712,27 @@ public class ModelSearchQueries {
       if (c == '\\' || c == '+' || c == '-' || c == '!' || c == '(' || c == ')' || c == ':' || c == '^' || c == '[' || c == ']' || c == '{' || c == '}' || c == '~')
         sb.append('\\');
 
+      /* Keep Track of Doublequotes being used - they need special treatment */
+      else if (c == '\"') {
+        doubleQuoteCount++;
+        if (i == 0)
+          startsWithDoubleQuote = true;
+        else if (i == s.length() - 1)
+          endsWithDoubleQuote = true;
+      }
+
       sb.append(c);
     }
-    return sb.toString();
+
+    String escapedString = sb.toString();
+
+    /* This results in a parser exception from QueryParser and thus needs special treatment */
+    if (doubleQuoteCount % 2 != 0) {
+      escapedString = escapedString.replace("\"", "\\\""); //$NON-NLS-1$ //$NON-NLS-2$
+      if (startsWithDoubleQuote && endsWithDoubleQuote) //Restore Quotes for Phrase Search if necessary
+        escapedString = escapedString.substring(1, escapedString.length() - 2) + "\""; //$NON-NLS-1$
+    }
+
+    return escapedString;
   }
 }
