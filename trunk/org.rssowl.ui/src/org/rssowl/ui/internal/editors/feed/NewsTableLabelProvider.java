@@ -205,24 +205,28 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
    */
   @Override
   public String getToolTipText(Object element) {
-    INews news = (INews) element;
-    String feedRef = news.getFeedLinkAsText();
-    IBookMark bookMark = CoreUtils.getBookMark(feedRef);
+    if (element instanceof INews) {
+      INews news = (INews) element;
+      String feedRef = news.getFeedLinkAsText();
+      IBookMark bookMark = CoreUtils.getBookMark(feedRef);
 
-    String name = null;
-    if (bookMark != null)
-      name = bookMark.getName();
-    else
-      name = feedRef;
+      String name = null;
+      if (bookMark != null)
+        name = bookMark.getName();
+      else
+        name = feedRef;
 
-    if (news.getParentId() != 0) {
-      INewsBin bin = DynamicDAO.load(INewsBin.class, news.getParentId());
-      if (bin != null) {
-        name = NLS.bind(Messages.NewsTableLabelProvider_BIN_NAME, bin.getName(), name);
+      if (news.getParentId() != 0) {
+        INewsBin bin = DynamicDAO.load(INewsBin.class, news.getParentId());
+        if (bin != null) {
+          name = NLS.bind(Messages.NewsTableLabelProvider_BIN_NAME, bin.getName(), name);
+        }
       }
+
+      return StringUtils.replaceAll(name, "&", "&&"); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
-    return StringUtils.replaceAll(name, "&", "&&"); //$NON-NLS-1$ //$NON-NLS-2$
+    return super.getToolTipText(element);
   }
 
   /**
