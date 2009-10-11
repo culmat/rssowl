@@ -1246,4 +1246,46 @@ public class ModelSearchTest4 extends AbstractModelSearchTest {
     result = fModelSearch.searchNews(list(condition), false);
     assertEquals(0, result.size());
   }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testSearchNewsWithOddDoubleQuotes() throws Exception {
+
+    /* First add some Types */
+    IFeed feed = fFactory.createFeed(null, new URI("http://www.feed.com/feed.xml"));
+    createNews(feed, "Hello World", "http://www.news.com/news1.html", State.READ);
+
+    DynamicDAO.save(feed);
+
+    /* Wait for Indexer */
+    waitForIndexer();
+
+    ISearchField field = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+
+    ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "Hello");
+    List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+    assertEquals(1, result.size());
+
+    condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "Hello World");
+    result = fModelSearch.searchNews(list(condition), false);
+    assertEquals(1, result.size());
+
+    condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "\"Hello World\"");
+    result = fModelSearch.searchNews(list(condition), false);
+    assertEquals(1, result.size());
+
+    condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "Hello\" World");
+    result = fModelSearch.searchNews(list(condition), false);
+    assertEquals(1, result.size());
+
+    condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "Hello\" \"World");
+    result = fModelSearch.searchNews(list(condition), false);
+    assertEquals(1, result.size());
+
+    condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "\"Hello World\"\"");
+    result = fModelSearch.searchNews(list(condition), false);
+    assertEquals(1, result.size());
+  }
 }
