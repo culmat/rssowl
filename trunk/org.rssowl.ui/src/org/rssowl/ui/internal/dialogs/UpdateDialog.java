@@ -202,7 +202,7 @@ public class UpdateDialog extends TitleAreaDialog {
         Location installLocation = Platform.getInstallLocation();
         if (installLocation != null && installLocation.getURL() != null) {
           File installDirectory = new File(installLocation.getURL().toURI());
-          if (installDirectory.isDirectory()) {
+          if (!installDirectory.isFile()) {
             File pluginsDir = new File(installDirectory, PLUGINS);
             File featuresDir = new File(installDirectory, FEATURES);
             if (pluginsDir.isDirectory() && featuresDir.isDirectory()) {
