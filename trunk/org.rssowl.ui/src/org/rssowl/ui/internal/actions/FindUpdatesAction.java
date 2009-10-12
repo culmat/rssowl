@@ -87,6 +87,11 @@ public class FindUpdatesAction extends Action implements IWorkbenchWindowActionD
    */
   @Override
   public void run() {
+
+    /* Respect System Property */
+    if (Controller.getDefault().isUpdateDisabled())
+      return;
+
     try {
 
       /* Scope to RSSOwl Updates Only */
