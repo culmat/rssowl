@@ -215,11 +215,14 @@ public class Messages extends NLS {
   public static String UpdateDialog_DESCRIPTION;
   public static String UpdateDialog_DL_SIZE;
   public static String UpdateDialog_DOWNLOAD_INSTALL;
+  public static String UpdateDialog_MISSING_PERMISSIONS_ERROR;
+  public static String UpdateDialog_MISSING_PERMISSIONS_WARNING;
   public static String UpdateDialog_NEW_VERSION;
   public static String UpdateDialog_NEW_VERSION_MSG;
   public static String UpdateDialog_UPDATE_AVAILABLE;
   public static String UpdateDialog_UPDATE_ON_STARTUP;
   public static String UpdateDialog_UPDATE_PROVIDER;
+  public static String UpdateDialog_WARNING;
   public static String WebsiteListDialog_ADD;
   public static String WebsiteListDialog_ENTER_WEBSITE;
   public static String WebsiteListDialog_JS_EXCEPTIONS;
