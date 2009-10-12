@@ -24,10 +24,14 @@
 
 package org.rssowl.ui.internal.dialogs;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
+import org.eclipse.jface.util.SafeRunnable;
+import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
@@ -45,10 +49,15 @@ import org.eclipse.update.operations.IInstallFeatureOperation;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.LayoutUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * The <code>UpdateDialog</code> shows when updates are available and will show
@@ -57,6 +66,9 @@ import org.rssowl.ui.internal.util.LayoutUtils;
  * @author bpasero
  */
 public class UpdateDialog extends TitleAreaDialog {
+  private static final String PLUGINS = "plugins"; //$NON-NLS-1$
+  private static final String FEATURES = "features"; //$NON-NLS-1$
+
   private LocalResourceManager fResources;
   private final IInstallFeatureOperation[] fUpdates;
   private StyledText fUpdateInfoTextRight;
@@ -64,6 +76,7 @@ public class UpdateDialog extends TitleAreaDialog {
   private StyledText fUpdateInfoTextBottom;
   private Button fUpdateOnStartupCheck;
   private IPreferenceScope fPreferences;
+  private final boolean fCanUpdate;
 
   /**
    * @param parentShell
@@ -74,6 +87,7 @@ public class UpdateDialog extends TitleAreaDialog {
     fResources = new LocalResourceManager(JFaceResources.getResources());
     fPreferences = Owl.getPreferenceService().getGlobalScope();
     fUpdates = updates;
+    fCanUpdate = canUpdate();
   }
 
   /*
@@ -85,6 +99,22 @@ public class UpdateDialog extends TitleAreaDialog {
       fPreferences.putBoolean(DefaultPreferences.UPDATE_ON_STARTUP, fUpdateOnStartupCheck.getSelection());
     fResources.dispose();
     return super.close();
+  }
+
+  /*
+   * @see org.eclipse.jface.dialogs.Dialog#okPressed()
+   */
+  @Override
+  protected void okPressed() {
+
+    /* Show an Extra Warning if Update will Fail due to missing write Permissions */
+    if (!fCanUpdate) {
+      MessageDialog dialog = new MessageDialog(getShell(), Messages.UpdateDialog_WARNING, null, Messages.UpdateDialog_MISSING_PERMISSIONS_WARNING, MessageDialog.WARNING, new String[] { IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL }, 0);
+      if (dialog.open() != 0)
+        return;
+    }
+
+    super.okPressed();
   }
 
   /*
@@ -151,12 +181,58 @@ public class UpdateDialog extends TitleAreaDialog {
     fUpdateOnStartupCheck.setText(Messages.UpdateDialog_UPDATE_ON_STARTUP);
     fUpdateOnStartupCheck.setSelection(fPreferences.getBoolean(DefaultPreferences.UPDATE_ON_STARTUP));
 
+    /* Show Error if Update will Fail due to missing Write Permissions */
+    if (!fCanUpdate)
+      setErrorMessage(Messages.UpdateDialog_MISSING_PERMISSIONS_ERROR);
+
     /* Separator */
     new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     applyDialogFont(composite);
 
     return composite;
+  }
+
+  /* Create a temporary file in the install location to check if write permissions are qualified */
+  private boolean canUpdate() {
+    final AtomicBoolean canUpdate = new AtomicBoolean(true);
+
+    SafeRunnable.run(new LoggingSafeRunnable() {
+      public void run() throws Exception {
+        Location installLocation = Platform.getInstallLocation();
+        if (installLocation != null && installLocation.getURL() != null) {
+          File installDirectory = new File(installLocation.getURL().toURI());
+          if (installDirectory.isDirectory()) {
+            File pluginsDir = new File(installDirectory, PLUGINS);
+            File featuresDir = new File(installDirectory, FEATURES);
+            if (pluginsDir.isDirectory() && featuresDir.isDirectory()) {
+              try {
+
+                /* Check Write Permission in Plugins Directory */
+                writeTempFile(canUpdate, pluginsDir);
+
+                /* Check Write Permission in Features Directory */
+                if (canUpdate.get())
+                  writeTempFile(canUpdate, featuresDir);
+              } catch (IOException e) {
+                canUpdate.set(false);
+              } catch (SecurityException e) {
+                canUpdate.set(false);
+              }
+            }
+          }
+        }
+      }
+
+      private void writeTempFile(AtomicBoolean canUpdate, File dir) throws IOException {
+        File tmpFile = File.createTempFile("permcheck", ".tmp", dir); //$NON-NLS-1$ //$NON-NLS-2$
+        tmpFile.deleteOnExit();
+        canUpdate.set(tmpFile.exists() && tmpFile.canWrite());
+        tmpFile.delete();
+      }
+    });
+
+    return canUpdate.get();
   }
 
   @SuppressWarnings("deprecation")
