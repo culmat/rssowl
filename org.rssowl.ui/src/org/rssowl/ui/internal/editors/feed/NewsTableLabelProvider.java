@@ -205,6 +205,8 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
    */
   @Override
   public String getToolTipText(Object element) {
+
+    /* News */
     if (element instanceof INews) {
       INews news = (INews) element;
       String feedRef = news.getFeedLinkAsText();
@@ -224,6 +226,11 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
       }
 
       return StringUtils.replaceAll(name, "&", "&&"); //$NON-NLS-1$ //$NON-NLS-2$
+    }
+
+    /* Entity Group */
+    else if (element instanceof EntityGroup) {
+      return StringUtils.replaceAll(((EntityGroup) element).getName(), "&", "&&"); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     return super.getToolTipText(element);
