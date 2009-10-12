@@ -249,6 +249,14 @@
                menubarPath="help/helpEnd"
                style="push"
                tooltip="%action.tooltip.2">
+            <enablement>
+               <not>
+                  <systemProperty
+                        name="disableUpdate"
+                        value="true">
+                  </systemProperty>
+               </not>
+            </enablement>
          </action>
          <action
                class="org.rssowl.ui.internal.actions.FindExtensionsAction"

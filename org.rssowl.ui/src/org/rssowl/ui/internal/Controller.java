@@ -187,6 +187,9 @@ public class Controller {
   /* System Property indicating that the application is running portable */
   private static final String PORTABLE_PROPERTY = "portable"; //$NON-NLS-1$
 
+  /* System Property indicating that the application should not support update */
+  private static final String DISABLE_UPDATE_PROPERTY = "disableUpdate"; //$NON-NLS-1$
+
   /* Queue for reloading Feeds */
   private final JobQueue fReloadFeedQueue;
 
@@ -245,6 +248,7 @@ public class Controller {
   private String fFeedSearchUrl;
   private boolean fShowWelcome;
   private boolean fPortable;
+  private boolean fDisableUpdate;
 
   /**
    * A listener that informs when a {@link IBookMark} is getting reloaded from
@@ -329,6 +333,7 @@ public class Controller {
     fFactory = Owl.getModelFactory();
     fConnectionTimeout = getSystemProperty(FEED_CON_TIMEOUT_PROPERTY, DEFAULT_FEED_CON_TIMEOUT, DEFAULT_FEED_CON_TIMEOUT);
     fPortable = System.getProperty(PORTABLE_PROPERTY) != null;
+    fDisableUpdate = Boolean.getBoolean(DISABLE_UPDATE_PROPERTY);
   }
 
   private int getSystemProperty(String key, int minValue, int defaultValue) {
@@ -1087,7 +1092,7 @@ public class Controller {
     }
 
     /* Check for Updates if Set */
-    else if (!Application.IS_ECLIPSE) {
+    else if (!Application.IS_ECLIPSE && !fDisableUpdate) {
       JobRunner.runInUIThread(5000, OwlUI.getActiveShell(), new Runnable() {
         public void run() {
           if (Owl.getPreferenceService().getGlobalScope().getBoolean(DefaultPreferences.UPDATE_ON_STARTUP)) {
@@ -1376,5 +1381,13 @@ public class Controller {
    */
   public boolean isPortable() {
     return fPortable;
+  }
+
+  /**
+   * @return <code>true</code> if updates should be disabled and
+   * <code>false</code> otherwise.
+   */
+  public boolean isUpdateDisabled() {
+    return fDisableUpdate;
   }
 }
