@@ -1915,7 +1915,11 @@ public class BookMarkExplorer extends ViewPart {
     return fBookMarkGrouping.isActive();
   }
 
-  boolean isSortByNameEnabled() {
+  /**
+   * @return <code>true</code> if elements are sorted by name,
+   * <code>false</code> otherwise.
+   */
+  public boolean isSortByNameEnabled() {
     return fBookMarkComparator.getType() == BookMarkSorter.Type.SORT_BY_NAME;
   }
 
