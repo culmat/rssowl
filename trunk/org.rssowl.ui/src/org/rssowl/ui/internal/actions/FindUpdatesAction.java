@@ -43,8 +43,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.update.configuration.IConfiguredSite;
 import org.eclipse.update.core.SiteManager;
 import org.eclipse.update.operations.IInstallFeatureOperation;
-import org.eclipse.update.search.BackLevelFilter;
-import org.eclipse.update.search.EnvironmentFilter;
 import org.eclipse.update.search.UpdateSearchScope;
 import org.eclipse.update.ui.UpdateJob;
 import org.rssowl.core.util.StringUtils;
@@ -102,8 +100,6 @@ public class FindUpdatesAction extends Action implements IWorkbenchWindowActionD
       /* Run in Update Job */
       final UpdateJob job = new UpdateJob(Messages.FindUpdatesAction_UPDATE_SEARCH, true, false);
       job.getSearchRequest().setScope(scope);
-      job.getSearchRequest().addFilter(new EnvironmentFilter());
-      job.getSearchRequest().addFilter(new BackLevelFilter());
       job.addJobChangeListener(new JobChangeAdapter() {
         @Override
         public void done(IJobChangeEvent event) {
