@@ -638,14 +638,10 @@ public class ApplicationServer {
       boolean portable = Controller.getDefault().isPortable();
       writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 
-      /* Send Headers (Bug on Mac: Header printed in Browser) */
-      if (Application.IS_MAC)
-        writer.append("<!--").append(CRLF); //$NON-NLS-1$
-
       if (Application.IS_WINDOWS && portable)
-        writer.append("HTTP/1.x 205 OK").append(CRLF); //$NON-NLS-1$
+        writer.append("HTTP/1.1 205 OK").append(CRLF); //$NON-NLS-1$
       else
-        writer.append("HTTP/1.x 200 OK").append(CRLF); //$NON-NLS-1$
+        writer.append("HTTP/1.1 200 OK").append(CRLF); //$NON-NLS-1$
 
       synchronized (RFC_1123_DATE) {
         writer.append("Date: ").append(RFC_1123_DATE.format(new Date())).append(CRLF); //$NON-NLS-1$
@@ -655,8 +651,6 @@ public class ApplicationServer {
       writer.append("Content-Type: text/html; charset=UTF-8").append(CRLF); //$NON-NLS-1$
       writer.append("Connection: close").append(CRLF); //$NON-NLS-1$
       writer.append("Expires: 0").append(CRLF); //$NON-NLS-1$
-      if (Application.IS_MAC)
-        writer.append("-->").append(CRLF); //$NON-NLS-1$
       writer.write(CRLF);
 
       /* Begin HTML */
