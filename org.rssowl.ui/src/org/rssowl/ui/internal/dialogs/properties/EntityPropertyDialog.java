@@ -77,6 +77,7 @@ public class EntityPropertyDialog extends Dialog implements IPropertyDialogSite 
   private TabFolder fTabFolder;
   private String fInitialMessage;
   private MessageType fInitialMessageType;
+  private boolean fEntitiesUpdated;
 
   /**
    * @param parentShell
@@ -137,6 +138,7 @@ public class EntityPropertyDialog extends Dialog implements IPropertyDialogSite 
       return;
 
     /* Save Entities while showing Busy-Cursor */
+    fEntitiesUpdated = !entitiesToSave.isEmpty();
     BusyIndicator.showWhile(getShell().getDisplay(), new Runnable() {
       public void run() {
         for (IEntity entity : entitiesToSave)
@@ -341,5 +343,13 @@ public class EntityPropertyDialog extends Dialog implements IPropertyDialogSite 
    */
   public ResourceManager getResourceManager() {
     return fResources;
+  }
+
+  /**
+   * @return <code>true</code> if entities have been modified and saved, or
+   * <code>false</code> otherwise.
+   */
+  public boolean entitiesUpdated() {
+    return fEntitiesUpdated;
   }
 }
