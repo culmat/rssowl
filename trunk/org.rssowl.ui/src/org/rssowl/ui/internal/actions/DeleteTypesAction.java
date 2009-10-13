@@ -200,6 +200,9 @@ public class DeleteTypesAction extends Action implements IObjectActionDelegate {
     /* Normalize */
     CoreUtils.normalize(entities);
 
+    /* Restore Editors if necessary */
+    restoreEditorsIfNecessary(entities);
+
     /* Separate News */
     final List<INews> newsToDelete = new ArrayList<INews>();
 
@@ -243,6 +246,19 @@ public class DeleteTypesAction extends Action implements IObjectActionDelegate {
     /* Run this potential short op right away */
     else
       deleteRunnable.run();
+  }
+
+  private void restoreEditorsIfNecessary(List<IEntity> entitiesToDelete) {
+    boolean restore= false;
+    for (IEntity entity : entitiesToDelete) {
+      if (entity instanceof IFolderChild) {
+        restore= true;
+        break;
+      }
+    }
+
+    if (restore)
+      OwlUI.getFeedViews();
   }
 
   private boolean shouldRunInBackground(List<IEntity> entities, List<INews> newsToDelete) {
