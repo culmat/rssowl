@@ -516,7 +516,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
       }
 
       public void partOpened(IWorkbenchPartReference partRef) {
-        if (FeedView.this.equals(partRef.getPart(false))) {
+        if (FeedView.this.equals(partRef.getPart(false)) && isVisible()) {
           fOpenTime = System.currentTimeMillis();
           OwlUI.updateWindowTitle(fInput != null ? new IMark[] { fInput.getMark() } : null);
         }
