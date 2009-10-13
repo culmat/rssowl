@@ -26,9 +26,11 @@ package org.rssowl.ui.internal.actions;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.window.IShellProvider;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.IObjectActionDelegate;
@@ -36,13 +38,16 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.ui.internal.Controller;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.dialogs.properties.EntityPropertyDialog;
 import org.rssowl.ui.internal.dialogs.properties.EntityPropertyPageWrapper;
 import org.rssowl.ui.internal.util.ModelUtils;
+import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
 import java.util.List;
 import java.util.Set;
@@ -104,7 +109,18 @@ public class EntityPropertyDialogAction extends Action implements IObjectActionD
           dialog.addPage(page);
         }
 
-        dialog.open();
+        /* Re-Sort if sorting by name is enabled */
+        if (dialog.open() == IDialogConstants.OK_ID) {
+          if (dialog.entitiesUpdated() && selectedEntities.size() == 1) { // Name can only be changed on single entity
+            IEntity entity = selectedEntities.get(0);
+            if (entity instanceof IFolderChild && ((IFolderChild) entity).getParent() != null) {
+              IFolder parent = ((IFolderChild) entity).getParent();
+              BookMarkExplorer explorer = OwlUI.getOpenedBookMarkExplorer();
+              if (explorer != null && explorer.isSortByNameEnabled())
+                ((StructuredViewer) explorer.getViewSite().getSelectionProvider()).refresh(parent);
+            }
+          }
+        }
       }
     }
   }
