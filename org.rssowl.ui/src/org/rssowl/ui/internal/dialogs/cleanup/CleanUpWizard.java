@@ -39,6 +39,7 @@ import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Controller;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.dialogs.ConfirmDialog;
 
 import java.lang.reflect.InvocationTargetException;
@@ -115,6 +116,10 @@ public class CleanUpWizard extends Wizard {
       if (dialog.open() != Window.OK)
         return false;
     }
+
+    /* Restore Editors if Bookmarks are to be deleted */
+    if (bmCounter > 0)
+      OwlUI.getFeedViews();
 
     /* Runnable that performs the tasks */
     IRunnableWithProgress runnable = new IRunnableWithProgress() {
