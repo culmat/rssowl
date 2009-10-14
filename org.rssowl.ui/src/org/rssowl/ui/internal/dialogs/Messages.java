@@ -222,6 +222,7 @@ public class Messages extends NLS {
   public static String UpdateDialog_UPDATE_AVAILABLE;
   public static String UpdateDialog_UPDATE_ON_STARTUP;
   public static String UpdateDialog_UPDATE_PROVIDER;
+  public static String UpdateDialog_VISIT_HP;
   public static String UpdateDialog_WARNING;
   public static String WebsiteListDialog_ADD;
   public static String WebsiteListDialog_ENTER_WEBSITE;

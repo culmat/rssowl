@@ -35,12 +35,15 @@ import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.update.core.ICategory;
 import org.eclipse.update.core.IFeature;
@@ -53,6 +56,7 @@ import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.util.BrowserUtils;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.io.File;
@@ -175,6 +179,18 @@ public class UpdateDialog extends TitleAreaDialog {
 
     /* Fill in Update Details */
     showUpdateDescription();
+
+    /* Link to open RSSOwl.org */
+    Link link = new Link(updateInfoContainer, SWT.NONE);
+    link.setBackground(updateInfoContainer.getBackground());
+    link.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
+    link.setText(Messages.UpdateDialog_VISIT_HP);
+    link.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        BrowserUtils.openLinkExternal("http://www.rssowl.org"); //$NON-NLS-1$
+      }
+    });
 
     /* Add Option to Control Checking for Updates Automatically */
     fUpdateOnStartupCheck = new Button(composite, SWT.CHECK);
@@ -332,7 +348,7 @@ public class UpdateDialog extends TitleAreaDialog {
    */
   @Override
   protected void createButtonsForButtonBar(Composite parent) {
-    createButton(parent, IDialogConstants.OK_ID, Messages.UpdateDialog_DOWNLOAD_INSTALL, true);
+    createButton(parent, IDialogConstants.OK_ID, Messages.UpdateDialog_DOWNLOAD_INSTALL, true).setFocus();
     createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
   }
 
