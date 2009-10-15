@@ -491,7 +491,7 @@ public class SearchConditionItem extends Composite {
           });
 
           /* Provide Auto-Complete Field */
-          OwlUI.hookAutoComplete(text, field.getSearchValueType().getEnumValues(), true);
+          OwlUI.hookAutoComplete(text, field.getSearchValueType().getEnumValues(), true, true);
 
           /* Pre-Select input if given */
           String inputValue = (input != null ? input.toString() : null);
@@ -551,7 +551,7 @@ public class SearchConditionItem extends Composite {
           /* Provide auto-complete for Categories, Authors and Feeds */
           if (field.getId() == INews.CATEGORIES || field.getId() == INews.AUTHOR || field.getId() == INews.FEED) {
             controlDeco.setDescriptionText(Messages.SearchConditionItem_CONTENT_ASSIST_INFO);
-            final Pair<SimpleContentProposalProvider, ContentProposalAdapter> pair = OwlUI.hookAutoComplete(text, null, false);
+            final Pair<SimpleContentProposalProvider, ContentProposalAdapter> pair = OwlUI.hookAutoComplete(text, null, false, true);
 
             /* Load proposals in the Background */
             JobRunner.runInBackgroundThread(100, new Runnable() {

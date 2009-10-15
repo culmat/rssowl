@@ -302,7 +302,7 @@ public class FeedDefinitionPage extends WizardPage {
       return;
     fIsAutoCompleteKeywordHooked = true;
 
-    final Pair<SimpleContentProposalProvider, ContentProposalAdapter> autoComplete = OwlUI.hookAutoComplete(fKeywordInput, null, true);
+    final Pair<SimpleContentProposalProvider, ContentProposalAdapter> autoComplete = OwlUI.hookAutoComplete(fKeywordInput, null, true, true);
 
     /* Load proposals in the Background */
     JobRunner.runInBackgroundThread(new Runnable() {
