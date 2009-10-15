@@ -131,7 +131,7 @@ public class LabelDialog extends Dialog {
       });
 
       /* Add auto-complete for Labels taken from existing Categories */
-      final Pair<SimpleContentProposalProvider, ContentProposalAdapter> pair = OwlUI.hookAutoComplete(fNameInput, null, true);
+      final Pair<SimpleContentProposalProvider, ContentProposalAdapter> pair = OwlUI.hookAutoComplete(fNameInput, null, true, false);
 
       /* Load proposals in the Background */
       JobRunner.runInBackgroundThread(100, new Runnable() {

@@ -170,7 +170,7 @@ public class AssignLabelsDialog extends Dialog {
       labelNames.add(label.getName());
     }
 
-    final Pair<SimpleContentProposalProvider, ContentProposalAdapter> pair = OwlUI.hookAutoComplete(fLabelsInput, adapter, labelNames, true);
+    final Pair<SimpleContentProposalProvider, ContentProposalAdapter> pair = OwlUI.hookAutoComplete(fLabelsInput, adapter, labelNames, true, false);
     pair.getSecond().setProposalAcceptanceStyle(ContentProposalAdapter.PROPOSAL_INSERT);
 
     /* Load proposals in the Background */

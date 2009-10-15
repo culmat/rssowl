@@ -1601,10 +1601,11 @@ public class OwlUI {
    * @param values the values that show up as proposal.
    * @param decorate if <code>true</code>, decorate the control to indicate
    * content assist is available.
+   * @param large if <code>true</code>, make the content assist large in height
    * @return Pair
    */
-  public static Pair<SimpleContentProposalProvider, ContentProposalAdapter> hookAutoComplete(final Text text, Collection<String> values, boolean decorate) {
-    return hookAutoComplete(text, new ContentAssistAdapter(text, ' ', false), values, decorate);
+  public static Pair<SimpleContentProposalProvider, ContentProposalAdapter> hookAutoComplete(final Text text, Collection<String> values, boolean decorate, boolean large) {
+    return hookAutoComplete(text, new ContentAssistAdapter(text, ' ', false), values, decorate, large);
   }
 
   /**
@@ -1615,7 +1616,7 @@ public class OwlUI {
    * @return Pair
    */
   public static Pair<SimpleContentProposalProvider, ContentProposalAdapter> hookAutoComplete(final Combo combo, Collection<String> values, boolean decorate) {
-    return hookAutoComplete(combo, new ContentAssistAdapter(combo, ' ', false), values, decorate);
+    return hookAutoComplete(combo, new ContentAssistAdapter(combo, ' ', false), values, decorate, true);
   }
 
   /**
@@ -1624,9 +1625,10 @@ public class OwlUI {
    * @param values the values that show up as proposal.
    * @param decorate if <code>true</code>, decorate the control to indicate
    * content assist is available.
+   * @param large if <code>true</code>, make the content assist large in height
    * @return Pair
    */
-  public static Pair<SimpleContentProposalProvider, ContentProposalAdapter> hookAutoComplete(final Control control, IControlContentAdapter contentAdapter, Collection<String> values, boolean decorate) {
+  public static Pair<SimpleContentProposalProvider, ContentProposalAdapter> hookAutoComplete(final Control control, IControlContentAdapter contentAdapter, Collection<String> values, boolean decorate, final boolean large) {
 
     /* Show UI Hint that Content Assist is available */
     if (decorate) {
@@ -1666,7 +1668,7 @@ public class OwlUI {
     control.getDisplay().timerExec(100, new Runnable() {
       public void run() {
         if (!control.isDisposed()) {
-          adapter.setPopupSize(new Point(control.getSize().x, 100));
+          adapter.setPopupSize(new Point(control.getSize().x, large ? 90 : 50));
         }
       }
     });
