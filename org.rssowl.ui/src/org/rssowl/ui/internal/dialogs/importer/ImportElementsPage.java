@@ -771,10 +771,14 @@ public class ImportElementsPage extends WizardPage {
     String content = result.getFirst();
     resourceLink = result.getSecond();
 
+    /* Add the used Link at first if the user has typed in a valid feed address */
+    List<String> links = new ArrayList<String>();
+    if (!isKeywordSearch)
+      links.add(resourceLink.toString());
+
     /* Extract Links from Content */
-    List<String> links = Collections.emptyList();
     if (StringUtils.isSet(content))
-      links = RegExUtils.extractLinksFromText(content, false);
+      links.addAll(RegExUtils.extractLinksFromText(content, false));
 
     /* Sort List: First process likely feeds, then others */
     final String resourceLinkValue = resourceLink.toString();
