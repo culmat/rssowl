@@ -51,6 +51,7 @@ public class Messages extends NLS {
   public static String ConfirmDialog_NEVER_ASK_AGAIN;
   public static String CustomizeToolbarDialog_ADD;
   public static String CustomizeToolbarDialog_CUSTOMIZE_TOOLBAR;
+  public static String CustomizeToolbarDialog_DIALOG_INFO;
   public static String CustomizeToolbarDialog_ICONS;
   public static String CustomizeToolbarDialog_ICONS_AND_TEXT;
   public static String CustomizeToolbarDialog_ICONS_AND_TEXT_SMALL;
