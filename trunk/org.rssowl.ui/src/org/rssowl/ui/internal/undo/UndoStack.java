@@ -30,6 +30,7 @@ import org.eclipse.osgi.util.NLS;
 import org.rssowl.core.util.LoggingSafeRunnable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -43,9 +44,9 @@ public class UndoStack {
   private static final int MAX_SIZE = 20;
   private static UndoStack singleton = new UndoStack();
 
-  private final List<IUndoOperation> fOperations = new ArrayList<IUndoOperation>();
+  private final List<IUndoOperation> fOperations = Collections.synchronizedList(new ArrayList<IUndoOperation>());
   private int fCurrentIndex = 0;
-  private List<IUndoRedoListener> fListeners = new ArrayList<IUndoRedoListener>();
+  private final List<IUndoRedoListener> fListeners = new ArrayList<IUndoRedoListener>();
 
   private UndoStack() {}
 
@@ -87,7 +88,7 @@ public class UndoStack {
    *
    * @param operation the operation to add to the stack.
    */
-  public void addOperation(IUndoOperation operation) {
+  public synchronized void addOperation(IUndoOperation operation) {
     Assert.isNotNull(operation);
 
     /* Handle case where User executed Undo-Operation */
@@ -160,7 +161,7 @@ public class UndoStack {
    * Navigates backwards in the list of operations if possible and undos the
    * operation.
    */
-  public void undo() {
+  public synchronized void undo() {
     if (!isUndoSupported())
       return;
 
@@ -173,7 +174,7 @@ public class UndoStack {
    * Navigates forwards in the list of operations if possible and redos the
    * operation.
    */
-  public void redo() {
+  public synchronized void redo() {
     if (!isRedoSupported())
       return;
 
