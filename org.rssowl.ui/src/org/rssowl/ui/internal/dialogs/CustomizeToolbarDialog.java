@@ -197,6 +197,10 @@ public class CustomizeToolbarDialog extends Dialog {
   protected Control createDialogArea(Composite parent) {
     Composite container = createContainer(parent);
 
+    Label infoLabel= new Label(container, SWT.None);
+    infoLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
+    infoLabel.setText(Messages.CustomizeToolbarDialog_DIALOG_INFO);
+
     /* Table showing Tool Items */
     Composite tableContainer = new Composite(container, SWT.NONE);
     tableContainer.setLayout(LayoutUtils.createGridLayout(1, 0, 0));
@@ -206,7 +210,7 @@ public class CustomizeToolbarDialog extends Dialog {
 
     fItemViewer = new TableViewer(cTable.getControl());
     fItemViewer.getTable().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-    fItemViewer.getTable().setHeaderVisible(true);
+    fItemViewer.getTable().setHeaderVisible(false);
     ((GridData) fItemViewer.getTable().getLayoutData()).heightHint = fItemViewer.getTable().getItemHeight() * 23;
     fItemViewer.getTable().setFocus();
 
