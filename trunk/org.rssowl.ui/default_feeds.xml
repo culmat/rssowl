@@ -77,6 +77,7 @@
         <outline text="xda-developers" xmlUrl="http://forum.xda-developers.com/external.php?type=RSS" htmlUrl="http://forum.xda-developers.com/" description="Community of XDA developers for programming and modding of PDA Cellphone hybrids." />
       </outline>
       <outline text="OS News" xmlUrl="http://www.osnews.com/files/recent.rdf" htmlUrl="http://www.osnews.com/" description="Exploring the Future of Computing" />
+      <outline text="Softpedia - Drivers" xmlUrl="http://drivers.softpedia.com/backend.xml" htmlUrl="http://drivers.softpedia.com/" description="Softpedia - Drivers - All" />
     </outline>
     <outline text="Entertainment">
       <outline text="Art">
@@ -106,6 +107,7 @@
       <outline text="Cars">
         <outline text="Autoblog" xmlUrl="http://www.autoblog.com/rss.xml" htmlUrl="http://www.autoblog.com" description="Autoblog" />
         <outline text="Autoblog Green" xmlUrl="http://www.autobloggreen.com/rss.xml" htmlUrl="http://green.autoblog.com" description="Autoblog Green" />
+        <outline text="autoevolution" xmlUrl="http://www.autoevolution.com/rss/backend.xml" htmlUrl="http://www.autoevolution.com/" description="autoevolution" />
         <outline text="Car and Driver Blog" xmlUrl="http://www.caranddriver.com/rssfeed.asp?rss_feed_id=38" htmlUrl="http://blog.caranddriver.com" description="Automotive News Blog at CARandDRIVER.com - Car News Resource" />
         <outline text="Cars! Cars! Cars!" xmlUrl="http://carscarscars.blogs.com/index/atom.xml" htmlUrl="http://carscarscars.blogs.com/index/" description="A Car Blog. Only Angrier&#xA;&#xA;&#xA;" />
         <outline text="Jalopnik" xmlUrl="http://feeds.gawker.com/jalopnik/full" htmlUrl="http://jalopnik.com" description="Jalopnik loves cars. Secret cars, concept cars, flying cars, vintage cars, tricked-out cars, red cars, black cars, blonde cars -- sometimes, cars just because of the curve of a hood." />
@@ -138,6 +140,7 @@
         <outline text="Joystiq [Xbox]" xmlUrl="http://www.xbox360fanboy.com/rss.xml" htmlUrl="http://xbox.joystiq.com" description="Joystiq [Xbox]" />
         <outline text="Kotaku" xmlUrl="http://www.kotaku.com/index.xml" htmlUrl="http://kotaku.com" description="As if you don't waste enough of your time in a gamer's haze, here's Kotaku: a gamer's guide that goes beyond the press release. Gossip, cheats, criticism, design, nostalgia, prediction. Don't get a life just yet." />
         <outline text="Slashdot: Games" xmlUrl="http://slashdot.org/games.rss" htmlUrl="" description="News for nerds, stuff that matters" />
+        <outline text="Softpedia - Games" xmlUrl="http://games.softpedia.com/backend.xml" htmlUrl="http://games.softpedia.com/" description="Softpedia - Games - All" />
         <outline text="Xbox Live's Major Nelson" xmlUrl="http://feeds.feedburner.com/MajorNelson" htmlUrl="http://majornelson.com/default.aspx" description="Xbox Lives Director of Programmings personal blog about Xbox and more." />
       </outline>
       <outline text="Humor">
@@ -325,6 +328,10 @@
       <outline text="PortableApps.com" xmlUrl="http://portableapps.com/feeds/general" htmlUrl="http://portableapps.com" />
       <outline text="Slashdot" xmlUrl="http://slashdot.org/slashdot.rss" htmlUrl="" description="News for nerds, stuff that matters" />
       <outline text="SnapFiles latest software" xmlUrl="http://www.webattack.com/webattack.xml" htmlUrl="http://www.snapfiles.com/" description="The latest shareware and freeware downloads on the web" />
+      <outline text="Softpedia - Linux" xmlUrl="http://linux.softpedia.com/backend.xml" htmlUrl="http://linux.softpedia.com/" description="Softpedia - Linux - All" />
+      <outline text="Softpedia - Mac OS" xmlUrl="http://mac.softpedia.com/backend.xml" htmlUrl="http://mac.softpedia.com/" description="Softpedia - Mac OS - All" />
+      <outline text="Softpedia - Webscripts" xmlUrl="http://webscripts.softpedia.com/backend.xml" htmlUrl="http://webscripts.softpedia.com/" description="Softpedia - Webscripts - All" />
+      <outline text="Softpedia - Windows" xmlUrl="http://www.softpedia.com/backend.xml" htmlUrl="http://win.softpedia.com/" description="Softpedia - Windows - All" />
     </outline>
     <outline text="Sports">
       <outline text="AP Sports" xmlUrl="http://xml.newsisfree.com/feeds/71/1471.xml" htmlUrl="http://www.dailycamera.com/news/sports/" description="Associated Press news (By http://www.newsisfree.com/syndicate.php - FOR PERSONAL AND NON COMMERCIAL USE ONLY!)" />
@@ -350,6 +357,8 @@
         <outline text="MobileCrunch" xmlUrl="http://feeds.feedburner.com/Mobilecrunch" htmlUrl="http://www.mobilecrunch.com" description="All About Mobile 2.0" />
         <outline text="mocoNews" xmlUrl="http://feeds.moconews.net/moconews/" htmlUrl="http://moconews.net/" description="Unhealthily Obsessed With Mobile Content" />
         <outline text="Phone Scoop - Latest News" xmlUrl="http://www.phonescoop.com/rss/news.php" htmlUrl="http://www.phonescoop.com/" description="Phone Scoop is a comprehensive resource for mobile phone enthusiasts, professionals, shoppers, and users." />
+        <outline text="Softpedia - Handheld Devices" xmlUrl="http://handheld.softpedia.com/backend.xml" htmlUrl="http://handheld.softpedia.com/" description="Softpedia - Handheld Devices" />
+        <outline text="Softpedia - Mobile" xmlUrl="http://mobile.softpedia.com/backend.xml" htmlUrl="http://mobile.softpedia.com/" description="Softpedia - Mobile" />
       </outline>
       <outline text="Programming Languages">
         <outline text="About.com Focus on JavaScript" xmlUrl="http://z.about.com/6/g/javascript/b/rss2.xml" htmlUrl="http://javascript.about.com/" description="Get the latest headlines from the About.com Focus on JavaScript GuideSite." />
@@ -417,6 +426,8 @@
       <outline text="Planet GNOME" xmlUrl="http://planet.gnome.org/rss20.xml" htmlUrl="http://planet.gnome.org/" description="Planet GNOME - http://planet.gnome.org/" />
       <outline text="Planet Mozilla" xmlUrl="http://planet.mozilla.org/rss20.xml" htmlUrl="http://planet.mozilla.org/" description="Planet Mozilla - http://planet.mozilla.org/" />
       <outline text="Shacknews" xmlUrl="http://www.shacknews.com/headlines.rdf" htmlUrl="http://www.shacknews.com/" description="Shacknews - Your source for the latest video game news" />
+      <outline text="Softpedia Gadgets News" xmlUrl="http://gadgets.softpedia.com/newsRSS/Global-0.xml" htmlUrl="http://gadgets.softpedia.com/news/" description="Softpedia Gadgets News - Global" />
+      <outline text="Softpedia News" xmlUrl="http://news.softpedia.com/newsRSS/Global-0.xml" htmlUrl="http://news.softpedia.com" description="Softpedia News - Global" />
       <outline text="TechBookReport" xmlUrl="http://www.techbookreport.com/rss/rss.xml" htmlUrl="http://www.techbookreport.com" description="The latest 10 book reviews from TechBookReport" />
       <outline text="The Register" xmlUrl="http://www.theregister.co.uk/tonys/slashdot.rdf" htmlUrl="http://www.theregister.co.uk/" description="Biting the hand that feeds IT" />
       <outline text="ThinkGeek: What's New" xmlUrl="http://www.thinkgeek.com/thinkgeek.rdf" htmlUrl="http://www.thinkgeek.com/?cpg=wnrdf" description="Stuff for Smart Masses" />
