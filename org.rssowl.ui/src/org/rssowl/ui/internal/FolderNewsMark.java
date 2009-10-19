@@ -96,7 +96,7 @@ public class FolderNewsMark extends Mark implements INewsMark {
         INewsMark newsmark = (INewsMark) child;
         List<INews> news = newsmark.getNews(INews.State.getVisible());
         for (INews newsitem : news) {
-          if (newsitem != null)
+          if (newsitem != null && newsitem.getId() != null)
             fNewsContainer.addNews(newsitem);
         }
       }
