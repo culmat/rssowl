@@ -115,6 +115,9 @@ public class DefaultProtocolHandler implements IProtocolHandler {
   /* The Default Connection Timeout */
   private static final int DEFAULT_CON_TIMEOUT = 30000;
 
+  /* Timeout for loading a Feed or Label for a Feed */
+  private static final int FEED_LABEL_CON_TIMEOUT = 10000;
+
   /* Timeout for loading a Favicon */
   private static final int FAVICON_CON_TIMEOUT = 5000;
 
@@ -611,6 +614,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     /* Define Properties for Connection */
     Map<Object, Object> properties = new HashMap<Object, Object>();
     properties.put(IConnectionPropertyConstants.PROGRESS_MONITOR, monitor);
+    properties.put(IConnectionPropertyConstants.CON_TIMEOUT, FEED_LABEL_CON_TIMEOUT);
 
     /* Open Stream */
     InputStream inS = openStream(link, properties);
@@ -760,6 +764,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     /* Define Properties for Connection */
     Map<Object, Object> properties = new HashMap<Object, Object>();
     properties.put(IConnectionPropertyConstants.PROGRESS_MONITOR, monitor);
+    properties.put(IConnectionPropertyConstants.CON_TIMEOUT, FEED_LABEL_CON_TIMEOUT);
 
     /* Open Stream */
     InputStream ins = openStream(website, properties);
