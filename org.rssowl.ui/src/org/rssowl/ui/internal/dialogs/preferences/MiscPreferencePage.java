@@ -26,6 +26,7 @@ package org.rssowl.ui.internal.dialogs.preferences;
 
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -288,6 +289,8 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
 
     fGlobalScope.putBoolean(DefaultPreferences.AGGREGATE_NEWS_AS_SEARCH, fAggregateNewsAsSearch.getSelection());
     fEclipseScope.putBoolean(DefaultPreferences.ECLIPSE_SINGLE_CLICK_OPEN, fOpenOnSingleClick.getSelection());
+    if (!Application.IS_ECLIPSE)
+      OpenStrategy.setOpenMethod(fOpenOnSingleClick.getSelection() ? OpenStrategy.SINGLE_CLICK | OpenStrategy.ARROW_KEYS_OPEN : OpenStrategy.DOUBLE_CLICK);
     fEclipseScope.putBoolean(DefaultPreferences.ECLIPSE_RESTORE_TABS, fReopenFeedsOnStartupCheck.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.ALWAYS_REUSE_FEEDVIEW, fAlwaysReuseFeedView.getSelection());
     fEclipseScope.putBoolean(DefaultPreferences.ECLIPSE_MULTIPLE_TABS, fUseMultipleTabsCheck.getSelection());
@@ -330,6 +333,8 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
 
     fAggregateNewsAsSearch.setSelection(defaultScope.getBoolean(DefaultPreferences.AGGREGATE_NEWS_AS_SEARCH));
     fOpenOnSingleClick.setSelection(defaultScope.getBoolean(DefaultPreferences.ECLIPSE_SINGLE_CLICK_OPEN));
+    if (!Application.IS_ECLIPSE)
+      OpenStrategy.setOpenMethod(fOpenOnSingleClick.getSelection() ? OpenStrategy.SINGLE_CLICK | OpenStrategy.ARROW_KEYS_OPEN : OpenStrategy.DOUBLE_CLICK);
     fReopenFeedsOnStartupCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.ECLIPSE_RESTORE_TABS));
     fAlwaysReuseFeedView.setSelection(defaultScope.getBoolean(DefaultPreferences.ALWAYS_REUSE_FEEDVIEW));
     fUseMultipleTabsCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.ECLIPSE_MULTIPLE_TABS));
