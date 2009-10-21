@@ -93,7 +93,7 @@ public class ApplicationServer {
 
   /* Local URL Parts */
   static final String PROTOCOL = "http"; //$NON-NLS-1$
-  static final String LOCALHOST = "127.0.0.1"; //$NON-NLS-1$
+  static String LOCALHOST = "127.0.0.1"; //$NON-NLS-1$
   @SuppressWarnings("all")
   static final int DEFAULT_SOCKET_PORT = Application.IS_ECLIPSE ? 8775 : 8795;
 
@@ -102,6 +102,9 @@ public class ApplicationServer {
 
   /* DWord controlling the startup-handshake */
   private static final String MULTI_INSTANCE_PROPERTY = "multiInstance"; //$NON-NLS-1$
+
+  /* DWord controlling the localhost value */
+  private static final String LOCALHOST_PROPERTY = "localhost"; //$NON-NLS-1$
 
   /* Identifies the Viewer providing the Content */
   private static final String ID = "id="; //$NON-NLS-1$
@@ -165,6 +168,11 @@ public class ApplicationServer {
     /* Server already running */
     if (isRunning())
       return;
+
+    /* Determine Localhost Value */
+    String localhostProperty = System.getProperty(LOCALHOST_PROPERTY);
+    if (localhostProperty != null && localhostProperty.length() > 0)
+      LOCALHOST= localhostProperty;
 
     /* Server not yet running */
     boolean usePortRange = Application.IS_ECLIPSE || System.getProperty(MULTI_INSTANCE_PROPERTY) != null;
