@@ -2604,7 +2604,6 @@ public class ModelTest3 {
    * @throws Exception
    */
   @Test
-  @Ignore
   public void testDeleteSearchFilter() throws Exception {
     ISearchField field = fFactory.createSearchField(INews.IS_FLAGGED, INews.class.getName());
     ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, true);
