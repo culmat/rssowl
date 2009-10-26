@@ -316,10 +316,6 @@ public class EventManager implements DatabaseListener   {
     if (news.getParentId() == 0)
       removeFromParentFeed(news);
 
-    fDb.delete(news.getGuid());
-    fDb.delete(news.getSource());
-    fDb.delete(news.getAuthor());
-
     /*
      * It seems like the categories are not activated at this stage at times.
      * This seems like a db4o bug, but not totally sure. In any case, we play
@@ -327,6 +323,10 @@ public class EventManager implements DatabaseListener   {
      */
     if (news.getCategories().isEmpty())
       fDb.activate(news, Integer.MAX_VALUE);
+
+    fDb.delete(news.getGuid());
+    fDb.delete(news.getSource());
+    fDb.delete(news.getAuthor());
 
     for (ICategory category : ReverseIterator.createInstance(news.getCategories()))
       fDb.delete(category);
