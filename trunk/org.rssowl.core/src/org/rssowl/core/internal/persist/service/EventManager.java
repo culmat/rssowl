@@ -276,8 +276,14 @@ public class EventManager implements DatabaseListener   {
       removeFromParentNews((IAttachment) entity);
     else if (entity instanceof ISearchCondition)
       cascadeSearchConditionDeletion((ISearchCondition) entity);
+    else if (entity instanceof ISearchFilter)
+      cascadeSearchFilterDeletion((ISearchFilter) entity);
     else if (entity instanceof ISearch)
       cascadeSearchDeletion((ISearch) entity);
+  }
+
+  private void cascadeSearchFilterDeletion(ISearchFilter entity) {
+    fDb.delete(entity.getSearch());
   }
 
   private void cascadeNewsBinDeletion(INewsBin entity) {
