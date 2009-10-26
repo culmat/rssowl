@@ -517,7 +517,6 @@ public final class DBHelper {
     for (FeedLinkReference feedRef : removedFeedRefs) {
       if ((countBookMarkReference(db, feedRef) == 0) && !feedHasNewsWithCopies(db, feedRef)) {
           db.delete(feedRef.resolve());
-          newsCounter.remove(feedRef.getLink());
           changed = true;
       }
     }

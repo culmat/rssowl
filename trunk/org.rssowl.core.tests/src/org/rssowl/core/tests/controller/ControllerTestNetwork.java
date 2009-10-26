@@ -25,6 +25,7 @@
 package org.rssowl.core.tests.controller;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -122,6 +123,7 @@ public class ControllerTestNetwork {
 
   /**
    * @throws Exception
+   * See http://dev.rssowl.org/show_bug.cgi?id=1107
    */
   @Test
   public void testDeleteFolderHierarchyWithBin() throws Exception {
@@ -150,6 +152,8 @@ public class ControllerTestNetwork {
 
     /* Delete Folder */
     DynamicDAO.deleteAll(Collections.singleton(folder));
+
+    assertNull(Owl.getPersistenceService().getDAOService().getNewsCounterDAO().load().get(feed.getLink()));
   }
 
   /**
