@@ -320,6 +320,14 @@ public class EventManager implements DatabaseListener   {
     fDb.delete(news.getSource());
     fDb.delete(news.getAuthor());
 
+    /*
+     * It seems like the categories are not activated at this stage at times.
+     * This seems like a db4o bug, but not totally sure. In any case, we play
+     * safe and activate the news fully in that case.
+     */
+    if (news.getCategories().isEmpty())
+      fDb.activate(news, Integer.MAX_VALUE);
+
     for (ICategory category : ReverseIterator.createInstance(news.getCategories()))
       fDb.delete(category);
     for (IAttachment attachment : ReverseIterator.createInstance(news.getAttachments()))
