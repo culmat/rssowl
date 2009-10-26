@@ -61,6 +61,8 @@ import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -217,7 +219,7 @@ public class UpdateDialog extends TitleAreaDialog {
       public void run() throws Exception {
         Location installLocation = Platform.getInstallLocation();
         if (installLocation != null && installLocation.getURL() != null) {
-          File installDirectory = new File(installLocation.getURL().toURI());
+          File installDirectory = toFile(installLocation.getURL());
           if (!installDirectory.isFile()) {
             File pluginsDir = new File(installDirectory, PLUGINS);
             File featuresDir = new File(installDirectory, FEATURES);
@@ -249,6 +251,14 @@ public class UpdateDialog extends TitleAreaDialog {
     });
 
     return canUpdate.get();
+  }
+
+  private static File toFile(URL url) {
+    try {
+      return new File(url.toURI());
+    } catch (URISyntaxException e) {
+      return new File(url.getPath());
+    }
   }
 
   @SuppressWarnings("deprecation")
