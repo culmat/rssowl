@@ -156,8 +156,10 @@ public class InformationPropertyPage implements IEntityPropertyPage {
     });
 
     /* Created */
-    createLabel(container, Messages.InformationPropertyPage_CREATED, true);
-    createLabel(container, fDateFormat.format(bm.getCreationDate()), false);
+    if (bm.getCreationDate() != null) {
+      createLabel(container, Messages.InformationPropertyPage_CREATED, true);
+      createLabel(container, fDateFormat.format(bm.getCreationDate()), false);
+    }
 
     /* Last Visited */
     createLabel(container, Messages.InformationPropertyPage_LAST_VISITED, true);
