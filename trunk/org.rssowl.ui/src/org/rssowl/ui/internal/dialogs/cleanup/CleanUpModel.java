@@ -202,7 +202,7 @@ public class CleanUpModel {
           /* Group of Bookmarks referencing the same Feed sorted by Creation Date */
           Set<IBookMark> sortedBookmarkGroup = new TreeSet<IBookMark>(new Comparator<IBookMark>() {
             public int compare(IBookMark o1, IBookMark o2) {
-              return o1.getCreationDate().compareTo(o2.getCreationDate());
+              return o1.getCreationDate() == null ? -1 : o1.getCreationDate().compareTo(o2.getCreationDate());
             }
           });
 
