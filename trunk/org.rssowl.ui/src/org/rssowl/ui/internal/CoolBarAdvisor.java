@@ -426,7 +426,7 @@ public class CoolBarAdvisor {
     /* Update Stop */
     Controller.getDefault().addBookMarkLoadListener(new BookMarkLoadListener() {
       public void bookMarkAboutToLoad(IBookMark bookmark) {
-        if (fLoadCounter.incrementAndGet() > 1)
+        if (fLoadCounter.incrementAndGet() > 0)
           update(CoolBarItem.STOP, null, null, true);
       }
 
