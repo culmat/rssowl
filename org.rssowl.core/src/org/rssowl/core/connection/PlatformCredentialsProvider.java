@@ -150,7 +150,13 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
 
       /* Try storing credentials in profile folder */
       try {
-        IPath stateLocation = Activator.getDefault().getStateLocation();
+        Activator activator = Activator.getDefault();
+
+        /* Check if Bundle is Stopped */
+        if (activator == null)
+          return null;
+
+        IPath stateLocation = activator.getStateLocation();
         stateLocation = stateLocation.append(SECURE_STORAGE_FILE);
         URL location = stateLocation.toFile().toURL();
         Map<String, String> options = null;
@@ -189,6 +195,10 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
   private ICredentials getAuthorizationInfo(URI link, String realm) throws CredentialsException {
     ISecurePreferences securePreferences = getSecurePreferences();
 
+    /* Check if Bundle is Stopped */
+    if (securePreferences == null)
+      return null;
+
     /* Return from Equinox Security Storage */
     if (securePreferences.nodeExists(SECURE_FEED_NODE)) { // Global Feed Node
       ISecurePreferences allFeedsPreferences = securePreferences.node(SECURE_FEED_NODE);
@@ -220,7 +230,13 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
    * (java.net.URI)
    */
   public IProxyCredentials getProxyCredentials(URI link) {
-    IProxyService proxyService = Activator.getDefault().getProxyService();
+    Activator activator = Activator.getDefault();
+
+    /* Check if Bundle is Stopped */
+    if (activator == null)
+      return null;
+
+    IProxyService proxyService = activator.getProxyService();
 
     /* Check if Proxy is enabled */
     if (!proxyService.isProxiesEnabled())
@@ -266,6 +282,10 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
    */
   public void setAuthCredentials(ICredentials credentials, URI link, String realm) throws CredentialsException {
     ISecurePreferences securePreferences = getSecurePreferences();
+
+    /* Check if Bundle is Stopped */
+    if (securePreferences == null)
+      return;
 
     /* Store in Equinox Security Storage */
     ISecurePreferences allFeedsPreferences = securePreferences.node(SECURE_FEED_NODE);
@@ -329,6 +349,10 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
   public synchronized void deleteAuthCredentials(URI link, String realm) throws CredentialsException {
     ISecurePreferences securePreferences = getSecurePreferences();
 
+    /* Check if Bundle is Stopped */
+    if (securePreferences == null)
+      return;
+
     /* Remove from Equinox Security Storage */
     if (securePreferences.nodeExists(SECURE_FEED_NODE)) { // Global Feed Node
       ISecurePreferences allFeedsPreferences = securePreferences.node(SECURE_FEED_NODE);
@@ -375,6 +399,11 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
 
     /* Remove all Nodes */
     ISecurePreferences secureRoot = getSecurePreferences();
+
+    /* Check if Bundle is Stopped */
+    if (secureRoot == null)
+      return;
+
     String[] childrenNames = secureRoot.childrenNames();
     for (String child : childrenNames) {
       secureRoot.node(child).removeNode();
