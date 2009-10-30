@@ -76,8 +76,8 @@ public class Migration2To3 implements Migration {
       if (descriptionValue != null) {
         MigrationHelper.setField(news, descriptionFieldName, null);
         Description description = new Description(news, descriptionValue);
-        oc.ext().set(description, Integer.MAX_VALUE);
-        oc.ext().set(news, Integer.MAX_VALUE);
+        oc.ext().store(description, Integer.MAX_VALUE);
+        oc.ext().store(news, Integer.MAX_VALUE);
       }
       ++i;
       if (newsCountPerIncrement == 0) {

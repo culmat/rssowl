@@ -174,9 +174,9 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
 
   protected void doSave(T entity) {
     if (fSaveFully)
-      fDb.ext().set(entity, Integer.MAX_VALUE);
+      fDb.ext().store(entity, Integer.MAX_VALUE);
     else
-      fDb.set(entity);
+      fDb.store(entity);
   }
 
   /*

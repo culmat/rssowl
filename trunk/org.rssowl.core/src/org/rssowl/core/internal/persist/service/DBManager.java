@@ -66,6 +66,7 @@ import com.db4o.config.ObjectClass;
 import com.db4o.config.ObjectField;
 import com.db4o.config.QueryEvaluationMode;
 import com.db4o.ext.DatabaseFileLockedException;
+import com.db4o.ext.Db4oIOException;
 import com.db4o.query.Query;
 
 import java.io.BufferedReader;
@@ -294,7 +295,7 @@ public class DBManager {
         try {
           /* Relies on fObjectContainer being set before calling backup */
           fObjectContainer.ext().backup(destinationFile.getAbsolutePath());
-        } catch (IOException e) {
+        } catch (Db4oIOException e) {
           throw new PersistenceException(e);
         }
       }
@@ -596,14 +597,14 @@ public class DBManager {
     for (Label label : sourceDb.query(Label.class)) {
       labels.add(label);
       sourceDb.activate(label, Integer.MAX_VALUE);
-      destinationDb.ext().set(label, Integer.MAX_VALUE);
+      destinationDb.ext().store(label, Integer.MAX_VALUE);
     }
 
     monitor.worked(5);
     for (Folder type : sourceDb.query(Folder.class)) {
       sourceDb.activate(type, Integer.MAX_VALUE);
       if (type.getParent() == null) {
-        destinationDb.ext().set(type, Integer.MAX_VALUE);
+        destinationDb.ext().store(type, Integer.MAX_VALUE);
       }
     }
     monitor.worked(15);
@@ -628,11 +629,11 @@ public class DBManager {
         }
         Object news = newsIt.next();
         sourceDb.activate(news, Integer.MAX_VALUE);
-        destinationDb.ext().set(news, Integer.MAX_VALUE);
+        destinationDb.ext().store(news, Integer.MAX_VALUE);
       }
       if (!staleNewsRefs.isEmpty()) {
         newsBin.removeNewsRefs(staleNewsRefs);
-        destinationDb.ext().set(newsBin, Integer.MAX_VALUE);
+        destinationDb.ext().store(newsBin, Integer.MAX_VALUE);
       }
     }
 
@@ -643,7 +644,7 @@ public class DBManager {
     for (Feed feed : sourceDb.query(Feed.class)) {
       sourceDb.activate(feed, Integer.MAX_VALUE);
       addNewsCounterItem(newsCounter, feed);
-      destinationDb.ext().set(feed, Integer.MAX_VALUE);
+      destinationDb.ext().store(feed, Integer.MAX_VALUE);
 
       ++feedCounter;
       if (feedCounter % 40 == 0)
@@ -651,13 +652,13 @@ public class DBManager {
     }
     System.gc();
 
-    destinationDb.ext().set(newsCounter, Integer.MAX_VALUE);
+    destinationDb.ext().store(newsCounter, Integer.MAX_VALUE);
     monitor.worked(30);
 
     int descriptionCounter = 0;
     for (Description description : sourceDb.query(Description.class)) {
       sourceDb.activate(description, Integer.MAX_VALUE);
-      destinationDb.ext().set(description, Integer.MAX_VALUE);
+      destinationDb.ext().store(description, Integer.MAX_VALUE);
 
       ++descriptionCounter;
       if (descriptionCounter % 600 == 0)
@@ -667,22 +668,22 @@ public class DBManager {
 
     for (Preference pref : sourceDb.query(Preference.class)) {
       sourceDb.activate(pref, Integer.MAX_VALUE);
-      destinationDb.ext().set(pref, Integer.MAX_VALUE);
+      destinationDb.ext().store(pref, Integer.MAX_VALUE);
     }
 
     for (ISearchFilter filter : sourceDb.query(SearchFilter.class)) {
       sourceDb.activate(filter, Integer.MAX_VALUE);
-      destinationDb.ext().set(filter, Integer.MAX_VALUE);
+      destinationDb.ext().store(filter, Integer.MAX_VALUE);
     }
 
     monitor.worked(5);
     List<Counter> counterSet = sourceDb.query(Counter.class);
     Counter counter = counterSet.iterator().next();
     sourceDb.activate(counter, Integer.MAX_VALUE);
-    destinationDb.ext().set(counter, Integer.MAX_VALUE);
+    destinationDb.ext().store(counter, Integer.MAX_VALUE);
     EntityIdsByEventType entityIdsByEventType = sourceDb.query(EntityIdsByEventType.class).iterator().next();
     sourceDb.activate(entityIdsByEventType, Integer.MAX_VALUE);
-    destinationDb.ext().set(entityIdsByEventType, Integer.MAX_VALUE);
+    destinationDb.ext().store(entityIdsByEventType, Integer.MAX_VALUE);
 
     sourceDb.close();
     destinationDb.commit();
@@ -732,7 +733,6 @@ public class DBManager {
     config.automaticShutDown(false);
 	config.callbacks(false);
     config.activationDepth(2);
-    config.flushFileBuffers(false);
     config.callConstructors(true);
     config.exceptionsOnNotStorable(true);
     configureAbstractEntity(config);

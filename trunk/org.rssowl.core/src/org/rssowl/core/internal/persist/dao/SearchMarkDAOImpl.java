@@ -80,7 +80,7 @@ public final class SearchMarkDAOImpl extends AbstractEntityDAO<ISearchMark, Sear
       mark.setLastVisitDate(new Date());
       mark.setPopularity(mark.getPopularity() + 1);
       preSave(mark);
-      fDb.ext().set(mark, 1);
+      fDb.ext().store(mark, 1);
       fDb.commit();
     } catch (Db4oException e) {
       throw new PersistenceException(e);

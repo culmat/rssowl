@@ -103,7 +103,7 @@ public class DB4OIDGenerator implements IDGenerator, DatabaseListener {
 
   private long increaseMax(boolean commit) {
     fCounter.increment(BATCH_SIZE);
-    fDb.set(fCounter);
+    fDb.store(fCounter);
     if (commit)
       fDb.commit();
 
@@ -113,7 +113,7 @@ public class DB4OIDGenerator implements IDGenerator, DatabaseListener {
   public synchronized void shutdown() {
     fMax = fCurrent;
     fCounter.setValue(fCurrent + 1);
-    fDb.set(fCounter);
+    fDb.store(fCounter);
     fDb.commit();
   }
 
