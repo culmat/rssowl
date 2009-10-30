@@ -70,7 +70,7 @@ public class Migration3To4 implements Migration {
         oc.activate(news, Integer.MAX_VALUE);
         String parentIdFieldName = "fParentId"; //$NON-NLS-1$
         MigrationHelper.setField(news, parentIdFieldName, newsBin.getId().longValue());
-        oc.ext().set(news, Integer.MAX_VALUE);
+        oc.ext().store(news, Integer.MAX_VALUE);
       }
     }
     oc.commit();

@@ -185,7 +185,7 @@ public class ApplicationServiceImpl implements IApplicationService {
         Date previousMostRecentDate = bookMark.getMostRecentNewsDate();
         if (previousMostRecentDate == null || mostRecentDate.after(previousMostRecentDate)) {
           bookMark.setMostRecentNewsDate(mostRecentDate);
-          fDb.set(bookMark);
+          fDb.store(bookMark);
         }
       }
 
@@ -236,7 +236,7 @@ public class ApplicationServiceImpl implements IApplicationService {
           if (deleteConditionalGet)
             fDb.delete(conditionalGet);
           else
-            fDb.ext().set(conditionalGet, 1);
+            fDb.ext().store(conditionalGet, 1);
         }
         DBHelper.preCommit(fDb);
         fDb.commit();
@@ -506,9 +506,9 @@ public class ApplicationServiceImpl implements IApplicationService {
 
     for (Object o : otherObjects) {
       if (o instanceof IFeed) {
-        fDb.ext().set(o, 2);
+        fDb.ext().store(o, 2);
       } else
-        fDb.ext().set(o, 1);
+        fDb.ext().store(o, 1);
     }
 
     NewsEventRunnable eventRunnables = DBHelper.getNewsEventRunnables(EventsMap.getInstance().getEventRunnables());

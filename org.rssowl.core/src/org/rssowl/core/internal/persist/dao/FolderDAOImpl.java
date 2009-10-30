@@ -98,18 +98,18 @@ public final class FolderDAOImpl extends AbstractEntityDAO<IFolder, FolderListen
       fillFolderChildEvents(reparentInfos, folderEvents, markEvents);
 
       for (FolderEvent event : folderEvents) {
-        fDb.set(event.getOldParent());
+        fDb.store(event.getOldParent());
         IFolder newParent = event.getEntity().getParent();
         if (newParent == null)
-          fDb.set(event.getEntity());
+          fDb.store(event.getEntity());
         else
-          fDb.set(newParent);
+          fDb.store(newParent);
       }
 
       for (MarkEvent event : markEvents) {
-        fDb.set(event.getOldParent());
+        fDb.store(event.getOldParent());
         IFolder newParent = event.getEntity().getParent();
-        fDb.set(newParent);
+        fDb.store(newParent);
       }
 
       fDb.commit();

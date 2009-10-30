@@ -300,7 +300,7 @@ public class EventManager implements DatabaseListener   {
     if (searchMark != null) {
       if (!itemsBeingDeletedContains(searchMark)) {
         if (searchMark.removeSearchCondition(searchCondition))
-          fDb.ext().set(searchMark, 2);
+          fDb.ext().store(searchMark, 2);
       }
     }
     fDb.delete(searchCondition.getField());
@@ -382,14 +382,14 @@ public class EventManager implements DatabaseListener   {
       return;
 
     news.removeAttachment(attachment);
-    fDb.set(news);
+    fDb.store(news);
   }
 
   private void removeFromParentFolderAndCascade(IFolder folder) {
     IFolder parentFolder = folder.getParent();
     if (parentFolder != null) {
       parentFolder.removeChild(folder);
-      fDb.set(parentFolder);
+      fDb.store(parentFolder);
     }
     for (IFolder child : ReverseIterator.createInstance(folder.getFolders())) {
       cascadeFolderDeletion(child);
@@ -421,7 +421,7 @@ public class EventManager implements DatabaseListener   {
     IFolder parentFolder = mark.getParent();
     parentFolder.removeChild(mark);
     if (mark.getProperty(PARENT_DELETED_KEY) == null)
-      fDb.set(parentFolder);
+      fDb.store(parentFolder);
     else {
       mark.removeProperty(PARENT_DELETED_KEY);
     }
@@ -435,7 +435,7 @@ public class EventManager implements DatabaseListener   {
     IFeed feed = feedRef.resolve();
     /* If the news was still within parent, update parent */
     if (feed.removeNews(news))
-      fDb.ext().set(feed, 2);
+      fDb.ext().store(feed, 2);
  }
 
   private boolean removeFromItemsBeingDeleted(Object entity) {
@@ -470,7 +470,7 @@ public class EventManager implements DatabaseListener   {
             addItemBeingDeleted(feed);
             fDb.delete(news);
           }
-          fDb.ext().set(feed, 2);
+          fDb.ext().store(feed, 2);
         }
         else
           fDb.delete(feed);

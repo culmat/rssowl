@@ -490,7 +490,7 @@ public class ApplicationLayerTest {
         assertEquals(category.getName(), oldNews.getCategories().get(0).getName());
         IAttachment oldAttachment = oldNews.getAttachments().get(0);
         assertEquals(attachment.getLink(), oldAttachment.getLink());
-        assertNull(oldAttachment.getNews());
+        assertEquals(oldNews.getId(), oldAttachment.getNews().getId());
       }
     };
     DynamicDAO.addEntityListener(INews.class, newsListener);

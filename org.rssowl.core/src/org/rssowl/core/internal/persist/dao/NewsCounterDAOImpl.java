@@ -153,6 +153,6 @@ public final class NewsCounterDAOImpl extends AbstractPersistableDAO<NewsCounter
 
   public void save() {
     Assert.isNotNull(fNewsCounter, "fNewsCounter"); //$NON-NLS-1$
-    fDb.ext().set(fNewsCounter, Integer.MAX_VALUE);
+    fDb.ext().store(fNewsCounter, Integer.MAX_VALUE);
   }
 }

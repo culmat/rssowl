@@ -239,18 +239,18 @@ public final class DBHelper {
     saveEntity(db, feed.getAuthor());
     saveEntity(db, feed.getImage());
 
-    db.ext().set(feed, 2);
+    db.ext().store(feed, 2);
   }
 
   private static void saveEntity(ObjectContainer db, IPersistable entity) {
     if (entity != null)
-      db.set(entity);
+      db.store(entity);
   }
 
 
   private static void saveEntities(ObjectContainer db, List<? extends IEntity> entities) {
     for (IEntity entity : entities)
-      db.ext().set(entity, 1);
+      db.ext().store(entity, 1);
   }
 
   static void saveAndCascadeAllNews(ObjectContainer db, Collection<INews> newsCollection, boolean root) {
@@ -270,7 +270,7 @@ public final class DBHelper {
   }
 
   public static final INews peekPersistedNews(ObjectContainer db, INews news) {
-    INews oldNews = db.ext().peekPersisted(news, 2, true);
+    INews oldNews = db.ext().peekPersisted(news, 3, true);
     if (oldNews instanceof News) {
       ((News) oldNews).init();
     }
@@ -287,7 +287,7 @@ public final class DBHelper {
       ModelEvent newsEventTemplate = new NewsEvent(oldNews, news, false);
       DBHelper.putEventTemplate(newsEventTemplate);
     }
-    db.ext().set(news, updateDepth);
+    db.ext().store(news, updateDepth);
   }
 
   static final boolean feedExists(ObjectContainer db, URI link) {
@@ -329,7 +329,7 @@ public final class DBHelper {
     saveEntity(db, news.getAuthor());
     saveEntities(db, news.getAttachments());
     saveEntity(db, news.getSource());
-    db.ext().set(news, 2);
+    db.ext().store(news, 2);
     saveDescription(db, news);
   }
 
@@ -360,7 +360,7 @@ public final class DBHelper {
       return;
 
     else if (dbDescriptionValue == null && newsDescriptionValue != null)
-      db.set(new Description(news, newsDescriptionValue));
+      db.store(new Description(news, newsDescriptionValue));
 
     else if (dbDescriptionValue != null && newsDescriptionValue == null)
       db.delete(dbDescription);
@@ -368,7 +368,7 @@ public final class DBHelper {
     else if (dbDescriptionValue != null && !dbDescriptionValue.equals(newsDescriptionValue)) {
       if (dbDescription != null) {
         dbDescription.setDescription(newsDescriptionValue);
-        db.set(dbDescription);
+        db.store(dbDescription);
       }
     }
   }
@@ -419,7 +419,7 @@ public final class DBHelper {
 
     newsToBeIndexed.addAllEntities(copy.getPersistEvents(), copy.getUpdateEvents(), copy.getRemoveEvents());
     newsToBeIndexed.compact();
-    db.ext().set(newsToBeIndexed, Integer.MAX_VALUE);
+    db.ext().store(newsToBeIndexed, Integer.MAX_VALUE);
   }
 
   public static Set<NewsEvent> filterPersistedNewsForIndexing(Collection<NewsEvent> events) {
@@ -492,7 +492,7 @@ public final class DBHelper {
         if (newsBin.updateNewsStates(mapEntry.getValue())) {
           removeNews(db, removedFeedRefs, newsBin.removeNews(EnumSet.of(INews.State.DELETED)));
           putEventTemplate(new NewsBinEvent(newsBin, null, true));
-          db.ext().set(newsBin, Integer.MAX_VALUE);
+          db.ext().store(newsBin, Integer.MAX_VALUE);
         }
       }
       removeFeedsAfterNewsBinUpdate(db, removedFeedRefs);
@@ -521,7 +521,7 @@ public final class DBHelper {
       }
     }
     if (changed)
-      db.ext().set(newsCounter, Integer.MAX_VALUE);
+      db.ext().store(newsCounter, Integer.MAX_VALUE);
   }
 
   static int countBookMarkReference(ObjectContainer db, FeedLinkReference feedRef) {

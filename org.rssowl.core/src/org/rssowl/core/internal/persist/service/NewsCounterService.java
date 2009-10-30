@@ -89,10 +89,10 @@ public final class NewsCounterService {
           updatedCounterItems.put(feedRef.getLink().toString(), newsCounterItem);
       }
       if (newsCounterUpdated)
-        fDb.ext().set(fNewsCounter, Integer.MAX_VALUE);
+        fDb.ext().store(fNewsCounter, Integer.MAX_VALUE);
       else {
         for (NewsCounterItem item : updatedCounterItems.values())
-          fDb.set(item);
+          fDb.store(item);
       }
     }
   }
@@ -151,7 +151,7 @@ public final class NewsCounterService {
         updatedCounterItems.put(currentNews.getFeedReference().getLink().toString(), counterItem);
       }
       for (NewsCounterItem counterItem : updatedCounterItems.values())
-        fDb.set(counterItem);
+        fDb.store(counterItem);
     }
   }
 
@@ -178,7 +178,7 @@ public final class NewsCounterService {
         updatedCounterItems.put(news.getFeedReference().getLink().toString(), counterItem);
       }
       for (NewsCounterItem counterItem : updatedCounterItems.values())
-        fDb.set(counterItem);
+        fDb.store(counterItem);
     }
   }
 
@@ -191,7 +191,7 @@ public final class NewsCounterService {
         IFeed feed = feedEvent.getEntity();
         fNewsCounter.remove(feed.getLink());
       }
-      fDb.ext().set(fNewsCounter, Integer.MAX_VALUE);
+      fDb.ext().store(fNewsCounter, Integer.MAX_VALUE);
     }
   }
 

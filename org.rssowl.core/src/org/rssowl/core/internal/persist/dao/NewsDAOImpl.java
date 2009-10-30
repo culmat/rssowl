@@ -175,7 +175,7 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
 
   private void save(Set<INews> newsList) {
     for (INews news : newsList) {
-      fDb.ext().set(news, 1);
+      fDb.ext().store(news, 1);
     }
   }
 
