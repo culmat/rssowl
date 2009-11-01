@@ -1842,6 +1842,20 @@
             name="%shareProvider.name.20"
             url="http://www.propeller.com/submit/?U=[L]&amp;T=[T]">
       </shareProvider>
+      <shareProvider
+            enabled="false"
+            icon="icons/obj16/share_evernote.gif"
+            id="org.rssowl.ui.EvernoteShareProvider"
+            name="%shareProvider.name.21"
+            url="http://www.evernote.com/clip.action?url=[L]&amp;title=[T]">
+      </shareProvider>
+      <shareProvider
+            enabled="false"
+            icon="icons/obj16/share_readitlater.gif"
+            id="org.rssowl.ui.ReadItLaterShareProvider"
+            name="%shareProvider.name.22"
+            url="http://readitlaterlist.com/save?url=[L]&amp;title=[T]">
+      </shareProvider>
    </extension>
    <extension
          point="org.rssowl.ui.FeedSearch">
