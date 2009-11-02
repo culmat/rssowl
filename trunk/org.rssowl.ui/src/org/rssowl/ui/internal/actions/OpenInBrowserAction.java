@@ -138,7 +138,7 @@ public class OpenInBrowserAction extends Action implements IWorkbenchWindowActio
       else if (object instanceof String)
         link = new URI(URIUtils.fastEncode((String) object));
 
-      if (link != null) {
+      if (link != null && link.isAbsolute()) {
         IWorkbenchBrowserSupport browserSupport = PlatformUI.getWorkbench().getBrowserSupport();
         try {
           IWebBrowser browser = browserSupport.createBrowser(WebBrowserView.EDITOR_ID);
