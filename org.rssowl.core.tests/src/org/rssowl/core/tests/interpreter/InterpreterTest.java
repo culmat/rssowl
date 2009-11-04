@@ -129,7 +129,7 @@ public class InterpreterTest {
     INews news2 = feed.getNews().get(1);
     assertEquals("<p>atom_entry2.title</p>", news2.getTitle());
     assertEquals("<p>atom_entry2.description</p>", news2.getDescription());
-    assertEquals(new URI("http://www.feed-uri.de"), news2.getBase());
+    assertEquals(new URI("http://www.feed-uri.de/subfolder"), news2.getBase());
 
     assertNotNull(news2.getSource());
     assertEquals(new URI("atom_entry2.source.link"), news2.getSource().getLink());

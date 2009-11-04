@@ -439,6 +439,39 @@ public class CoreUtils {
    * <code>null</code> if none.
    */
   public static String getLink(INews news) {
+    String linkAsStr = getLinkAsString(news);
+    if (linkAsStr != null) {
+
+      /* Return early if link is absolute (includes protocol identifier) */
+      if (linkAsStr.contains(URIUtils.PROTOCOL_IDENTIFIER))
+        return linkAsStr;
+
+      /* Append missing protocol if this is a web link */
+      else if (linkAsStr.startsWith("www.")) //$NON-NLS-1$
+        return URIUtils.HTTP + linkAsStr;
+
+      /* Now try to resolve the relative link as absolute if a base is provided */
+      URI base = news.getBase();
+      if (base != null) {
+        try {
+          return URIUtils.resolve(base, new URI(linkAsStr)).toString();
+        } catch (URISyntaxException e) {
+          return linkAsStr;
+        }
+      }
+
+      /* Finally resolve against Feed Link */
+      try {
+        return URIUtils.resolve(new URI(news.getFeedLinkAsText()), new URI(linkAsStr)).toString();
+      } catch (URISyntaxException e) {
+        return linkAsStr;
+      }
+    }
+
+    return null;
+  }
+
+  private static String getLinkAsString(INews news) {
 
     /* Check Link Provided */
     String link = news.getLinkAsText();

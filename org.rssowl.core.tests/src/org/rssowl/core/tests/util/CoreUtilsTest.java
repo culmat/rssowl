@@ -207,10 +207,46 @@ public class CoreUtilsTest {
 
     IGuid guid = fFactory.createGuid(news1, "www.guid.de", false);
     news1.setGuid(guid);
-    assertEquals("www.guid.de", CoreUtils.getLink(news1));
+    assertEquals("http://www.guid.de", CoreUtils.getLink(news1));
 
-    news1.setLink(new URI("link"));
-    assertEquals("link", CoreUtils.getLink(news1));
+    news1.setLink(new URI("www.link.de"));
+    assertEquals("http://www.link.de", CoreUtils.getLink(news1));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testGetLinkRelative() throws Exception {
+    IFeed feedNoBase = fFactory.createFeed(null, new URI("http://www.feed1.com"));
+
+    IFeed feedWithBase = fFactory.createFeed(null, new URI("http://www.feed2.com"));
+    feedWithBase.setBase(new URI("http://www.base.com"));
+
+    /* No Base */
+    {
+      INews newsNoBase = fFactory.createNews(null, feedNoBase, new Date());
+      assertNull(CoreUtils.getLink(newsNoBase));
+
+      newsNoBase.setLink(new URI("link"));
+      assertEquals("http://www.feed1.com/link", CoreUtils.getLink(newsNoBase));
+
+      newsNoBase.setLink(new URI("http://www.rssowl.org/foo"));
+      assertEquals("http://www.rssowl.org/foo", CoreUtils.getLink(newsNoBase));
+    }
+
+    /* With Base */
+    {
+      INews newsWithBase = fFactory.createNews(null, feedWithBase, new Date());
+      newsWithBase.setBase(feedWithBase.getBase());
+      assertNull(CoreUtils.getLink(newsWithBase));
+
+      newsWithBase.setLink(new URI("link"));
+      assertEquals("http://www.base.com/link", CoreUtils.getLink(newsWithBase));
+
+      newsWithBase.setLink(new URI("http://www.rssowl.org/foo"));
+      assertEquals("http://www.rssowl.org/foo", CoreUtils.getLink(newsWithBase));
+    }
   }
 
   /**
