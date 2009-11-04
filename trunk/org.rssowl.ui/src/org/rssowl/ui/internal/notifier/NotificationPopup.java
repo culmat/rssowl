@@ -95,7 +95,7 @@ public class NotificationPopup extends PopupDialog {
   private static final int MAX_ITEMS = 30;
 
   /* Default Width of the Popup */
-  private static final int DEFAULT_WIDTH = 400;
+  private static final int DEFAULT_WIDTH = 420;
 
   /* Milliseconds before incrementing the alpha for fade in / fade out */
   private static final int FADE_DELAY = 40;
@@ -488,27 +488,25 @@ public class NotificationPopup extends PopupDialog {
     itemLabel.addMouseListener(mouseListener);
     imageLabel.addMouseListener(mouseListener);
 
-    /* Offer Label to mark item read if content is shown */
-    if (fGlobalScope.getBoolean(DefaultPreferences.SHOW_EXCERPT_IN_NOTIFIER)) {
-      CLabel markReadLabel = new CLabel(fInnerContentCircle, SWT.NONE);
-      markReadLabel.setImage(item.supportsMarkRead() ? fMarkReadIcon : fMarkReadDisabledIcon);
-      markReadLabel.setBackground(fInnerContentCircle.getBackground());
-      markReadLabel.addMouseTrackListener(fMouseTrackListner);
-      markReadLabel.setEnabled(item.supportsMarkRead());
-      markReadLabel.setCursor(fShell.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
-      markReadLabel.addMouseListener(new MouseAdapter() {
-        @Override
-        public void mouseDown(MouseEvent e) {
-          boolean newStateRead = !item.isRead();
+    /* Offer Label to mark item read */
+    CLabel markReadLabel = new CLabel(fInnerContentCircle, SWT.NONE);
+    markReadLabel.setImage(item.supportsMarkRead() ? fMarkReadIcon : fMarkReadDisabledIcon);
+    markReadLabel.setBackground(fInnerContentCircle.getBackground());
+    markReadLabel.addMouseTrackListener(fMouseTrackListner);
+    markReadLabel.setEnabled(item.supportsMarkRead());
+    markReadLabel.setCursor(fShell.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
+    markReadLabel.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseDown(MouseEvent e) {
+        boolean newStateRead = !item.isRead();
 
-          /* Update Font */
-          itemLabel.setFont(newStateRead ? fNormalTextFont : fBoldTextFont);
+        /* Update Font */
+        itemLabel.setFont(newStateRead ? fNormalTextFont : fBoldTextFont);
 
-          /* Apply state */
-          item.setRead(newStateRead);
-        }
-      });
-    }
+        /* Apply state */
+        item.setRead(newStateRead);
+      }
+    });
 
     /* Offer Label to mark item sticky */
     final CLabel markStickyLabel = new CLabel(fInnerContentCircle, SWT.NONE);
@@ -747,7 +745,7 @@ public class NotificationPopup extends PopupDialog {
     /* Inner composite containing the content controlls */
     fInnerContentCircle = new Composite(middleContentCircle, SWT.NO_FOCUS);
     fInnerContentCircle.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-    fInnerContentCircle.setLayout(LayoutUtils.createGridLayout(fGlobalScope.getBoolean(DefaultPreferences.SHOW_EXCERPT_IN_NOTIFIER) ? 4 : 3, 0, 5, 0, 0, false));
+    fInnerContentCircle.setLayout(LayoutUtils.createGridLayout(4, 0, 5, 0, 0, false));
     ((GridLayout) fInnerContentCircle.getLayout()).marginLeft = 5;
     ((GridLayout) fInnerContentCircle.getLayout()).marginRight = 2;
     fInnerContentCircle.addMouseTrackListener(fMouseTrackListner);
