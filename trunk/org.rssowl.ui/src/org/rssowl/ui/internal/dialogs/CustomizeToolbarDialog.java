@@ -211,7 +211,7 @@ public class CustomizeToolbarDialog extends Dialog {
     fItemViewer = new TableViewer(cTable.getControl());
     fItemViewer.getTable().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     fItemViewer.getTable().setHeaderVisible(false);
-    ((GridData) fItemViewer.getTable().getLayoutData()).heightHint = fItemViewer.getTable().getItemHeight() * 23;
+    ((GridData) fItemViewer.getTable().getLayoutData()).heightHint = fItemViewer.getTable().getItemHeight() * 24;
     fItemViewer.getTable().setFocus();
 
     /* Custom Owner Drawn Category */
