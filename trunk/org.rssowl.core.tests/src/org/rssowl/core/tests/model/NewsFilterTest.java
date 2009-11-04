@@ -27,6 +27,7 @@ package org.rssowl.core.tests.model;
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.IApplicationService;
@@ -114,7 +115,7 @@ public class NewsFilterTest {
 
     DynamicDAO.save(filter);
 
-    fAppService.handleFeedReload(bm, feed, null, false);
+    fAppService.handleFeedReload(bm, feed, null, false, new NullProgressMonitor());
 
     List<INews> news = bm.getFeedLinkReference().resolve().getNews();
     assertEquals(3, bm.getNewsCount(EnumSet.of(INews.State.READ)));
@@ -150,7 +151,7 @@ public class NewsFilterTest {
 
     DynamicDAO.save(filter);
 
-    fAppService.handleFeedReload(bm, feed, null, false);
+    fAppService.handleFeedReload(bm, feed, null, false, new NullProgressMonitor());
 
     List<INews> news = bm.getFeedLinkReference().resolve().getNews();
     assertEquals(3, bm.getNewsCount(EnumSet.of(INews.State.NEW)));
@@ -190,7 +191,7 @@ public class NewsFilterTest {
 
     DynamicDAO.save(filter);
 
-    fAppService.handleFeedReload(bm, feed, null, false);
+    fAppService.handleFeedReload(bm, feed, null, false, new NullProgressMonitor());
 
     List<INews> news = bm.getFeedLinkReference().resolve().getNews();
     assertEquals(3, news.size());
@@ -228,7 +229,7 @@ public class NewsFilterTest {
 
     DynamicDAO.save(filter);
 
-    fAppService.handleFeedReload(bm, feed, null, false);
+    fAppService.handleFeedReload(bm, feed, null, false, new NullProgressMonitor());
 
     List<INews> news = bm.getFeedLinkReference().resolve().getNews();
     assertEquals(3, news.size());
@@ -269,7 +270,7 @@ public class NewsFilterTest {
 
     DynamicDAO.save(filter);
 
-    fAppService.handleFeedReload(bm, feed, null, false);
+    fAppService.handleFeedReload(bm, feed, null, false, new NullProgressMonitor());
 
     List<INews> news = bm.getFeedLinkReference().resolve().getNews();
     assertEquals(3, news.size());
@@ -319,7 +320,7 @@ public class NewsFilterTest {
 
     DynamicDAO.save(filter);
 
-    fAppService.handleFeedReload(bm, feed, null, false);
+    fAppService.handleFeedReload(bm, feed, null, false, new NullProgressMonitor());
 
     List<INews> news = bm.getFeedLinkReference().resolve().getNews();
     assertEquals(3, news.size());
@@ -370,7 +371,7 @@ public class NewsFilterTest {
 
     DynamicDAO.save(filter);
 
-    fAppService.handleFeedReload(bm, feed, null, false);
+    fAppService.handleFeedReload(bm, feed, null, false, new NullProgressMonitor());
 
     List<INews> news = bm.getFeedLinkReference().resolve().getNews();
     assertEquals(3, news.size());
@@ -435,7 +436,7 @@ public class NewsFilterTest {
       DynamicDAO.save(filter);
     }
 
-    fAppService.handleFeedReload(bm, feed, null, false);
+    fAppService.handleFeedReload(bm, feed, null, false, new NullProgressMonitor());
 
     List<INews> news = bm.getFeedLinkReference().resolve().getNews();
     assertEquals(3, news.size());
@@ -498,7 +499,7 @@ public class NewsFilterTest {
       DynamicDAO.save(filter);
     }
 
-    fAppService.handleFeedReload(bm, feed, null, false);
+    fAppService.handleFeedReload(bm, feed, null, false, new NullProgressMonitor());
 
     List<INews> news = bm.getFeedLinkReference().resolve().getNews();
     assertEquals(3, news.size());
@@ -559,7 +560,7 @@ public class NewsFilterTest {
       DynamicDAO.save(filter);
     }
 
-    fAppService.handleFeedReload(bm, feed, null, false);
+    fAppService.handleFeedReload(bm, feed, null, false, new NullProgressMonitor());
 
     List<INews> news = bm.getFeedLinkReference().resolve().getNews();
     assertEquals(3, news.size());
@@ -655,7 +656,7 @@ public class NewsFilterTest {
       DynamicDAO.save(filter);
     }
 
-    fAppService.handleFeedReload(bm, feed, null, false);
+    fAppService.handleFeedReload(bm, feed, null, false, new NullProgressMonitor());
 
     List<INews> news = bm.getFeedLinkReference().resolve().getNews();
     assertEquals(4, news.size());
@@ -760,7 +761,7 @@ public class NewsFilterTest {
 
     DynamicDAO.save(filter);
 
-    fAppService.handleFeedReload(bm, feed, null, false);
+    fAppService.handleFeedReload(bm, feed, null, false, new NullProgressMonitor());
 
     List<INews> news = bm.getFeedLinkReference().resolve().getNews();
     assertEquals(3, news.size());
@@ -823,7 +824,7 @@ public class NewsFilterTest {
 
     DynamicDAO.save(filter);
 
-    fAppService.handleFeedReload(bm, feed, null, false);
+    fAppService.handleFeedReload(bm, feed, null, false, new NullProgressMonitor());
 
     List<INews> news = bm.getFeedLinkReference().resolve().getNews();
     assertEquals(3, news.size());
@@ -867,7 +868,7 @@ public class NewsFilterTest {
 
     DynamicDAO.save(filter);
 
-    fAppService.handleFeedReload(bm, feed, null, false);
+    fAppService.handleFeedReload(bm, feed, null, false, new NullProgressMonitor());
 
     List<INews> news = bm.getFeedLinkReference().resolve().getNews();
     assertEquals(3, news.size());
@@ -911,7 +912,7 @@ public class NewsFilterTest {
 
     DynamicDAO.save(filter);
 
-    fAppService.handleFeedReload(bm, feed, null, false);
+    fAppService.handleFeedReload(bm, feed, null, false, new NullProgressMonitor());
 
     List<INews> news = bm.getFeedLinkReference().resolve().getNews();
     assertEquals(3, news.size());
@@ -961,7 +962,7 @@ public class NewsFilterTest {
 
     DynamicDAO.save(filter);
 
-    fAppService.handleFeedReload(bm2, feed2, null, false);
+    fAppService.handleFeedReload(bm2, feed2, null, false, new NullProgressMonitor());
 
     List<INews> news = bm2.getFeedLinkReference().resolve().getNews();
     assertEquals(1, news.size());
@@ -1005,7 +1006,7 @@ public class NewsFilterTest {
 
     DynamicDAO.save(filter);
 
-    fAppService.handleFeedReload(bm1, feed, null, false);
+    fAppService.handleFeedReload(bm1, feed, null, false, new NullProgressMonitor());
 
     List<INews> news = bm1.getFeedLinkReference().resolve().getNews();
     assertEquals(3, bm1.getNewsCount(EnumSet.of(INews.State.READ)));
@@ -1046,7 +1047,7 @@ public class NewsFilterTest {
 
     DynamicDAO.save(filter);
 
-    fAppService.handleFeedReload(bm1, feed, null, false);
+    fAppService.handleFeedReload(bm1, feed, null, false, new NullProgressMonitor());
 
     List<INews> news = bm1.getFeedLinkReference().resolve().getNews();
     assertEquals(0, bm1.getNewsCount(EnumSet.of(INews.State.READ)));
@@ -1086,7 +1087,7 @@ public class NewsFilterTest {
 
     DynamicDAO.save(filter);
 
-    fAppService.handleFeedReload(bm, feed, null, false);
+    fAppService.handleFeedReload(bm, feed, null, false, new NullProgressMonitor());
 
     List<INews> news = bm.getFeedLinkReference().resolve().getNews();
     assertEquals(3, news.size());

@@ -34,6 +34,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
@@ -668,7 +669,7 @@ public class Controller {
               return Status.CANCEL_STATUS;
 
             /* Handle Feed Reload */
-            fAppService.handleFeedReload(bookmark, result.getFirst(), finalConditionalGet, finalDeleteConditionalGet);
+            fAppService.handleFeedReload(bookmark, result.getFirst(), finalConditionalGet, finalDeleteConditionalGet, otherMonitor);
             return Status.OK_STATUS;
           }
 
@@ -678,7 +679,7 @@ public class Controller {
           }
         });
       } else {
-        fAppService.handleFeedReload(bookmark, result.getFirst(), conditionalGet, deleteConditionalGet);
+        fAppService.handleFeedReload(bookmark, result.getFirst(), conditionalGet, deleteConditionalGet, new NullProgressMonitor());
       }
     }
 
@@ -1031,7 +1032,7 @@ public class Controller {
       fReloadFeedQueue.cancel(false);
 
     /* Cancel the feed-save queue (join) */
-    if (!emergency && fSaveFeedQueue != null)
+    if (fSaveFeedQueue != null)
       fSaveFeedQueue.cancel(true);
 
     /* Stop the Notification Service */

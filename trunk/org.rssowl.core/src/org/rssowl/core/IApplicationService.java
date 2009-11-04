@@ -24,6 +24,7 @@
 
 package org.rssowl.core;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IConditionalGet;
 import org.rssowl.core.persist.IFeed;
@@ -56,6 +57,7 @@ public interface IApplicationService {
    * @param deleteConditionalGet if <code>true</code> an existing
    * IConditionalGet object associated with the IFeed will be deleted as part of
    * this operation.
+   * @param monitor a monitor to show progress and react on cancellation.
    */
-  void handleFeedReload(IBookMark bookMark, IFeed interpretedFeed, IConditionalGet conditionalGet, boolean deleteConditionalGet);
+  void handleFeedReload(IBookMark bookMark, IFeed interpretedFeed, IConditionalGet conditionalGet, boolean deleteConditionalGet, IProgressMonitor monitor);
 }
