@@ -116,6 +116,8 @@ public class Messages extends NLS {
   public static String CoolBarAdvisor_CLOSE_OTHERS;
   public static String CoolBarAdvisor_COPY;
   public static String CoolBarAdvisor_COPY_NEWS;
+  public static String CoolBarAdvisor_DELETE;
+  public static String CoolBarAdvisor_DELETE_NEWS;
   public static String CoolBarAdvisor_DOWNLOADS_ACTIVITY;
   public static String CoolBarAdvisor_EXPORT;
   public static String CoolBarAdvisor_FIND_FEEDS;
