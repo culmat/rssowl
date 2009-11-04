@@ -62,8 +62,11 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -75,6 +78,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IActionDelegate;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -123,6 +127,7 @@ import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.ShareProvider;
 import org.rssowl.ui.internal.StatusLineUpdater;
+import org.rssowl.ui.internal.actions.AggregateFolderAction;
 import org.rssowl.ui.internal.actions.DeleteTypesAction;
 import org.rssowl.ui.internal.actions.EntityPropertyDialogAction;
 import org.rssowl.ui.internal.actions.FindAction;
@@ -362,6 +367,15 @@ public class BookMarkExplorer extends ViewPart {
       }
     });
 
+    /* Aggregate Folder on Mouse Middle Click */
+    fViewer.getTree().addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseUp(MouseEvent e) {
+        if (e.button == 2)
+          onMouseMiddleClick(fViewer.getTree().getItem(new Point(e.x, e.y)));
+      }
+    });
+
     /* Custom Owner Drawn for Groups */
     if (!OwlUI.isHighContrast()) {
       fViewer.getControl().addListener(SWT.EraseItem, new Listener() {
@@ -418,6 +432,15 @@ public class BookMarkExplorer extends ViewPart {
       boolean expandedState = !fViewer.getExpandedState(firstElem);
       fViewer.setExpandedState(firstElem, expandedState);
       onTreeEvent(firstElem, expandedState);
+    }
+  }
+
+  private void onMouseMiddleClick(TreeItem item) {
+    if (item != null && item.getData() instanceof IFolder) {
+      AggregateFolderAction action = new AggregateFolderAction();
+      action.setActivePart(null, this);
+      action.selectionChanged(null, new StructuredSelection(item.getData()));
+      action.run(null);
     }
   }
 
