@@ -31,6 +31,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.IApplicationService;
@@ -127,7 +128,7 @@ public class ApplicationLayerTest {
     feed1 = fFactory.createFeed(null, new URI("http://www.feed1.com"));
     INews news1 = fFactory.createNews(null, feed1, new Date());
     news1.setLink(newsLink);
-    fAppService.handleFeedReload(mark1, feed1, null, false);
+    fAppService.handleFeedReload(mark1, feed1, null, false, new NullProgressMonitor());
 
     assertEquals(INews.State.READ, DynamicDAO.load(INews.class, news1.getId()).getState());
   }
@@ -150,13 +151,13 @@ public class ApplicationLayerTest {
     long time = System.currentTimeMillis();
     feed1 = fFactory.createFeed(null, new URI("http://www.feed1.com"));
     fFactory.createNews(null, feed1, new Date());
-    fAppService.handleFeedReload(mark1, feed1, null, false);
+    fAppService.handleFeedReload(mark1, feed1, null, false, new NullProgressMonitor());
     assertNotNull(mark1.getMostRecentNewsDate());
     long lastUpdatedDate = mark1.getMostRecentNewsDate().getTime();
     assertTrue(time <= lastUpdatedDate);
 
     feed1 = fFactory.createFeed(null, new URI("http://www.feed1.com"));
-    fAppService.handleFeedReload(mark1, feed1, null, false);
+    fAppService.handleFeedReload(mark1, feed1, null, false, new NullProgressMonitor());
     assertEquals(lastUpdatedDate, mark1.getMostRecentNewsDate().getTime());
   }
 
@@ -180,7 +181,7 @@ public class ApplicationLayerTest {
     news.setState(INews.State.READ);
 
     Owl.getPreferenceService().getEntityScope(mark).putBoolean(DefaultPreferences.DEL_READ_NEWS_STATE, true);
-    fAppService.handleFeedReload(mark, emptyFeed, null, false);
+    fAppService.handleFeedReload(mark, emptyFeed, null, false, new NullProgressMonitor());
 
     feed = null;
     System.gc();
@@ -223,7 +224,7 @@ public class ApplicationLayerTest {
 
     IFeed emptyFeed = fFactory.createFeed(null, feed.getLink());
 
-    fAppService.handleFeedReload(mark, emptyFeed, null, false);
+    fAppService.handleFeedReload(mark, emptyFeed, null, false, new NullProgressMonitor());
 
     feed = null;
     System.gc();
@@ -265,7 +266,7 @@ public class ApplicationLayerTest {
         }
       };
       DynamicDAO.addEntityListener(INews.class, newsListener);
-      fAppService.handleFeedReload(mark, emptyFeed, null, false);
+      fAppService.handleFeedReload(mark, emptyFeed, null, false, new NullProgressMonitor());
     } finally {
       if (newsListener != null)
         DynamicDAO.removeEntityListener(INews.class, newsListener);

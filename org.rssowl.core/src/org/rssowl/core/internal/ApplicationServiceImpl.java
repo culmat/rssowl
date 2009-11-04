@@ -35,6 +35,7 @@ import org.apache.lucene.store.RAMDirectory;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
@@ -99,6 +100,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 
@@ -152,11 +154,12 @@ public class ApplicationServiceImpl implements IApplicationService {
 
   /*
    * @see
-   * org.rssowl.core.model.dao.IApplicationLayer#handleFeedReload(org.rssowl
-   * .core.model.persist.IBookMark, org.rssowl.core.model.persist.IFeed,
-   * org.rssowl.core.model.persist.IConditionalGet, boolean)
+   * org.rssowl.core.IApplicationService#handleFeedReload(org.rssowl.core.persist
+   * .IBookMark, org.rssowl.core.persist.IFeed,
+   * org.rssowl.core.persist.IConditionalGet, boolean,
+   * org.eclipse.core.runtime.IProgressMonitor)
    */
-  public final void handleFeedReload(IBookMark bookMark, IFeed interpretedFeed, IConditionalGet conditionalGet, boolean deleteConditionalGet) {
+  public final void handleFeedReload(IBookMark bookMark, IFeed interpretedFeed, IConditionalGet conditionalGet, boolean deleteConditionalGet, final IProgressMonitor monitor) {
     fWriteLock.lock();
     MergeResult mergeResult = null;
     try {
@@ -167,6 +170,10 @@ public class ApplicationServiceImpl implements IApplicationService {
       if (feed == null)
         return;
 
+      /* Return early on cancellation */
+      if (monitor.isCanceled())
+        return;
+
       /* Copy over Properties to reloaded Feed to keep them */
       Map<String, Serializable> feedProperties = feed.getProperties();
       if (feedProperties != null) {
@@ -175,9 +182,17 @@ public class ApplicationServiceImpl implements IApplicationService {
           interpretedFeed.setProperty(entry.getKey(), entry.getValue());
       }
 
+      /* Return early on cancellation */
+      if (monitor.isCanceled())
+        return;
+
       /* Merge with existing */
       mergeResult = feed.mergeAndCleanUp(interpretedFeed);
       final List<INews> newNewsAdded = getNewNewsAdded(feed);
+
+      /* Return early on cancellation */
+      if (monitor.isCanceled())
+        return;
 
       /* Update Date of last added news in Bookmark */
       if (!newNewsAdded.isEmpty()) {
@@ -189,22 +204,38 @@ public class ApplicationServiceImpl implements IApplicationService {
         }
       }
 
+      /* Return early on cancellation */
+      if (monitor.isCanceled())
+        return;
+
       /* Update state of added news if equivalent news already exists */
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception { //See Bug 1216 (NPE in ModelSearchImpl.getCurrentSearcher)
-          updateStateOfUnsavedNewNews(newNewsAdded);
+          updateStateOfUnsavedNewNews(newNewsAdded, monitor);
         }
       });
 
+      /* Return early on cancellation */
+      if (monitor.isCanceled())
+        return;
+
       /* Retention Policy */
       final List<INews> deletedNews = RetentionStrategy.process(bookMark, feed);
-
       for (INews news : deletedNews)
         mergeResult.addUpdatedObject(news);
+
+      /* Return early on cancellation */
+      if (monitor.isCanceled())
+        return;
 
       /* Set ID to News and handle Description entity */
       IDGenerator generator = Owl.getPersistenceService().getIDGenerator();
       for (INews news : newNewsAdded) {
+
+        /* Return early on cancellation */
+        if (monitor.isCanceled())
+          return;
+
         long id;
         if (generator instanceof DB4OIDGenerator)
           id = ((DB4OIDGenerator) generator).getNext(false);
@@ -219,13 +250,23 @@ public class ApplicationServiceImpl implements IApplicationService {
         }
       }
 
+      /* Return early on cancellation */
+      if (monitor.isCanceled())
+        return;
+
       /* Run News Filters */
+      final AtomicBoolean someNewsFiltered = new AtomicBoolean(false);
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
           newNewsAdded.removeAll(deletedNews);
-          runNewsFilters(newNewsAdded);
+          boolean result = runNewsFilters(newNewsAdded, monitor);
+          someNewsFiltered.set(result);
         }
       });
+
+      /* Return early on cancellation and if no filter was running */
+      if (monitor.isCanceled() && !someNewsFiltered.get())
+        return;
 
       try {
         lockNewsObjects(mergeResult);
@@ -278,14 +319,18 @@ public class ApplicationServiceImpl implements IApplicationService {
     return firstFilter.getSearch() != null;
   }
 
-  private void runNewsFilters(final List<INews> news) throws Exception {
+  private boolean runNewsFilters(final List<INews> news, final IProgressMonitor monitor) throws Exception {
 
     /* Load Filters */
     Set<ISearchFilter> enabledFilters = loadEnabledFilters();
 
     /* Nothing to do */
     if (enabledFilters.isEmpty())
-      return;
+      return false;
+
+    /* Return early on cancellation */
+    if (monitor.isCanceled())
+      return false;
 
     /* Need to index News and perform Searches */
     RAMDirectory directory = null;
@@ -299,6 +344,11 @@ public class ApplicationServiceImpl implements IApplicationService {
       try {
         IndexWriter indexWriter = new IndexWriter(directory, Indexer.createAnalyzer());
         for (int i = 0; i < news.size(); i++) {
+
+          /* Return early on cancellation */
+          if (monitor.isCanceled())
+            return false;
+
           NewsDocument document = new NewsDocument(news.get(i));
           document.addFields(indexDescription);
           document.getDocument().getField(SearchDocument.ENTITY_ID_TEXT).setValue(String.valueOf(i));
@@ -315,12 +365,15 @@ public class ApplicationServiceImpl implements IApplicationService {
 
     /* Remember the news already filtered */
     List<INews> filteredNews = new ArrayList<INews>(news.size());
+    boolean filterMatchedAll= false;
 
     /* Iterate over Filters */
     for (ISearchFilter filter : enabledFilters) {
 
       /* No Search Required */
       if (filter.getSearch() == null) {
+        filterMatchedAll= true;
+
         List<INews> remainingNews = new ArrayList<INews>(news);
         remainingNews.removeAll(filteredNews);
         if (!remainingNews.isEmpty())
@@ -332,6 +385,11 @@ public class ApplicationServiceImpl implements IApplicationService {
 
       /* Search Required */
       else if (directory != null && searcher[0] != null) {
+
+        /* Return early if cancelled and nothing filtered yet */
+        if (monitor.isCanceled() && filteredNews.isEmpty())
+          return false;
+
         try {
           final List<INews> matchingNews = new ArrayList<INews>(3);
 
@@ -368,6 +426,8 @@ public class ApplicationServiceImpl implements IApplicationService {
     /* Free RAMDirectory if it was built */
     if (directory != null)
       directory.close();
+
+    return filterMatchedAll || !filteredNews.isEmpty();
   }
 
   private boolean needToIndexDescription(Set<ISearchFilter> filters) {
@@ -434,7 +494,7 @@ public class ApplicationServiceImpl implements IApplicationService {
     return newsList;
   }
 
-  private void updateStateOfUnsavedNewNews(List<INews> news) {
+  private void updateStateOfUnsavedNewNews(List<INews> news, IProgressMonitor monitor) {
     if (news.isEmpty())
       return;
 
@@ -448,9 +508,14 @@ public class ApplicationServiceImpl implements IApplicationService {
     }
 
     ModelSearchImpl modelSearch = (ModelSearchImpl) Owl.getPersistenceService().getModelSearch();
-    Map<URI, List<NewsReference>> linkToNewsRefs = modelSearch.searchNewsByLinks(links, false);
-    Map<IGuid, List<NewsReference>> guidToNewsRefs = modelSearch.searchNewsByGuids(guids, false);
+    Map<URI, List<NewsReference>> linkToNewsRefs = modelSearch.searchNewsByLinks(links, false, monitor);
+    Map<IGuid, List<NewsReference>> guidToNewsRefs = modelSearch.searchNewsByGuids(guids, false, monitor);
     for (INews newsItem : news) {
+
+      /* Return early on cancellation */
+      if (monitor.isCanceled())
+        return;
+
       List<NewsReference> equivalentNewsRefs = guidToNewsRefs.get(newsItem.getGuid());
       if (equivalentNewsRefs != null && !equivalentNewsRefs.isEmpty()) {
         NewsReference newsRef = equivalentNewsRefs.get(0);

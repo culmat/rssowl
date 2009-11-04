@@ -199,14 +199,20 @@ public class ModelSearchImpl implements IModelSearch {
   /**
    * @param guids the List of {@link IGuid} to search news for.
    * @param copy If <code>true</code>, only consider copied News.
+   * @param monitor to react on cancellation
    * @return a List of {@link NewsReference} matching the given search and
    * grouped by {@link IGuid}.
    */
-  public Map<IGuid, List<NewsReference>> searchNewsByGuids(List<IGuid> guids, boolean copy) {
+  public Map<IGuid, List<NewsReference>> searchNewsByGuids(List<IGuid> guids, boolean copy, IProgressMonitor monitor) {
     Map<IGuid, List<NewsReference>> linkToRefs = new HashMap<IGuid, List<NewsReference>>(guids.size());
     IndexSearcher currentSearcher = getCurrentSearcher();
     try {
       for (IGuid guid : guids) {
+
+        /* Return early on cancellation */
+        if (monitor.isCanceled())
+          return linkToRefs;
+
         BooleanQuery query = createGuidQuery(guid, copy);
         List<NewsReference> newsRefs = simpleSearch(currentSearcher, query);
         if (!newsRefs.isEmpty())
@@ -221,14 +227,20 @@ public class ModelSearchImpl implements IModelSearch {
   /**
    * @param links The Links to search news for.
    * @param copy If <code>true</code>, only consider copied News.
+   * @param monitor to react on cancellation
    * @return a List of {@link NewsReference} matching the given search and
    * grouped by the {@link URI}.
    */
-  public Map<URI, List<NewsReference>> searchNewsByLinks(List<URI> links, boolean copy) {
+  public Map<URI, List<NewsReference>> searchNewsByLinks(List<URI> links, boolean copy, IProgressMonitor monitor) {
     Map<URI, List<NewsReference>> linkToRefs = new HashMap<URI, List<NewsReference>>(links.size());
     IndexSearcher currentSearcher = getCurrentSearcher();
     try {
       for (URI link : links) {
+
+        /* Return early on cancellation */
+        if (monitor.isCanceled())
+          return linkToRefs;
+
         BooleanQuery query = createNewsByLinkBooleanQuery(link, copy);
         List<NewsReference> newsRefs = simpleSearch(currentSearcher, query);
         if (!newsRefs.isEmpty())
