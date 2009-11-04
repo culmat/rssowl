@@ -75,6 +75,7 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.ui.internal.Controller.BookMarkLoadListener;
 import org.rssowl.ui.internal.actions.AutomateFilterAction;
+import org.rssowl.ui.internal.actions.DeleteTypesAction;
 import org.rssowl.ui.internal.actions.ExportAction;
 import org.rssowl.ui.internal.actions.ImportAction;
 import org.rssowl.ui.internal.actions.MakeNewsStickyAction;
@@ -190,7 +191,7 @@ public class CoolBarAdvisor {
     UPDATE_ALL(ReloadAllAction.ID, Messages.CoolBarAdvisor_UPDATE_ALL, null, OwlUI.getImageDescriptor("icons/elcl16/reload_all.gif"), null, 3), //$NON-NLS-1$
 
     /** Stop */
-    STOP("org.rssowl.ui.StopUpdate", Messages.CoolBarAdvisor_STOP, Messages.CoolBarAdvisor_STOP_UPDATES, OwlUI.getImageDescriptor("icons/etool16/cancel.gif"), OwlUI.getImageDescriptor("icons/dtool16/cancel.gif"), IAction.AS_PUSH_BUTTON, false, 3), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    STOP("org.rssowl.ui.StopUpdate", Messages.CoolBarAdvisor_STOP, Messages.CoolBarAdvisor_STOP_UPDATES, OwlUI.getImageDescriptor("icons/etool16/stop.gif"), OwlUI.getImageDescriptor("icons/dtool16/stop.gif"), IAction.AS_PUSH_BUTTON, false, 3), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
     /** Search */
     SEARCH(SearchNewsAction.ID, Messages.CoolBarAdvisor_SEARCH, null, OwlUI.SEARCHMARK, null, 4),
@@ -271,7 +272,10 @@ public class CoolBarAdvisor {
     PREFERENCES("org.rssowl.ui.ShowPreferences", Messages.CoolBarAdvisor_PREFERENCES, null, OwlUI.getImageDescriptor("icons/elcl16/preferences.gif"), null, IAction.AS_PUSH_BUTTON, false, 12), //$NON-NLS-1$ //$NON-NLS-2$
 
     /** Fullscreen */
-    FULLSCREEN("org.rssowl.ui.FullScreenCommand", Messages.CoolBarAdvisor_FULL_SCREEN, Messages.CoolBarAdvisor_TOGGLE_FULL_SCREEN, OwlUI.getImageDescriptor("icons/etool16/fullscreen.gif"), null, IAction.AS_CHECK_BOX, true, 12); //$NON-NLS-1$ //$NON-NLS-2$
+    FULLSCREEN("org.rssowl.ui.FullScreenCommand", Messages.CoolBarAdvisor_FULL_SCREEN, Messages.CoolBarAdvisor_TOGGLE_FULL_SCREEN, OwlUI.getImageDescriptor("icons/etool16/fullscreen.gif"), null, IAction.AS_CHECK_BOX, true, 12), //$NON-NLS-1$ //$NON-NLS-2$
+
+    /** Delete */
+    DELETE("org.eclipse.ui.edit.delete", Messages.CoolBarAdvisor_DELETE, Messages.CoolBarAdvisor_DELETE_NEWS, OwlUI.getImageDescriptor("icons/etool16/cancel.gif"), OwlUI.getImageDescriptor("icons/dtool16/cancel.gif"), 8); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
     private final String fId;
     private final String fName;
@@ -443,6 +447,7 @@ public class CoolBarAdvisor {
         update(CoolBarItem.MOVE, selection, part, false);
         update(CoolBarItem.COPY, selection, part, false);
         update(CoolBarItem.STICKY, selection, part, false);
+        update(CoolBarItem.DELETE, selection, part, false);
         update(CoolBarItem.OPEN, selection, part, false);
         update(CoolBarItem.UPDATE, selection, part, false);
       }
@@ -771,6 +776,11 @@ public class CoolBarAdvisor {
         action.setToolTipText(getLabelWithBinding(type.getCommandId(), type.getName(), true));
         break;
       }
+
+        /* Update Delete */
+      case DELETE:
+        action.setEnabled(part instanceof FeedView && !selection.isEmpty());
+        break;
     }
   }
 
@@ -1084,6 +1094,14 @@ public class CoolBarAdvisor {
         /* Bookmarks */
       case BOOKMARKS: {
         OwlUI.positionDropDownMenu(wrappingAction, manager);
+        break;
+      }
+
+        /* Delete */
+      case DELETE: {
+        IStructuredSelection selection = OwlUI.getActiveFeedViewSelection();
+        if (selection != null && !selection.isEmpty())
+          new DeleteTypesAction(fWindow.getShell(), selection).run();
         break;
       }
     }

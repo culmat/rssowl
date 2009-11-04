@@ -93,6 +93,7 @@ import org.rssowl.ui.internal.util.LayoutUtils;
 import org.rssowl.ui.internal.util.CColumnLayoutData.Size;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -390,7 +391,7 @@ public class CustomizeToolbarDialog extends Dialog {
           visibleItems.add(CoolBarItem.values()[toolbarItemId]);
         }
 
-        CoolBarItem[] toolItems = CoolBarItem.values();
+        CoolBarItem[] toolItems = getSortedItems();
         int currentGroup = -1;
         for (final CoolBarItem toolItem : toolItems) {
           if (!visibleItems.contains(toolItem) || toolItem == CoolBarItem.SEPARATOR || toolItem == CoolBarItem.SPACER) {
@@ -548,6 +549,18 @@ public class CustomizeToolbarDialog extends Dialog {
     applyDialogFont(container);
 
     return container;
+  }
+
+  private CoolBarItem[] getSortedItems() {
+    CoolBarItem[] items = CoolBarItem.values();
+    List<CoolBarItem> sortedItems = new ArrayList<CoolBarItem>(items.length);
+    sortedItems.addAll(Arrays.asList(items));
+
+    /* Move "Delete News" before "Print News" */
+    sortedItems.remove(CoolBarItem.DELETE);
+    sortedItems.add(sortedItems.indexOf(CoolBarItem.PRINT), CoolBarItem.DELETE);
+
+    return sortedItems.toArray(new CoolBarItem[sortedItems.size()]);
   }
 
   private void onAdd(CoolBarItem newItem) {
