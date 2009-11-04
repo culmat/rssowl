@@ -65,7 +65,7 @@
 	</entry>
 	
 	<!-- Entry #2 using "html" as type -->
-	<entry>
+	<entry xml:base="/subfolder">
 		<title type="html"><![CDATA[<p>atom_entry2.title</p>]]></title>
 		<content type="html"><![CDATA[<p>atom_entry2.description</p>]]></content>
 		<source>

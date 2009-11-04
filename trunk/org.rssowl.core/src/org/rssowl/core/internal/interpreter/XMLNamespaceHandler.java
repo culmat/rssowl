@@ -33,6 +33,7 @@ import org.rssowl.core.persist.IPersistable;
 import org.rssowl.core.util.URIUtils;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * Handler for the XML Namespace.
@@ -40,7 +41,7 @@ import java.net.URI;
  * Namespace Prefix: xml<br>
  * Namespace URI: http://www.w3.org/XML/1998/namespace
  * </p>
- * 
+ *
  * @author bpasero
  */
 public class XMLNamespaceHandler implements INamespaceHandler {
@@ -68,8 +69,19 @@ public class XMLNamespaceHandler implements INamespaceHandler {
       URI baseUri = URIUtils.createURI(attribute.getValue());
       if (baseUri != null && type instanceof IFeed)
         ((IFeed) type).setBase(baseUri);
-      else if (baseUri != null && type instanceof INews)
-        ((INews) type).setBase(baseUri);
+      else if (baseUri != null && type instanceof INews) {
+        INews news = (INews) type;
+
+        /* If the Base is relative, try to resolve against Feeds's base if provided */
+        if (news.getBase() != null && news.getBase().isAbsolute() && !baseUri.isAbsolute()) {
+          try {
+            news.setBase(URIUtils.resolve(news.getBase(), baseUri));
+          } catch (URISyntaxException e) {
+            news.setBase(baseUri);
+          }
+        } else
+          news.setBase(baseUri);
+      }
     }
   }
 }
