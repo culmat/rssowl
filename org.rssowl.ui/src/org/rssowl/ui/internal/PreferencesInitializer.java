@@ -244,6 +244,10 @@ public class PreferencesInitializer implements IPreferencesInitializer {
     items.add(CoolBarAdvisor.CoolBarItem.LABEL.ordinal());
     items.add(CoolBarAdvisor.CoolBarItem.STICKY.ordinal());
 
+    /* Share */
+    items.add(CoolBarAdvisor.CoolBarItem.SEPARATOR.ordinal());
+    items.add(CoolBarAdvisor.CoolBarItem.SHARE.ordinal());
+
     /* Next | Previous */
     items.add(CoolBarAdvisor.CoolBarItem.SEPARATOR.ordinal());
     items.add(CoolBarAdvisor.CoolBarItem.NEXT.ordinal());
