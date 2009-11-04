@@ -673,7 +673,7 @@ public class OwlUI {
 
   private static String getImageUri(File file) {
     URI uri = file.toURI();
-    String s = uri.toASCIIString();
+    String s = uri.toString();
     return s.replaceFirst("/", "///"); //$NON-NLS-1$ //$NON-NLS-2$
   }
 
