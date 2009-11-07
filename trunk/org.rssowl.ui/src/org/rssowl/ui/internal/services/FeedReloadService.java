@@ -118,11 +118,11 @@ public class FeedReloadService {
       fLastRunInMillis = System.currentTimeMillis();
 
       /* Reload */
-      if (!monitor.isCanceled())
+      if (!monitor.isCanceled() && !Controller.getDefault().isShuttingDown())
         Controller.getDefault().reloadQueued(fBookMark, null);
 
       /* Re-Schedule */
-      if (!monitor.isCanceled() && updateIntervalInSeconds != null)
+      if (!monitor.isCanceled() && !Controller.getDefault().isShuttingDown() && updateIntervalInSeconds != null)
         schedule(updateIntervalInSeconds * 1000);
 
       return Status.OK_STATUS;
@@ -243,17 +243,20 @@ public class FeedReloadService {
 
       @Override
       public void entitiesAdded(Set<BookMarkEvent> events) {
-        onBookMarksAdded(events);
+        if (!Controller.getDefault().isShuttingDown())
+          onBookMarksAdded(events);
       }
 
       @Override
       public void entitiesUpdated(Set<BookMarkEvent> events) {
-        onBookMarksUpdated(events);
+        if (!Controller.getDefault().isShuttingDown())
+          onBookMarksUpdated(events);
       }
 
       @Override
       public void entitiesDeleted(Set<BookMarkEvent> events) {
-        onBookMarksDeleted(events);
+        if (!Controller.getDefault().isShuttingDown())
+          onBookMarksDeleted(events);
       }
     };
 

@@ -128,6 +128,11 @@ public class Indexer {
     for (ListIterator<INews> it = entities.listIterator(entities.size()); it.hasPrevious();) {
       INews news = it.previous();
       it.remove();
+
+      /* React on shutting down while indexing */
+      if (Owl.isShuttingDown())
+        break;
+
       NewsDocument newsDoc = new NewsDocument(news);
       try {
         if (newsDoc.addFields()) {
@@ -219,8 +224,16 @@ public class Indexer {
   }
 
   synchronized void shutdown(boolean emergency) {
+    if (fJobQueue != null) {
+      if (!emergency)
+        fJobQueue.cancel(false);
+      else
+        fJobQueue.seal();
+    }
+
     unregisterListeners();
     dispose();
+
     if (!emergency) {
       saveCommittedNews(true, fUncommittedNews);
       fUncommittedNews.clear();

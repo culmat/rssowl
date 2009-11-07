@@ -193,4 +193,21 @@ public final class Owl {
   public static boolean isStarted() {
     return InternalOwl.getDefault().isStarted();
   }
+
+  /**
+   * @param emergency If set to <code>TRUE</code>, this method is called from a
+   * shutdown hook that got triggered from a non-normal shutdown (e.g. System
+   * Shutdown).
+   */
+  public static void shutdown(boolean emergency) {
+    InternalOwl.getDefault().shutdown(emergency);
+  }
+
+  /**
+   * @return <code>true</code> if {@link Owl#shutdown(boolean)} has
+   * been called already and <code>false</code> otherwise.
+   */
+  public static boolean isShuttingDown() {
+    return InternalOwl.getDefault().isShuttingDown();
+  }
 }

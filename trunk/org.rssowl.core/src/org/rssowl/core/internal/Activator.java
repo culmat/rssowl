@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.Status;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.rssowl.core.Owl;
 import org.rssowl.core.util.LoggingSafeRunnable;
 
 /**
@@ -102,7 +103,7 @@ public class Activator extends Plugin {
     /* Stop Internal Owl */
     SafeRunner.run(new LoggingSafeRunnable() {
       public void run() throws Exception {
-        InternalOwl.getDefault().shutdown();
+        Owl.shutdown(false);
       }
     });
 

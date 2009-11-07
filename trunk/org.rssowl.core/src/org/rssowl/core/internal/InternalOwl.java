@@ -72,6 +72,7 @@ public final class InternalOwl {
   private volatile IPersistenceService fPersistenceService;
   private volatile IApplicationService fApplicationService;
   private volatile IModelFactory fModelFactory;
+  private volatile boolean fShuttingDown;
   private volatile boolean fStarted;
 
   /** Flag indicating Performance-Tests are running */
@@ -119,14 +120,29 @@ public final class InternalOwl {
     return fStarted;
   }
 
-  /** Shutdown the Services managed by this Facade */
-  public void shutdown() {
-    /* Services could be null if an exception was thrown during start-up */
-    if (fConnectionService != null)
+  /**
+   * Shutdown the Services managed by this Facade
+   *
+   * @param emergency If set to <code>TRUE</code>, this method is called from a
+   * shutdown hook that got triggered from a non-normal shutdown (e.g. System
+   * Shutdown).
+   */
+  public void shutdown(boolean emergency) {
+    fShuttingDown = true;
+
+    if (!emergency && fConnectionService != null)
       fConnectionService.shutdown();
 
     if (fPersistenceService != null)
-      fPersistenceService.shutdown(false);
+      fPersistenceService.shutdown(emergency);
+  }
+
+  /**
+   * @return Returns <code>TRUE</code> if {@link InternalOwl#shutdown(boolean)}
+   * has been called.
+   */
+  public boolean isShuttingDown() {
+    return fShuttingDown;
   }
 
   /**

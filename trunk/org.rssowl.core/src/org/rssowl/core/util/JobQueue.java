@@ -70,6 +70,7 @@ public class JobQueue {
   private final boolean fShowProgress;
   private boolean fIsUnknownProgress;
   private final ListenerList fListeners = new ListenerList();
+  private boolean fIsSealed;
 
   /* These fields are accessed from N Jobs concurrently */
   private volatile boolean fProgressJobScheduled;
@@ -154,8 +155,11 @@ public class JobQueue {
    * yet done.
    */
   public void cancel(boolean joinRunning) {
-
     synchronized (this) {
+
+      /* Seal */
+      seal();
+
       /* Clear open tasks */
       fOpenTasksQueue.clear();
 
@@ -166,6 +170,7 @@ public class JobQueue {
       if (fProgressJob != null)
         fProgressJob.cancel();
     }
+
     /* Join running Jobs if any */
     if (joinRunning) {
       while (Job.getJobManager().find(this).length != 0) {
@@ -176,6 +181,13 @@ public class JobQueue {
         }
       }
     }
+  }
+
+  /**
+   * Seals this queue so that no task can be added anymore.
+   */
+  public void seal() {
+    fIsSealed= true;
   }
 
   /**
@@ -212,9 +224,9 @@ public class JobQueue {
    *
    * @param tasks The Tasks to add into this Queue.
    * @return {@code true} if all the tasks were scheduled or {@code false} if
-   * some tasks were not scheduled because the current thread was interrupted.
+   * some tasks were not scheduled because the current thread was interrupted or
+   * this queue is sealed.
    */
-  //TODO Consider returning the tasks that were not scheduled instead
   public boolean schedule(List<ITask> tasks) {
     final int tasksSize = tasks.size();
 
@@ -222,10 +234,15 @@ public class JobQueue {
     if (tasksSize == 0)
       return true;
 
+    /* Return if Queue is Sealed */
+    if (fIsSealed)
+      return false;
+
+    /* Add into List of open tasks */
     for (ITask task : tasks) {
-      /* Add into List of open tasks */
       try {
         fOpenTasksQueue.put(task);
+
         /* Adjust Total Work Counter */
         fTotalWork.incrementAndGet();
       } catch (InterruptedException e) {

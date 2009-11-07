@@ -1027,9 +1027,13 @@ public class Controller {
     if (!InternalOwl.TESTING && !emergency && fFeedReloadService != null)
       fFeedReloadService.stopService();
 
-    /* Cancel the reload queue */
-    if (!emergency && fReloadFeedQueue != null)
-      fReloadFeedQueue.cancel(false);
+    /* Cancel/Seal the reload queue */
+    if (fReloadFeedQueue != null) {
+      if (!emergency)
+        fReloadFeedQueue.cancel(false);
+      else
+        fReloadFeedQueue.seal();
+    }
 
     /* Cancel the feed-save queue (join) */
     if (fSaveFeedQueue != null)

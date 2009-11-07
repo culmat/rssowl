@@ -27,6 +27,7 @@ package org.rssowl.core.internal.persist.search;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.rssowl.core.Owl;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.persist.INews;
@@ -131,17 +132,20 @@ public final class IndexingTask implements ITask {
 
       /* Add the Entities of the Events to the Index */
       case PERSIST:
-        addToIndex();
+        if (!monitor.isCanceled() && !Owl.isShuttingDown())
+          addToIndex();
         break;
 
       /* Update the Entities of the Events in the Index */
       case UPDATE:
-        updateIndex();
+        if (!monitor.isCanceled() && !Owl.isShuttingDown())
+          updateIndex();
         break;
 
       /* Delete the Entities of the Events from the Index */
       case REMOVE:
-        deleteFromIndex();
+        if (!monitor.isCanceled() && !Owl.isShuttingDown())
+          deleteFromIndex();
         break;
     }
 
