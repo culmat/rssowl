@@ -369,9 +369,26 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
         /* Delete Label from DB */
         DynamicDAO.deleteAll(selectedLabels);
         fViewer.refresh();
+        fixOrderAfterDelete();
       }
     }
     fViewer.getTree().setFocus();
+  }
+
+  /* Ensure that after Delete, the orders are in sync again */
+  private void fixOrderAfterDelete() {
+    List<ILabel> labelsToSave = new ArrayList<ILabel>();
+
+    TreeItem[] items = fViewer.getTree().getItems();
+    for (int i = 0; i < items.length; i++) {
+      TreeItem item = items[i];
+      ILabel label = (ILabel) item.getData();
+      label.setOrder(i);
+
+      labelsToSave.add(label);
+    }
+
+    DynamicDAO.saveAll(labelsToSave);
   }
 
   private Collection<INews> findNewsWithLabel(ILabel label) {
