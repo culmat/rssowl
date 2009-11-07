@@ -257,7 +257,7 @@ public class DateUtils {
         "yyyy-MM-dd'T'HH:mm:ssz", //$NON-NLS-1$
 
         /* ISO 8601 slightly modified */
-        "yyyy-MM-dd'T'HH:mm:ss", //$NON-NLS-1$
+        "yyyy-MM-dd'T'HH:mm:ss.SSSz",  //$NON-NLS-1$
 
         /* ISO 8601 slightly modified */
         "yyyy-MM-dd'T'HHmmss.SSSz", //$NON-NLS-1$
