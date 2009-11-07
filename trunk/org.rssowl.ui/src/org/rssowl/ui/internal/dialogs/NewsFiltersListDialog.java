@@ -705,8 +705,25 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
 
       fSearchFilterDao.deleteAll(filtersToDelete);
       fViewer.remove(selection.toArray());
+      fixOrderAfterDelete();
       updateTitle();
     }
+  }
+
+  /* Ensure that after Delete, the orders are in sync again */
+  private void fixOrderAfterDelete() {
+    List<ISearchFilter> filtersToSave= new ArrayList<ISearchFilter>();
+
+    TableItem[] items = fViewer.getTable().getItems();
+    for (int i = 0; i < items.length; i++) {
+      TableItem item = items[i];
+      ISearchFilter filter= (ISearchFilter) item.getData();
+      filter.setOrder(i);
+
+      filtersToSave.add(filter);
+    }
+
+    DynamicDAO.saveAll(filtersToSave);
   }
 
   private String getMessage(List<?> elements) {
