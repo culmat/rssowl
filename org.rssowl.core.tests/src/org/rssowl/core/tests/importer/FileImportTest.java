@@ -571,6 +571,42 @@ public class FileImportTest {
     List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/filter.opml"));
     assertEquals(1, elements.size());
     assertEquals(1, count(SearchFilter.class.getName(), elements));
+
+    for (IEntity item : elements) {
+      if ("Filter 1".equals(((ISearchFilter) item).getName()))
+        assertEquals(0, ((ISearchFilter) item).getOrder());
+    }
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings( { "nls", "null", "unused", "unchecked" })
+  public void testImport_Filter_Order() throws Exception {
+    IFolder root = DynamicDAO.save(Owl.getModelFactory().createFolder(null, null, "Root"));
+
+    ISearchFilter filter = Owl.getModelFactory().createSearchFilter(null, null, "Filter 1");
+    filter.setMatchAllNews(true);
+    filter.setEnabled(true);
+    filter.setOrder(0);
+    filter.addAction(Owl.getModelFactory().createFilterAction("org.rssowl.core.MarkReadNewsAction"));
+    DynamicDAO.save(filter);
+
+    /* Import */
+    List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/filter.opml"));
+    assertEquals(1, elements.size());
+    assertEquals(1, count(SearchFilter.class.getName(), elements));
+
+    ImportUtils.doImport(null, elements, false);
+
+    Collection<ISearchFilter> filters = DynamicDAO.loadAll(ISearchFilter.class);
+    for (ISearchFilter item : filters) {
+      if ("Filter 1".equals(item.getName()))
+        assertEquals(0, item.getOrder());
+      else
+        assertEquals(1, item.getOrder());
+    }
   }
 
   /**
@@ -584,6 +620,109 @@ public class FileImportTest {
     List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/labels.opml"));
     assertEquals(5, elements.size());
     assertEquals(5, count(Label.class.getName(), elements));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings( { "nls", "null", "unused", "unchecked" })
+  public void testImport_Labels_Order_NoLabels() throws Exception {
+    IFolder root = DynamicDAO.save(Owl.getModelFactory().createFolder(null, null, "Root"));
+
+    /* Import */
+    List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/labels.opml"));
+    assertEquals(5, elements.size());
+    assertEquals(5, count(Label.class.getName(), elements));
+
+    ImportUtils.doImport(null, elements, false);
+
+    for (IEntity entity : elements) {
+      ILabel label = (ILabel) entity;
+      if ("Later".equals(label.getName()))
+        assertEquals(0, label.getOrder());
+      else if ("Personal".equals(label.getName()))
+        assertEquals(1, label.getOrder());
+      else if ("Important".equals(label.getName()))
+        assertEquals(2, label.getOrder());
+      else if ("Work".equals(label.getName()))
+        assertEquals(3, label.getOrder());
+      else if ("To Do".equals(label.getName()))
+        assertEquals(4, label.getOrder());
+    }
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings( { "nls", "null", "unused", "unchecked" })
+  public void testImport_Labels_Order_ExistingLabels() throws Exception {
+    IFolder root = DynamicDAO.save(Owl.getModelFactory().createFolder(null, null, "Root"));
+
+    ILabel fooLabel = Owl.getModelFactory().createLabel(null, "Foo");
+    fooLabel.setOrder(0);
+
+    ILabel barLabel = Owl.getModelFactory().createLabel(null, "Bar");
+    barLabel.setOrder(1);
+
+    DynamicDAO.save(fooLabel);
+    DynamicDAO.save(barLabel);
+
+    /* Import */
+    List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/labels.opml"));
+    assertEquals(5, elements.size());
+    assertEquals(5, count(Label.class.getName(), elements));
+
+    ImportUtils.doImport(null, elements, false);
+
+    int orderSum = 0;
+    Collection<ILabel> allLabels = DynamicDAO.loadAll(ILabel.class);
+    for (ILabel label : allLabels) {
+      orderSum += label.getOrder();
+    }
+
+    /* Check the Sequence is consistent */
+    assertEquals(0 + 1 + 2 + 3 + 4 + 5 + 6, orderSum);
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings( { "nls", "null", "unused", "unchecked" })
+  public void testImport_Labels_Order_ExistingLabels_Merge() throws Exception {
+    IFolder root = DynamicDAO.save(Owl.getModelFactory().createFolder(null, null, "Root"));
+
+    ILabel laterLabel = Owl.getModelFactory().createLabel(null, "Later");
+    laterLabel.setOrder(1);
+
+    ILabel personalLabel = Owl.getModelFactory().createLabel(null, "Personal");
+    personalLabel.setOrder(0);
+
+    DynamicDAO.save(laterLabel);
+    DynamicDAO.save(personalLabel);
+
+    /* Import */
+    List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/labels.opml"));
+    assertEquals(5, elements.size());
+    assertEquals(5, count(Label.class.getName(), elements));
+
+    ImportUtils.doImport(null, elements, false);
+
+    for (IEntity entity : elements) {
+      ILabel label = (ILabel) entity;
+      if ("Later".equals(label.getName()))
+        assertEquals(0, label.getOrder());
+      else if ("Personal".equals(label.getName()))
+        assertEquals(1, label.getOrder());
+      else if ("Important".equals(label.getName()))
+        assertEquals(2, label.getOrder());
+      else if ("Work".equals(label.getName()))
+        assertEquals(3, label.getOrder());
+      else if ("To Do".equals(label.getName()))
+        assertEquals(4, label.getOrder());
+    }
   }
 
   /**
