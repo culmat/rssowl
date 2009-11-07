@@ -111,7 +111,8 @@ public class SavedSearchService {
   private IndexListener registerListeners() {
     IndexListener listener = new IndexListener() {
       public void indexUpdated(int entitiesCount) {
-        onIndexUpdated(entitiesCount);
+        if (!Controller.getDefault().isShuttingDown())
+          onIndexUpdated(entitiesCount);
       }
     };
 
@@ -179,6 +180,10 @@ public class SavedSearchService {
     /* For each Search Mark */
     for (ISearchMark searchMark : searchMarks) {
 
+      /* Return early if shutting down */
+      if (Controller.getDefault().isShuttingDown())
+        return;
+
       /* Execute the search */
       List<SearchHit<NewsReference>> results = modelSearch.searchNews(searchMark.getSearchConditions(), searchMark.matchAllConditions());
 
@@ -187,8 +192,12 @@ public class SavedSearchService {
 
       Set<State> visibleStates = INews.State.getVisible();
       for (SearchHit<NewsReference> searchHit : results) {
-        INews.State state = (State) searchHit.getData(INews.STATE);
 
+        /* Return early if shutting down */
+        if (Controller.getDefault().isShuttingDown())
+          return;
+
+        INews.State state = (State) searchHit.getData(INews.STATE);
         if (visibleStates.contains(state)) {
           List<NewsReference> newsRefs = resultsMap.get(state);
           if (newsRefs == null) {
@@ -210,7 +219,7 @@ public class SavedSearchService {
     }
 
     /* Notify Listeners */
-    if (!events.isEmpty())
+    if (!events.isEmpty() && !Controller.getDefault().isShuttingDown())
       DynamicDAO.getDAO(ISearchMarkDAO.class).fireResultsChanged(events);
   }
 

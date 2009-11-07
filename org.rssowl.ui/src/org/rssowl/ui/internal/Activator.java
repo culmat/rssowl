@@ -125,7 +125,7 @@ public class Activator extends AbstractUIPlugin {
         /* Shutdown Core */
         SafeRunner.run(new LoggingSafeRunnable() {
           public void run() throws Exception {
-            Owl.getPersistenceService().shutdown(true);
+            Owl.shutdown(true);
           }
         });
       }

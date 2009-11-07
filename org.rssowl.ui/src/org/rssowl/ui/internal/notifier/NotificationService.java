@@ -124,7 +124,8 @@ public class NotificationService {
     NewsListener listener = new NewsAdapter() {
       @Override
       public void entitiesAdded(final Set<NewsEvent> events) {
-        onNewsAdded(events);
+        if (!Controller.getDefault().isShuttingDown())
+          onNewsAdded(events);
       }
     };
 
@@ -137,7 +138,8 @@ public class NotificationService {
     SearchMarkListener listener = new SearchMarkAdapter() {
       @Override
       public void resultsChanged(Set<SearchMarkEvent> events) {
-        onResultsChanged(events);
+        if (!Controller.getDefault().isShuttingDown())
+          onResultsChanged(events);
       }
     };
 
