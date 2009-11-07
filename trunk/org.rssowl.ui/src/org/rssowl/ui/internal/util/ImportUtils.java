@@ -65,6 +65,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -158,6 +159,7 @@ public class ImportUtils {
     }
 
     /* Import Labels  */
+    boolean fixLabelOrder= false;
     Map<String, ILabel> mapExistingLabelToName = new HashMap<String, ILabel>();
     Map<Long, ILabel> mapOldIdToImportedLabel = new HashMap<Long, ILabel>();
     if (labels != null && !labels.isEmpty()) {
@@ -178,6 +180,8 @@ public class ImportUtils {
         /* Update Existing */
         if (existingLabel != null) {
           existingLabel.setColor(importedLabel.getColor());
+          if (existingLabel.getOrder() != importedLabel.getOrder())
+            fixLabelOrder= true;
           existingLabel.setOrder(importedLabel.getOrder());
           DynamicDAO.save(existingLabel);
         }
@@ -186,14 +190,29 @@ public class ImportUtils {
         else {
           importedLabel.removeProperty(ITypeImporter.ID_KEY);
           DynamicDAO.save(importedLabel);
+          fixLabelOrder = true;
         }
+      }
+
+      /* Fix Order to be a sequence again */
+      if (fixLabelOrder && !existingLabels.isEmpty()) {
+        Set<ILabel> sortedLabels = CoreUtils.loadSortedLabels();
+        int index = 0;
+        for (Iterator<?> iterator = sortedLabels.iterator(); iterator.hasNext();) {
+          ILabel label = (ILabel) iterator.next();
+          label.setOrder(index);
+          index++;
+        }
+
+        DynamicDAO.saveAll(sortedLabels);
       }
     }
 
     /* Import Filters */
     if (filters != null && !filters.isEmpty()) {
+      int existingFiltersCount = DynamicDAO.loadAll(ISearchFilter.class).size();
 
-      /* Fix locations in Searches if required */
+   /* Fix locations in Searches if required */
       List<ISearch> locationConditionSearches = getLocationConditionSearchesFromFilters(filters);
       if (!locationConditionSearches.isEmpty())
         updateLocationConditions(mapOldIdToFolderChild, locationConditionSearches);
@@ -241,6 +260,11 @@ public class ImportUtils {
             }
           }
         }
+      }
+
+      /* Fix Order */
+      for (ISearchFilter filter : filters) {
+        filter.setOrder(filter.getOrder() + existingFiltersCount);
       }
 
       /* Save */
