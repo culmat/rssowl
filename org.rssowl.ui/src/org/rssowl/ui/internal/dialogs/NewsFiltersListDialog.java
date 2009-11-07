@@ -240,7 +240,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
         ISearchFilter filter1 = (ISearchFilter) e1;
         ISearchFilter filter2 = (ISearchFilter) e2;
 
-        return (filter1.getOrder() < filter2.getOrder() ? -1 : (filter1.getOrder() == filter2.getOrder() ? 0 : 1));
+        return filter1.getOrder() < filter2.getOrder() ? -1 : 1;
       }
     });
 

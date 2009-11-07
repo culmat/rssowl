@@ -302,7 +302,10 @@ public class ApplicationServiceImpl implements IApplicationService {
     /* Sort filters by ID */
     Set<ISearchFilter> sortedFilters = new TreeSet<ISearchFilter>(new Comparator<ISearchFilter>() {
       public int compare(ISearchFilter f1, ISearchFilter f2) {
-        return (f1.getOrder() < f2.getOrder() ? -1 : (f1.getOrder() == f2.getOrder() ? 0 : 1));
+        if (f1.equals(f2))
+          return 0;
+
+        return f1.getOrder() < f2.getOrder() ? -1 : 1;
       }
     });
 
