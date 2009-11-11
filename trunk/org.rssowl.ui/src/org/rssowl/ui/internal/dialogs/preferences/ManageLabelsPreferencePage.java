@@ -67,6 +67,7 @@ import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.SearchHit;
+import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.dialogs.ConfirmDialog;
@@ -414,6 +415,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
     fViewer.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     ((GridData) fViewer.getTree().getLayoutData()).heightHint = 190;
     fViewer.getTree().setFont(OwlUI.getBold(JFaceResources.DIALOG_FONT));
+    fViewer.getTree().setData(ApplicationWorkbenchWindowAdvisor.FOCUSLESS_SCROLL_HOOK, new Object());
 
     /* Content Provider */
     fViewer.setContentProvider(new ITreeContentProvider() {

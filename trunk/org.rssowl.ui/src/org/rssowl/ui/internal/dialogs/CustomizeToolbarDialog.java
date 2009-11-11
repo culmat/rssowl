@@ -82,6 +82,7 @@ import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Application;
+import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.CoolBarAdvisor;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.CoolBarAdvisor.CoolBarItem;
@@ -214,6 +215,7 @@ public class CustomizeToolbarDialog extends Dialog {
     fItemViewer.getTable().setHeaderVisible(false);
     ((GridData) fItemViewer.getTable().getLayoutData()).heightHint = fItemViewer.getTable().getItemHeight() * 24;
     fItemViewer.getTable().setFocus();
+    fItemViewer.getTable().setData(ApplicationWorkbenchWindowAdvisor.FOCUSLESS_SCROLL_HOOK, new Object());
 
     /* Custom Owner Drawn Category */
     if (!OwlUI.isHighContrast()) {

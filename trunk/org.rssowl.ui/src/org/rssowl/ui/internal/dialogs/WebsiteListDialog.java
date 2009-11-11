@@ -50,6 +50,7 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.StringUtils;
+import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.CColumnLayoutData;
 import org.rssowl.ui.internal.util.CTable;
@@ -120,6 +121,7 @@ public class WebsiteListDialog extends Dialog {
     fViewer.getTable().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     fViewer.getTable().setHeaderVisible(true);
     ((GridData) fViewer.getTable().getLayoutData()).heightHint = fViewer.getTable().getItemHeight() * 10;
+    fViewer.getTable().setData(ApplicationWorkbenchWindowAdvisor.FOCUSLESS_SCROLL_HOOK, new Object());
 
     TableColumn nameCol = new TableColumn(fViewer.getTable(), SWT.NONE);
 

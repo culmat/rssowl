@@ -73,6 +73,7 @@ import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.ReparentInfo;
 import org.rssowl.ui.internal.Application;
+import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.DeleteTypesAction;
 import org.rssowl.ui.internal.actions.EntityPropertyDialogAction;
@@ -88,7 +89,7 @@ import java.util.Set;
 /**
  * The <code>ManageSetsDialog</code> allows to manage bookmark-sets. These are
  * root-leveld Folders containing other Folders and Marks.
- * 
+ *
  * @author bpasero
  */
 public class ManageSetsDialog extends TitleAreaDialog {
@@ -204,6 +205,7 @@ public class ManageSetsDialog extends TitleAreaDialog {
     fViewer = new TableViewer(composite, SWT.BORDER);
     fViewer.getTable().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
     ((GridData) fViewer.getTable().getLayoutData()).heightHint = fViewer.getTable().getItemHeight() * 7;
+    fViewer.getTable().setData(ApplicationWorkbenchWindowAdvisor.FOCUSLESS_SCROLL_HOOK, new Object());
 
     /* Drag and Drop */
     initDragAndDrop();

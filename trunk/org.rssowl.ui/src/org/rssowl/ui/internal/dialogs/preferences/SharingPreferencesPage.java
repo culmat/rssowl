@@ -66,6 +66,7 @@ import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.StringUtils;
+import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.ShareProvider;
@@ -133,6 +134,7 @@ public class SharingPreferencesPage extends PreferencePage implements IWorkbench
     fViewer.getTable().setHeaderVisible(true);
     ((GridData) fViewer.getTable().getLayoutData()).heightHint = fViewer.getTable().getItemHeight() * 15;
     fViewer.getTable().setFocus();
+    fViewer.getTable().setData(ApplicationWorkbenchWindowAdvisor.FOCUSLESS_SCROLL_HOOK, new Object());
 
     TableColumn nameCol = new TableColumn(fViewer.getTable(), SWT.NONE);
 
