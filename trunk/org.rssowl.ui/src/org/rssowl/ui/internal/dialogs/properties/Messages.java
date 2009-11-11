@@ -57,6 +57,7 @@ public class Messages extends NLS {
   public static String GeneralPropertyPage_WARNING;
   public static String InformationPropertyPage_CREATED;
   public static String InformationPropertyPage_DESCRIPTION;
+  public static String InformationPropertyPage_FIND_OUT_MORE;
   public static String InformationPropertyPage_HOMEPAGE;
   public static String InformationPropertyPage_LAST_VISITED;
   public static String InformationPropertyPage_LOAD_FAILED_REASON;

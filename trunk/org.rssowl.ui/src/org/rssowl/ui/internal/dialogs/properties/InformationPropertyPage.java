@@ -43,8 +43,10 @@ import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.util.StringUtils;
+import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.dialogs.properties.IEntityPropertyPage;
 import org.rssowl.ui.dialogs.properties.IPropertyDialogSite;
+import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.OpenInBrowserAction;
@@ -53,6 +55,7 @@ import org.rssowl.ui.internal.util.LayoutUtils;
 import org.rssowl.ui.internal.util.UIBackgroundJob;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.DateFormat;
 import java.util.EnumSet;
 import java.util.List;
@@ -109,6 +112,29 @@ public class InformationPropertyPage implements IEntityPropertyPage {
     msgLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
     ((GridData) msgLabel.getLayoutData()).widthHint = 300;
     msgLabel.setText(message);
+
+    /* Link to Feedvalidator in case of an error */
+    if (bm.isErrorLoading()) {
+      new Label(container, SWT.None);
+
+      Link validateLink = new Link(container, SWT.None);
+      validateLink.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
+      validateLink.setText(Messages.InformationPropertyPage_FIND_OUT_MORE);
+      validateLink.addSelectionListener(new SelectionAdapter() {
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+          try {
+            URI uri = new URI("http://www.feedvalidator.org/check.cgi?url=" + URIUtils.urlEncode(bm.getFeedLinkReference().getLinkAsText())); //$NON-NLS-1$
+
+            OpenInBrowserAction action = new OpenInBrowserAction();
+            action.selectionChanged(null, new StructuredSelection(uri));
+            action.run();
+          } catch (URISyntaxException ex) {
+            Activator.safeLogError(ex.getMessage(), ex);
+          }
+        }
+      });
+    }
 
     /* Feed: Description */
     createLabel(container, Messages.InformationPropertyPage_DESCRIPTION, true);
