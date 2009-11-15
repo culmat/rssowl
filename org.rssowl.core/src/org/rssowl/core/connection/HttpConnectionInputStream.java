@@ -52,9 +52,10 @@ import java.net.URISyntaxException;
  */
 public class HttpConnectionInputStream extends FilterInputStream implements IConditionalGetCompatible, IAbortable {
 
-  /* Request Header */
+  /* Response Header */
   private static final String HEADER_RESPONSE_ETAG = "ETag"; //$NON-NLS-1$
   private static final String HEADER_RESPONSE_LAST_MODIFIED = "Last-Modified"; //$NON-NLS-1$
+  private static final String HEADER_RESPONSE_CONTENT_LENGTH = "Content-Length"; //$NON-NLS-1$
 
   private final GetMethod fGetMethod;
   private final IProgressMonitor fMonitor;
@@ -187,5 +188,23 @@ public class HttpConnectionInputStream extends FilterInputStream implements ICon
       throw new MonitorCanceledException(Messages.HttpConnectionInputStream_ERROR_CONNECTION_CANCELED);
 
     return super.available();
+  }
+
+  /**
+   * @return the content length of the content served by this stream or -1 if
+   * not available;
+   */
+  public int getContentLength() {
+    Header header = fGetMethod.getResponseHeader(HEADER_RESPONSE_CONTENT_LENGTH);
+    if (header != null) {
+      String value = header.getValue();
+      try {
+        return Integer.parseInt(value);
+      } catch (NumberFormatException e) {
+        return -1;
+      }
+    }
+
+    return -1;
   }
 }
