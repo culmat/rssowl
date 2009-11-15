@@ -1144,7 +1144,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
       /* Offer Download Action for each */
       for (final Pair<IAttachment, URI> attachmentPair : attachments) {
         IAttachment attachment = attachmentPair.getFirst();
-        final String fileName = URIUtils.getFile(attachmentPair.getSecond());
+        final String fileName = URIUtils.getFile(attachmentPair.getSecond(), OwlUI.getExtensionForMime(attachment.getType()));
         String size = OwlUI.getSize(attachment.getLength());
 
         Action action = new Action(size != null ? (NLS.bind(Messages.ApplicationActionBarAdvisor_FILE_SIZE, fileName, size)) : (fileName)) {

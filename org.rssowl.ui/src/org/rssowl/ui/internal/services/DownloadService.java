@@ -172,7 +172,7 @@ public class DownloadService {
     if (StringUtils.isSet(fileName))
       downloadFileName = fileName;
     else
-      downloadFileName = URIUtils.getFile(link);
+      downloadFileName = URIUtils.getFile(link, OwlUI.getExtensionForMime(attachment.getType()));
 
     File downloadFile = new File(folder, downloadFileName);
     job.setName(NLS.bind(Messages.DownloadService_DOWNLOADING, downloadFileName));
