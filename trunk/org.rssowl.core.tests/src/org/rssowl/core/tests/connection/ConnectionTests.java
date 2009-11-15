@@ -38,11 +38,13 @@ import org.eclipse.core.runtime.Platform;
 import org.junit.Test;
 import org.rssowl.core.Owl;
 import org.rssowl.core.connection.AuthenticationRequiredException;
+import org.rssowl.core.connection.HttpConnectionInputStream;
 import org.rssowl.core.connection.IConditionalGetCompatible;
 import org.rssowl.core.connection.IConnectionPropertyConstants;
 import org.rssowl.core.connection.IConnectionService;
 import org.rssowl.core.connection.ICredentials;
 import org.rssowl.core.connection.ICredentialsProvider;
+import org.rssowl.core.connection.IProtocolHandler;
 import org.rssowl.core.connection.IProxyCredentials;
 import org.rssowl.core.connection.NotModifiedException;
 import org.rssowl.core.internal.persist.Feed;
@@ -116,6 +118,23 @@ public class ConnectionTests {
     byte[] feedIcon = conManager.getFeedIcon(feedUrl, new NullProgressMonitor());
     assertNotNull(feedIcon);
     assertTrue(feedIcon.length != 0);
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testHttpConnectionInputStream() throws Exception {
+    IConnectionService conManager = Owl.getConnectionService();
+    URI url = new URI("http://www.rssowl.org/favicon.ico");
+    IProtocolHandler handler = conManager.getHandler(url);
+    InputStream stream = handler.openStream(url, null, null);
+    if (stream instanceof HttpConnectionInputStream) {
+      HttpConnectionInputStream inS = (HttpConnectionInputStream) stream;
+      assertTrue(inS.getContentLength() > 0);
+      assertNotNull(inS.getIfModifiedSince());
+      assertNotNull(inS.getIfNoneMatch());
+    }
   }
 
   /**

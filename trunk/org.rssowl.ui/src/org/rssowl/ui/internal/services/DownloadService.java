@@ -39,6 +39,7 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.connection.AuthenticationRequiredException;
 import org.rssowl.core.connection.ConnectionException;
 import org.rssowl.core.connection.CredentialsException;
+import org.rssowl.core.connection.HttpConnectionInputStream;
 import org.rssowl.core.connection.IAbortable;
 import org.rssowl.core.connection.IConnectionPropertyConstants;
 import org.rssowl.core.connection.IProtocolHandler;
@@ -200,6 +201,7 @@ public class DownloadService {
         monitor.beginTask(formatTask(bytesConsumed, length, -1), length > 0 ? length : IProgressMonitor.UNKNOWN);
 
         /* First Download to a temporary File */
+        int contentLength= length;
         InputStream in = null;
         FileOutputStream out = null;
         File partFile = new File(folder, downloadFileName + ".part"); //$NON-NLS-1$
@@ -209,6 +211,13 @@ public class DownloadService {
 
           /* Open Stream */
           in = handler.openStream(link, monitor, properties);
+
+          /* Obtain real Content Length from Stream if available */
+          if (in instanceof HttpConnectionInputStream) {
+            int len = ((HttpConnectionInputStream) in).getContentLength();
+            if (len > 0)
+              contentLength = len;
+          }
 
           /* Create tmp part File */
           partFile.createNewFile();
@@ -242,7 +251,7 @@ public class DownloadService {
             if (timeDiff > 1000) {
               long bytesDiff = bytesConsumed - lastBytesCheck;
               bytesPerSecond = bytesDiff / (timeDiff / 1000);
-              monitor.setTaskName(formatTask(bytesConsumed, length, (int) bytesPerSecond));
+              monitor.setTaskName(formatTask(bytesConsumed, contentLength, (int) bytesPerSecond));
               lastTaskNameUpdate = now;
               lastBytesCheck = bytesConsumed;
             }
