@@ -2017,9 +2017,20 @@ public class OwlUI {
   /* Find a Image for the given Mime Type using Program API from SWT */
   private static ImageDescriptor getImageForMime(String mime) {
     if (StringUtils.isSet(mime)) {
-      String extension = fgMapMimeToExtension.get(mime.toLowerCase());
+      String extension = getExtensionForMime(mime);
       return getImageForExtension(extension);
     }
+
+    return null;
+  }
+
+  /**
+   * @param mime the mime type
+   * @return the extension for the mime type or <code>null</code> if none
+   */
+  public static String getExtensionForMime(String mime) {
+    if (StringUtils.isSet(mime))
+      return fgMapMimeToExtension.get(mime.toLowerCase());
 
     return null;
   }

@@ -637,7 +637,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
           if (attachment.getLink() != null) {
             strip = true;
             URI link = attachment.getLink();
-            String name = URIUtils.getFile(link);
+            String name = URIUtils.getFile(link, OwlUI.getExtensionForMime(attachment.getType()));
             if (!StringUtils.isSet(name))
               name = link.toASCIIString();
 

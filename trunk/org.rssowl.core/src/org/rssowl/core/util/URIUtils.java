@@ -33,6 +33,10 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * Utility Class for working with Links.
@@ -311,9 +315,71 @@ public class URIUtils {
    * Try to get the File Name of the given URI.
    *
    * @param uri The URI to parse the File from.
+   * @param extension the file extension or <code>null</code> if unknown.
    * @return String The File Name or the URI in external Form.
    */
-  public static String getFile(URI uri) {
+  public static String getFile(URI uri, String extension) {
+
+    /* Fallback if Extension not set */
+    if (!StringUtils.isSet(extension))
+      return getFile(uri);
+
+    /* Prefix Extension if necessary */
+    if (!extension.startsWith(".")) //$NON-NLS-1$
+      extension = "." + extension; //$NON-NLS-1$
+
+    /* Obtain Filename Candidates from Query and Path */
+    String fileQuerySegment = getFileSegmentFromQuery(uri.getQuery(), extension);
+    String lastPathSegment = getLastSegmentFromPath(uri.getPath());
+
+    /* Favour Query over Path if Extension part of it */
+    if (StringUtils.isSet(fileQuerySegment) && fileQuerySegment.contains(extension))
+      return urlDecode(fileQuerySegment);
+
+    /* Use Path if Extension part of it */
+    if (StringUtils.isSet(lastPathSegment) && lastPathSegment.contains(extension))
+      return urlDecode(lastPathSegment);
+
+    /* Favour Path over Query otherwise */
+    if (StringUtils.isSet(lastPathSegment))
+      return urlDecode(lastPathSegment);
+
+    /* Use Query as Fallback */
+    if (StringUtils.isSet(fileQuerySegment))
+      return urlDecode(fileQuerySegment);
+
+    return uri.toASCIIString();
+  }
+
+  private static String getLastSegmentFromPath(String path) {
+    if (StringUtils.isSet(path)) {
+      String parts[] = path.split("/"); //$NON-NLS-1$
+      if (parts.length > 0 && StringUtils.isSet(parts[parts.length - 1]))
+        return parts[parts.length - 1];
+    }
+
+    return null;
+  }
+
+  private static String getFileSegmentFromQuery(String query, String extension) {
+    if (StringUtils.isSet(query)) {
+      StringTokenizer tokenizer = new StringTokenizer(query, "&?=/"); //$NON-NLS-1$
+      List<String> tokens = new ArrayList<String>();
+      while (tokenizer.hasMoreTokens())
+        tokens.add(tokenizer.nextToken());
+
+      Collections.reverse(tokens);
+
+      for (String token : tokens) {
+        if (token.contains(extension))
+          return token;
+      }
+    }
+
+    return null;
+  }
+
+  private static String getFile(URI uri) {
     String file = uri.getPath();
     if (StringUtils.isSet(file)) {
       String parts[] = file.split("/"); //$NON-NLS-1$

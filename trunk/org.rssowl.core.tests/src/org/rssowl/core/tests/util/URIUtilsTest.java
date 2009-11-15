@@ -89,11 +89,32 @@ public class URIUtilsTest {
    */
   @Test
   public void testGetFile() throws Exception {
-    assertEquals("foo", URIUtils.getFile(new URI("foo")));
-    assertEquals("foo.bar", URIUtils.getFile(new URI("foo.bar")));
-    assertEquals("bar", URIUtils.getFile(new URI("foo/bar")));
-    assertEquals("bar", URIUtils.getFile(new URI("/foo/bar")));
-    assertEquals("bar.txt", URIUtils.getFile(new URI("/foo/bar.txt")));
+    assertEquals("foo", URIUtils.getFile(new URI("foo"), null));
+    assertEquals("foo.bar", URIUtils.getFile(new URI("foo.bar"), null));
+    assertEquals("bar", URIUtils.getFile(new URI("foo/bar"), null));
+    assertEquals("bar", URIUtils.getFile(new URI("/foo/bar"), null));
+    assertEquals("bar.txt", URIUtils.getFile(new URI("/foo/bar.txt"), null));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testGetFile2() throws Exception {
+    assertEquals("foo", URIUtils.getFile(new URI("foo"), "foo"));
+    assertEquals("foo.bar", URIUtils.getFile(new URI("foo.bar"), "bar"));
+    assertEquals("bar", URIUtils.getFile(new URI("foo/bar"), "foo"));
+    assertEquals("bar", URIUtils.getFile(new URI("/foo/bar"), "bar"));
+    assertEquals("bar.txt", URIUtils.getFile(new URI("/foo/bar.txt"), "foo"));
+    assertEquals("levin11102009.mp3", URIUtils.getFile(new URI("http://server.com/dloadTrack.mp3?prm=2069xhttp://other.server.com/levin11102009.mp3"), "mp3"));
+    assertEquals("levin11102009.mp3", URIUtils.getFile(new URI("http://server.com/dloadTrack.mp3?http://other.server.com/levin11102009.mp3"), "mp3"));
+    assertEquals("dloadTrack.mp3", URIUtils.getFile(new URI("http://server.com/dloadTrack.mp3?http://other.server.com/levin11102009.mp3"), "ogg"));
+    assertEquals("baba.ogg", URIUtils.getFile(new URI("http://server.com/dloadTrack.mp3?baba.ogg"), "ogg"));
+    assertEquals("dloadTrack.mp3_baba.ogg", URIUtils.getFile(new URI("http://server.com/dloadTrack.mp3_baba.ogg"), "ogg"));
+    assertEquals("http://server.com", URIUtils.getFile(new URI("http://server.com"), "ogg"));
+    assertEquals("podcast.mp3", URIUtils.getFile(new URI("http://server.com/download.php?file=podcast.mp3"), "mp3"));
+    assertEquals("podcast.mp3", URIUtils.getFile(new URI("http://server.com/download.php?test=true&file=podcast.mp3&cached"), "mp3"));
+    assertEquals("", URIUtils.getFile(new URI(""), "mp3"));
   }
 
   /**
