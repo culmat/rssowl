@@ -51,7 +51,7 @@ import org.rssowl.core.connection.ConnectionException;
 import org.rssowl.core.connection.CredentialsException;
 import org.rssowl.core.connection.IConnectionPropertyConstants;
 import org.rssowl.core.connection.NotModifiedException;
-import org.rssowl.core.connection.UnknownFeedException;
+import org.rssowl.core.connection.UnknownProtocolException;
 import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.interpreter.InterpreterException;
@@ -793,7 +793,7 @@ public class Controller {
       /* Store locally */
       if (shouldProceedReloading(monitor, bookmark))
         OwlUI.storeImage(bookmark.getId(), faviconBytes, OwlUI.BOOKMARK, 16, 16);
-    } catch (UnknownFeedException e) {
+    } catch (UnknownProtocolException e) {
       Activator.getDefault().getLog().log(e.getStatus());
     } catch (ConnectionException e) {
       Activator.getDefault().getLog().log(e.getStatus());

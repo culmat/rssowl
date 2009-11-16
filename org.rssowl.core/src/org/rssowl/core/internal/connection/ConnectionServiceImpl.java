@@ -42,7 +42,7 @@ import org.rssowl.core.connection.ICredentials;
 import org.rssowl.core.connection.ICredentialsProvider;
 import org.rssowl.core.connection.IProtocolHandler;
 import org.rssowl.core.connection.IProxyCredentials;
-import org.rssowl.core.connection.UnknownFeedException;
+import org.rssowl.core.connection.UnknownProtocolException;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.persist.IConditionalGet;
@@ -158,7 +158,7 @@ public class ConnectionServiceImpl implements IConnectionService {
       return handler;
 
     /* No Handler present */
-    throw new UnknownFeedException(Activator.getDefault().createErrorStatus(NLS.bind(Messages.ConnectionServiceImpl_ERROR_NO_PROTOCOL_HANDLER, protocol), null), protocol);
+    throw new UnknownProtocolException(Activator.getDefault().createErrorStatus(NLS.bind(Messages.ConnectionServiceImpl_ERROR_NO_PROTOCOL_HANDLER, protocol), null), protocol);
   }
 
   /*
@@ -174,7 +174,7 @@ public class ConnectionServiceImpl implements IConnectionService {
       return handler.getLabel(link, monitor);
 
     /* No Handler present */
-    throw new UnknownFeedException(Activator.getDefault().createErrorStatus(NLS.bind(Messages.ConnectionServiceImpl_ERROR_NO_PROTOCOL_HANDLER, protocol), null), protocol);
+    throw new UnknownProtocolException(Activator.getDefault().createErrorStatus(NLS.bind(Messages.ConnectionServiceImpl_ERROR_NO_PROTOCOL_HANDLER, protocol), null), protocol);
   }
 
   /*
@@ -194,7 +194,7 @@ public class ConnectionServiceImpl implements IConnectionService {
       return handler.reload(link, monitor, properties);
 
     /* No Handler present */
-    throw new UnknownFeedException(Activator.getDefault().createErrorStatus(NLS.bind(Messages.ConnectionServiceImpl_ERROR_NO_PROTOCOL_HANDLER, protocol), null), protocol);
+    throw new UnknownProtocolException(Activator.getDefault().createErrorStatus(NLS.bind(Messages.ConnectionServiceImpl_ERROR_NO_PROTOCOL_HANDLER, protocol), null), protocol);
   }
 
   /*
@@ -211,7 +211,7 @@ public class ConnectionServiceImpl implements IConnectionService {
       return handler.getFeedIcon(link, monitor);
 
     /* No Handler present */
-    throw new UnknownFeedException(Activator.getDefault().createErrorStatus(NLS.bind(Messages.ConnectionServiceImpl_ERROR_NO_PROTOCOL_HANDLER, protocol), null), protocol);
+    throw new UnknownProtocolException(Activator.getDefault().createErrorStatus(NLS.bind(Messages.ConnectionServiceImpl_ERROR_NO_PROTOCOL_HANDLER, protocol), null), protocol);
   }
 
   /*
@@ -227,7 +227,7 @@ public class ConnectionServiceImpl implements IConnectionService {
       return handler.getFeed(link, monitor);
 
     /* No Handler present */
-    throw new UnknownFeedException(Activator.getDefault().createErrorStatus(NLS.bind(Messages.ConnectionServiceImpl_ERROR_NO_PROTOCOL_HANDLER, protocol), null), protocol);
+    throw new UnknownProtocolException(Activator.getDefault().createErrorStatus(NLS.bind(Messages.ConnectionServiceImpl_ERROR_NO_PROTOCOL_HANDLER, protocol), null), protocol);
   }
 
   /*

@@ -32,7 +32,7 @@ import org.eclipse.core.runtime.IStatus;
  *
  * @author bpasero
  */
-public class UnknownFeedException extends ConnectionException {
+public class UnknownProtocolException extends ConnectionException {
   private final String fProtocol;
 
   /**
@@ -42,7 +42,7 @@ public class UnknownFeedException extends ConnectionException {
    * @param status the status object to be associated with this exception
    * @param protocol the unknown protocol
    */
-  public UnknownFeedException(IStatus status, String protocol) {
+  public UnknownProtocolException(IStatus status, String protocol) {
     super(status);
     fProtocol = protocol;
   }
