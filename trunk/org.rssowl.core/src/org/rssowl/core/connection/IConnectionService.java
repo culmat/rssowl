@@ -82,7 +82,7 @@ public interface IConnectionService {
    * @throws CoreException In case of an Exception while loading the Feed from
    * the URL.
    * @see IConnectionPropertyConstants
-   * @see UnknownFeedException
+   * @see UnknownProtocolException
    */
   Triple<IFeed, IConditionalGet, URI> reload(URI link, IProgressMonitor monitor, Map<Object, Object> properties) throws CoreException;
 
@@ -96,7 +96,7 @@ public interface IConnectionService {
    * @return Returns an Icon for the given Link as byte-array.
    * @throws ConnectionException Checked Exception to be used in case of any
    * Exception.
-   * @see UnknownFeedException
+   * @see UnknownProtocolException
    */
   byte[] getFeedIcon(URI link, IProgressMonitor monitor) throws ConnectionException;
 

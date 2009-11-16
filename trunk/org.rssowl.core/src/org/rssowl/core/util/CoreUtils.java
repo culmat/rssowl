@@ -28,7 +28,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.osgi.util.NLS;
 import org.rssowl.core.Owl;
 import org.rssowl.core.connection.ConnectionException;
-import org.rssowl.core.connection.UnknownFeedException;
+import org.rssowl.core.connection.UnknownProtocolException;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.newsaction.CopyNewsAction;
 import org.rssowl.core.internal.newsaction.MoveNewsAction;
@@ -1590,8 +1590,8 @@ public class CoreUtils {
     }
 
     /* Protocol Unsupported */
-    if (ex instanceof UnknownFeedException) {
-      String protocol = ((UnknownFeedException) ex).getProtocol();
+    if (ex instanceof UnknownProtocolException) {
+      String protocol = ((UnknownProtocolException) ex).getProtocol();
       return NLS.bind(Messages.CoreUtils_UNSUPPORTED_PROTOCOL, protocol);
     }
 
