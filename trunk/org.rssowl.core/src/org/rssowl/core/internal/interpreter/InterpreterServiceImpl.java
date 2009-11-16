@@ -151,7 +151,7 @@ public class InterpreterServiceImpl implements IInterpreterService {
 
     /* A Interpreter is required */
     if (!fFormatInterpreters.containsKey(format))
-      throw new UnknownFormatException(Activator.getDefault().createErrorStatus(NLS.bind(Messages.InterpreterServiceImpl_ERROR_NO_INTERPRETER_FOUND, format), null));
+      throw new UnknownFormatException(Activator.getDefault().createErrorStatus(NLS.bind(Messages.InterpreterServiceImpl_ERROR_NO_INTERPRETER_FOUND, format), null), format);
 
     /* Interpret Document into a Feed */
     fFormatInterpreters.get(format).interpret(document, feed);
@@ -174,7 +174,7 @@ public class InterpreterServiceImpl implements IInterpreterService {
 
     /* An Importer is required */
     if (!fTypeImporters.containsKey(format))
-      throw new UnknownFormatException(Activator.getDefault().createErrorStatus(NLS.bind(Messages.InterpreterServiceImpl_ERROR_NO_IMPORTER_FOUND, format), null));
+      throw new UnknownFormatException(Activator.getDefault().createErrorStatus(NLS.bind(Messages.InterpreterServiceImpl_ERROR_NO_IMPORTER_FOUND, format), null), format);
 
     /* Import Type from the Document */
     return fTypeImporters.get(format).importFrom(document);

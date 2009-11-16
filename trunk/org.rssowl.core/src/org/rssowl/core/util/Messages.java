@@ -30,7 +30,9 @@ public class Messages extends NLS {
   private static final String BUNDLE_NAME = "org.rssowl.core.util.messages"; //$NON-NLS-1$
   public static String CoreUtils_ALL_IN_N;
   public static String CoreUtils_AND;
+  public static String CoreUtils_CONNECTION_TIMEOUT;
   public static String CoreUtils_IN_N;
+  public static String CoreUtils_INVALID_FEED;
   public static String CoreUtils_N_DAY;
   public static String CoreUtils_N_DAYS;
   public static String CoreUtils_N_HOUR;
@@ -39,6 +41,11 @@ public class Messages extends NLS {
   public static String CoreUtils_N_MINUTES;
   public static String CoreUtils_NO_HEADLINE;
   public static String CoreUtils_OR;
+  public static String CoreUtils_UNABLE_CONNECT;
+  public static String CoreUtils_UNABLE_RESOLVE_HOST;
+  public static String CoreUtils_UNNABLE_CONNECT;
+  public static String CoreUtils_UNSUPPORTED_FORMAT;
+  public static String CoreUtils_UNSUPPORTED_PROTOCOL;
   public static String JobQueue_TASK_NAME;
 
   private Messages() {}

@@ -29,18 +29,28 @@ import org.eclipse.core.runtime.IStatus;
 /**
  * Checked Exception thrown in case the XML's Format is unknown to the
  * Interpreter.
- * 
+ *
  * @author bpasero
  */
 public class UnknownFormatException extends InterpreterException {
+  private final String fFormat;
 
   /**
    * Creates a new exception with the given status object. The message of the
    * given status is used as the exception message.
-   * 
+   *
    * @param status the status object to be associated with this exception
+   * @param format the format that is unknown.
    */
-  public UnknownFormatException(IStatus status) {
+  public UnknownFormatException(IStatus status, String format) {
     super(status);
+    fFormat = format;
+  }
+
+  /**
+   * @return the format that is unknown.
+   */
+  public String getFormat() {
+    return fFormat;
   }
 }

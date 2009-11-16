@@ -46,6 +46,7 @@ import org.rssowl.core.connection.IProtocolHandler;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
@@ -323,8 +324,9 @@ public class DownloadService {
 
           /* Indicate Error Message if any and offer Action to download again */
           if (error != null) {
-            if (error.getMessage() != null)
-              job.setName(NLS.bind(Messages.DownloadService_ERROR_DOWNLOADING_N, downloadFileName, error.getMessage()));
+            String errorMessage= CoreUtils.toMessage(error);
+            if (StringUtils.isSet(errorMessage))
+              job.setName(NLS.bind(Messages.DownloadService_ERROR_DOWNLOADING_N, downloadFileName, errorMessage));
             else
               job.setName(NLS.bind(Messages.DownloadService_ERROR_DOWNLOADING, downloadFileName));
 

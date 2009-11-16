@@ -29,18 +29,28 @@ import org.eclipse.core.runtime.IStatus;
 /**
  * Checked Exception thrown in case the Feed to connect to uses a protcol which
  * does not have any contributed FeedHandler.
- * 
+ *
  * @author bpasero
  */
 public class UnknownFeedException extends ConnectionException {
+  private final String fProtocol;
 
   /**
    * Creates a new exception with the given status object. The message of the
    * given status is used as the exception message.
-   * 
+   *
    * @param status the status object to be associated with this exception
+   * @param protocol the unknown protocol
    */
-  public UnknownFeedException(IStatus status) {
+  public UnknownFeedException(IStatus status, String protocol) {
     super(status);
+    fProtocol = protocol;
+  }
+
+  /**
+   * @return the unknown protocol.
+   */
+  public String getProtocol() {
+    return fProtocol;
   }
 }

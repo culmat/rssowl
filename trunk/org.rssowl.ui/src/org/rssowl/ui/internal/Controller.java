@@ -814,11 +814,19 @@ public class Controller {
     }
 
     /* Set Error-Loading flag if necessary */
-    else if (!bookmark.isErrorLoading() && ex != null && !(ex instanceof NotModifiedException) && !(ex instanceof AuthenticationRequiredException)) {
+    else if (ex != null && !(ex instanceof NotModifiedException) && !(ex instanceof AuthenticationRequiredException)) {
+      boolean wasShowingError= bookmark.isErrorLoading();
+      Object oldMessage= bookmark.getProperty(LOAD_ERROR_KEY);
+
       bookmark.setErrorLoading(true);
-      if (StringUtils.isSet(ex.getMessage()))
-        bookmark.setProperty(LOAD_ERROR_KEY, ex.getMessage());
-      fBookMarkDAO.save(bookmark);
+      String message= CoreUtils.toMessage(ex);
+      if (StringUtils.isSet(message))
+        bookmark.setProperty(LOAD_ERROR_KEY, message);
+      else
+        bookmark.removeProperty(LOAD_ERROR_KEY);
+
+      if (!wasShowingError || (oldMessage != null && message == null) || (message != null && !message.equals(oldMessage)))
+        fBookMarkDAO.save(bookmark);
     }
   }
 
