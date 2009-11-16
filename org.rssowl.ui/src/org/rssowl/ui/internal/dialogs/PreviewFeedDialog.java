@@ -54,6 +54,7 @@ import org.rssowl.core.interpreter.ParserException;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Application;
@@ -228,8 +229,11 @@ public class PreviewFeedDialog extends Dialog {
       protected void runInUI(IProgressMonitor monitor) {
         if (feed != null && error == null)
           showFeed(feed);
-        else if (error != null && StringUtils.isSet(error.getMessage()))
-          showMessage(NLS.bind(Messages.PreviewFeedDialog_UNABLE_LOAD_FEED, error.getMessage()), true);
+        else if (error != null) {
+          String errorMessage = CoreUtils.toMessage(error);
+          if (StringUtils.isSet(errorMessage))
+            showMessage(NLS.bind(Messages.PreviewFeedDialog_UNABLE_LOAD_FEED, errorMessage), true);
+        }
       }
     });
   }

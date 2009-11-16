@@ -24,12 +24,18 @@
 
 package org.rssowl.core.util;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.osgi.util.NLS;
 import org.rssowl.core.Owl;
+import org.rssowl.core.connection.ConnectionException;
+import org.rssowl.core.connection.UnknownFeedException;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.newsaction.CopyNewsAction;
 import org.rssowl.core.internal.newsaction.MoveNewsAction;
 import org.rssowl.core.interpreter.ITypeImporter;
+import org.rssowl.core.interpreter.InterpreterException;
+import org.rssowl.core.interpreter.ParserException;
+import org.rssowl.core.interpreter.UnknownFormatException;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ICategory;
 import org.rssowl.core.persist.IEntity;
@@ -67,8 +73,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.net.ConnectException;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1565,5 +1576,71 @@ public class CoreUtils {
     }
 
     return null;
+  }
+
+  /**
+   * @param ex the {@link CoreException} that occured.
+   * @return a human readable message for the occured exception.
+   */
+  public static String toMessage(Exception ex) {
+
+    /* Specially treat InvocationTargetExceptions */
+    if (ex instanceof InvocationTargetException && ex.getCause() != null && ex.getCause() instanceof Exception) {
+      ex = (Exception) ex.getCause();
+    }
+
+    /* Protocol Unsupported */
+    if (ex instanceof UnknownFeedException) {
+      String protocol = ((UnknownFeedException) ex).getProtocol();
+      return NLS.bind(Messages.CoreUtils_UNSUPPORTED_PROTOCOL, protocol);
+    }
+
+    /* Format Unsupported */
+    if (ex instanceof UnknownFormatException) {
+      String format = ((UnknownFormatException) ex).getFormat();
+      return NLS.bind(Messages.CoreUtils_UNSUPPORTED_FORMAT, format);
+    }
+
+    /* Issues Interpreting the Feed */
+    if (ex instanceof InterpreterException && ex.getCause() == null) {
+      return Messages.CoreUtils_INVALID_FEED;
+    }
+
+    /* Issues Parsing XML */
+    if (ex instanceof ParserException) {
+      return Messages.CoreUtils_INVALID_FEED;
+    }
+
+    /* Issues Connecting to a remote resource */
+    if (ex instanceof ConnectionException) {
+      Throwable cause = ex.getCause();
+
+      /* Signals that a timeout has occurred on a socket read or accept */
+      if (cause instanceof SocketTimeoutException)
+        return Messages.CoreUtils_CONNECTION_TIMEOUT;
+
+      /*
+       * Thrown to indicate that the IP address of a host could not be
+       * determined
+       */
+      if (cause instanceof UnknownHostException)
+        return Messages.CoreUtils_UNABLE_RESOLVE_HOST;
+
+      /*
+       * Signals that an error occurred while attempting to connect a socket to
+       * a remote address and port
+       */
+      if (cause instanceof ConnectException)
+        return Messages.CoreUtils_UNABLE_CONNECT;
+
+      /*
+       * Thrown to indicate that there is an error in the underlying protocol,
+       * such as a TCP error
+       */
+      if (cause instanceof SocketException)
+        return Messages.CoreUtils_UNNABLE_CONNECT;
+    }
+
+    return ex.getMessage();
   }
 }

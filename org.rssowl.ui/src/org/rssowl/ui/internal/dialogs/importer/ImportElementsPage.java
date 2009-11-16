@@ -551,17 +551,26 @@ public class ImportElementsPage extends WizardPage {
 
         /* Log and Show any Exception during Import */
         catch (Exception e) {
-          String message = e.getMessage();
+
+          /* Log Message */
+          String logMessage = e.getMessage();
           if (e instanceof InvocationTargetException && e.getCause() != null && StringUtils.isSet(e.getCause().getMessage()))
-            message = e.getCause().getMessage();
+            logMessage = e.getCause().getMessage();
 
-          if (StringUtils.isSet(message))
-            message = NLS.bind(Messages.ImportElementsPage_UNABLE_TO_IMPORT_REASON, message);
+          if (StringUtils.isSet(logMessage))
+            logMessage = NLS.bind(Messages.ImportElementsPage_UNABLE_TO_IMPORT_REASON, logMessage);
           else
-            message = Messages.ImportElementsPage_UNABLE_TO_IMPORT;
+            logMessage = Messages.ImportElementsPage_UNABLE_TO_IMPORT;
 
-          Activator.getDefault().logError(message, e);
-          setErrorMessage(message);
+          /* User Message */
+          String userMessage = CoreUtils.toMessage(e);
+          if (StringUtils.isSet(userMessage))
+            userMessage = NLS.bind(Messages.ImportElementsPage_UNABLE_TO_IMPORT_REASON, userMessage);
+          else
+            userMessage = Messages.ImportElementsPage_UNABLE_TO_IMPORT;
+
+          Activator.getDefault().logError(logMessage, e);
+          setErrorMessage(userMessage);
           setPageComplete(false);
 
           /* Give a chance to try again */
