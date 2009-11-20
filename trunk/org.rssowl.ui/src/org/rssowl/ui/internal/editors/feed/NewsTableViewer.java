@@ -115,7 +115,7 @@ public class NewsTableViewer extends TreeViewer {
     }
 
     /* Set new Selection */
-    if (updateSelection && newSelection != null)
+    if (updateSelection)
       setSelection(newSelection);
   }
 
