@@ -114,6 +114,7 @@ import org.rssowl.ui.internal.dialogs.welcome.TutorialWizard;
 import org.rssowl.ui.internal.editors.browser.WebBrowserContext;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
+import org.rssowl.ui.internal.handler.RemoveLabelsHandler;
 import org.rssowl.ui.internal.handler.TutorialHandler;
 import org.rssowl.ui.internal.util.BrowserUtils;
 import org.rssowl.ui.internal.util.ModelUtils;
@@ -1329,6 +1330,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     /* Remove All Labels */
     labelMenu.add(new Separator());
     LabelAction removeAllLabels = new LabelAction(null, selection);
+    removeAllLabels.setId(RemoveLabelsHandler.ID);
+    removeAllLabels.setActionDefinitionId(RemoveLabelsHandler.ID);
     removeAllLabels.setEnabled(!selection.isEmpty() && !labels.isEmpty());
     labelMenu.add(removeAllLabels);
   }
