@@ -159,7 +159,7 @@ public class ImportUtils {
     }
 
     /* Import Labels  */
-    boolean fixLabelOrder= false;
+    boolean fixLabelOrder = false;
     Map<String, ILabel> mapExistingLabelToName = new HashMap<String, ILabel>();
     Map<Long, ILabel> mapOldIdToImportedLabel = new HashMap<Long, ILabel>();
     if (labels != null && !labels.isEmpty()) {
@@ -181,7 +181,7 @@ public class ImportUtils {
         if (existingLabel != null) {
           existingLabel.setColor(importedLabel.getColor());
           if (existingLabel.getOrder() != importedLabel.getOrder())
-            fixLabelOrder= true;
+            fixLabelOrder = true;
           existingLabel.setOrder(importedLabel.getOrder());
           DynamicDAO.save(existingLabel);
         }
@@ -212,7 +212,7 @@ public class ImportUtils {
     if (filters != null && !filters.isEmpty()) {
       int existingFiltersCount = DynamicDAO.loadAll(ISearchFilter.class).size();
 
-   /* Fix locations in Searches if required */
+      /* Fix locations in Searches if required */
       List<ISearch> locationConditionSearches = getLocationConditionSearchesFromFilters(filters);
       if (!locationConditionSearches.isEmpty())
         updateLocationConditions(mapOldIdToFolderChild, locationConditionSearches);
