@@ -634,6 +634,7 @@ public class InterpreterTest {
     assertNotNull(DateUtils.parseDate("Tue, 19 Jul 05 23:00:51 GMT"));
     assertNotNull(DateUtils.parseDate("2005-12-14T00:00:00+00:00"));
     assertNotNull(DateUtils.parseDate("2005-12-16T00:00:00Z"));
+    assertNotNull(DateUtils.parseDate("2009-11-04T06:44:55.985-07:00"));
     assertNotNull(DateUtils.parseDate("2005-12-16T11:29:19+01:00"));
     assertNotNull(DateUtils.parseDate("2005-12-16T11:29:19 -01:00"));
     assertNotNull(DateUtils.parseDate("2005-12-16"));
