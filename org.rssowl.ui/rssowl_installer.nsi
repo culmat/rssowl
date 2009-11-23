@@ -30,7 +30,7 @@
  */
 
 ;#####	 Variables	######
-!define VER_DISPLAY "2.0.0"
+!define VER_DISPLAY "2.1.0"
 
 ;#####   Include Modern UI   ######
 !include "MUI.nsh"
