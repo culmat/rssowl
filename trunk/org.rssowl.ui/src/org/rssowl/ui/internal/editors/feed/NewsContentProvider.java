@@ -511,6 +511,13 @@ public class NewsContentProvider implements ITreeContentProvider {
 
   private boolean handleAddedNews(Set<NewsEvent> events) {
 
+    /*
+     * Input can be NULL if this listener was called before NewsTableControl.setPartInput()
+     * has been called (can happen if the viewer has thousands of items to load)
+     */
+    if (fFeedView.isTableViewerVisible() && fTableViewer.getInput() == null)
+      return false;
+
     /* Receive added News */
     List<INews> addedNews = new ArrayList<INews>(events.size());
     for (NewsEvent event : events) {
