@@ -6,9 +6,9 @@
    <aboutInfo>
       <image path="/org.rssowl.ui/icons/product/about.gif"/>
       <text>
-         RSSOwl 2.0
+         RSSOwl
 
-Version: 2.0.0
+Version: 2.1.0
 Build id: Nightly
 
 (c) Copyright RSSOwl contributors and others 2005, 2009.  All rights reserved.
@@ -69,9 +69,9 @@ RSSOwl Development Team - initial API and implementation
    </plugins>
 
    <features>
-      <feature id="org.rssowl" version="2.0.0.qualifier"/>
+      <feature id="org.rssowl" version="2.1.0.qualifier"/>
       <feature id="org.eclipse.rcp" version="3.4.200.R342_v20090122-989JESTEbig-SVaL8UJHcYBr4A63"/>
-      <feature id="org.rssowl.dependencies" version="2.0.0"/>
+      <feature id="org.rssowl.dependencies" version="2.1.0"/>
    </features>
 
 
