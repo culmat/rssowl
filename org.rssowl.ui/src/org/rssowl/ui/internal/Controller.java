@@ -1038,14 +1038,14 @@ public class Controller {
     /* Cancel/Seal the reload queue */
     if (fReloadFeedQueue != null) {
       if (!emergency)
-        fReloadFeedQueue.cancel(false);
+        fReloadFeedQueue.cancel(false, true);
       else
         fReloadFeedQueue.seal();
     }
 
     /* Cancel the feed-save queue (join) */
     if (fSaveFeedQueue != null)
-      fSaveFeedQueue.cancel(true);
+      fSaveFeedQueue.cancel(true, true);
 
     /* Stop the Notification Service */
     if (!InternalOwl.TESTING && !emergency && fNotificationService != null)
@@ -1385,7 +1385,7 @@ public class Controller {
    * Cancels all pending Updates to Feeds.
    */
   public void stopUpdate() {
-    fReloadFeedQueue.cancel(false);
+    fReloadFeedQueue.cancel(false, false);
   }
 
   /**

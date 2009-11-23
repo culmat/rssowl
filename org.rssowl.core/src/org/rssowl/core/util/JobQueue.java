@@ -153,12 +153,15 @@ public class JobQueue {
    *
    * @param joinRunning If <code>TRUE</code>, join the running Jobs that are not
    * yet done.
+   * @param seal if <code>true</code> this queue is sealed and no tasks will
+   * ever be scheduled anymore.
    */
-  public void cancel(boolean joinRunning) {
+  public void cancel(boolean joinRunning, boolean seal) {
     synchronized (this) {
 
       /* Seal */
-      seal();
+      if (seal)
+        seal();
 
       /* Clear open tasks */
       fOpenTasksQueue.clear();
