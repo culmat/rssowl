@@ -226,7 +226,7 @@ public class Indexer {
   synchronized void shutdown(boolean emergency) {
     if (fJobQueue != null) {
       if (!emergency)
-        fJobQueue.cancel(false);
+        fJobQueue.cancel(false, true);
       else
         fJobQueue.seal();
     }
