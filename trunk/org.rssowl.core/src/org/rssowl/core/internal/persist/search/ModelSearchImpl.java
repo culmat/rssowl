@@ -174,6 +174,7 @@ public class ModelSearchImpl implements IModelSearch {
 
     private final IndexSearcher fSearcher;
     private final List<NewsReference> fResultList;
+    private final Map<Long, Long> fSearchResultNewsIds = new HashMap<Long, Long>();
 
     SimpleHitCollector(IndexSearcher searcher, List<NewsReference> resultList) {
       fSearcher = searcher;
@@ -188,8 +189,17 @@ public class ModelSearchImpl implements IModelSearch {
         /* Receive Stored Fields */
         long newsId = Long.parseLong(document.get(SearchDocument.ENTITY_ID_TEXT));
 
-        /* Add to List */
-        fResultList.add(new NewsReference(newsId));
+        /*
+         * Under some circumstances the index might contain the same news twice.
+         * This can happen in situations where RSSOwl is quitting in an emergent
+         * way (e.g. the OS shutting down while RSSOwl is running). To avoid
+         * issues, we filter out duplicate results from the search. See
+         * http://dev.rssowl.org/show_bug.cgi?id=1264
+         */
+        if (!fSearchResultNewsIds.containsKey(newsId)) {
+          fResultList.add(new NewsReference(newsId));
+          fSearchResultNewsIds.put(newsId, newsId);
+        }
       } catch (IOException e) {
         Activator.safeLogError(e.getMessage(), e);
       }
@@ -369,6 +379,7 @@ public class ModelSearchImpl implements IModelSearch {
       /* Make sure the searcher is in sync */
       final IndexSearcher currentSearcher = getCurrentSearcher();
       final List<SearchHit<NewsReference>> resultList = new ArrayList<SearchHit<NewsReference>>();
+      final Map<Long, Long> searchResultNewsIds= new HashMap<Long, Long>();
 
       /* Use custom hit collector for performance reasons */
       HitCollector collector = new HitCollector() {
@@ -384,8 +395,17 @@ public class ModelSearchImpl implements IModelSearch {
             Map<Integer, INews.State> data = new HashMap<Integer, INews.State>(1);
             data.put(INews.STATE, newsState);
 
-            /* Add to List */
-            resultList.add(new SearchHit<NewsReference>(new NewsReference(newsId), score, data));
+            /*
+             * Under some circumstances the index might contain the same news
+             * twice. This can happen in situations where RSSOwl is quitting in
+             * an emergent way (e.g. the OS shutting down while RSSOwl is
+             * running). To avoid issues, we filter out duplicate results from
+             * the search. See http://dev.rssowl.org/show_bug.cgi?id=1264
+             */
+            if (!searchResultNewsIds.containsKey(newsId)) {
+              resultList.add(new SearchHit<NewsReference>(new NewsReference(newsId), score, data));
+              searchResultNewsIds.put(newsId, newsId);
+            }
           } catch (IOException e) {
             Activator.safeLogError(e.getMessage(), e);
           }
