@@ -133,6 +133,7 @@ import org.rssowl.core.util.SearchHit;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
+import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.ApplicationActionBarAdvisor;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.EntityGroup;
@@ -1649,8 +1650,18 @@ public class SearchNewsDialog extends TitleAreaDialog {
       protected void runInUI(IProgressMonitor monitor) {
 
         /* News got Deleted */
-        if (fDeletedScoredNews != null)
-          fResultViewer.remove(fDeletedScoredNews.toArray());
+        if (fDeletedScoredNews != null) {
+
+          /* Temporary Fix for https://bugs.eclipse.org/bugs/show_bug.cgi?id=295980 */
+          if (Application.isWindows7()) {
+            Object input = fResultViewer.getInput();
+            if (input instanceof List<?>) {
+              ((List<?>) input).removeAll(fDeletedScoredNews);
+              fResultViewer.refresh();
+            }
+          } else
+            fResultViewer.remove(fDeletedScoredNews.toArray());
+        }
 
         /* News got Updated */
         if (fUpdatedScoredNews != null)
