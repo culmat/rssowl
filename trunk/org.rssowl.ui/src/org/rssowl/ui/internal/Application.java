@@ -230,4 +230,11 @@ public class Application implements IApplication {
 
     return null;
   }
+
+  /**
+   * @return <code>true</code> if the host os is Windows 7.
+   */
+  public static boolean isWindows7() {
+    return "6.1".equals(System.getProperty("os.version")); //$NON-NLS-1$ //$NON-NLS-2$
+  }
 }
