@@ -67,6 +67,8 @@ public class Messages extends NLS {
   public static String CleanUpWizard_CONFIRM_DELETE;
   public static String CleanUpWizard_CONFIRM_NEWS;
   public static String CleanUpWizard_NO_UNDO;
+  public static String CleanUpWizard_RESTART_RSSOWL;
+  public static String CleanUpWizard_RESTART_TO_CLEANUP;
   public static String CleanUpWizard_SUMMARY;
   public static String CleanUpWizard_WAIT_CLEANUP;
   public static String DefragDatabaseTask_IMPROVE_DB_PERFORMANCE;

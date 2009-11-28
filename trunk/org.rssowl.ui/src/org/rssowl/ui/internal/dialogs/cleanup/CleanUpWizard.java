@@ -25,10 +25,12 @@
 package org.rssowl.ui.internal.dialogs.cleanup;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.ui.PlatformUI;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
@@ -46,6 +48,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author bpasero
@@ -83,6 +86,7 @@ public class CleanUpWizard extends Wizard {
   public boolean performFinish() {
     final INewsDAO newsDao = DynamicDAO.getDAO(INewsDAO.class);
     final CleanUpOperations operations = fCleanUpOptionsPage.getOperations();
+    final AtomicBoolean askForRestart= new AtomicBoolean(false);
 
     /* Receive Tasks */
     final List<CleanUpTask> tasks = fCleanUpSummaryPage.getTasks();
@@ -153,8 +157,10 @@ public class CleanUpWizard extends Wizard {
             optimizeSearch = true;
 
           /* Defrag Database */
-          else if (task instanceof DefragDatabaseTask)
+          else if (task instanceof DefragDatabaseTask) {
             Owl.getPersistenceService().optimizeOnNextStartup();
+            askForRestart.set(true);
+          }
         }
 
         /* Delete BookMarks */
@@ -198,6 +204,13 @@ public class CleanUpWizard extends Wizard {
       Activator.getDefault().logError(e.getMessage(), e);
     } catch (InterruptedException e) {
       Activator.getDefault().logError(e.getMessage(), e);
+    }
+
+    /* Ask to restart if Task was used */
+    if (askForRestart.get()) {
+      boolean restart = MessageDialog.openQuestion(getShell(), Messages.CleanUpWizard_RESTART_RSSOWL, Messages.CleanUpWizard_RESTART_TO_CLEANUP);
+      if (restart)
+        PlatformUI.getWorkbench().restart();
     }
 
     return true;

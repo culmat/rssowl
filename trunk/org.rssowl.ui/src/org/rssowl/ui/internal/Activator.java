@@ -179,7 +179,7 @@ public class Activator extends AbstractUIPlugin {
 
       @Override
       protected Point getInitialSize() {
-        int minWidth = 380;
+        int minWidth = 400;
         int minHeight = getShell().computeSize(minWidth, SWT.DEFAULT).y;
 
         return new Point(minWidth, minHeight);
