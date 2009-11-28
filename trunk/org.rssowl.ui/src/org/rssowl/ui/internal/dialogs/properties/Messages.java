@@ -63,9 +63,15 @@ public class Messages extends NLS {
   public static String InformationPropertyPage_LOAD_FAILED_REASON;
   public static String InformationPropertyPage_LOAD_FAILED_UNKNOWN;
   public static String InformationPropertyPage_LOADED_OK;
+  public static String InformationPropertyPage_N_NEW;
+  public static String InformationPropertyPage_N_NEW_UNREAD;
+  public static String InformationPropertyPage_N_NEW_UNREAD_UPDATED;
+  public static String InformationPropertyPage_N_NEW_UPDATED;
+  public static String InformationPropertyPage_N_UNREAD;
+  public static String InformationPropertyPage_N_UNREAD_UPDATED;
+  public static String InformationPropertyPage_N_UPDATED;
   public static String InformationPropertyPage_NEVER;
   public static String InformationPropertyPage_NEWS_COUNT;
-  public static String InformationPropertyPage_NEWS_COUNT_N_OF_M;
   public static String InformationPropertyPage_NONE;
   public static String InformationPropertyPage_NOT_LOADED;
   public static String InformationPropertyPage_STATUS;
