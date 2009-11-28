@@ -198,12 +198,25 @@ public class InformationPropertyPage implements IEntityPropertyPage {
     createLabel(container, Messages.InformationPropertyPage_NEWS_COUNT, true);
     int totalCount = bm.getNewsCount(INews.State.getVisible());
     int newCount = bm.getNewsCount(EnumSet.of(INews.State.NEW));
-    int unreadCount = bm.getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED));
+    int unreadCount = bm.getNewsCount(EnumSet.of(INews.State.UNREAD));
+    int updatedCount = bm.getNewsCount(EnumSet.of(INews.State.UPDATED));
 
-    if (totalCount == 0)
-      createLabel(container, "0", false); //$NON-NLS-1$
+    if (newCount != 0 && unreadCount != 0 && updatedCount != 0)
+      createLabel(container, NLS.bind(Messages.InformationPropertyPage_N_NEW_UNREAD_UPDATED, new Object[] { totalCount, newCount, unreadCount, updatedCount }), false);
+    else if (newCount != 0 && unreadCount != 0)
+      createLabel(container, NLS.bind(Messages.InformationPropertyPage_N_NEW_UNREAD, new Object[] { totalCount, newCount, unreadCount }), false);
+    else if (unreadCount != 0 && updatedCount != 0)
+      createLabel(container, NLS.bind(Messages.InformationPropertyPage_N_UNREAD_UPDATED, new Object[] { totalCount, unreadCount, updatedCount }), false);
+    else if (newCount != 0 && updatedCount != 0)
+      createLabel(container, NLS.bind(Messages.InformationPropertyPage_N_NEW_UPDATED, new Object[] { totalCount, newCount, updatedCount }), false);
+    else if (newCount != 0)
+      createLabel(container, NLS.bind(Messages.InformationPropertyPage_N_NEW, new Object[] { totalCount, newCount }), false);
+    else if (unreadCount != 0)
+      createLabel(container, NLS.bind(Messages.InformationPropertyPage_N_UNREAD, new Object[] { totalCount, unreadCount }), false);
+    else if (updatedCount != 0)
+      createLabel(container, NLS.bind(Messages.InformationPropertyPage_N_UPDATED, new Object[] { totalCount, updatedCount }), false);
     else
-      createLabel(container, NLS.bind(Messages.InformationPropertyPage_NEWS_COUNT_N_OF_M, new Object[] { totalCount, newCount, unreadCount }), false);
+      createLabel(container, String.valueOf(totalCount), false);
 
     return container;
   }
