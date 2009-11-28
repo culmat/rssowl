@@ -533,10 +533,11 @@ public class NewsContentProvider implements ITreeContentProvider {
     if (fGrouping.needsRefresh(INews.class, events, false))
       return true;
 
-    /* Add to Table-Viewer if Visible (keep top item stable) */
+    /* Add to Table-Viewer if Visible (keep top item and selection stable) */
     if (fFeedView.isTableViewerVisible()) {
       Tree tree = fTableViewer.getTree();
       TreeItem topItem = tree.getTopItem();
+      int selectionCount = tree.getSelectionCount();
       int indexOfTopItem = 0;
       if (topItem != null)
         indexOfTopItem = tree.indexOf(topItem);
@@ -546,6 +547,8 @@ public class NewsContentProvider implements ITreeContentProvider {
         fTableViewer.add(fTableViewer.getInput(), addedNews.toArray());
         if (topItem != null && indexOfTopItem != 0)
           tree.setTopItem(topItem);
+        if (selectionCount > 0)
+          tree.showSelection();
       } finally {
         tree.setRedraw(true);
       }
