@@ -43,6 +43,7 @@ import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IElementComparer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -407,14 +408,23 @@ public class NewsTableControl implements IFeedViewPart {
     else
       model = NewsColumnViewModel.createGlobal();
 
-    /* Synthetically add the "Feed" column if both "Feed" and "Location" not present */
+    /* Synthetically add the "Feed" column if both "Feed" and "Location" not present and if not grouping by feed */
     if ((input instanceof ISearchMark) || (input instanceof INewsBin) || (input instanceof FolderNewsMark)) {
       if (!model.getColumns().contains(NewsColumn.FEED) && !model.getColumns().contains(NewsColumn.LOCATION)) {
-        model.getColumns().add(1, NewsColumn.FEED);
+        if (!isGroupingByFeed())
+          model.getColumns().add(1, NewsColumn.FEED);
       }
     }
 
     return model;
+  }
+
+  private boolean isGroupingByFeed() {
+    IContentProvider contentProvider = fViewer.getContentProvider();
+    if (contentProvider != null && contentProvider instanceof NewsContentProvider)
+      return ((NewsContentProvider) contentProvider).isGroupingByFeed();
+
+    return false;
   }
 
   private void showColumns(NewsColumnViewModel newModel, boolean update, boolean refresh) {
