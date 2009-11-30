@@ -798,6 +798,11 @@ public class FilterBar {
     if (withQuickSearch) {
       SearchTarget target = fFeedView.getFilter().getSearchTarget();
       String text = fSearchInput.getText();
+
+      /* Convert to Wildcard Query */
+      if (!text.endsWith("*")) //$NON-NLS-1$
+        text = text + "*"; //$NON-NLS-1$
+
       switch (target) {
         case ALL:
           field = factory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
