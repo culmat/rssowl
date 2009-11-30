@@ -1,13 +1,3 @@
-
-package org.rssowl.core.tests;
-
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Plugin;
-import org.eclipse.core.runtime.Status;
-import org.osgi.framework.BundleContext;
-import org.rssowl.core.internal.InternalOwl;
-import org.rssowl.ui.internal.Controller;
-
 /*   **********************************************************************  **
  **   Copyright notice                                                       **
  **                                                                          **
@@ -31,6 +21,15 @@ import org.rssowl.ui.internal.Controller;
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
+package org.rssowl.core.tests;
+
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Plugin;
+import org.eclipse.core.runtime.Status;
+import org.osgi.framework.BundleContext;
+import org.rssowl.core.internal.InternalOwl;
+import org.rssowl.ui.internal.Controller;
 
 /**
  * @author bpasero
