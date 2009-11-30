@@ -69,6 +69,7 @@ import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.ITask;
+import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.TaskAdapter;
 import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.Controller;
@@ -800,7 +801,7 @@ public class FilterBar {
       String text = fSearchInput.getText();
 
       /* Convert to Wildcard Query */
-      if (!text.endsWith("*")) //$NON-NLS-1$
+      if (StringUtils.isSet(text) && !text.endsWith("*")) //$NON-NLS-1$
         text = text + "*"; //$NON-NLS-1$
 
       switch (target) {
