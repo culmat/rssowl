@@ -1,7 +1,0 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Name: RSSOwl Core Language Pack
-Bundle-SymbolicName: org.rssowl.core.nl
-Bundle-Version: 2.0.0.qualifier
-Fragment-Host: org.rssowl.core
-Bundle-Vendor: RSSOwl.org
