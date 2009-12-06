@@ -173,9 +173,11 @@ public class FeedDefinitionPage extends WizardPage {
     if (!StringUtils.isSet(fInitialLink))
       fInitialLink = loadInitialLinkFromClipboard();
 
+    boolean loadTitleFromFeed = fGlobalScope.getBoolean(DefaultPreferences.BM_LOAD_TITLE_FROM_FEED);
+
     fFeedByLinkButton = new Button(container, SWT.RADIO);
     fFeedByLinkButton.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-    fFeedByLinkButton.setText(Messages.FeedDefinitionPage_CREATE_FEED);
+    fFeedByLinkButton.setText(loadTitleFromFeed ? Messages.FeedDefinitionPage_CREATE_FEED : Messages.FeedDefinitionPage_CREATE_FEED_DIRECT);
     fFeedByLinkButton.setSelection(true);
     fFeedByLinkButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -223,7 +225,7 @@ public class FeedDefinitionPage extends WizardPage {
 
     fLoadTitleFromFeedButton = new Button(textIndent, SWT.CHECK);
     fLoadTitleFromFeedButton.setText(Messages.FeedDefinitionPage_USE_TITLE_OF_FEED);
-    fLoadTitleFromFeedButton.setSelection(fGlobalScope.getBoolean(DefaultPreferences.BM_LOAD_TITLE_FROM_FEED));
+    fLoadTitleFromFeedButton.setSelection(loadTitleFromFeed);
     fLoadTitleFromFeedButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
