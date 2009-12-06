@@ -197,7 +197,7 @@ public class AggregateFolderAction implements IObjectActionDelegate {
         if (valueLong[CoreUtils.FOLDER].length != 1)
           continue;
 
-        if (valueLong[CoreUtils.FOLDER][0] == folder.getId())
+        if (valueLong[CoreUtils.FOLDER][0] != null && valueLong[CoreUtils.FOLDER][0].equals(folder.getId()))
           return search;
       }
     }

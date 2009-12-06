@@ -682,7 +682,7 @@ public class NewsGrouping {
     Set<EntityGroup> sortedItems = new TreeSet<EntityGroup>(new Comparator<EntityGroup>() {
       public int compare(EntityGroup o1, EntityGroup o2) {
         if (o1.getSortKey() != null && o2.getSortKey() != null) {
-          if (o1.getSortKey() == o2.getSortKey())
+          if (o1.getSortKey().equals(o2.getSortKey()))
             return -1;
 
           return o1.getSortKey().compareTo(o2.getSortKey());

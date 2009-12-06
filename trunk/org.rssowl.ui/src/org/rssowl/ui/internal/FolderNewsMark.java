@@ -64,7 +64,7 @@ public class FolderNewsMark extends Mark implements INewsMark {
    *
    * @author bpasero
    */
-  public final class FolderNewsMarkReference extends ModelReference {
+  public static final class FolderNewsMarkReference extends ModelReference {
 
     /**
      * @param id
