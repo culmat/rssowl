@@ -180,7 +180,7 @@ public class SearchCondition extends AbstractEntity implements ISearchCondition 
     synchronized (searchCondition) {
       SearchCondition s = (SearchCondition) searchCondition;
 
-      return  getId() == s.getId() &&
+      return  (getId() == null ? s.getId() == null : getId().equals(s.getId())) &&
           fField.equals(s.fField) && fSpecifier.equals(s.fSpecifier) &&
           fValue.equals(s.fValue) && (getProperties() == null ? s.getProperties() == null : getProperties().equals(s.getProperties()));
     }

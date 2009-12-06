@@ -958,7 +958,7 @@ public class News extends AbstractEntity implements INews {
     fLock.acquireReadLock();
     n.fLock.acquireReadLock();
     try {
-      return getId().equals(n.getId()) &&
+      return (getId() == null ? n.getId() == null : getId().equals(n.getId())) &&
           fFeedLink.equals(n.fFeedLink) &&
           simpleFieldsEqual(n) &&
           (fReceiveDate == null ? n.fReceiveDate == null : fReceiveDate.equals(n.fReceiveDate)) &&

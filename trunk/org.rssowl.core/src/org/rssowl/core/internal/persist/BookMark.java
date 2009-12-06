@@ -146,7 +146,7 @@ public class BookMark extends Mark implements IBookMark {
     synchronized (bookMark) {
       BookMark b = (BookMark) bookMark;
 
-      return getId() == b.getId() &&
+      return (getId() == null ? b.getId() == null : getId().equals(b.getId())) &&
           (getParent() == null ? b.getParent() == null : getParent().equals(b.getParent())) &&
           (getCreationDate() == null ? b.getCreationDate() == null : getCreationDate().equals(b.getCreationDate())) &&
           (getName() == null ? b.getName() == null : getName().equals(b.getName())) &&

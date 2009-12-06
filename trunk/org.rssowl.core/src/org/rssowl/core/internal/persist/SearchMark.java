@@ -144,7 +144,13 @@ public class SearchMark extends Mark implements ISearchMark {
 
     SearchMark s = (SearchMark) searchMark;
 
-    return getId() == s.getId() && (getParent() == null ? s.getParent() == null : getParent().equals(s.getParent())) && (fSearchConditions == null ? s.fSearchConditions == null : fSearchConditions.equals(s.fSearchConditions)) && (getLastVisitDate() == null ? s.getLastVisitDate() == null : getLastVisitDate().equals(s.getLastVisitDate())) && getPopularity() == s.getPopularity() && fMatchAllConditions == s.matchAllConditions() && (getProperties() == null ? s.getProperties() == null : getProperties().equals(s.getProperties()));
+    return (getId() == null ? s.getId() == null : getId().equals(s.getId())) &&
+           (getParent() == null ? s.getParent() == null : getParent().equals(s.getParent())) &&
+           (fSearchConditions == null ? s.fSearchConditions == null : fSearchConditions.equals(s.fSearchConditions)) &&
+           (getLastVisitDate() == null ? s.getLastVisitDate() == null : getLastVisitDate().equals(s.getLastVisitDate())) &&
+           getPopularity() == s.getPopularity() &&
+           fMatchAllConditions == s.matchAllConditions() &&
+           (getProperties() == null ? s.getProperties() == null : getProperties().equals(s.getProperties()));
   }
 
   /**

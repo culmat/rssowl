@@ -450,7 +450,8 @@ public class Feed extends AbstractEntity implements IFeed {
     synchronized (feed) {
       Feed f = (Feed) feed;
 
-      return getId() == f.getId() && (fAuthor == null ? f.fAuthor == null : fAuthor.equals(f.fAuthor))
+      return (getId() == null ? f.getId() == null : getId().equals(f.getId()))
+          && (fAuthor == null ? f.fAuthor == null : fAuthor.equals(f.fAuthor))
           && (fCategories == null ? f.fCategories == null : fCategories.equals(f.fCategories))
           && (fCopyright == null ? f.fCopyright == null : fCopyright.equals(f.fCopyright))
           && (fDescription == null ? f.fDescription == null : fDescription.equals(f.fDescription))
