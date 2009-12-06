@@ -281,7 +281,8 @@ public class Folder extends AbstractEntity implements IFolder {
     synchronized (folder) {
       Folder f = (Folder) folder;
 
-      return  getId() == f.getId() && (fParent == null ? f.fParent == null : fParent.equals(f.fParent)) &&
+      return  (getId() == null ? f.getId() == null : getId().equals(f.getId())) &&
+          (fParent == null ? f.fParent == null : fParent.equals(f.fParent)) &&
           (fName == null ? f.fName == null : fName.equals(f.fName)) &&
           (getBlogrollLink() == null ? f.getBlogrollLink() == null : getBlogrollLink().equals(f.getBlogrollLink())) &&
           (fChildren == null ? f.fChildren == null : fChildren.equals(f.fChildren)) &&

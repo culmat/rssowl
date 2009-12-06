@@ -122,7 +122,8 @@ public class Label extends AbstractEntity implements ILabel {
     synchronized (label) {
       Label l = (Label) label;
 
-      return getId() == l.getId() && fName.equals(l.fName) &&
+      return (getId() == null ? l.getId() == null : getId().equals(l.getId())) &&
+          fName.equals(l.fName) &&
           (fColor == null ? l.fColor == null : fColor.equals(l.fColor)) &&
           getOrder() == l.getOrder() &&
           (getProperties() == null ? l.getProperties() == null : getProperties().equals(l.getProperties()));

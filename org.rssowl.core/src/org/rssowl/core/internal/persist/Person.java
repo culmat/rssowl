@@ -124,7 +124,8 @@ public class Person extends AbstractEntity implements IPerson {
     synchronized (person) {
       Person p = (Person) person;
 
-      return getId() == p.getId() && (fName == null ? p.fName == null : fName.equals(p.fName))
+      return (getId() == null ? p.getId() == null : getId().equals(p.getId()))
+          && (fName == null ? p.fName == null : fName.equals(p.fName))
           && (getUri() == null ? p.getUri() == null : getUri().toString().equals(p.getUri().toString()))
           && (getEmail() == null ? p.getEmail() == null : getEmail().equals(p.getEmail())) &&
           (getProperties() == null ? p.getProperties() == null : getProperties().equals(p.getProperties()));

@@ -178,7 +178,10 @@ public class Attachment extends AbstractEntity implements IAttachment {
     synchronized (attachment) {
       Attachment a = (Attachment) attachment;
 
-      return getId() == a.getId() && fNews.equals(a.fNews) && (fLink == null ? a.fLink == null : fLink.equals(a.fLink)) && (fType == null ? a.fType == null : fType.equals(a.fType)) && fLength == a.fLength && (getProperties() == null ? a.getProperties() == null : getProperties().equals(a.getProperties()));
+      return (getId() == null ? a.getId() == null : getId().equals(a.getId())) &&
+              fNews.equals(a.fNews) && (fLink == null ? a.fLink == null : fLink.equals(a.fLink)) &&
+              (fType == null ? a.fType == null : fType.equals(a.fType)) && fLength == a.fLength &&
+              (getProperties() == null ? a.getProperties() == null : getProperties().equals(a.getProperties()));
     }
   }
 

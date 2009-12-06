@@ -106,7 +106,7 @@ public class Category extends AbstractEntity implements ICategory {
     synchronized (category) {
       Category c = (Category) category;
 
-      return getId() == c.getId()
+      return (getId() == null ? c.getId() == null : getId().equals(c.getId()))
           && (fDomain == null ? c.fDomain == null : fDomain.equals(c.fDomain))
           && fName.equals(c.fName)
           && (getProperties() == null ? c.getProperties() == null :
