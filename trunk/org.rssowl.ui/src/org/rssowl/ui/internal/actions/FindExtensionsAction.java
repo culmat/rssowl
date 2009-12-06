@@ -35,7 +35,12 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.update.search.BackLevelFilter;
@@ -199,6 +204,37 @@ public class FindExtensionsAction extends Action implements IWorkbenchWindowActi
         org.eclipse.update.internal.ui.wizards.InstallWizard2 wizard = new org.eclipse.update.internal.ui.wizards.InstallWizard2(fJob.getSearchRequest(), fJob.getUpdates(), fJob.isUpdate());
         WizardDialog dialog = new org.eclipse.update.internal.ui.wizards.ResizableInstallWizardDialog(getValidShell(), wizard, Messages.FindExtensionsAction_RSSOWL_ADDONS);
         dialog.create();
+
+        /* A little hack to improve the UI of the Add-on Wizard */
+        if (dialog.getCurrentPage() != null) {
+          Control control = dialog.getCurrentPage().getControl();
+          if (control != null && !control.isDisposed() && control instanceof Composite) {
+            Composite container = ((Composite) control);
+            Control[] children = container.getChildren();
+            if (children != null && children.length == 1 && children[0] instanceof Composite) {
+              container = (Composite) children[0];
+              children = container.getChildren();
+              if (children.length > 2) {
+
+                /* Sash and Tree */
+                if (children[1] instanceof SashForm) {
+                  SashForm form = (SashForm) children[1];
+                  form.setWeights(new int[] { 70, 30 });
+
+                  Control[] formChilds = form.getChildren();
+                  if (formChilds.length != 0 && formChilds[0] instanceof Tree) {
+                    Tree tree = (Tree) formChilds[0];
+                    if (tree.getItemCount() != 0) {
+                      TreeItem root = tree.getItem(0);
+                      root.setExpanded(true);
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+
         dialog.open();
       }
     }
