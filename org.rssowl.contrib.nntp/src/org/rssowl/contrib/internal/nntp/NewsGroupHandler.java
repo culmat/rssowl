@@ -151,7 +151,7 @@ public class NewsGroupHandler implements IProtocolHandler {
       setupAuthentication(link, client);
 
       /* Check Authentication Required */
-      checkAuthenticationRequired(client);
+      checkAuthenticationRequired(client, link);
 
       /* Support early cancellation */
       if (monitor.isCanceled())
@@ -170,7 +170,7 @@ public class NewsGroupHandler implements IProtocolHandler {
       boolean selected = client.selectNewsgroup(newsgroup, groupInfo);
 
       /* Check Authentication Required */
-      checkAuthenticationRequired(client);
+      checkAuthenticationRequired(client, link);
 
       /* Check Newsgroup Selected */
       if (!selected)
@@ -512,9 +512,15 @@ public class NewsGroupHandler implements IProtocolHandler {
     }
   }
 
-  private void checkAuthenticationRequired(NNTPClient client) throws AuthenticationRequiredException {
-    if (client.getReplyCode() == STATUS_AUTH_REQUIRED || client.getReplyCode() == STATUS_AUTH_REQUIRED_ALTERNATIVE)
+  private void checkAuthenticationRequired(NNTPClient client, URI link) throws AuthenticationRequiredException {
+    if (client.getReplyCode() == STATUS_AUTH_REQUIRED || client.getReplyCode() == STATUS_AUTH_REQUIRED_ALTERNATIVE) {
+      try {
+        Owl.getConnectionService().getCredentialsProvider(link).deleteAuthCredentials(link, null);
+      } catch (CredentialsException e) {
+        Activator.log(e);
+      }
       throw new AuthenticationRequiredException(null, Activator.createErrorStatus(Messages.NewsGroupHandler_ERROR_AUTH_REQUIRED, null));
+    }
   }
 
   private void throwConnectionException(String msg, NNTPClient client) throws ConnectionException {
