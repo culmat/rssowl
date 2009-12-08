@@ -493,8 +493,13 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
   protected Color getForeground(Object element, int columnIndex) {
 
     /* Handle EntityGroup */
-    if (element instanceof EntityGroup)
+    if (element instanceof EntityGroup) {
+      EntityGroup group = (EntityGroup) element;
+      if (group.getColorHint() != null)
+        return OwlUI.getColor(fResources, group.getColorHint());
+
       return fGroupFgColor;
+    }
 
     /* Handle INews */
     else if (element instanceof INews) {
@@ -536,17 +541,51 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
 
     /* Erase Group */
     else if (element instanceof EntityGroup)
+      eraseGroup(event, (EntityGroup) element);
+
+  }
+
+  private void eraseGroup(Event event, EntityGroup group) {
+    Scrollable scrollable = (Scrollable) event.widget;
+    GC gc = event.gc;
+
+    /* Draw Color if Selected */
+    if (group.getColorHint() != null && (event.detail & SWT.SELECTED) != 0) {
+
+      /* Some conditions under which we don't override the selection color */
+      if (!scrollable.isFocusControl() || isInvalidLabelColor(group.getColorHint()))
+        return;
+
+      Rectangle clArea = scrollable.getClientArea();
+      Rectangle itemRect = event.getBounds();
+
+      /* Paint the selection beyond the end of last column */
+      OwlUI.codExpandRegion(event, scrollable, gc, clArea);
+
+      /* Draw Rectangle */
+      Color oldBackground = gc.getBackground();
+      gc.setBackground(OwlUI.getColor(fResources, group.getColorHint()));
+      gc.fillRectangle(0, itemRect.y, clArea.width, itemRect.height);
+      gc.setBackground(oldBackground);
+      gc.setForeground(scrollable.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+
+      /* Mark as Selected being handled */
+      event.detail &= ~SWT.SELECTED;
+    }
+
+    /* Draw Gradient */
+    else
       OwlUI.codDrawGradient(event, fGradientFgColor, fGradientBgColor, fGradientEndColor);
   }
 
   private void eraseNews(Event event, INews news) {
-    final Scrollable scrollable = (Scrollable) event.widget;
+    Scrollable scrollable = (Scrollable) event.widget;
     GC gc = event.gc;
 
     /* Handle selected News (Linux: Note Bug 444) */
     if (!news.isFlagged() && (event.detail & SWT.SELECTED) != 0) {
-
       Set<ILabel> labels = CoreUtils.getSortedLabels(news);
+
       /* Some conditions under which we don't override the selection color */
       if (labels.isEmpty() || !scrollable.isFocusControl())
         return;
@@ -593,6 +632,16 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
 
   private boolean isInvalidLabelColor(ILabel label) {
     return label.getColor().equals(LABEL_COLOR_BLACK) || label.getColor().equals(LABEL_COLOR_WHITE);
+  }
+
+  private boolean isInvalidLabelColor(RGB color) {
+    if (color.blue == 0 && color.red == 0 && color.green == 0)
+      return true;
+
+    if (color.blue == 255 && color.red == 255 && color.green == 255)
+      return true;
+
+    return false;
   }
 
   /*

@@ -27,6 +27,7 @@ package org.rssowl.ui.internal;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.IActionFilter;
 import org.rssowl.core.persist.IEntity;
 
@@ -48,6 +49,7 @@ public class EntityGroup implements IActionFilter {
   private ImageDescriptor fImage;
   List<EntityGroupItem> fItems;
   private final Integer fSortKey;
+  private final RGB fColorHint;
 
   /**
    * Creates a new EntityGroup with the given ID. Note that inside one Viewer
@@ -72,7 +74,7 @@ public class EntityGroup implements IActionFilter {
    * @param name The Name of this EntityGroup.
    */
   public EntityGroup(long id, String groupId, String name) {
-    this (id, groupId, name, null);
+    this(id, groupId, name, null, null);
   }
 
   /**
@@ -85,14 +87,17 @@ public class EntityGroup implements IActionFilter {
    * The Category is used to decide wether contributed Actions should enable.
    * @param sortKey a key for sorting or <code>null</code> if none.
    * @param name The Name of this EntityGroup.
+   * @param colorHint a hint for the color that should be used for this group or
+   * <code>null</code> if none.
    */
-  public EntityGroup(long id, String groupId, String name, Integer sortKey) {
+  public EntityGroup(long id, String groupId, String name, Integer sortKey, RGB colorHint) {
     Assert.isNotNull(groupId);
     fId = id;
     fCategoryId = groupId;
     fName = name;
     fItems = new ArrayList<EntityGroupItem>();
     fSortKey = sortKey;
+    fColorHint = colorHint;
   }
 
   /**
@@ -124,8 +129,8 @@ public class EntityGroup implements IActionFilter {
   }
 
   /**
-   * @return Returns the List of <code>EntityGroupItem</code>s contained in
-   * this Group.
+   * @return Returns the List of <code>EntityGroupItem</code>s contained in this
+   * Group.
    */
   public List<EntityGroupItem> getItems() {
     return fItems;
@@ -172,6 +177,17 @@ public class EntityGroup implements IActionFilter {
     return fSortKey;
   }
 
+  /**
+   * @return a hint for the color that should be used for this group or
+   * <code>null</code> if none.
+   */
+  public RGB getColorHint() {
+    return fColorHint;
+  }
+
+  /*
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
   @Override
   public boolean equals(Object obj) {
     if (this == obj)
@@ -184,6 +200,9 @@ public class EntityGroup implements IActionFilter {
     return fId == group.fId;
   }
 
+  /*
+   * @see java.lang.Object#hashCode()
+   */
   @Override
   public int hashCode() {
     final int PRIME = 31;
@@ -192,6 +211,9 @@ public class EntityGroup implements IActionFilter {
     return result;
   }
 
+  /*
+   * @see java.lang.Object#toString()
+   */
   @Override
   public String toString() {
     return getName();
