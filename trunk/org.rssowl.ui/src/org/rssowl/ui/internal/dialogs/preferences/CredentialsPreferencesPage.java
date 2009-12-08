@@ -93,12 +93,14 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
 
   private IConnectionService fConService = Owl.getConnectionService();
   private TableViewer fViewer;
+  private Button fAddCredentials;
   private Button fRemoveAll;
   private Button fRemoveSelected;
   private Button fUseMasterPasswordCheck;
   private IPreferenceScope fGlobalScope = Owl.getPreferenceService().getGlobalScope();
   private Button fChangeMasterPassword;
   private Button fResetMasterPassword;
+  private boolean fIsError = false;
 
   /* Model used in the Viewer */
   private static class CredentialsModelData {
@@ -330,17 +332,15 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
       }
     });
 
-    /* Set Dummy Input */
-    fViewer.setInput(new Object());
-
+    /* Buttons Container */
     Composite buttonContainer = new Composite(container, SWT.None);
     buttonContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
     buttonContainer.setLayout(LayoutUtils.createGridLayout(3, 0, 0));
 
     /* Offer Button to add Credentials */
-    Button addCredentials = new Button(buttonContainer, SWT.PUSH);
-    addCredentials.setText(Messages.CredentialsPreferencesPage_ADD);
-    addCredentials.addSelectionListener(new SelectionAdapter() {
+    fAddCredentials = new Button(buttonContainer, SWT.PUSH);
+    fAddCredentials.setText(Messages.CredentialsPreferencesPage_ADD);
+    fAddCredentials.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
         onAdd();
@@ -368,15 +368,19 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
       }
     });
 
-    Dialog.applyDialogFont(addCredentials);
+    Dialog.applyDialogFont(fAddCredentials);
     Dialog.applyDialogFont(fRemoveSelected);
     Dialog.applyDialogFont(fRemoveAll);
-    setButtonLayoutData(addCredentials);
+    setButtonLayoutData(fAddCredentials);
     setButtonLayoutData(fRemoveSelected);
     setButtonLayoutData(fRemoveAll);
     ((GridData) fRemoveAll.getLayoutData()).grabExcessHorizontalSpace = false;
     ((GridData) fRemoveAll.getLayoutData()).horizontalAlignment = SWT.BEGINNING;
 
+    /* Set Dummy Input */
+    fViewer.setInput(new Object());
+
+    /* Listen to Selection Changes */
     fViewer.addSelectionChangedListener(new ISelectionChangedListener() {
       public void selectionChanged(SelectionChangedEvent event) {
         fRemoveSelected.setEnabled(!fViewer.getSelection().isEmpty());
@@ -386,6 +390,20 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
     applyDialogFont(container);
 
     return container;
+  }
+
+  /*
+   * @see org.eclipse.jface.preference.PreferencePage#createControl(org.eclipse.swt.widgets.Composite)
+   */
+  @Override
+  public void createControl(Composite parent) {
+    super.createControl(parent);
+
+    if (getDefaultsButton() != null && fIsError)
+      getDefaultsButton().setEnabled(false);
+
+    if (getApplyButton() != null && fIsError)
+      getApplyButton().setEnabled(false);
   }
 
   private void onAdd() {
@@ -419,6 +437,7 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
         Activator.getDefault().logError(e.getMessage(), e);
       } catch (CredentialsException e) {
         Activator.getDefault().logError(e.getMessage(), e);
+        setShowError(true);
       }
     }
   }
@@ -565,6 +584,8 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
   }
 
   private void setShowError(boolean isError) {
+    fIsError = isError;
+
     if (isError)
       setErrorMessage(Messages.CredentialsPreferencesPage_WRONG_MASTER_PW);
     else
@@ -577,6 +598,13 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
     }
 
     fViewer.getTable().setEnabled(!isError);
+    fAddCredentials.setEnabled(!isError);
+
+    if (getDefaultsButton() != null)
+      getDefaultsButton().setEnabled(!isError);
+
+    if (getApplyButton() != null)
+      getApplyButton().setEnabled(!isError);
   }
 
   private Composite createComposite(Composite parent) {
