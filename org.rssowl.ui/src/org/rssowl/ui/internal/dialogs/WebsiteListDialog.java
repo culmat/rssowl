@@ -161,8 +161,9 @@ public class WebsiteListDialog extends Dialog {
     Composite buttonBar = (Composite) super.createButtonBar(parent);
     ((GridLayout) buttonBar.getLayout()).marginHeight = 0;
     ((GridLayout) buttonBar.getLayout()).marginBottom = 10;
+    ((GridLayout) buttonBar.getLayout()).makeColumnsEqualWidth = false;
 
-    ((GridData) buttonBar.getLayoutData()).horizontalAlignment = SWT.BEGINNING;
+    ((GridData) buttonBar.getLayoutData()).horizontalAlignment = SWT.FILL;
 
     return buttonBar;
   }
@@ -194,6 +195,8 @@ public class WebsiteListDialog extends Dialog {
 
     /* Remove Selected */
     fRemoveSelectedButton = createButton(parent, -1, Messages.WebsiteListDialog_REMOVE_WEBSITE, false);
+    ((GridData) fRemoveSelectedButton.getLayoutData()).horizontalAlignment = SWT.BEGINNING;
+    ((GridData) fRemoveSelectedButton.getLayoutData()).grabExcessHorizontalSpace = false;
     fRemoveSelectedButton.setEnabled(false);
     fRemoveSelectedButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -204,6 +207,8 @@ public class WebsiteListDialog extends Dialog {
 
     /* Remove All */
     Button removeAllButton = createButton(parent, -2, Messages.WebsiteListDialog_REMOVE_ALL_WEBSITES, false);
+    ((GridData) removeAllButton.getLayoutData()).horizontalAlignment = SWT.BEGINNING;
+    ((GridData) removeAllButton.getLayoutData()).grabExcessHorizontalSpace = false;
     removeAllButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -230,9 +235,10 @@ public class WebsiteListDialog extends Dialog {
       String[] newWebsitesArray = newWebsites.toArray(new String[newWebsites.size()]);
       fPreferences.putStrings(DefaultPreferences.DISABLE_JAVASCRIPT_EXCEPTIONS, newWebsitesArray);
       fViewer.setInput(newWebsitesArray);
-      fWebsiteInput.setText(""); //$NON-NLS-1$
-      fWebsiteInput.setFocus();
     }
+
+    fWebsiteInput.setText(""); //$NON-NLS-1$
+    fWebsiteInput.setFocus();
   }
 
   private void onRemoveAll() {
