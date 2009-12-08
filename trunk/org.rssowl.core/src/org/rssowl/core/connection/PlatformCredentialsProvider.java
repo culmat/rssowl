@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -85,8 +86,8 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
   /* Default Realm being used to store credentials */
   private static final String REALM = ""; //$NON-NLS-1$
 
-  /* A cache of non-protected Links */
-  private final Set<String> fUnprotectedLinksCache = new HashSet<String>();
+  /* A cache of non-protected Links (in the form Link + Realm) */
+  private final Set<String> fUnprotectedLinksCache = Collections.synchronizedSet(new HashSet<String>());
 
   /* Simple POJO Implementation of ICredentials */
   private static class Credentials implements ICredentials {
@@ -121,7 +122,7 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
   public synchronized ICredentials getAuthCredentials(URI link, String realm) throws CredentialsException {
 
     /* Check Cache first */
-    if (fUnprotectedLinksCache.contains(link.toString()))
+    if (checkCacheProtected(link.toString(), realm))
       return null;
 
     /* Retrieve Credentials */
@@ -132,8 +133,7 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
       return authorizationInfo;
 
     /* Cache as unprotected */
-    if (!fUnprotectedLinksCache.contains(link.toString()))
-      fUnprotectedLinksCache.add(link.toString());
+    addCacheProtected(link.toString(), realm);
 
     /* Credentials not provided */
     return null;
@@ -318,7 +318,7 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
     }
 
     /* Uncache */
-    fUnprotectedLinksCache.remove(link.toString());
+    removeCacheProtected(link.toString(), realm);
   }
 
   /*
@@ -372,7 +372,7 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
     }
 
     /* Delete from Cache */
-    fUnprotectedLinksCache.remove(link.toString());
+    removeCacheProtected(link.toString(), realm);
   }
 
   /*
@@ -415,5 +415,26 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
     } catch (IOException e) {
       Activator.getDefault().logError(e.getMessage(), e);
     }
+  }
+
+  private boolean checkCacheProtected(String link, String realm) {
+    return fUnprotectedLinksCache.contains(toCacheKey(link, realm));
+  }
+
+  private void addCacheProtected(String link, String realm) {
+    String cacheKey = toCacheKey(link, realm);
+    if (!fUnprotectedLinksCache.contains(cacheKey))
+      fUnprotectedLinksCache.add(cacheKey);
+  }
+
+  private void removeCacheProtected(String link, String realm) {
+    fUnprotectedLinksCache.remove(toCacheKey(link, realm));
+  }
+
+  private String toCacheKey(String link, String realm) {
+    if (realm == null)
+      realm = REALM;
+
+    return link + realm;
   }
 }
