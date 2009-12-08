@@ -727,6 +727,9 @@ public class OwlUI {
    * @return RGB
    */
   public static RGB getRGB(String rgb) {
+    if (!StringUtils.isSet(rgb))
+      return null;
+
     String color[] = rgb.split(","); //$NON-NLS-1$
     return new RGB(Integer.parseInt(color[0]), Integer.parseInt(color[1]), Integer.parseInt(color[2]));
   }
