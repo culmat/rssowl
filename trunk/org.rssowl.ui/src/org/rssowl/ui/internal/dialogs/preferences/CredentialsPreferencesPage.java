@@ -59,13 +59,13 @@ import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
-import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.dialogs.AddCredentialsDialog;
 import org.rssowl.ui.internal.dialogs.ConfirmDialog;
 import org.rssowl.ui.internal.util.CColumnLayoutData;
 import org.rssowl.ui.internal.util.CTable;
@@ -333,8 +333,22 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
     /* Set Dummy Input */
     fViewer.setInput(new Object());
 
+    Composite buttonContainer = new Composite(container, SWT.None);
+    buttonContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
+    buttonContainer.setLayout(LayoutUtils.createGridLayout(3, 0, 0));
+
+    /* Offer Button to add Credentials */
+    Button addCredentials = new Button(buttonContainer, SWT.PUSH);
+    addCredentials.setText(Messages.CredentialsPreferencesPage_ADD);
+    addCredentials.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        onAdd();
+      }
+    });
+
     /* Offer Buttons to remove Credentials */
-    fRemoveSelected = new Button(container, SWT.PUSH);
+    fRemoveSelected = new Button(buttonContainer, SWT.PUSH);
     fRemoveSelected.setText(Messages.CredentialsPreferencesPage_REMOVE);
     fRemoveSelected.setEnabled(false);
     fRemoveSelected.addSelectionListener(new SelectionAdapter() {
@@ -344,7 +358,7 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
       }
     });
 
-    fRemoveAll = new Button(container, SWT.PUSH);
+    fRemoveAll = new Button(buttonContainer, SWT.PUSH);
     fRemoveAll.setText(Messages.CredentialsPreferencesPage_REMOVE_ALL);
     fRemoveAll.setEnabled(fViewer.getTable().getItemCount() > 0);
     fRemoveAll.addSelectionListener(new SelectionAdapter() {
@@ -354,8 +368,10 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
       }
     });
 
+    Dialog.applyDialogFont(addCredentials);
     Dialog.applyDialogFont(fRemoveSelected);
     Dialog.applyDialogFont(fRemoveAll);
+    setButtonLayoutData(addCredentials);
     setButtonLayoutData(fRemoveSelected);
     setButtonLayoutData(fRemoveAll);
     ((GridData) fRemoveAll.getLayoutData()).grabExcessHorizontalSpace = false;
@@ -370,6 +386,41 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
     applyDialogFont(container);
 
     return container;
+  }
+
+  private void onAdd() {
+    AddCredentialsDialog dialog = new AddCredentialsDialog(getShell());
+    if (dialog.open() == IDialogConstants.OK_ID) {
+      String site = dialog.getSite();
+      final String username = dialog.getUsername();
+      final String password = dialog.getPassword();
+
+      try {
+        URI siteUri = new URI(site);
+        ICredentialsProvider credentialsProvider = Owl.getConnectionService().getCredentialsProvider(siteUri);
+        if (credentialsProvider != null) {
+          credentialsProvider.setAuthCredentials(new ICredentials() {
+            public String getUsername() {
+              return username;
+            }
+
+            public String getPassword() {
+              return password;
+            }
+
+            public String getDomain() {
+              return null;
+            }
+          }, siteUri, null);
+
+          fViewer.refresh();
+        }
+      } catch (URISyntaxException e) {
+        Activator.getDefault().logError(e.getMessage(), e);
+      } catch (CredentialsException e) {
+        Activator.getDefault().logError(e.getMessage(), e);
+      }
+    }
   }
 
   private void onChangeMasterPassword() {
@@ -476,20 +527,25 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
     Collection<IBookMark> bookmarks = DynamicDAO.loadAll(IBookMark.class);
     for (IBookMark bookmark : bookmarks) {
       String realm = (String) bookmark.getProperty(Controller.BM_REALM_PROPERTY);
-
-      /* Only support sites with realms */
-      if (!StringUtils.isSet(realm))
-        continue;
-
       URI feedLink = bookmark.getFeedLinkReference().getLink();
       URI normalizedLink = URIUtils.normalizeUri(feedLink, true);
 
       try {
-        ICredentials authCredentials = fConService.getAuthCredentials(normalizedLink, realm);
-        if (authCredentials != null) {
-          CredentialsModelData data = new CredentialsModelData(authCredentials.getUsername(), authCredentials.getPassword(), normalizedLink, realm);
+
+        /* First try Normalized Link with Realm */
+        CredentialsModelData data = loadCredentials(normalizedLink, realm);
+        if (data != null)
           credentials.add(data);
-        }
+
+        /* Then try actual Feed Link with Realm */
+        data = loadCredentials(feedLink, realm);
+        if (data != null)
+          credentials.add(data);
+
+        /* Then try actual Feed Link without Realm */
+        data = loadCredentials(feedLink, null);
+        if (data != null)
+          credentials.add(data);
       } catch (CredentialsException e) {
         Activator.getDefault().logError(e.getMessage(), e);
         setShowError(true);
@@ -498,6 +554,14 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
     }
 
     return credentials;
+  }
+
+  private CredentialsModelData loadCredentials(URI link, String realm) throws CredentialsException {
+    ICredentials authCredentials = fConService.getAuthCredentials(link, realm);
+    if (authCredentials != null)
+      return new CredentialsModelData(authCredentials.getUsername(), authCredentials.getPassword(), link, realm);
+
+    return null;
   }
 
   private void setShowError(boolean isError) {

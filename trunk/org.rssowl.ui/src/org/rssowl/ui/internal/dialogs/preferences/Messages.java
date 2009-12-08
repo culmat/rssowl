@@ -38,6 +38,7 @@ public class Messages extends NLS {
   public static String BrowserPreferencePage_USE_EXTERNAL_BROWSER;
   public static String BrowserPreferencePage_USE_STANDARD_BROWSER;
   public static String BrowserPreferencePage_USE_STANDARD_BROWSER_N;
+  public static String CredentialsPreferencesPage_ADD;
   public static String CredentialsPreferencesPage_CHANGE_MASTER_PW;
   public static String CredentialsPreferencesPage_CONFIRM_REMOVE;
   public static String CredentialsPreferencesPage_CONFIRM_RESET;
