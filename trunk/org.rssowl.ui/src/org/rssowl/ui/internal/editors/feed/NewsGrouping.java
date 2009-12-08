@@ -475,7 +475,7 @@ public class NewsGrouping {
   private Collection<EntityGroup> createLabelGroups(Collection<INews> input) {
 
     /* Default Group */
-    EntityGroup gDefault = new EntityGroup(Group.NONE.ordinal(), GROUP_CATEGORY_ID, Group.NONE.getName(), Integer.MAX_VALUE);
+    EntityGroup gDefault = new EntityGroup(Group.NONE.ordinal(), GROUP_CATEGORY_ID, Group.NONE.getName(), Integer.MAX_VALUE, null);
 
     Map<String, EntityGroup> groupCache = new HashMap<String, EntityGroup>();
     groupCache.put(Group.NONE.getName(), gDefault);
@@ -493,7 +493,7 @@ public class NewsGrouping {
           String name = label.getName();
           group = groupCache.get(name);
           if (group == null) {
-            group = new EntityGroup(nextId++, GROUP_CATEGORY_ID, name, label.getOrder());
+            group = new EntityGroup(nextId++, GROUP_CATEGORY_ID, name, label.getOrder(), OwlUI.getRGB(label));
             groupCache.put(name, group);
           }
         }
