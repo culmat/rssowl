@@ -222,6 +222,7 @@ public class NewsTableControl implements IFeedViewPart {
   private FeedViewInput fEditorInput;
   private boolean fBlockColumMoveEvent;
   private IStructuredSelection fLastSelection = StructuredSelection.EMPTY;
+  private long fLastColumnActionInvokedMillies;
 
   /* Settings */
   private IPreferenceScope fGlobalPreferences;
@@ -621,8 +622,12 @@ public class NewsTableControl implements IFeedViewPart {
     Object firstElem = selection.getFirstElement();
 
     /* Open News */
-    if (firstElem instanceof INews)
-      new OpenInBrowserAction(selection, WebBrowserContext.createFrom((INews) firstElem, fEditorInput.getMark())).run();
+    if (firstElem instanceof INews) {
+
+      /* Do nothing if the user recently invokved a column action */
+      if (System.currentTimeMillis() - fLastColumnActionInvokedMillies > 200)
+        new OpenInBrowserAction(selection, WebBrowserContext.createFrom((INews) firstElem, fEditorInput.getMark())).run();
+    }
 
     /* Toggle expanded State of Group */
     else if (firstElem instanceof EntityGroup)
@@ -727,6 +732,7 @@ public class NewsTableControl implements IFeedViewPart {
         disableTrackerTemporary = (news.getState() == INews.State.READ);
         INews.State newState = (news.getState() == INews.State.READ) ? INews.State.UNREAD : INews.State.READ;
         setNewsState(news, newState, false);
+        fLastColumnActionInvokedMillies = System.currentTimeMillis();
       }
     }
 
@@ -738,6 +744,7 @@ public class NewsTableControl implements IFeedViewPart {
       if (data instanceof INews) {
         disableTrackerTemporary = false;
         new MakeNewsStickyAction(new StructuredSelection(data)).run();
+        fLastColumnActionInvokedMillies = System.currentTimeMillis();
       }
     }
 
