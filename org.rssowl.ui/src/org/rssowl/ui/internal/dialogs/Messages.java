@@ -32,6 +32,11 @@ public class Messages extends NLS {
   public static String ActivityDialog_DOWNLOADS_ACTIVITY;
   public static String ActivityDialog_DOWNLOADS_AND_ACTIVITY;
   public static String ActivityDialog_REMOVE_COMPLETED;
+  public static String AddCredentialsDialog_ADD_PASSWORD;
+  public static String AddCredentialsDialog_ENTER_EXISTING_FEED_LINK;
+  public static String AddCredentialsDialog_LINK;
+  public static String AddCredentialsDialog_PASSWORD;
+  public static String AddCredentialsDialog_USERNAME;
   public static String AggregateNewsDialog_AGGREGATE_NEWS;
   public static String AggregateNewsDialog_AGGREGATE_NEWS_OF_N;
   public static String AggregateNewsDialog_AGGREGATION_RECOMMENDATION;
