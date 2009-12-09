@@ -33,6 +33,7 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.util.ITreeNode;
 import org.rssowl.core.util.TreeTraversal;
+import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.util.WidgetTreeNode;
 
 /**
@@ -86,7 +87,8 @@ public class NewsTableViewer extends TreeViewer {
   }
 
   void updateSelectionAfterDelete(Runnable runnable) {
-    TreeItem[] oldSelection = getTree().getSelection();
+    Tree tree = getTree();
+    TreeItem[] oldSelection = tree.getSelection();
 
     /* Nothing to do, since no selection */
     if (oldSelection.length == 0) {
@@ -94,8 +96,29 @@ public class NewsTableViewer extends TreeViewer {
       return;
     }
 
+    TreeItem lastSelectedItem = oldSelection[oldSelection.length - 1];
+
+    /* Determine if we need to force an update of the selection (See Bug 1285) */
+    boolean forceUpdateSelection = false;
+
+    /* Force Update: Last Selected Item is an Entity Group */
+    if (lastSelectedItem.getData() instanceof EntityGroup) {
+      forceUpdateSelection = true;
+
+      /* Given this group gets deleted, use the next or previous entity group as input for the WidgetTreeNode below */
+      int indexOfEntityGroup = tree.indexOf(lastSelectedItem);
+      if (tree.getItemCount() > indexOfEntityGroup + 1) //Try Next
+        lastSelectedItem = tree.getItem(indexOfEntityGroup + 1);
+      else if (indexOfEntityGroup > 0) //Try Previous
+        lastSelectedItem = tree.getItem(indexOfEntityGroup - 1);
+    }
+
+    /* Force Update: Last Selected Item is last of Entity Group */
+    else if (lastSelectedItem.getParentItem() != null && lastSelectedItem.getParentItem().getItemCount() == 1)
+      forceUpdateSelection = true;
+
     /* Navigate to next News if possible */
-    ITreeNode startingNode = new WidgetTreeNode(oldSelection[oldSelection.length - 1], this);
+    ITreeNode startingNode = new WidgetTreeNode(lastSelectedItem, this);
     ISelection newSelection = navigate(startingNode, true);
 
     /* Try previous News if possible then */
@@ -116,6 +139,10 @@ public class NewsTableViewer extends TreeViewer {
 
     /* Set new Selection */
     if (updateSelection)
+      setSelection(newSelection);
+
+    /* Bug: For some reason, we need to force update of selection (see Bug 1285) */
+    else if (forceUpdateSelection)
       setSelection(newSelection);
   }
 
