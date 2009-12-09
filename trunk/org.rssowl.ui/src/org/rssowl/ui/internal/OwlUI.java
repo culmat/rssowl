@@ -2245,4 +2245,21 @@ public class OwlUI {
 
     return Pair.create(folder, position);
   }
+
+  /**
+   * @param selection the selected elements as {@link ISelection}.
+   * @return <code>true</code> if the selection contains a {@link EntityGroup}
+   * and <code>false</code> otherwise.
+   */
+  public static boolean isEntityGroupSelected(ISelection selection) {
+    if (selection instanceof IStructuredSelection) {
+      List<?> list = ((IStructuredSelection) selection).toList();
+      for (Object object : list) {
+        if (object instanceof EntityGroup)
+          return true;
+      }
+    }
+
+    return false;
+  }
 }

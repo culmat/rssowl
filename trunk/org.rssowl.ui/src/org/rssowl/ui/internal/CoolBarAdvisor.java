@@ -720,7 +720,7 @@ public class CoolBarAdvisor {
 
       /* Update Open */
       case OPEN:
-        action.setEnabled(part instanceof FeedView && !selection.isEmpty());
+        action.setEnabled(part instanceof FeedView && !selection.isEmpty() && !OwlUI.isEntityGroupSelected(selection));
         break;
 
       /* Update Update */

@@ -821,9 +821,10 @@ public class NewsTableControl implements IFeedViewPart {
     manager.addMenuListener(new IMenuListener() {
       public void menuAboutToShow(IMenuManager manager) {
         final IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
+        boolean isEntityGroupSelected= OwlUI.isEntityGroupSelected(selection);
 
         /* Open */
-        {
+        if (!isEntityGroupSelected) {
           manager.add(new Separator("open")); //$NON-NLS-1$
 
           /* Show only when internal browser is used */
@@ -919,12 +920,8 @@ public class NewsTableControl implements IFeedViewPart {
         manager.add(new GroupMarker("edit")); //$NON-NLS-1$
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
-        /* Need a good Selection here */
-        if (selection.isEmpty() || (selection.size() == 1 && selection.getFirstElement() instanceof EntityGroup))
-          return;
-
         /* Show in Feed (only for searchmarks) */
-        if (fViewer.getInput() instanceof SearchMarkReference) {
+        if (fViewer.getInput() instanceof SearchMarkReference && !selection.isEmpty() && !isEntityGroupSelected) {
           OpenNewsAction showInFeedAction = new OpenNewsAction(selection);
           showInFeedAction.setText(Messages.NewsTableControl_SHOW_IN_FEED);
           manager.appendToGroup("open", showInFeedAction); //$NON-NLS-1$
