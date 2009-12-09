@@ -467,14 +467,14 @@ public class NewsContentProvider implements ITreeContentProvider {
             if (updateSelectionFromDelete) {
               fTableViewer.updateSelectionAfterDelete(new Runnable() {
                 public void run() {
-                  fFeedView.refresh(false, false);
+                  fFeedView.refresh(true, true);
                 }
               });
             }
 
             /* Normal refresh w/o deletion */
             else if (refresh)
-              fFeedView.refresh(false, false);
+              fFeedView.refresh(true, true);
           }
         });
       }
@@ -504,7 +504,7 @@ public class NewsContentProvider implements ITreeContentProvider {
             /* Handle Deleted News */
             boolean refresh = handleDeletedNews(deletedNews);
             if (refresh)
-              fFeedView.refresh(false, false);
+              fFeedView.refresh(true, true);
           }
         });
       }
