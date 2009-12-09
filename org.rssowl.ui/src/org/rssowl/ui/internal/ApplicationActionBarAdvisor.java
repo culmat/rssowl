@@ -612,8 +612,10 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         } else
           selection = StructuredSelection.EMPTY;
 
+        boolean isEntityGroupSelected= OwlUI.isEntityGroupSelected(selection);
+
         /* Open */
-        {
+        if (!isEntityGroupSelected) {
           manager.add(new Separator("open")); //$NON-NLS-1$
 
           /* Open News in Browser */
@@ -1201,6 +1203,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     }
 
     /* List all selected Share Providers  */
+    final boolean isEnabled = !selection.isEmpty() && !OwlUI.isEntityGroupSelected(selection);
     List<ShareProvider> providers = Controller.getDefault().getShareProviders();
     for (final ShareProvider provider : providers) {
       if (provider.isEnabled()) {
@@ -1235,7 +1238,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
           @Override
           public boolean isEnabled() {
-            return !selection.isEmpty();
+            return isEnabled;
           }
 
           @Override
