@@ -244,6 +244,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
   private SashForm fSashForm;
   private Composite fBottomSash;
   private List<ISearchCondition> fCurrentSearchConditions;
+  private long fLastColumnActionInvokedMillies;
 
   /* Container for a search result */
   private static class ScoredNews {
@@ -1710,6 +1711,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
         INews news = ((ScoredNews) data).getNews();
         INews.State newState = (news.getState() == INews.State.READ) ? INews.State.UNREAD : INews.State.READ;
         setNewsState(new ArrayList<INews>(Arrays.asList(new INews[] { news })), newState);
+        fLastColumnActionInvokedMillies = System.currentTimeMillis();
       }
     }
 
@@ -1720,6 +1722,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
       /* Toggle State between Sticky / Not Sticky */
       if (data instanceof ScoredNews) {
         new MakeNewsStickyAction(new StructuredSelection(((ScoredNews) data).getNews())).run();
+        fLastColumnActionInvokedMillies = System.currentTimeMillis();
       }
     }
   }
@@ -1758,16 +1761,20 @@ public class SearchNewsDialog extends TitleAreaDialog {
     if (selection.isEmpty())
       return;
 
-    /* Convert Selection to INews */
-    List<?> selectedElements = selection.toList();
-    List<INews> selectedNews = new ArrayList<INews>();
-    for (Object selectedElement : selectedElements) {
-      ScoredNews scoredNews = (ScoredNews) selectedElement;
-      selectedNews.add(scoredNews.getNews());
-    }
+    /* Do nothing if the user recently invokved a column action */
+    if (System.currentTimeMillis() - fLastColumnActionInvokedMillies > 200) {
 
-    /* Open News */
-    new OpenNewsAction(new StructuredSelection(selectedNews), getShell()).run();
+      /* Convert Selection to INews */
+      List<?> selectedElements = selection.toList();
+      List<INews> selectedNews = new ArrayList<INews>();
+      for (Object selectedElement : selectedElements) {
+        ScoredNews scoredNews = (ScoredNews) selectedElement;
+        selectedNews.add(scoredNews.getNews());
+      }
+
+      /* Open News */
+      new OpenNewsAction(new StructuredSelection(selectedNews), getShell()).run();
+    }
   }
 
   private void hookContextualMenu() {
