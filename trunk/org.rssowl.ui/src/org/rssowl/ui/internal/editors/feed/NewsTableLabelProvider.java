@@ -181,7 +181,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
 
     RGB listBackgroundRGB = Display.getDefault().getSystemColor(SWT.COLOR_LIST_BACKGROUND).getRGB();
     RGB newsBgColorRGB = OwlUI.getThemeRGB(OwlUI.NEWS_LIST_BG_COLOR_ID, listBackgroundRGB);
-    if (newsBgColorRGB != null && !listBackgroundRGB.equals(newsBgColorRGB)) {
+    if (newsBgColorRGB != null && !listBackgroundRGB.equals(newsBgColorRGB) && !isInvalidColor(newsBgColorRGB)) {
       fNewsBgGradientEndColor = OwlUI.getColor(fResources, newsBgColorRGB);
 
       RGB newsBgColorRGBLighter = new RGB(0, 0, 0);
@@ -578,7 +578,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
     if (group.getColorHint() != null && (event.detail & SWT.SELECTED) != 0) {
 
       /* Some conditions under which we don't override the selection color */
-      if (!scrollable.isFocusControl() || isInvalidLabelColor(group.getColorHint()))
+      if (!scrollable.isFocusControl() || isInvalidColor(group.getColorHint()))
         return;
 
       Rectangle clArea = scrollable.getClientArea();
@@ -616,7 +616,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
         return;
 
       ILabel label = labels.iterator().next();
-      if (isInvalidLabelColor(label))
+      if (isInvalidColor(label))
         return;
 
       Rectangle clArea = scrollable.getClientArea();
@@ -673,11 +673,11 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
     }
   }
 
-  private boolean isInvalidLabelColor(ILabel label) {
+  private boolean isInvalidColor(ILabel label) {
     return label.getColor().equals(LABEL_COLOR_BLACK) || label.getColor().equals(LABEL_COLOR_WHITE);
   }
 
-  private boolean isInvalidLabelColor(RGB color) {
+  private boolean isInvalidColor(RGB color) {
     if (color.blue == 0 && color.red == 0 && color.green == 0)
       return true;
 
