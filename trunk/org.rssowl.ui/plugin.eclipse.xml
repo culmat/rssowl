@@ -1188,6 +1188,15 @@
             %colorDefinition.description.0
          </description>
       </colorDefinition>
+      <colorDefinition
+            categoryId="org.rssowl.ui.ThemeCategory"
+            id="org.rssowl.ui.NewsListBackgroundColor"
+            label="%colorDefinition.label.1"
+            value="COLOR_LIST_BACKGROUND">
+         <description>
+            %colorDefinition.description.1
+         </description>
+      </colorDefinition>
    </extension>
    <extension
          point="org.eclipse.ui.browserSupport">

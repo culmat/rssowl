@@ -290,6 +290,9 @@ public class OwlUI {
   /** Search Highlight Background Color */
   public static final String SEARCH_HIGHLIGHT_BG_COLOR_ID = "org.rssowl.ui.SearchHighlightBGColor"; //$NON-NLS-1$
 
+  /** News Background Color */
+  public static final String NEWS_LIST_BG_COLOR_ID = "org.rssowl.ui.NewsListBackgroundColor"; //$NON-NLS-1$
+
   /* ID of the High Contrast Theme */
   private static final String HIGH_CONTRAST_THEME = "org.eclipse.ui.ide.systemDefault"; //$NON-NLS-1$
 

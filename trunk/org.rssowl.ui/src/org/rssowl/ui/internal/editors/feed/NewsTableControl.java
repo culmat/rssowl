@@ -605,9 +605,10 @@ public class NewsTableControl implements IFeedViewPart {
         if (fViewer.getControl().isDisposed())
           return;
 
-        if (OwlUI.STICKY_BG_COLOR_ID.equals(event.getProperty())) {
+        if (OwlUI.STICKY_BG_COLOR_ID.equals(event.getProperty()) || OwlUI.NEWS_LIST_BG_COLOR_ID.equals(event.getProperty())) {
           ((NewsTableLabelProvider) fViewer.getLabelProvider()).updateResources();
           fViewer.refresh(true);
+          fViewer.getTree().redraw();
         }
       }
     };

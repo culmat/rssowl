@@ -39,6 +39,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.Scrollable;
@@ -94,6 +95,8 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
   private Color fGradientEndColor;
   private Color fGroupFgColor;
   private Color fGroupBgColor;
+  private Color fNewsBgGradientStartColor;
+  private Color fNewsBgGradientEndColor;
 
   /* Pre-Cache some Images being used */
   private Image fNewsUnreadIcon;
@@ -142,6 +145,9 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
 
     /* Sticky Color */
     fStickyBgColor = OwlUI.getThemeColor(OwlUI.STICKY_BG_COLOR_ID, fResources, new RGB(255, 255, 180));
+
+    /* News Background Color */
+    createNewsListBackgroundResources();
   }
 
   private void createResources() {
@@ -154,6 +160,8 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
     fGroupFgColor = OwlUI.getColor(fResources, OwlUI.GROUP_FG_COLOR);
     fGroupBgColor = OwlUI.getColor(fResources, OwlUI.GROUP_BG_COLOR);
 
+    createNewsListBackgroundResources();
+
     /* Icons */
     fNewsUnreadIcon = OwlUI.getImage(fResources, OwlUI.NEWS_STATE_UNREAD);
     fNewsNewIcon = OwlUI.getImage(fResources, OwlUI.NEWS_STATE_NEW);
@@ -165,6 +173,23 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
 
     /* Fonts */
     fBoldFont = OwlUI.getThemeFont(OwlUI.HEADLINES_FONT_ID, SWT.BOLD);
+  }
+
+  private void createNewsListBackgroundResources() {
+    fNewsBgGradientStartColor = null;
+    fNewsBgGradientEndColor = null;
+
+    RGB listBackgroundRGB = Display.getDefault().getSystemColor(SWT.COLOR_LIST_BACKGROUND).getRGB();
+    RGB newsBgColorRGB = OwlUI.getThemeRGB(OwlUI.NEWS_LIST_BG_COLOR_ID, listBackgroundRGB);
+    if (newsBgColorRGB != null && !listBackgroundRGB.equals(newsBgColorRGB)) {
+      fNewsBgGradientEndColor = OwlUI.getColor(fResources, newsBgColorRGB);
+
+      RGB newsBgColorRGBLighter = new RGB(0, 0, 0);
+      newsBgColorRGBLighter.red = Math.min(newsBgColorRGB.red + 5, 255);
+      newsBgColorRGBLighter.green = Math.min(newsBgColorRGB.green + 5, 255);
+      newsBgColorRGBLighter.blue = Math.min(newsBgColorRGB.blue + 5, 255);
+      fNewsBgGradientStartColor = OwlUI.getColor(fResources, newsBgColorRGBLighter);
+    }
   }
 
   /*
@@ -627,6 +652,24 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
 
       /* Mark as Background being handled */
       event.detail &= ~SWT.BACKGROUND;
+    }
+
+    /* Handle News List Background Color if set */
+    else if (fNewsBgGradientStartColor != null && fNewsBgGradientEndColor != null) {
+      int index = 0;
+      if (event.item instanceof TreeItem) {
+        TreeItem item = (TreeItem) event.item;
+        if (item.getParentItem() != null)
+          index = item.getParentItem().indexOf(item);
+        else
+          index = item.getParent().indexOf(item);
+      } else if (event.item instanceof TableItem) {
+        TableItem item = (TableItem) event.item;
+        index = item.getParent().indexOf(item);
+      }
+
+      if (index % 2 != 0)
+        OwlUI.codDrawGradient(event, fNewsBgGradientStartColor, fNewsBgGradientEndColor, fNewsBgGradientEndColor);
     }
   }
 
