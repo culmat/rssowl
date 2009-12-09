@@ -36,6 +36,9 @@ import org.rssowl.core.util.TreeTraversal;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.util.WidgetTreeNode;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * The actual TreeViewer responsible for displaying the Headlines of a Feed.
  *
@@ -96,14 +99,15 @@ public class NewsTableViewer extends TreeViewer {
       return;
     }
 
+    /* Remember the actual selected Objects to determine if a selection needs to be restored */
+    List<Object> oldSelectionObjects = new ArrayList<Object>(oldSelection.length);
+    for (TreeItem item : oldSelection) {
+      oldSelectionObjects.add(item.getData());
+    }
+
+    /* Check if Last Selected Item is an Entity Group */
     TreeItem lastSelectedItem = oldSelection[oldSelection.length - 1];
-
-    /* Determine if we need to force an update of the selection (See Bug 1285) */
-    boolean forceUpdateSelection = false;
-
-    /* Force Update: Last Selected Item is an Entity Group */
     if (lastSelectedItem.getData() instanceof EntityGroup) {
-      forceUpdateSelection = true;
 
       /* Given this group gets deleted, use the next or previous entity group as input for the WidgetTreeNode below */
       int indexOfEntityGroup = tree.indexOf(lastSelectedItem);
@@ -112,10 +116,6 @@ public class NewsTableViewer extends TreeViewer {
       else if (indexOfEntityGroup > 0) //Try Previous
         lastSelectedItem = tree.getItem(indexOfEntityGroup - 1);
     }
-
-    /* Force Update: Last Selected Item is last of Entity Group */
-    else if (lastSelectedItem.getParentItem() != null && lastSelectedItem.getParentItem().getItemCount() == 1)
-      forceUpdateSelection = true;
 
     /* Navigate to next News if possible */
     ITreeNode startingNode = new WidgetTreeNode(lastSelectedItem, this);
@@ -130,8 +130,12 @@ public class NewsTableViewer extends TreeViewer {
 
     /* Ensure that an updated selection is required */
     boolean updateSelection = false;
-    for (TreeItem oldSelectedItem : oldSelection) {
-      if (oldSelectedItem.isDisposed()) {
+    for (int i = 0; i < oldSelection.length; i++) {
+      TreeItem oldSelectedItem = oldSelection[i];
+      Object oldSelectedObject = oldSelectionObjects.get(i);
+
+      /* Update if Item is now Disposed or contains a different Object */
+      if (oldSelectedItem.isDisposed() || (oldSelectedObject != null && !oldSelectedObject.equals(oldSelectedItem.getData()))) {
         updateSelection = true;
         break;
       }
@@ -139,10 +143,6 @@ public class NewsTableViewer extends TreeViewer {
 
     /* Set new Selection */
     if (updateSelection)
-      setSelection(newSelection);
-
-    /* Bug: For some reason, we need to force update of selection (see Bug 1285) */
-    else if (forceUpdateSelection)
       setSelection(newSelection);
   }
 
