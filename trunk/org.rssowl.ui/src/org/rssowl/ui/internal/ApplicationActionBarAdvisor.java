@@ -449,9 +449,81 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         });
 
         manager.add(layoutMenu);
-        manager.add(new Separator());
+
+        /* Zoom (In, Out, Reset) */
+        final boolean isFeedViewActive = OwlUI.getActiveFeedView() != null;
+        MenuManager zoomMenu = new MenuManager(Messages.ApplicationActionBarAdvisor_ZOOM);
+        zoomMenu.add(new Action(Messages.ApplicationActionBarAdvisor_ZOOM_IN) {
+          @Override
+          public void run() {
+            OwlUI.zoomNewsText(true, false);
+          }
+
+          @Override
+          public String getId() {
+            return "org.rssowl.ui.ZoomInCommand"; //$NON-NLS-1$
+          }
+
+          @Override
+          public String getActionDefinitionId() {
+            return "org.rssowl.ui.ZoomInCommand"; //$NON-NLS-1$
+          }
+
+          @Override
+          public boolean isEnabled() {
+            return isFeedViewActive;
+          }
+        });
+
+        zoomMenu.add(new Action(Messages.ApplicationActionBarAdvisor_ZOOM_OUT) {
+          @Override
+          public void run() {
+            OwlUI.zoomNewsText(false, false);
+          }
+
+          @Override
+          public String getId() {
+            return "org.rssowl.ui.ZoomOutCommand"; //$NON-NLS-1$
+          }
+
+          @Override
+          public String getActionDefinitionId() {
+            return "org.rssowl.ui.ZoomOutCommand"; //$NON-NLS-1$
+          }
+
+          @Override
+          public boolean isEnabled() {
+            return isFeedViewActive;
+          }
+        });
+
+        zoomMenu.add(new Separator());
+        zoomMenu.add(new Action(Messages.ApplicationActionBarAdvisor_RESET) {
+          @Override
+          public void run() {
+            OwlUI.zoomNewsText(false, true);
+          }
+
+          @Override
+          public String getId() {
+            return "org.rssowl.ui.ZoomResetCommand"; //$NON-NLS-1$
+          }
+
+          @Override
+          public String getActionDefinitionId() {
+            return "org.rssowl.ui.ZoomResetCommand"; //$NON-NLS-1$
+          }
+
+          @Override
+          public boolean isEnabled() {
+            return isFeedViewActive;
+          }
+        });
+
+        manager.add(zoomMenu);
 
         /* Toggle State of Toolbar Visibility */
+        manager.add(new Separator());
         manager.add(new Action(Messages.ApplicationActionBarAdvisor_TOOLBAR, IAction.AS_CHECK_BOX) {
           @Override
           public void run() {
@@ -612,7 +684,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         } else
           selection = StructuredSelection.EMPTY;
 
-        boolean isEntityGroupSelected= OwlUI.isEntityGroupSelected(selection);
+        boolean isEntityGroupSelected = OwlUI.isEntityGroupSelected(selection);
 
         /* Open */
         if (!isEntityGroupSelected) {

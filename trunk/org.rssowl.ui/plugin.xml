@@ -863,6 +863,27 @@
             id="org.rssowl.ui.RemoveLabelsCommand"
             name="%command.name.54">
       </command>
+      <command
+            categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            defaultHandler="org.rssowl.ui.internal.handler.ZoomInHandler"
+            description="%command.description.36"
+            id="org.rssowl.ui.ZoomInCommand"
+            name="%command.name.57">
+      </command>
+      <command
+            categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            defaultHandler="org.rssowl.ui.internal.handler.ZoomOutHandler"
+            description="%command.description.35"
+            id="org.rssowl.ui.ZoomOutCommand"
+            name="%command.name.56">
+      </command>
+      <command
+            categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            defaultHandler="org.rssowl.ui.internal.handler.ZoomResetHandler"
+            description="%command.description.34"
+            id="org.rssowl.ui.ZoomResetCommand"
+            name="%command.name.55">
+      </command>
    </extension>
    <extension
          id="product"
@@ -1104,6 +1125,24 @@
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.rssowl.ui.KeyScheme"
             sequence="F1">
+      </key>
+      <key
+            commandId="org.rssowl.ui.ZoomInCommand"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.rssowl.ui.KeyScheme"
+            sequence="M1++">
+      </key>
+      <key
+            commandId="org.rssowl.ui.ZoomOutCommand"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.rssowl.ui.KeyScheme"
+            sequence="M1+-">
+      </key>
+      <key
+            commandId="org.rssowl.ui.ZoomResetCommand"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.rssowl.ui.KeyScheme"
+            sequence="M1+M2+0">
       </key>
    </extension>
    <extension

@@ -39,6 +39,7 @@ import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.jface.fieldassist.IControlContentAdapter;
 import org.eclipse.jface.fieldassist.SimpleContentProposalProvider;
+import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.resource.ColorDescriptor;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.DeviceResourceException;
@@ -64,6 +65,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Drawable;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
@@ -319,6 +321,9 @@ public class OwlUI {
 
   /* Workaround for unknown State Width */
   private static int STATE_WIDTH = -1;
+
+  /* Default News Text Font Height */
+  private static final int DEFAULT_NEWS_TEXT_FONT_HEIGHT = 10;
 
   /* Map Common Mime Types to Extensions (used for Attachments) */
   private static final Map<String, String> fgMapMimeToExtension = new HashMap<String, String>();
@@ -2261,5 +2266,39 @@ public class OwlUI {
     }
 
     return false;
+  }
+
+  /**
+   * @param zoomIn
+   * @param reset
+   */
+  @SuppressWarnings("restriction")
+  public static void zoomNewsText(boolean zoomIn, boolean reset) {
+
+    /* Retrieve Font */
+    ITheme theme = PlatformUI.getWorkbench().getThemeManager().getCurrentTheme();
+    FontRegistry registry = theme.getFontRegistry();
+    FontData[] oldFontDatas = registry.getFontData(NEWS_TEXT_FONT_ID);
+    FontData[] newFontDatas = new FontData[oldFontDatas.length];
+
+    /* Set Height */
+    for (int i = 0; i < oldFontDatas.length; i++) {
+      FontData oldFontData = oldFontDatas[i];
+      int oldHeight = oldFontData.getHeight();
+
+      if (reset)
+        newFontDatas[i] = new FontData(oldFontData.getName(), DEFAULT_NEWS_TEXT_FONT_HEIGHT, oldFontData.getStyle());
+      else
+        newFontDatas[i] = new FontData(oldFontData.getName(), zoomIn ? oldHeight + 1 : Math.max(oldHeight - 1, 0), oldFontData.getStyle());
+    }
+
+    registry.put(NEWS_TEXT_FONT_ID, newFontDatas);
+
+    /* Store in Preferences */
+    String key = org.eclipse.ui.internal.themes.ThemeElementHelper.createPreferenceKey(theme, NEWS_TEXT_FONT_ID);
+    String fdString = PreferenceConverter.getStoredRepresentation(newFontDatas);
+    String storeString = org.eclipse.ui.internal.util.PrefUtil.getInternalPreferenceStore().getString(key);
+    if (!fdString.equals(storeString))
+      org.eclipse.ui.internal.util.PrefUtil.getInternalPreferenceStore().setValue(key, fdString);
   }
 }
