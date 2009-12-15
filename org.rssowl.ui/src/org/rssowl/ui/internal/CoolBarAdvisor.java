@@ -70,6 +70,7 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
@@ -104,12 +105,14 @@ import org.rssowl.ui.internal.editors.feed.FeedViewInput;
 import org.rssowl.ui.internal.undo.IUndoRedoListener;
 import org.rssowl.ui.internal.undo.UndoStack;
 import org.rssowl.ui.internal.util.JobRunner;
+import org.rssowl.ui.internal.util.ModelUtils;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -275,7 +278,10 @@ public class CoolBarAdvisor {
     FULLSCREEN("org.rssowl.ui.FullScreenCommand", Messages.CoolBarAdvisor_FULL_SCREEN, Messages.CoolBarAdvisor_TOGGLE_FULL_SCREEN, OwlUI.getImageDescriptor("icons/etool16/fullscreen.gif"), null, IAction.AS_CHECK_BOX, true, 12), //$NON-NLS-1$ //$NON-NLS-2$
 
     /** Delete */
-    DELETE("org.eclipse.ui.edit.delete", Messages.CoolBarAdvisor_DELETE, Messages.CoolBarAdvisor_DELETE_NEWS, OwlUI.getImageDescriptor("icons/etool16/cancel.gif"), OwlUI.getImageDescriptor("icons/dtool16/cancel.gif"), 8); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    DELETE("org.eclipse.ui.edit.delete", Messages.CoolBarAdvisor_DELETE, Messages.CoolBarAdvisor_DELETE_NEWS, OwlUI.getImageDescriptor("icons/etool16/cancel.gif"), OwlUI.getImageDescriptor("icons/dtool16/cancel.gif"), 8), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+    /** Attachments */
+    ATTACHMENTS("org.rssowl.ui.Attachments", Messages.CoolBarAdvisor_ATTACHMENTS, null, OwlUI.getImageDescriptor("icons/obj16/attachment.gif"), OwlUI.getImageDescriptor("icons/dtool16/attachment.gif"), IAction.AS_DROP_DOWN_MENU, false, 8); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
     private final String fId;
     private final String fName;
@@ -450,6 +456,7 @@ public class CoolBarAdvisor {
         update(CoolBarItem.DELETE, selection, part, false);
         update(CoolBarItem.OPEN, selection, part, false);
         update(CoolBarItem.UPDATE, selection, part, false);
+        update(CoolBarItem.ATTACHMENTS, selection, part, false);
       }
     };
 
@@ -781,6 +788,22 @@ public class CoolBarAdvisor {
       case DELETE:
         action.setEnabled(part instanceof FeedView && !selection.isEmpty());
         break;
+
+      /* Update Attachments */
+      case ATTACHMENTS:
+        boolean enabled = false;
+        if (part instanceof FeedView && !selection.isEmpty()) {
+          Set<INews> selectedNews = ModelUtils.normalize(((IStructuredSelection) selection).toList());
+          for (INews news : selectedNews) {
+            if (!news.getAttachments().isEmpty()) {
+              enabled = true;
+              break;
+            }
+          }
+        }
+
+        action.setEnabled(enabled);
+        break;
     }
   }
 
@@ -1104,6 +1127,12 @@ public class CoolBarAdvisor {
           new DeleteTypesAction(fWindow.getShell(), selection).run();
         break;
       }
+
+        /* Attachments */
+      case ATTACHMENTS: {
+        OwlUI.positionDropDownMenu(wrappingAction, manager);
+        break;
+      }
     }
   }
 
@@ -1321,6 +1350,23 @@ public class CoolBarAdvisor {
           public Menu getMenu(Control parent) {
             MenuManager manager = new MenuManager();
             ApplicationActionBarAdvisor.fillBookMarksMenu(manager, fWindow);
+            return manager.createContextMenu(parent);
+          }
+
+          public Menu getMenu(Menu parent) {
+            return null;
+          }
+
+          public void dispose() {}
+        };
+
+        /* Attachments */
+      case ATTACHMENTS:
+        return new IMenuCreator() {
+          public Menu getMenu(Control parent) {
+            MenuManager manager = new MenuManager();
+            IStructuredSelection activeFeedViewSelection = OwlUI.getActiveFeedViewSelection();
+            ApplicationActionBarAdvisor.fillAttachmentsMenu(manager, activeFeedViewSelection, fWindow, true);
             return manager.createContextMenu(parent);
           }
 

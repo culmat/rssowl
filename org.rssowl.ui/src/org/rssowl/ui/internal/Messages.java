@@ -111,6 +111,7 @@ public class Messages extends NLS {
   public static String Controller_UPDATING_FEEDS_JOB;
   public static String Controller_WORK;
   public static String CoolBarAdvisor_ACTIVITY;
+  public static String CoolBarAdvisor_ATTACHMENTS;
   public static String CoolBarAdvisor_BLANK;
   public static String CoolBarAdvisor_BOOKMARK;
   public static String CoolBarAdvisor_BOOKMARK_VIEW;
