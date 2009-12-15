@@ -245,6 +245,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
   private Composite fBottomSash;
   private List<ISearchCondition> fCurrentSearchConditions;
   private long fLastColumnActionInvokedMillies;
+  private Menu fAttachmentsMenu;
 
   /* Container for a search result */
   private static class ScoredNews {
@@ -621,6 +622,8 @@ public class SearchNewsDialog extends TitleAreaDialog {
   @Override
   public boolean close() {
     fgOpenDialogCount--;
+    if (fAttachmentsMenu != null)
+      fAttachmentsMenu.dispose();
 
     /* Store Column Model */
     if (!fResultViewer.getTable().isDisposed()) {
@@ -1728,6 +1731,28 @@ public class SearchNewsDialog extends TitleAreaDialog {
         fLastColumnActionInvokedMillies = System.currentTimeMillis();
       }
     }
+
+    /* Mouse-Up over Attachments-Column */
+    else if (event.button == 1 && isInImageBounds(item, NewsColumn.ATTACHMENTS, p)) {
+      Object data = item.getData();
+
+      if (data instanceof ScoredNews) {
+        MenuManager contextMenu = new MenuManager();
+        ApplicationActionBarAdvisor.fillAttachmentsMenu(contextMenu, new StructuredSelection(((ScoredNews) data).getNews()), this, true);
+
+        if (fAttachmentsMenu != null)
+          fAttachmentsMenu.dispose();
+
+        fAttachmentsMenu = contextMenu.createContextMenu(fResultViewer.getControl());
+
+        Point cursorLocation = item.getDisplay().getCursorLocation();
+        cursorLocation.y = cursorLocation.y + 16;
+        fAttachmentsMenu.setLocation(cursorLocation);
+        fAttachmentsMenu.setVisible(true);
+
+        fLastColumnActionInvokedMillies = System.currentTimeMillis();
+      }
+    }
   }
 
   private void onMouseMove(Event event) {
@@ -1744,7 +1769,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     }
 
     /* Show Hand-Cursor if action can be performed */
-    boolean changeToHandCursor = isInImageBounds(item, NewsColumn.TITLE, p) || isInImageBounds(item, NewsColumn.STICKY, p);
+    boolean changeToHandCursor = isInImageBounds(item, NewsColumn.TITLE, p) || isInImageBounds(item, NewsColumn.STICKY, p) || isInImageBounds(item, NewsColumn.ATTACHMENTS, p);
     if (!fShowsHandCursor && changeToHandCursor) {
       fResultViewer.getControl().setCursor(fHandCursor);
       fShowsHandCursor = true;

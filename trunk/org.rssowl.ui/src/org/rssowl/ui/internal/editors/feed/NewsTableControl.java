@@ -224,6 +224,7 @@ public class NewsTableControl implements IFeedViewPart {
   private boolean fBlockColumMoveEvent;
   private IStructuredSelection fLastSelection = StructuredSelection.EMPTY;
   private long fLastColumnActionInvokedMillies;
+  private Menu fAttachmentsMenu;
 
   /* Settings */
   private IPreferenceScope fGlobalPreferences;
@@ -761,6 +762,26 @@ public class NewsTableControl implements IFeedViewPart {
       }
     }
 
+    /* Mouse-Up over Attachments-Column */
+    else if (event.button == 1 && isInImageBounds(item, NewsColumn.ATTACHMENTS, p)) {
+      Object data = item.getData();
+
+      MenuManager contextMenu = new MenuManager();
+      ApplicationActionBarAdvisor.fillAttachmentsMenu(contextMenu, new StructuredSelection(data), fEditorSite, true);
+
+      if (fAttachmentsMenu != null)
+        fAttachmentsMenu.dispose();
+
+      fAttachmentsMenu = contextMenu.createContextMenu(fViewer.getControl());
+
+      Point cursorLocation = item.getDisplay().getCursorLocation();
+      cursorLocation.y = cursorLocation.y + 16;
+      fAttachmentsMenu.setLocation(cursorLocation);
+      fAttachmentsMenu.setVisible(true);
+
+      fLastColumnActionInvokedMillies = System.currentTimeMillis();
+    }
+
     /*
      * This is a workaround: Immediately after the mouse-down-event has been
      * issued, a selection-event is triggered. This event is resulting in the
@@ -786,7 +807,7 @@ public class NewsTableControl implements IFeedViewPart {
     }
 
     /* Show Hand-Cursor if action can be performed */
-    boolean changeToHandCursor = isInImageBounds(item, NewsColumn.TITLE, p) || isInImageBounds(item, NewsColumn.STICKY, p);
+    boolean changeToHandCursor = isInImageBounds(item, NewsColumn.TITLE, p) || isInImageBounds(item, NewsColumn.STICKY, p) || isInImageBounds(item, NewsColumn.ATTACHMENTS, p);
     if (!fShowsHandCursor && changeToHandCursor) {
       fCustomTree.getControl().setCursor(fHandCursor);
       fShowsHandCursor = true;
@@ -991,6 +1012,8 @@ public class NewsTableControl implements IFeedViewPart {
    * @see org.rssowl.ui.internal.editors.feed.IFeedViewPart#dispose()
    */
   public void dispose() {
+    if (fAttachmentsMenu != null)
+      fAttachmentsMenu.dispose();
     fNewsStateTracker.cancel();
     fInstantMarkUnreadTracker.cancel();
     fResources.dispose();
