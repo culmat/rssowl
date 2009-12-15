@@ -609,7 +609,7 @@ public class FilterBar {
 
         /* Restore Default */
         if (filter.getType() != NewsFilter.Type.SHOW_ALL)
-          doFilter(NewsFilter.Type.SHOW_ALL, true, true);
+          onFilter(NewsFilter.Type.SHOW_ALL);
 
         /* Show Menu */
         else
@@ -650,7 +650,7 @@ public class FilterBar {
           @Override
           public void widgetSelected(SelectionEvent e) {
             if (showAll.getSelection() && filter.getType() != NewsFilter.Type.SHOW_ALL)
-              doFilter(NewsFilter.Type.SHOW_ALL, true, true);
+              onFilter(NewsFilter.Type.SHOW_ALL);
           }
         });
         menu.setDefaultItem(showAll);
@@ -667,7 +667,7 @@ public class FilterBar {
           @Override
           public void widgetSelected(SelectionEvent e) {
             if (showNew.getSelection() && filter.getType() != NewsFilter.Type.SHOW_NEW)
-              doFilter(NewsFilter.Type.SHOW_NEW, true, true);
+              onFilter(NewsFilter.Type.SHOW_NEW);
           }
         });
 
@@ -680,7 +680,7 @@ public class FilterBar {
           @Override
           public void widgetSelected(SelectionEvent e) {
             if (showUnread.getSelection() && filter.getType() != NewsFilter.Type.SHOW_UNREAD)
-              doFilter(NewsFilter.Type.SHOW_UNREAD, true, true);
+              onFilter(NewsFilter.Type.SHOW_UNREAD);
           }
         });
 
@@ -692,7 +692,7 @@ public class FilterBar {
           @Override
           public void widgetSelected(SelectionEvent e) {
             if (showSticky.getSelection() && filter.getType() != NewsFilter.Type.SHOW_STICKY)
-              doFilter(NewsFilter.Type.SHOW_STICKY, true, true);
+              onFilter(NewsFilter.Type.SHOW_STICKY);
           }
         });
 
@@ -707,7 +707,7 @@ public class FilterBar {
           @Override
           public void widgetSelected(SelectionEvent e) {
             if (showRecent.getSelection() && filter.getType() != NewsFilter.Type.SHOW_RECENT)
-              doFilter(NewsFilter.Type.SHOW_RECENT, true, true);
+              onFilter(NewsFilter.Type.SHOW_RECENT);
           }
         });
 
@@ -719,7 +719,7 @@ public class FilterBar {
           @Override
           public void widgetSelected(SelectionEvent e) {
             if (showLastFiveDays.getSelection() && filter.getType() != NewsFilter.Type.SHOW_LAST_5_DAYS)
-              doFilter(NewsFilter.Type.SHOW_LAST_5_DAYS, true, true);
+              onFilter(NewsFilter.Type.SHOW_LAST_5_DAYS);
           }
         });
 
@@ -848,22 +848,28 @@ public class FilterBar {
     dialog.open();
   }
 
+  private void onFilter(NewsFilter.Type type) {
+    doFilter(type, true, true);
+    EditorUtils.updateFilterAndGrouping();
+  }
+
   void doFilter(final NewsFilter.Type type, boolean refresh, boolean saveSettings) {
+    boolean noChange = fFeedView.getFilter().getType() == type;
+
     fFeedView.getFilter().setType(type);
     fFirstToolBarManager.find(FILTER_ACTION).update();
+
+    /* No need to refresh or save settings if nothing changed */
+    if (noChange)
+      return;
 
     /* Refresh if set */
     if (refresh)
       fFeedView.refresh(true, false);
 
     /* Update Settings */
-    if (saveSettings) {
-      JobRunner.runInBackgroundThread(new Runnable() {
-        public void run() {
-          fGlobalPreferences.putInteger(DefaultPreferences.FV_FILTER_TYPE, type.ordinal());
-        }
-      });
-    }
+    if (saveSettings)
+      saveIntegerValue(DefaultPreferences.BM_NEWS_FILTERING, type.ordinal());
   }
 
   private void doSearch(final NewsFilter.SearchTarget target) {
@@ -892,7 +898,7 @@ public class FilterBar {
 
         /* Restore Default */
         if (fFeedView.getGrouper().getType() != NewsGrouping.Type.NO_GROUPING)
-          doGrouping(NewsGrouping.Type.NO_GROUPING, true, true);
+          onGrouping(NewsGrouping.Type.NO_GROUPING);
 
         /* Show Menu */
         else
@@ -929,7 +935,7 @@ public class FilterBar {
           @Override
           public void widgetSelected(SelectionEvent e) {
             if (noGrouping.getSelection() && grouping.getType() != NewsGrouping.Type.NO_GROUPING)
-              doGrouping(NewsGrouping.Type.NO_GROUPING, true, true);
+              onGrouping(NewsGrouping.Type.NO_GROUPING);
           }
         });
         menu.setDefaultItem(noGrouping);
@@ -945,7 +951,7 @@ public class FilterBar {
           @Override
           public void widgetSelected(SelectionEvent e) {
             if (groupByDate.getSelection() && grouping.getType() != NewsGrouping.Type.GROUP_BY_DATE)
-              doGrouping(NewsGrouping.Type.GROUP_BY_DATE, true, true);
+              onGrouping(NewsGrouping.Type.GROUP_BY_DATE);
           }
         });
 
@@ -957,7 +963,7 @@ public class FilterBar {
           @Override
           public void widgetSelected(SelectionEvent e) {
             if (groupByAuthor.getSelection() && grouping.getType() != NewsGrouping.Type.GROUP_BY_AUTHOR)
-              doGrouping(NewsGrouping.Type.GROUP_BY_AUTHOR, true, true);
+              onGrouping(NewsGrouping.Type.GROUP_BY_AUTHOR);
           }
         });
 
@@ -969,7 +975,7 @@ public class FilterBar {
           @Override
           public void widgetSelected(SelectionEvent e) {
             if (groupByCategory.getSelection() && grouping.getType() != NewsGrouping.Type.GROUP_BY_CATEGORY)
-              doGrouping(NewsGrouping.Type.GROUP_BY_CATEGORY, true, true);
+              onGrouping(NewsGrouping.Type.GROUP_BY_CATEGORY);
           }
         });
 
@@ -981,7 +987,7 @@ public class FilterBar {
           @Override
           public void widgetSelected(SelectionEvent e) {
             if (groupByTopic.getSelection() && grouping.getType() != NewsGrouping.Type.GROUP_BY_TOPIC)
-              doGrouping(NewsGrouping.Type.GROUP_BY_TOPIC, true, true);
+              onGrouping(NewsGrouping.Type.GROUP_BY_TOPIC);
           }
         });
 
@@ -1002,7 +1008,7 @@ public class FilterBar {
           @Override
           public void widgetSelected(SelectionEvent e) {
             if (groupByState.getSelection() && grouping.getType() != NewsGrouping.Type.GROUP_BY_STATE)
-              doGrouping(NewsGrouping.Type.GROUP_BY_STATE, true, true);
+              onGrouping(NewsGrouping.Type.GROUP_BY_STATE);
           }
         });
 
@@ -1014,7 +1020,7 @@ public class FilterBar {
           @Override
           public void widgetSelected(SelectionEvent e) {
             if (groupByStickyness.getSelection() && grouping.getType() != NewsGrouping.Type.GROUP_BY_STICKY)
-              doGrouping(NewsGrouping.Type.GROUP_BY_STICKY, true, true);
+              onGrouping(NewsGrouping.Type.GROUP_BY_STICKY);
           }
         });
 
@@ -1029,7 +1035,7 @@ public class FilterBar {
           @Override
           public void widgetSelected(SelectionEvent e) {
             if (groupByLabel.getSelection() && grouping.getType() != NewsGrouping.Type.GROUP_BY_LABEL)
-              doGrouping(NewsGrouping.Type.GROUP_BY_LABEL, true, true);
+              onGrouping(NewsGrouping.Type.GROUP_BY_LABEL);
           }
         });
 
@@ -1041,7 +1047,7 @@ public class FilterBar {
           @Override
           public void widgetSelected(SelectionEvent e) {
             if (groupByRating.getSelection() && grouping.getType() != NewsGrouping.Type.GROUP_BY_RATING)
-              doGrouping(NewsGrouping.Type.GROUP_BY_RATING, true, true);
+              onGrouping(NewsGrouping.Type.GROUP_BY_RATING);
           }
         });
 
@@ -1056,7 +1062,7 @@ public class FilterBar {
           @Override
           public void widgetSelected(SelectionEvent e) {
             if (groupByFeed.getSelection() && grouping.getType() != NewsGrouping.Type.GROUP_BY_FEED)
-              doGrouping(NewsGrouping.Type.GROUP_BY_FEED, true, true);
+              onGrouping(NewsGrouping.Type.GROUP_BY_FEED);
           }
         });
 
@@ -1074,9 +1080,20 @@ public class FilterBar {
     fFirstToolBarManager.add(item);
   }
 
+  private void onGrouping(NewsGrouping.Type type) {
+    doGrouping(type, true, true);
+    EditorUtils.updateFilterAndGrouping();
+  }
+
   void doGrouping(final NewsGrouping.Type type, boolean refresh, boolean saveSettings) {
+    boolean noChange = fFeedView.getGrouper().getType() == type;
+
     fFeedView.getGrouper().setType(type);
     fFirstToolBarManager.find(GROUP_ACTION).update();
+
+    /* No need to refresh or save settings if nothing changed */
+    if (noChange)
+      return;
 
     /* Refresh if set */
     if (refresh) {
@@ -1093,13 +1110,31 @@ public class FilterBar {
     }
 
     /* Update Settings */
-    if (saveSettings) {
-      JobRunner.runInBackgroundThread(new Runnable() {
-        public void run() {
-          fGlobalPreferences.putInteger(DefaultPreferences.FV_GROUP_TYPE, type.ordinal());
-        }
-      });
+    if (saveSettings)
+      saveIntegerValue(DefaultPreferences.BM_NEWS_GROUPING, type.ordinal());
+  }
+
+  /*
+   * This Method stores an Integer value to either the entity scope or global scope,
+   * depending on if the current feed view input has the given setting stored in the
+   * entity or not.
+   */
+  private void saveIntegerValue(String key, int value) {
+    FeedViewInput input = ((FeedViewInput) fFeedView.getEditorInput());
+
+    /* Save only into Entity if the Entity was configured with the given Settings before */
+    IPreferenceScope entityPrefs = Owl.getPreferenceService().getEntityScope(input.getMark());
+    if (entityPrefs.hasKey(key)) {
+      entityPrefs.putInteger(key, value);
+      if (input.getMark() instanceof FolderNewsMark)
+        DynamicDAO.save(((FolderNewsMark) input.getMark()).getFolder());
+      else
+        DynamicDAO.save(input.getMark());
     }
+
+    /* Save Globally */
+    else
+      fGlobalPreferences.putInteger(key, value);
   }
 
   void updateBrowserViewMaximized(boolean maximized) {

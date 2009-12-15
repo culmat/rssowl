@@ -33,6 +33,7 @@ import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
+import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.URIUtils;
@@ -318,5 +319,26 @@ public class ModelUtils {
     }
 
     return attachmentLinks;
+  }
+
+  /**
+   * Helper method to load a specific value from preferences by bypassing an
+   * implementation detail (see Bug 1291: Simplify filter and group settings
+   * treatment).
+   *
+   * @param preferences the actual scope to load from.
+   * @param key the key of the setting to load.
+   * @param fallback the fallback preferences to use in case the setting has a
+   * negative value.
+   * @param fallbackKey the key of the fallback setting to load in case the
+   * setting has a negative value.
+   * @return the integer value from the given preferences. Never negative.
+   */
+  public static int loadIntegerValueWithFallback(IPreferenceScope preferences, String key, IPreferenceScope fallback, String fallbackKey) {
+    int iVal = preferences.getInteger(key);
+    if (iVal >= 0)
+      return iVal;
+
+    return Math.max(0, fallback.getInteger(fallbackKey));
   }
 }
