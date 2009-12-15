@@ -643,19 +643,19 @@ public class NewsGrouping {
         Date date = DateUtils.getRecentDate(news);
 
         /* Feed was visited Today */
-        if (date.getTime() > todayMillis)
+        if (date.getTime() >= todayMillis)
           new EntityGroupItem(gToday, news);
 
         /* Feed was visited Yesterday */
-        else if (date.after(yesterday))
+        else if (date.compareTo(yesterday) >= 0)
           new EntityGroupItem(gYesterday, news);
 
         /* Feed was visited Two Weeks Ago */
-        else if (date.after(earlierThisWeek))
+        else if (date.compareTo(earlierThisWeek) >= 0)
           new EntityGroupItem(gEarlierThisWeek, news);
 
         /* Feed was visited Last Week */
-        else if (date.after(lastWeek))
+        else if (date.compareTo(lastWeek) >= 0)
           new EntityGroupItem(gLastWeek, news);
 
         /* Feed was visited more than a Week ago */

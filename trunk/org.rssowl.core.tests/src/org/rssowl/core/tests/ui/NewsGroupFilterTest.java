@@ -84,7 +84,7 @@ public class NewsGroupFilterTest {
     fFactory = Owl.getModelFactory();
     fGrouping = new NewsGrouping();
     fFiltering = new NewsFilter();
-    fToday = new Date(DateUtils.getToday().getTimeInMillis() + 1000);
+    fToday = new Date(DateUtils.getToday().getTimeInMillis());
     fYesterday = new Date(fToday.getTime() - DAY);
     Calendar today = DateUtils.getToday();
     fTodayIsFirstDayOfWeek = today.get(Calendar.DAY_OF_WEEK) == today.getFirstDayOfWeek();

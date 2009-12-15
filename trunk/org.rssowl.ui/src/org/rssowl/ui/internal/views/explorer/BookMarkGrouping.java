@@ -228,19 +228,19 @@ public class BookMarkGrouping {
           new EntityGroupItem(gNever, mark);
 
         /* Feed was visited Today */
-        else if (lastVisitDate.getTime() > todayMillis)
+        else if (lastVisitDate.getTime() >= todayMillis)
           new EntityGroupItem(gToday, mark);
 
         /* Feed was visited Yesterday */
-        else if (lastVisitDate.after(yesterday))
+        else if (lastVisitDate.compareTo(yesterday) >= 0)
           new EntityGroupItem(gYesterday, mark);
 
         /* Feed was visited Earlier this Week */
-        else if (lastVisitDate.after(earlierThisWeek))
+        else if (lastVisitDate.compareTo(earlierThisWeek) >= 0)
           new EntityGroupItem(gEarlierThisWeek, mark);
 
         /* Feed was visited Last Week */
-        else if (lastVisitDate.after(lastWeek))
+        else if (lastVisitDate.compareTo(lastWeek) >= 0)
           new EntityGroupItem(gLastWeek, mark);
 
         /* Feed was visited more than a Week ago */
