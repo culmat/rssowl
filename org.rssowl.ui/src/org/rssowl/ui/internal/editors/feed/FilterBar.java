@@ -30,7 +30,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
@@ -72,6 +71,7 @@ import org.rssowl.core.util.ITask;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.TaskAdapter;
 import org.rssowl.ui.internal.Application;
+import org.rssowl.ui.internal.ContextMenuCreator;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.FolderNewsMark;
 import org.rssowl.ui.internal.OwlUI;
@@ -233,10 +233,10 @@ public class FilterBar {
     };
     quickSearch.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/find.gif")); //$NON-NLS-1$
 
-    quickSearch.setMenuCreator(new IMenuCreator() {
-      public void dispose() {}
+    quickSearch.setMenuCreator(new ContextMenuCreator() {
 
-      public Menu getMenu(Control parent) {
+      @Override
+      public Menu createMenu(Control parent) {
         Menu menu = new Menu(parent);
 
         /* Search on: Subject */
@@ -344,10 +344,6 @@ public class FilterBar {
         }
 
         return menu;
-      }
-
-      public Menu getMenu(Menu parent) {
-        return null;
       }
     });
 
@@ -485,8 +481,10 @@ public class FilterBar {
     };
     columnDropdown.setId(COLUMNS_ACTION);
 
-    columnDropdown.setMenuCreator(new IMenuCreator() {
-      public Menu getMenu(Control parent) {
+    columnDropdown.setMenuCreator(new ContextMenuCreator() {
+
+      @Override
+      public Menu createMenu(Control parent) {
         Menu menu = new Menu(parent);
 
         MenuItem restoreDefaults = new MenuItem(menu, SWT.None);
@@ -527,12 +525,6 @@ public class FilterBar {
 
         return menu;
       }
-
-      public Menu getMenu(Menu parent) {
-        return null;
-      }
-
-      public void dispose() {}
     });
 
     fSecondToolBarManager.add(columnDropdown);
@@ -636,10 +628,10 @@ public class FilterBar {
 
     fFirstToolBarManager.add(item);
 
-    newsFilterAction.setMenuCreator(new IMenuCreator() {
-      public void dispose() {}
+    newsFilterAction.setMenuCreator(new ContextMenuCreator() {
 
-      public Menu getMenu(Control parent) {
+      @Override
+      public Menu createMenu(Control parent) {
         Menu menu = new Menu(parent);
 
         /* Filter: None */
@@ -742,10 +734,6 @@ public class FilterBar {
         }
 
         return menu;
-      }
-
-      public Menu getMenu(Menu parent) {
-        return null;
       }
     });
   }
@@ -921,10 +909,10 @@ public class FilterBar {
 
     newsGroup.setId(GROUP_ACTION);
 
-    newsGroup.setMenuCreator(new IMenuCreator() {
-      public void dispose() {}
+    newsGroup.setMenuCreator(new ContextMenuCreator() {
 
-      public Menu getMenu(Control parent) {
+      @Override
+      public Menu createMenu(Control parent) {
         Menu menu = new Menu(parent);
 
         /* Group: None */
@@ -1067,10 +1055,6 @@ public class FilterBar {
         });
 
         return menu;
-      }
-
-      public Menu getMenu(Menu parent) {
-        return null;
       }
     });
 

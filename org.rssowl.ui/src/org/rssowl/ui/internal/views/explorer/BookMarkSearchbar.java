@@ -31,7 +31,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ISelection;
@@ -67,6 +66,7 @@ import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.progress.WorkbenchJob;
 import org.rssowl.ui.internal.Application;
+import org.rssowl.ui.internal.ContextMenuCreator;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.JobRunner;
@@ -204,10 +204,10 @@ class BookMarkSearchbar extends Composite {
       }
     };
 
-    filterTargetAction.setMenuCreator(new IMenuCreator() {
-      public void dispose() {}
+    filterTargetAction.setMenuCreator(new ContextMenuCreator() {
 
-      public Menu getMenu(Control parent) {
+      @Override
+      public Menu createMenu(Control parent) {
         Menu menu = new Menu(parent);
 
         /* Search on: Name */
@@ -235,10 +235,6 @@ class BookMarkSearchbar extends Composite {
         });
 
         return menu;
-      }
-
-      public Menu getMenu(Menu parent) {
-        return null;
       }
     });
 

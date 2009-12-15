@@ -902,8 +902,8 @@ public class NewsTableControl implements IFeedViewPart {
             moveMenu.add(new MoveCopyNewsToBinAction(selection, bin, true));
           }
 
-          moveMenu.add(new Separator("movetonewbin")); //$NON-NLS-1$
           moveMenu.add(new MoveCopyNewsToBinAction(selection, null, true));
+          moveMenu.add(new Separator());
           moveMenu.add(new AutomateFilterAction(PresetAction.MOVE, selection));
 
           /* Copy To */
@@ -917,8 +917,8 @@ public class NewsTableControl implements IFeedViewPart {
             copyMenu.add(new MoveCopyNewsToBinAction(selection, bin, false));
           }
 
-          copyMenu.add(new Separator("copytonewbin")); //$NON-NLS-1$
           copyMenu.add(new MoveCopyNewsToBinAction(selection, null, false));
+          copyMenu.add(new Separator());
           copyMenu.add(new AutomateFilterAction(PresetAction.COPY, selection));
         }
 

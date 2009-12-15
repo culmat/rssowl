@@ -28,7 +28,6 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -122,6 +121,7 @@ import org.rssowl.core.util.ModelTreeNode;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.TreeTraversal;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
+import org.rssowl.ui.internal.ContextMenuCreator;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.OwlUI;
@@ -863,10 +863,10 @@ public class BookMarkExplorer extends ViewPart {
     };
     bookmarkFilter.setId(FILTER_ACTION);
 
-    bookmarkFilter.setMenuCreator(new IMenuCreator() {
-      public void dispose() {}
+    bookmarkFilter.setMenuCreator(new ContextMenuCreator() {
 
-      public Menu getMenu(Control parent) {
+      @Override
+      public Menu createMenu(Control parent) {
         Menu menu = new Menu(parent);
 
         /* Filter: None */
@@ -953,10 +953,6 @@ public class BookMarkExplorer extends ViewPart {
 
         return menu;
       }
-
-      public Menu getMenu(Menu parent) {
-        return null;
-      }
     });
 
     fToolBarManager.add(bookmarkFilter);
@@ -986,10 +982,10 @@ public class BookMarkExplorer extends ViewPart {
     };
     bookmarkGroup.setId(GROUP_ACTION);
 
-    bookmarkGroup.setMenuCreator(new IMenuCreator() {
-      public void dispose() {}
+    bookmarkGroup.setMenuCreator(new ContextMenuCreator() {
 
-      public Menu getMenu(Control parent) {
+      @Override
+      public Menu createMenu(Control parent) {
         Menu menu = new Menu(parent);
 
         /* Group: None */
@@ -1060,10 +1056,6 @@ public class BookMarkExplorer extends ViewPart {
         });
 
         return menu;
-      }
-
-      public Menu getMenu(Menu parent) {
-        return null;
       }
     });
 
