@@ -620,9 +620,6 @@ public class CoolBarAdvisor {
       /* Ensure Updates are properly Propagated */
       if (fromUpdate) {
 
-        /* Update Action UI */
-        updateActions(OwlUI.getActivePart(fWindow));
-
         /* Update Overall Coolbar UI */
         fManager.update(true);
         if (barControl != null) {
@@ -630,6 +627,9 @@ public class CoolBarAdvisor {
           barControl.setLocked(!isLocked);
           barControl.setLocked(isLocked);
         }
+
+        /* Update Action UI */
+        updateActions(OwlUI.getActivePart(fWindow));
       }
     } finally {
       if (barControl != null && fromUpdate)
