@@ -449,6 +449,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
     /* Show Menu on Selection */
     fTrayItem.addListener(SWT.MenuDetect, new Listener() {
+      private Menu menu;
+
       public void handleEvent(Event event) {
         MenuManager trayMenu = new MenuManager();
 
@@ -474,7 +476,10 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         /* Other Items */
         fActionBarAdvisor.fillTrayItem(trayMenu, shell, ApplicationWorkbenchWindowAdvisor.this);
 
-        Menu menu = trayMenu.createContextMenu(shell);
+        if (menu != null)
+          menu.dispose();
+
+        menu = trayMenu.createContextMenu(shell);
         menu.setVisible(true);
       }
     });
