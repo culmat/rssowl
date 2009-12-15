@@ -562,6 +562,10 @@ public class CustomizeToolbarDialog extends Dialog {
     sortedItems.remove(CoolBarItem.DELETE);
     sortedItems.add(sortedItems.indexOf(CoolBarItem.PRINT), CoolBarItem.DELETE);
 
+    /* Move "Attachments" after "Print News" */
+    sortedItems.remove(CoolBarItem.ATTACHMENTS);
+    sortedItems.add(sortedItems.indexOf(CoolBarItem.PRINT) + 1, CoolBarItem.ATTACHMENTS);
+
     return sortedItems.toArray(new CoolBarItem[sortedItems.size()]);
   }
 
