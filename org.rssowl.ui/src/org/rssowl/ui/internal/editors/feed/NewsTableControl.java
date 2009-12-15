@@ -124,6 +124,7 @@ import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -337,7 +338,7 @@ public class NewsTableControl implements IFeedViewPart {
 
   private void setTextData(DragSourceEvent event) {
     IStructuredSelection selection = (IStructuredSelection) LocalSelectionTransfer.getTransfer().getSelection();
-    Set<INews> news = ModelUtils.normalize(selection.toList());
+    Collection<INews> news = ModelUtils.normalize(selection.toList());
 
     if (!news.isEmpty()) {
       String linkAsText = CoreUtils.getLink(news.iterator().next());

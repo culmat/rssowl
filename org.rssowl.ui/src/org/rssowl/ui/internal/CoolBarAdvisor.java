@@ -109,10 +109,10 @@ import org.rssowl.ui.internal.util.ModelUtils;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -793,7 +793,7 @@ public class CoolBarAdvisor {
       case ATTACHMENTS:
         boolean enabled = false;
         if (part instanceof FeedView && !selection.isEmpty()) {
-          Set<INews> selectedNews = ModelUtils.normalize(((IStructuredSelection) selection).toList());
+          Collection<INews> selectedNews = ModelUtils.normalize(((IStructuredSelection) selection).toList());
           for (INews news : selectedNews) {
             if (!news.getAttachments().isEmpty()) {
               enabled = true;

@@ -45,6 +45,7 @@ import org.rssowl.ui.internal.editors.feed.NewsGrouping;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -233,12 +234,12 @@ public class ModelUtils {
    * @param objects
    * @return all News of the List of Objects also considering EntityGroups.
    */
-  public static Set<INews> normalize(List<?> objects) {
-    Set<INews> normalizedNews = new HashSet<INews>(objects.size());
+  public static Collection<INews> normalize(List<?> objects) {
+    List<INews> normalizedNews = new ArrayList<INews>(objects.size());
     for (Object object : objects) {
 
       /* News */
-      if (object instanceof INews) {
+      if (object instanceof INews && !normalizedNews.contains(object)) {
         normalizedNews.add((INews) object);
       }
 
@@ -248,7 +249,8 @@ public class ModelUtils {
         if (NewsGrouping.GROUP_CATEGORY_ID.equals(group.getCategory())) {
           List<IEntity> entities = group.getEntities();
           for (IEntity entity : entities) {
-            normalizedNews.add((INews) entity);
+            if (!normalizedNews.contains(entity))
+              normalizedNews.add((INews) entity);
           }
         }
       }
@@ -295,7 +297,7 @@ public class ModelUtils {
    */
   public static List<Pair<IAttachment, URI>> getAttachmentLinks(IStructuredSelection selection) {
     List<Pair<IAttachment, URI>> attachmentLinks = new ArrayList<Pair<IAttachment, URI>>();
-    Set<INews> news = normalize(selection.toList());
+    Collection<INews> news = normalize(selection.toList());
     for (INews newsitem : news) {
       List<IAttachment> attachments = newsitem.getAttachments();
       for (IAttachment attachment : attachments) {

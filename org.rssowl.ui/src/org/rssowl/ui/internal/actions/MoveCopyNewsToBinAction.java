@@ -40,8 +40,8 @@ import org.rssowl.ui.internal.undo.UndoStack;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Action to move or copy a selection of News to a Newsbin.
@@ -103,7 +103,7 @@ public class MoveCopyNewsToBinAction extends Action {
 
   private void moveCopyToBin() {
     List<?> objects = fSelection.toList();
-    Set<INews> news = ModelUtils.normalize(objects);
+    Collection<INews> news = ModelUtils.normalize(objects);
     boolean requiresSave = false;
 
     /* Only consider those not already present in the Bin */
