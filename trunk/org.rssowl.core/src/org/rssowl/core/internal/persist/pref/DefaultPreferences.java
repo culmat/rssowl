@@ -127,10 +127,10 @@ public class DefaultPreferences {
   /** Feed View: Search Target */
   public static final String FV_SEARCH_TARGET = Preference.FV_SEARCH_TARGET.id();
 
-  /** Feed View: Selected Grouping */
+  /** Feed View: Selected Grouping (Deprecated as of RSSOwl 2.0.2) */
   public static final String FV_GROUP_TYPE = Preference.FV_GROUP_TYPE.id();
 
-  /** Feed View: Selected Filter */
+  /** Feed View: Selected Filter (Deprecated as of RSSOwl 2.0.2) */
   public static final String FV_FILTER_TYPE = Preference.FV_FILTER_TYPE.id();
 
   /** Feed View: SashForm Weights */

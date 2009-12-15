@@ -63,6 +63,7 @@ import org.rssowl.ui.internal.editors.feed.NewsGrouping;
 import org.rssowl.ui.internal.services.FeedReloadService;
 import org.rssowl.ui.internal.util.EditorUtils;
 import org.rssowl.ui.internal.util.LayoutUtils;
+import org.rssowl.ui.internal.util.ModelUtils;
 import org.rssowl.ui.internal.util.NewsColumnSelectionControl;
 
 import java.util.Collection;
@@ -304,13 +305,12 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
 
     fFilterCombo = new Combo(group, SWT.BORDER | SWT.READ_ONLY);
     fFilterCombo.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false));
-    fFilterCombo.add(""); //$NON-NLS-1$
 
     NewsFilter.Type[] filters = NewsFilter.Type.values();
     for (NewsFilter.Type filter : filters)
       fFilterCombo.add(filter.getName());
 
-    fFilterCombo.select(fGlobalScope.getInteger(DefaultPreferences.BM_NEWS_FILTERING) + 1);
+    fFilterCombo.select(ModelUtils.loadIntegerValueWithFallback(fGlobalScope, DefaultPreferences.BM_NEWS_FILTERING, fGlobalScope, DefaultPreferences.FV_FILTER_TYPE));
     fFilterCombo.setVisibleItemCount(fFilterCombo.getItemCount());
 
     /* Group Settings */
@@ -319,13 +319,12 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
 
     fGroupCombo = new Combo(group, SWT.BORDER | SWT.READ_ONLY);
     fGroupCombo.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false));
-    fGroupCombo.add(""); //$NON-NLS-1$
 
     NewsGrouping.Type[] groups = NewsGrouping.Type.values();
     for (NewsGrouping.Type groupT : groups)
       fGroupCombo.add(groupT.getName());
 
-    fGroupCombo.select(fGlobalScope.getInteger(DefaultPreferences.BM_NEWS_GROUPING) + 1);
+    fGroupCombo.select(ModelUtils.loadIntegerValueWithFallback(fGlobalScope, DefaultPreferences.BM_NEWS_GROUPING, fGlobalScope, DefaultPreferences.FV_GROUP_TYPE));
     fGroupCombo.setVisibleItemCount(fGroupCombo.getItemCount());
 
     /* Open Site for News Settings */
@@ -501,13 +500,13 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     fGlobalScope.putInteger(DefaultPreferences.MARK_READ_IN_MILLIS, fMarkReadAfterSpinner.getSelection() * 1000);
 
     /* Display */
-    if (fGlobalScope.getInteger(DefaultPreferences.BM_NEWS_FILTERING) != (fFilterCombo.getSelectionIndex() - 1)) {
-      fGlobalScope.putInteger(DefaultPreferences.BM_NEWS_FILTERING, fFilterCombo.getSelectionIndex() - 1);
+    if (ModelUtils.loadIntegerValueWithFallback(fGlobalScope, DefaultPreferences.BM_NEWS_FILTERING, fGlobalScope, DefaultPreferences.FV_FILTER_TYPE) != (fFilterCombo.getSelectionIndex())) {
+      fGlobalScope.putInteger(DefaultPreferences.BM_NEWS_FILTERING, fFilterCombo.getSelectionIndex());
       displayChange = true;
     }
 
-    if (fGlobalScope.getInteger(DefaultPreferences.BM_NEWS_GROUPING) != (fGroupCombo.getSelectionIndex() - 1)) {
-      fGlobalScope.putInteger(DefaultPreferences.BM_NEWS_GROUPING, fGroupCombo.getSelectionIndex() - 1);
+    if (ModelUtils.loadIntegerValueWithFallback(fGlobalScope, DefaultPreferences.BM_NEWS_GROUPING, fGlobalScope, DefaultPreferences.FV_GROUP_TYPE) != (fGroupCombo.getSelectionIndex())) {
+      fGlobalScope.putInteger(DefaultPreferences.BM_NEWS_GROUPING, fGroupCombo.getSelectionIndex());
       displayChange = true;
     }
 
@@ -655,8 +654,8 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     fMarkReadAfterSpinner.setEnabled(fMarkReadStateCheck.getSelection());
 
     /* Display */
-    fFilterCombo.select(defaultScope.getInteger(DefaultPreferences.BM_NEWS_FILTERING) + 1);
-    fGroupCombo.select(defaultScope.getInteger(DefaultPreferences.BM_NEWS_GROUPING) + 1);
+    fFilterCombo.select(ModelUtils.loadIntegerValueWithFallback(defaultScope, DefaultPreferences.BM_NEWS_FILTERING, defaultScope, DefaultPreferences.FV_FILTER_TYPE));
+    fGroupCombo.select(ModelUtils.loadIntegerValueWithFallback(defaultScope, DefaultPreferences.BM_NEWS_GROUPING, defaultScope, DefaultPreferences.FV_GROUP_TYPE));
     fOpenSiteForNewsCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_NEWS));
     fOpenSiteForEmptyNewsCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_EMPTY_NEWS));
     fLoadImagesForNewsCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.BM_LOAD_IMAGES));

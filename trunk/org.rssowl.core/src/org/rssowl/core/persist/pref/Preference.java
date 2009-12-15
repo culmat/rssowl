@@ -124,10 +124,10 @@ public enum Preference {
   /** Feed View: Search Target */
   FV_SEARCH_TARGET("org.rssowl.ui.internal.editors.feed.SearchTarget", IPreferenceType.INTEGER), //$NON-NLS-1$
 
-  /** Feed View: Selected Grouping */
+  /** Feed View: Selected Grouping (Deprecated as of RSSOwl 2.0.2) */
   FV_GROUP_TYPE("org.rssowl.ui.internal.editors.feed.GroupType", IPreferenceType.INTEGER), //$NON-NLS-1$
 
-  /** Feed View: Selected Filter */
+  /** Feed View: Selected Filter (Deprecated as of RSSOwl 2.0.2) */
   FV_FILTER_TYPE("org.rssowl.ui.internal.editors.feed.FilterType", IPreferenceType.INTEGER), //$NON-NLS-1$
 
   /** Feed View: SashForm Weights */

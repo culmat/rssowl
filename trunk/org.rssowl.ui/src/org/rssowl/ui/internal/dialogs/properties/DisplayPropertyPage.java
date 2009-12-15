@@ -45,6 +45,7 @@ import org.rssowl.ui.internal.editors.feed.NewsFilter;
 import org.rssowl.ui.internal.editors.feed.NewsGrouping;
 import org.rssowl.ui.internal.util.EditorUtils;
 import org.rssowl.ui.internal.util.LayoutUtils;
+import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,24 +89,25 @@ public class DisplayPropertyPage implements IEntityPropertyPage {
   }
 
   private void loadInitialSettings() {
+    IPreferenceScope globalScope = Owl.getPreferenceService().getGlobalScope();
+    IPreferenceScope defaultScope = Owl.getPreferenceService().getDefaultScope();
 
     /* Take the first scope as initial values */
     IPreferenceScope firstScope = fEntityPreferences.get(0);
-    fPrefSelectedFilter = firstScope.getInteger(DefaultPreferences.BM_NEWS_FILTERING);
-    fPrefSelectedGroup = firstScope.getInteger(DefaultPreferences.BM_NEWS_GROUPING);
+    fPrefSelectedFilter = ModelUtils.loadIntegerValueWithFallback(firstScope, DefaultPreferences.BM_NEWS_FILTERING, globalScope, DefaultPreferences.FV_FILTER_TYPE);
+    fPrefSelectedGroup = ModelUtils.loadIntegerValueWithFallback(firstScope, DefaultPreferences.BM_NEWS_GROUPING, globalScope, DefaultPreferences.FV_GROUP_TYPE);
     fPrefOpenSiteForNews = firstScope.getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_NEWS);
     fPrefLoadImagesForNews = firstScope.getBoolean(DefaultPreferences.BM_LOAD_IMAGES);
 
     /* For any other scope not sharing the initial values, use the default */
-    IPreferenceScope defaultScope = Owl.getPreferenceService().getDefaultScope();
     for (int i = 1; i < fEntityPreferences.size(); i++) {
       IPreferenceScope otherScope = fEntityPreferences.get(i);
 
-      if (otherScope.getInteger(DefaultPreferences.BM_NEWS_FILTERING) != fPrefSelectedFilter)
-        fPrefSelectedFilter = defaultScope.getInteger(DefaultPreferences.BM_NEWS_FILTERING);
+      if (ModelUtils.loadIntegerValueWithFallback(otherScope, DefaultPreferences.BM_NEWS_FILTERING, globalScope, DefaultPreferences.FV_FILTER_TYPE) != fPrefSelectedFilter)
+        fPrefSelectedFilter = ModelUtils.loadIntegerValueWithFallback(defaultScope, DefaultPreferences.BM_NEWS_FILTERING, defaultScope, DefaultPreferences.FV_FILTER_TYPE);
 
-      if (otherScope.getInteger(DefaultPreferences.BM_NEWS_GROUPING) != fPrefSelectedGroup)
-        fPrefSelectedGroup = defaultScope.getInteger(DefaultPreferences.BM_NEWS_GROUPING);
+      if (ModelUtils.loadIntegerValueWithFallback(otherScope, DefaultPreferences.BM_NEWS_GROUPING, globalScope, DefaultPreferences.FV_GROUP_TYPE) != fPrefSelectedGroup)
+        fPrefSelectedGroup = ModelUtils.loadIntegerValueWithFallback(defaultScope, DefaultPreferences.BM_NEWS_GROUPING, defaultScope, DefaultPreferences.FV_GROUP_TYPE);
 
       if (otherScope.getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_NEWS) != fPrefOpenSiteForNews)
         fPrefOpenSiteForNews = defaultScope.getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_NEWS);
@@ -128,13 +130,12 @@ public class DisplayPropertyPage implements IEntityPropertyPage {
 
     fFilterCombo = new Combo(container, SWT.BORDER | SWT.READ_ONLY);
     fFilterCombo.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false));
-    fFilterCombo.add(""); //$NON-NLS-1$
 
     NewsFilter.Type[] filters = NewsFilter.Type.values();
     for (NewsFilter.Type filter : filters)
       fFilterCombo.add(filter.getName());
 
-    fFilterCombo.select(fPrefSelectedFilter + 1);
+    fFilterCombo.select(fPrefSelectedFilter);
     fFilterCombo.setVisibleItemCount(fFilterCombo.getItemCount());
 
     /* Group Settings */
@@ -143,13 +144,12 @@ public class DisplayPropertyPage implements IEntityPropertyPage {
 
     fGroupCombo = new Combo(container, SWT.BORDER | SWT.READ_ONLY);
     fGroupCombo.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false));
-    fGroupCombo.add(""); //$NON-NLS-1$
 
     NewsGrouping.Type[] groups = NewsGrouping.Type.values();
     for (NewsGrouping.Type group : groups)
       fGroupCombo.add(group.getName());
 
-    fGroupCombo.select(fPrefSelectedGroup + 1);
+    fGroupCombo.select(fPrefSelectedGroup);
     fGroupCombo.setVisibleItemCount(fGroupCombo.getItemCount());
 
     /* Open Site for News Settings */
@@ -227,14 +227,14 @@ public class DisplayPropertyPage implements IEntityPropertyPage {
     boolean changed = false;
 
     /* Filter */
-    int iVal = fFilterCombo.getSelectionIndex() - 1;
+    int iVal = fFilterCombo.getSelectionIndex();
     if (fPrefSelectedFilter != iVal) {
       scope.putInteger(DefaultPreferences.BM_NEWS_FILTERING, iVal);
       changed = true;
     }
 
     /* Grouping */
-    iVal = fGroupCombo.getSelectionIndex() - 1;
+    iVal = fGroupCombo.getSelectionIndex();
     if (fPrefSelectedGroup != iVal) {
       scope.putInteger(DefaultPreferences.BM_NEWS_GROUPING, iVal);
       changed = true;
