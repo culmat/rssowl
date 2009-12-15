@@ -58,6 +58,8 @@ import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.dao.IPersonDAO;
 import org.rssowl.core.persist.dao.ISearchMarkDAO;
+import org.rssowl.core.persist.event.NewsEvent;
+import org.rssowl.core.persist.event.NewsListener;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.ReparentInfo;
@@ -69,6 +71,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * This TestCase is for testing the Model Plugin (4 of 4).
@@ -535,5 +538,116 @@ public class ModelTest4 {
 
     assertFalse(news1.isEquivalent(news2));
     assertFalse(news2.isEquivalent(news1));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testEntityReadWriteFromAdded() throws Exception {
+    final AtomicBoolean listenerHit= new AtomicBoolean(false);
+
+    IFeed feed = fFactory.createFeed(null, new URI("feed"));
+    fFactory.createNews(null, feed, new Date());
+
+    NewsListener listener = new NewsListener() {
+      public void entitiesAdded(Set<NewsEvent> events) {
+        listenerHit.set(true);
+
+        for (NewsEvent event : events) {
+          event.getEntity().getState();
+          event.getEntity().setState(INews.State.READ);
+        }
+      }
+
+      public void entitiesUpdated(Set<NewsEvent> events) {}
+
+      public void entitiesDeleted(Set<NewsEvent> events) {}
+    };
+    DynamicDAO.addEntityListener(INews.class, listener);
+
+    try {
+      DynamicDAO.save(feed);
+      assertTrue(listenerHit.get());
+    } finally {
+      DynamicDAO.removeEntityListener(INews.class, listener);
+    }
+  }
+
+  /**
+   * @throws Exception
+   * @see IllegalStateException: Cannot acquire the write lock from the same
+   * thread as the read lock (Bug 1279)
+   */
+  @Test
+  @Ignore
+  public void testEntityReadWriteFromUpdated() throws Exception {
+    final AtomicBoolean listenerHit = new AtomicBoolean(false);
+
+    IFeed feed = fFactory.createFeed(null, new URI("feed"));
+    final INews news = fFactory.createNews(null, feed, new Date());
+
+    DynamicDAO.save(feed);
+
+    NewsListener listener = new NewsListener() {
+      public void entitiesUpdated(Set<NewsEvent> events) {
+        listenerHit.set(true);
+
+        for (NewsEvent event : events) {
+          event.getEntity().getState();
+          event.getEntity().setState(INews.State.READ);
+        }
+      }
+
+      public void entitiesDeleted(Set<NewsEvent> events) {}
+
+      public void entitiesAdded(Set<NewsEvent> events) {}
+    };
+    DynamicDAO.addEntityListener(INews.class, listener);
+
+    news.setFlagged(true);
+
+    try {
+      DynamicDAO.save(news);
+      assertTrue(listenerHit.get());
+    } finally {
+      DynamicDAO.removeEntityListener(INews.class, listener);
+    }
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testEntityReadWriteFromDeleted() throws Exception {
+    final AtomicBoolean listenerHit= new AtomicBoolean(false);
+
+    IFeed feed = fFactory.createFeed(null, new URI("feed"));
+    final INews news = fFactory.createNews(null, feed, new Date());
+
+    DynamicDAO.save(feed);
+
+    NewsListener listener = new NewsListener() {
+      public void entitiesDeleted(Set<NewsEvent> events) {
+        listenerHit.set(true);
+
+        for (NewsEvent event : events) {
+          event.getEntity().getState();
+          event.getEntity().setState(INews.State.READ);
+        }
+      }
+
+      public void entitiesUpdated(Set<NewsEvent> events) {}
+
+      public void entitiesAdded(Set<NewsEvent> events) {}
+    };
+    DynamicDAO.addEntityListener(INews.class, listener);
+
+    try {
+      DynamicDAO.delete(news);
+      assertTrue(listenerHit.get());
+    } finally {
+      DynamicDAO.removeEntityListener(INews.class, listener);
+    }
   }
 }
