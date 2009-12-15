@@ -78,6 +78,7 @@ import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.dialogs.SearchMarkDialog;
 import org.rssowl.ui.internal.editors.feed.NewsFilter.SearchTarget;
 import org.rssowl.ui.internal.editors.feed.NewsFilter.Type;
+import org.rssowl.ui.internal.util.EditorUtils;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.JobTracker;
 import org.rssowl.ui.internal.util.LayoutUtils;
@@ -594,8 +595,8 @@ public class FilterBar {
     else
       newModel.saveTo(fGlobalPreferences);
 
-    /* Update Columns of visible Feedview */
-    fFeedView.updateColumns();
+    /* Update Columns of all visible Feedviews */
+    EditorUtils.updateColumns();
   }
 
   /* News Filter */
