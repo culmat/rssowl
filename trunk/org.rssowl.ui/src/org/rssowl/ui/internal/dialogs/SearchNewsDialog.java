@@ -29,7 +29,6 @@ import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -136,6 +135,7 @@ import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.ApplicationActionBarAdvisor;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
+import org.rssowl.ui.internal.ContextMenuCreator;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.AutomateFilterAction;
@@ -857,8 +857,10 @@ public class SearchNewsDialog extends TitleAreaDialog {
       }
     };
 
-    columnDropdown.setMenuCreator(new IMenuCreator() {
-      public Menu getMenu(Control parent) {
+    columnDropdown.setMenuCreator(new ContextMenuCreator() {
+
+      @Override
+      public Menu createMenu(Control parent) {
         Menu menu = new Menu(parent);
 
         MenuItem restoreDefaults = new MenuItem(menu, SWT.None);
@@ -898,12 +900,6 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
         return menu;
       }
-
-      public Menu getMenu(Menu parent) {
-        return null;
-      }
-
-      public void dispose() {}
     });
 
     dialogToolBar.add(columnDropdown);
@@ -977,10 +973,10 @@ public class SearchNewsDialog extends TitleAreaDialog {
       }
     };
 
-    savedSearches.setMenuCreator(new IMenuCreator() {
-      public void dispose() {}
+    savedSearches.setMenuCreator(new ContextMenuCreator() {
 
-      public Menu getMenu(Control parent) {
+      @Override
+      public Menu createMenu(Control parent) {
         Collection<ISearchMark> searchMarks = CoreUtils.loadSortedSearchMarks();
         Menu menu = new Menu(parent);
 
@@ -1014,10 +1010,6 @@ public class SearchNewsDialog extends TitleAreaDialog {
         }
 
         return menu;
-      }
-
-      public Menu getMenu(Menu parent) {
-        return null;
       }
     });
 
@@ -1861,8 +1853,8 @@ public class SearchNewsDialog extends TitleAreaDialog {
             moveMenu.add(new MoveCopyNewsToBinAction(selection, bin, true));
           }
 
-          moveMenu.add(new Separator("movetonewbin")); //$NON-NLS-1$
           moveMenu.add(new MoveCopyNewsToBinAction(selection, null, true));
+          moveMenu.add(new Separator());
           moveMenu.add(new AutomateFilterAction(PresetAction.MOVE, selection));
 
           /* Copy To */
@@ -1873,8 +1865,8 @@ public class SearchNewsDialog extends TitleAreaDialog {
             copyMenu.add(new MoveCopyNewsToBinAction(selection, bin, false));
           }
 
-          copyMenu.add(new Separator("copytonewbin")); //$NON-NLS-1$
           copyMenu.add(new MoveCopyNewsToBinAction(selection, null, false));
+          copyMenu.add(new Separator());
           copyMenu.add(new AutomateFilterAction(PresetAction.COPY, selection));
         }
 

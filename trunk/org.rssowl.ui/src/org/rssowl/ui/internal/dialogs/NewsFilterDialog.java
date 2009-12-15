@@ -26,7 +26,6 @@ package org.rssowl.ui.internal.dialogs;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.Dialog;
@@ -79,6 +78,7 @@ import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Activator;
+import org.rssowl.ui.internal.ContextMenuCreator;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.filter.NewsActionDescriptor;
 import org.rssowl.ui.internal.filter.NewsActionList;
@@ -593,10 +593,10 @@ public class NewsFilterDialog extends TitleAreaDialog {
         }
       };
 
-      existingFilters.setMenuCreator(new IMenuCreator() {
-        public void dispose() {}
+      existingFilters.setMenuCreator(new ContextMenuCreator() {
 
-        public Menu getMenu(Control parent) {
+        @Override
+        public Menu createMenu(Control parent) {
           Collection<ISearchFilter> filters = CoreUtils.loadSortedNewsFilters();
           Menu menu = new Menu(parent);
 
@@ -637,10 +637,6 @@ public class NewsFilterDialog extends TitleAreaDialog {
 
           return menu;
         }
-
-        public Menu getMenu(Menu parent) {
-          return null;
-        }
       });
 
       dialogToolBar.add(existingFilters);
@@ -665,10 +661,10 @@ public class NewsFilterDialog extends TitleAreaDialog {
         }
       };
 
-      savedSearches.setMenuCreator(new IMenuCreator() {
-        public void dispose() {}
+      savedSearches.setMenuCreator(new ContextMenuCreator() {
 
-        public Menu getMenu(Control parent) {
+        @Override
+        public Menu createMenu(Control parent) {
           Collection<ISearchMark> searchMarks = CoreUtils.loadSortedSearchMarks();
           Menu menu = new Menu(parent);
 
@@ -696,10 +692,6 @@ public class NewsFilterDialog extends TitleAreaDialog {
           }
 
           return menu;
-        }
-
-        public Menu getMenu(Menu parent) {
-          return null;
         }
       });
 

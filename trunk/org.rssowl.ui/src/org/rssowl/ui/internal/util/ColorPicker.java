@@ -134,6 +134,8 @@ public class ColorPicker {
     fBar = new ToolBar(fParent, style);
     fBar.addDisposeListener(new DisposeListener() {
       public void widgetDisposed(DisposeEvent e) {
+        fColorMenu.dispose();
+
         for (Image img : fImagesToDispose) {
           img.dispose();
         }
@@ -155,7 +157,7 @@ public class ColorPicker {
     });
   }
 
-  private Menu createColorMenu() {
+  private void createColorMenu() {
     fColorMenu = new Menu(fParent.getShell(), SWT.POP_UP);
 
     /* Add some useful Colors */
@@ -184,8 +186,6 @@ public class ColorPicker {
         onSelectOtherColor();
       }
     });
-
-    return fColorMenu;
   }
 
   private void onColorSelected(RGB color) {

@@ -28,7 +28,6 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
@@ -76,6 +75,7 @@ import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.ApplicationServer;
+import org.rssowl.ui.internal.ContextMenuCreator;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.ILinkHandler;
 import org.rssowl.ui.internal.OwlUI;
@@ -325,7 +325,7 @@ public class WebBrowserView extends EditorPart implements IReusableEditor {
   public void createPartControl(Composite parent) {
     fCreated = true;
     parent.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 0, 0, false));
-    ((GridLayout)parent.getLayout()).marginTop = 5;
+    ((GridLayout) parent.getLayout()).marginTop = 5;
 
     /* Browser Bar */
     createBrowserBar(parent);
@@ -452,12 +452,10 @@ public class WebBrowserView extends EditorPart implements IReusableEditor {
     };
     fNavigationToolBarManager.add(shareLink);
     shareLink.setImageDescriptor(OwlUI.SHARE);
-    shareLink.setMenuCreator(new IMenuCreator() {
-      public Menu getMenu(Menu parent) {
-        return null;
-      }
+    shareLink.setMenuCreator(new ContextMenuCreator() {
 
-      public Menu getMenu(Control parent) {
+      @Override
+      public Menu createMenu(Control parent) {
         MenuManager shareMenu = new MenuManager();
 
         String url = fBrowser.getControl().getUrl();
@@ -519,8 +517,6 @@ public class WebBrowserView extends EditorPart implements IReusableEditor {
 
         return shareMenu.createContextMenu(parent);
       }
-
-      public void dispose() {}
     });
 
     /* Discover Feeds on Website */

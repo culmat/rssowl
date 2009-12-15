@@ -38,6 +38,8 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -176,6 +178,12 @@ public class NewsColumnSelectionControl extends Composite {
         pt = addButton.toDisplay(pt);
         menu.setLocation(pt.x, pt.y);
         menu.setVisible(true);
+      }
+    });
+
+    addButton.addDisposeListener(new DisposeListener() {
+      public void widgetDisposed(DisposeEvent e) {
+        menu.dispose();
       }
     });
 

@@ -30,7 +30,6 @@ import org.eclipse.jface.action.CoolBarManager;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.ICoolBarManager;
-import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
@@ -664,13 +663,9 @@ public class CoolBarAdvisor {
       public void run() {
         CoolBarAdvisor.this.run(this, item, manager);
       }
-
-      @Override
-      public IMenuCreator getMenuCreator() {
-        return CoolBarAdvisor.this.getMenu(item);
-      }
     };
     action.setToolTipText(item.getTooltip());
+    action.setMenuCreator(getMenu(item));
     return action;
   }
 
@@ -1150,7 +1145,7 @@ public class CoolBarAdvisor {
     action.run(null);
   }
 
-  private IMenuCreator getMenu(CoolBarItem item) {
+  private ContextMenuCreator getMenu(CoolBarItem item) {
     if (!item.withDropDownMenu())
       return null;
 
@@ -1158,19 +1153,27 @@ public class CoolBarAdvisor {
 
       /* New Bookmark | Saved Search | News Bin | Folder */
       case NEW: {
-        NewTypeDropdownAction action = new NewTypeDropdownAction();
-        action.init(fWindow);
-        IFolder folder = OwlUI.getBookMarkExplorerSelection();
-        if (folder != null)
-          action.selectionChanged(null, new StructuredSelection(folder));
-        return action;
+        return new ContextMenuCreator() {
+
+          @Override
+          public Menu createMenu(Control parent) {
+            NewTypeDropdownAction action = new NewTypeDropdownAction();
+            action.init(fWindow);
+            IFolder folder = OwlUI.getBookMarkExplorerSelection();
+            if (folder != null)
+              action.selectionChanged(null, new StructuredSelection(folder));
+
+            return action.getMenu(parent);
+          }
+        };
       }
 
         /* Next News | Next Unread News || Next Feed | Next Unread Feed || Next Tab */
       case NEXT: {
-        return new IMenuCreator() {
+        return new ContextMenuCreator() {
 
-          public Menu getMenu(Control parent) {
+          @Override
+          public Menu createMenu(Control parent) {
             Menu menu = new Menu(parent);
             NavigationActionType defaultAction = NavigationActionType.values()[fPreferences.getInteger(DefaultPreferences.DEFAULT_NEXT_ACTION)];
 
@@ -1215,20 +1218,15 @@ public class CoolBarAdvisor {
 
             return menu;
           }
-
-          public void dispose() {}
-
-          public Menu getMenu(Menu parent) {
-            return null;
-          }
         };
       }
 
         /* Previous News | Previous Unread News || Previous Feed | Previous Unread Feed || Previous Tab */
       case PREVIOUS: {
-        return new IMenuCreator() {
+        return new ContextMenuCreator() {
 
-          public Menu getMenu(Control parent) {
+          @Override
+          public Menu createMenu(Control parent) {
             Menu menu = new Menu(parent);
             NavigationActionType defaultAction = NavigationActionType.values()[fPreferences.getInteger(DefaultPreferences.DEFAULT_PREVIOUS_ACTION)];
 
@@ -1273,20 +1271,15 @@ public class CoolBarAdvisor {
 
             return menu;
           }
-
-          public void dispose() {}
-
-          public Menu getMenu(Menu parent) {
-            return null;
-          }
         };
       }
 
         /* History */
       case HISTORY:
-        return new IMenuCreator() {
+        return new ContextMenuCreator() {
 
-          public Menu getMenu(Control parent) {
+          @Override
+          public Menu createMenu(Control parent) {
             Menu menu = new Menu(parent);
             ContributionItemFactory.REOPEN_EDITORS.create(fWindow).fill(menu, 0);
             MenuItem[] items = menu.getItems();
@@ -1294,29 +1287,19 @@ public class CoolBarAdvisor {
               items[0].dispose();
             return menu;
           }
-
-          public Menu getMenu(Menu parent) {
-            return null;
-          }
-
-          public void dispose() {}
         };
 
         /* Label */
       case LABEL:
-        return new IMenuCreator() {
-          public Menu getMenu(Control parent) {
+        return new ContextMenuCreator() {
+        
+          @Override
+          public Menu createMenu(Control parent) {
             MenuManager manager = new MenuManager();
             IStructuredSelection activeFeedViewSelection = OwlUI.getActiveFeedViewSelection();
             ApplicationActionBarAdvisor.fillLabelMenu(manager, activeFeedViewSelection, fWindow, true);
             return manager.createContextMenu(parent);
           }
-
-          public Menu getMenu(Menu parent) {
-            return null;
-          }
-
-          public void dispose() {}
         };
 
         /* Move */
@@ -1329,61 +1312,51 @@ public class CoolBarAdvisor {
 
         /* Share */
       case SHARE:
-        return new IMenuCreator() {
-          public Menu getMenu(Control parent) {
+        return new ContextMenuCreator() {
+        
+          @Override
+          public Menu createMenu(Control parent) {
             MenuManager manager = new MenuManager();
             IStructuredSelection activeFeedViewSelection = OwlUI.getActiveFeedViewSelection();
             ApplicationActionBarAdvisor.fillShareMenu(manager, activeFeedViewSelection, fWindow, true);
             return manager.createContextMenu(parent);
           }
-
-          public Menu getMenu(Menu parent) {
-            return null;
-          }
-
-          public void dispose() {}
         };
 
         /* Bookmarks */
       case BOOKMARKS:
-        return new IMenuCreator() {
-          public Menu getMenu(Control parent) {
+        return new ContextMenuCreator() {
+        
+          @Override
+          public Menu createMenu(Control parent) {
             MenuManager manager = new MenuManager();
             ApplicationActionBarAdvisor.fillBookMarksMenu(manager, fWindow);
             return manager.createContextMenu(parent);
           }
-
-          public Menu getMenu(Menu parent) {
-            return null;
-          }
-
-          public void dispose() {}
         };
 
         /* Attachments */
       case ATTACHMENTS:
-        return new IMenuCreator() {
-          public Menu getMenu(Control parent) {
+        return new ContextMenuCreator() {
+        
+          @Override
+          public Menu createMenu(Control parent) {
             MenuManager manager = new MenuManager();
             IStructuredSelection activeFeedViewSelection = OwlUI.getActiveFeedViewSelection();
             ApplicationActionBarAdvisor.fillAttachmentsMenu(manager, activeFeedViewSelection, fWindow, true);
             return manager.createContextMenu(parent);
           }
-
-          public Menu getMenu(Menu parent) {
-            return null;
-          }
-
-          public void dispose() {}
         };
     };
 
     return null;
   }
 
-  private IMenuCreator getMoveCopyMenu(final boolean isMove) {
-    return new IMenuCreator() {
-      public Menu getMenu(Control parent) {
+  private ContextMenuCreator getMoveCopyMenu(final boolean isMove) {
+    return new ContextMenuCreator() {
+
+      @Override
+      public Menu createMenu(Control parent) {
         IStructuredSelection selection = OwlUI.getActiveFeedViewSelection();
         if (selection == null || selection.isEmpty())
           return null;
@@ -1410,18 +1383,12 @@ public class CoolBarAdvisor {
           manager.add(new MoveCopyNewsToBinAction(selection, bin, isMove));
         }
 
-        manager.add(new Separator("movetonewbin")); //$NON-NLS-1$
         manager.add(new MoveCopyNewsToBinAction(selection, null, isMove));
+        manager.add(new Separator());
         manager.add(new AutomateFilterAction(isMove ? PresetAction.MOVE : PresetAction.COPY, selection));
 
         return manager.createContextMenu(parent);
       }
-
-      public Menu getMenu(Menu parent) {
-        return null;
-      }
-
-      public void dispose() {}
     };
   }
 

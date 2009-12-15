@@ -53,6 +53,7 @@ import org.rssowl.ui.internal.OwlUI;
  */
 public class NewTypeDropdownAction implements IWorkbenchWindowPulldownDelegate, IMenuCreator {
   private Shell fShell;
+  private Menu fMenu;
   private IFolder fParent;
   private IMark fPosition;
   private LocalResourceManager fResources = new LocalResourceManager(JFaceResources.getResources());
@@ -62,9 +63,12 @@ public class NewTypeDropdownAction implements IWorkbenchWindowPulldownDelegate, 
    * @see org.eclipse.ui.IWorkbenchWindowPulldownDelegate#getMenu(org.eclipse.swt.widgets.Control)
    */
   public Menu getMenu(Control parent) {
-    Menu menu = new Menu(parent);
+    if (fMenu != null)
+      fMenu.dispose();
 
-    MenuItem newBookMark = new MenuItem(menu, SWT.PUSH);
+    fMenu = new Menu(parent);
+
+    MenuItem newBookMark = new MenuItem(fMenu, SWT.PUSH);
     newBookMark.setText(getLabelWithBinding("org.rssowl.ui.actions.NewBookMark", Messages.NewTypeDropdownAction_BOOKMARK)); //$NON-NLS-1$
     newBookMark.setImage(OwlUI.getImage(fResources, OwlUI.BOOKMARK));
     newBookMark.addSelectionListener(new SelectionAdapter() {
@@ -78,7 +82,7 @@ public class NewTypeDropdownAction implements IWorkbenchWindowPulldownDelegate, 
       }
     });
 
-    MenuItem newNewsBin = new MenuItem(menu, SWT.PUSH);
+    MenuItem newNewsBin = new MenuItem(fMenu, SWT.PUSH);
     newNewsBin.setText(getLabelWithBinding("org.rssowl.ui.actions.NewNewsBin", Messages.NewTypeDropdownAction_NEWSBIN)); //$NON-NLS-1$
     newNewsBin.setImage(OwlUI.getImage(fResources, OwlUI.NEWSBIN));
     newNewsBin.addSelectionListener(new SelectionAdapter() {
@@ -92,7 +96,7 @@ public class NewTypeDropdownAction implements IWorkbenchWindowPulldownDelegate, 
       }
     });
 
-    MenuItem newSearchMark = new MenuItem(menu, SWT.PUSH);
+    MenuItem newSearchMark = new MenuItem(fMenu, SWT.PUSH);
     newSearchMark.setText(getLabelWithBinding("org.rssowl.ui.actions.NewSearchMark", Messages.NewTypeDropdownAction_SAVED_SEARCH)); //$NON-NLS-1$
     newSearchMark.setImage(OwlUI.getImage(fResources, OwlUI.SEARCHMARK));
     newSearchMark.addSelectionListener(new SelectionAdapter() {
@@ -106,9 +110,9 @@ public class NewTypeDropdownAction implements IWorkbenchWindowPulldownDelegate, 
       }
     });
 
-    new MenuItem(menu, SWT.SEPARATOR);
+    new MenuItem(fMenu, SWT.SEPARATOR);
 
-    MenuItem newFolder = new MenuItem(menu, SWT.PUSH);
+    MenuItem newFolder = new MenuItem(fMenu, SWT.PUSH);
     newFolder.setText(getLabelWithBinding("org.rssowl.ui.actions.NewFolder", Messages.NewTypeDropdownAction_FOLDER)); //$NON-NLS-1$
     newFolder.setImage(OwlUI.getImage(fResources, OwlUI.FOLDER));
     newFolder.addSelectionListener(new SelectionAdapter() {
@@ -122,7 +126,7 @@ public class NewTypeDropdownAction implements IWorkbenchWindowPulldownDelegate, 
       }
     });
 
-    return menu;
+    return fMenu;
   }
 
   /*
@@ -130,6 +134,8 @@ public class NewTypeDropdownAction implements IWorkbenchWindowPulldownDelegate, 
    */
   public void dispose() {
     fResources.dispose();
+    if (fMenu != null)
+      fMenu.dispose();
   }
 
   /*

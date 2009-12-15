@@ -275,8 +275,8 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
             moveMenu.add(new MoveCopyNewsToBinAction(fCurrentSelection, bin, true));
           }
 
-          moveMenu.add(new Separator("movetonewbin")); //$NON-NLS-1$
           moveMenu.add(new MoveCopyNewsToBinAction(fCurrentSelection, null, true));
+          moveMenu.add(new Separator());
           moveMenu.add(new AutomateFilterAction(PresetAction.MOVE, fCurrentSelection));
 
           /* Copy To */
@@ -290,8 +290,8 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
             copyMenu.add(new MoveCopyNewsToBinAction(fCurrentSelection, bin, false));
           }
 
-          copyMenu.add(new Separator("copytonewbin")); //$NON-NLS-1$
           copyMenu.add(new MoveCopyNewsToBinAction(fCurrentSelection, null, false));
+          copyMenu.add(new Separator());
           copyMenu.add(new AutomateFilterAction(PresetAction.COPY, fCurrentSelection));
         }
 

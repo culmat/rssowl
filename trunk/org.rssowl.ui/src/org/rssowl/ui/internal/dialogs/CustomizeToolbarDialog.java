@@ -119,6 +119,7 @@ public class CustomizeToolbarDialog extends Dialog {
   private Button fMoveDownButton;
   private Button fRestoreDefaults;
   private boolean fOkPressed;
+  private Menu fAddMenu;
 
   /* Remember State when Dialog Opened */
   private int[] fInitialToolBarItems;
@@ -127,6 +128,7 @@ public class CustomizeToolbarDialog extends Dialog {
   /* Colors */
   private Color fSeparatorBorderFg;
   private Color fSeparatorBg;
+
 
   /* Used in the Toolbar Item Viewer to avoid equal conflict with Separator / Spacer */
   private static class ToolBarItem {
@@ -175,6 +177,7 @@ public class CustomizeToolbarDialog extends Dialog {
    */
   @Override
   public boolean close() {
+    fAddMenu.dispose();
     fResources.dispose();
     if (!fOkPressed) {
       fPreferences.putIntegers(DefaultPreferences.TOOLBAR_ITEMS, fInitialToolBarItems);
@@ -378,10 +381,10 @@ public class CustomizeToolbarDialog extends Dialog {
     buttonContainer.setLayoutData(new GridData(SWT.BEGINNING, SWT.FILL, false, false));
 
     /* Add */
-    final Menu menu = new Menu(getShell(), SWT.POP_UP);
-    menu.addMenuListener(new MenuListener() {
+    fAddMenu = new Menu(getShell(), SWT.POP_UP);
+    fAddMenu.addMenuListener(new MenuListener() {
       public void menuShown(MenuEvent e) {
-        MenuItem[] items = menu.getItems();
+        MenuItem[] items = fAddMenu.getItems();
         for (MenuItem item : items) {
           item.dispose();
         }
@@ -400,10 +403,10 @@ public class CustomizeToolbarDialog extends Dialog {
 
             /* Divide Groups by Separators */
             if (currentGroup >= 0 && currentGroup != toolItem.getGroup())
-              new MenuItem(menu, SWT.SEPARATOR);
+              new MenuItem(fAddMenu, SWT.SEPARATOR);
 
             /* Create Menu Item */
-            MenuItem item = new MenuItem(menu, SWT.PUSH);
+            MenuItem item = new MenuItem(fAddMenu, SWT.PUSH);
             if (StringUtils.isSet(toolItem.getTooltip()))
               item.setText(toolItem.getTooltip());
             else
@@ -419,9 +422,9 @@ public class CustomizeToolbarDialog extends Dialog {
                 onAdd(toolItem);
 
                 /* Re-Open Menu for More */
-                JobRunner.runInUIThread(menu, new Runnable() {
+                JobRunner.runInUIThread(fAddMenu, new Runnable() {
                   public void run() {
-                    menu.setVisible(true);
+                    fAddMenu.setVisible(true);
                   };
                 });
               }
@@ -445,8 +448,8 @@ public class CustomizeToolbarDialog extends Dialog {
         Rectangle rect = fAddButton.getBounds();
         Point pt = new Point(rect.x, rect.y + rect.height);
         pt = fAddButton.toDisplay(pt);
-        menu.setLocation(pt.x, pt.y);
-        menu.setVisible(true);
+        fAddMenu.setLocation(pt.x, pt.y);
+        fAddMenu.setVisible(true);
       }
     });
 
