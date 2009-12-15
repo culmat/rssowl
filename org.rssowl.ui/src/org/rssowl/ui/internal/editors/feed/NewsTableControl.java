@@ -728,7 +728,6 @@ public class NewsTableControl implements IFeedViewPart {
   }
 
   private void onMouseDown(Event event) {
-    boolean disableTrackerTemporary = false;
     Point p = new Point(event.x, event.y);
     TreeItem item = fCustomTree.getControl().getItem(p);
 
@@ -743,8 +742,18 @@ public class NewsTableControl implements IFeedViewPart {
       /* Toggle State between Read / Unread */
       if (data instanceof INews) {
         INews news = (INews) data;
-        disableTrackerTemporary = (news.getState() == INews.State.READ);
         INews.State newState = (news.getState() == INews.State.READ) ? INews.State.UNREAD : INews.State.READ;
+
+        /*
+         * This is a workaround: Immediately after the mouse-down-event has been
+         * issued, a selection-event is triggered. This event is resulting in the
+         * news-state-tracker to run and mark the selected news as read again. To
+         * avoid this, we disable the tracker for a short while and set it back to
+         * enabled again.
+         */
+        JobRunner.runDelayedFlagInversion(200, fBlockNewsStateTracker);
+
+        /* Set State */
         setNewsState(news, newState, false);
         fLastColumnActionInvokedMillies = System.currentTimeMillis();
       }
@@ -756,7 +765,6 @@ public class NewsTableControl implements IFeedViewPart {
 
       /* Toggle State between Sticky / Not Sticky */
       if (data instanceof INews) {
-        disableTrackerTemporary = false;
         new MakeNewsStickyAction(new StructuredSelection(data)).run();
         fLastColumnActionInvokedMillies = System.currentTimeMillis();
       }
@@ -781,16 +789,6 @@ public class NewsTableControl implements IFeedViewPart {
 
       fLastColumnActionInvokedMillies = System.currentTimeMillis();
     }
-
-    /*
-     * This is a workaround: Immediately after the mouse-down-event has been
-     * issued, a selection-event is triggered. This event is resulting in the
-     * news-state-tracker to run and mark the selected news as read again. To
-     * avoid this, we disable the tracker for a short while and set it back to
-     * enabled again.
-     */
-    if (disableTrackerTemporary)
-      JobRunner.runDelayedFlagInversion(200, fBlockNewsStateTracker);
   }
 
   private void onMouseMove(Event event) {
