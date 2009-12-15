@@ -131,7 +131,7 @@ public class CleanUpModel {
         if (date == null)
           date = mark.getCreationDate();
 
-        if (date == null || date.getTime() <= maxLastVisitDate) {
+        if (date == null || date.getTime() < maxLastVisitDate) {
           bookmarksToDelete.add(mark);
           group.addTask(new BookMarkTask(group, mark));
         }
@@ -160,11 +160,11 @@ public class CleanUpModel {
         boolean deleteBookMark = false;
 
         /* Ask for most recent news date if present */
-        if (mostRecentNewsDate != null && mostRecentNewsDate.getTime() <= maxLastUpdateDate)
+        if (mostRecentNewsDate != null && mostRecentNewsDate.getTime() < maxLastUpdateDate)
           deleteBookMark = true;
 
         /* Alternatively check for creation date */
-        else if (mostRecentNewsDate == null && creationDate.getTime() <= maxLastUpdateDate)
+        else if (mostRecentNewsDate == null && creationDate.getTime() < maxLastUpdateDate)
           deleteBookMark = true;
 
         if (deleteBookMark) {

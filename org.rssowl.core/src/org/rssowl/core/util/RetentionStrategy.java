@@ -177,7 +177,7 @@ public class RetentionStrategy {
   private static void fillNewsToDeleteByAge(Collection<INews> targetNews, List<INews> newsToDelete, int days, boolean keepUnread, boolean keepLabeled) {
     long maxAge = DateUtils.getToday().getTimeInMillis() - (days * DAY);
     for (INews newsItem : targetNews) {
-      if (!shouldKeep(newsItem, keepUnread, keepLabeled) && !newsToDelete.contains(newsItem) && DateUtils.getRecentDate(newsItem).getTime() <= maxAge)
+      if (!shouldKeep(newsItem, keepUnread, keepLabeled) && !newsToDelete.contains(newsItem) && DateUtils.getRecentDate(newsItem).getTime() < maxAge)
         newsToDelete.add(newsItem);
     }
   }
