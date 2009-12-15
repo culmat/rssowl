@@ -1530,9 +1530,20 @@ public class SearchNewsDialog extends TitleAreaDialog {
     Collection<INews> news = ModelUtils.normalize(selection.toList());
 
     if (!news.isEmpty()) {
-      String linkAsText = CoreUtils.getLink(news.iterator().next());
-      if (StringUtils.isSet(linkAsText))
-        event.data = linkAsText;
+      StringBuilder strB = new StringBuilder();
+
+      for (INews item : news) {
+        String link = CoreUtils.getLink(item);
+        if (StringUtils.isSet(link)) {
+          strB.append(link);
+
+          if (news.size() > 1)
+            strB.append("\n"); //$NON-NLS-1$
+        }
+      }
+
+      if (strB.length() > 0)
+        event.data = strB.toString();
     }
   }
 

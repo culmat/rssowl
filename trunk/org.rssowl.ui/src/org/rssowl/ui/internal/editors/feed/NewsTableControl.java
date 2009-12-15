@@ -341,9 +341,20 @@ public class NewsTableControl implements IFeedViewPart {
     Collection<INews> news = ModelUtils.normalize(selection.toList());
 
     if (!news.isEmpty()) {
-      String linkAsText = CoreUtils.getLink(news.iterator().next());
-      if (StringUtils.isSet(linkAsText))
-        event.data = linkAsText;
+      StringBuilder strB = new StringBuilder();
+
+      for (INews item : news) {
+        String link = CoreUtils.getLink(item);
+        if (StringUtils.isSet(link)) {
+          strB.append(link);
+
+          if (news.size() > 1)
+            strB.append("\n"); //$NON-NLS-1$
+        }
+      }
+
+      if (strB.length() > 0)
+        event.data = strB.toString();
     }
   }
 
@@ -822,7 +833,7 @@ public class NewsTableControl implements IFeedViewPart {
     manager.addMenuListener(new IMenuListener() {
       public void menuAboutToShow(IMenuManager manager) {
         final IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
-        boolean isEntityGroupSelected= OwlUI.isEntityGroupSelected(selection);
+        boolean isEntityGroupSelected = OwlUI.isEntityGroupSelected(selection);
 
         /* Open */
         if (!isEntityGroupSelected) {
