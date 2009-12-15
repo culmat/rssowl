@@ -69,6 +69,7 @@ public class Messages extends NLS {
   public static String ApplicationActionBarAdvisor_ORGANIZE_LABELS;
   public static String ApplicationActionBarAdvisor_PREFERENCES;
   public static String ApplicationActionBarAdvisor_REPORT_PROBLEMS;
+  public static String ApplicationActionBarAdvisor_RESET;
   public static String ApplicationActionBarAdvisor_SELECT_FILE_FOR_DOWNLOAD;
   public static String ApplicationActionBarAdvisor_SELECT_FOLDER_FOR_DOWNLOADS;
   public static String ApplicationActionBarAdvisor_SHARE_NEWS;
@@ -88,6 +89,9 @@ public class Messages extends NLS {
   public static String ApplicationActionBarAdvisor_VERTICAL_VIEW;
   public static String ApplicationActionBarAdvisor_VIEW;
   public static String ApplicationActionBarAdvisor_WINDOW;
+  public static String ApplicationActionBarAdvisor_ZOOM;
+  public static String ApplicationActionBarAdvisor_ZOOM_IN;
+  public static String ApplicationActionBarAdvisor_ZOOM_OUT;
   public static String ApplicationServer_INFO_UNABLE_OPEN_PORT;
   public static String ApplicationWorkbenchWindowAdvisor_RESTORE;
   public static String Controller_ERROR_LOADING;

@@ -27,26 +27,22 @@ package org.rssowl.ui.internal.handler;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.IHandler;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.rssowl.ui.internal.OwlUI;
-import org.rssowl.ui.internal.actions.OpenInExternalBrowserAction;
 
 /**
  * This {@link IHandler} is required to support key-bindings for programmatic
- * added actions like the {@link OpenInExternalBrowserAction}.
+ * added actions like zooming in.
  *
  * @author bpasero
  */
-public class OpenExternalHandler extends AbstractHandler {
+public class ZoomInHandler extends AbstractHandler {
 
   /*
    * @see org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands.ExecutionEvent)
    */
   public Object execute(ExecutionEvent event) {
-    IStructuredSelection selection = OwlUI.getActiveFeedViewSelection();
-
-    if (selection != null && !selection.isEmpty())
-      new OpenInExternalBrowserAction(selection).run();
+    if (OwlUI.getActiveFeedView() != null)
+      OwlUI.zoomNewsText(true, false);
 
     return null; //As per JavaDoc
   }
