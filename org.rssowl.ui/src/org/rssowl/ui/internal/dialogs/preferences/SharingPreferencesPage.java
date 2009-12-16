@@ -110,6 +110,15 @@ public class SharingPreferencesPage extends PreferencePage implements IWorkbench
   }
 
   /*
+   * @see org.eclipse.jface.preference.PreferencePage#createControl(org.eclipse.swt.widgets.Composite)
+   */
+  @Override
+  public void createControl(Composite parent) {
+    super.createControl(parent);
+    updateApplyEnablement(false);
+  }
+
+  /*
    * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite)
    */
   @Override
@@ -291,7 +300,7 @@ public class SharingPreferencesPage extends PreferencePage implements IWorkbench
     selectAllButton.setText(Messages.SharingPreferencesPage_SELECT_ALL);
     Dialog.applyDialogFont(selectAllButton);
     setButtonLayoutData(selectAllButton);
-    ((GridData)selectAllButton.getLayoutData()).verticalIndent= 10;
+    ((GridData) selectAllButton.getLayoutData()).verticalIndent = 10;
     selectAllButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -325,6 +334,13 @@ public class SharingPreferencesPage extends PreferencePage implements IWorkbench
     infoTextLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
     applyDialogFont(container);
+
+    /* Enable Apply Button on Selection Changes */
+    OwlUI.runOnSelection(new Runnable() {
+      public void run() {
+        updateApplyEnablement(true);
+      }
+    }, container);
 
     return container;
   }
@@ -514,6 +530,7 @@ public class SharingPreferencesPage extends PreferencePage implements IWorkbench
     fViewer.refresh();
     updateCheckedState();
     updateMoveEnablement();
+    updateApplyEnablement(true);
   }
 
   /*
@@ -523,6 +540,7 @@ public class SharingPreferencesPage extends PreferencePage implements IWorkbench
   protected void performApply() {
     super.performApply();
     fInitialShareProviderState = fPreferences.getIntegers(DefaultPreferences.SHARE_PROVIDER_STATE);
+    updateApplyEnablement(false);
   }
 
   /*
@@ -541,5 +559,11 @@ public class SharingPreferencesPage extends PreferencePage implements IWorkbench
   public void dispose() {
     super.dispose();
     fResources.dispose();
+  }
+
+  private void updateApplyEnablement(boolean enable) {
+    Button applyButton = getApplyButton();
+    if (applyButton != null && !applyButton.isDisposed() && applyButton.isEnabled() != enable)
+      applyButton.setEnabled(enable);
   }
 }
