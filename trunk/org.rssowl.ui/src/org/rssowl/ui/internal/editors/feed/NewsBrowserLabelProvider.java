@@ -67,7 +67,9 @@ import java.io.Writer;
 import java.net.URI;
 import java.text.DateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -79,6 +81,9 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
   /* Date Formatter for News */
   private DateFormat fDateFormat = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.SHORT);
+
+  /* Time Formatter for News */
+  private DateFormat fTimeFormat = DateFormat.getTimeInstance(DateFormat.SHORT);
 
   /* Potential Media Tags */
   private final Set<String> fMediaTags = new HashSet<String>(Arrays.asList(new String[] { "img", "applet", "embed", "area", "frame", "frameset", "iframe", "map", "object" })); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$
@@ -108,6 +113,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   private final boolean fIsIE;
   private final NewsBrowserViewer fViewer;
   private boolean fStripMediaFromNews;
+  private Calendar fSharedCalendar = Calendar.getInstance();
 
   /**
    * Creates a new Browser LabelProvider for News
@@ -498,7 +504,13 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
     /* Date */
     builder.append("<td class=\"subline\">"); //$NON-NLS-1$
-    builder.append(fDateFormat.format(DateUtils.getRecentDate(news)));
+
+    Date newsDate = DateUtils.getRecentDate(news);
+    if (isToday(newsDate))
+      builder.append(fTimeFormat.format(newsDate));
+    else
+      builder.append(fDateFormat.format(newsDate));
+
     builder.append("</td>"); //$NON-NLS-1$
 
     /* Author */
@@ -847,5 +859,14 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       builder.append(" id=\"").append(id).append("\""); //$NON-NLS-1$ //$NON-NLS-2$
 
     builder.append(">").append(content).append("</span>\n"); //$NON-NLS-1$ //$NON-NLS-2$
+  }
+
+  private boolean isToday(Date date) {
+    fSharedCalendar.set(Calendar.HOUR_OF_DAY, 0);
+    fSharedCalendar.set(Calendar.MINUTE, 0);
+    fSharedCalendar.set(Calendar.SECOND, 0);
+    fSharedCalendar.set(Calendar.MILLISECOND, 0);
+
+    return date.compareTo(fSharedCalendar.getTime()) >= 0;
   }
 }
