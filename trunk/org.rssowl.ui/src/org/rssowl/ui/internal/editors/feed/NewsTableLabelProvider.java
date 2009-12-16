@@ -97,6 +97,8 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
   private Color fGroupBgColor;
   private Color fNewsBgGradientStartColor;
   private Color fNewsBgGradientEndColor;
+  private RGB fListBackground;
+  private RGB fListSelectionBackground;
 
   /* Pre-Cache some Images being used */
   private Image fNewsUnreadIcon;
@@ -159,6 +161,9 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
     fGradientEndColor = OwlUI.getColor(fResources, OwlUI.GROUP_GRADIENT_END_COLOR);
     fGroupFgColor = OwlUI.getColor(fResources, OwlUI.GROUP_FG_COLOR);
     fGroupBgColor = OwlUI.getColor(fResources, OwlUI.GROUP_BG_COLOR);
+
+    fListBackground = fResources.getDevice().getSystemColor(SWT.COLOR_LIST_BACKGROUND).getRGB();
+    fListSelectionBackground = fResources.getDevice().getSystemColor(SWT.COLOR_LIST_SELECTION).getRGB();
 
     createNewsListBackgroundResources();
 
@@ -520,8 +525,10 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
     /* Handle EntityGroup */
     if (element instanceof EntityGroup) {
       EntityGroup group = (EntityGroup) element;
-      if (group.getColorHint() != null)
-        return OwlUI.getColor(fResources, group.getColorHint());
+      if (group.getColorHint() != null) {
+        if (!fListBackground.equals(group.getColorHint()) && !fListSelectionBackground.equals(group.getColorHint()))
+          return OwlUI.getColor(fResources, group.getColorHint());
+      }
 
       return fGroupFgColor;
     }
@@ -529,8 +536,11 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
     /* Handle INews */
     else if (element instanceof INews) {
       Set<ILabel> labels = CoreUtils.getSortedLabels((INews) element);
-      if (!labels.isEmpty())
-        return OwlUI.getColor(fResources, labels.iterator().next());
+      if (!labels.isEmpty()) {
+        RGB labelRGB = OwlUI.getRGB(labels.iterator().next());
+        if (!fListBackground.equals(labelRGB) && !fListSelectionBackground.equals(labelRGB))
+          return OwlUI.getColor(fResources, labelRGB);
+      }
     }
 
     return null;

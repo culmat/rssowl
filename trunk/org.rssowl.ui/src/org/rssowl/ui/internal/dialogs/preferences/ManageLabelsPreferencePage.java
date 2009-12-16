@@ -209,7 +209,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
     fMoveUpButton.setEnabled(false);
     Dialog.applyDialogFont(fMoveUpButton);
     setButtonLayoutData(fMoveUpButton);
-    ((GridData)fMoveUpButton.getLayoutData()).verticalIndent= 10;
+    ((GridData) fMoveUpButton.getLayoutData()).verticalIndent = 10;
     fMoveUpButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -441,6 +441,8 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
     });
 
     /* Label Provider */
+    final RGB listBackground = fViewer.getControl().getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND).getRGB();
+    final RGB listSelectionBackground = fViewer.getControl().getDisplay().getSystemColor(SWT.COLOR_LIST_SELECTION).getRGB();
     fViewer.setLabelProvider(new CellLabelProvider() {
       @Override
       public void update(ViewerCell cell) {
@@ -450,8 +452,13 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
         cell.setText(label.getName());
 
         /* Color */
-        if (!OwlUI.isHighContrast())
-          cell.setForeground(OwlUI.getColor(fResources, label));
+        if (!OwlUI.isHighContrast()) {
+          RGB labelRGB = OwlUI.getRGB(label);
+          if (!listBackground.equals(labelRGB) && !listSelectionBackground.equals(labelRGB))
+            cell.setForeground(OwlUI.getColor(fResources, labelRGB));
+          else
+            cell.setForeground(null);
+        }
       }
     });
 
