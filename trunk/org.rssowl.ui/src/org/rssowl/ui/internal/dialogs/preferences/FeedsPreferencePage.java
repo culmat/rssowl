@@ -130,6 +130,15 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
   public void init(IWorkbench workbench) {}
 
   /*
+   * @see org.eclipse.jface.preference.PreferencePage#createControl(org.eclipse.swt.widgets.Composite)
+   */
+  @Override
+  public void createControl(Composite parent) {
+    super.createControl(parent);
+    updateApplyEnablement(false);
+  }
+
+  /*
    * @see org.eclipse.jface.dialogs.DialogPage#dispose()
    */
   @Override
@@ -177,6 +186,13 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     infoText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
     applyDialogFont(container);
+
+    /* Enable Apply Button on Selection Changes */
+    OwlUI.runOnSelection(new Runnable() {
+      public void run() {
+        updateApplyEnablement(true);
+      }
+    }, container);
 
     return container;
   }
@@ -561,6 +577,15 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     return super.performOk();
   }
 
+  /*
+   * @see org.eclipse.jface.preference.PreferencePage#performApply()
+   */
+  @Override
+  protected void performApply() {
+    super.performApply();
+    updateApplyEnablement(false);
+  }
+
   private void finish(boolean autoUpdateChange, boolean displayChange, boolean columnChange, boolean runCleanup) throws PersistenceException {
     final Collection<IFolder> rootFolders = CoreUtils.loadRootFolders();
 
@@ -673,6 +698,8 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     fDeleteReadNewsCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.DEL_READ_NEWS_STATE));
     fNeverDeleteUnReadNewsCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.NEVER_DEL_UNREAD_NEWS_STATE));
     fNeverDeleteLabeledNewsCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.NEVER_DEL_LABELED_NEWS_STATE));
+
+    updateApplyEnablement(true);
   }
 
   private int getUpdateIntervalScope() {
@@ -684,5 +711,11 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
       return HOURS_SCOPE;
 
     return MINUTES_SCOPE;
+  }
+
+  private void updateApplyEnablement(boolean enable) {
+    Button applyButton = getApplyButton();
+    if (applyButton != null && !applyButton.isDisposed() && applyButton.isEnabled() != enable)
+      applyButton.setEnabled(enable);
   }
 }

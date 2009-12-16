@@ -110,6 +110,20 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
   }
 
   /*
+   * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
+   */
+  public void init(IWorkbench workbench) {}
+
+  /*
+   * @see org.eclipse.jface.preference.PreferencePage#createControl(org.eclipse.swt.widgets.Composite)
+   */
+  @Override
+  public void createControl(Composite parent) {
+    super.createControl(parent);
+    updateApplyEnablement(false);
+  }
+
+  /*
    * @see org.eclipse.jface.dialogs.DialogPage#dispose()
    */
   @Override
@@ -163,6 +177,14 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
     });
 
     applyDialogFont(container);
+
+
+    /* Enable Apply Button on Selection Changes */
+    OwlUI.runOnSelection(new Runnable() {
+      public void run() {
+        updateApplyEnablement(true);
+      }
+    }, container);
 
     return container;
   }
@@ -564,6 +586,15 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
   }
 
   /*
+   * @see org.eclipse.jface.preference.PreferencePage#performApply()
+   */
+  @Override
+  protected void performApply() {
+    super.performApply();
+    updateApplyEnablement(false);
+  }
+
+  /*
    * @see org.eclipse.jface.preference.PreferencePage#performDefaults()
    */
   @Override
@@ -598,10 +629,13 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
     fLimitNotifierToSelectionCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.LIMIT_NOTIFIER_TO_SELECTION));
 
     setLimitNotificationEnabled(fShowNotificationPopup.getSelection() && fLimitNotifierToSelectionCheck.getSelection());
+
+    updateApplyEnablement(true);
   }
 
-  /*
-   * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
-   */
-  public void init(IWorkbench workbench) {}
+  private void updateApplyEnablement(boolean enable) {
+    Button applyButton = getApplyButton();
+    if (applyButton != null && !applyButton.isDisposed() && applyButton.isEnabled() != enable)
+      applyButton.setEnabled(enable);
+  }
 }

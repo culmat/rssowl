@@ -61,6 +61,12 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.events.DragDetectEvent;
+import org.eclipse.swt.events.DragDetectListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Drawable;
@@ -77,6 +83,7 @@ import org.eclipse.swt.graphics.Region;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.program.Program;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -87,6 +94,7 @@ import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Scrollable;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolItem;
@@ -2300,5 +2308,100 @@ public class OwlUI {
     String storeString = org.eclipse.ui.internal.util.PrefUtil.getInternalPreferenceStore().getString(key);
     if (!fdString.equals(storeString))
       org.eclipse.ui.internal.util.PrefUtil.getInternalPreferenceStore().setValue(key, fdString);
+  }
+
+  /**
+   * @param run the {@link Runnable} to run on selection changes.
+   * @param control the control to add selection listener to. Will recursively
+   * go into child controls for Composites.
+   */
+  public static void runOnSelection(final Runnable run, Control... control) {
+    for (Control c : control) {
+
+      /* Button */
+      if (c instanceof Button) {
+        Button button = (Button) c;
+        button.addSelectionListener(new SelectionAdapter() {
+          @Override
+          public void widgetSelected(SelectionEvent e) {
+            run.run();
+          }
+        });
+      }
+
+      /* Combo */
+      else if (c instanceof Combo) {
+        Combo combo = (Combo) c;
+        combo.addSelectionListener(new SelectionAdapter() {
+          @Override
+          public void widgetSelected(SelectionEvent e) {
+            run.run();
+          }
+        });
+      }
+
+      /* Tree */
+      else if (c instanceof Tree) {
+        Tree tree = (Tree) c;
+        tree.addSelectionListener(new SelectionAdapter() {
+          @Override
+          public void widgetSelected(SelectionEvent e) {
+            if ((e.detail & SWT.CHECK) != 0)
+              run.run();
+          }
+        });
+
+        tree.addDragDetectListener(new DragDetectListener() {
+          public void dragDetected(DragDetectEvent e) {
+            run.run();
+          }
+        });
+      }
+
+      /* Table */
+      else if (c instanceof Table) {
+        Table table = (Table) c;
+        table.addSelectionListener(new SelectionAdapter() {
+          @Override
+          public void widgetSelected(SelectionEvent e) {
+            if ((e.detail & SWT.CHECK) != 0)
+              run.run();
+          }
+        });
+
+        table.addDragDetectListener(new DragDetectListener() {
+          public void dragDetected(DragDetectEvent e) {
+            run.run();
+          }
+        });
+      }
+
+      /* Spinner */
+      else if (c instanceof Spinner) {
+        Spinner spinner = (Spinner) c;
+        spinner.addSelectionListener(new SelectionAdapter() {
+          @Override
+          public void widgetSelected(SelectionEvent e) {
+            run.run();
+          }
+        });
+      }
+
+      /* Text */
+      else if (c instanceof Text) {
+        Text text = (Text) c;
+        text.addModifyListener(new ModifyListener() {
+          public void modifyText(ModifyEvent e) {
+            run.run();
+          }
+        });
+      }
+
+      /* Composite */
+      else if (c instanceof Composite) {
+        Composite composite = (Composite) c;
+        runOnSelection(run, composite.getChildren());
+      }
+    }
   }
 }

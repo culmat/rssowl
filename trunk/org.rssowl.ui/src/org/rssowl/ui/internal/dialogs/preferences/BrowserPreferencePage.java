@@ -83,6 +83,15 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
   public void init(IWorkbench workbench) {}
 
   /*
+   * @see org.eclipse.jface.preference.PreferencePage#createControl(org.eclipse.swt.widgets.Composite)
+   */
+  @Override
+  public void createControl(Composite parent) {
+    super.createControl(parent);
+    updateApplyEnablement(false);
+  }
+
+  /*
    * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite)
    */
   @Override
@@ -214,6 +223,13 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
       });
 
       updateEnablement();
+
+      /* Enable Apply Button on Selection Changes */
+      OwlUI.runOnSelection(new Runnable() {
+        public void run() {
+          updateApplyEnablement(true);
+        }
+      }, browserGroup);
     }
   }
 
@@ -290,6 +306,15 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
   }
 
   /*
+   * @see org.eclipse.jface.preference.PreferencePage#performApply()
+   */
+  @Override
+  protected void performApply() {
+    super.performApply();
+    updateApplyEnablement(false);
+  }
+
+  /*
    * @see org.eclipse.jface.preference.PreferencePage#performDefaults()
    */
   @Override
@@ -314,6 +339,13 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
     fCustomBrowserSearchButton.setEnabled(fUseCustomExternalBrowser.getSelection());
 
     updateEnablement();
+    updateApplyEnablement(true);
+  }
+
+  private void updateApplyEnablement(boolean enable) {
+    Button applyButton = getApplyButton();
+    if (applyButton != null && !applyButton.isDisposed() && applyButton.isEnabled() != enable)
+      applyButton.setEnabled(enable);
   }
 
   private void updateEnablement() {

@@ -96,6 +96,15 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
   public void init(IWorkbench workbench) {}
 
   /*
+   * @see org.eclipse.jface.preference.PreferencePage#createControl(org.eclipse.swt.widgets.Composite)
+   */
+  @Override
+  public void createControl(Composite parent) {
+    super.createControl(parent);
+    updateApplyEnablement(false);
+  }
+
+  /*
    * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite)
    */
   @Override
@@ -116,6 +125,13 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     createMiscOptions(container);
 
     applyDialogFont(container);
+
+    /* Enable Apply Button on Selection Changes */
+    OwlUI.runOnSelection(new Runnable() {
+      public void run() {
+        updateApplyEnablement(true);
+      }
+    }, container);
 
     return container;
   }
@@ -315,6 +331,15 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
   }
 
   /*
+   * @see org.eclipse.jface.preference.PreferencePage#performApply()
+   */
+  @Override
+  protected void performApply() {
+    super.performApply();
+    updateApplyEnablement(false);
+  }
+
+  /*
    * @see org.eclipse.jface.preference.PreferencePage#performDefaults()
    */
   @Override
@@ -349,5 +374,13 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     }
 
     fAlwaysReuseFeedView.setEnabled(!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1);
+    
+    updateApplyEnablement(true);
+  }
+
+  private void updateApplyEnablement(boolean enable) {
+    Button applyButton = getApplyButton();
+    if (applyButton != null && !applyButton.isDisposed() && applyButton.isEnabled() != enable)
+      applyButton.setEnabled(enable);
   }
 }

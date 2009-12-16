@@ -389,6 +389,13 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
 
     applyDialogFont(container);
 
+    /* Enable Apply Button on Selection Changes */
+    OwlUI.runOnSelection(new Runnable() {
+      public void run() {
+        updateApplyEnablement(true);
+      }
+    }, container);
+
     return container;
   }
 
@@ -402,8 +409,7 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
     if (getDefaultsButton() != null && fIsError)
       getDefaultsButton().setEnabled(false);
 
-    if (getApplyButton() != null && fIsError)
-      getApplyButton().setEnabled(false);
+    updateApplyEnablement(false);
   }
 
   private void onAdd() {
@@ -647,6 +653,7 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
   @Override
   protected void performApply() {
     super.performApply();
+    updateApplyEnablement(false);
 
     if (!Application.IS_ECLIPSE)
       fChangeMasterPassword.setEnabled(fUseMasterPasswordCheck.getSelection());
@@ -664,6 +671,8 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
       fUseMasterPasswordCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.USE_MASTER_PASSWORD));
       fChangeMasterPassword.setEnabled(fUseMasterPasswordCheck.getSelection());
     }
+
+    updateApplyEnablement(true);
   }
 
   private void reSetAllCredentials() {
@@ -711,5 +720,14 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
         }
       }
     }
+  }
+
+  private void updateApplyEnablement(boolean enable) {
+    if (fIsError)
+      return;
+
+    Button applyButton = getApplyButton();
+    if (applyButton != null && !applyButton.isDisposed() && applyButton.isEnabled() != enable)
+      applyButton.setEnabled(enable);
   }
 }
