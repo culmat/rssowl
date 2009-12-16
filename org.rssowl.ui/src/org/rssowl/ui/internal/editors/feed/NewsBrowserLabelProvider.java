@@ -43,12 +43,15 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.PlatformUI;
 import org.rssowl.core.persist.IAttachment;
+import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ICategory;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.ISource;
 import org.rssowl.core.persist.INews.State;
+import org.rssowl.core.persist.reference.NewsBinReference;
+import org.rssowl.core.persist.reference.SearchMarkReference;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.ExpandingReader;
@@ -59,6 +62,7 @@ import org.rssowl.ui.internal.ApplicationServer;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.ILinkHandler;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.FolderNewsMark.FolderNewsMarkReference;
 import org.rssowl.ui.internal.util.CBrowser;
 
 import java.io.IOException;
@@ -70,8 +74,10 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -113,7 +119,8 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   private final boolean fIsIE;
   private final NewsBrowserViewer fViewer;
   private boolean fStripMediaFromNews;
-  private Calendar fSharedCalendar = Calendar.getInstance();
+  private final Calendar fSharedCalendar = Calendar.getInstance();
+  private final Map<String, String> fMapFeedLinkToName = new HashMap<String, String>();
 
   /**
    * Creates a new Browser LabelProvider for News
@@ -156,6 +163,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   public void dispose() {
     super.dispose();
     unregisterListeners();
+    fMapFeedLinkToName.clear();
   }
 
   private void registerListeners() {
@@ -237,6 +245,11 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   private boolean isSingleNewsDisplayed() {
     Object input = fViewer != null ? fViewer.getInput() : null;
     return input instanceof INews;
+  }
+
+  private boolean showFeedInformation() {
+    Object input = fViewer != null ? fViewer.getInput() : null;
+    return input instanceof FolderNewsMarkReference || input instanceof SearchMarkReference || input instanceof NewsBinReference;
   }
 
   /**
@@ -547,6 +560,32 @@ public class NewsBrowserLabelProvider extends LabelProvider {
         search.append(", "); //$NON-NLS-1$
       }
       builder.append("</td>"); //$NON-NLS-1$
+    }
+
+    /* Feed Information */
+    if (showFeedInformation()) {
+
+      /* Retrieve Name */
+      String feedLinkAsText = news.getFeedLinkAsText();
+      String feedName = fMapFeedLinkToName.get(feedLinkAsText);
+      if (feedName == null) {
+        IBookMark bm = CoreUtils.getBookMark(news.getFeedReference());
+        if (bm != null) {
+          feedName = StringUtils.htmlEscape(bm.getName());
+          fMapFeedLinkToName.put(feedLinkAsText, feedName);
+        }
+      }
+
+      /* Show Name if Provided */
+      if (StringUtils.isSet(feedName)) {
+        builder.append("<td class=\"subline\">"); //$NON-NLS-1$
+        builder.append("|"); //$NON-NLS-1$
+        builder.append("</td>"); //$NON-NLS-1$
+
+        builder.append("<td class=\"subline\">"); //$NON-NLS-1$
+        builder.append(feedName);
+        builder.append("</td>"); //$NON-NLS-1$
+      }
     }
 
     /* Comments */
