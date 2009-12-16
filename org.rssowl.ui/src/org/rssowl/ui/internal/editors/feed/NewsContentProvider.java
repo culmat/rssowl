@@ -355,10 +355,6 @@ public class NewsContentProvider implements ITreeContentProvider {
 
                     /* Refresh Viewer to reflect changes */
                     fFeedView.refresh(true, true);
-
-                    /* Add to Browser-Viewer if showing entire Feed */
-                    if (fAddedNews != null && !fAddedNews.isEmpty() && fBrowserViewer.getInput() instanceof BookMarkReference)
-                      fBrowserViewer.add(fBrowserViewer.getInput(), fAddedNews.toArray());
                   }
                 });
               }
@@ -473,8 +469,31 @@ public class NewsContentProvider implements ITreeContentProvider {
             }
 
             /* Normal refresh w/o deletion */
-            else if (refresh)
-              fFeedView.refresh(true, true);
+            else if (refresh) {
+
+              /*
+               * Optimization: The Browser is likely only showing a single news and thus
+               * there is no need to refresh the entire content but rather use the update
+               * instead.
+               */
+              if (!browserShowsCollection()) {
+                List<INews> updatedNewsItems = new ArrayList<INews>(events.size());
+                for (NewsEvent event : events) {
+                  updatedNewsItems.add(event.getEntity());
+                }
+
+                /* Update Browser Viewer */
+                if (contains(fBrowserViewer.getInput(), updatedNewsItems))
+                  fBrowserViewer.update(events);
+
+                /* Refresh Table Viewer */
+                fFeedView.refreshTableViewer(true, true);
+              }
+
+              /* Browser is showing Collection, thereby perform a refresh */
+              else
+                fFeedView.refresh(true, true);
+            }
           }
         });
       }

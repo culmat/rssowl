@@ -1571,7 +1571,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
   }
 
   /* Refresh Table-Viewer if visible */
-  private void refreshTableViewer(boolean delayRedraw, boolean updateLabels) {
+  void refreshTableViewer(boolean delayRedraw, boolean updateLabels) {
     if (isTableViewerVisible()) {
       boolean groupingEnabled = fNewsGrouping.getType() != NewsGrouping.Type.NO_GROUPING;
 
