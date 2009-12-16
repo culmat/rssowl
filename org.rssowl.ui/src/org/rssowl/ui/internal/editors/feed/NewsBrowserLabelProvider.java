@@ -364,7 +364,10 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     /* DIV: Group */
     div(builder, "group"); //$NON-NLS-1$
 
-    builder.append(StringUtils.htmlEscape(group.getName()));
+    if (group.getColorHint() != null && !group.getColorHint().equals(new RGB(255, 255, 255)))
+      span(builder, StringUtils.htmlEscape(group.getName()), null, OwlUI.toString(group.getColorHint()));
+    else
+      builder.append(StringUtils.htmlEscape(group.getName()));
 
     /* Close: Group */
     close(builder, "div"); //$NON-NLS-1$
@@ -398,7 +401,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     boolean isUnread = (state == State.NEW || state == State.UPDATED || state == State.UNREAD);
     Set<ILabel> labels = CoreUtils.getSortedLabels(news);
     String color = !labels.isEmpty() ? labels.iterator().next().getColor() : null;
-    if ("0,0,0".equals(color)) //Don't let black override link color //$NON-NLS-1$
+    if ("0,0,0".equals(color) || "255,255,255".equals(color)) //Don't let black or white override link color //$NON-NLS-1$ //$NON-NLS-2$
       color = null;
 
     boolean hasAttachments = false;
@@ -832,7 +835,10 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   }
 
   private void span(StringBuilder builder, String content, String cssClass, String id, String color) {
-    builder.append("<span class=\"").append(cssClass).append("\""); //$NON-NLS-1$ //$NON-NLS-2$
+    if (cssClass != null)
+      builder.append("<span class=\"").append(cssClass).append("\""); //$NON-NLS-1$ //$NON-NLS-2$
+    else
+      builder.append("<span"); //$NON-NLS-1$
 
     if (color != null)
       builder.append(" style=\"color: rgb(").append(color).append(");\""); //$NON-NLS-1$ //$NON-NLS-2$
