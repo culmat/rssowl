@@ -259,6 +259,18 @@ public class NewsBrowserLabelProvider extends LabelProvider {
    * @throws IOException In case of an error while writing.
    */
   public void writeCSS(Writer writer) throws IOException {
+    writeCSS(writer, isSingleNewsDisplayed());
+  }
+
+  /**
+   * Writes the CSS information to the given Writer.
+   *
+   * @param writer the writer to add the CSS information to.
+   * @param forSingleNews if <code>true</code>, the site contains a single news,
+   * or <code>false</code> if it contains a collection of news.
+   * @throws IOException In case of an error while writing.
+   */
+  public void writeCSS(Writer writer, boolean forSingleNews) throws IOException {
 
     /* Open CSS */
     writer.write("<style type=\"text/css\">\n"); //$NON-NLS-1$
@@ -275,7 +287,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.append("div.group { color: #678; ").append(fBiggestFontCSS).append(" font-weight: bold; padding: 10px 0px 10px 5px; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* Main DIV per Item */
-    if (isSingleNewsDisplayed()) {
+    if (forSingleNews) {
       writer.write("div.newsitemUnread { margin: 0; border-bottom: dotted 1px silver; }\n"); //$NON-NLS-1$
       writer.write("div.newsitemRead { margin: 0; border-bottom: dotted 1px silver; }\n"); //$NON-NLS-1$
     } else {

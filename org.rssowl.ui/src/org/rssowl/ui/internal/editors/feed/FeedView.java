@@ -400,7 +400,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
         content.append("\n  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n"); //$NON-NLS-1$
         StringWriter css = new StringWriter();
         try {
-          labelProvider.writeCSS(css);
+          labelProvider.writeCSS(css, newsToSave.size() == 1);
         } catch (IOException e) {
           /* Ignore */
         }
