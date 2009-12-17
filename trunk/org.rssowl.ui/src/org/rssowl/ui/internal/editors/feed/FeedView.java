@@ -273,7 +273,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
       dialog.setFilterExtensions(new String[] { ".html", ".xml" }); //$NON-NLS-1$ //$NON-NLS-2$
     else
       dialog.setFilterExtensions(new String[] { ".html" }); //$NON-NLS-1$
-    dialog.setFileName(fInput.getName());
+    dialog.setFileName(Application.IS_WINDOWS ? CoreUtils.getSafeFileNameForWindows(fInput.getName()) : fInput.getName());
 
     String fileName = dialog.open();
     if (fileName == null)
@@ -579,11 +579,11 @@ public class FeedView extends EditorPart implements IReusableEditor {
       }
 
       public void entitiesDeleted(Set<SearchConditionEvent> events) {
-        /* Ignore Due to Bug 1140 (http://dev.rssowl.org/show_bug.cgi?id=1140) */
+      /* Ignore Due to Bug 1140 (http://dev.rssowl.org/show_bug.cgi?id=1140) */
       }
 
       public void entitiesUpdated(Set<SearchConditionEvent> events) {
-        /* Ignore Due to Bug 1140 (http://dev.rssowl.org/show_bug.cgi?id=1140) */
+      /* Ignore Due to Bug 1140 (http://dev.rssowl.org/show_bug.cgi?id=1140) */
       }
 
       /* We rely on the implementation detail that updating a SM means deleting/adding conditions */
