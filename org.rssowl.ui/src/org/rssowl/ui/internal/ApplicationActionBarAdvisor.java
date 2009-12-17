@@ -1227,7 +1227,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
           public void run() {
             FileDialog dialog = new FileDialog(shellProvider.getShell(), SWT.SAVE);
             dialog.setText(Messages.ApplicationActionBarAdvisor_SELECT_FILE_FOR_DOWNLOAD);
-            dialog.setFileName(fileName);
+            dialog.setFileName(Application.IS_WINDOWS ? CoreUtils.getSafeFileNameForWindows(fileName) : fileName);
             dialog.setOverwrite(true);
 
             String downloadFolder = preferences.getString(DefaultPreferences.DOWNLOAD_FOLDER);

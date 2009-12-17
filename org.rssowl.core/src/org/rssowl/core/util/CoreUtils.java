@@ -123,6 +123,9 @@ public class CoreUtils {
   private static final String[] FEED_MIME_TYPES = new String[] { "application/rss+xml", "application/atom+xml", "application/rdf+xml" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
   private static final String HREF = "href="; //$NON-NLS-1$
 
+  /* Reserved Characters for Filenames on Windows */
+  private static final String[] RESERVED_FILENAME_CHARACTERS_WINDOWS = new String[] { "<", ">", ":", "\"", "/", "\\", "|", "?", "*" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$
+
   /* This utility class constructor is hidden */
   private CoreUtils() {
   // Protect default constructor
@@ -1642,5 +1645,18 @@ public class CoreUtils {
     }
 
     return ex.getMessage();
+  }
+
+  /**
+   * @param fileName the proposed filename.
+   * @return a filename that is safe to be used on Windows.
+   */
+  public static String getSafeFileNameForWindows(String fileName) {
+    String candidate = fileName;
+    for (String reservedChar : RESERVED_FILENAME_CHARACTERS_WINDOWS) {
+      candidate = StringUtils.replaceAll(candidate, reservedChar, ""); //$NON-NLS-1$
+    }
+
+    return candidate;
   }
 }
