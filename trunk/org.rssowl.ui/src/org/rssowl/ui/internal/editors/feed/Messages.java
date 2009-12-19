@@ -146,6 +146,7 @@ public class Messages extends NLS {
   public static String NewsGrouping_UNGROUPED;
   public static String NewsGrouping_UNKNOWN_AUTHOR;
   public static String NewsGrouping_UNKNOWN_CATEGORY;
+  public static String NewsGrouping_UNLABELED;
   public static String NewsGrouping_UNRATED;
   public static String NewsGrouping_UNREAD;
   public static String NewsGrouping_UPDATED;
