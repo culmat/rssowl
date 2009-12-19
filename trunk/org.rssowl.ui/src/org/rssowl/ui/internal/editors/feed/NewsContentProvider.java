@@ -463,37 +463,14 @@ public class NewsContentProvider implements ITreeContentProvider {
             if (updateSelectionFromDelete) {
               fTableViewer.updateSelectionAfterDelete(new Runnable() {
                 public void run() {
-                  fFeedView.refresh(true, true);
+                  updateViewers(events, EventType.REMOVE);
                 }
               });
             }
 
             /* Normal refresh w/o deletion */
-            else if (refresh) {
-
-              /*
-               * Optimization: The Browser is likely only showing a single news and thus
-               * there is no need to refresh the entire content but rather use the update
-               * instead.
-               */
-              if (!browserShowsCollection()) {
-                List<INews> updatedNewsItems = new ArrayList<INews>(events.size());
-                for (NewsEvent event : events) {
-                  updatedNewsItems.add(event.getEntity());
-                }
-
-                /* Update Browser Viewer */
-                if (contains(fBrowserViewer.getInput(), updatedNewsItems))
-                  fBrowserViewer.update(events);
-
-                /* Refresh Table Viewer */
-                fFeedView.refreshTableViewer(true, true);
-              }
-
-              /* Browser is showing Collection, thereby perform a refresh */
-              else
-                fFeedView.refresh(true, true);
-            }
+            else if (refresh)
+              updateViewers(events, EventType.UPDATE);
           }
         });
       }
@@ -530,6 +507,36 @@ public class NewsContentProvider implements ITreeContentProvider {
     };
 
     DynamicDAO.addEntityListener(INews.class, fNewsListener);
+  }
+
+  private void updateViewers(final Set<NewsEvent> events, EventType type) {
+
+    /*
+     * Optimization: The Browser is likely only showing a single news and thus
+     * there is no need to refresh the entire content but rather use the update
+     * instead.
+     */
+    if (!browserShowsCollection()) {
+      List<INews> items = new ArrayList<INews>(events.size());
+      for (NewsEvent event : events) {
+        items.add(event.getEntity());
+      }
+
+      /* Update Browser Viewer */
+      if (contains(fBrowserViewer.getInput(), items)) {
+        if (type == EventType.UPDATE)
+          fBrowserViewer.update(events);
+        else if (type == EventType.REMOVE)
+          fBrowserViewer.remove(items.toArray());
+      }
+
+      /* Refresh Table Viewer */
+      fFeedView.refreshTableViewer(true, true);
+    }
+
+    /* Browser is showing Collection, thereby perform a refresh */
+    else
+      fFeedView.refresh(true, true);
   }
 
   private boolean handleAddedNews(Set<NewsEvent> events) {
