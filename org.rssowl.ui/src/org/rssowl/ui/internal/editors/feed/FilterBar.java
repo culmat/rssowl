@@ -91,7 +91,7 @@ import java.util.List;
 /**
  * The FilterBar is the central control to filter News that are showing in the
  * FeedView. It supports filtering, grouping and a quick-search.
- *
+ * 
  * @author bpasero
  */
 public class FilterBar {
@@ -137,7 +137,7 @@ public class FilterBar {
 
   /**
    * Clear the Quick-Search
-   *
+   * 
    * @param refresh
    */
   public void clearQuickSearch(boolean refresh) {
@@ -852,8 +852,18 @@ public class FilterBar {
       return;
 
     /* Refresh if set */
-    if (refresh)
-      fFeedView.refresh(true, false);
+    if (refresh) {
+      NewsTableControl newsTable = fFeedView.getNewsTableControl();
+      boolean isNewsTableVisible = fFeedView.isTableViewerVisible();
+
+      /* Only Refresh Table as Browser shows single News */
+      if (newsTable != null && isNewsTableVisible)
+        fFeedView.refreshTableViewer(true, false);
+
+      /* Refresh All */
+      else
+        fFeedView.refresh(true, false);
+    }
 
     /* Update Settings */
     if (saveSettings)
