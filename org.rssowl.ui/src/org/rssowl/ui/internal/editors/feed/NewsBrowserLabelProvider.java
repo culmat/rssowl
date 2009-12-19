@@ -302,8 +302,8 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.write("   padding: 15px 10px 15px 10px; border-top: dotted 1px silver; \n"); //$NON-NLS-1$
     writer.append("  background-color: #fff; clear: both; ").append(fNormalFontCSS).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
     writer.write("}\n"); //$NON-NLS-1$
-    writer.write("div.footer { background-color: rgb(248,248,248); padding: 5px 10px 5px 10px; line-height: 20px; border-top: dotted 1px silver; }\n"); //$NON-NLS-1$
-    writer.append("div.footerSticky { ").append(fStickyBGColorCSS).append(" padding: 5px 10px 5px 10px; line-height: 20px; border-top: dotted 1px silver; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.write("div.footer { background-color: rgb(248,248,248); padding: 5px 10px 5px 10px; line-height: 20px; border-top: dotted 1px silver; clear: both; }\n"); //$NON-NLS-1$
+    writer.append("div.footerSticky { ").append(fStickyBGColorCSS).append(" padding: 5px 10px 5px 10px; line-height: 20px; border-top: dotted 1px silver; clear: both; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* Restrict the style of embedded Paragraphs */
     writer.write("div.content p { margin-top: 0; padding-top: 0; margin-left: 0; padding-left: 0; }\n"); //$NON-NLS-1$
