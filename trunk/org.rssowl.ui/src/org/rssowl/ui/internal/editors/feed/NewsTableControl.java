@@ -744,6 +744,15 @@ public class NewsTableControl implements IFeedViewPart {
         INews news = (INews) data;
         INews.State newState = (news.getState() == INews.State.READ) ? INews.State.UNREAD : INews.State.READ;
 
+        /* Set State */
+        fBlockNewsStateTracker.set(true);
+        try {
+          setNewsState(news, newState, false);
+        } finally {
+          fBlockNewsStateTracker.set(false);
+        }
+        fLastColumnActionInvokedMillies = System.currentTimeMillis();
+
         /*
          * This is a workaround: Immediately after the mouse-down-event has been
          * issued, a selection-event is triggered. This event is resulting in the
@@ -752,10 +761,6 @@ public class NewsTableControl implements IFeedViewPart {
          * enabled again.
          */
         JobRunner.runDelayedFlagInversion(200, fBlockNewsStateTracker);
-
-        /* Set State */
-        setNewsState(news, newState, false);
-        fLastColumnActionInvokedMillies = System.currentTimeMillis();
       }
     }
 
