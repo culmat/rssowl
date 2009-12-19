@@ -1084,9 +1084,16 @@ public class FilterBar {
       NewsTableControl newsTable = fFeedView.getNewsTableControl();
       boolean isNewsTableVisible = fFeedView.isTableViewerVisible();
       try {
-        if (newsTable != null && isNewsTableVisible)
+
+        /* Only Refresh Table as Browser shows single News */
+        if (newsTable != null && isNewsTableVisible) {
           newsTable.setBlockNewsStateTracker(true);
-        fFeedView.refresh(true, false);
+          fFeedView.refreshTableViewer(true, false);
+        }
+
+        /* Refresh All */
+        else
+          fFeedView.refresh(true, false);
       } finally {
         if (newsTable != null && isNewsTableVisible)
           newsTable.setBlockNewsStateTracker(false);
