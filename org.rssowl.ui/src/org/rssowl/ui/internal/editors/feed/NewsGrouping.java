@@ -475,7 +475,7 @@ public class NewsGrouping {
   private Collection<EntityGroup> createLabelGroups(Collection<INews> input) {
 
     /* Default Group */
-    EntityGroup gDefault = new EntityGroup(Group.NONE.ordinal(), GROUP_CATEGORY_ID, Group.NONE.getName(), Integer.MAX_VALUE, null);
+    EntityGroup gDefault = new EntityGroup(Group.NONE.ordinal(), GROUP_CATEGORY_ID, Messages.NewsGrouping_UNLABELED, Integer.MAX_VALUE, null);
 
     Map<String, EntityGroup> groupCache = new HashMap<String, EntityGroup>();
     groupCache.put(Group.NONE.getName(), gDefault);
