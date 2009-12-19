@@ -30,17 +30,33 @@ import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.core.runtime.IExecutableExtensionFactory;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.PartInitException;
+import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.IFolderChild;
+import org.rssowl.core.persist.IMark;
+import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsMark;
+import org.rssowl.core.util.CoreUtils;
+import org.rssowl.core.util.ITreeNode;
+import org.rssowl.core.util.ModelTreeNode;
+import org.rssowl.core.util.TreeTraversal;
 import org.rssowl.ui.internal.Activator;
+import org.rssowl.ui.internal.FolderNewsMark;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.editors.feed.FeedView;
+import org.rssowl.ui.internal.editors.feed.FeedViewInput;
+import org.rssowl.ui.internal.editors.feed.PerformAfterInputSet;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
+import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 /**
@@ -166,15 +182,74 @@ public class NavigationActionFactory implements IExecutableExtensionFactory, IEx
         return false;
 
       /* Navigate on Explorer */
-      if (bookmarkExplorer.navigate(fType.isNewsScoped(), fType.isNext(), fType.isUnread()))
-        return true;
+      bookmarkExplorer.navigate(fType.isNewsScoped(), fType.isNext(), fType.isUnread());
 
-      return false;
+      return true; //Avoid navigation on Model if Explorer is Opened
     }
 
     private boolean navigateOnModel() {
-      // TODO Implement this!
-      return false;
+      List<IFolderChild> startingNodes = new ArrayList<IFolderChild>();
+
+      /* Check Current Active FeedView */
+      FeedView activeFeedView = OwlUI.getActiveFeedView();
+      if (activeFeedView != null) {
+        IEditorInput input = activeFeedView.getEditorInput();
+        if (input != null && input instanceof FeedViewInput) {
+          INewsMark mark = ((FeedViewInput) input).getMark();
+          if (mark != null)
+            startingNodes.add(mark instanceof FolderNewsMark ? ((FolderNewsMark) mark).getFolder() : mark);
+        }
+      }
+
+      /* Add all Root Folders */
+      startingNodes.addAll(CoreUtils.loadRootFolders());
+
+      /* Select from all available Starting Nodes */
+      ITreeNode targetNode = null;
+      for (IFolderChild startingNode : startingNodes) {
+        TreeTraversal traversal = new TreeTraversal(startingNode instanceof IFolder ? new ModelTreeNode((IFolder) startingNode) : new ModelTreeNode((IMark) startingNode)) {
+
+          @Override
+          public boolean select(ITreeNode node) {
+            Object data = node.getData();
+
+            /* Check for Unread news if required */
+            if (data instanceof INewsMark) {
+              INewsMark newsmark = (INewsMark) data;
+              if (fType.isUnread() && newsmark.getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)) == 0)
+                return false;
+            }
+
+            /* Folders are no valid navigation nodes */
+            else if (data instanceof IFolder)
+              return false;
+
+            return true;
+          }
+        };
+
+        targetNode = fType.isNext() ? traversal.nextNode() : traversal.previousNode();
+        if (targetNode != null)
+          break;
+      }
+
+      /* Open Node if present */
+      if (targetNode != null) {
+        INewsMark mark = (INewsMark) targetNode.getData();
+
+        /* Open in FeedView */
+        PerformAfterInputSet perform = null;
+        if (fType.isNewsScoped() && fType.isUnread())
+          perform = PerformAfterInputSet.SELECT_UNREAD_NEWS;
+        else if (fType.isNewsScoped())
+          perform = PerformAfterInputSet.SELECT_FIRST_NEWS;
+
+        IWorkbenchPage page = OwlUI.getPage();
+        if (page != null)
+          OwlUI.openInFeedView(page, new StructuredSelection(mark), true, perform);
+      }
+
+      return targetNode != null;
     }
 
     public void selectionChanged(IAction action, ISelection selection) {}
