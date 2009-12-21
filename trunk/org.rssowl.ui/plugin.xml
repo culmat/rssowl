@@ -1524,12 +1524,7 @@
    </extension>
    <extension
          point="org.eclipse.ui.themes">
-      <themeElementCategory
-            id="org.rssowl.ui.ThemeCategory"
-            label="%themeElementCategory.label">
-      </themeElementCategory>
       <fontDefinition
-            categoryId="org.rssowl.ui.ThemeCategory"
             id="org.rssowl.ui.NewsTextFont"
             label="%fontDefinition.label"
             value="Verdana-regular-10">
@@ -1537,7 +1532,6 @@
             %fontDefinition.description</description>
       </fontDefinition>
       <fontDefinition
-            categoryId="org.rssowl.ui.ThemeCategory"
             id="org.rssowl.ui.HeadlinesFont"
             label="%fontDefinition.label.0">
          <description>
@@ -1545,7 +1539,6 @@
          </description>
       </fontDefinition>
       <fontDefinition
-            categoryId="org.rssowl.ui.ThemeCategory"
             id="org.rssowl.ui.BookmarkExplorerFont"
             label="%fontDefinition.label.1">
          <description>
@@ -1553,7 +1546,6 @@
          </description>
       </fontDefinition>
       <colorDefinition
-            categoryId="org.rssowl.ui.ThemeCategory"
             id="org.rssowl.ui.StickyBGColor"
             label="%colorDefinition.label"
             value="255,255,180">
@@ -1562,7 +1554,6 @@
          </description>
       </colorDefinition>
       <fontDefinition
-            categoryId="org.rssowl.ui.ThemeCategory"
             id="org.rssowl.ui.NotificationPopupFont"
             label="%fontDefinition.label.2">
          <description>
@@ -1570,7 +1561,6 @@
          </description>
       </fontDefinition>
       <colorDefinition
-            categoryId="org.rssowl.ui.ThemeCategory"
             id="org.rssowl.ui.SearchHighlightBGColor"
             label="%colorDefinition.label.0"
             value="255,255,0">
@@ -1579,7 +1569,6 @@
          </description>
       </colorDefinition>
       <colorDefinition
-            categoryId="org.rssowl.ui.ThemeCategory"
             id="org.rssowl.ui.NewsListBackgroundColor"
             label="%colorDefinition.label.1"
             value="COLOR_LIST_BACKGROUND">
