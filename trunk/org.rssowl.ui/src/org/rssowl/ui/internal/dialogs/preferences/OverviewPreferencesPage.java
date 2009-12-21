@@ -40,6 +40,7 @@ import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
+import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
@@ -81,6 +82,7 @@ public class OverviewPreferencesPage extends PreferencePage implements IWorkbenc
   /*
    * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite)
    */
+  @SuppressWarnings("restriction")
   @Override
   protected Control createContents(Composite parent) {
     final IWorkbenchPreferenceContainer preferences = (IWorkbenchPreferenceContainer) getContainer();
@@ -190,6 +192,10 @@ public class OverviewPreferencesPage extends PreferencePage implements IWorkbenc
     infoText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
     applyDialogFont(container);
+
+    /* Reveal the Items below the Overview Node for better Usability */
+    if (!Application.IS_ECLIPSE)
+      ((org.eclipse.ui.internal.dialogs.WorkbenchPreferenceDialog) preferences).getTreeViewer().expandAll();
 
     return container;
   }
