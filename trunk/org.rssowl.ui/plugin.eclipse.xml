@@ -784,10 +784,9 @@
             objectClass="java.lang.Object">
          <action
                class="org.rssowl.ui.internal.actions.MarkTypesReadAction"
-               definitionId="org.rssowl.ui.actions.MarkRead"
                enablesFor="+"
                icon="icons/elcl16/mark_read.gif"
-               id="org.rssowl.ui.actions.MarkRead"
+               id="org.rssowl.ui.actions.MarkTypesRead"
                label="%action.label.28"
                menubarPath="mark"
                style="push"
