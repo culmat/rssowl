@@ -33,7 +33,4 @@ public class RetargetActions {
 
   /** Reload */
   public static final String RELOAD = "org.rssowl.ui.actions.Reload"; //$NON-NLS-1$
-
-  /** Mark All Read */
-  public static final String MARK_ALL_READ = "org.rssowl.ui.MarkAllRead"; //$NON-NLS-1$
 }
