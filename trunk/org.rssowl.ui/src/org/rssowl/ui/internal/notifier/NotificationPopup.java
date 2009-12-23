@@ -374,7 +374,22 @@ public class NotificationPopup extends PopupDialog {
     int totalPages = (fDisplayedItems.size() / fItemLimit) + ((fDisplayedItems.size() % fItemLimit != 0) ? 1 : 0);
     int currentPage = (fDisplayOffset / fItemLimit) + 1;
 
-    String titlePart = NLS.bind(Messages.NotificationPopup_N_INCOMING, fDisplayedItems.size());
+    /* Count News Notification Items and Search Notification Items */
+    int newsCount = 0;
+    int searchCount = 0;
+    for (NotificationItem item : fDisplayedItems) {
+      if (item instanceof NewsNotificationItem)
+        newsCount++;
+      else
+        searchCount++;
+    }
+
+    String titlePart;
+    if (newsCount == 0 && searchCount > 0)
+      titlePart = (searchCount == 1) ? NLS.bind(Messages.NotificationPopup_N_SEARCH_MATCH, searchCount) : NLS.bind(Messages.NotificationPopup_N_SEARCH_MATCHES, searchCount);
+    else
+      titlePart = NLS.bind(Messages.NotificationPopup_N_INCOMING, newsCount);
+
     String footerPart = ""; //$NON-NLS-1$
 
     /* More than one page */
