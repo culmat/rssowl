@@ -31,9 +31,7 @@ import org.eclipse.core.runtime.jobs.Job;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * The <code>BatchedBuffer</code> can be used to batch certain types of
@@ -56,13 +54,13 @@ public class BatchedBuffer<T> {
   public interface Receiver<T> {
 
     /**
-     * Asks the implementor to process the given Set of Objects. This method
+     * Asks the implementor to process the given Collection of Objects. This method
      * will be called after <code>batchInterval</code> millies.
      *
-     * @param objects A Set of Objects that have been added during
+     * @param objects A Collection of Objects that have been added during
      * <code>batchInterval</code>.
      */
-    void receive(Set<T> objects);
+    void receive(Collection<T> objects);
   }
 
   /**
@@ -112,7 +110,7 @@ public class BatchedBuffer<T> {
       @Override
       protected IStatus run(IProgressMonitor monitor) {
         synchronized (fBuffer) {
-          fReceiver.receive(new HashSet<T>(fBuffer));
+          fReceiver.receive(new ArrayList<T>(fBuffer));
           fBuffer.clear();
         }
 

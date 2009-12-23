@@ -54,6 +54,7 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * The <code>NotificationService</code> listens on News being downloaded and
@@ -68,7 +69,7 @@ public class NotificationService {
   private static final int BATCH_INTERVAL = 5000;
 
   private final NewsListener fNewsListener;
-  private SearchMarkListener fSearchMarkListener;
+  private final SearchMarkListener fSearchMarkListener;
   private final IPreferenceScope fGlobalPreferences;
   private final BatchedBuffer<NotificationItem> fBatchedBuffer;
 
@@ -80,7 +81,7 @@ public class NotificationService {
 
     /* Process Events batched */
     BatchedBuffer.Receiver<NotificationItem> receiver = new BatchedBuffer.Receiver<NotificationItem>() {
-      public void receive(Set<NotificationItem> items) {
+      public void receive(Collection<NotificationItem> items) {
         showItems(items);
       }
     };
@@ -102,7 +103,7 @@ public class NotificationService {
    * @param color the color to use for the news or <code>null</code> if none.
    */
   public void show(List<INews> news, RGB color) {
-    List<NotificationItem> items = new ArrayList<NotificationItem>(news.size());
+    Set<NotificationItem> items = new TreeSet<NotificationItem>();
     for (INews newsitem : news)
       items.add(new NewsNotificationItem(newsitem, color));
 
@@ -190,7 +191,7 @@ public class NotificationService {
     }
 
     /* Create Items */
-    List<NotificationItem> items = new ArrayList<NotificationItem>(filteredEvents.size());
+    Set<NotificationItem> items = new TreeSet<NotificationItem>();
     for (SearchMarkEvent event : filteredEvents)
       items.add(new SearchNotificationItem(event.getEntity(), event.getEntity().getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED))));
 
@@ -229,7 +230,7 @@ public class NotificationService {
     }
 
     /* Create Items */
-    List<NotificationItem> items = new ArrayList<NotificationItem>(events.size());
+    Set<NotificationItem> items = new TreeSet<NotificationItem>();
     for (NewsEvent event : events) {
       INews news = event.getEntity();
       if (news.getState().equals(INews.State.NEW)) //Only show NEW news in Notifier
