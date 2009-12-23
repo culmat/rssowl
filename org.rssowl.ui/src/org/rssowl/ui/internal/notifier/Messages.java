@@ -29,6 +29,8 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
   private static final String BUNDLE_NAME = "org.rssowl.ui.internal.notifier.messages"; //$NON-NLS-1$
   public static String NotificationPopup_N_INCOMING;
+  public static String NotificationPopup_N_SEARCH_MATCH;
+  public static String NotificationPopup_N_SEARCH_MATCHES;
   public static String NotificationPopup_NO_CONTENT;
   public static String NotificationPopup_PAGE_N_OF_M;
   public static String SearchNotificationItem_NAME_UNREAD_COUNT;
