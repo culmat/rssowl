@@ -249,10 +249,17 @@ public class NewsNotificationItem extends NotificationItem {
 
     /* Compare with other News Item */
     if (o instanceof NewsNotificationItem) {
+
+      /* Return 0 if the Items Equal */
+      if (equals(o))
+        return 0;
+
+      /* Compare by Date */
       Date date1 = fRecentNewsDate;
       Date date2 = ((NewsNotificationItem) o).fRecentNewsDate;
 
-      return date2.compareTo(date1);
+      int res = date2.compareTo(date1);
+      return (res != 0) ? res : -1;
     }
 
     /* Otherwise sort to Bottom */

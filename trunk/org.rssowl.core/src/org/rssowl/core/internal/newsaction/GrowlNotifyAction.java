@@ -70,7 +70,7 @@ public class GrowlNotifyAction implements INewsAction {
   /** Initialize a Batched Buffer for Growl Notifications */
   public GrowlNotifyAction() {
     BatchedBuffer.Receiver<INews> receiver = new BatchedBuffer.Receiver<INews>() {
-      public void receive(Set<INews> items) {
+      public void receive(Collection<INews> items) {
         try {
           executeCommand(fPathToGrowlNotify, items);
         }

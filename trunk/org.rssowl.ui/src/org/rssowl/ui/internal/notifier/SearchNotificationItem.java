@@ -148,7 +148,14 @@ public class SearchNotificationItem extends NotificationItem {
 
     /* Compare with other Search Item */
     if (o instanceof SearchNotificationItem) {
-      return getText().compareTo(o.getText());
+
+      /* Return 0 if the Items are Equal */
+      if (equals(o))
+        return 0;
+
+      /* Compare by Name */
+      int res = getText().compareTo(o.getText());
+      return (res != 0) ? res : -1;
     }
 
     /* Otherwise sort to top */
