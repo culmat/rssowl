@@ -104,7 +104,7 @@ public class ConnectionTests {
     IConnectionService conManager = Owl.getConnectionService();
     URI feedUrl = new URI("http://www.rssowl.org/node/feed");
     String label = conManager.getLabel(feedUrl, new NullProgressMonitor());
-    assertEquals("RSSOwl - Powerful RSS / RDF / Atom News Feed Reader", label);
+    assertEquals("RSSOwl News", label);
   }
 
   /**
