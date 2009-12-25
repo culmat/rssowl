@@ -1600,7 +1600,7 @@
             icon="icons/obj16/fav_google.gif"
             id="org.rssowl.ui.GoogleNewsKeywordFeed"
             name="%keywordFeed.name"
-            url="http://news.google.com/news?q=[:]&amp;output=rss">
+            url="http://news.google.com/news?q=[:]&amp;output=rss&amp;num=25">
       </keywordFeed>
       <keywordFeed
             icon="icons/obj16/fav_technorati.gif"
@@ -1618,25 +1618,25 @@
             icon="icons/obj16/fav_live.gif"
             id="org.rssowl.ui.LiveKeywordFeed"
             name="%keywordFeed.name.2"
-            url="http://search.live.com/results.aspx?q=[:]&amp;format=rss">
+            url="http://www.bing.com/search?q=[:]&amp;format=rss&amp;count=25">
       </keywordFeed>
       <keywordFeed
             icon="icons/obj16/fav_digg.gif"
             id="org.rssowl.ui.DiggKeywordFeed"
             name="%keywordFeed.name.3"
-            url="http://digg.com/rss_search?s=[:]">
+            url="http://digg.com/rss_search?s=[:]&amp;num=25">
       </keywordFeed>
       <keywordFeed
             icon="icons/obj16/fav_twitter.gif"
             id="org.rssowl.ui.TwitterKeywordFeed"
             name="%keywordFeed.name.4"
-            url="http://search.twitter.com/search.atom?q=[:]">
+            url="http://search.twitter.com/search.atom?q=[:]&amp;rpp=25">
       </keywordFeed>
       <keywordFeed
             icon="icons/obj16/fav_google.gif"
             id="org.rssowl.ui.GoogleBlogKeywordFeed"
             name="%keywordFeed.name.5"
-            url="http://blogsearch.google.com/blogsearch_feeds?q=[:]&amp;num=10&amp;output=rss">
+            url="http://blogsearch.google.com/blogsearch_feeds?q=[:]&amp;num=25&amp;output=rss">
       </keywordFeed>
       <keywordFeed
             icon="icons/obj16/fav_youtube.gif"
