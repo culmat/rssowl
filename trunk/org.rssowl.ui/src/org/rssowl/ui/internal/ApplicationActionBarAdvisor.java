@@ -634,6 +634,26 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
           }
         });
 
+        /* Minimize */
+        manager.add(new Action(Messages.ApplicationActionBarAdvisor_MINIMIZE) {
+          @Override
+          public void run() {
+            Shell shell = OwlUI.getActiveShell();
+            if (shell != null)
+              shell.setMinimized(true);
+          }
+
+          @Override
+          public String getActionDefinitionId() {
+            return "org.rssowl.ui.MinimizeCommand"; //$NON-NLS-1$
+          }
+
+          @Override
+          public String getId() {
+            return "org.rssowl.ui.MinimizeCommand"; //$NON-NLS-1$
+          }
+        });
+
         manager.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
         manager.add(new GroupMarker(M_VIEW_START));
       }
