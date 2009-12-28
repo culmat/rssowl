@@ -75,6 +75,8 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
   private Button fOpenOnSingleClick;
   private Button fUpdateOnStartup;
   private Button fAggregateNewsAsSearch;
+  private Button fSingleClickRestore;
+  private Button fDoubleClickRestore;
 
   /** Leave for reflection */
   public MiscPreferencePage() {
@@ -260,16 +262,58 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     fMinimizeToTray = new Button(group, SWT.CHECK);
     fMinimizeToTray.setText(Messages.MiscPreferencePage_ON_MINIMIZE);
     fMinimizeToTray.setSelection(fGlobalScope.getBoolean(DefaultPreferences.TRAY_ON_MINIMIZE));
+    fMinimizeToTray.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        updateRestoreEnablement();
+      }
+    });
 
     /* Move to Tray on Start */
     fMoveToTrayOnStart = new Button(group, SWT.CHECK);
     fMoveToTrayOnStart.setText(Messages.MiscPreferencePage_ON_START);
     fMoveToTrayOnStart.setSelection(fGlobalScope.getBoolean(DefaultPreferences.TRAY_ON_START));
+    fMoveToTrayOnStart.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        updateRestoreEnablement();
+      }
+    });
 
     /* Move to Tray on Close */
     fMoveToTrayOnExit = new Button(group, SWT.CHECK);
     fMoveToTrayOnExit.setText(Messages.MiscPreferencePage_ON_CLOSE);
     fMoveToTrayOnExit.setSelection(fGlobalScope.getBoolean(DefaultPreferences.TRAY_ON_CLOSE));
+    fMoveToTrayOnExit.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        updateRestoreEnablement();
+      }
+    });
+
+    label = new Label(group, SWT.NONE);
+    label.setText(Messages.MiscPreferencePage_RESTORE_FROM_TRAY);
+    label.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
+    ((GridData) label.getLayoutData()).verticalIndent = 5;
+
+    Composite buttonContainer = new Composite(group, SWT.None);
+    buttonContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
+
+    fSingleClickRestore = new Button(buttonContainer, SWT.RADIO);
+    fSingleClickRestore.setText(Messages.MiscPreferencePage_SINGLE_CLICK_RESTORE);
+    fSingleClickRestore.setSelection(!fGlobalScope.getBoolean(DefaultPreferences.RESTORE_TRAY_DOUBLECLICK));
+
+    fDoubleClickRestore = new Button(buttonContainer, SWT.RADIO);
+    fDoubleClickRestore.setText(Messages.MiscPreferencePage_DOUBLE_CLICK_RESTORE);
+    fDoubleClickRestore.setSelection(fGlobalScope.getBoolean(DefaultPreferences.RESTORE_TRAY_DOUBLECLICK));
+
+    updateRestoreEnablement();
+  }
+
+  private void updateRestoreEnablement() {
+    boolean enable = fMinimizeToTray.getSelection() || fMoveToTrayOnStart.getSelection() || fMoveToTrayOnExit.getSelection();
+    fSingleClickRestore.setEnabled(enable);
+    fDoubleClickRestore.setEnabled(enable);
   }
 
   private Composite createComposite(Composite parent) {
@@ -317,6 +361,7 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
       fGlobalScope.putBoolean(DefaultPreferences.TRAY_ON_MINIMIZE, fMinimizeToTray.getSelection());
       fGlobalScope.putBoolean(DefaultPreferences.TRAY_ON_START, fMoveToTrayOnStart.getSelection());
       fGlobalScope.putBoolean(DefaultPreferences.TRAY_ON_CLOSE, fMoveToTrayOnExit.getSelection());
+      fGlobalScope.putBoolean(DefaultPreferences.RESTORE_TRAY_DOUBLECLICK, fDoubleClickRestore.getSelection());
     }
 
     /* Update Visible Feedviews */
@@ -371,10 +416,13 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
       fMinimizeToTray.setSelection(defaultScope.getBoolean(DefaultPreferences.TRAY_ON_MINIMIZE));
       fMoveToTrayOnStart.setSelection(defaultScope.getBoolean(DefaultPreferences.TRAY_ON_START));
       fMoveToTrayOnExit.setSelection(defaultScope.getBoolean(DefaultPreferences.TRAY_ON_CLOSE));
+      fSingleClickRestore.setSelection(!defaultScope.getBoolean(DefaultPreferences.RESTORE_TRAY_DOUBLECLICK));
+      fDoubleClickRestore.setSelection(defaultScope.getBoolean(DefaultPreferences.RESTORE_TRAY_DOUBLECLICK));
+      updateRestoreEnablement();
     }
 
     fAlwaysReuseFeedView.setEnabled(!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1);
-    
+
     updateApplyEnablement(true);
   }
 

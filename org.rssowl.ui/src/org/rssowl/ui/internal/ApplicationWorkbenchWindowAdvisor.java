@@ -96,6 +96,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
   private IPreferenceScope fPreferences;
   private boolean fBlockIconifyEvent;
   private boolean fMinimizeFromClose;
+  private Menu fTrayMenu;
 
   /* Listeners */
   private NewsAdapter fNewsListener;
@@ -419,6 +420,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       return false;
 
     final Shell shell = primaryWindow.getShell();
+    final int doubleClickTime = shell.getDisplay().getDoubleClickTime();
     final Tray tray = shell.getDisplay().getSystemTray();
 
     /* Tray not support on the OS */
@@ -449,44 +451,36 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
     /* Show Menu on Selection */
     fTrayItem.addListener(SWT.MenuDetect, new Listener() {
-      private Menu menu;
-
       public void handleEvent(Event event) {
-        MenuManager trayMenu = new MenuManager();
-
-        /* Restore */
-        trayMenu.add(new ContributionItem() {
-          @Override
-          public void fill(Menu menu, int index) {
-            MenuItem restoreItem = new MenuItem(menu, SWT.PUSH);
-            restoreItem.setText(Messages.ApplicationWorkbenchWindowAdvisor_RESTORE);
-            restoreItem.addSelectionListener(new SelectionAdapter() {
-              @Override
-              public void widgetSelected(SelectionEvent e) {
-                restoreFromTray(shell);
-              }
-            });
-            menu.setDefaultItem(restoreItem);
-          }
-        });
-
-        /* Separator */
-        trayMenu.add(new Separator());
-
-        /* Other Items */
-        fActionBarAdvisor.fillTrayItem(trayMenu, shell, ApplicationWorkbenchWindowAdvisor.this);
-
-        if (menu != null)
-          menu.dispose();
-
-        menu = trayMenu.createContextMenu(shell);
-        menu.setVisible(true);
+        showTrayMenu(shell);
       }
     });
 
-    /* Handle Selection */
-    fTrayItem.addListener(Application.IS_MAC ? SWT.Selection : SWT.DefaultSelection, new Listener() {
+    /* Handle Selection (Default and Normal) */
+    Listener selectionListener = new Listener() {
+      private long lastDoubleClickTime;
+
       public void handleEvent(Event event) {
+        boolean restoreOnDoubleclick = fPreferences.getBoolean(DefaultPreferences.RESTORE_TRAY_DOUBLECLICK);
+        boolean isDoubleClick = (event.type == SWT.DefaultSelection);
+
+        /* Remember when Doubleclick was invoked */
+        if (isDoubleClick)
+          lastDoubleClickTime = System.currentTimeMillis();
+
+        /* Show the Tray Context Menu if this is not a double click */
+        if (!isDoubleClick && restoreOnDoubleclick) {
+          JobRunner.runInUIThread(doubleClickTime + 10, tray, new Runnable() {
+            public void run() {
+              if (lastDoubleClickTime < System.currentTimeMillis() - doubleClickTime && !shell.isDisposed())
+                showTrayMenu(shell);
+            }
+          });
+        }
+
+        /* Do not restore if settings are different */
+        if (restoreOnDoubleclick != isDoubleClick)
+          return;
 
         /* Restore from Tray */
         if (!shell.isVisible())
@@ -496,7 +490,10 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         else if (!Application.IS_WINDOWS)
           moveToTray(shell);
       }
-    });
+    };
+
+    fTrayItem.addListener(SWT.DefaultSelection, selectionListener);
+    fTrayItem.addListener(SWT.Selection, selectionListener);
 
     /* Indicate new News in Tray */
     fNewsListener = new NewsAdapter() {
@@ -626,5 +623,37 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
   @Override
   public IWorkbenchWindowConfigurer getWindowConfigurer() {
     return super.getWindowConfigurer();
+  }
+
+  private void showTrayMenu(final Shell shell) {
+    MenuManager trayMenuManager = new MenuManager();
+
+    /* Restore */
+    trayMenuManager.add(new ContributionItem() {
+      @Override
+      public void fill(Menu menu, int index) {
+        MenuItem restoreItem = new MenuItem(menu, SWT.PUSH);
+        restoreItem.setText(Messages.ApplicationWorkbenchWindowAdvisor_RESTORE);
+        restoreItem.addSelectionListener(new SelectionAdapter() {
+          @Override
+          public void widgetSelected(SelectionEvent e) {
+            restoreFromTray(shell);
+          }
+        });
+        menu.setDefaultItem(restoreItem);
+      }
+    });
+
+    /* Separator */
+    trayMenuManager.add(new Separator());
+
+    /* Other Items */
+    fActionBarAdvisor.fillTrayItem(trayMenuManager, shell, ApplicationWorkbenchWindowAdvisor.this);
+
+    if (fTrayMenu != null)
+      fTrayMenu.dispose();
+
+    fTrayMenu = trayMenuManager.createContextMenu(shell);
+    fTrayMenu.setVisible(true);
   }
 }

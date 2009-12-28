@@ -100,6 +100,7 @@ public class Messages extends NLS {
   public static String ManageLabelsPreferencePage_NO_UNDO;
   public static String MiscPreferencePage_AGGREGATE_AS_SEARCH;
   public static String MiscPreferencePage_CLASSIC;
+  public static String MiscPreferencePage_DOUBLE_CLICK_RESTORE;
   public static String MiscPreferencePage_LAYOUT;
   public static String MiscPreferencePage_MISC;
   public static String MiscPreferencePage_MOVE_TO_TRAY;
@@ -109,8 +110,10 @@ public class Messages extends NLS {
   public static String MiscPreferencePage_ON_MINIMIZE;
   public static String MiscPreferencePage_ON_START;
   public static String MiscPreferencePage_REOPEN_LAST_OPENED;
+  public static String MiscPreferencePage_RESTORE_FROM_TRAY;
   public static String MiscPreferencePage_SAME_TAB;
   public static String MiscPreferencePage_SINGLE_CLICK;
+  public static String MiscPreferencePage_SINGLE_CLICK_RESTORE;
   public static String MiscPreferencePage_SYSTEM_TRAY;
   public static String MiscPreferencePage_TAB_LIMIT;
   public static String MiscPreferencePage_TABBED_BROWSING;
