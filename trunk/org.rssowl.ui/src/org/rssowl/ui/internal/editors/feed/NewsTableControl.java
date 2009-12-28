@@ -441,6 +441,14 @@ public class NewsTableControl implements IFeedViewPart {
     return false;
   }
 
+  private boolean isGroupingByStickyness() {
+    IContentProvider contentProvider = fViewer.getContentProvider();
+    if (contentProvider != null && contentProvider instanceof NewsContentProvider)
+      return ((NewsContentProvider) contentProvider).isGroupingByStickyness();
+
+    return false;
+  }
+
   private void showColumns(NewsColumnViewModel newModel, boolean update, boolean refresh) {
     if (fCustomTree.getControl().isDisposed())
       return;
@@ -766,11 +774,22 @@ public class NewsTableControl implements IFeedViewPart {
 
     /* Mouse-Up over Sticky-State-Column */
     else if (event.button == 1 && isInImageBounds(item, NewsColumn.STICKY, p)) {
-      Object data = item.getData();
+      final Object data = item.getData();
 
       /* Toggle State between Sticky / Not Sticky */
       if (data instanceof INews) {
-        new MakeNewsStickyAction(new StructuredSelection(data)).run();
+        Runnable runnable = new Runnable() {
+          public void run() {
+            new MakeNewsStickyAction(new StructuredSelection(data)).run();
+          }
+        };
+
+        INews news = (INews) data;
+        if (news.getState() != INews.State.READ && isGroupingByStickyness()) //Workaround for Bug 1279
+          JobRunner.runInBackgroundThread(50, runnable);
+        else
+          runnable.run();
+
         fLastColumnActionInvokedMillies = System.currentTimeMillis();
       }
     }

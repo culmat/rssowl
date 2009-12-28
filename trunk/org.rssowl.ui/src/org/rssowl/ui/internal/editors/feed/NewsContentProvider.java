@@ -228,6 +228,10 @@ public class NewsContentProvider implements ITreeContentProvider {
     return fGrouping.getType() == NewsGrouping.Type.GROUP_BY_FEED;
   }
 
+  boolean isGroupingByStickyness() {
+    return fGrouping.getType() == NewsGrouping.Type.GROUP_BY_STICKY;
+  }
+
   /* Returns the news that have been added since the last refresh */
   synchronized List<INews> refreshCache(INewsMark input, boolean onlyAdd) throws PersistenceException {
     List<INews> addedNews = Collections.emptyList();
