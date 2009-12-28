@@ -724,7 +724,7 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
 
   private void updateApplyEnablement(boolean enable) {
     if (fIsError)
-      return;
+      enable = false;
 
     Button applyButton = getApplyButton();
     if (applyButton != null && !applyButton.isDisposed() && applyButton.isEnabled() != enable)

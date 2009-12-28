@@ -37,6 +37,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
@@ -59,6 +60,7 @@ import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
+import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.OwlUI;
 
@@ -264,6 +266,17 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
     }
 
     return super.getToolTipText(element);
+  }
+
+  /*
+   * @see org.eclipse.jface.viewers.CellLabelProvider#getToolTipShift(java.lang.Object)
+   */
+  @Override
+  public Point getToolTipShift(Object object) {
+    if (Application.IS_WINDOWS)
+      return new Point(0, 21);
+
+    return super.getToolTipShift(object);
   }
 
   /**
