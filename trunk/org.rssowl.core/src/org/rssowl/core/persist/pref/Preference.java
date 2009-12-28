@@ -73,6 +73,9 @@ public enum Preference {
   /** Global: Minimize to the system tray on Application Start */
   TRAY_ON_START("org.rssowl.pref.TrayOnStart", IPreferenceType.BOOLEAN), //$NON-NLS-1$
 
+  /** Global: Restore from Tray with a Double Click */
+  RESTORE_TRAY_DOUBLECLICK("org.rssowl.pref.RestoreTrayDoubleclick", IPreferenceType.BOOLEAN), //$NON-NLS-1$
+
   /** Global: Mark Read state */
   MARK_READ_STATE("org.rssowl.pref.MarkReadState", IPreferenceType.BOOLEAN), //$NON-NLS-1$
 

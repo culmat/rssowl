@@ -76,6 +76,9 @@ public class DefaultPreferences {
   /** Global: Minimize to the system tray on Application Start */
   public static final String TRAY_ON_START = Preference.TRAY_ON_START.id();
 
+  /** Global: Restore from Tray with a Double Click */
+  public static final String RESTORE_TRAY_DOUBLECLICK = Preference.RESTORE_TRAY_DOUBLECLICK.id();
+
   /** Global: Mark Read state */
   public static final String MARK_READ_STATE = Preference.MARK_READ_STATE.id();
 

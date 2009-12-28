@@ -91,6 +91,7 @@ public class PreferencesInitializer implements IPreferencesInitializer {
     defaultScope.putBoolean(Preference.DISABLE_JAVASCRIPT.id(), true);
     defaultScope.putBoolean(Preference.USE_DEFAULT_EXTERNAL_BROWSER.id(), true);
     defaultScope.putBoolean(Preference.TRAY_ON_MINIMIZE.id(), false);
+    defaultScope.putBoolean(Preference.RESTORE_TRAY_DOUBLECLICK.id(), Application.IS_WINDOWS);
     defaultScope.putBoolean(Preference.MARK_READ_STATE.id(), true);
     defaultScope.putInteger(Preference.MARK_READ_IN_MILLIS.id(), 0);
     defaultScope.putBoolean(Preference.BM_OPEN_SITE_FOR_EMPTY_NEWS.id(), false);
