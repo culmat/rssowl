@@ -468,8 +468,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         if (isDoubleClick)
           lastDoubleClickTime = System.currentTimeMillis();
 
-        /* Show the Tray Context Menu if this is not a double click */
-        if (!isDoubleClick && restoreOnDoubleclick) {
+        /* Show the Tray Context Menu if this is not a double click and we are on Windows */
+        if (!isDoubleClick && restoreOnDoubleclick && Application.IS_WINDOWS) {
           JobRunner.runInUIThread(doubleClickTime + 10, tray, new Runnable() {
             public void run() {
               if (lastDoubleClickTime < System.currentTimeMillis() - doubleClickTime && !shell.isDisposed())
