@@ -725,6 +725,13 @@
             id="org.rssowl.ui.ZoomResetCommand"
             name="%command.name.55">
       </command>
+      <command
+            categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            defaultHandler="org.rssowl.ui.internal.handler.MinimizeHandler"
+            description="%command.description.37"
+            id="org.rssowl.ui.MinimizeCommand"
+            name="%command.name.58">
+      </command>
    </extension>
    <extension
          id="product"
