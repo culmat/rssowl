@@ -244,41 +244,41 @@ litigation.
 
    <plugin
          id="org.rssowl.core"
-         download-size="632"
-         install-size="632"
+         download-size="171"
+         install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="org.rssowl.lib.db4o"
          download-size="631"
-         install-size="631"
+         install-size="0"
          version="0.0.0"/>
 
    <plugin
          id="org.rssowl.lib.httpclient"
          download-size="365"
-         install-size="365"
+         install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="org.rssowl.lib.jdom"
          download-size="147"
-         install-size="147"
+         install-size="0"
          version="0.0.0"/>
 
    <plugin
          id="org.rssowl.ui"
-         download-size="2038"
-         install-size="2038"
+         download-size="771"
+         install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="org.rssowl.lib.lucene"
          download-size="614"
-         install-size="614"
+         install-size="0"
          version="0.0.0"/>
 
 </feature>
