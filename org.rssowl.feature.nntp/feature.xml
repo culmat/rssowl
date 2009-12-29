@@ -244,7 +244,7 @@ litigation.
    <plugin
          id="org.rssowl.contrib.nntp"
          download-size="413"
-         install-size="413"
+         install-size="0"
          version="0.0.0"
          unpack="false"/>
 
