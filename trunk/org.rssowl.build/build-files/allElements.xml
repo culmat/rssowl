@@ -22,6 +22,14 @@
 			<property name="type" value="feature" />
 			<property name="id" value="org.rssowl.dependencies" />
 		</ant>
+		<ant antfile="${genericTargets}" target="${target}">
+			<property name="type" value="feature" />
+			<property name="id" value="org.rssowl.contrib.notes" />
+		</ant>
+		<ant antfile="${genericTargets}" target="${target}">
+			<property name="type" value="feature" />
+			<property name="id" value="org.rssowl.feature.contrib.feedhandler" />
+		</ant>
 		
 	</target>
 
@@ -49,6 +57,16 @@
 		</ant>
 	</target>
 	<target name="assemble.org.rssowl.dependencies">
+		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
+			<property name="zipargs" value="" />
+		</ant>
+	</target>
+	<target name="assemble.org.rssowl.contrib.notes">
+		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
+			<property name="zipargs" value="" />
+		</ant>
+	</target>
+	<target name="assemble.org.rssowl.feature.contrib.feedhandler">
 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
 			<property name="zipargs" value="" />
 		</ant>
