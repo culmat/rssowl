@@ -40,6 +40,7 @@ import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 public class ManageConfigurationAction extends Action implements IWorkbenchWindowActionDelegate {
   private static final String CONFIGURATION_VIEW_SHOW_NESTED_FEATURES = "ConfigurationView.showNestedFeatures"; //$NON-NLS-1$
   private static final String CONFIGURATION_VIEW_SHOW_SITES = "ConfigurationView.showSites"; //$NON-NLS-1$
+  private static final String CONFIGURATION_VIEW_SHOW_DISABLED = "ConfigurationView.showUnconf"; //$NON-NLS-1$
 
   private Shell fShell;
 
@@ -59,6 +60,8 @@ public class ManageConfigurationAction extends Action implements IWorkbenchWindo
     pluginPreferences.setValue(CONFIGURATION_VIEW_SHOW_SITES, false);
     pluginPreferences.setDefault(CONFIGURATION_VIEW_SHOW_NESTED_FEATURES, true);
     pluginPreferences.setValue(CONFIGURATION_VIEW_SHOW_NESTED_FEATURES, false);
+    pluginPreferences.setDefault(CONFIGURATION_VIEW_SHOW_DISABLED, false);
+    pluginPreferences.setValue(CONFIGURATION_VIEW_SHOW_DISABLED, true);
     org.eclipse.update.internal.ui.UpdateUI.getDefault().savePluginPreferences();
 
     /* Open Config Dialog */
