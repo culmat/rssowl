@@ -894,6 +894,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     toolsMenu.add(new GroupMarker("begin")); //$NON-NLS-1$
     toolsMenu.add(new Separator());
     toolsMenu.add(new GroupMarker("middle")); //$NON-NLS-1$
+    toolsMenu.add(new Separator("addons")); //$NON-NLS-1$
     toolsMenu.add(new Separator());
     toolsMenu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
     toolsMenu.add(new Separator());

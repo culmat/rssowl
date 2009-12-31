@@ -279,7 +279,7 @@
          <menu
                id="extensions"
                label="%menu.label.2"
-               path="tools/additions">
+               path="tools/addons">
             <separator name="extensionsBegin"/>
             <groupMarker name="findExtensions"/>
             <separator name="extensionsEnd"/>
