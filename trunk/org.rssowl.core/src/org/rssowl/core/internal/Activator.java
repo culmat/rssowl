@@ -64,6 +64,9 @@ public class Activator extends Plugin {
     fContext = context;
     fVersion = (String) fgPlugin.getBundle().getHeaders().get("Bundle-Version"); //$NON-NLS-1$
 
+    /* Use the LogBridge as Logger */
+    System.setProperty("org.apache.commons.logging.Log", "org.rssowl.core.internal.LogBridge"); //$NON-NLS-1$ //$NON-NLS-2$
+
     /* Load the Proxy Service */
     SafeRunner.run(new LoggingSafeRunnable() {
       public void run() throws Exception {
