@@ -4,7 +4,7 @@ Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.rssowl.core;singleton:=true
 Bundle-Version: 2.1.0.qualifier
 Bundle-Activator: org.rssowl.core.internal.Activator
-Eclipse-RegisterBuddy: org.rssowl.lib.db4o
+Eclipse-RegisterBuddy: org.rssowl.lib.db4o, org.rssowl.lib.httpclient
 Require-Bundle: org.eclipse.core.runtime,
  org.rssowl.lib.db4o,
  org.rssowl.lib.jdom,
