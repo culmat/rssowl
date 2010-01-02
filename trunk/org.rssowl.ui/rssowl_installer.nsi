@@ -290,6 +290,8 @@ Section ""
     CreateShortcut "$QUICKLAUNCH\RSSOwl.lnk" "$INSTDIR\rssowl.exe" "" "$INSTDIR\rssowl.ico"
   !insertmacro MUI_STARTMENU_WRITE_END
   
+  WriteINIStr "$SMPROGRAMS\$STARTMENU_FOLDER\Visit Homepage.url" "InternetShortcut" "URL" "http://www.rssowl.org"
+  
   WriteRegStr HKCU "Software\RSSOwl" "" $INSTDIR
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\RSSOwl" "DisplayName" "RSSOwl"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\RSSOwl" "UninstallString" "$INSTDIR\Uninstall.exe"
@@ -322,6 +324,7 @@ Section "Uninstall"
   !insertmacro MUI_STARTMENU_GETFOLDER Application $MUI_TEMP
   
   Delete "$SMPROGRAMS\$MUI_TEMP\Uninstall.lnk"
+  Delete "$SMPROGRAMS\$MUI_TEMP\Visit Homepage.url"
   Delete "$SMPROGRAMS\$MUI_TEMP\RSSOwl.lnk"
   Delete "$DESKTOP\RSSOwl.lnk"
   Delete "$QUICKLAUNCH\RSSOwl.lnk"
