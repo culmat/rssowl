@@ -95,7 +95,9 @@ public class Messages extends NLS {
   public static String ApplicationActionBarAdvisor_ZOOM_OUT;
   public static String ApplicationServer_INFO_UNABLE_OPEN_PORT;
   public static String ApplicationWorkbenchWindowAdvisor_RESTORE;
+  public static String Controller_ERROR;
   public static String Controller_ERROR_LOADING;
+  public static String Controller_ERROR_STARTING_SERVER;
   public static String Controller_IMPORTANT;
   public static String Controller_LABEL;
   public static String Controller_LABEL_MSG;

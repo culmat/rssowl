@@ -39,6 +39,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Shell;
@@ -815,11 +816,11 @@ public class Controller {
 
     /* Set Error-Loading flag if necessary */
     else if (ex != null && !(ex instanceof NotModifiedException) && !(ex instanceof AuthenticationRequiredException)) {
-      boolean wasShowingError= bookmark.isErrorLoading();
-      Object oldMessage= bookmark.getProperty(LOAD_ERROR_KEY);
+      boolean wasShowingError = bookmark.isErrorLoading();
+      Object oldMessage = bookmark.getProperty(LOAD_ERROR_KEY);
 
       bookmark.setErrorLoading(true);
-      String message= CoreUtils.toMessage(ex);
+      String message = CoreUtils.toMessage(ex);
       if (StringUtils.isSet(message))
         bookmark.setProperty(LOAD_ERROR_KEY, message);
       else
@@ -1115,6 +1116,14 @@ public class Controller {
           }
         }
       });
+    }
+
+    /* Inform the User if the ApplicationServer is not running */
+    ApplicationServer server = ApplicationServer.getDefault();
+    if (!server.isRunning()) {
+      Shell shell = OwlUI.getPrimaryShell();
+      if (shell != null)
+        MessageDialog.openError(shell, Messages.Controller_ERROR, NLS.bind(Messages.Controller_ERROR_STARTING_SERVER, server.getPort(), server.getHost()));
     }
 
     /* Indicate Application is started */
