@@ -992,7 +992,21 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
       }
     });
 
+    /* Link to Forum */
+    helpMenu.add(new Action(Messages.ApplicationActionBarAdvisor_VISIT_FORUM) {
+      @Override
+      public void run() {
+        BrowserUtils.openLinkExternal("http://sourceforge.net/projects/rssowl/forums/forum/296910"); //$NON-NLS-1$
+      }
+
+      @Override
+      public ImageDescriptor getImageDescriptor() {
+        return OwlUI.getImageDescriptor("icons/obj16/forum.gif"); //$NON-NLS-1$
+      }
+    });
+
     /* Show Key Bindings */
+    helpMenu.add(new Separator());
     helpMenu.add(new Action(Messages.ApplicationActionBarAdvisor_SHOW_KEY_BINDINGS) {
       @Override
       public void run() {
