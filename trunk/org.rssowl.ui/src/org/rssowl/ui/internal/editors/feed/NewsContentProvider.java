@@ -357,8 +357,13 @@ public class NewsContentProvider implements ITreeContentProvider {
                     if (onlyHandleAddedNews && (fAddedNews == null || fAddedNews.size() == 0))
                       return;
 
+                    /* Try to optimize added news by calling Viewer.add() instead of refresh() */
+                    if (onlyHandleAddedNews && !isGroupingEnabled())
+                      addToViewers(fAddedNews);
+
                     /* Refresh Viewer to reflect changes */
-                    fFeedView.refresh(true, true);
+                    else
+                      fFeedView.refresh(true, true); //TODO Seems some JFace caching problem here (redraw=true)
                   }
                 });
               }
@@ -567,6 +572,14 @@ public class NewsContentProvider implements ITreeContentProvider {
     if (fGrouping.needsRefresh(INews.class, events, false))
       return true;
 
+    addToViewers(addedNews);
+
+    return false;
+  }
+
+  /* Add a List of News to Table and Browser Viewers */
+  private void addToViewers(List<INews> addedNews) {
+
     /* Add to Table-Viewer if Visible (keep top item and selection stable) */
     if (fFeedView.isTableViewerVisible()) {
       Tree tree = fTableViewer.getTree();
@@ -588,8 +601,6 @@ public class NewsContentProvider implements ITreeContentProvider {
     /* Add to Browser-Viewer if showing entire Feed */
     if (browserShowsCollection())
       fBrowserViewer.add(fBrowserViewer.getInput(), addedNews.toArray());
-
-    return false;
   }
 
   /* Browser shows collection if maximized */
