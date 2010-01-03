@@ -91,11 +91,15 @@ public class ApplicationServer {
   /* The Singleton Instance */
   private static ApplicationServer fgInstance = new ApplicationServer();
 
-  /* Local URL Parts */
+  /* Local URL Default Values */
   static final String PROTOCOL = "http"; //$NON-NLS-1$
-  static String LOCALHOST = "127.0.0.1"; //$NON-NLS-1$
+  static final String DEFAULT_LOCALHOST = "127.0.0.1"; //$NON-NLS-1$
   @SuppressWarnings("all")
   static final int DEFAULT_SOCKET_PORT = Application.IS_ECLIPSE ? 8775 : 8795;
+
+  /* Local URL Parts */
+  static String LOCALHOST = DEFAULT_LOCALHOST;
+  static int SOCKET_PORT = DEFAULT_SOCKET_PORT;
 
   /* Handshake Message */
   static final String STARTUP_HANDSHAKE = "org.rssowl.ui.internal.StartupHandshake"; //$NON-NLS-1$
@@ -105,6 +109,9 @@ public class ApplicationServer {
 
   /* DWord controlling the localhost value */
   private static final String LOCALHOST_PROPERTY = "localhost"; //$NON-NLS-1$
+
+  /* DWord controlling the port value */
+  private static final String PORT_PROPERTY = "port"; //$NON-NLS-1$
 
   /* Identifies the Viewer providing the Content */
   private static final String ID = "id="; //$NON-NLS-1$
@@ -172,7 +179,17 @@ public class ApplicationServer {
     /* Determine Localhost Value */
     String localhostProperty = System.getProperty(LOCALHOST_PROPERTY);
     if (localhostProperty != null && localhostProperty.length() > 0)
-      LOCALHOST= localhostProperty;
+      LOCALHOST = localhostProperty;
+
+    /* Determine Port Value */
+    String portProperty = System.getProperty(PORT_PROPERTY);
+    if (portProperty != null && portProperty.length() > 0) {
+      try {
+        SOCKET_PORT = Integer.parseInt(portProperty);
+      } catch (NumberFormatException e) {
+        Activator.getDefault().logError(e.getMessage(), e);
+      }
+    }
 
     /* Server not yet running */
     boolean usePortRange = Application.IS_ECLIPSE || System.getProperty(MULTI_INSTANCE_PROPERTY) != null;
@@ -185,7 +202,8 @@ public class ApplicationServer {
   public void shutdown() {
     fServerJob.cancel();
     try {
-      fSocket.close();
+      if (fSocket != null)
+        fSocket.close();
     } catch (IOException e) {
       if (Activator.getDefault() != null)
         Activator.getDefault().logError(e.getMessage(), e);
@@ -212,12 +230,12 @@ public class ApplicationServer {
 
     /* Ports to try */
     List<Integer> ports = new ArrayList<Integer>();
-    ports.add(DEFAULT_SOCKET_PORT);
+    ports.add(SOCKET_PORT);
 
     /* Try up to 10 different ports if set */
     if (usePortRange) {
       for (int i = 1; i < 10; i++)
-        ports.add(DEFAULT_SOCKET_PORT + i);
+        ports.add(SOCKET_PORT + i);
     }
 
     /* Attempt to open Port */
