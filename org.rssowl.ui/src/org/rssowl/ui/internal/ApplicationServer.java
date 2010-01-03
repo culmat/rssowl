@@ -778,4 +778,18 @@ public class ApplicationServer {
     }
     return strBuf.toString();
   }
+
+  /**
+   * @return the port used by this server.
+   */
+  public int getPort() {
+    return SOCKET_PORT;
+  }
+
+  /**
+   * @return the host used by this server.
+   */
+  public String getHost() {
+    return LOCALHOST;
+  }
 }
