@@ -400,7 +400,7 @@ public class CleanUpSummaryPage extends WizardPage {
       fViewer.setExpandedState(group, expandedState);
 
       if (expandedState && fViewer.getChecked(group))
-        setChildsChecked(group, true, true);
+        setChildsChecked(group, true);
     }
 
     /* Display Bookmark */
@@ -427,7 +427,7 @@ public class CleanUpSummaryPage extends WizardPage {
       TreeItem item = (TreeItem) e.item;
 
       if (item.getData() instanceof CleanUpGroup)
-        setChildsChecked((CleanUpGroup) item.getData(), item.getChecked(), true);
+        setChildsChecked((CleanUpGroup) item.getData(), item.getChecked());
 
       if (!item.getChecked() && item.getData() instanceof CleanUpTask)
         setParentsChecked((CleanUpTask) item.getData(), false);
@@ -437,15 +437,13 @@ public class CleanUpSummaryPage extends WizardPage {
   private void onExpand(TreeExpansionEvent event) {
     boolean isChecked = fViewer.getChecked(event.getElement());
     if (isChecked)
-      setChildsChecked((CleanUpGroup) event.getElement(), isChecked, false);
+      setChildsChecked((CleanUpGroup) event.getElement(), isChecked);
   }
 
-  private void setChildsChecked(CleanUpGroup cleanUpGroup, boolean checked, boolean onlyExpanded) {
-    if (!onlyExpanded || fViewer.getExpandedState(cleanUpGroup)) {
-      List<CleanUpTask> children = cleanUpGroup.getTasks();
-      for (CleanUpTask child : children)
-        fViewer.setChecked(child, checked);
-    }
+  private void setChildsChecked(CleanUpGroup cleanUpGroup, boolean checked) {
+    List<CleanUpTask> children = cleanUpGroup.getTasks();
+    for (CleanUpTask child : children)
+      fViewer.setChecked(child, checked);
   }
 
   private void setParentsChecked(CleanUpTask cleanUpTask, boolean checked) {
