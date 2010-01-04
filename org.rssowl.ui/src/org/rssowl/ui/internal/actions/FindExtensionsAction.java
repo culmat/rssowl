@@ -48,6 +48,7 @@ import org.eclipse.update.search.EnvironmentFilter;
 import org.eclipse.update.search.UpdateSearchRequest;
 import org.eclipse.update.search.UpdateSearchScope;
 import org.eclipse.update.ui.UpdateJob;
+import org.rssowl.core.util.StringUtils;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -59,6 +60,12 @@ public class FindExtensionsAction extends Action implements IWorkbenchWindowActi
 
   /* RSSOwl.org Update Site */
   private static final String UPDATE_SITE = "http://boreal.rssowl.org/update/addons/"; //$NON-NLS-1$
+
+  /* System Property to Control Sites for Extensions to look for */
+  private static final String EXTENSION_SITES_PROPERTY = "addonSites"; //$NON-NLS-1$
+
+  /* Used in the Extension Sites System Property to distinguish mutliple sites from each other */
+  private static final String EXTENSION_SITES_DIVIDER = "\\|"; //$NON-NLS-1$
 
   private Shell fShell;
 
@@ -82,11 +89,29 @@ public class FindExtensionsAction extends Action implements IWorkbenchWindowActi
 
   UpdateSearchRequest getSearchRequest() {
     UpdateSearchScope scope = new UpdateSearchScope();
-    try {
-      URL url = new URL(UPDATE_SITE);
-      scope.addSearchSite("RSSOwl.org", url, null); //$NON-NLS-1$
-    } catch (MalformedURLException e) {
-      // skip bad URLs
+
+    /* Check for User Defined Sites from System Property */
+    String extensionSites = System.getProperty(EXTENSION_SITES_PROPERTY);
+    if (StringUtils.isSet(extensionSites)) {
+      String[] sites = extensionSites.split(EXTENSION_SITES_DIVIDER);
+      for (String site : sites) {
+        try {
+          URL url = new URL(site);
+          scope.addSearchSite(url.toString(), url, null);
+        } catch (MalformedURLException e) {
+          // skip bad URLs
+        }
+      }
+    }
+
+    /* Add RSSOwl.org if user did not define any other sites */
+    if (scope.getSearchSites().length == 0) {
+      try {
+        URL url = new URL(UPDATE_SITE);
+        scope.addSearchSite("RSSOwl.org", url, null); //$NON-NLS-1$
+      } catch (MalformedURLException e) {
+        // skip bad URLs
+      }
     }
 
     UpdateSearchRequest result = new UpdateSearchRequest(UpdateSearchRequest.createDefaultSiteSearchCategory(), scope);
