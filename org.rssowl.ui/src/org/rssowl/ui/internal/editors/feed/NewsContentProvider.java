@@ -362,8 +362,12 @@ public class NewsContentProvider implements ITreeContentProvider {
                       addToViewers(fAddedNews);
 
                     /* Refresh Viewer to reflect changes */
-                    else
-                      fFeedView.refresh(true, true); //TODO Seems some JFace caching problem here (redraw=true)
+                    else {
+                      if (!browserShowsCollection())
+                        fFeedView.refreshTableViewer(true, true);
+                      else
+                        fFeedView.refresh(true, true); //TODO Seems some JFace caching problem here (redraw=true)
+                    }
                   }
                 });
               }
@@ -404,8 +408,12 @@ public class NewsContentProvider implements ITreeContentProvider {
 
             /* Handle */
             boolean refresh = handleAddedNews(addedNews);
-            if (refresh)
-              fFeedView.refresh(true, false);
+            if (refresh) {
+              if (!browserShowsCollection())
+                fFeedView.refreshTableViewer(true, false);
+              else
+                fFeedView.refresh(true, false);
+            }
           }
         });
       }
@@ -472,14 +480,14 @@ public class NewsContentProvider implements ITreeContentProvider {
             if (updateSelectionFromDelete) {
               fTableViewer.updateSelectionAfterDelete(new Runnable() {
                 public void run() {
-                  updateViewers(events, EventType.REMOVE);
+                  refreshViewers(events, EventType.REMOVE);
                 }
               });
             }
 
             /* Normal refresh w/o deletion */
             else if (refresh)
-              updateViewers(events, EventType.UPDATE);
+              refreshViewers(events, EventType.UPDATE);
           }
         });
       }
@@ -508,8 +516,12 @@ public class NewsContentProvider implements ITreeContentProvider {
 
             /* Handle Deleted News */
             boolean refresh = handleDeletedNews(deletedNews);
-            if (refresh)
-              fFeedView.refresh(true, true);
+            if (refresh) {
+              if (!browserShowsCollection())
+                fFeedView.refreshTableViewer(true, false);
+              else
+                fFeedView.refresh(true, false);
+            }
           }
         });
       }
@@ -518,7 +530,7 @@ public class NewsContentProvider implements ITreeContentProvider {
     DynamicDAO.addEntityListener(INews.class, fNewsListener);
   }
 
-  private void updateViewers(final Set<NewsEvent> events, EventType type) {
+  private void refreshViewers(final Set<NewsEvent> events, EventType type) {
 
     /*
      * Optimization: The Browser is likely only showing a single news and thus
