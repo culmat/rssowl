@@ -59,6 +59,7 @@ import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Application;
@@ -582,9 +583,14 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
   }
 
   private CredentialsModelData loadCredentials(URI link, String realm) throws CredentialsException {
-    ICredentials authCredentials = fConService.getAuthCredentials(link, realm);
-    if (authCredentials != null)
-      return new CredentialsModelData(authCredentials.getUsername(), authCredentials.getPassword(), link, realm);
+    if (StringUtils.isSet(link.getScheme())) {
+      ICredentialsProvider credentialsProvider = fConService.getCredentialsProvider(link);
+      if (credentialsProvider != null) {
+        ICredentials authCredentials = credentialsProvider.getAuthCredentials(link, realm);
+        if (authCredentials != null)
+          return new CredentialsModelData(authCredentials.getUsername(), authCredentials.getPassword(), link, realm);
+      }
+    }
 
     return null;
   }
