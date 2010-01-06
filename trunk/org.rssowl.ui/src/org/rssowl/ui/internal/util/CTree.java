@@ -32,7 +32,6 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
-import org.eclipse.swt.widgets.TreeItem;
 import org.rssowl.ui.internal.Application;
 
 import java.util.ArrayList;
@@ -74,15 +73,13 @@ public class CTree {
     return fTree;
   }
 
-  /* Returns true if the first item has a child (when grouping is enabled) */
-  private boolean showsParentWithChilds() {
-    if (!fTree.isDisposed()) {
-      TreeItem[] items = fTree.getItems();
-      if (items.length > 0)
-        return items[0].getItemCount() != 0;
-    }
-
-    return false;
+  /**
+   * @param isFlat set to <code>true</code> to indicate that this tree is
+   * showing a list of elements or <code>false</code> to indicate that its
+   * showing entries with child entries.
+   */
+  public void setFlat(boolean isFlat) {
+    fIsFlat = isFlat;
   }
 
   /**
@@ -157,7 +154,7 @@ public class CTree {
     if (Application.IS_MAC) {
       totalWidth -= 3;
 
-      if (showsParentWithChilds())
+      if (!fIsFlat)
         totalWidth -= 24;
     }
 
@@ -195,7 +192,7 @@ public class CTree {
         if (Application.IS_WINDOWS && i == 0) {
           if (fIsFlat)
             widthHint += 25;
-          else if (!fIsFlat)
+          else
             widthHint += 45;
         }
 

@@ -395,6 +395,7 @@ public class NewsTableControl implements IFeedViewPart {
     fViewer.setComparer(getComparer());
 
     /* Create and Show Columns */
+    fCustomTree.setFlat(!isGroupingEnabled());
     showColumns(columnModel, false, false);
 
     /* Add Filter */
@@ -431,6 +432,14 @@ public class NewsTableControl implements IFeedViewPart {
     }
 
     return model;
+  }
+
+  private boolean isGroupingEnabled() {
+    IContentProvider contentProvider = fViewer.getContentProvider();
+    if (contentProvider != null && contentProvider instanceof NewsContentProvider)
+      return ((NewsContentProvider) contentProvider).isGroupingEnabled();
+
+    return false;
   }
 
   private boolean isGroupingByFeed() {
