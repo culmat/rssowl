@@ -84,6 +84,9 @@ public class CBrowser {
   /* Flag to check if Mozilla is available on Windows */
   private static boolean fgMozillaAvailable = true;
 
+  /* Flag to check if RSSOwl failed to disable navigation sounds in IE */
+  private static boolean fgIESoundDisableError;
+
   private Browser fBrowser;
   private boolean fBlockNavigation;
   private IPreferenceScope fPreferences;
@@ -166,6 +169,20 @@ public class CBrowser {
     /* Add Focusless Scroll Hook on Windows */
     if (Application.IS_WINDOWS)
       browser.setData(ApplicationWorkbenchWindowAdvisor.FOCUSLESS_SCROLL_HOOK, true);
+
+    /* Disable IE Navigation Sound (Windows Only) */
+    if (!fgIESoundDisableError && Application.IS_WINDOWS && !useMozilla()) {
+      try {
+        Class<?> clazz = Class.forName("org.eclipse.swt.internal.win32.OS"); //$NON-NLS-1$
+        Method method = clazz.getMethod("CoInternetSetFeatureEnabled", int.class, int.class, boolean.class); //$NON-NLS-1$
+
+        int FEATURE_DISABLE_NAVIGATION_SOUNDS = 21;
+        int SET_FEATURE_ON_PROCESS = 0x2;
+        method.invoke(clazz, FEATURE_DISABLE_NAVIGATION_SOUNDS, SET_FEATURE_ON_PROCESS, true);
+      } catch (Throwable t) {
+        fgIESoundDisableError = true;
+      }
+    }
 
     /* Clear all Link Handlers upon disposal */
     browser.addDisposeListener(new DisposeListener() {
