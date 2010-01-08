@@ -212,8 +212,11 @@ public class Messages extends NLS {
   public static String SearchNewsDialog_SEARCH_IN;
   public static String SearchNewsDialog_SEARCH_NEWS;
   public static String SearchNewsDialog_SEARCH_RESULT_1;
+  public static String SearchNewsDialog_SEARCH_RESULT_1_FILTERED;
   public static String SearchNewsDialog_SEARCH_RESULT_2;
+  public static String SearchNewsDialog_SEARCH_RESULT_2_FILTERED;
   public static String SearchNewsDialog_SEARCH_RESULT_3;
+  public static String SearchNewsDialog_SEARCH_RESULT_3_FILTERED;
   public static String SearchNewsDialog_SHOW_PREVIEW;
   public static String SearchNewsDialog_SHOW_SAVED_SEARCH;
   public static String SearchNewsDialog_VISIBLE_COLUMNS;
