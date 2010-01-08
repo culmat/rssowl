@@ -240,7 +240,7 @@ litigation.
 
    <plugin
          id="org.rssowl.lib.jdom"
-         download-size="147"
+         download-size="52"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
@@ -254,7 +254,7 @@ litigation.
 
    <plugin
          id="org.rssowl.lib.db4o"
-         download-size="631"
+         download-size="165"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
@@ -268,14 +268,14 @@ litigation.
 
    <plugin
          id="org.rssowl.lib.httpclient"
-         download-size="365"
+         download-size="118"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="org.rssowl.lib.lucene"
-         download-size="614"
+         download-size="195"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
