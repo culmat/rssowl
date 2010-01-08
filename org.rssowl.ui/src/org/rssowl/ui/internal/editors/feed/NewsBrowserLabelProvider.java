@@ -444,6 +444,11 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       }
     }
 
+    /* Offer Search to Find Related News from Title */
+    String relatedSearchLink = ILinkHandler.HANDLER_PROTOCOL + NewsBrowserViewer.TITLE_HANDLER_ID + "?" + URIUtils.urlEncode(newsTitle); //$NON-NLS-1$
+    link(search, relatedSearchLink, Messages.NewsBrowserLabelProvider_SIMILAR, "searchrelated"); //$NON-NLS-1$
+    search.append(", "); //$NON-NLS-1$
+
     /* DIV: NewsItem */
     div(builder, isUnread ? "newsitemUnread" : "newsitemRead", Dynamic.NEWS.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
 

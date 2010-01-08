@@ -53,6 +53,7 @@ import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
+import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
@@ -108,6 +109,7 @@ import java.util.StringTokenizer;
 public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
   /* ID for Link Handlers */
+  static final String TITLE_HANDLER_ID = "org.rssowl.ui.search.Title"; //$NON-NLS-1$
   static final String AUTHOR_HANDLER_ID = "org.rssowl.ui.search.Author"; //$NON-NLS-1$
   static final String CATEGORY_HANDLER_ID = "org.rssowl.ui.search.Category"; //$NON-NLS-1$
   static final String LABEL_HANDLER_ID = "org.rssowl.ui.search.Label"; //$NON-NLS-1$
@@ -174,6 +176,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     fFactory = Owl.getModelFactory();
 
     /* Register Link Handler */
+    fBrowser.addLinkHandler(TITLE_HANDLER_ID, this);
     fBrowser.addLinkHandler(AUTHOR_HANDLER_ID, this);
     fBrowser.addLinkHandler(CATEGORY_HANDLER_ID, this);
     fBrowser.addLinkHandler(LABEL_HANDLER_ID, this);
@@ -387,12 +390,19 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       query = URIUtils.urlDecode(query).trim();
 
     /* Handler to perform a Search */
-    if (StringUtils.isSet(query) && (AUTHOR_HANDLER_ID.equals(id) || CATEGORY_HANDLER_ID.equals(id) || LABEL_HANDLER_ID.equals(id))) {
+    if (StringUtils.isSet(query) && (TITLE_HANDLER_ID.equals(id) || AUTHOR_HANDLER_ID.equals(id) || CATEGORY_HANDLER_ID.equals(id) || LABEL_HANDLER_ID.equals(id))) {
       List<ISearchCondition> conditions = new ArrayList<ISearchCondition>(1);
       String entity = INews.class.getName();
 
+      /* Search on Title */
+      if (TITLE_HANDLER_ID.equals(id)) {
+        ISearchField field = fFactory.createSearchField(IEntity.ALL_FIELDS, entity);
+        ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, query);
+        conditions.add(condition);
+      }
+
       /* Search on Author */
-      if (AUTHOR_HANDLER_ID.equals(id)) {
+      else if (AUTHOR_HANDLER_ID.equals(id)) {
         ISearchField field = fFactory.createSearchField(INews.AUTHOR, entity);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, query);
         conditions.add(condition);
@@ -414,8 +424,10 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
       /* Open Dialog and Search */
       if (conditions.size() >= 1 && !fBrowser.getControl().isDisposed()) {
-        boolean matchAllConditions = AUTHOR_HANDLER_ID.equals(id);
-        SearchNewsDialog dialog = new SearchNewsDialog(fBrowser.getControl().getShell(), conditions, matchAllConditions, true);
+        boolean useLowScoreFilter = TITLE_HANDLER_ID.equals(id);
+
+        SearchNewsDialog dialog = new SearchNewsDialog(fBrowser.getControl().getShell(), conditions, true, true);
+        dialog.setUseLowScoreFilter(useLowScoreFilter);
         dialog.open();
       }
     }

@@ -57,6 +57,7 @@ import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.SameShellProvider;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.osgi.util.NLS;
@@ -170,6 +171,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * The <code>SearchNewsDialog</code> allows to define a number of
@@ -224,6 +227,8 @@ public class SearchNewsDialog extends TitleAreaDialog {
   private NewsBrowserViewer fBrowserViewer;
   private NewsTableLabelProvider fNewsTableLabelProvider;
   private int[] fCachedWeights;
+  private boolean fUseLowScoreFilter;
+  private AtomicInteger fLowScoreNewsFilteredCount = new AtomicInteger(0);
 
   /* Misc. */
   private LocalResourceManager fResources;
@@ -354,6 +359,41 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
     boolean isAscending() {
       return fNewsComparator.isAscending();
+    }
+  }
+
+  /* Filters out Low Score Hits for the first search running */
+  private class FirstTimeLowScoreFilter extends ViewerFilter {
+    private final AtomicBoolean fEnabled = new AtomicBoolean(true);
+
+    /*
+     * @see org.eclipse.jface.viewers.ViewerFilter#filter(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object[])
+     */
+    @Override
+    public Object[] filter(Viewer viewer, Object parent, Object[] elements) {
+      Object[] result = elements;
+
+      if (fEnabled.get()) {
+        result = super.filter(viewer, parent, elements);
+        fEnabled.set(false);
+      }
+
+      fLowScoreNewsFilteredCount.set(elements.length - result.length);
+
+      return result;
+    }
+
+    /*
+     * @see org.eclipse.jface.viewers.ViewerFilter#select(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
+     */
+    @Override
+    public boolean select(Viewer viewer, Object parentElement, Object element) {
+      if (fEnabled.get() && element instanceof ScoredNews) {
+        ScoredNews news = (ScoredNews) element;
+        return (news.getRelevance() == Relevance.HIGH || news.getRelevance() == Relevance.MEDIUM);
+      }
+
+      return true;
     }
   }
 
@@ -605,6 +645,14 @@ public class SearchNewsDialog extends TitleAreaDialog {
       fInitialScope = conditions.getFirst();
       fInitialConditions = conditions.getSecond();
     }
+  }
+
+  /**
+   * @param useLowScoreFilter if <code>true</code>, filters the results of the
+   * first run by score.
+   */
+  public void setUseLowScoreFilter(boolean useLowScoreFilter) {
+    fUseLowScoreFilter = useLowScoreFilter;
   }
 
   /*
@@ -1251,12 +1299,21 @@ public class SearchNewsDialog extends TitleAreaDialog {
         /* Update Status Label */
         String text;
         int size = fResult.size();
-        if (size == 0)
-          text = Messages.SearchNewsDialog_SEARCH_RESULT_1;
-        else if (size == 1)
-          text = NLS.bind(Messages.SearchNewsDialog_SEARCH_RESULT_2, fResult.size());
-        else
-          text = NLS.bind(Messages.SearchNewsDialog_SEARCH_RESULT_3, fResult.size());
+        if (fLowScoreNewsFilteredCount.get() != 0) {
+          if (size == 0)
+            text = Messages.SearchNewsDialog_SEARCH_RESULT_1_FILTERED;
+          else if (size == 1)
+            text = NLS.bind(Messages.SearchNewsDialog_SEARCH_RESULT_2_FILTERED, fResult.size() - fLowScoreNewsFilteredCount.get(), fLowScoreNewsFilteredCount.get());
+          else
+            text = NLS.bind(Messages.SearchNewsDialog_SEARCH_RESULT_3_FILTERED, fResult.size() - fLowScoreNewsFilteredCount.get(), fLowScoreNewsFilteredCount.get());
+        } else {
+          if (size == 0)
+            text = Messages.SearchNewsDialog_SEARCH_RESULT_1;
+          else if (size == 1)
+            text = NLS.bind(Messages.SearchNewsDialog_SEARCH_RESULT_2, fResult.size());
+          else
+            text = NLS.bind(Messages.SearchNewsDialog_SEARCH_RESULT_3, fResult.size());
+        }
 
         fStatusLabel.setText(text);
 
@@ -1386,6 +1443,10 @@ public class SearchNewsDialog extends TitleAreaDialog {
     /* Create Sorter */
     fNewsSorter = new ScoredNewsComparator();
     fResultViewer.setComparator(fNewsSorter);
+
+    /* Create Filter (if necessary) */
+    if (fUseLowScoreFilter)
+      fResultViewer.addFilter(new FirstTimeLowScoreFilter());
 
     /* Create the Columns */
     showColumns(model, false);
