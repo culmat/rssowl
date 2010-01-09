@@ -32,11 +32,13 @@ public class Messages extends NLS {
 
   public static String WebBrowserView_BACK;
   public static String WebBrowserView_BLANK_PAGE;
+  public static String WebBrowserView_CLOSE;
   public static String WebBrowserView_CONFIGURE;
   public static String WebBrowserView_ENTER_WEBSITE_PHRASE;
   public static String WebBrowserView_FIND_FEEDS;
   public static String WebBrowserView_FORWARD;
   public static String WebBrowserView_HOME;
+  public static String WebBrowserView_JS_DISABLED_INFO;
   public static String WebBrowserView_NEW_TAB;
   public static String WebBrowserView_RELOAD;
   public static String WebBrowserView_SHARE_LINK;

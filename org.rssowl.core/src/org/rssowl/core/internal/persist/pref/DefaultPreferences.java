@@ -340,6 +340,9 @@ public class DefaultPreferences {
   /** Global: Last Used Folder for Downloads */
   public static final String DOWNLOAD_FOLDER = Preference.DOWNLOAD_FOLDER.id();
 
+  /** Global: JavaScript Warning Closed */
+  public static final String JS_INFOBAR_CLOSED = Preference.JS_INFOBAR_CLOSED.id();
+
   /**
    * Eclipse Preferences Follow
    */
