@@ -1298,14 +1298,14 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
         /* Update Status Label */
         String text;
-        int size = fResult.size();
+        int size = fResult.size() - fLowScoreNewsFilteredCount.get();
         if (fLowScoreNewsFilteredCount.get() != 0) {
           if (size == 0)
-            text = Messages.SearchNewsDialog_SEARCH_RESULT_1_FILTERED;
+            text = NLS.bind(Messages.SearchNewsDialog_SEARCH_RESULT_1_FILTERED, fLowScoreNewsFilteredCount.get());
           else if (size == 1)
-            text = NLS.bind(Messages.SearchNewsDialog_SEARCH_RESULT_2_FILTERED, fResult.size() - fLowScoreNewsFilteredCount.get(), fLowScoreNewsFilteredCount.get());
+            text = NLS.bind(Messages.SearchNewsDialog_SEARCH_RESULT_2_FILTERED, size, fLowScoreNewsFilteredCount.get());
           else
-            text = NLS.bind(Messages.SearchNewsDialog_SEARCH_RESULT_3_FILTERED, fResult.size() - fLowScoreNewsFilteredCount.get(), fLowScoreNewsFilteredCount.get());
+            text = NLS.bind(Messages.SearchNewsDialog_SEARCH_RESULT_3_FILTERED, size, fLowScoreNewsFilteredCount.get());
         } else {
           if (size == 0)
             text = Messages.SearchNewsDialog_SEARCH_RESULT_1;
