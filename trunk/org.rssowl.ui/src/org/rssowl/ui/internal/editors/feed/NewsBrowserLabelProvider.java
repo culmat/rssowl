@@ -119,6 +119,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   private final boolean fIsIE;
   private final NewsBrowserViewer fViewer;
   private boolean fStripMediaFromNews;
+  private boolean fForceShowFeedInformation;
   private final Calendar fSharedCalendar = Calendar.getInstance();
   private final Map<String, String> fMapFeedLinkToName = new HashMap<String, String>();
 
@@ -154,6 +155,14 @@ public class NewsBrowserLabelProvider extends LabelProvider {
    */
   void setStripMediaFromNews(boolean stripMediaFromNews) {
     fStripMediaFromNews = stripMediaFromNews;
+  }
+
+  /**
+   * @param forceShowFeedInformation if <code>true</code> will show the name of
+   * a feed of a news when shown, <code>false</code> otherwise.
+   */
+  public void setForceShowFeedInformation(boolean forceShowFeedInformation) {
+    fForceShowFeedInformation = forceShowFeedInformation;
   }
 
   /*
@@ -248,6 +257,9 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   }
 
   private boolean showFeedInformation() {
+    if (fForceShowFeedInformation)
+      return true;
+
     Object input = fViewer != null ? fViewer.getInput() : null;
     return input instanceof FolderNewsMarkReference || input instanceof SearchMarkReference || input instanceof NewsBinReference;
   }

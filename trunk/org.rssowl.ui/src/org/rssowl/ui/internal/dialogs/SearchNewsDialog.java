@@ -837,7 +837,9 @@ public class SearchNewsDialog extends TitleAreaDialog {
     });
 
     /* Create LabelProvider */
-    fBrowserViewer.setLabelProvider(new NewsBrowserLabelProvider(fBrowserViewer));
+    NewsBrowserLabelProvider labelProvider = new NewsBrowserLabelProvider(fBrowserViewer);
+    labelProvider.setForceShowFeedInformation(true);
+    fBrowserViewer.setLabelProvider(labelProvider);
 
     /* Set input when selection in result viewer changes */
     fResultViewer.addSelectionChangedListener(new ISelectionChangedListener() {
