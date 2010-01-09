@@ -337,6 +337,9 @@ public enum Preference {
   /** Global: Last Used Folder for Downloads */
   DOWNLOAD_FOLDER("org.rssowl.pref.DownloadFolder", IPreferenceType.STRING), //$NON-NLS-1$
 
+  /** Global: JavaScript Warning Closed */
+  JS_INFOBAR_CLOSED("org.rssowl.pref.JSInfobarClosed", IPreferenceType.BOOLEAN), //$NON-NLS-1$
+
   /******************************
    * Eclipse Preferences Follow *
    ******************************/

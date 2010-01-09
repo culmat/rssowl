@@ -357,4 +357,13 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
     fLoadBrowserTabInBackground.setEnabled(enable);
     fReOpenBrowserTabs.setEnabled(enable);
   }
+
+  /*
+   * @see org.eclipse.jface.preference.PreferencePage#applyData(java.lang.Object)
+   */
+  @Override
+  public void applyData(Object data) {
+    if (Boolean.TRUE.equals(data) && fDisableJavaScriptExceptionsButton != null && !fDisableJavaScriptExceptionsButton.isDisposed())
+      fDisableJavaScriptExceptionsButton.setFocus();
+  }
 }

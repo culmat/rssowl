@@ -56,8 +56,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IActionDelegate;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorReference;
@@ -68,7 +71,10 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.part.EditorPart;
+import org.rssowl.core.Owl;
+import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.INewsMark;
+import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.StringUtils;
@@ -83,6 +89,7 @@ import org.rssowl.ui.internal.ShareProvider;
 import org.rssowl.ui.internal.actions.ImportAction;
 import org.rssowl.ui.internal.actions.OpenInBrowserAction;
 import org.rssowl.ui.internal.actions.SendLinkAction;
+import org.rssowl.ui.internal.dialogs.preferences.BrowserPreferencePage;
 import org.rssowl.ui.internal.dialogs.preferences.SharingPreferencesPage;
 import org.rssowl.ui.internal.editors.feed.PerformAfterInputSet;
 import org.rssowl.ui.internal.util.BrowserUtils;
@@ -124,6 +131,8 @@ public class WebBrowserView extends EditorPart implements IReusableEditor {
   private boolean fCreated;
   private boolean fLocationSelectAllOnce = true;
   private IPartListener2 fPartListener;
+  private Label fJSInfoSeparator;
+  private Composite fJSInfoBar;
 
   /** Leave default for reflection */
   public WebBrowserView() {}
@@ -330,11 +339,18 @@ public class WebBrowserView extends EditorPart implements IReusableEditor {
     /* Browser Bar */
     createBrowserBar(parent);
 
+    /* JavaScript Info Bar */
+    createInfobar(parent);
+
     /* Separator */
     new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     /* Browser */
     createBrowser(parent);
+
+    /* Update JS Info Bar if required */
+    if (Application.IS_WINDOWS && !fBrowser.isIE())
+      closeJSInfoBar();
 
     /* Add Listeners */
     hookListeners();
@@ -351,6 +367,63 @@ public class WebBrowserView extends EditorPart implements IReusableEditor {
 
     /* Location Field */
     createLocationInput(container);
+  }
+
+  private void createInfobar(final Composite parent) {
+    final IPreferenceScope preferences = Owl.getPreferenceService().getGlobalScope();
+    if (Application.IS_WINDOWS && !preferences.getBoolean(DefaultPreferences.JS_INFOBAR_CLOSED) && preferences.getBoolean(DefaultPreferences.DISABLE_JAVASCRIPT)) {
+
+      /* Separator */
+      fJSInfoSeparator = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
+      fJSInfoSeparator.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+
+      /* Info Bar */
+      fJSInfoBar = new Composite(parent, SWT.None);
+      fJSInfoBar.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+      fJSInfoBar.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+      fJSInfoBar.setLayout(LayoutUtils.createGridLayout(3, 3, 3));
+
+      Label imgLabel = new Label(fJSInfoBar, SWT.None);
+      imgLabel.setImage(OwlUI.getImage(imgLabel, "icons/obj16/warning.gif")); //$NON-NLS-1$
+      imgLabel.setBackground(fJSInfoBar.getBackground());
+      imgLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
+
+      Link textLink = new Link(fJSInfoBar, SWT.NONE);
+      textLink.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+      textLink.setBackground(fJSInfoBar.getBackground());
+      textLink.setText(Messages.WebBrowserView_JS_DISABLED_INFO);
+      textLink.addSelectionListener(new SelectionAdapter() {
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+          PreferencesUtil.createPreferenceDialogOn(fBrowser.getControl().getShell(), BrowserPreferencePage.ID, null, Boolean.TRUE).open();
+        }
+      });
+
+      ToolBar bar = new ToolBar(fJSInfoBar, SWT.FLAT);
+      bar.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, true));
+      bar.setBackground(fJSInfoBar.getBackground());
+
+      ToolItem closeItem = new ToolItem(bar, SWT.PUSH);
+      closeItem.setToolTipText(Messages.WebBrowserView_CLOSE);
+      closeItem.setImage(OwlUI.getImage(bar, "icons/etool16/close_normal.png")); //$NON-NLS-1$
+      closeItem.addSelectionListener(new SelectionAdapter() {
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+          closeJSInfoBar();
+          preferences.putBoolean(DefaultPreferences.JS_INFOBAR_CLOSED, true);
+        }
+      });
+    }
+  }
+
+  private void closeJSInfoBar() {
+    if (fJSInfoSeparator != null && fJSInfoBar != null) {
+      ((GridData) fJSInfoSeparator.getLayoutData()).exclude = true;
+      ((GridData) fJSInfoBar.getLayoutData()).exclude = true;
+      fJSInfoSeparator.setVisible(false);
+      fJSInfoBar.setVisible(false);
+      fJSInfoBar.getParent().layout(true, true);
+    }
   }
 
   private void createNavigationToolBar(Composite parent) {
