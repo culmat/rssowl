@@ -634,8 +634,10 @@ public class ImportElementsPage extends WizardPage {
           fCurrentProgressMonitor = monitor;
 
           /* Return on Cancellation */
-          if (monitor.isCanceled() || Controller.getDefault().isShuttingDown())
+          if (monitor.isCanceled() || Controller.getDefault().isShuttingDown()) {
+            canceled = true;
             return;
+          }
 
           /* Open Stream */
           in = openStream(link, monitor, INITIAL_CON_TIMEOUT, false, false, null);
@@ -752,6 +754,8 @@ public class ImportElementsPage extends WizardPage {
             importFromOnlineResourceBruteforce(link, monitor, false, false);
           } catch (Exception e) {
             throw new InvocationTargetException(e);
+          } finally {
+            fCurrentProgressMonitor = null;
           }
         }
 
@@ -777,13 +781,17 @@ public class ImportElementsPage extends WizardPage {
           fCurrentProgressMonitor = monitor;
 
           /* Return on Cancellation */
-          if (monitor.isCanceled() || Controller.getDefault().isShuttingDown())
+          if (monitor.isCanceled() || Controller.getDefault().isShuttingDown()) {
+            canceled = true;
             return;
+          }
 
           /* Obtain Google Account Credentials */
           ICredentials credentials = Owl.getConnectionService().getAuthCredentials(URI.create(SyncUtils.GOOGLE_LOGIN), null);
-          if (credentials == null)
+          if (credentials == null) {
+            canceled = true;
             return;
+          }
 
           /* Obtain SID */
           String googleSID = SyncUtils.getGoogleSID(credentials.getUsername(), credentials.getPassword(), monitor);
