@@ -394,8 +394,13 @@ public class DefaultProtocolHandler implements IProtocolHandler {
       throw new ProxyAuthenticationRequiredException(Activator.getDefault().createErrorStatus(Messages.DefaultProtocolHandler_ERROR_PROXY_AUTHENTICATION_REQUIRED, null));
 
     /* If status code is 4xx, throw an IOException with the status code included */
-    if (method.getStatusCode() >= HTTP_ERRORS)
+    if (method.getStatusCode() >= HTTP_ERRORS) {
+      String error = getError(method.getStatusCode());
+      if (error != null)
+        throw new ConnectionException(Activator.getDefault().createErrorStatus(NLS.bind(Messages.DefaultProtocolHandler_ERROR_HTTP_STATUS_MSG, String.valueOf(method.getStatusCode()), error), null));
+
       throw new ConnectionException(Activator.getDefault().createErrorStatus(NLS.bind(Messages.DefaultProtocolHandler_ERROR_HTTP_STATUS, String.valueOf(method.getStatusCode())), null));
+    }
 
     /* In case the Feed has not been modified since */
     if (method.getStatusCode() == HTTP_STATUS_NOT_MODIFIED)
@@ -412,6 +417,28 @@ public class DefaultProtocolHandler implements IProtocolHandler {
 
     /* Return a Stream that releases the connection once closed */
     return new HttpConnectionInputStream(link, method, monitor, inS);
+  }
+
+  /* Some HTTP Error Messages */
+  private String getError(int errorCode) {
+    switch (errorCode) {
+      case 400:
+        return "Bad Request"; //$NON-NLS-1$
+      case 403:
+        return "Forbidden"; //$NON-NLS-1$
+      case 404:
+        return "Not Found"; //$NON-NLS-1$
+      case 408:
+        return "Request Timeout"; //$NON-NLS-1$
+      case 500:
+        return "Internal Server Error"; //$NON-NLS-1$
+      case 502:
+        return "Bad Gateway"; //$NON-NLS-1$
+      case 503:
+        return "Service Unavailable"; //$NON-NLS-1$
+    }
+
+    return null;
   }
 
   private InputStream loadFileProtocol(URI link) throws ConnectionException {
