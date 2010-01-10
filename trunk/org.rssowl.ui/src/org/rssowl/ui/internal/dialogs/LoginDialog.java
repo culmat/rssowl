@@ -26,6 +26,7 @@ package org.rssowl.ui.internal.dialogs;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.osgi.util.NLS;
@@ -69,6 +70,9 @@ public class LoginDialog extends TitleAreaDialog {
   private Text fPassword;
   private final ICredentialsProvider fCredProvider;
   private final String fRealm;
+  private String fHeader;
+  private String fSubline;
+  private ImageDescriptor fTitleImageDescriptor;
 
   /**
    * @param parentShell
@@ -81,6 +85,27 @@ public class LoginDialog extends TitleAreaDialog {
     fRealm = realm;
     fResources = new LocalResourceManager(JFaceResources.getResources());
     fCredProvider = Owl.getConnectionService().getCredentialsProvider(link);
+  }
+
+  /**
+   * @param header the header message of the dialog.
+   */
+  public void setHeader(String header) {
+    fHeader = header;
+  }
+
+  /**
+   * @param subline the subline message below the header of the dialog.
+   */
+  public void setSubline(String subline) {
+    fSubline = subline;
+  }
+
+  /**
+   * @param titleImageDescriptor the image to use in the title.
+   */
+  public void setTitleImageDescriptor(ImageDescriptor titleImageDescriptor) {
+    fTitleImageDescriptor = titleImageDescriptor;
   }
 
   /*
@@ -159,13 +184,18 @@ public class LoginDialog extends TitleAreaDialog {
     composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
     /* Title */
-    setTitle(Messages.LoginDialog_LOGIN);
+    setTitle(StringUtils.isSet(fHeader) ? fHeader : Messages.LoginDialog_LOGIN);
 
     /* Title Image */
-    setTitleImage(OwlUI.getImage(fResources, "icons/wizban/auth.gif")); //$NON-NLS-1$
+    if (fTitleImageDescriptor != null)
+      setTitleImage(OwlUI.getImage(fResources, fTitleImageDescriptor));
+    else
+      setTitleImage(OwlUI.getImage(fResources, "icons/wizban/auth.gif")); //$NON-NLS-1$
 
     /* Title Message */
-    if (fRealm != null)
+    if (StringUtils.isSet(fSubline))
+      setMessage(fSubline);
+    else if (fRealm != null)
       setMessage(NLS.bind(Messages.LoginDialog_ENTER_USER_PW_REALM, fRealm));
     else
       setMessage(Messages.LoginDialog_ENTER_USER_PW);

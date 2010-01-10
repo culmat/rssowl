@@ -25,8 +25,8 @@
 package org.rssowl.core.connection;
 
 import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.URIException;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import java.io.FilterInputStream;
@@ -37,10 +37,10 @@ import java.net.URISyntaxException;
 
 /**
  * <p>
- * This kind of FilterInputStream makes sure that the GetMethod responsible for
- * the given InputStream is releasing its connection after the stream has been
- * closed. This class is also keeping two important headers to be used for the
- * Conditional GET Mechanism of HTTP.
+ * This kind of FilterInputStream makes sure that the HTTP Method responsible
+ * for the given InputStream is releasing its connection after the stream has
+ * been closed. This class is also keeping two important headers to be used for
+ * the Conditional GET Mechanism of HTTP.
  * </p>
  * <p>
  * Passing an instance of <code>IProgressMonitor</code> into the class allows
@@ -57,7 +57,7 @@ public class HttpConnectionInputStream extends FilterInputStream implements ICon
   private static final String HEADER_RESPONSE_LAST_MODIFIED = "Last-Modified"; //$NON-NLS-1$
   private static final String HEADER_RESPONSE_CONTENT_LENGTH = "Content-Length"; //$NON-NLS-1$
 
-  private final GetMethod fGetMethod;
+  private final HttpMethodBase fMethod;
   private final IProgressMonitor fMonitor;
   private String fIfModifiedSince;
   private String fIfNoneMatch;
@@ -69,23 +69,23 @@ public class HttpConnectionInputStream extends FilterInputStream implements ICon
    * later use.
    *
    * @param link the {@link URI} that was used to create the Stream.
-   * @param getMethod The Method holding the connection of the given Stream.
+   * @param method The Method holding the connection of the given Stream.
    * @param monitor A ProgressMonitor to support early cancelation, or
    * <code>NULL</code> if no monitor is being used.
    * @param inS the underlying input Stream.
    */
-  public HttpConnectionInputStream(URI link, GetMethod getMethod, IProgressMonitor monitor, InputStream inS) {
+  public HttpConnectionInputStream(URI link, HttpMethodBase method, IProgressMonitor monitor, InputStream inS) {
     super(inS);
     fLink = link;
-    fGetMethod = getMethod;
+    fMethod = method;
     fMonitor = monitor;
 
     /* Keep some important Headers */
-    Header headerLastModified = getMethod.getResponseHeader(HEADER_RESPONSE_LAST_MODIFIED);
+    Header headerLastModified = method.getResponseHeader(HEADER_RESPONSE_LAST_MODIFIED);
     if (headerLastModified != null)
       setIfModifiedSince(headerLastModified.getValue());
 
-    Header headerETag = getMethod.getResponseHeader(HEADER_RESPONSE_ETAG);
+    Header headerETag = method.getResponseHeader(HEADER_RESPONSE_ETAG);
     if (headerETag != null)
       setIfNoneMatch(headerETag.getValue());
   }
@@ -95,7 +95,7 @@ public class HttpConnectionInputStream extends FilterInputStream implements ICon
    */
   public URI getLink() {
     try {
-      return new URI(fGetMethod.getURI().toString());
+      return new URI(fMethod.getURI().toString());
     } catch (URIException e) {
       return fLink;
     } catch (URISyntaxException e) {
@@ -139,7 +139,7 @@ public class HttpConnectionInputStream extends FilterInputStream implements ICon
    * @see org.rssowl.core.connection.IAbortable#abort()
    */
   public void abort() {
-    fGetMethod.abort();
+    fMethod.abort();
   }
 
   /*
@@ -148,7 +148,7 @@ public class HttpConnectionInputStream extends FilterInputStream implements ICon
   @Override
   public void close() throws IOException {
     super.close();
-    fGetMethod.releaseConnection();
+    fMethod.releaseConnection();
   }
 
   /*
@@ -195,7 +195,7 @@ public class HttpConnectionInputStream extends FilterInputStream implements ICon
    * not available;
    */
   public int getContentLength() {
-    Header header = fGetMethod.getResponseHeader(HEADER_RESPONSE_CONTENT_LENGTH);
+    Header header = fMethod.getResponseHeader(HEADER_RESPONSE_CONTENT_LENGTH);
     if (header != null) {
       String value = header.getValue();
       try {

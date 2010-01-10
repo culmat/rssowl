@@ -49,11 +49,13 @@ import org.rssowl.core.connection.IProxyCredentials;
 import org.rssowl.core.connection.NotModifiedException;
 import org.rssowl.core.internal.persist.Feed;
 import org.rssowl.core.persist.IConditionalGet;
+import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.RegExUtils;
 import org.rssowl.core.util.StringUtils;
+import org.rssowl.core.util.SyncUtils;
 import org.rssowl.core.util.Triple;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Controller;
@@ -499,7 +501,7 @@ public class ConnectionTests {
    */
   @Test
   public void testWebsite() throws Exception {
-    String link= "http://www.rssowl.org";
+    String link = "http://www.rssowl.org";
 
     Map<Object, Object> properties = new HashMap<Object, Object>();
     properties.put(IConnectionPropertyConstants.CON_TIMEOUT, 60000);
@@ -511,5 +513,25 @@ public class ConnectionTests {
     List<String> links = RegExUtils.extractLinksFromText(content, false);
     assertTrue(!links.isEmpty());
     assertTrue(links.size() > 10);
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testGoogleReaderSync() throws Exception {
+    String sid = SyncUtils.getGoogleSID("rssowl@mailinator.com", "rssowl.org", new NullProgressMonitor());
+    assertNotNull(sid);
+
+    URI uri = URI.create("https://www.google.com/reader/subscriptions/export");
+    IProtocolHandler handler = Owl.getConnectionService().getHandler(uri);
+
+    Map<Object, Object> properties = new HashMap<Object, Object>();
+    properties.put(IConnectionPropertyConstants.COOKIE, sid);
+
+    InputStream inS = handler.openStream(uri, new NullProgressMonitor(), properties);
+
+    List<? extends IEntity> elements = Owl.getInterpreter().importFrom(inS);
+    assertTrue(!elements.isEmpty());
   }
 }
