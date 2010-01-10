@@ -58,6 +58,7 @@ import org.rssowl.core.connection.CredentialsException;
 import org.rssowl.core.connection.HttpConnectionInputStream;
 import org.rssowl.core.connection.IAbortable;
 import org.rssowl.core.connection.IConnectionPropertyConstants;
+import org.rssowl.core.connection.ICredentials;
 import org.rssowl.core.connection.IProtocolHandler;
 import org.rssowl.core.interpreter.ITypeImporter;
 import org.rssowl.core.interpreter.InterpreterException;
@@ -79,6 +80,7 @@ import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.RegExUtils;
 import org.rssowl.core.util.StringUtils;
+import org.rssowl.core.util.SyncUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Application;
@@ -127,6 +129,9 @@ public class ImportElementsPage extends WizardPage {
 
   /* Default Feed Search Language */
   private static final String DEFAULT_LANGUAGE = "en"; //$NON-NLS-1$
+
+  /* URL to export from Google Reader */
+  private static final String GOOGLE_READER_OPML_URI = "https://www.google.com/reader/subscriptions/export"; //$NON-NLS-1$
 
   private CheckboxTreeViewer fViewer;
   private FolderChildCheckboxTree fFolderChildTree;
@@ -489,6 +494,8 @@ public class ImportElementsPage extends WizardPage {
     /* Return if the Source did not Change */
     if (source == Source.RECOMMENDED && fCurrentSourceKind == Source.RECOMMENDED)
       return;
+    else if (source == Source.GOOGLE && fCurrentSourceKind == Source.GOOGLE)
+      return;
     else if (source == Source.KEYWORD && fCurrentSourceKind == Source.KEYWORD && importSourcePage.getImportKeywords().equals(fCurrentSourceKeywords) && fCurrentSourceLocalizedFeedSearch == importSourcePage.isLocalizedFeedSearch())
       return;
     else if (source == Source.RESOURCE && fCurrentSourceKind == Source.RESOURCE) {
@@ -527,6 +534,21 @@ public class ImportElementsPage extends WizardPage {
     if (importSourcePage.isRemoteSource())
       setImportedElements(Collections.EMPTY_LIST);
 
+    /* Ask for Username and Password if importing from Google */
+    if (source == Source.GOOGLE) {
+      URI googleLoginUri = URI.create(SyncUtils.GOOGLE_LOGIN);
+      LoginDialog dialog = new LoginDialog(OwlUI.getActiveShell(), googleLoginUri, null);
+      dialog.setHeader(Messages.ImportElementsPage_LOGIN_GOOGLE_READER);
+      dialog.setSubline(Messages.ImportElementsPage_ENTER_GOOGLE_ACCOUNT);
+      dialog.setTitleImageDescriptor(OwlUI.getImageDescriptor("icons/wizban/reader_wiz.png")); //$NON-NLS-1$
+      if (dialog.open() != IDialogConstants.OK_ID) {
+        setErrorMessage(Messages.ImportElementsPage_MISSING_ACCOUNT);
+        setPageComplete(false);
+        fCurrentSourceKind = null;
+        return;
+      }
+    }
+
     /* Import Runnable */
     Runnable runnable = new Runnable() {
       public void run() {
@@ -539,6 +561,10 @@ public class ImportElementsPage extends WizardPage {
           /* Import from Supplied Online Resource */
           else if (source == Source.RESOURCE && URIUtils.looksLikeLink(fCurrentSourceResource))
             importFromOnlineResource(new URI(URIUtils.ensureProtocol(fCurrentSourceResource)));
+
+          /* Import from Google */
+          else if (source == Source.GOOGLE)
+            importFromGoogleReader();
 
           /* Import by Keyword Search */
           else if (source == Source.KEYWORD)
@@ -612,7 +638,7 @@ public class ImportElementsPage extends WizardPage {
             return;
 
           /* Open Stream */
-          in = openStream(link, monitor, INITIAL_CON_TIMEOUT, false, false);
+          in = openStream(link, monitor, INITIAL_CON_TIMEOUT, false, false, null);
 
           /* Return on Cancellation */
           if (monitor.isCanceled() || Controller.getDefault().isShuttingDown()) {
@@ -726,6 +752,95 @@ public class ImportElementsPage extends WizardPage {
             importFromOnlineResourceBruteforce(link, monitor, false, false);
           } catch (Exception e) {
             throw new InvocationTargetException(e);
+          }
+        }
+
+        /* Done */
+        monitor.done();
+        fCurrentProgressMonitor = null;
+      }
+    };
+
+    /* Run Operation in Background and allow for Cancellation */
+    getContainer().run(true, true, runnable);
+  }
+
+  private void importFromGoogleReader() throws InvocationTargetException, InterruptedException {
+    IRunnableWithProgress runnable = new IRunnableWithProgress() {
+      public void run(final IProgressMonitor monitor) throws InvocationTargetException {
+        InputStream in = null;
+        boolean canceled = false;
+        Exception error = null;
+        try {
+          monitor.beginTask(Messages.ImportElementsPage_IMPORT_GOOGLE_READER, IProgressMonitor.UNKNOWN);
+          monitor.subTask(Messages.ImportElementsPage_CONNECTING);
+          fCurrentProgressMonitor = monitor;
+
+          /* Return on Cancellation */
+          if (monitor.isCanceled() || Controller.getDefault().isShuttingDown())
+            return;
+
+          /* Obtain Google Account Credentials */
+          ICredentials credentials = Owl.getConnectionService().getAuthCredentials(URI.create(SyncUtils.GOOGLE_LOGIN), null);
+          if (credentials == null)
+            return;
+
+          /* Obtain SID */
+          String googleSID = SyncUtils.getGoogleSID(credentials.getUsername(), credentials.getPassword(), monitor);
+
+          /* Open Stream */
+          in = openStream(URI.create(GOOGLE_READER_OPML_URI), monitor, INITIAL_CON_TIMEOUT, false, false, googleSID);
+
+          /* Return on Cancellation */
+          if (monitor.isCanceled() || Controller.getDefault().isShuttingDown()) {
+            canceled = true;
+            return;
+          }
+
+          /* Try to Import */
+          try {
+            final List<? extends IEntity> types = Owl.getInterpreter().importFrom(in);
+
+            /* Return on Cancellation */
+            if (monitor.isCanceled() || Controller.getDefault().isShuttingDown()) {
+              canceled = true;
+              return;
+            }
+
+            /* Show in UI */
+            JobRunner.runInUIThread(getShell(), new Runnable() {
+              public void run() {
+                setImportedElements(types);
+                updateMessage(true);
+              }
+            });
+          }
+
+          /* Error Importing from File - Try Bruteforce then */
+          catch (Exception e) {
+            error = e;
+          }
+        }
+
+        /* Error finding a Handler for the Link - Rethrow */
+        catch (Exception e) {
+          throw new InvocationTargetException(e);
+        } finally {
+
+          /* Reset Field in case of error or cancellation */
+          if (canceled || error != null)
+            fCurrentProgressMonitor = null;
+
+          /* Close Input Stream */
+          if (in != null) {
+            try {
+              if ((canceled || error != null) && in instanceof IAbortable)
+                ((IAbortable) in).abort();
+              else
+                in.close();
+            } catch (IOException e) {
+              throw new InvocationTargetException(e);
+            }
           }
         }
 
@@ -867,7 +982,7 @@ public class ImportElementsPage extends WizardPage {
           break;
 
         /* Open Stream to potential Feed */
-        in = openStream(feedLink, monitor, FEED_CON_TIMEOUT, false, false);
+        in = openStream(feedLink, monitor, FEED_CON_TIMEOUT, false, false, null);
 
         /* Return on Cancellation */
         if (monitor.isCanceled() || Controller.getDefault().isShuttingDown()) {
@@ -953,7 +1068,7 @@ public class ImportElementsPage extends WizardPage {
         return null;
 
       /* Open Stream */
-      in = openStream(link, monitor, INITIAL_CON_TIMEOUT, true, isLocalizedSearch);
+      in = openStream(link, monitor, INITIAL_CON_TIMEOUT, true, isLocalizedSearch, null);
 
       /* Return on Cancellation */
       if (monitor.isCanceled() || Controller.getDefault().isShuttingDown())
@@ -976,11 +1091,15 @@ public class ImportElementsPage extends WizardPage {
     }
   }
 
-  private InputStream openStream(URI link, IProgressMonitor monitor, int timeout, boolean setAcceptLanguage, boolean isLocalized) throws ConnectionException {
+  private InputStream openStream(URI link, IProgressMonitor monitor, int timeout, boolean setAcceptLanguage, boolean isLocalized, String cookie) throws ConnectionException {
     IProtocolHandler handler = Owl.getConnectionService().getHandler(link);
 
     Map<Object, Object> properties = new HashMap<Object, Object>();
     properties.put(IConnectionPropertyConstants.CON_TIMEOUT, timeout);
+
+    /* Set Cookie if set */
+    if (StringUtils.isSet(cookie))
+      properties.put(IConnectionPropertyConstants.COOKIE, cookie);
 
     /* Set the Accept-Language Header */
     if (setAcceptLanguage) {

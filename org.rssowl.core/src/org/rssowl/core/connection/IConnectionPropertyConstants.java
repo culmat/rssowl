@@ -48,6 +48,15 @@ public interface IConnectionPropertyConstants {
   /** Key for storing the Accept-Language value */
   public static final String ACCEPT_LANGUAGE = "ACCEPT_LANGUAGE"; //$NON-NLS-1$
 
+  /** Key for storing the Cookie value */
+  public static final String COOKIE = "COOKIE"; //$NON-NLS-1$
+
+  /** Key for storing Headers */
+  public static final String HEADERS = "HEADERS"; //$NON-NLS-1$
+
+  /** Key for forcing a POST */
+  public static final String POST = "POST"; //$NON-NLS-1$
+
   /**
    * Key for storing an instance of <code>IProgressMonitor</code> to support
    * early cancelation while a Stream is read from the Connection. See

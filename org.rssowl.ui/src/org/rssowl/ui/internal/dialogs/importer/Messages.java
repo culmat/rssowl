@@ -34,11 +34,15 @@ public class Messages extends NLS {
   public static String ImportElementsPage_CHOOSE_ELEMENTS_MESSAGE;
   public static String ImportElementsPage_CONNECTING;
   public static String ImportElementsPage_DESELECT_ALL;
+  public static String ImportElementsPage_ENTER_GOOGLE_ACCOUNT;
   public static String ImportElementsPage_FEED_TITLE;
   public static String ImportElementsPage_FETCHING_RESULTS;
   public static String ImportElementsPage_FLATTEN;
   public static String ImportElementsPage_HIDDEN_ELEMENTS_INFO;
   public static String ImportElementsPage_HIDE_EXISTING;
+  public static String ImportElementsPage_IMPORT_GOOGLE_READER;
+  public static String ImportElementsPage_LOGIN_GOOGLE_READER;
+  public static String ImportElementsPage_MISSING_ACCOUNT;
   public static String ImportElementsPage_N_RESULTS;
   public static String ImportElementsPage_NO_FEEDS_FOUND;
   public static String ImportElementsPage_PREVIEW;
@@ -65,6 +69,7 @@ public class Messages extends NLS {
   public static String ImportSourcePage_CHOOSE_SOURCE_FOR_IMPORT;
   public static String ImportSourcePage_IMPORT_BY_KEYWORD;
   public static String ImportSourcePage_IMPORT_FROM_FILE_OR_WEBSITE;
+  public static String ImportSourcePage_IMPORT_GOOGLE_READER;
   public static String ImportSourcePage_IMPORT_RECOMMENDED;
   public static String ImportSourcePage_MATCH_LANGUAGE;
   public static String ImportSourcePage_MATCH_LANGUAGE_N;

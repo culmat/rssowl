@@ -26,6 +26,7 @@ package org.rssowl.core.internal.connection;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
+import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.NTCredentials;
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
@@ -33,6 +34,7 @@ import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.auth.AuthState;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.protocol.DefaultProtocolSocketFactory;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
@@ -81,6 +83,8 @@ import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -103,6 +107,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
   private static final int HTTP_ERROR_PROXY_AUTH_REQUIRED = 407;
 
   /* Response Header */
+  private static final String HEADER_COOKIE = "Cookie"; //$NON-NLS-1$
   private static final String HEADER_ACCEPT_LANGUAGE = "Accept-Language"; //$NON-NLS-1$
   private static final String HEADER_RESPOND_USER_AGENT = "User-Agent"; //$NON-NLS-1$
   private static final String HEADER_RESPOND_ACCEPT_ENCODING = "Accept-Encoding"; //$NON-NLS-1$
@@ -355,43 +360,45 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     HttpClient client = initClient(properties);
 
     /* Init the connection */
-    GetMethod getMethod = null;
+    HttpMethodBase method = null;
     InputStream inS = null;
     try {
-      getMethod = initConnection(link, properties);
+
+      /* Create Method (GET or POST) */
+      method = initConnection(link, properties);
 
       /* Proxy if required */
       setupProxy(link, client);
 
       /* Authentication if required */
-      setupAuthentication(authLink, authRealm, client, getMethod);
+      setupAuthentication(authLink, authRealm, client, method);
 
       /* Open the connection */
-      inS = openConnection(client, getMethod);
+      inS = openConnection(client, method);
 
       /* Try to pipe the resulting stream into a GZipInputStream */
       if (inS != null)
-        inS = pipeStream(inS, getMethod);
+        inS = pipeStream(inS, method);
     } catch (IOException e) {
       throw new ConnectionException(Activator.getDefault().createErrorStatus(e.getMessage(), e));
     }
 
     /* In case authentication required / failed */
-    if (getMethod.getStatusCode() == HTTP_ERROR_AUTH_REQUIRED) {
-      AuthState hostAuthState = getMethod.getHostAuthState();
+    if (method.getStatusCode() == HTTP_ERROR_AUTH_REQUIRED) {
+      AuthState hostAuthState = method.getHostAuthState();
       throw new AuthenticationRequiredException(hostAuthState != null ? hostAuthState.getRealm() : null, Activator.getDefault().createErrorStatus(Messages.DefaultProtocolHandler_ERROR_AUTHENTICATION_REQUIRED, null));
     }
 
     /* In case proxy-authentication required / failed */
-    if (getMethod.getStatusCode() == HTTP_ERROR_PROXY_AUTH_REQUIRED)
+    if (method.getStatusCode() == HTTP_ERROR_PROXY_AUTH_REQUIRED)
       throw new ProxyAuthenticationRequiredException(Activator.getDefault().createErrorStatus(Messages.DefaultProtocolHandler_ERROR_PROXY_AUTHENTICATION_REQUIRED, null));
 
     /* If status code is 4xx, throw an IOException with the status code included */
-    if (getMethod.getStatusCode() >= HTTP_ERRORS)
-      throw new ConnectionException(Activator.getDefault().createErrorStatus(NLS.bind(Messages.DefaultProtocolHandler_ERROR_HTTP_STATUS, String.valueOf(getMethod.getStatusCode())), null));
+    if (method.getStatusCode() >= HTTP_ERRORS)
+      throw new ConnectionException(Activator.getDefault().createErrorStatus(NLS.bind(Messages.DefaultProtocolHandler_ERROR_HTTP_STATUS, String.valueOf(method.getStatusCode())), null));
 
     /* In case the Feed has not been modified since */
-    if (getMethod.getStatusCode() == HTTP_STATUS_NOT_MODIFIED)
+    if (method.getStatusCode() == HTTP_STATUS_NOT_MODIFIED)
       throw new NotModifiedException(Activator.getDefault().createInfoStatus(Messages.DefaultProtocolHandler_INFO_NOT_MODIFIED_SINCE, null));
 
     /* In case response body is not available */
@@ -404,7 +411,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
       monitor = (IProgressMonitor) properties.get(IConnectionPropertyConstants.PROGRESS_MONITOR);
 
     /* Return a Stream that releases the connection once closed */
-    return new HttpConnectionInputStream(link, getMethod, monitor, inS);
+    return new HttpConnectionInputStream(link, method, monitor, inS);
   }
 
   private InputStream loadFileProtocol(URI link) throws ConnectionException {
@@ -416,20 +423,20 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     }
   }
 
-  private void setupAuthentication(URI link, String realm, HttpClient client, GetMethod getMethod) throws URIException, CredentialsException {
+  private void setupAuthentication(URI link, String realm, HttpClient client, HttpMethodBase method) throws URIException, CredentialsException {
     ICredentials authCredentials = Owl.getConnectionService().getAuthCredentials(link, realm);
     if (authCredentials != null) {
       client.getParams().setAuthenticationPreemptive(true);
 
       /* Require Host */
-      String host = getMethod.getURI().getHost();
+      String host = method.getURI().getHost();
 
       /* Create the UsernamePasswordCredentials */
       NTCredentials userPwCreds = new NTCredentials(authCredentials.getUsername(), authCredentials.getPassword(), host, (authCredentials.getDomain() != null) ? authCredentials.getDomain() : ""); //$NON-NLS-1$
 
       /* Authenticate to the Server */
       client.getState().setCredentials(AuthScope.ANY, userPwCreds);
-      getMethod.setDoAuthentication(true);
+      method.setDoAuthentication(true);
     }
   }
 
@@ -480,9 +487,9 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     fgFeedProtocolInitialized = true;
   }
 
-  private void setHeaders(Map<Object, Object> properties, GetMethod getMethod) {
-    getMethod.setRequestHeader(HEADER_RESPOND_ACCEPT_ENCODING, "gzip"); //$NON-NLS-1$
-    getMethod.setRequestHeader(HEADER_RESPOND_USER_AGENT, USER_AGENT);
+  private void setHeaders(Map<Object, Object> properties, HttpMethodBase method) {
+    setRequestHeader(method, HEADER_RESPOND_ACCEPT_ENCODING, "gzip"); //$NON-NLS-1$
+    setRequestHeader(method, HEADER_RESPOND_USER_AGENT, USER_AGENT);
 
     /* Add Conditional GET Headers if present */
     if (properties != null) {
@@ -490,15 +497,36 @@ public class DefaultProtocolHandler implements IProtocolHandler {
       String ifNoneMatch = (String) properties.get(IConnectionPropertyConstants.IF_NONE_MATCH);
 
       if (ifModifiedSince != null)
-        getMethod.setRequestHeader(HEADER_RESPOND_IF_MODIFIED_SINCE, ifModifiedSince);
+        setRequestHeader(method, HEADER_RESPOND_IF_MODIFIED_SINCE, ifModifiedSince);
 
       if (ifNoneMatch != null)
-        getMethod.setRequestHeader(HEADER_RESPOND_IF_NONE_MATCH, ifNoneMatch);
+        setRequestHeader(method, HEADER_RESPOND_IF_NONE_MATCH, ifNoneMatch);
     }
 
     /* Add Accept-Language Header if present */
     if (properties != null && properties.containsKey(IConnectionPropertyConstants.ACCEPT_LANGUAGE))
-      getMethod.setRequestHeader(HEADER_ACCEPT_LANGUAGE, (String) properties.get(IConnectionPropertyConstants.ACCEPT_LANGUAGE));
+      setRequestHeader(method, HEADER_ACCEPT_LANGUAGE, (String) properties.get(IConnectionPropertyConstants.ACCEPT_LANGUAGE));
+
+    /* Add Cookie Header if present */
+    if (properties != null && properties.containsKey(IConnectionPropertyConstants.COOKIE))
+      setRequestHeader(method, HEADER_COOKIE, (String) properties.get(IConnectionPropertyConstants.COOKIE));
+
+    /* Add more Headers */
+    if (properties != null && properties.containsKey(IConnectionPropertyConstants.HEADERS)) {
+      Map<?, ?> headers = (Map<?, ?>) properties.get(IConnectionPropertyConstants.HEADERS);
+      Set<?> entries = headers.entrySet();
+      for (Object obj : entries) {
+        Entry<?, ?> entry = (Entry<?, ?>) obj;
+        setRequestHeader(method, (String) entry.getKey(), (String) entry.getValue());
+      }
+    }
+  }
+
+  private void setRequestHeader(HttpMethodBase method, String key, String value) {
+    if (method instanceof GetMethod)
+      ((GetMethod) method).setRequestHeader(key, value);
+    else if (method instanceof PostMethod)
+      ((PostMethod) method).addParameter(key, value);
   }
 
   private HttpClient initClient(Map<Object, Object> properties) {
@@ -520,42 +548,47 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     return client;
   }
 
-  private GetMethod initConnection(URI link, Map<Object, Object> properties) throws IOException {
+  private HttpMethodBase initConnection(URI link, Map<Object, Object> properties) throws IOException {
 
-    /* Create the Get Method. Wrap any RuntimeException into an IOException */
-    GetMethod getMethod = null;
+    /* Create the Method. Wrap any RuntimeException into an IOException */
+    HttpMethodBase method = null;
     try {
-      getMethod = new GetMethod(link.toString());
+      if (properties != null && properties.containsKey(IConnectionPropertyConstants.POST))
+        method = new PostMethod(link.toString());
+      else
+        method = new GetMethod(link.toString());
     } catch (RuntimeException e) {
       throw new IOException(e.getMessage());
     }
 
     /* Ignore Cookies */
-    getMethod.getParams().setCookiePolicy(CookiePolicy.IGNORE_COOKIES);
+    if (method instanceof GetMethod)
+      method.getParams().setCookiePolicy(CookiePolicy.IGNORE_COOKIES);
 
     /* Set Headers */
-    setHeaders(properties, getMethod);
+    setHeaders(properties, method);
 
     /* Follow Redirects */
-    getMethod.setFollowRedirects(true);
+    if (method instanceof GetMethod)
+      method.setFollowRedirects(true);
 
-    return getMethod;
+    return method;
   }
 
-  private InputStream openConnection(HttpClient client, GetMethod getMethod) throws HttpException, IOException {
+  private InputStream openConnection(HttpClient client, HttpMethodBase method) throws HttpException, IOException {
 
-    /* Execute the GET Method */
-    client.executeMethod(getMethod);
+    /* Execute the Method */
+    client.executeMethod(method);
 
     /* Finally retrieve the InputStream from the respond body */
-    return getMethod.getResponseBodyAsStream();
+    return method.getResponseBodyAsStream();
   }
 
-  private InputStream pipeStream(InputStream inputStream, GetMethod getMethod) throws IOException {
+  private InputStream pipeStream(InputStream inputStream, HttpMethodBase method) throws IOException {
     Assert.isNotNull(inputStream);
 
     /* Retrieve the Content Encoding */
-    String contentEncoding = getMethod.getResponseHeader("Content-Encoding") != null ? getMethod.getResponseHeader("Content-Encoding").getValue() : null; //$NON-NLS-1$ //$NON-NLS-2$
+    String contentEncoding = method.getResponseHeader("Content-Encoding") != null ? method.getResponseHeader("Content-Encoding").getValue() : null; //$NON-NLS-1$ //$NON-NLS-2$
     boolean isGzipStream = false;
 
     /*
