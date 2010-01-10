@@ -33,6 +33,7 @@ public class Messages extends NLS {
   public static String ConnectionServiceImpl_ERROR_UNKNOWN_PROTOCOL;
   public static String DefaultProtocolHandler_ERROR_AUTHENTICATION_REQUIRED;
   public static String DefaultProtocolHandler_ERROR_HTTP_STATUS;
+  public static String DefaultProtocolHandler_ERROR_HTTP_STATUS_MSG;
   public static String DefaultProtocolHandler_ERROR_PROXY_AUTHENTICATION_REQUIRED;
   public static String DefaultProtocolHandler_ERROR_STREAM_UNAVAILABLE;
   public static String DefaultProtocolHandler_INFO_NOT_MODIFIED_SINCE;
