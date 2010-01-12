@@ -174,9 +174,9 @@ public class PreviewFeedDialog extends Dialog {
     /* Show Info that Feed is loading */
     if (fLoadedFeed == null || fLoadedFeed.getVisibleNews().isEmpty()) {
       if (StringUtils.isSet(fBookmark.getName()))
-        showMessage(NLS.bind(Messages.PreviewFeedDialog_LOAD_FEED_N, fBookmark.getName()), false);
+        showMessage(NLS.bind(Messages.PreviewFeedDialog_LOAD_FEED_N, fBookmark.getName()), false, true);
       else
-        showMessage(Messages.PreviewFeedDialog_LOAD_FEED, false);
+        showMessage(Messages.PreviewFeedDialog_LOAD_FEED, false, true);
     }
 
     /* Load Feed in Background */
@@ -232,13 +232,13 @@ public class PreviewFeedDialog extends Dialog {
         else if (error != null) {
           String errorMessage = CoreUtils.toMessage(error);
           if (StringUtils.isSet(errorMessage))
-            showMessage(NLS.bind(Messages.PreviewFeedDialog_UNABLE_LOAD_FEED, errorMessage), true);
+            showMessage(NLS.bind(Messages.PreviewFeedDialog_UNABLE_LOAD_FEED, errorMessage), true, false);
         }
       }
     });
   }
 
-  private void showMessage(String msg, boolean error) {
+  private void showMessage(String msg, boolean isError, boolean showProgress) {
     if (fBrowser.getControl().isDisposed())
       return;
 
@@ -246,11 +246,20 @@ public class PreviewFeedDialog extends Dialog {
     html.append("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n"); //$NON-NLS-1$
     html.append("<html>\n"); //$NON-NLS-1$
     html.append("<body style=\"overflow: auto; font-family: ").append(fNewsFontFamily).append(",Verdanna,sans-serif; ").append(fNormalFontCSS).append("\">"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-    if (error)
+
+    if (showProgress)
+      html.append("<img src=\"" + OwlUI.getImageUri("/icons/obj16/progress.gif", "progress.gif") + "\" />"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+
+    if (isError)
       html.append("<span style=\"color: darkred;\">"); //$NON-NLS-1$
+    else if (showProgress)
+      html.append("<span style=\"padding-left:3px; vertical-align:top;\">"); //$NON-NLS-1$
+
     html.append(msg);
-    if (error)
+
+    if (isError || showProgress)
       html.append("</span>"); //$NON-NLS-1$
+
     html.append("</body>\n"); //$NON-NLS-1$
     html.append("</html>\n"); //$NON-NLS-1$
 
