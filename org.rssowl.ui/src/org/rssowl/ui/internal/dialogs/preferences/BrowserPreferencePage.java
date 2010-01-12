@@ -49,6 +49,7 @@ import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.dialogs.WebsiteListDialog;
+import org.rssowl.ui.internal.util.CBrowser;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 /**
@@ -209,7 +210,7 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
     }
 
     /* Block Popups on Windows / Disable JavaScript in Browser */
-    if (Application.IS_WINDOWS) {
+    if (Application.IS_WINDOWS && !CBrowser.isMozillaRunningOnWindows()) {
       Label label = new Label(bottomContainer, SWT.NONE);
       label.setText(Messages.BrowserPreferencePage_CONTENT);
       label.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
@@ -323,7 +324,7 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
     fGlobalScope.putBoolean(DefaultPreferences.REOPEN_BROWSER_TABS, fReOpenBrowserTabs.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.ALWAYS_REUSE_BROWSER, fAlwaysReuseBrowser.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.OPEN_BROWSER_IN_BACKGROUND, fLoadBrowserTabInBackground.getSelection());
-    if (Application.IS_WINDOWS) {
+    if (Application.IS_WINDOWS && !CBrowser.isMozillaRunningOnWindows()) {
       fGlobalScope.putBoolean(DefaultPreferences.ENABLE_IE_POPUP_BLOCKER, fEnablePopupBlockerCheck.getSelection());
       fGlobalScope.putBoolean(DefaultPreferences.DISABLE_JAVASCRIPT, fDisableJavaScriptCheck.getSelection());
       fDisableJavaScriptExceptionsButton.setEnabled(fDisableJavaScriptCheck.getSelection());
@@ -357,7 +358,7 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
     fReOpenBrowserTabs.setSelection(defaultScope.getBoolean(DefaultPreferences.REOPEN_BROWSER_TABS));
     fAlwaysReuseBrowser.setSelection(defaultScope.getBoolean(DefaultPreferences.ALWAYS_REUSE_BROWSER));
     fLoadBrowserTabInBackground.setSelection(defaultScope.getBoolean(DefaultPreferences.OPEN_BROWSER_IN_BACKGROUND));
-    if (Application.IS_WINDOWS) {
+    if (Application.IS_WINDOWS && !CBrowser.isMozillaRunningOnWindows()) {
       fEnablePopupBlockerCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.ENABLE_IE_POPUP_BLOCKER));
       fDisableJavaScriptCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.DISABLE_JAVASCRIPT));
       fDisableJavaScriptExceptionsButton.setEnabled(fDisableJavaScriptCheck.getSelection());

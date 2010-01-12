@@ -84,6 +84,9 @@ public class CBrowser {
   /* Flag to check if Mozilla is available on Windows */
   private static boolean fgMozillaAvailable = true;
 
+  /* Flag to check if Mozilla is running as Browser */
+  private static boolean fgMozillaRunningOnWindows;
+
   /* Flag to check if RSSOwl failed to set a Feature in IE */
   private static boolean fgCoInternetSetFeatureError;
 
@@ -166,6 +169,7 @@ public class CBrowser {
     if (useMozilla()) {
       try {
         browser = new Browser(parent, style | SWT.MOZILLA);
+        fgMozillaRunningOnWindows = true;
       } catch (SWTError e) {
         fgMozillaAvailable = false;
 
@@ -420,6 +424,15 @@ public class CBrowser {
    */
   public boolean isIE() {
     return Application.IS_WINDOWS && !fBrowser.isDisposed() && (fBrowser.getStyle() & SWT.MOZILLA) == 0;
+  }
+
+  /**
+   * @return <code>true</code> if this browser is Mozilla on Windows and
+   * <code>false</code> otherwise. Note that this will always return
+   * <code>false</code> as long as a Browser has not been created.
+   */
+  public static boolean isMozillaRunningOnWindows() {
+    return fgMozillaRunningOnWindows;
   }
 
   /**
