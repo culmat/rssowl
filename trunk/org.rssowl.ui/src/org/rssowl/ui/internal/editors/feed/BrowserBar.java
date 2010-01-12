@@ -163,8 +163,12 @@ public class BrowserBar {
           String url = ((Browser) event.widget).getUrl();
           if (ApplicationServer.getDefault().isNewsServerUrl(url))
             fLocationInput.setText(""); //$NON-NLS-1$
-          else
-            fLocationInput.setText(URIUtils.ABOUT_BLANK.equals(url) ? "" : url); //$NON-NLS-1$
+          else if (StringUtils.isSet(url)) {
+            if (URIUtils.ABOUT_BLANK.equals(url))
+              fLocationInput.setText(""); //$NON-NLS-1$
+            else if (!fLocationInput.isFocusControl())
+              fLocationInput.setText(url);
+          }
         }
       }
     };

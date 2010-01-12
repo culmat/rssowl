@@ -739,7 +739,11 @@ public class WebBrowserView extends EditorPart implements IReusableEditor {
           if (ApplicationServer.getDefault().isNewsServerUrl(url))
             fLocationInput.setText(""); //$NON-NLS-1$
           else if (StringUtils.isSet(url)) {
-            fLocationInput.setText(URIUtils.ABOUT_BLANK.equals(url) ? "" : url); //$NON-NLS-1$
+            if (URIUtils.ABOUT_BLANK.equals(url))
+              fLocationInput.setText(""); //$NON-NLS-1$
+            else if (!fLocationInput.isFocusControl())
+              fLocationInput.setText(url);
+
             if (fInput != null)
               fInput.setCurrentUrl(url);
           }
