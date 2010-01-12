@@ -340,6 +340,9 @@ public enum Preference {
   /** Global: JavaScript Warning Closed */
   JS_INFOBAR_CLOSED("org.rssowl.pref.JSInfobarClosed", IPreferenceType.BOOLEAN), //$NON-NLS-1$
 
+  /** Global: Internet Explorer Popup Blocker */
+  ENABLE_IE_POPUP_BLOCKER("org.rssowl.pref.EnableIEPopupBlocker", IPreferenceType.BOOLEAN), //$NON-NLS-1$
+
   /******************************
    * Eclipse Preferences Follow *
    ******************************/
