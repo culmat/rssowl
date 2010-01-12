@@ -84,8 +84,20 @@ public class CBrowser {
   /* Flag to check if Mozilla is available on Windows */
   private static boolean fgMozillaAvailable = true;
 
-  /* Flag to check if RSSOwl failed to disable navigation sounds in IE */
-  private static boolean fgIESoundDisableError;
+  /* Flag to check if RSSOwl failed to set a Feature in IE */
+  private static boolean fgCoInternetSetFeatureError;
+
+  /* Track if the Navigation Sound Disable Feature was set */
+  private static boolean fgNavigationSoundsDisabled;
+
+  /* Track if the Popup Blocker Feature was set */
+  private static boolean fgPopupBlockerEnabled;
+
+  /* Windows IE Only Features (CoInternetSetFeatureEnabled) */
+  private static final int FEATURE_WEBOC_POPUPMANAGEMENT = 5;
+  private static final int FEATURE_SECURITYBAND = 9;
+  private static final int FEATURE_DISABLE_NAVIGATION_SOUNDS = 21;
+  private static final int SET_FEATURE_ON_PROCESS = 0x2;
 
   private Browser fBrowser;
   private boolean fBlockNavigation;
@@ -171,16 +183,19 @@ public class CBrowser {
       browser.setData(ApplicationWorkbenchWindowAdvisor.FOCUSLESS_SCROLL_HOOK, true);
 
     /* Disable IE Navigation Sound (Windows Only) */
-    if (!fgIESoundDisableError && Application.IS_WINDOWS && !useMozilla()) {
-      try {
-        Class<?> clazz = Class.forName("org.eclipse.swt.internal.win32.OS"); //$NON-NLS-1$
-        Method method = clazz.getMethod("CoInternetSetFeatureEnabled", int.class, int.class, boolean.class); //$NON-NLS-1$
+    Method method = null;
+    if (!fgNavigationSoundsDisabled) {
+      method = callCoInternetSetFeatureEnabled(method, FEATURE_DISABLE_NAVIGATION_SOUNDS, SET_FEATURE_ON_PROCESS, true);
+      fgNavigationSoundsDisabled = true;
+    }
 
-        int FEATURE_DISABLE_NAVIGATION_SOUNDS = 21;
-        int SET_FEATURE_ON_PROCESS = 0x2;
-        method.invoke(clazz, FEATURE_DISABLE_NAVIGATION_SOUNDS, SET_FEATURE_ON_PROCESS, true);
-      } catch (Throwable t) {
-        fgIESoundDisableError = true;
+    /* Set Popupblocker if necessary */
+    if (Application.IS_WINDOWS) {
+      boolean prefEnablePopupBlocker = fPreferences.getBoolean(DefaultPreferences.ENABLE_IE_POPUP_BLOCKER);
+      if (prefEnablePopupBlocker != fgPopupBlockerEnabled) {
+        method = callCoInternetSetFeatureEnabled(method, FEATURE_WEBOC_POPUPMANAGEMENT, SET_FEATURE_ON_PROCESS, prefEnablePopupBlocker);
+        callCoInternetSetFeatureEnabled(method, FEATURE_SECURITYBAND, SET_FEATURE_ON_PROCESS, prefEnablePopupBlocker);
+        fgPopupBlockerEnabled = prefEnablePopupBlocker;
       }
     }
 
@@ -192,6 +207,26 @@ public class CBrowser {
     });
 
     return browser;
+  }
+
+  private Method callCoInternetSetFeatureEnabled(Method method, int feature, int scope, boolean enable) {
+    if (!fgCoInternetSetFeatureError && Application.IS_WINDOWS && !useMozilla()) {
+      try {
+        Class<?> clazz = Class.forName("org.eclipse.swt.internal.win32.OS"); //$NON-NLS-1$
+
+        if (method == null)
+          method = clazz.getMethod("CoInternetSetFeatureEnabled", int.class, int.class, boolean.class); //$NON-NLS-1$
+
+        method.invoke(clazz, feature, scope, enable);
+
+        return method;
+      } catch (Throwable t) {
+        Activator.getDefault().logError(t.getMessage(), t);
+        fgCoInternetSetFeatureError = true;
+      }
+    }
+
+    return null;
   }
 
   private boolean useProxy() {

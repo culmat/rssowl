@@ -28,12 +28,15 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
   private static final String BUNDLE_NAME = "org.rssowl.ui.internal.dialogs.preferences.messages"; //$NON-NLS-1$
+  public static String BrowserPreferencePage_BLOCK_POPUPS;
   public static String BrowserPreferencePage_BROWSE;
+  public static String BrowserPreferencePage_CONTENT;
   public static String BrowserPreferencePage_DISABLE_JS;
   public static String BrowserPreferencePage_EXCEPTIONS;
   public static String BrowserPreferencePage_OPEN_IN_BACKGROUND;
   public static String BrowserPreferencePage_OPEN_IN_SAME_TAB;
   public static String BrowserPreferencePage_REOPEN_WEBSITE;
+  public static String BrowserPreferencePage_TABBED_BROWSING;
   public static String BrowserPreferencePage_USE_EMBEDDED_BROWSER;
   public static String BrowserPreferencePage_USE_EXTERNAL_BROWSER;
   public static String BrowserPreferencePage_USE_STANDARD_BROWSER;

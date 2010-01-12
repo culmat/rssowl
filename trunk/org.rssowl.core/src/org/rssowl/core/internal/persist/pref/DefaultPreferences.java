@@ -343,6 +343,9 @@ public class DefaultPreferences {
   /** Global: JavaScript Warning Closed */
   public static final String JS_INFOBAR_CLOSED = Preference.JS_INFOBAR_CLOSED.id();
 
+  /** Global: Internet Explorer Popup Blocker */
+  public static final String ENABLE_IE_POPUP_BLOCKER= Preference.ENABLE_IE_POPUP_BLOCKER.id();
+
   /**
    * Eclipse Preferences Follow
    */

@@ -95,7 +95,7 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
   private Button fAutoCloseNotifierCheck;
   private Button fShowExcerptCheck;
   private Button fCloseNotifierOnOpen;
-  private LocalResourceManager fResources = new LocalResourceManager(JFaceResources.getResources());;
+  private LocalResourceManager fResources = new LocalResourceManager(JFaceResources.getResources());
 
   /** Leave for reflection */
   public NotifierPreferencesPage() {
