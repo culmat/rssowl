@@ -103,7 +103,6 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
-import org.rssowl.core.persist.ICategory;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.ILabel;
@@ -423,10 +422,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
       NewsColumn column = fColumnModel.getColumn(cell.getColumnIndex());
 
       /* Text */
-      if (column == NewsColumn.CATEGORY)
-        cell.setText(getCategories(scoredNews.getNews()));
-      else
-        cell.setText(getColumnText(scoredNews.getNews(), column, cell.getColumnIndex()));
+      cell.setText(getColumnText(scoredNews.getNews(), column, cell.getColumnIndex()));
 
       /* Image */
       cell.setImage(getColumnImage(scoredNews, column, cell.getColumnIndex()));
@@ -447,22 +443,6 @@ public class SearchNewsDialog extends TitleAreaDialog {
       /* Background */
       if (!OwlUI.isHighContrast())
         cell.setBackground(getBackground(scoredNews.getNews(), cell.getColumnIndex()));
-    }
-
-    private String getCategories(INews news) {
-      StringBuilder builder = new StringBuilder();
-      List<ICategory> categories = news.getCategories();
-      for (ICategory category : categories) {
-        if (category.getName() != null)
-          builder.append(category.getName()).append(", "); //$NON-NLS-1$
-        else if (category.getDomain() != null)
-          builder.append(category.getDomain()).append(", "); //$NON-NLS-1$
-      }
-
-      if (builder.length() > 0)
-        return builder.substring(0, builder.length() - 2);
-
-      return builder.toString();
     }
 
     /*

@@ -332,12 +332,17 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
 
         case CATEGORY:
           List<ICategory> categories = news.getCategories();
-          if (categories.size() > 0) {
-            ICategory category = categories.get(0);
-            if (category.getName() != null)
-              text = category.getName();
-            else if (category.getDomain() != null)
-              text = category.getDomain();
+          if (!categories.isEmpty()) {
+            StringBuilder str = new StringBuilder();
+            for (ICategory category : categories) {
+              if (StringUtils.isSet(category.getName()))
+                str.append(category.getName().trim()).append(", "); //$NON-NLS-1$
+              else if (StringUtils.isSet(category.getDomain()))
+                str.append(category.getDomain().trim()).append(", "); //$NON-NLS-1$
+            }
+
+            str = str.delete(str.length() - 2, str.length());
+            text = str.toString();
           }
           break;
 
