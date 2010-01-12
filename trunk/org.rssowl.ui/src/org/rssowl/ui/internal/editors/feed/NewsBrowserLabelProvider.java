@@ -461,6 +461,19 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     link(search, relatedSearchLink, Messages.NewsBrowserLabelProvider_SIMILAR, "searchrelated"); //$NON-NLS-1$
     search.append(", "); //$NON-NLS-1$
 
+    /* Add Labels to Search */
+    for (ILabel label : labels) {
+      String link = ILinkHandler.HANDLER_PROTOCOL + NewsBrowserViewer.LABEL_HANDLER_ID + "?" + URIUtils.urlEncode(label.getName()); //$NON-NLS-1$
+      String labelColor = label.getColor();
+
+      if (!"0,0,0".equals(labelColor) && !"255,255,255".equals(labelColor)) //$NON-NLS-1$ //$NON-NLS-2$
+        link(search, link, StringUtils.htmlEscape(label.getName()), "searchrelated", labelColor); //$NON-NLS-1$
+      else
+        link(search, link, StringUtils.htmlEscape(label.getName()), "searchrelated"); //$NON-NLS-1$
+
+      search.append(", "); //$NON-NLS-1$
+    }
+
     /* DIV: NewsItem */
     div(builder, isUnread ? "newsitemUnread" : "newsitemRead", Dynamic.NEWS.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -585,7 +598,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       String value = StringUtils.isSet(name) ? name : email;
       if (StringUtils.isSet(value)) {
         String link = ILinkHandler.HANDLER_PROTOCOL + NewsBrowserViewer.AUTHOR_HANDLER_ID + "?" + URIUtils.urlEncode(value); //$NON-NLS-1$
-        link(search, link, StringUtils.htmlEscape(value), "searchrelated"); //$NON-NLS-1$
+        link(search, link, NLS.bind(Messages.NewsBrowserLabelProvider_BY_AUTHOR, StringUtils.htmlEscape(value)), "searchrelated"); //$NON-NLS-1$
         search.append(", "); //$NON-NLS-1$
       }
       builder.append("</td>"); //$NON-NLS-1$
@@ -781,13 +794,6 @@ public class NewsBrowserLabelProvider extends LabelProvider {
             search.append(", "); //$NON-NLS-1$
           }
         }
-      }
-
-      /* Add Labels to Search */
-      for (ILabel label : labels) {
-        String link = ILinkHandler.HANDLER_PROTOCOL + NewsBrowserViewer.LABEL_HANDLER_ID + "?" + URIUtils.urlEncode(label.getName()); //$NON-NLS-1$
-        link(search, link, StringUtils.htmlEscape(label.getName()), "searchrelated"); //$NON-NLS-1$
-        search.append(", "); //$NON-NLS-1$
       }
 
       /* Find related News */
