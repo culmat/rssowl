@@ -545,8 +545,25 @@ public class NewsContentProvider implements ITreeContentProvider {
 
       /* Update Browser Viewer */
       if (contains(fBrowserViewer.getInput(), items)) {
-        if (type == EventType.UPDATE)
-          fBrowserViewer.update(events);
+
+        /* Update */
+        if (type == EventType.UPDATE) {
+          Set<NewsEvent> newsToUpdate = events;
+
+          /*
+           * Optimization: If more than a single news is to update, check
+           * if the Browser only shows a single news to avoid a full refresh.
+           */
+          if (events.size() > 1) {
+            NewsEvent event = findShowingEventFromBrowser(events);
+            if (event != null)
+              newsToUpdate = Collections.singleton(event);
+          }
+
+          fBrowserViewer.update(newsToUpdate);
+        }
+
+        /* Remove */
         else if (type == EventType.REMOVE)
           fBrowserViewer.remove(items.toArray());
       }
@@ -642,8 +659,21 @@ public class NewsContentProvider implements ITreeContentProvider {
       fTableViewer.update(updatedNews.toArray(), null);
 
     /* Update in Browser-Viewer */
-    if (contains(fBrowserViewer.getInput(), updatedNews))
-      fBrowserViewer.update(events);
+    if (contains(fBrowserViewer.getInput(), updatedNews)) {
+      Set<NewsEvent> newsToUpdate = events;
+
+      /*
+       * Optimization: If more than a single news is to update, check
+       * if the Browser only shows a single news to avoid a full refresh.
+       */
+      if (events.size() > 1) {
+        NewsEvent event = findShowingEventFromBrowser(events);
+        if (event != null)
+          newsToUpdate = Collections.singleton(event);
+      }
+
+      fBrowserViewer.update(newsToUpdate);
+    }
 
     return false;
   }
@@ -753,5 +783,18 @@ public class NewsContentProvider implements ITreeContentProvider {
     }
 
     return false;
+  }
+
+  private NewsEvent findShowingEventFromBrowser(Set<NewsEvent> events) {
+    Object input = fBrowserViewer.getInput();
+    if (input instanceof INews) {
+      INews news = (INews) input;
+      for (NewsEvent event : events) {
+        if (news.equals(event.getEntity()))
+          return event;
+      }
+    }
+
+    return null;
   }
 }
