@@ -49,6 +49,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.MessageBox;
@@ -70,6 +71,7 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IBookMark;
+import org.rssowl.core.persist.IFilterAction;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.ILabel;
@@ -77,6 +79,7 @@ import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.INewsMark;
+import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
@@ -114,6 +117,7 @@ import org.rssowl.ui.internal.dialogs.welcome.TutorialWizard;
 import org.rssowl.ui.internal.editors.browser.WebBrowserContext;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
+import org.rssowl.ui.internal.filter.DownloadAttachmentsNewsAction;
 import org.rssowl.ui.internal.handler.RemoveLabelsHandler;
 import org.rssowl.ui.internal.handler.TutorialHandler;
 import org.rssowl.ui.internal.util.BrowserUtils;
@@ -135,6 +139,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -1227,7 +1232,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         }
         String sumSize = OwlUI.getSize(sumBytes);
 
-        attachmentMenu.add(new Action(sumSize != null ? (NLS.bind(Messages.ApplicationActionBarAdvisor_DOWNLOAD_ALL_WITH_SIZE, sumSize)) : (Messages.ApplicationActionBarAdvisor_DOWNLOAD_ALL)) {
+        Action downloadAllAction = new Action(sumSize != null ? (NLS.bind(Messages.ApplicationActionBarAdvisor_DOWNLOAD_ALL_WITH_SIZE, sumSize)) : (Messages.ApplicationActionBarAdvisor_DOWNLOAD_ALL)) {
           @Override
           public void run() {
             DirectoryDialog dialog = new DirectoryDialog(shellProvider.getShell(), SWT.None);
@@ -1247,9 +1252,15 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
               preferences.putString(DefaultPreferences.DOWNLOAD_FOLDER, folder);
             }
           }
-        });
+        };
+        downloadAllAction.setImageDescriptor(OwlUI.getImageDescriptor("icons/elcl16/save_all.gif")); //$NON-NLS-1$
+        attachmentMenu.add(downloadAllAction);
         attachmentMenu.add(new Separator());
       }
+
+      /* Collect openable Attachments that have already been downloaded */
+      List<Action> openActions = new ArrayList<Action>(1);
+      Set<String> downloadLocations = getDownloadLocations();
 
       /* Offer Download Action for each */
       for (final Pair<IAttachment, URI> attachmentPair : attachments) {
@@ -1280,14 +1291,81 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
           }
         };
 
-        action.setImageDescriptor(OwlUI.getAttachmentImage(fileName, attachmentPair.getFirst().getType()));
+        action.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/save_as.gif")); //$NON-NLS-1$
         attachmentMenu.add(action);
+
+        /* Check if Attachment already exists and offer Open Action then */
+        String usedFileName = Application.IS_WINDOWS ? CoreUtils.getSafeFileNameForWindows(fileName) : fileName;
+        if (shouldOfferOpenAction(usedFileName)) {
+          for (String downloadLocation : downloadLocations) {
+            final File downloadedFile = new File(downloadLocation, usedFileName);
+            if (downloadedFile.exists()) {
+              Action openAction = new Action(NLS.bind(Messages.ApplicationActionBarAdvisor_OPEN_FILE, fileName)) {
+                @Override
+                public void run() {
+                  Program.launch(downloadedFile.toString());
+                }
+              };
+
+              openAction.setImageDescriptor(OwlUI.getAttachmentImage(fileName, attachmentPair.getFirst().getType()));
+              openActions.add(openAction);
+
+              break;
+            }
+          }
+        }
+      }
+
+      /* Offer Open Action for each downloaded */
+      if (!openActions.isEmpty()) {
+        attachmentMenu.add(new Separator());
+        for (Action openAction : openActions) {
+          attachmentMenu.add(openAction);
+        }
       }
 
       /* Offer to Automize Downloading */
       attachmentMenu.add(new Separator());
       attachmentMenu.add(new AutomateFilterAction(PresetAction.DOWNLOAD, selection));
     }
+  }
+
+  private static boolean shouldOfferOpenAction(String filename) {
+    if (Application.IS_WINDOWS)
+      return !filename.endsWith(".exe") && !filename.endsWith(".bat") && !filename.endsWith(".com"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+    return true;
+  }
+
+  private static Set<String> getDownloadLocations() {
+    IPreferenceScope preferences = Owl.getPreferenceService().getGlobalScope();
+    Set<String> locations = new HashSet<String>(1);
+
+    /* Check Preference */
+    String folderPath = preferences.getString(DefaultPreferences.DOWNLOAD_FOLDER);
+    if (folderPath != null) {
+      File folder = new File(folderPath);
+      if (folder.exists())
+        locations.add(folderPath);
+    }
+
+    /* Check Filters */
+    Collection<ISearchFilter> filters = DynamicDAO.loadAll(ISearchFilter.class);
+    for (ISearchFilter filter : filters) {
+      List<IFilterAction> actions = filter.getActions();
+      for (IFilterAction action : actions) {
+        if (DownloadAttachmentsNewsAction.ID.equals(action.getActionId()) && action.getData() instanceof String) {
+          folderPath = (String) action.getData();
+          if (folderPath != null) {
+            File folder = new File(folderPath);
+            if (folder.exists())
+              locations.add(folderPath);
+          }
+        }
+      }
+    }
+
+    return locations;
   }
 
   /**

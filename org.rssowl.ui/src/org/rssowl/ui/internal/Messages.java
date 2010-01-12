@@ -67,6 +67,7 @@ public class Messages extends NLS {
   public static String ApplicationActionBarAdvisor_NEW_WINDOW;
   public static String ApplicationActionBarAdvisor_NEWS;
   public static String ApplicationActionBarAdvisor_NEWSPAPER_VIEW;
+  public static String ApplicationActionBarAdvisor_OPEN_FILE;
   public static String ApplicationActionBarAdvisor_ORGANIZE_LABELS;
   public static String ApplicationActionBarAdvisor_PREFERENCES;
   public static String ApplicationActionBarAdvisor_REPORT_PROBLEMS;
