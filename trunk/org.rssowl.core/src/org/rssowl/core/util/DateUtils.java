@@ -32,7 +32,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -52,15 +51,6 @@ public class DateUtils {
 
   /* An array of custom date formats */
   private static final DateFormat[] CUSTOM_DATE_FORMATS;
-
-  /* A Map of common Date Formatter */
-  private static final HashMap<String, DateFormat> COMMON_DATE_FORMATS;
-
-  /* A Map of common Time Formatter */
-  private static final HashMap<String, DateFormat> COMMON_TIME_FORMATS;
-
-  /* A Map of common DateTime Formatter */
-  private static final HashMap<String, DateFormat> COMMON_DATE_TIME_FORMATS;
 
   /* The Default Timezone to be used */
   private static final TimeZone TIMEZONE = TimeZone.getTimeZone("UTC"); //$NON-NLS-1$
@@ -180,39 +170,6 @@ public class DateUtils {
 
   /** Initialize the array of common date formats and formatter */
   static {
-
-    /* Create Common Date Formatter */
-    COMMON_DATE_FORMATS = new HashMap<String, DateFormat>();
-    COMMON_DATE_FORMATS.put(String.valueOf(DateFormat.SHORT), DateFormat.getDateInstance(DateFormat.SHORT));
-    COMMON_DATE_FORMATS.put(String.valueOf(DateFormat.MEDIUM), DateFormat.getDateInstance(DateFormat.MEDIUM));
-    COMMON_DATE_FORMATS.put(String.valueOf(DateFormat.LONG), DateFormat.getDateInstance(DateFormat.LONG));
-    COMMON_DATE_FORMATS.put(String.valueOf(DateFormat.FULL), DateFormat.getDateInstance(DateFormat.FULL));
-
-    /* Create Common Time Formatter */
-    COMMON_TIME_FORMATS = new HashMap<String, DateFormat>();
-    COMMON_TIME_FORMATS.put(String.valueOf(DateFormat.SHORT), DateFormat.getTimeInstance(DateFormat.SHORT));
-    COMMON_TIME_FORMATS.put(String.valueOf(DateFormat.MEDIUM), DateFormat.getTimeInstance(DateFormat.MEDIUM));
-    COMMON_TIME_FORMATS.put(String.valueOf(DateFormat.LONG), DateFormat.getTimeInstance(DateFormat.LONG));
-    COMMON_TIME_FORMATS.put(String.valueOf(DateFormat.FULL), DateFormat.getTimeInstance(DateFormat.FULL));
-
-    /* Create Common DateTime Formatter */
-    COMMON_DATE_TIME_FORMATS = new HashMap<String, DateFormat>();
-    COMMON_DATE_TIME_FORMATS.put(String.valueOf(DateFormat.SHORT) + String.valueOf(DateFormat.SHORT), DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT));
-    COMMON_DATE_TIME_FORMATS.put(String.valueOf(DateFormat.SHORT) + String.valueOf(DateFormat.MEDIUM), DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM));
-    COMMON_DATE_TIME_FORMATS.put(String.valueOf(DateFormat.SHORT) + String.valueOf(DateFormat.LONG), DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG));
-    COMMON_DATE_TIME_FORMATS.put(String.valueOf(DateFormat.SHORT) + String.valueOf(DateFormat.FULL), DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.FULL));
-    COMMON_DATE_TIME_FORMATS.put(String.valueOf(DateFormat.MEDIUM) + String.valueOf(DateFormat.SHORT), DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT));
-    COMMON_DATE_TIME_FORMATS.put(String.valueOf(DateFormat.MEDIUM) + String.valueOf(DateFormat.MEDIUM), DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM));
-    COMMON_DATE_TIME_FORMATS.put(String.valueOf(DateFormat.MEDIUM) + String.valueOf(DateFormat.LONG), DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.LONG));
-    COMMON_DATE_TIME_FORMATS.put(String.valueOf(DateFormat.MEDIUM) + String.valueOf(DateFormat.FULL), DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.FULL));
-    COMMON_DATE_TIME_FORMATS.put(String.valueOf(DateFormat.LONG) + String.valueOf(DateFormat.SHORT), DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT));
-    COMMON_DATE_TIME_FORMATS.put(String.valueOf(DateFormat.LONG) + String.valueOf(DateFormat.MEDIUM), DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.MEDIUM));
-    COMMON_DATE_TIME_FORMATS.put(String.valueOf(DateFormat.LONG) + String.valueOf(DateFormat.LONG), DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG));
-    COMMON_DATE_TIME_FORMATS.put(String.valueOf(DateFormat.LONG) + String.valueOf(DateFormat.FULL), DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.FULL));
-    COMMON_DATE_TIME_FORMATS.put(String.valueOf(DateFormat.FULL) + String.valueOf(DateFormat.SHORT), DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.SHORT));
-    COMMON_DATE_TIME_FORMATS.put(String.valueOf(DateFormat.FULL) + String.valueOf(DateFormat.MEDIUM), DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.MEDIUM));
-    COMMON_DATE_TIME_FORMATS.put(String.valueOf(DateFormat.FULL) + String.valueOf(DateFormat.LONG), DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.LONG));
-    COMMON_DATE_TIME_FORMATS.put(String.valueOf(DateFormat.FULL) + String.valueOf(DateFormat.FULL), DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL));
 
     /* Create Date Formats */
     final String[] possibleDateFormats = {

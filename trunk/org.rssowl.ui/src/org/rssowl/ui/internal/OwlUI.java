@@ -152,6 +152,7 @@ import java.net.URI;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -332,6 +333,11 @@ public class OwlUI {
 
   /* Default News Text Font Height */
   private static final int DEFAULT_NEWS_TEXT_FONT_HEIGHT = 10;
+
+  /* System Properties for Date Format */
+  private static final String SHORT_DATE_FORMAT_PROPERTY = "shortDateFormat"; //$NON-NLS-1$
+  private static final String LONG_DATE_FORMAT_PROPERTY = "longDateFormat"; //$NON-NLS-1$
+  private static final String SHORT_TIME_FORMAT_PROPERTY = "shortTimeFormat"; //$NON-NLS-1$
 
   /* Map Common Mime Types to Extensions (used for Attachments) */
   private static final Map<String, String> fgMapMimeToExtension = new HashMap<String, String>();
@@ -1763,7 +1769,7 @@ public class OwlUI {
       return DATE_WIDTH;
 
     /* Calculate and Cache */
-    DateFormat dF = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+    DateFormat dF = getShortDateFormat();
     Calendar cal = Calendar.getInstance();
     cal.set(2006, Calendar.DECEMBER, 12, 12, 12, 12);
     String sampleDate = dF.format(cal.getTime());
@@ -2403,5 +2409,56 @@ public class OwlUI {
         runOnSelection(run, composite.getChildren());
       }
     }
+  }
+
+  /**
+   * @return the {@link DateFormat} used for short dates. Respects the system
+   * property to override this value from default.
+   */
+  public static DateFormat getShortDateFormat() {
+    String format = System.getProperty(SHORT_DATE_FORMAT_PROPERTY);
+    if (StringUtils.isSet(format)) {
+      try {
+        return new SimpleDateFormat(format);
+      } catch (Exception e) {
+        /* Ignore and use Default */
+      }
+    }
+
+    return DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+  }
+
+  /**
+   * @return the {@link DateFormat} used for long dates. Respects the system
+   * property to override this value from default.
+   */
+  public static DateFormat getLongDateFormat() {
+    String format = System.getProperty(LONG_DATE_FORMAT_PROPERTY);
+    if (StringUtils.isSet(format)) {
+      try {
+        return new SimpleDateFormat(format);
+      } catch (Exception e) {
+        /* Ignore and use Default */
+      }
+    }
+
+    return DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.SHORT);
+  }
+
+  /**
+   * @return the {@link DateFormat} used for short times. Respects the system
+   * property to override this value from default.
+   */
+  public static DateFormat getShortTimeFormat() {
+    String format = System.getProperty(SHORT_TIME_FORMAT_PROPERTY);
+    if (StringUtils.isSet(format)) {
+      try {
+        return new SimpleDateFormat(format);
+      } catch (Exception e) {
+        /* Ignore and use Default */
+      }
+    }
+
+    return DateFormat.getTimeInstance(DateFormat.SHORT);
   }
 }

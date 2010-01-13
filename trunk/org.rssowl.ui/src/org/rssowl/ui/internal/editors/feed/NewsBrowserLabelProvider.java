@@ -86,10 +86,10 @@ import java.util.Set;
 public class NewsBrowserLabelProvider extends LabelProvider {
 
   /* Date Formatter for News */
-  private DateFormat fDateFormat = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.SHORT);
+  private DateFormat fDateFormat = OwlUI.getLongDateFormat();
 
   /* Time Formatter for News */
-  private DateFormat fTimeFormat = DateFormat.getTimeInstance(DateFormat.SHORT);
+  private DateFormat fTimeFormat = OwlUI.getShortTimeFormat();
 
   /* Potential Media Tags */
   private final Set<String> fMediaTags = new HashSet<String>(Arrays.asList(new String[] { "img", "applet", "embed", "area", "frame", "frameset", "iframe", "map", "object" })); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$
