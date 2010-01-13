@@ -68,7 +68,7 @@ import java.util.Set;
  */
 public class InformationPropertyPage implements IEntityPropertyPage {
   private List<IEntity> fEntities;
-  private final DateFormat fDateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+  private final DateFormat fDateFormat = OwlUI.getShortDateFormat();
 
   /*
    * @see org.rssowl.ui.dialogs.properties.IEntityPropertyPage#init(org.rssowl.ui.dialogs.properties.IPropertyDialogSite, java.util.List)
