@@ -103,10 +103,11 @@ public class CBrowser {
   private static final int SET_FEATURE_ON_PROCESS = 0x2;
 
   private Browser fBrowser;
-  private boolean fBlockNavigation;
+  private boolean fAllowExternalNavigation;
   private IPreferenceScope fPreferences;
   private IPreferenceScope fEclipsePreferences;
   private Map<String, ILinkHandler> fLinkHandler;
+  private String fLastSetUrl;
 
   /**
    * @param parent The Parent Composite of this Browser.
@@ -329,7 +330,8 @@ public class CBrowser {
    * @param url The URL to browse to.
    */
   public void setUrl(String url) {
-    fBlockNavigation = false;
+    fLastSetUrl = url;
+    fAllowExternalNavigation = false;
     fBrowser.setUrl(url);
   }
 
@@ -340,7 +342,7 @@ public class CBrowser {
    * <code>false</code> otherwise
    */
   public boolean back() {
-    fBlockNavigation = false;
+    fAllowExternalNavigation = false;
     return fBrowser.back();
   }
 
@@ -351,7 +353,7 @@ public class CBrowser {
    * <code>false</code> otherwise
    */
   public boolean forward() {
-    fBlockNavigation = false;
+    fAllowExternalNavigation = false;
     return fBrowser.forward();
   }
 
@@ -489,8 +491,19 @@ public class CBrowser {
     /* Listen to Location-Changes */
     fBrowser.addLocationListener(new LocationListener() {
       public void changed(LocationEvent event) {
-        if (event.top && useExternalBrowser())
-          fBlockNavigation = true;
+
+        /* The website is fully loaded and external navigation is supported from now on. */
+        if (event.top) {
+
+          /*
+          * Bug: It is possible that a changed() event is triggered for a previously visited
+          * site although another site was already browsed to. In this case, we check if the
+          * URL that was last set to the browser equals the event location to make sure the
+          * changed() event is captured for the right moment.
+          */
+          if (StringUtils.isSet(event.location) && event.location.equals(fLastSetUrl))
+            fAllowExternalNavigation = true;
+        }
       }
 
       public void changing(LocationEvent event) {
@@ -521,25 +534,25 @@ public class CBrowser {
           }
         }
 
-        /* Feature not enabled */
-        if (!useExternalBrowser())
-          return;
+        /* Support opening Links in External Browser */
+        if (useExternalBrowser()) {
 
-        /* Only proceed if navigation should not be blocked */
-        if (!fBlockNavigation)
-          return;
+          /* Only proceed if external navigation should not be blocked */
+          if (!fAllowExternalNavigation)
+            return;
 
-        /* Let local ApplicationServer URLs open */
-        if (ApplicationServer.getDefault().isNewsServerUrl(event.location))
-          return;
+          /* Let local ApplicationServer URLs open */
+          if (ApplicationServer.getDefault().isNewsServerUrl(event.location))
+            return;
 
-        /* The URL must not be empty or about:blank (Problem on Linux) */
-        if (!StringUtils.isSet(event.location) || URIUtils.ABOUT_BLANK.equals(event.location))
-          return;
+          /* The URL must not be empty or about:blank (Problem on Linux) */
+          if (!StringUtils.isSet(event.location) || URIUtils.ABOUT_BLANK.equals(event.location))
+            return;
 
-        /* Finally, cancel event and open URL external */
-        event.doit = false;
-        BrowserUtils.openLinkExternal(event.location);
+          /* Finally, cancel event and open URL external */
+          event.doit = false;
+          BrowserUtils.openLinkExternal(event.location);
+        }
       }
     });
   }
