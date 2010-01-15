@@ -386,11 +386,14 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
     /* Extract Query Part and Decode */
     String query = link.getQuery();
-    if (StringUtils.isSet(query))
+    boolean queryProvided = StringUtils.isSet(query);
+    if (queryProvided) {
       query = URIUtils.urlDecode(query).trim();
+      queryProvided = StringUtils.isSet(query);
+    }
 
     /* Handler to perform a Search */
-    if (StringUtils.isSet(query) && (TITLE_HANDLER_ID.equals(id) || AUTHOR_HANDLER_ID.equals(id) || CATEGORY_HANDLER_ID.equals(id) || LABEL_HANDLER_ID.equals(id))) {
+    if (queryProvided && (TITLE_HANDLER_ID.equals(id) || AUTHOR_HANDLER_ID.equals(id) || CATEGORY_HANDLER_ID.equals(id) || LABEL_HANDLER_ID.equals(id))) {
       List<ISearchCondition> conditions = new ArrayList<ISearchCondition>(1);
       String entity = INews.class.getName();
 
@@ -433,7 +436,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     }
 
     /*  Toggle Read */
-    else if (StringUtils.isSet(query) && TOGGLE_READ_HANDLER_ID.equals(id)) {
+    else if (queryProvided && TOGGLE_READ_HANDLER_ID.equals(id)) {
       INews news = getNews(query);
       if (news != null) {
         INews.State newState = (news.getState() == INews.State.READ) ? INews.State.UNREAD : INews.State.READ;
@@ -444,7 +447,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     }
 
     /*  Toggle Sticky */
-    else if (StringUtils.isSet(query) && TOGGLE_STICKY_HANDLER_ID.equals(id)) {
+    else if (queryProvided && TOGGLE_STICKY_HANDLER_ID.equals(id)) {
       INews news = getNews(query);
       if (news != null) {
         Set<INews> singleNewsSet = Collections.singleton(news);
@@ -456,7 +459,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     }
 
     /*  Delete */
-    else if (StringUtils.isSet(query) && DELETE_HANDLER_ID.equals(id)) {
+    else if (queryProvided && DELETE_HANDLER_ID.equals(id)) {
       INews news = getNews(query);
       if (news != null) {
         Set<INews> singleNewsSet = Collections.singleton(news);
@@ -466,7 +469,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     }
 
     /*  Labels Menu */
-    else if (StringUtils.isSet(query) && LABELS_MENU_HANDLER_ID.equals(id)) {
+    else if (queryProvided && LABELS_MENU_HANDLER_ID.equals(id)) {
       INews news = getNews(query);
       if (news != null) {
         setSelection(new StructuredSelection(news));
@@ -478,7 +481,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     }
 
     /*  Attachments Menu */
-    else if (StringUtils.isSet(query) && ATTACHMENTS_MENU_HANDLER_ID.equals(id)) {
+    else if (queryProvided && ATTACHMENTS_MENU_HANDLER_ID.equals(id)) {
       INews news = getNews(query);
       if (news != null) {
         setSelection(new StructuredSelection(news));
@@ -490,7 +493,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     }
 
     /* News Context Menu */
-    else if (StringUtils.isSet(query) && NEWS_MENU_HANDLER_ID.equals(id)) {
+    else if (queryProvided && NEWS_MENU_HANDLER_ID.equals(id)) {
       INews news = getNews(query);
       if (news != null) {
         setSelection(new StructuredSelection(news));
@@ -502,7 +505,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     }
 
     /* Share News Context Menu */
-    else if (StringUtils.isSet(query) && SHARE_NEWS_MENU_HANDLER_ID.equals(id)) {
+    else if (queryProvided && SHARE_NEWS_MENU_HANDLER_ID.equals(id)) {
       INews news = getNews(query);
       if (news != null) {
         setSelection(new StructuredSelection(news));
