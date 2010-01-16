@@ -65,8 +65,6 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.StringUtils;
-import org.rssowl.ui.internal.ApplicationWorkbenchAdvisor;
-import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.CCLabel;
 import org.rssowl.ui.internal.util.LayoutUtils;
@@ -584,25 +582,6 @@ public class NotificationPopup extends PopupDialog {
     }
   }
 
-  private void restoreWindow(IWorkbenchPage page) {
-    Shell applicationShell = page.getWorkbenchWindow().getShell();
-    ApplicationWorkbenchWindowAdvisor advisor = ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor;
-
-    /* Restore From Tray */
-    if (advisor != null && advisor.isMinimizedToTray())
-      advisor.restoreFromTray(applicationShell);
-
-    /* Restore from being Minimized */
-    else if (applicationShell.getMinimized()) {
-      applicationShell.setMinimized(false);
-      applicationShell.forceActive();
-    }
-
-    /* Otherwise force Active */
-    else
-      applicationShell.forceActive();
-  }
-
   private void initResources() {
 
     /* Colors */
@@ -717,7 +696,7 @@ public class NotificationPopup extends PopupDialog {
         if (page != null) {
 
           /* Restore Window */
-          restoreWindow(page);
+          OwlUI.restoreWindow(page);
 
           /* Close Notifier */
           doClose();

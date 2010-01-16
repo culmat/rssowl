@@ -99,8 +99,10 @@ public class CleanUpReminderService {
                 if (monitor.isCanceled() || !Platform.isRunning())
                   return;
 
-                if (CleanUpReminderDialog.getVisibleInstance() == null && new CleanUpReminderDialog(shell).open() == IDialogConstants.OK_ID)
+                if (CleanUpReminderDialog.getVisibleInstance() == null && new CleanUpReminderDialog(shell).open() == IDialogConstants.OK_ID) {
+                  OwlUI.restoreWindow(shell);
                   new CleanUpAction().openWizard(shell);
+                }
               }
             });
 
