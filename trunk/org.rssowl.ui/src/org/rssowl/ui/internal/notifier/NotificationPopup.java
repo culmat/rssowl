@@ -66,6 +66,7 @@ import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.notifier.NotificationService.Mode;
 import org.rssowl.ui.internal.util.CCLabel;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
@@ -74,10 +75,8 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * TODO
+ * Todo:
  * <ul>
- * <li>Implement animation</li>
- * <li>Add preferences (respect use animation, number of news)</li>
  * <li>SearchNotificationItems are not aggregated if the max. number of items is
  * already showing</li>
  * </ul>
@@ -146,6 +145,7 @@ public class NotificationPopup extends PopupDialog {
   private boolean fMouseOverNotifier;
   private FadeJob fFadeJob;
   private Collection<NotificationItem> fInitialItems;
+  private final Mode fMode;
 
   private class FadeJob extends UIJob {
     FadeJob() {
@@ -166,7 +166,7 @@ public class NotificationPopup extends PopupDialog {
       if (proceed(monitor)) {
         final int alpha = getShell().getAlpha();
 
-        if (FADE_ENABLED && fgFadeSupported && alpha < 255) {
+        if (shouldFadeIn() && alpha < 255) {
           if (proceed(monitor)) {
             getShell().getDisplay().syncExec(new Runnable() {
               public void run() {
@@ -188,8 +188,9 @@ public class NotificationPopup extends PopupDialog {
     }
   };
 
-  NotificationPopup(int visibleItemCount) {
+  NotificationPopup(int visibleItemCount, Mode mode) {
     super(new Shell(PlatformUI.getWorkbench().getDisplay()), SWT.NO_TRIM | SWT.ON_TOP, false, false, false, false, false, null, null);
+    fMode = mode;
     fResources = new LocalResourceManager(JFaceResources.getResources());
     fBoldTextFont = OwlUI.getThemeFont(OwlUI.NOTIFICATION_POPUP_FONT_ID, SWT.BOLD);
     fNormalTextFont = OwlUI.getThemeFont(OwlUI.NOTIFICATION_POPUP_FONT_ID, SWT.NORMAL);
@@ -225,7 +226,7 @@ public class NotificationPopup extends PopupDialog {
     makeVisible(fInitialItems);
 
     /* Make shell invisible initially if fading in */
-    if (FADE_ENABLED && fgFadeSupported && fGlobalScope.getBoolean(DefaultPreferences.FADE_NOTIFIER))
+    if (shouldFadeIn() && fGlobalScope.getBoolean(DefaultPreferences.FADE_NOTIFIER))
       getShell().setAlpha(0);
   }
 
@@ -239,7 +240,7 @@ public class NotificationPopup extends PopupDialog {
     int res = super.open();
 
     /* Make shell fade in */
-    if (FADE_ENABLED && fgFadeSupported && fGlobalScope.getBoolean(DefaultPreferences.FADE_NOTIFIER))
+    if (shouldFadeIn() && fGlobalScope.getBoolean(DefaultPreferences.FADE_NOTIFIER))
       fadeIn();
 
     return res;
@@ -323,7 +324,7 @@ public class NotificationPopup extends PopupDialog {
         if (!fGlobalScope.getBoolean(DefaultPreferences.STICKY_NOTIFICATION_POPUP))
           fAutoCloser.cancel();
 
-        if (FADE_ENABLED && fgFadeSupported && fGlobalScope.getBoolean(DefaultPreferences.FADE_NOTIFIER) && getShell().getAlpha() < 255) {
+        if (shouldFadeIn() && fGlobalScope.getBoolean(DefaultPreferences.FADE_NOTIFIER) && getShell().getAlpha() < 255) {
           if (fFadeJob != null)
             fFadeJob.cancel();
           getShell().setAlpha(255);
@@ -383,7 +384,11 @@ public class NotificationPopup extends PopupDialog {
     }
 
     String titlePart;
-    if (newsCount == 0 && searchCount > 0)
+    if (fMode == Mode.RECENT)
+      titlePart = Messages.NotificationPopup_TODAYS_NEWS;
+    else if (fMode == Mode.INCOMING_MANUAL)
+      titlePart = Messages.NotificationPopup_INCOMING_NEWS;
+    else if (newsCount == 0 && searchCount > 0)
       titlePart = (searchCount == 1) ? NLS.bind(Messages.NotificationPopup_N_SEARCH_MATCH, searchCount) : NLS.bind(Messages.NotificationPopup_N_SEARCH_MATCHES, searchCount);
     else
       titlePart = NLS.bind(Messages.NotificationPopup_N_INCOMING, newsCount);
@@ -933,5 +938,9 @@ public class NotificationPopup extends PopupDialog {
       fInitialItems.clear();
 
     return super.close();
+  }
+
+  private boolean shouldFadeIn() {
+    return fMode == Mode.INCOMING_AUTOMATIC && FADE_ENABLED && fgFadeSupported;
   }
 }
