@@ -1149,7 +1149,13 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     });
 
     trayItem.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-    trayItem.add(getAction(ActionFactory.QUIT.getId()));
+
+    trayItem.add(new Action(Messages.ApplicationActionBarAdvisor_EXIT) {
+      @Override
+      public void run() {
+        PlatformUI.getWorkbench().close();
+      }
+    });
   }
 
   /*
