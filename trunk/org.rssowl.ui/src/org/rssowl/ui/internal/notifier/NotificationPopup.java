@@ -43,6 +43,8 @@ import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
@@ -697,15 +699,7 @@ public class NotificationPopup extends PopupDialog {
     fTitleCircleLabel.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseUp(MouseEvent e) {
-        IWorkbenchPage page = OwlUI.getPage();
-        if (page != null) {
-
-          /* Restore Window */
-          OwlUI.restoreWindow(page);
-
-          /* Close Notifier */
-          doClose();
-        }
+        doRestore();
       }
     });
 
@@ -844,6 +838,20 @@ public class NotificationPopup extends PopupDialog {
       }
     });
 
+    /* Simple Keybinding Support */
+    fShell.addTraverseListener(new TraverseListener() {
+      public void keyTraversed(TraverseEvent e) {
+        if (e.detail == SWT.TRAVERSE_ESCAPE)
+          doClose();
+        else if (e.detail == SWT.TRAVERSE_RETURN)
+          doRestore();
+        else if (e.detail == SWT.TRAVERSE_ARROW_NEXT || e.detail == SWT.TRAVERSE_PAGE_NEXT)
+          onNavNext();
+        else if (e.detail == SWT.TRAVERSE_ARROW_PREVIOUS || e.detail == SWT.TRAVERSE_PAGE_PREVIOUS)
+          onNavPrevious();
+      }
+    });
+
     return outerCircle;
   }
 
@@ -938,6 +946,19 @@ public class NotificationPopup extends PopupDialog {
       fInitialItems.clear();
 
     return super.close();
+  }
+
+  /* Restore RSSOwl and Close the Notifier */
+  private void doRestore() {
+    IWorkbenchPage page = OwlUI.getPage();
+    if (page != null) {
+
+      /* Restore Window */
+      OwlUI.restoreWindow(page);
+
+      /* Close Notifier */
+      doClose();
+    }
   }
 
   private boolean shouldFadeIn() {
