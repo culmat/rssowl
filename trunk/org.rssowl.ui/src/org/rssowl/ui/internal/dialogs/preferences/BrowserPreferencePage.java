@@ -112,83 +112,91 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
 
   private void createBrowserOptions(Composite container) {
     Composite browserGroup = new Composite(container, SWT.None);
-    browserGroup.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
+    browserGroup.setLayout(LayoutUtils.createGridLayout(1, 0, 0));
     browserGroup.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-
-    /* Use internal Browser */
-    fUseInternalBrowser = new Button(browserGroup, SWT.RADIO);
-    fUseInternalBrowser.setText(Messages.BrowserPreferencePage_USE_EMBEDDED_BROWSER);
-    fUseInternalBrowser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
-    fUseInternalBrowser.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        updateEnablement();
-      }
-    });
-
-    /* Use default external Browser */
-    fUseDefaultExternalBrowser = new Button(browserGroup, SWT.RADIO);
-    String name = getDefaultBrowserName();
-    if (StringUtils.isSet(name))
-      fUseDefaultExternalBrowser.setText(NLS.bind(Messages.BrowserPreferencePage_USE_STANDARD_BROWSER_N, name));
-    else
-      fUseDefaultExternalBrowser.setText(Messages.BrowserPreferencePage_USE_STANDARD_BROWSER);
-
-    fUseDefaultExternalBrowser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
-    fUseDefaultExternalBrowser.setSelection(fGlobalScope.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER));
-
-    /* Use custom external Browser */
-    fUseCustomExternalBrowser = new Button(browserGroup, SWT.RADIO);
-    fUseCustomExternalBrowser.setText(Messages.BrowserPreferencePage_USE_EXTERNAL_BROWSER);
-    fUseCustomExternalBrowser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
-    fUseCustomExternalBrowser.setSelection(fGlobalScope.getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER));
-    fUseCustomExternalBrowser.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        fCustomBrowserInput.setEnabled(fUseCustomExternalBrowser.getSelection());
-        fCustomBrowserSearchButton.setEnabled(fUseCustomExternalBrowser.getSelection());
-      }
-    });
-
-    fUseInternalBrowser.setSelection(!fUseDefaultExternalBrowser.getSelection() && !fUseCustomExternalBrowser.getSelection());
-
-    fCustomBrowserInput = new Text(browserGroup, SWT.BORDER);
-    fCustomBrowserInput.setEnabled(fUseCustomExternalBrowser.getSelection());
-    fCustomBrowserInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
-
-    String customBrowserValue = fGlobalScope.getString(DefaultPreferences.CUSTOM_BROWSER_PATH);
-    if (customBrowserValue != null)
-      fCustomBrowserInput.setText(customBrowserValue);
-
-    fCustomBrowserSearchButton = new Button(browserGroup, SWT.PUSH);
-    fCustomBrowserSearchButton.setText(Messages.BrowserPreferencePage_BROWSE);
-    Dialog.applyDialogFont(fCustomBrowserSearchButton);
-    setButtonLayoutData(fCustomBrowserSearchButton);
-    fCustomBrowserSearchButton.setEnabled(fUseCustomExternalBrowser.getSelection());
-    fCustomBrowserSearchButton.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        FileDialog dialog = new FileDialog(getShell(), SWT.OPEN);
-        dialog.setFileName(fCustomBrowserInput.getText());
-        String path = dialog.open();
-        if (path != null)
-          fCustomBrowserInput.setText(path);
-      }
-    });
-
-    Composite bottomContainer = new Composite(browserGroup, SWT.NONE);
-    bottomContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
-    bottomContainer.setLayout(LayoutUtils.createGridLayout(1, 0, 0));
-    ((GridLayout) bottomContainer.getLayout()).marginTop = 10;
 
     /* Tabbed Browsing */
     {
-      Label label = new Label(bottomContainer, SWT.NONE);
+      Label label = new Label(browserGroup, SWT.NONE);
+      label.setText(Messages.BrowserPreferencePage_BROWSER_SELECTION);
+      label.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
+
+      /* Group */
+      Composite group = new Composite(browserGroup, SWT.None);
+      group.setLayout(LayoutUtils.createGridLayout(2, 7, 3));
+      ((GridLayout) group.getLayout()).marginBottom = 5;
+      group.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+
+      /* Use internal Browser */
+      fUseInternalBrowser = new Button(group, SWT.RADIO);
+      fUseInternalBrowser.setText(Messages.BrowserPreferencePage_USE_EMBEDDED_BROWSER);
+      fUseInternalBrowser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
+      fUseInternalBrowser.addSelectionListener(new SelectionAdapter() {
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+          updateEnablement();
+        }
+      });
+
+      /* Use default external Browser */
+      fUseDefaultExternalBrowser = new Button(group, SWT.RADIO);
+      String name = getDefaultBrowserName();
+      if (StringUtils.isSet(name))
+        fUseDefaultExternalBrowser.setText(NLS.bind(Messages.BrowserPreferencePage_USE_STANDARD_BROWSER_N, name));
+      else
+        fUseDefaultExternalBrowser.setText(Messages.BrowserPreferencePage_USE_STANDARD_BROWSER);
+
+      fUseDefaultExternalBrowser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
+      fUseDefaultExternalBrowser.setSelection(fGlobalScope.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER));
+
+      /* Use custom external Browser */
+      fUseCustomExternalBrowser = new Button(group, SWT.RADIO);
+      fUseCustomExternalBrowser.setText(Messages.BrowserPreferencePage_USE_EXTERNAL_BROWSER);
+      fUseCustomExternalBrowser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
+      fUseCustomExternalBrowser.setSelection(fGlobalScope.getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER));
+      fUseCustomExternalBrowser.addSelectionListener(new SelectionAdapter() {
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+          fCustomBrowserInput.setEnabled(fUseCustomExternalBrowser.getSelection());
+          fCustomBrowserSearchButton.setEnabled(fUseCustomExternalBrowser.getSelection());
+        }
+      });
+
+      fUseInternalBrowser.setSelection(!fUseDefaultExternalBrowser.getSelection() && !fUseCustomExternalBrowser.getSelection());
+
+      fCustomBrowserInput = new Text(group, SWT.BORDER);
+      fCustomBrowserInput.setEnabled(fUseCustomExternalBrowser.getSelection());
+      fCustomBrowserInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+
+      String customBrowserValue = fGlobalScope.getString(DefaultPreferences.CUSTOM_BROWSER_PATH);
+      if (customBrowserValue != null)
+        fCustomBrowserInput.setText(customBrowserValue);
+
+      fCustomBrowserSearchButton = new Button(group, SWT.PUSH);
+      fCustomBrowserSearchButton.setText(Messages.BrowserPreferencePage_BROWSE);
+      Dialog.applyDialogFont(fCustomBrowserSearchButton);
+      setButtonLayoutData(fCustomBrowserSearchButton);
+      fCustomBrowserSearchButton.setEnabled(fUseCustomExternalBrowser.getSelection());
+      fCustomBrowserSearchButton.addSelectionListener(new SelectionAdapter() {
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+          FileDialog dialog = new FileDialog(getShell(), SWT.OPEN);
+          dialog.setFileName(fCustomBrowserInput.getText());
+          String path = dialog.open();
+          if (path != null)
+            fCustomBrowserInput.setText(path);
+        }
+      });
+    }
+
+    /* Tabbed Browsing */
+    {
+      Label label = new Label(browserGroup, SWT.NONE);
       label.setText(Messages.BrowserPreferencePage_TABBED_BROWSING);
       label.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
 
       /* Group */
-      Composite group = new Composite(bottomContainer, SWT.None);
+      Composite group = new Composite(browserGroup, SWT.None);
       group.setLayout(LayoutUtils.createGridLayout(1, 7, 3));
       ((GridLayout) group.getLayout()).marginBottom = 5;
       group.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
@@ -211,12 +219,12 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
 
     /* Block Popups on Windows / Disable JavaScript in Browser */
     if (Application.IS_WINDOWS && !CBrowser.isMozillaRunningOnWindows()) {
-      Label label = new Label(bottomContainer, SWT.NONE);
+      Label label = new Label(browserGroup, SWT.NONE);
       label.setText(Messages.BrowserPreferencePage_CONTENT);
       label.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
 
       /* Group */
-      Composite group = new Composite(bottomContainer, SWT.None);
+      Composite group = new Composite(browserGroup, SWT.None);
       group.setLayout(LayoutUtils.createGridLayout(2, 7, 3));
       group.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
