@@ -30,6 +30,7 @@ public class Messages extends NLS {
   private static final String BUNDLE_NAME = "org.rssowl.ui.internal.dialogs.preferences.messages"; //$NON-NLS-1$
   public static String BrowserPreferencePage_BLOCK_POPUPS;
   public static String BrowserPreferencePage_BROWSE;
+  public static String BrowserPreferencePage_BROWSER_SELECTION;
   public static String BrowserPreferencePage_CONTENT;
   public static String BrowserPreferencePage_DISABLE_JS;
   public static String BrowserPreferencePage_EXCEPTIONS;
@@ -126,6 +127,8 @@ public class Messages extends NLS {
   public static String NotifierPreferencesPage_CLOSE_AUTOMATICALLY;
   public static String NotifierPreferencesPage_CLOSE_NOTIFIER_ON_OPEN;
   public static String NotifierPreferencesPage_DESELECT_ALL;
+  public static String NotifierPreferencesPage_GENERAL;
+  public static String NotifierPreferencesPage_NOTIFICATION_FOR_INCOMING_NEWS;
   public static String NotifierPreferencesPage_NOTIFIER_TIP;
   public static String NotifierPreferencesPage_SECONDS;
   public static String NotifierPreferencesPage_SELECT_ALL;

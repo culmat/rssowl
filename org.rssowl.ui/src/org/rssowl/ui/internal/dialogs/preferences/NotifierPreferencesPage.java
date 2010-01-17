@@ -142,12 +142,6 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
     /* Misc. Options */
     createNotificationOptions(container);
 
-    /* Spacer */
-    new Label(container, SWT.None);
-
-    /* Viewer to select Folders/Marks for the Notifier */
-    createNotifierViewer(container);
-
     /* Info Container */
     Composite infoContainer = new Composite(container, SWT.None);
     infoContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
@@ -177,7 +171,6 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
     });
 
     applyDialogFont(container);
-
 
     /* Enable Apply Button on Selection Changes */
     OwlUI.runOnSelection(new Runnable() {
@@ -407,97 +400,114 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
     notificationGroup.setLayout(LayoutUtils.createGridLayout(1, 0, 0));
     notificationGroup.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
-    /* Show Notification Popup */
-    fShowNotificationPopup = new Button(notificationGroup, SWT.CHECK);
-    fShowNotificationPopup.setText(Messages.NotifierPreferencesPage_SHOW_NOTIFIER);
-    fShowNotificationPopup.setSelection(fGlobalScope.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP));
-    fShowNotificationPopup.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        fNotificationOnlyFromTray.setEnabled(fShowNotificationPopup.getSelection());
-        fShowExcerptCheck.setEnabled(fShowNotificationPopup.getSelection());
-        fCloseNotifierOnOpen.setEnabled(fShowNotificationPopup.getSelection());
-        fAutoCloseNotifierCheck.setEnabled(fShowNotificationPopup.getSelection());
-        fAutoCloseNotifierSpinner.setEnabled(fShowNotificationPopup.getSelection());
-        fLimitNotificationCheck.setEnabled(fShowNotificationPopup.getSelection());
-        fLimitNotificationSpinner.setEnabled(fLimitNotificationCheck.isEnabled() && fLimitNotificationCheck.getSelection());
-        setLimitNotificationEnabled(fShowNotificationPopup.getSelection() && fLimitNotifierToSelectionCheck.getSelection());
-        fLimitNotifierToSelectionCheck.setEnabled(fShowNotificationPopup.getSelection());
-      }
-    });
+    /* General */
+    {
+      Label label = new Label(notificationGroup, SWT.NONE);
+      label.setText(Messages.NotifierPreferencesPage_GENERAL);
+      label.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
 
-    /* Limit number of Items showing in Notification */
-    Composite limitItemsContainer = new Composite(notificationGroup, SWT.None);
-    limitItemsContainer.setLayout(LayoutUtils.createGridLayout(3, 0, 0, 0, 2, false));
+      /* Group */
+      Composite group = new Composite(notificationGroup, SWT.None);
+      group.setLayout(LayoutUtils.createGridLayout(1, 7, 3));
+      ((GridLayout) group.getLayout()).marginBottom = 5;
+      group.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
-    int notificationLimit = fGlobalScope.getInteger(DefaultPreferences.LIMIT_NOTIFICATION_SIZE);
+      /* Limit number of Items showing in Notification */
+      Composite limitItemsContainer = new Composite(group, SWT.None);
+      limitItemsContainer.setLayout(LayoutUtils.createGridLayout(3, 0, 0, 0, 2, false));
 
-    fLimitNotificationCheck = new Button(limitItemsContainer, SWT.CHECK);
-    fLimitNotificationCheck.setText(Messages.NotifierPreferencesPage_SHOW_MAX_NEWS_START);
-    fLimitNotificationCheck.setEnabled(fShowNotificationPopup.getSelection());
-    fLimitNotificationCheck.setSelection(notificationLimit >= 0);
-    fLimitNotificationCheck.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        fLimitNotificationSpinner.setEnabled(fLimitNotificationCheck.getSelection());
-      }
-    });
+      int notificationLimit = fGlobalScope.getInteger(DefaultPreferences.LIMIT_NOTIFICATION_SIZE);
 
-    fLimitNotificationSpinner = new Spinner(limitItemsContainer, SWT.BORDER);
-    fLimitNotificationSpinner.setMinimum(1);
-    fLimitNotificationSpinner.setMaximum(30);
-    fLimitNotificationSpinner.setEnabled(fLimitNotificationCheck.isEnabled() && fLimitNotificationCheck.getSelection());
-    if (notificationLimit > 0)
-      fLimitNotificationSpinner.setSelection(notificationLimit);
-    else
-      fLimitNotificationSpinner.setSelection(notificationLimit * -1);
+      fLimitNotificationCheck = new Button(limitItemsContainer, SWT.CHECK);
+      fLimitNotificationCheck.setText(Messages.NotifierPreferencesPage_SHOW_MAX_NEWS_START);
+      fLimitNotificationCheck.setSelection(notificationLimit >= 0);
+      fLimitNotificationCheck.addSelectionListener(new SelectionAdapter() {
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+          fLimitNotificationSpinner.setEnabled(fLimitNotificationCheck.getSelection());
+        }
+      });
 
-    Label label = new Label(limitItemsContainer, SWT.None);
-    label.setText(Messages.NotifierPreferencesPage_SHOW_MAX_NEWS_END);
+      fLimitNotificationSpinner = new Spinner(limitItemsContainer, SWT.BORDER);
+      fLimitNotificationSpinner.setMinimum(1);
+      fLimitNotificationSpinner.setMaximum(30);
+      fLimitNotificationSpinner.setEnabled(fLimitNotificationCheck.getSelection());
+      if (notificationLimit > 0)
+        fLimitNotificationSpinner.setSelection(notificationLimit);
+      else
+        fLimitNotificationSpinner.setSelection(notificationLimit * -1);
 
-    /* Full Content */
-    fShowExcerptCheck = new Button(notificationGroup, SWT.CHECK);
-    fShowExcerptCheck.setText(Messages.NotifierPreferencesPage_SHOW_EXCERPT);
-    fShowExcerptCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.SHOW_EXCERPT_IN_NOTIFIER));
-    fShowExcerptCheck.setEnabled(fShowNotificationPopup.getSelection());
+      label = new Label(limitItemsContainer, SWT.None);
+      label.setText(Messages.NotifierPreferencesPage_SHOW_MAX_NEWS_END);
 
-    /* Only from Tray */
-    fNotificationOnlyFromTray = new Button(notificationGroup, SWT.CHECK);
-    fNotificationOnlyFromTray.setText(Messages.NotifierPreferencesPage_SHOW_WHEN_MINIMIZED);
-    fNotificationOnlyFromTray.setSelection(fGlobalScope.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP_ONLY_WHEN_MINIMIZED));
-    fNotificationOnlyFromTray.setEnabled(fShowNotificationPopup.getSelection());
+      /* Full Content */
+      fShowExcerptCheck = new Button(group, SWT.CHECK);
+      fShowExcerptCheck.setText(Messages.NotifierPreferencesPage_SHOW_EXCERPT);
+      fShowExcerptCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.SHOW_EXCERPT_IN_NOTIFIER));
 
-    /* Close Notifier when opening Item */
-    fCloseNotifierOnOpen = new Button(notificationGroup, SWT.CHECK);
-    fCloseNotifierOnOpen.setText(Messages.NotifierPreferencesPage_CLOSE_NOTIFIER_ON_OPEN);
-    fCloseNotifierOnOpen.setSelection(fGlobalScope.getBoolean(DefaultPreferences.CLOSE_NOTIFIER_ON_OPEN));
-    fCloseNotifierOnOpen.setEnabled(fShowNotificationPopup.getSelection());
+      /* Only from Tray */
+      fNotificationOnlyFromTray = new Button(group, SWT.CHECK);
+      fNotificationOnlyFromTray.setText(Messages.NotifierPreferencesPage_SHOW_WHEN_MINIMIZED);
+      fNotificationOnlyFromTray.setSelection(fGlobalScope.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP_ONLY_WHEN_MINIMIZED));
 
-    /* Auto Close Notifier */
-    Composite autoCloseContainer = new Composite(notificationGroup, SWT.None);
-    autoCloseContainer.setLayout(LayoutUtils.createGridLayout(3, 0, 0, 0, 2, false));
+      /* Close Notifier when opening Item */
+      fCloseNotifierOnOpen = new Button(group, SWT.CHECK);
+      fCloseNotifierOnOpen.setText(Messages.NotifierPreferencesPage_CLOSE_NOTIFIER_ON_OPEN);
+      fCloseNotifierOnOpen.setSelection(fGlobalScope.getBoolean(DefaultPreferences.CLOSE_NOTIFIER_ON_OPEN));
 
-    fAutoCloseNotifierCheck = new Button(autoCloseContainer, SWT.CHECK);
-    fAutoCloseNotifierCheck.setText(Messages.NotifierPreferencesPage_CLOSE_AUTOMATICALLY);
-    fAutoCloseNotifierCheck.setEnabled(fShowNotificationPopup.getSelection());
-    fAutoCloseNotifierCheck.setSelection(!fGlobalScope.getBoolean(DefaultPreferences.STICKY_NOTIFICATION_POPUP));
-    fAutoCloseNotifierCheck.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        fAutoCloseNotifierSpinner.setEnabled(fAutoCloseNotifierCheck.getSelection());
-      }
-    });
+      /* Auto Close Notifier */
+      Composite autoCloseContainer = new Composite(group, SWT.None);
+      autoCloseContainer.setLayout(LayoutUtils.createGridLayout(3, 0, 0, 0, 2, false));
 
-    int notificationAutoCloseValue = fGlobalScope.getInteger(DefaultPreferences.AUTOCLOSE_NOTIFICATION_VALUE);
+      fAutoCloseNotifierCheck = new Button(autoCloseContainer, SWT.CHECK);
+      fAutoCloseNotifierCheck.setText(Messages.NotifierPreferencesPage_CLOSE_AUTOMATICALLY);
+      fAutoCloseNotifierCheck.setSelection(!fGlobalScope.getBoolean(DefaultPreferences.STICKY_NOTIFICATION_POPUP));
+      fAutoCloseNotifierCheck.addSelectionListener(new SelectionAdapter() {
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+          fAutoCloseNotifierSpinner.setEnabled(fAutoCloseNotifierCheck.getSelection());
+        }
+      });
 
-    fAutoCloseNotifierSpinner = new Spinner(autoCloseContainer, SWT.BORDER);
-    fAutoCloseNotifierSpinner.setMinimum(1);
-    fAutoCloseNotifierSpinner.setMaximum(99);
-    fAutoCloseNotifierSpinner.setEnabled(fAutoCloseNotifierCheck.isEnabled() && fAutoCloseNotifierCheck.getSelection());
-    fAutoCloseNotifierSpinner.setSelection(notificationAutoCloseValue);
+      int notificationAutoCloseValue = fGlobalScope.getInteger(DefaultPreferences.AUTOCLOSE_NOTIFICATION_VALUE);
 
-    label = new Label(autoCloseContainer, SWT.None);
-    label.setText(Messages.NotifierPreferencesPage_SECONDS);
+      fAutoCloseNotifierSpinner = new Spinner(autoCloseContainer, SWT.BORDER);
+      fAutoCloseNotifierSpinner.setMinimum(1);
+      fAutoCloseNotifierSpinner.setMaximum(99);
+      fAutoCloseNotifierSpinner.setEnabled(fAutoCloseNotifierCheck.getSelection());
+      fAutoCloseNotifierSpinner.setSelection(notificationAutoCloseValue);
+
+      label = new Label(autoCloseContainer, SWT.None);
+      label.setText(Messages.NotifierPreferencesPage_SECONDS);
+    }
+
+    /* Incoming News */
+    {
+      Label label = new Label(notificationGroup, SWT.NONE);
+      label.setText(Messages.NotifierPreferencesPage_NOTIFICATION_FOR_INCOMING_NEWS);
+      label.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
+
+      /* Group */
+      Composite group = new Composite(notificationGroup, SWT.None);
+      group.setLayout(LayoutUtils.createGridLayout(1, 7, 3));
+      ((GridLayout) group.getLayout()).marginBottom = 5;
+      group.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+
+      /* Show Notification Popup */
+      fShowNotificationPopup = new Button(group, SWT.CHECK);
+      fShowNotificationPopup.setText(Messages.NotifierPreferencesPage_SHOW_NOTIFIER);
+      fShowNotificationPopup.setSelection(fGlobalScope.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP));
+      fShowNotificationPopup.addSelectionListener(new SelectionAdapter() {
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+          setLimitNotificationEnabled(fShowNotificationPopup.getSelection() && fLimitNotifierToSelectionCheck.getSelection());
+          fLimitNotifierToSelectionCheck.setEnabled(fShowNotificationPopup.getSelection());
+        }
+      });
+
+      /* Viewer to select Folders/Marks for the Notifier */
+      createNotifierViewer(group);
+    }
   }
 
   private Composite createComposite(Composite parent) {
@@ -604,21 +614,16 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
     IPreferenceScope defaultScope = Owl.getPreferenceService().getDefaultScope();
 
     fShowNotificationPopup.setSelection(defaultScope.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP));
+
     fNotificationOnlyFromTray.setSelection(defaultScope.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP_ONLY_WHEN_MINIMIZED));
-    fNotificationOnlyFromTray.setEnabled(fShowNotificationPopup.getSelection());
-
     fShowExcerptCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.SHOW_EXCERPT_IN_NOTIFIER));
-    fShowExcerptCheck.setEnabled(fShowNotificationPopup.getSelection());
-
     fCloseNotifierOnOpen.setSelection(defaultScope.getBoolean(DefaultPreferences.CLOSE_NOTIFIER_ON_OPEN));
-    fCloseNotifierOnOpen.setEnabled(fShowNotificationPopup.getSelection());
 
     fAutoCloseNotifierCheck.setSelection(!defaultScope.getBoolean(DefaultPreferences.STICKY_NOTIFICATION_POPUP));
-    fAutoCloseNotifierCheck.setEnabled(fShowNotificationPopup.getSelection());
-
     fAutoCloseNotifierSpinner.setSelection(defaultScope.getInteger(DefaultPreferences.AUTOCLOSE_NOTIFICATION_VALUE));
-    fAutoCloseNotifierSpinner.setEnabled(fShowNotificationPopup.getSelection() && fAutoCloseNotifierCheck.getSelection());
+    fAutoCloseNotifierSpinner.setEnabled(fAutoCloseNotifierCheck.getSelection());
 
+    /* Show a maximum of N News */
     int limitNotificationValue = defaultScope.getInteger(DefaultPreferences.LIMIT_NOTIFICATION_SIZE);
     fLimitNotificationCheck.setSelection(limitNotificationValue >= 0);
     if (limitNotificationValue >= 0)
@@ -626,8 +631,9 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
     fLimitNotificationCheck.setEnabled(fShowNotificationPopup.getSelection());
     fLimitNotificationSpinner.setEnabled(fShowNotificationPopup.getSelection());
 
+    /* Limit to Selected Elements */
     fLimitNotifierToSelectionCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.LIMIT_NOTIFIER_TO_SELECTION));
-
+    fLimitNotifierToSelectionCheck.setEnabled(fShowNotificationPopup.getSelection());
     setLimitNotificationEnabled(fShowNotificationPopup.getSelection() && fLimitNotifierToSelectionCheck.getSelection());
 
     updateApplyEnablement(true);
