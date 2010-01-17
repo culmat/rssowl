@@ -44,6 +44,7 @@ public class Messages extends NLS {
   public static String ApplicationActionBarAdvisor_DOWNLOAD_ALL;
   public static String ApplicationActionBarAdvisor_DOWNLOAD_ALL_WITH_SIZE;
   public static String ApplicationActionBarAdvisor_EDIT;
+  public static String ApplicationActionBarAdvisor_EXIT;
   public static String ApplicationActionBarAdvisor_EXPORT_LOGFILE;
   public static String ApplicationActionBarAdvisor_EXPORT_LOGFILE_DIALOG;
   public static String ApplicationActionBarAdvisor_FAQ;
@@ -96,6 +97,7 @@ public class Messages extends NLS {
   public static String ApplicationActionBarAdvisor_ZOOM_IN;
   public static String ApplicationActionBarAdvisor_ZOOM_OUT;
   public static String ApplicationServer_INFO_UNABLE_OPEN_PORT;
+  public static String ApplicationWorkbenchWindowAdvisor_N_INCOMING_NEWS;
   public static String ApplicationWorkbenchWindowAdvisor_RESTORE;
   public static String Controller_ERROR;
   public static String Controller_ERROR_LOADING;
