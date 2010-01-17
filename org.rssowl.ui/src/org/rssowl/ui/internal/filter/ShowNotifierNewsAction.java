@@ -31,6 +31,7 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.notifier.NotificationService;
+import org.rssowl.ui.internal.notifier.NotificationService.Mode;
 
 import java.util.Collections;
 import java.util.List;
@@ -48,9 +49,9 @@ public class ShowNotifierNewsAction implements INewsAction {
   public List<IEntity> run(final List<INews> news, final Object data) {
     NotificationService notificationService = Controller.getDefault().getNotificationService();
     if (data != null && data instanceof String)
-      notificationService.show(news, OwlUI.getRGB((String) data));
+      notificationService.show(news, OwlUI.getRGB((String) data), Mode.INCOMING_AUTOMATIC);
     else
-      notificationService.show(news, null);
+      notificationService.show(news, null, Mode.INCOMING_AUTOMATIC);
 
     return Collections.emptyList();
   }

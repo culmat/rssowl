@@ -31,6 +31,7 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.util.LocalSelectionTransfer;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -59,7 +60,12 @@ import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
+import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.ISearch;
+import org.rssowl.core.persist.ISearchCondition;
+import org.rssowl.core.persist.ISearchField;
+import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IPreferenceDAO;
 import org.rssowl.core.persist.event.NewsAdapter;
@@ -68,24 +74,36 @@ import org.rssowl.core.persist.event.PreferenceEvent;
 import org.rssowl.core.persist.event.PreferenceListener;
 import org.rssowl.core.persist.event.runnable.EventType;
 import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.LoggingSafeRunnable;
+import org.rssowl.core.util.SearchHit;
 import org.rssowl.ui.internal.dialogs.ActivityDialog;
 import org.rssowl.ui.internal.editors.feed.FeedView;
+import org.rssowl.ui.internal.notifier.NotificationService;
+import org.rssowl.ui.internal.notifier.NotificationService.Mode;
 import org.rssowl.ui.internal.util.JobRunner;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * @author bpasero
  */
 public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
+  /** Key for Data-Slot in Controls that support this Hook */
+  public static final String FOCUSLESS_SCROLL_HOOK = "org.rssowl.ui.internal.FocuslessScrollHook"; //$NON-NLS-1$
+
   /* WebSite class being used for the Browser on Windows only */
   private static final String SWT_BROWSER_WIN = "org.eclipse.swt.browser.WebSite"; //$NON-NLS-1$
 
-  /** Key for Data-Slot in Controls that support this Hook */
-  public static final String FOCUSLESS_SCROLL_HOOK = "org.rssowl.ui.internal.FocuslessScrollHook"; //$NON-NLS-1$
+  /* Maximum Number of News for Teasing */
+  private static final int TEASE_LIMIT = 200;
 
   private TrayItem fTrayItem;
   private boolean fTrayTeasing;
@@ -97,6 +115,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
   private boolean fBlockIconifyEvent;
   private boolean fMinimizeFromClose;
   private Menu fTrayMenu;
+  private List<Long> fTeasingNewsCache;
+  private ISearch fRecentNewsSearch;
 
   /* Listeners */
   private NewsAdapter fNewsListener;
@@ -109,6 +129,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
   public ApplicationWorkbenchWindowAdvisor(IWorkbenchWindowConfigurer configurer) {
     super(configurer);
     fResources = new LocalResourceManager(JFaceResources.getResources());
+    fTeasingNewsCache = new ArrayList<Long>();
   }
 
   /*
@@ -468,12 +489,18 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         if (isDoubleClick)
           lastDoubleClickTime = System.currentTimeMillis();
 
-        /* Show the Tray Context Menu if this is not a double click and we are on Windows */
+        /* Invoke Single Click Action if this is not a double click and we are on Windows */
         if (!isDoubleClick && restoreOnDoubleclick && Application.IS_WINDOWS) {
-          JobRunner.runInUIThread(doubleClickTime + 10, tray, new Runnable() {
+          JobRunner.runInBackgroundThread(doubleClickTime, new Runnable() {
             public void run() {
-              if (lastDoubleClickTime < System.currentTimeMillis() - doubleClickTime && !shell.isDisposed())
-                showTrayMenu(shell);
+              if (lastDoubleClickTime < System.currentTimeMillis() - doubleClickTime) {
+                JobRunner.runInUIThread(tray, new Runnable() {
+                  public void run() {
+                    if (!shell.isDisposed())
+                      onSingleClick(shell);
+                  }
+                });
+              }
             }
           });
         }
@@ -499,19 +526,35 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     fNewsListener = new NewsAdapter() {
 
       @Override
-      public void entitiesAdded(Set<NewsEvent> events) {
+      public void entitiesAdded(final Set<NewsEvent> events) {
         if (!CoreUtils.containsState(events, INews.State.NEW))
           return;
 
         JobRunner.runInUIThread(fTrayItem, new Runnable() {
           public void run() {
 
-            /* Update Icon only when Tray is visible and not yet teasing */
-            if (!fTrayItem.getVisible() || fTrayTeasing || shell.getVisible())
+            /* Update Icon only when Tray is visible */
+            if (!fTrayItem.getVisible() || shell.getVisible())
               return;
 
-            fTrayTeasing = true;
-            fTrayItem.setImage(OwlUI.getImage(fResources, OwlUI.TRAY_OWL_TEASING));
+            /* Remember Added News (Windows Only and Only if restoring with Doubleclick) */
+            if (Application.IS_WINDOWS && fPreferences.getBoolean(DefaultPreferences.RESTORE_TRAY_DOUBLECLICK)) {
+              synchronized (fTeasingNewsCache) {
+                for (NewsEvent event : events) {
+                  if (event.getEntity().getState() == INews.State.NEW)
+                    fTeasingNewsCache.add(event.getEntity().getId());
+                }
+
+                if (!fTeasingNewsCache.isEmpty())
+                  fTrayItem.setToolTipText(NLS.bind(Messages.ApplicationWorkbenchWindowAdvisor_N_INCOMING_NEWS, fTeasingNewsCache.size()));
+              }
+            }
+
+            /* Show Teaser */
+            if (!fTrayTeasing) {
+              fTrayTeasing = true;
+              fTrayItem.setImage(OwlUI.getImage(fResources, OwlUI.TRAY_OWL_TEASING));
+            }
           }
         });
       }
@@ -561,11 +604,24 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     if (Application.IS_WINDOWS)
       fTrayItem.setVisible(false);
 
+    fMinimizedToTray = false;
+
+    clearTease();
+  }
+
+  private void clearTease() {
     if (fTrayTeasing)
       fTrayItem.setImage(OwlUI.getImage(fResources, OwlUI.TRAY_OWL));
 
     fTrayTeasing = false;
-    fMinimizedToTray = false;
+
+    if (Application.IS_WINDOWS) {
+      synchronized (fTeasingNewsCache) {
+        fTeasingNewsCache.clear();
+      }
+
+      fTrayItem.setToolTipText("RSSOwl"); //$NON-NLS-1$
+    }
   }
 
   /* Disable System-Tray Support */
@@ -655,5 +711,104 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
     fTrayMenu = trayMenuManager.createContextMenu(shell);
     fTrayMenu.setVisible(true);
+  }
+
+  private void onSingleClick(Shell shell) {
+    NotificationService service = Controller.getDefault().getNotificationService();
+    List<INews> newsToShow = new ArrayList<INews>();
+    Mode mode;
+
+    /* Return early if Notifier already showing */
+    if (service.isPopupVisible())
+      return;
+
+    /* Show News Downloaded while Minimized */
+    if (!fTeasingNewsCache.isEmpty()) {
+      synchronized (fTeasingNewsCache) {
+        int counter = 0;
+        for (int i = fTeasingNewsCache.size() - 1; i >= 0; i--) {
+          NewsReference reference = new NewsReference(fTeasingNewsCache.get(i));
+          INews newsitem = reference.resolve();
+          if (newsitem != null) {
+            newsToShow.add(newsitem);
+
+            if (++counter >= TEASE_LIMIT)
+              break;
+          }
+
+          /* Return early if Notifier already showing */
+          if (service.isPopupVisible())
+            return;
+        }
+      }
+      mode = Mode.INCOMING_MANUAL;
+    }
+
+    /* Show Recent News */
+    else {
+
+      /* Build the Search if not yet done */
+      if (fRecentNewsSearch == null) {
+        IModelFactory factory = Owl.getModelFactory();
+
+        String newsClassName = INews.class.getName();
+        ISearchField ageField = factory.createSearchField(INews.AGE_IN_DAYS, newsClassName);
+        ISearchCondition ageCondition = factory.createSearchCondition(ageField, SearchSpecifier.IS_LESS_THAN, 2);
+        ISearchField stateField = factory.createSearchField(INews.STATE, newsClassName);
+        ISearchCondition stateCondition = factory.createSearchCondition(stateField, SearchSpecifier.IS, EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED, INews.State.READ));
+
+        fRecentNewsSearch = factory.createSearch(null);
+        fRecentNewsSearch.setMatchAllConditions(true);
+        fRecentNewsSearch.addSearchCondition(ageCondition);
+        fRecentNewsSearch.addSearchCondition(stateCondition);
+      }
+
+      /* Sort by Id (simulate sorting by date) */
+      List<SearchHit<NewsReference>> result = Owl.getPersistenceService().getModelSearch().searchNews(fRecentNewsSearch);
+      Set<NewsReference> recentNews = new TreeSet<NewsReference>(new Comparator<NewsReference>() {
+        public int compare(NewsReference ref1, NewsReference ref2) {
+          if (ref1.equals(ref2))
+            return 0;
+
+          return ref1.getId() > ref2.getId() ? -1 : 1;
+        }
+      });
+
+      for (SearchHit<NewsReference> hit : result) {
+        recentNews.add(hit.getResult());
+      }
+
+      /* Resolve and Add News from Result */
+      int counter = 0;
+      for (NewsReference reference : recentNews) {
+        INews newsitem = reference.resolve();
+        if (newsitem != null) {
+          newsToShow.add(newsitem);
+
+          if (++counter >= TEASE_LIMIT)
+            break;
+        }
+
+        /* Return early if Notifier already showing */
+        if (service.isPopupVisible())
+          return;
+      }
+
+      mode = Mode.RECENT;
+    }
+
+    /* Return early if Notifier already showing */
+    if (service.isPopupVisible())
+      return;
+
+    /* Tease with News */
+    if (!newsToShow.isEmpty()) {
+      service.show(newsToShow, null, mode);
+      clearTease();
+    }
+
+    /* Otherwise show Context Menu */
+    else
+      showTrayMenu(shell);
   }
 }

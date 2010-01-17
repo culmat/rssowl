@@ -76,13 +76,26 @@ public class NotificationService {
   /* Singleton instance */
   private static NotificationPopup fgNotificationPopup;
 
+  /** Supported Modes of the Notifier */
+  public enum Mode {
+
+    /** Automatic Notification of Incoming News (default) */
+    INCOMING_AUTOMATIC,
+
+    /** Manual Notification of Incoming News */
+    INCOMING_MANUAL,
+
+    /** Notification of Recent News */
+    RECENT
+  }
+
   /** Creates a new Notification Service */
   public NotificationService() {
 
     /* Process Events batched */
     BatchedBuffer.Receiver<NotificationItem> receiver = new BatchedBuffer.Receiver<NotificationItem>() {
       public void receive(Collection<NotificationItem> items) {
-        showItems(items);
+        showItems(items, Mode.INCOMING_AUTOMATIC);
       }
     };
 
@@ -101,22 +114,29 @@ public class NotificationService {
   /**
    * @param news the list of {@link INews} to show in the notifier.
    * @param color the color to use for the news or <code>null</code> if none.
+   * @param mode the {@link Mode} of the notification
    */
-  public void show(List<INews> news, RGB color) {
+  public void show(List<INews> news, RGB color, Mode mode) {
+
+    /* Create Notification Items */
     Set<NotificationItem> items = new TreeSet<NotificationItem>();
     for (INews newsitem : news)
       items.add(new NewsNotificationItem(newsitem, color));
 
-    /* Add into Buffer */
-    if (!isPopupVisible())
+    /* Add into Buffer for automatic */
+    if (!isPopupVisible() && mode == Mode.INCOMING_AUTOMATIC)
       fBatchedBuffer.addAll(items);
 
-    /* Show Directly */
+    /* Show Directly otherwise */
     else
-      showItems(items);
+      showItems(items, mode);
   }
 
-  private boolean isPopupVisible() {
+  /**
+   * @return <code>true</code> if the popup notification is currently visible
+   * and <code>false</code> otherwise.
+   */
+  public boolean isPopupVisible() {
     return fgNotificationPopup != null;
   }
 
@@ -201,7 +221,7 @@ public class NotificationService {
 
     /* Show Directly */
     else
-      showItems(items);
+      showItems(items, Mode.INCOMING_AUTOMATIC);
   }
 
   private void onNewsAdded(Set<NewsEvent> events) {
@@ -247,7 +267,7 @@ public class NotificationService {
 
     /* Show Directly */
     else
-      showItems(items);
+      showItems(items, Mode.INCOMING_AUTOMATIC);
   }
 
   private Set<NewsEvent> filterEvents(Set<NewsEvent> events, List<FeedLinkReference> enabledFeeds) {
@@ -262,7 +282,7 @@ public class NotificationService {
   }
 
   /* Show Notification in UI Thread */
-  private void showItems(final Collection<NotificationItem> items) {
+  private void showItems(final Collection<NotificationItem> items, final Mode mode) {
 
     /* Ignore empty lists */
     if (items.isEmpty())
@@ -285,7 +305,7 @@ public class NotificationService {
         /* Show News in Popup */
         synchronized (this) {
           if (fgNotificationPopup == null) {
-            fgNotificationPopup = new NotificationPopup(items.size()) {
+            fgNotificationPopup = new NotificationPopup(items.size(), mode) {
               @Override
               public boolean doClose() {
                 fgNotificationPopup = null;
@@ -295,8 +315,8 @@ public class NotificationService {
             fgNotificationPopup.open(items);
           }
 
-          /* Notifier already opened - Show Items */
-          else
+          /* Notifier already opened - Show Items (only for automatic) */
+          else if (mode == Mode.INCOMING_AUTOMATIC)
             fgNotificationPopup.makeVisible(items);
         }
       }
