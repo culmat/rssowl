@@ -25,6 +25,7 @@
 package org.rssowl.ui.internal.notifier;
 
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.widgets.Shell;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
@@ -55,6 +56,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * The <code>NotificationService</code> listens on News being downloaded and
@@ -242,6 +244,35 @@ public class NotificationService {
     /* Return if events are not containing any NEW News */
     if (!CoreUtils.containsState(events, INews.State.NEW))
       return;
+
+    /*
+     * Optimization and Workaround for a Bug: It is quite useless to send notification items
+     * to the buffer for showing in the notifier if the user has configured RSSOwl to only show
+     * a notification when the application window is minimized and the window is currently not
+     * minimized. This also fixes a timing issue where quickly minimizing the window after
+     * receving news items would show them in the notifier (although they might have been read
+     * before already). The fix is to check in the UI thread whether the application window
+     * is minimized or not.
+     */
+    if (fGlobalPreferences.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP_ONLY_WHEN_MINIMIZED)) {
+      final AtomicBoolean sendNewsToBuffer = new AtomicBoolean(true);
+      Shell primaryShell = OwlUI.getPrimaryShell();
+      if (primaryShell != null) {
+        JobRunner.runSyncedInUIThread(primaryShell, new Runnable() {
+          public void run() {
+            if (Controller.getDefault().isShuttingDown())
+              return;
+
+            ApplicationWorkbenchWindowAdvisor advisor = ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor;
+            if (advisor != null && !advisor.isMinimizedToTray() && !advisor.isMinimized())
+              sendNewsToBuffer.set(false);
+          }
+        });
+      }
+
+      if (!sendNewsToBuffer.get())
+        return;
+    }
 
     /* Filter Events if user decided to show Notifier only for selected Elements */
     if (fGlobalPreferences.getBoolean(DefaultPreferences.LIMIT_NOTIFIER_TO_SELECTION)) {
