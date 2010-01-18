@@ -616,10 +616,10 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
     fMinimizedToTray = false;
 
-    clearTease();
+    clearTease(false);
   }
 
-  private void clearTease() {
+  private void clearTease(boolean clearTray) {
     if (fTrayTeasing)
       fTrayItem.setImage(OwlUI.getImage(fResources, OwlUI.TRAY_OWL));
 
@@ -630,7 +630,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         fTeasingNewsCache.clear();
       }
 
-      fTrayItem.setToolTipText("RSSOwl"); //$NON-NLS-1$
+      fTrayItem.setToolTipText(clearTray ? "" : "RSSOwl"); //$NON-NLS-1$ //$NON-NLS-2$
     }
   }
 
@@ -814,7 +814,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     /* Tease with News */
     if (!newsToShow.isEmpty()) {
       service.show(newsToShow, null, mode);
-      clearTease();
+      clearTease(true);
     }
 
     /* Otherwise show Context Menu */
