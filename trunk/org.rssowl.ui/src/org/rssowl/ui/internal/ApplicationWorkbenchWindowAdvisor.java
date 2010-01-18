@@ -116,7 +116,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
   private boolean fMinimizeFromClose;
   private Menu fTrayMenu;
   private List<Long> fTeasingNewsCache;
-  private ISearch fRecentNewsSearch;
+  private ISearch fTodaysNewsSearch;
 
   /* Listeners */
   private NewsAdapter fNewsListener;
@@ -491,18 +491,28 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
         /* Invoke Single Click Action if this is not a double click and we are on Windows */
         if (!isDoubleClick && restoreOnDoubleclick && Application.IS_WINDOWS) {
-          JobRunner.runInBackgroundThread(doubleClickTime, new Runnable() {
-            public void run() {
-              if (lastDoubleClickTime < System.currentTimeMillis() - doubleClickTime) {
-                JobRunner.runInUIThread(tray, new Runnable() {
-                  public void run() {
-                    if (!shell.isDisposed())
-                      onSingleClick(shell);
-                  }
-                });
+          NotificationService service = Controller.getDefault().getNotificationService();
+
+          /* Notifier showing - close it instantly */
+          if (service.isPopupVisible()) {
+            service.closePopup();
+          }
+
+          /* Notifier not showing - invoke single click action */
+          else {
+            JobRunner.runInBackgroundThread(doubleClickTime, new Runnable() {
+              public void run() {
+                if (lastDoubleClickTime < System.currentTimeMillis() - doubleClickTime) {
+                  JobRunner.runInUIThread(tray, new Runnable() {
+                    public void run() {
+                      if (!shell.isDisposed())
+                        onSingleClick(shell);
+                    }
+                  });
+                }
               }
-            }
-          });
+            });
+          }
         }
 
         /* Do not restore if settings are different */
@@ -748,23 +758,23 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     else {
 
       /* Build the Search if not yet done */
-      if (fRecentNewsSearch == null) {
+      if (fTodaysNewsSearch == null) {
         IModelFactory factory = Owl.getModelFactory();
 
         String newsClassName = INews.class.getName();
         ISearchField ageField = factory.createSearchField(INews.AGE_IN_DAYS, newsClassName);
-        ISearchCondition ageCondition = factory.createSearchCondition(ageField, SearchSpecifier.IS_LESS_THAN, 2);
+        ISearchCondition ageCondition = factory.createSearchCondition(ageField, SearchSpecifier.IS_LESS_THAN, 1);
         ISearchField stateField = factory.createSearchField(INews.STATE, newsClassName);
         ISearchCondition stateCondition = factory.createSearchCondition(stateField, SearchSpecifier.IS, EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED, INews.State.READ));
 
-        fRecentNewsSearch = factory.createSearch(null);
-        fRecentNewsSearch.setMatchAllConditions(true);
-        fRecentNewsSearch.addSearchCondition(ageCondition);
-        fRecentNewsSearch.addSearchCondition(stateCondition);
+        fTodaysNewsSearch = factory.createSearch(null);
+        fTodaysNewsSearch.setMatchAllConditions(true);
+        fTodaysNewsSearch.addSearchCondition(ageCondition);
+        fTodaysNewsSearch.addSearchCondition(stateCondition);
       }
 
       /* Sort by Id (simulate sorting by date) */
-      List<SearchHit<NewsReference>> result = Owl.getPersistenceService().getModelSearch().searchNews(fRecentNewsSearch);
+      List<SearchHit<NewsReference>> result = Owl.getPersistenceService().getModelSearch().searchNews(fTodaysNewsSearch);
       Set<NewsReference> recentNews = new TreeSet<NewsReference>(new Comparator<NewsReference>() {
         public int compare(NewsReference ref1, NewsReference ref2) {
           if (ref1.equals(ref2))
