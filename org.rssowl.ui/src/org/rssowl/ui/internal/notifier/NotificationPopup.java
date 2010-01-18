@@ -114,6 +114,7 @@ public class NotificationPopup extends PopupDialog {
   private final List<NotificationItem> fDisplayedItems = new ArrayList<NotificationItem>();
   private final ResourceManager fResources;
   private Image fCloseImageNormal;
+  private Image fCloseImageHot;
   private Image fCloseImagePressed;
   private CLabel fTitleCircleLabel;
   private CLabel fFooterCircleLabel;
@@ -598,6 +599,7 @@ public class NotificationPopup extends PopupDialog {
 
     /* Icons */
     fCloseImageNormal = OwlUI.getImage(fResources, "icons/etool16/close_normal.png"); //$NON-NLS-1$
+    fCloseImageHot = OwlUI.getImage(fResources, "icons/etool16/close_hot.png"); //$NON-NLS-1$
     fCloseImagePressed = OwlUI.getImage(fResources, "icons/etool16/close_pressed.png"); //$NON-NLS-1$
     fMarkReadIcon = OwlUI.getImage(fResources, "icons/elcl16/mark_read.gif"); //$NON-NLS-1$
     fMarkReadDisabledIcon = OwlUI.getImage(fResources, "icons/dlcl16/mark_read.gif"); //$NON-NLS-1$
@@ -719,6 +721,18 @@ public class NotificationPopup extends PopupDialog {
       @Override
       public void mouseDown(MouseEvent e) {
         closeButton.setImage(fCloseImagePressed);
+      }
+    });
+
+    closeButton.addMouseTrackListener(new MouseTrackAdapter() {
+      @Override
+      public void mouseEnter(MouseEvent e) {
+        closeButton.setImage(fCloseImageHot);
+      }
+
+      @Override
+      public void mouseExit(MouseEvent e) {
+        closeButton.setImage(fCloseImageNormal);
       }
     });
 
