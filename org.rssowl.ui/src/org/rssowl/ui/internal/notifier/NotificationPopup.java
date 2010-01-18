@@ -37,14 +37,15 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.MouseTrackListener;
+import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
-import org.eclipse.swt.events.TraverseEvent;
-import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
@@ -191,7 +192,7 @@ public class NotificationPopup extends PopupDialog {
   };
 
   NotificationPopup(int visibleItemCount, Mode mode) {
-    super(new Shell(PlatformUI.getWorkbench().getDisplay()), SWT.NO_TRIM | SWT.ON_TOP, false, false, false, false, false, null, null);
+    super(new Shell(PlatformUI.getWorkbench().getDisplay()), SWT.NO_TRIM | SWT.ON_TOP, mode != Mode.INCOMING_AUTOMATIC, false, false, false, false, null, null);
     fMode = mode;
     fResources = new LocalResourceManager(JFaceResources.getResources());
     fBoldTextFont = OwlUI.getThemeFont(OwlUI.NOTIFICATION_POPUP_FONT_ID, SWT.BOLD);
@@ -306,7 +307,7 @@ public class NotificationPopup extends PopupDialog {
     fAutoCloser = new UIJob(PlatformUI.getWorkbench().getDisplay(), "") { //$NON-NLS-1$
       @Override
       public IStatus runInUIThread(IProgressMonitor monitor) {
-        if (!fMouseOverNotifier && getShell() != null && !getShell().isDisposed())
+        if (!fMouseOverNotifier && getShell() != null && !getShell().isDisposed() && !monitor.isCanceled())
           doClose();
 
         return Status.OK_STATUS;
@@ -816,12 +817,13 @@ public class NotificationPopup extends PopupDialog {
 
       @Override
       public void mouseDown(MouseEvent e) {
-        fPrevButton.setImage(fPrevImagePressed);
+        if (canNavPrevious())
+          fPrevButton.setImage(fPrevImagePressed);
       }
     });
 
     /* Nav to next News */
-    fNextButton = new CLabel(footerCircle, SWT.NO_FOCUS);
+    fNextButton = new CLabel(footerCircle, fMode == Mode.INCOMING_AUTOMATIC ? SWT.NO_FOCUS : SWT.NONE);
     fNextButton.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, true));
     fNextButton.addMouseTrackListener(fMouseTrackListner);
     fNextButton.setCursor(fShell.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
@@ -834,20 +836,47 @@ public class NotificationPopup extends PopupDialog {
 
       @Override
       public void mouseDown(MouseEvent e) {
-        fNextButton.setImage(fNextImagePressed);
+        if (canNavNext())
+          fNextButton.setImage(fNextImagePressed);
       }
     });
 
     /* Simple Keybinding Support */
-    fShell.addTraverseListener(new TraverseListener() {
-      public void keyTraversed(TraverseEvent e) {
-        if (e.detail == SWT.TRAVERSE_ESCAPE)
-          doClose();
-        else if (e.detail == SWT.TRAVERSE_RETURN)
-          doRestore();
-        else if (e.detail == SWT.TRAVERSE_ARROW_NEXT || e.detail == SWT.TRAVERSE_PAGE_NEXT)
+    KeyAdapter keyListener = new KeyAdapter() {
+      @Override
+      public void keyReleased(KeyEvent e) {
+        handleUserAction();
+
+        if (e.keyCode == SWT.ARROW_LEFT || e.keyCode == SWT.ARROW_UP || e.keyCode == SWT.PAGE_UP)
+          onNavPrevious();
+        else if (e.keyCode == SWT.ARROW_RIGHT || e.keyCode == SWT.ARROW_DOWN || e.keyCode == SWT.PAGE_DOWN)
           onNavNext();
-        else if (e.detail == SWT.TRAVERSE_ARROW_PREVIOUS || e.detail == SWT.TRAVERSE_PAGE_PREVIOUS)
+        else if (e.keyCode == SWT.HOME)
+          onNavFirstPage();
+        else if (e.keyCode == SWT.END)
+          onNavLastPage();
+        else if (e.keyCode == ' ')
+          onNavNextAndMarkRead();
+        else if (e.keyCode == SWT.CR)
+          doRestore();
+        else if (e.keyCode == SWT.ESC)
+          doClose();
+      }
+    };
+
+    if (fMode == Mode.INCOMING_AUTOMATIC)
+      fShell.addKeyListener(keyListener);
+    else
+      fNextButton.addKeyListener(keyListener);
+
+    /* Allow to navigate with Mouse Wheel Too */
+    fShell.addMouseWheelListener(new MouseWheelListener() {
+      public void mouseScrolled(MouseEvent e) {
+        handleUserAction();
+
+        if (e.count < 0)
+          onNavNext();
+        else if (e.count > 0)
           onNavPrevious();
       }
     });
@@ -855,8 +884,36 @@ public class NotificationPopup extends PopupDialog {
     return outerCircle;
   }
 
-  private void onNavPrevious() {
-    int newOffset = fDisplayOffset - fItemLimit;
+  private void handleUserAction() {
+    if (fMouseOverNotifier || fGlobalScope.getBoolean(DefaultPreferences.STICKY_NOTIFICATION_POPUP))
+      return;
+
+    fAutoCloser.cancel();
+    fAutoCloser.schedule(fGlobalScope.getInteger(DefaultPreferences.AUTOCLOSE_NOTIFICATION_VALUE) * 1000);
+  }
+
+  /*
+   * @see org.eclipse.jface.dialogs.PopupDialog#getFocusControl()
+   */
+  @Override
+  protected Control getFocusControl() {
+    return fNextButton;
+  }
+
+  private void onNavFirstPage() {
+    int newOffset = 0;
+    fDisplayOffset = newOffset;
+    updateTitleLabel();
+    updateContents(newOffset);
+  }
+
+  private void onNavLastPage() {
+    int newOffset;
+    if (fDisplayedItems.size() % fItemLimit == 0)
+      newOffset = fDisplayedItems.size() - fItemLimit;
+    else
+      newOffset = fDisplayedItems.size() - (fDisplayedItems.size() % fItemLimit);
+
     if (newOffset >= 0) {
       fDisplayOffset = newOffset;
       updateTitleLabel();
@@ -864,24 +921,57 @@ public class NotificationPopup extends PopupDialog {
     }
   }
 
-  private void onNavNext() {
+  private boolean onNavPrevious() {
+    int newOffset = fDisplayOffset - fItemLimit;
+    if (newOffset >= 0) {
+      fDisplayOffset = newOffset;
+      updateTitleLabel();
+      updateContents(newOffset);
+
+      return true;
+    }
+
+    return false;
+  }
+
+  private boolean onNavNext() {
     int newOffset = fDisplayOffset + fItemLimit;
     if (newOffset < fDisplayedItems.size()) {
       fDisplayOffset = newOffset;
       updateTitleLabel();
       updateContents(newOffset);
+
+      return true;
     }
+
+    return false;
+  }
+
+  private void onNavNextAndMarkRead() {
+    for (int i = fDisplayOffset; i < fDisplayOffset + fItemLimit && i < fDisplayedItems.size(); i++) {
+      NotificationItem item = fDisplayedItems.get(i);
+      item.setRead(true);
+    }
+
+    boolean navigated = onNavNext();
+    if (!navigated)
+      doClose();
   }
 
   private void updateNavButtons() {
-    boolean isPrevEnabled = fDisplayOffset - fItemLimit >= 0;
-    boolean isNextEnabled = fDisplayOffset + fItemLimit < fDisplayedItems.size();
+    boolean isPrevEnabled = canNavPrevious();
+    boolean isNextEnabled = canNavNext();
 
-    fPrevButton.setEnabled(isPrevEnabled);
     fPrevButton.setImage(isPrevEnabled ? fPrevImageNormal : fPrevImageDisabled);
-
-    fNextButton.setEnabled(isNextEnabled);
     fNextButton.setImage(isNextEnabled ? fNextImageNormal : fNextImageDisabled);
+  }
+
+  private boolean canNavNext() {
+    return fDisplayOffset + fItemLimit < fDisplayedItems.size();
+  }
+
+  private boolean canNavPrevious() {
+    return fDisplayOffset - fItemLimit >= 0;
   }
 
   /*

@@ -140,6 +140,15 @@ public class NotificationService {
     return fgNotificationPopup != null;
   }
 
+  /**
+   * Close the notification popup if it is currently showing.
+   */
+  public void closePopup() {
+    NotificationPopup popup = fgNotificationPopup;
+    if (popup != null)
+      popup.doClose();
+  }
+
   /* Listen on News Events */
   private NewsListener registerNewsListener() {
     NewsListener listener = new NewsAdapter() {
