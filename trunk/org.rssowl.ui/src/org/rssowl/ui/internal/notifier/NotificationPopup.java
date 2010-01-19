@@ -1062,7 +1062,7 @@ public class NotificationPopup extends PopupDialog {
       fInitialItems.clear();
 
     /* Little Hack: Clear Teasing Status from Tray if user interacted with Notifier */
-    if (fUserInteracted && Application.IS_WINDOWS) {
+    if (fUserInteracted && Application.IS_WINDOWS && fMode == Mode.INCOMING_AUTOMATIC) {
       ApplicationWorkbenchWindowAdvisor advisor = ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor;
       if (advisor != null)
         advisor.clearTeaseIfShowing();
