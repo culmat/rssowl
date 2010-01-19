@@ -2041,7 +2041,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
       Point bestSize = getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT);
       getShell().setSize(minWidth, bestSize.y);
-      LayoutUtils.positionShell(getShell(), false);
+      LayoutUtils.positionShell(getShell());
     }
 
     /* Move a bit to bottom right if multiple dialogs are open at the same time */

@@ -157,7 +157,7 @@ public class NewNewsBinAction implements IWorkbenchWindowActionDelegate, IObject
       super.initializeBounds();
       Point bestSize = getShell().computeSize(convertHorizontalDLUsToPixels(IDialogConstants.MINIMUM_MESSAGE_AREA_WIDTH), SWT.DEFAULT);
       getShell().setSize(bestSize.x, bestSize.y);
-      LayoutUtils.positionShell(getShell(), false);
+      LayoutUtils.positionShell(getShell());
     }
 
     private void validateInput() {

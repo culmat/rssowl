@@ -295,7 +295,7 @@ public class ActivityDialog extends TitleAreaDialog {
       Point requiredSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 
       shell.setSize(Math.max(minWidth, requiredSize.x), Math.max(minHeight, requiredSize.y));
-      LayoutUtils.positionShell(shell, false);
+      LayoutUtils.positionShell(shell);
     }
   }
 }

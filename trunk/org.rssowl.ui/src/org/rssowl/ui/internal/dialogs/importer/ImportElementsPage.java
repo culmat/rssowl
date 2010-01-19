@@ -540,7 +540,7 @@ public class ImportElementsPage extends WizardPage {
     /* Ask for Username and Password if importing from Google */
     if (source == Source.GOOGLE) {
       URI googleLoginUri = URI.create(SyncUtils.GOOGLE_LOGIN);
-      LoginDialog dialog = new LoginDialog(OwlUI.getActiveShell(), googleLoginUri, null);
+      LoginDialog dialog = new LoginDialog(getShell(), googleLoginUri, null);
       dialog.setHeader(Messages.ImportElementsPage_LOGIN_GOOGLE_READER);
       dialog.setSubline(Messages.ImportElementsPage_ENTER_GOOGLE_ACCOUNT);
       dialog.setTitleImageDescriptor(OwlUI.getImageDescriptor("icons/wizban/reader_wiz.png")); //$NON-NLS-1$
@@ -743,7 +743,7 @@ public class ImportElementsPage extends WizardPage {
 
           /* Give user a chance to log in */
           if (e instanceof AuthenticationRequiredException && !monitor.isCanceled() && !Controller.getDefault().isShuttingDown()) {
-            final Shell shell = OwlUI.getActiveShell();
+            final Shell shell = getShell();
             if (shell != null && !shell.isDisposed()) {
               boolean locked = Controller.getDefault().getLoginDialogLock().tryLock();
               if (locked) {

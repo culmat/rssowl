@@ -460,7 +460,7 @@ public class SearchMarkDialog extends TitleAreaDialog {
         requiredSize.x = requiredSize.x + 50;
 
       getShell().setSize(requiredSize);
-      LayoutUtils.positionShell(getShell(), false);
+      LayoutUtils.positionShell(getShell());
     }
   }
 }

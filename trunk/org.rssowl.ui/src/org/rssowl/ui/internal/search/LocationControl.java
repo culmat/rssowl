@@ -583,7 +583,7 @@ public class LocationControl extends Composite {
       super.initializeBounds();
       Point bestSize = getShell().computeSize(convertHorizontalDLUsToPixels(IDialogConstants.MINIMUM_MESSAGE_AREA_WIDTH), SWT.DEFAULT);
       getShell().setSize(bestSize);
-      LayoutUtils.positionShell(getShell(), false);
+      LayoutUtils.positionShell(getShell());
     }
   }
 
