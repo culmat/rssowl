@@ -174,9 +174,9 @@ public class ImportWizard extends Wizard implements IImportWizard {
   @Override
   public boolean canFinish() {
 
-    /* Prohibit direct Finish from Sources that require a remote connection or include recommended feeds */
+    /* Prohibit direct Finish from Sources that require a potential remote connection or include recommended feeds */
     if (getContainer().getCurrentPage() == fImportSourcePage) {
-      if (fImportSourcePage.isRemoteSource() || (fImportSourcePage.getSource() == Source.RECOMMENDED))
+      if ((fImportSourcePage.getSource() == Source.RESOURCE) || fImportSourcePage.isRemoteSource() || (fImportSourcePage.getSource() == Source.RECOMMENDED))
         return false;
     }
 

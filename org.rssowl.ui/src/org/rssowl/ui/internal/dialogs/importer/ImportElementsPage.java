@@ -98,9 +98,12 @@ import org.rssowl.ui.internal.util.LayoutUtils;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
@@ -530,8 +533,8 @@ public class ImportElementsPage extends WizardPage {
     setErrorMessage(null);
     setMessage(Messages.ImportElementsPage_CHOOSE_ELEMENTS_MESSAGE);
 
-    /* Clear Viewer if remotely loading */
-    if (importSourcePage.isRemoteSource())
+    /* Clear Viewer before loading */
+    if (source == Source.RESOURCE || importSourcePage.isRemoteSource())
       setImportedElements(Collections.EMPTY_LIST);
 
     /* Ask for Username and Password if importing from Google */
@@ -556,7 +559,7 @@ public class ImportElementsPage extends WizardPage {
 
           /* Import from Supplied File */
           if (source == Source.RESOURCE && sourceFile != null && sourceFile.exists())
-            importFromLocalResource(new FileInputStream(sourceFile));
+            importFromLocalResource(sourceFile);
 
           /* Import from Supplied Online Resource */
           else if (source == Source.RESOURCE && URIUtils.looksLikeLink(fCurrentSourceResource))
@@ -605,8 +608,8 @@ public class ImportElementsPage extends WizardPage {
       }
     };
 
-    /* Perform delayed if remote import to give Viewer a chance to show */
-    if (importSourcePage.isRemoteSource())
+    /* Perform delayed if potential remote import to give Viewer a chance to show */
+    if (source == Source.RESOURCE || importSourcePage.isRemoteSource())
       JobRunner.runInUIThread(50, getShell(), runnable);
     else
       runnable.run();
@@ -619,6 +622,66 @@ public class ImportElementsPage extends WizardPage {
     List<? extends IEntity> types = Owl.getInterpreter().importFrom(in);
     setImportedElements(types);
     updateMessage(true);
+  }
+
+  /* Import from a Local File */
+  private void importFromLocalResource(final File file) throws FileNotFoundException, InvocationTargetException, InterruptedException {
+    boolean bruteForce = false;
+
+    /* First Try to Import as OPML */
+    try {
+      importFromLocalResource(new FileInputStream(file));
+    } catch (ParserException e) {
+      bruteForce = true;
+    } catch (InterpreterException e) {
+      bruteForce = true;
+    }
+
+    /* Then try to parse links found in the file as Feeds */
+    if (bruteForce) {
+      IRunnableWithProgress runnable = new IRunnableWithProgress() {
+        public void run(final IProgressMonitor monitor) throws InvocationTargetException {
+          monitor.beginTask(Messages.ImportElementsPage_SEARCHING_FOR_FEEDS, IProgressMonitor.UNKNOWN);
+          fCurrentProgressMonitor = monitor;
+
+          /* Return on Cancellation */
+          if (monitor.isCanceled() || Controller.getDefault().isShuttingDown())
+            return;
+
+          /* Read Content */
+          Reader reader = null;
+          try {
+            reader = new FileReader(file);
+            String content = StringUtils.readString(reader);
+
+            /* Extract Links from Content */
+            List<String> links = new ArrayList<String>();
+            if (StringUtils.isSet(content))
+              links.addAll(RegExUtils.extractLinksFromText(content, false));
+
+            /* Check Links for valid Feeds */
+            importFromLinksBruteforce(links, monitor);
+          } catch (Exception e) {
+            throw new InvocationTargetException(e);
+          } finally {
+            fCurrentProgressMonitor = null;
+            monitor.done();
+
+            /* Close Reader */
+            if (reader != null) {
+              try {
+                reader.close();
+              } catch (IOException e) {
+                throw new InvocationTargetException(e);
+              }
+            }
+          }
+        }
+      };
+
+      /* Run Operation in Background and allow for Cancellation */
+      getContainer().run(true, true, runnable);
+    }
   }
 
   private void importFromOnlineResource(final URI link) throws InvocationTargetException, InterruptedException {
@@ -892,7 +955,6 @@ public class ImportElementsPage extends WizardPage {
     getContainer().run(true, true, runnable);
   }
 
-  @SuppressWarnings("null")
   private void importFromOnlineResourceBruteforce(URI resourceLink, IProgressMonitor monitor, final boolean isKeywordSearch, boolean isLocalizedSearch) throws ConnectionException, IOException {
 
     /* Read Content */
@@ -945,6 +1007,13 @@ public class ImportElementsPage extends WizardPage {
         links.add(0, feedStr);
       }
     }
+
+    /* Look for Links */
+    importFromLinksBruteforce(links, monitor);
+  }
+
+  @SuppressWarnings("null")
+  private void importFromLinksBruteforce(List<String> links, IProgressMonitor monitor) {
 
     /* Return on Cancellation */
     if (monitor.isCanceled() || Controller.getDefault().isShuttingDown())
