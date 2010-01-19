@@ -328,6 +328,7 @@
       <outline text="digg - tech news" xmlUrl="http://digg.com/rss/index.xml" htmlUrl="http://digg.com/" description="digg.com: Stories / Popular" />
       <outline text="Digital Photography Review" xmlUrl="http://www.dpreview.com/news/dpr.rdf" htmlUrl="http://www.dpreview.com/" description="Digital Photography Review, Latest digital camera news, camera reviews, galleries, technology and comparisons." />
       <outline text="eWEEK Technology News" xmlUrl="http://rssnewsapps.ziffdavis.com/tech.xml" htmlUrl="http://www.eweek.com" description="eWeek - RSS Feeds" />
+      <outline text="IRC-Junkie.org - IRC News" xmlUrl="http://www.irc-junkie.org/feed/" htmlUrl="http://www.irc-junkie.org" />
       <outline text="Joel on Software" xmlUrl="http://www.joelonsoftware.com/rss.xml" htmlUrl="http://www.joelonsoftware.com" description="Painless Software Management" />
       <outline text="MAKE: Blog" xmlUrl="http://www.makezine.com/blog/index.rdf" htmlUrl="http://blog.makezine.com/" description="MAKE is a quarterly publication from O'Reilly for those who just can't stop tinkering, disassembling, re-creating, and inventing cool new uses for the technology in our lives.  It's the first do-it-yourself magazine dedicated to the incorrigible and chronically incurable technology enthusiast in all of us.  MAKE celebrates your right to tweak, hack, and bend technology any way you want." />
       <outline text="Planet Eclipse" xmlUrl="http://www.planeteclipse.org/planet/atom.xml" htmlUrl="http://planeteclipse.org/planet/" />
