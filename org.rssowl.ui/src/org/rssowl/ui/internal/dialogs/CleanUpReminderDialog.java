@@ -211,6 +211,6 @@ public class CleanUpReminderDialog extends TitleAreaDialog {
     Point requiredSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 
     shell.setSize(Math.min(maxWidth, requiredSize.x), Math.min(maxHeight, requiredSize.y));
-    LayoutUtils.positionShell(shell, false);
+    LayoutUtils.positionShell(shell);
   }
 }

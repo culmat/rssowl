@@ -33,14 +33,14 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * Factory class for some LayoutData concerns in RSSOwl.
- * 
+ *
  * @author bpasero
  */
 public class LayoutUtils {
 
   /**
    * Create a new FillLayout with the given parameters
-   * 
+   *
    * @param horizontal If TRUE, align Layout horizontally
    * @param marginWidth Margin width in pixel
    * @param marginHeight Margin height in pixel
@@ -55,7 +55,7 @@ public class LayoutUtils {
 
   /**
    * Create a new GridLayout with the given parameters
-   * 
+   *
    * @param cols The number of columns
    * @return GridLayout New GridLayout with the given parameters
    */
@@ -65,7 +65,7 @@ public class LayoutUtils {
 
   /**
    * Create a new GridLayout with the given parameters
-   * 
+   *
    * @param cols The number of columns
    * @param marginWidth Margin width in pixel
    * @return GridLayout New GridLayout with the given parameters
@@ -76,7 +76,7 @@ public class LayoutUtils {
 
   /**
    * Create a new GridLayout with the given parameters
-   * 
+   *
    * @param cols The number of columns
    * @param marginWidth Margin width in pixel
    * @param marginHeight Margin height in pixel
@@ -88,7 +88,7 @@ public class LayoutUtils {
 
   /**
    * Create a new GridLayout with the given parameters
-   * 
+   *
    * @param cols The number of columns
    * @param marginWidth Margin width in pixel
    * @param marginHeight Margin height in pixel
@@ -101,7 +101,7 @@ public class LayoutUtils {
 
   /**
    * Create a new GridLayout with the given parameters
-   * 
+   *
    * @param cols The number of columns
    * @param marginWidth Margin width in pixel
    * @param marginHeight Margin height in pixel
@@ -114,7 +114,7 @@ public class LayoutUtils {
 
   /**
    * Create a new GridLayout with the given parameters
-   * 
+   *
    * @param cols The number of columns
    * @param marginWidth Margin width in pixel
    * @param marginHeight Margin height in pixel
@@ -137,13 +137,12 @@ public class LayoutUtils {
    * centers the shell horizontally (1/2 of the difference to the left and 1/2
    * to the right) and vertically (1/3 above and 2/3 below) relative to the
    * parent shell
-   * 
+   *
    * @param shell The shell to set the location
-   * @param computeSize If TRUE, initialSize is computed from the Shell
    */
-  public static void positionShell(Shell shell, boolean computeSize) {
+  public static void positionShell(Shell shell) {
     Rectangle containerBounds = shell.getParent().getBounds();
-    Point initialSize = (computeSize == true) ? shell.computeSize(SWT.DEFAULT, SWT.DEFAULT, true) : shell.getSize();
+    Point initialSize = shell.getSize();
     int x = Math.max(0, containerBounds.x + (containerBounds.width - initialSize.x) / 2);
     int y = Math.max(0, containerBounds.y + (containerBounds.height - initialSize.y) / 3);
     shell.setLocation(x, y);

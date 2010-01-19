@@ -268,7 +268,7 @@ public class EntityPropertyDialog extends Dialog implements IPropertyDialogSite 
     }
 
     shell.setSize(Math.max(minWidth, requiredSize.x), Math.max(minHeight, requiredSize.y));
-    LayoutUtils.positionShell(shell, true);
+    LayoutUtils.positionShell(shell);
   }
 
   private boolean displaysSavedSearch() {

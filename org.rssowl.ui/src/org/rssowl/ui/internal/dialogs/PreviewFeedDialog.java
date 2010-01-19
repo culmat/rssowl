@@ -443,6 +443,6 @@ public class PreviewFeedDialog extends Dialog {
 
     /* Set Location */
     if (fFirstTimeOpen)
-      LayoutUtils.positionShell(shell, false);
+      LayoutUtils.positionShell(shell);
   }
 }
