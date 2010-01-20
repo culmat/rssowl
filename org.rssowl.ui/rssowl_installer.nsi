@@ -24,12 +24,12 @@
 
 /**
  * The NSIS-Script to create the RSSOwl installer.
- * 
+ *
  * @author bpasero
- * @version 2.0
+ * @version 2.1.0
  */
 
-;#####	 Variables	######
+;#####   Variables  ######
 !define VER_DISPLAY "2.1.0"
 
 ;#####   Include Modern UI   ######
@@ -37,7 +37,7 @@
 
 ;#####   Installer Configuration   ######
 Name "RSSOwl"
-OutFile "RSSOwl Setup 2.0.exe"
+OutFile "RSSOwl Setup 2.1.0.exe"
 InstallDir $PROGRAMFILES\RSSOwl
 InstallDirRegKey HKCU "Software\RSSOwl" ""
 AllowRootDirInstall true
@@ -54,7 +54,7 @@ Function "ExecRSSOwl"
   Exec "$INSTDIR\rssowl.exe"
 FunctionEnd
 
-;#####	Version Information	######
+;#####  Version Information ######
 VIProductVersion "${VER_DISPLAY}.0"
 VIAddVersionKey "ProductName" "RSSOwl"
 VIAddVersionKey "CompanyName" "RSSOwl Team"
@@ -152,136 +152,141 @@ FunctionEnd
 
 ;#####   Installer Section   ######
 Section ""
+  SetOutPath $INSTDIR
+
+  ;### Delete Files if existing ###
+  RMDir /r "$INSTDIR\configuration"
+  RMDir /r "$INSTDIR\features"
+  RMDir /r "$INSTDIR\plugins"
 
   ;### Copy / Create Files ###
-  SetOutPath $INSTDIR
   File /r bin\*.*
-  
+
   ;### Unpack200 ###
   DetailPrint "$(^Extract) com.ibm.icu.base_3.8.1.v20080530.jar"
   nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\com.ibm.icu.base_3.8.1.v20080530.jar.pack plugins\com.ibm.icu.base_3.8.1.v20080530.jar'
-  
+
   DetailPrint "$(^Extract) org.eclipse.core.commands_3.4.0.I20080509-2000.jar"
   nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.eclipse.core.commands_3.4.0.I20080509-2000.jar.pack plugins\org.eclipse.core.commands_3.4.0.I20080509-2000.jar'
-  
+
   DetailPrint "$(^Extract) org.eclipse.core.contenttype_3.3.0.v20080604-1400.jar"
   nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.eclipse.core.contenttype_3.3.0.v20080604-1400.jar.pack plugins\org.eclipse.core.contenttype_3.3.0.v20080604-1400.jar'
-  
+
   DetailPrint "$(^Extract) org.eclipse.core.databinding.beans_1.1.1.M20080827-0800a.jar"
   nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.eclipse.core.databinding.beans_1.1.1.M20080827-0800a.jar.pack plugins\org.eclipse.core.databinding.beans_1.1.1.M20080827-0800a.jar'
-  
+
   DetailPrint "$(^Extract) org.eclipse.core.databinding_1.1.1.M20080827-0800b.jar"
   nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.eclipse.core.databinding_1.1.1.M20080827-0800b.jar.pack plugins\org.eclipse.core.databinding_1.1.1.M20080827-0800b.jar'
-  
+
   DetailPrint "$(^Extract) org.eclipse.core.expressions_3.4.1.r342_v20081203-0800.jar"
   nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.eclipse.core.expressions_3.4.1.r342_v20081203-0800.jar.pack plugins\org.eclipse.core.expressions_3.4.1.r342_v20081203-0800.jar'
-  
+
   DetailPrint "$(^Extract) org.eclipse.core.jobs_3.4.1.R34x_v20081128.jar"
   nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.eclipse.core.jobs_3.4.1.R34x_v20081128.jar.pack plugins\org.eclipse.core.jobs_3.4.1.R34x_v20081128.jar'
-  
+
   DetailPrint "$(^Extract) org.eclipse.core.net.win32.x86_1.0.0.I20080521.jar"
   nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.eclipse.core.net.win32.x86_1.0.0.I20080521.jar.pack plugins\org.eclipse.core.net.win32.x86_1.0.0.I20080521.jar'
-  
+
   DetailPrint "$(^Extract) org.eclipse.core.net_1.1.0.I20080604.jar"
   nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.eclipse.core.net_1.1.0.I20080604.jar.pack plugins\org.eclipse.core.net_1.1.0.I20080604.jar'
-  
+
   DetailPrint "$(^Extract) org.eclipse.core.runtime.compatibility.auth_3.2.100.v20070502.jar"
   nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.eclipse.core.runtime.compatibility.auth_3.2.100.v20070502.jar.pack plugins\org.eclipse.core.runtime.compatibility.auth_3.2.100.v20070502.jar'
-  
+
   DetailPrint "$(^Extract) org.eclipse.core.runtime_3.4.0.v20080512.jar"
   nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.eclipse.core.runtime_3.4.0.v20080512.jar.pack plugins\org.eclipse.core.runtime_3.4.0.v20080512.jar'
-  
+
   DetailPrint "$(^Extract) org.eclipse.equinox.app_1.1.0.v20080421-2006.jar"
   nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.eclipse.equinox.app_1.1.0.v20080421-2006.jar.pack plugins\org.eclipse.equinox.app_1.1.0.v20080421-2006.jar'
-  
+
   DetailPrint "$(^Extract) org.eclipse.equinox.common_3.4.0.v20080421-2006.jar"
   nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.eclipse.equinox.common_3.4.0.v20080421-2006.jar.pack plugins\org.eclipse.equinox.common_3.4.0.v20080421-2006.jar'
-  
+
   DetailPrint "$(^Extract) org.eclipse.equinox.launcher_1.0.101.R34x_v20081125.jar"
   nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.eclipse.equinox.launcher_1.0.101.R34x_v20081125.jar.pack plugins\org.eclipse.equinox.launcher_1.0.101.R34x_v20081125.jar'
-  
+
   DetailPrint "$(^Extract) org.eclipse.equinox.preferences_3.2.201.R34x_v20080709.jar"
   nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.eclipse.equinox.preferences_3.2.201.R34x_v20080709.jar.pack plugins\org.eclipse.equinox.preferences_3.2.201.R34x_v20080709.jar'
-  
+
   DetailPrint "$(^Extract) org.eclipse.equinox.registry_3.4.0.v20080516-0950.jar"
   nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.eclipse.equinox.registry_3.4.0.v20080516-0950.jar.pack plugins\org.eclipse.equinox.registry_3.4.0.v20080516-0950.jar'
-  
+
   DetailPrint "$(^Extract) org.eclipse.equinox.security.win32.x86_1.0.0.v20080529-1600.jar"
   nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.eclipse.equinox.security.win32.x86_1.0.0.v20080529-1600.jar.pack plugins\org.eclipse.equinox.security.win32.x86_1.0.0.v20080529-1600.jar'
-  
+
   DetailPrint "$(^Extract) org.eclipse.equinox.security_1.0.1.R34x_v20080721.jar"
   nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.eclipse.equinox.security_1.0.1.R34x_v20080721.jar.pack plugins\org.eclipse.equinox.security_1.0.1.R34x_v20080721.jar'
-  
+
   DetailPrint "$(^Extract) org.eclipse.equinox.simpleconfigurator_1.0.0.v20080604.jar"
   nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.eclipse.equinox.simpleconfigurator_1.0.0.v20080604.jar.pack plugins\org.eclipse.equinox.simpleconfigurator_1.0.0.v20080604.jar'
-  
+
   DetailPrint "$(^Extract) org.eclipse.help_3.3.102.v20081014_34x.jar"
   nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.eclipse.help_3.3.102.v20081014_34x.jar.pack plugins\org.eclipse.help_3.3.102.v20081014_34x.jar'
-  
+
   DetailPrint "$(^Extract) org.eclipse.jface.databinding_1.2.1.M20080827-0800a.jar"
   nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.eclipse.jface.databinding_1.2.1.M20080827-0800a.jar.pack plugins\org.eclipse.jface.databinding_1.2.1.M20080827-0800a.jar'
-  
+
   DetailPrint "$(^Extract) org.eclipse.jface_3.4.2.M20090107-0800.jar"
   nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.eclipse.jface_3.4.2.M20090107-0800.jar.pack plugins\org.eclipse.jface_3.4.2.M20090107-0800.jar'
-  
+
   DetailPrint "$(^Extract) org.eclipse.osgi_3.4.3.R34x_v20081215-1030.jar"
   nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.eclipse.osgi_3.4.3.R34x_v20081215-1030.jar.pack plugins\org.eclipse.osgi_3.4.3.R34x_v20081215-1030.jar'
-  
+
   DetailPrint "$(^Extract) org.eclipse.rcp_3.4.1.R342_v20090205.jar"
   nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.eclipse.rcp_3.4.1.R342_v20090205.jar.pack plugins\org.eclipse.rcp_3.4.1.R342_v20090205.jar'
-  
+
   DetailPrint "$(^Extract) org.eclipse.swt.win32.win32.x86_3.4.1.v3452b.jar"
   nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.eclipse.swt.win32.win32.x86_3.4.1.v3452b.jar.pack plugins\org.eclipse.swt.win32.win32.x86_3.4.1.v3452b.jar'
-  
+
   DetailPrint "$(^Extract) org.eclipse.swt_3.4.2.v3452b.jar"
   nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.eclipse.swt_3.4.2.v3452b.jar.pack plugins\org.eclipse.swt_3.4.2.v3452b.jar'
-  
+
   DetailPrint "$(^Extract) org.eclipse.ui.forms_3.3.103.v20081027_34x.jar"
   nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.eclipse.ui.forms_3.3.103.v20081027_34x.jar.pack plugins\org.eclipse.ui.forms_3.3.103.v20081027_34x.jar'
-  
+
   DetailPrint "$(^Extract) org.eclipse.ui.net_1.0.0.I20080605.jar"
   nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.eclipse.ui.net_1.0.0.I20080605.jar.pack plugins\org.eclipse.ui.net_1.0.0.I20080605.jar'
-  
+
   DetailPrint "$(^Extract) org.eclipse.ui.workbench_3.4.2.M20090127-1700.jar"
   nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.eclipse.ui.workbench_3.4.2.M20090127-1700.jar.pack plugins\org.eclipse.ui.workbench_3.4.2.M20090127-1700.jar'
-  
+
   DetailPrint "$(^Extract) org.eclipse.ui_3.4.2.M20090204-0800.jar"
   nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.eclipse.ui_3.4.2.M20090204-0800.jar.pack plugins\org.eclipse.ui_3.4.2.M20090204-0800.jar'
 
   DetailPrint "$(^Extract) org.eclipse.update.configurator_3.2.201.R34x_v20080819.jar"
   nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.eclipse.update.configurator_3.2.201.R34x_v20080819.jar.pack plugins\org.eclipse.update.configurator_3.2.201.R34x_v20080819.jar'
-  
+
   DetailPrint "$(^Extract) org.eclipse.update.core.win32_3.2.100.v20080107.jar"
   nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.eclipse.update.core.win32_3.2.100.v20080107.jar.pack plugins\org.eclipse.update.core.win32_3.2.100.v20080107.jar'
-  
+
   DetailPrint "$(^Extract) org.eclipse.update.core_3.2.202.R34x_v20081128.jar"
   nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.eclipse.update.core_3.2.202.R34x_v20081128.jar.pack plugins\org.eclipse.update.core_3.2.202.R34x_v20081128.jar'
-  
+
   DetailPrint "$(^Extract) org.eclipse.update.ui_3.2.101.R34x_v20081128.jar"
   nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.eclipse.update.ui_3.2.101.R34x_v20081128.jar.pack plugins\org.eclipse.update.ui_3.2.101.R34x_v20081128.jar'
-  
-  DetailPrint "$(^Extract) org.rssowl.core_2.0.2.201001021502.jar"
-  nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.rssowl.core_2.0.2.201001021502.jar.pack plugins\org.rssowl.core_2.0.2.201001021502.jar'
-  
-  DetailPrint "$(^Extract) org.rssowl.lib.db4o_2.0.2.201001021502.jar"
-  nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.rssowl.lib.db4o_2.0.2.201001021502.jar.pack plugins\org.rssowl.lib.db4o_2.0.2.201001021502.jar'
-  
-  DetailPrint "$(^Extract) org.rssowl.lib.httpclient_2.0.2.201001021502.jar"
-  nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.rssowl.lib.httpclient_2.0.2.201001021502.jar.pack plugins\org.rssowl.lib.httpclient_2.0.2.201001021502.jar'
-  
-  DetailPrint "$(^Extract) org.rssowl.lib.jdom_2.0.2.201001021502.jar"
-  nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.rssowl.lib.jdom_2.0.2.201001021502.jar.pack plugins\org.rssowl.lib.jdom_2.0.2.201001021502.jar'
-  
-  DetailPrint "$(^Extract) org.rssowl.lib.lucene_2.0.2.201001021502.jar"
-  nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.rssowl.lib.lucene_2.0.2.201001021502.jar.pack plugins\org.rssowl.lib.lucene_2.0.2.201001021502.jar'
-  
-  DetailPrint "$(^Extract) org.rssowl.ui_2.0.2.201001021502.jar"
-  nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.rssowl.ui_2.0.2.201001021502.jar.pack plugins\org.rssowl.ui_2.0.2.201001021502.jar'
-  
+
+  DetailPrint "$(^Extract) org.rssowl.core_2.0.3.201001202213.jar"
+  nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.rssowl.core_2.0.3.201001202213.jar.pack plugins\org.rssowl.core_2.0.3.201001202213.jar'
+
+  DetailPrint "$(^Extract) org.rssowl.lib.db4o_2.0.3.201001202213.jar"
+  nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.rssowl.lib.db4o_2.0.3.201001202213.jar.pack plugins\org.rssowl.lib.db4o_2.0.3.201001202213.jar'
+
+  DetailPrint "$(^Extract) org.rssowl.lib.httpclient_2.0.3.201001202213.jar"
+  nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.rssowl.lib.httpclient_2.0.3.201001202213.jar.pack plugins\org.rssowl.lib.httpclient_2.0.3.201001202213.jar'
+
+  DetailPrint "$(^Extract) org.rssowl.lib.jdom_2.0.3.201001202213.jar"
+  nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.rssowl.lib.jdom_2.0.3.201001202213.jar.pack plugins\org.rssowl.lib.jdom_2.0.3.201001202213.jar'
+
+  DetailPrint "$(^Extract) org.rssowl.lib.lucene_2.0.3.201001202213.jar"
+  nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.rssowl.lib.lucene_2.0.3.201001202213.jar.pack plugins\org.rssowl.lib.lucene_2.0.3.201001202213.jar'
+
+  DetailPrint "$(^Extract) org.rssowl.ui_2.0.3.201001202213.jar"
+  nsExec::ExecToStack '"plugins\unpack200.exe" -r plugins\org.rssowl.ui_2.0.3.201001202213.jar.pack plugins\org.rssowl.ui_2.0.3.201001202213.jar'
+
   Delete "$INSTDIR\plugins\unpack200.exe"
-  
+
   WriteUninstaller "$INSTDIR\Uninstall.exe"
-  
+
   ;### Startmenu ###
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
     CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
@@ -289,9 +294,9 @@ Section ""
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
     CreateShortcut "$QUICKLAUNCH\RSSOwl.lnk" "$INSTDIR\rssowl.exe" "" "$INSTDIR\rssowl.ico"
   !insertmacro MUI_STARTMENU_WRITE_END
-  
+
   WriteINIStr "$SMPROGRAMS\$STARTMENU_FOLDER\Visit Homepage.url" "InternetShortcut" "URL" "http://www.rssowl.org"
-  
+
   WriteRegStr HKCU "Software\RSSOwl" "" $INSTDIR
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\RSSOwl" "DisplayName" "RSSOwl"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\RSSOwl" "UninstallString" "$INSTDIR\Uninstall.exe"
@@ -322,7 +327,7 @@ Section "Uninstall"
 
   ;### Uninstall Startmenu ###
   !insertmacro MUI_STARTMENU_GETFOLDER Application $MUI_TEMP
-  
+
   Delete "$SMPROGRAMS\$MUI_TEMP\Uninstall.lnk"
   Delete "$SMPROGRAMS\$MUI_TEMP\Visit Homepage.url"
   Delete "$SMPROGRAMS\$MUI_TEMP\RSSOwl.lnk"
