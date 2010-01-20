@@ -221,21 +221,21 @@ public class LoginDialog extends TitleAreaDialog {
     /* Username Label */
     Label usernameLabel = new Label(composite, SWT.NONE);
     usernameLabel.setText(Messages.LoginDialog_USERNAME);
-    usernameLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
+    usernameLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
 
     /* Username input field */
     fUsername = new Text(composite, SWT.SINGLE | SWT.BORDER);
-    fUsername.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+    fUsername.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
     fUsername.setFocus();
 
     /* Password Label */
     Label passwordLabel = new Label(composite, SWT.NONE);
     passwordLabel.setText(Messages.LoginDialog_PASSWORD);
-    passwordLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
+    passwordLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
 
     /* Password input field */
     fPassword = new Text(composite, SWT.SINGLE | SWT.BORDER | SWT.PASSWORD);
-    fPassword.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+    fPassword.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
     /* Separator */
     Label separator = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
