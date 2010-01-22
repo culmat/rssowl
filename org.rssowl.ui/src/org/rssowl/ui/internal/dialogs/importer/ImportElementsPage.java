@@ -534,8 +534,7 @@ public class ImportElementsPage extends WizardPage {
     setMessage(Messages.ImportElementsPage_CHOOSE_ELEMENTS_MESSAGE);
 
     /* Clear Viewer before loading */
-    if (source == Source.RESOURCE || importSourcePage.isRemoteSource())
-      setImportedElements(Collections.EMPTY_LIST);
+    setImportedElements(Collections.EMPTY_LIST);
 
     /* Ask for Username and Password if importing from Google */
     if (source == Source.GOOGLE) {
@@ -609,7 +608,7 @@ public class ImportElementsPage extends WizardPage {
     };
 
     /* Perform delayed if potential remote import to give Viewer a chance to show */
-    if (source == Source.RESOURCE || importSourcePage.isRemoteSource())
+    if (importSourcePage.isRemoteSource())
       JobRunner.runInUIThread(50, getShell(), runnable);
     else
       runnable.run();
