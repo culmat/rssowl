@@ -126,7 +126,8 @@ public class StatusLineUpdater implements ISelectionChangedListener {
     if (newsCount > 0)
       itemsBuf.append(NLS.bind(Messages.StatusLineUpdater_N_NEWS, newsCount)).append(", "); //$NON-NLS-1$
 
-    itemsBuf.delete(itemsBuf.length() - 2, itemsBuf.length());
+    if (itemsBuf.length() > 0)
+      itemsBuf.delete(itemsBuf.length() - 2, itemsBuf.length());
 
     StringBuilder buf = new StringBuilder();
     buf.append(NLS.bind(Messages.StatusLineUpdater_N_ITEMS_SELECTED, elements.length, itemsBuf.toString()));

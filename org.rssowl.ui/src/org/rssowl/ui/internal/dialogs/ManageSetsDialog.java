@@ -552,7 +552,7 @@ public class ManageSetsDialog extends TitleAreaDialog {
       /* Set is Empty */
       if (counter[0] == 0 && counter[1] == 0 && counter[2] == 0 && counter[3] == 0)
         itemBuilder = new StringBuilder(Messages.ManageSetsDialog_EMPTY_SET);
-      else
+      else if (itemBuilder.length() > 0)
         itemBuilder.delete(itemBuilder.length() - 2, itemBuilder.length());
 
       fStatusLabel.setText(NLS.bind(Messages.ManageSetsDialog_SET_CONTENT, bookmarkSet.getName(), itemBuilder.toString()));

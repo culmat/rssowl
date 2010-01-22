@@ -747,7 +747,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
           }
         }
 
-        if (strip)
+        if (strip && footer.length() > 0)
           footer.delete(footer.length() - 2, footer.length());
 
         /* Close: NewsItem/Footer/Attachments */

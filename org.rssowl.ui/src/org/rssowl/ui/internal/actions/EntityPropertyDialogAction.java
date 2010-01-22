@@ -194,7 +194,8 @@ public class EntityPropertyDialogAction extends Action implements IObjectActionD
       if (newsBinCount > 0)
         buf.append(newsBinCount == 1 ? NLS.bind(Messages.EntityPropertyDialogAction_N_BIN, newsBinCount) : NLS.bind(Messages.EntityPropertyDialogAction_N_BINS, newsBinCount)).append(", "); //$NON-NLS-1$
 
-      buf.delete(buf.length() - 2, buf.length());
+      if (buf.length() > 0)
+        buf.delete(buf.length() - 2, buf.length());
 
       return buf.toString();
     }

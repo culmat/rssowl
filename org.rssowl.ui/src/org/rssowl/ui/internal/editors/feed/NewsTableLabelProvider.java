@@ -341,7 +341,8 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
                 str.append(category.getDomain().trim()).append(", "); //$NON-NLS-1$
             }
 
-            str = str.delete(str.length() - 2, str.length());
+            if (str.length() > 0)
+              str = str.delete(str.length() - 2, str.length());
             text = str.toString();
           }
           break;
@@ -354,7 +355,8 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
               str.append(label.getName()).append(", "); //$NON-NLS-1$
             }
 
-            str = str.delete(str.length() - 2, str.length());
+            if (str.length() > 0)
+              str = str.delete(str.length() - 2, str.length());
             text = str.toString();
           }
           break;
