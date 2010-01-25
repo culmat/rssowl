@@ -379,7 +379,7 @@ public class OwlUI {
   }
 
   /** An enumeration of Operating System Themes */
-  enum OSTheme {
+  public enum OSTheme {
 
     /** Windows XP Blue */
     WINDOWS_BLUE,
