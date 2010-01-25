@@ -82,6 +82,12 @@ public class DownloadService {
   /* Connection Timeouts in MS */
   private static final int DEFAULT_CON_TIMEOUT = 30000;
 
+  /* Default Length for Download Tasks */
+  private static final int DEFAULT_TASK_LENGTH = 1000000;
+
+  /* Default Progress for Download Tasks */
+  private static final int DEFAULT_WORKED = 200;
+
   private DownloadJobQueue fDownloadQueue;
   private Map<OutputStream, OutputStream> fOutputStreamMap = new ConcurrentHashMap<OutputStream, OutputStream>();
   private IPreferenceScope fPreferences = Owl.getPreferenceService().getGlobalScope();
@@ -199,10 +205,10 @@ public class DownloadService {
         byte[] buffer = new byte[8192];
 
         /* Begin Task */
-        monitor.beginTask(formatTask(bytesConsumed, length, -1), length > 0 ? length : IProgressMonitor.UNKNOWN);
+        monitor.beginTask(formatTask(bytesConsumed, length, -1), length > 0 ? length : DEFAULT_TASK_LENGTH);
 
         /* First Download to a temporary File */
-        int contentLength= length;
+        int contentLength = length;
         InputStream in = null;
         FileOutputStream out = null;
         File partFile = new File(folder, downloadFileName + ".part"); //$NON-NLS-1$
@@ -257,8 +263,19 @@ public class DownloadService {
               lastBytesCheck = bytesConsumed;
             }
 
-            /* Update Worked */
-            monitor.worked(read);
+            /* Report accurate progress */
+            if (attachment.getLength() > 0)
+              monitor.worked(read);
+
+            /* Report calculated progress if possible */
+            else if (contentLength > 0) {
+              float relWorked = read / (float) contentLength;
+              monitor.worked((int) (relWorked * DEFAULT_TASK_LENGTH));
+            }
+
+            /* Use a generic Progress Value */
+            else
+              monitor.worked(DEFAULT_WORKED);
           }
         } catch (FileNotFoundException e) {
           error = e;
@@ -324,7 +341,7 @@ public class DownloadService {
 
           /* Indicate Error Message if any and offer Action to download again */
           if (error != null) {
-            String errorMessage= CoreUtils.toMessage(error);
+            String errorMessage = CoreUtils.toMessage(error);
             if (StringUtils.isSet(errorMessage))
               job.setName(NLS.bind(Messages.DownloadService_ERROR_DOWNLOADING_N, downloadFileName, errorMessage));
             else
