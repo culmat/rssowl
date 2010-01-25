@@ -69,6 +69,9 @@ public class URIUtilsTest {
     assertTrue(URIUtils.looksLikeLink("www.domain.org"));
     assertTrue(URIUtils.looksLikeLink("http://www.domain.org"));
     assertTrue(URIUtils.looksLikeLink("http://www.domain.de/foobar.rss"));
+    assertTrue(URIUtils.looksLikeLink("http://domain.de/foobar.rss"));
+    assertTrue(URIUtils.looksLikeLink("feed://www.domain.de/foobar.rss"));
+    assertTrue(URIUtils.looksLikeLink("feed://domain.de/foobar.rss"));
   }
 
   /**

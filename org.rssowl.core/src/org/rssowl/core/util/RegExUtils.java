@@ -37,13 +37,13 @@ import java.util.regex.Pattern;
 public class RegExUtils {
 
   /* The reg. expression for an URL */
-  private static final String URL_REGEX = "(www([\\wv\\-\\.,@?^=%&:/~\\+#]*[\\w\\-\\@?^=%&/~\\+#])?)|(http|ftp|https):\\/\\/[\\w]+(.[\\w]+)([\\wv\\-\\.,@?^=%&:/~\\+#]*[\\w\\-\\@?^=%&/~\\+#])?"; //$NON-NLS-1$
+  private static final String URL_REGEX = "(www([\\wv\\-\\.,@?^=%&:/~\\+#]*[\\w\\-\\@?^=%&/~\\+#])?)|(http|ftp|https|feed):\\/\\/[\\w]+(.[\\w]+)([\\wv\\-\\.,@?^=%&:/~\\+#]*[\\w\\-\\@?^=%&/~\\+#])?"; //$NON-NLS-1$
 
   /* The compiled pattern to match an URL */
   private static final Pattern URL_REGEX_PATTERN = Pattern.compile(URL_REGEX);
 
   /* The reg. expression for a strict URL (requires protocol) */
-  private static final String STRICT_URL_REGEX = "(http|ftp|https):\\/\\/[\\w]+(.[\\w]+)([\\wv\\-\\.,@?^=%&:/~\\+#]*[\\w\\-\\@?^=%&/~\\+#])?"; //$NON-NLS-1$
+  private static final String STRICT_URL_REGEX = "(http|ftp|https|feed):\\/\\/[\\w]+(.[\\w]+)([\\wv\\-\\.,@?^=%&:/~\\+#]*[\\w\\-\\@?^=%&/~\\+#])?"; //$NON-NLS-1$
 
   /* The compiled pattern to match a strict URL (requires protocol) */
   private static final Pattern STRICT_URL_REGEX_PATTERN = Pattern.compile(STRICT_URL_REGEX);
