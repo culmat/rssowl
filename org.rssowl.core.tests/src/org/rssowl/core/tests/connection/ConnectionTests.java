@@ -406,6 +406,18 @@ public class ConnectionTests {
    * @throws Exception
    */
   @Test
+  @SuppressWarnings("nls")
+  public void testLoadEntityEncodedFeedFromWebsite() throws Exception {
+    IConnectionService conManager = Owl.getConnectionService();
+    URI feedUrl = new URI("http://www.rssowl.org/rssowl2dg/tests/connection/homepage.html");
+
+    assertEquals("http://www.rssowl.org/node/feed&help=true", conManager.getFeed(feedUrl, new NullProgressMonitor()).toString());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
   public void testKeywordFeeds() throws Exception {
     String keywords = "blog feed";
     String URL_INPUT_TOKEN = "[:]";

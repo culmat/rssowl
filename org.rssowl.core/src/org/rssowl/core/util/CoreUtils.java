@@ -1539,6 +1539,9 @@ public class CoreUtils {
 
               String linkVal = str.toString();
 
+              /* Convert &amp; to & as it is a common character in a URL */
+              linkVal= StringUtils.replaceAll(linkVal, "&amp;", "&"); //$NON-NLS-1$ //$NON-NLS-2$
+
               /* Handle relative Links */
               try {
                 URI uri = new URI(linkVal);
