@@ -861,6 +861,10 @@ public class CoreUtilsTest {
     links = RegExUtils.extractLinksFromText("this is a http://www.rssowl.org short link to http://www.google.com as well", true);
     assertEquals(2, links.size());
     assertTrue(links.containsAll(Arrays.asList(new String[] { "http://www.rssowl.org", "http://www.google.com" })));
+
+    links = RegExUtils.extractLinksFromText("this is a feed://www.rssowl.org short link to feed://google.com as well", true);
+    assertEquals(2, links.size());
+    assertTrue(links.containsAll(Arrays.asList(new String[] { "feed://www.rssowl.org", "feed://google.com" })));
   }
 
   /**
