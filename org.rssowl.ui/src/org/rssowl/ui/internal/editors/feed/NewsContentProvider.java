@@ -357,17 +357,10 @@ public class NewsContentProvider implements ITreeContentProvider {
                     if (onlyHandleAddedNews && (fAddedNews == null || fAddedNews.size() == 0))
                       return;
 
-                    /* Try to optimize added news by calling Viewer.add() instead of refresh() */
-                    if (onlyHandleAddedNews && !isGroupingEnabled())
-                      addToViewers(fAddedNews);
-
-                    /* Refresh Viewer to reflect changes */
-                    else {
-                      if (!browserShowsCollection())
-                        fFeedView.refreshTableViewer(true, true);
-                      else
-                        fFeedView.refresh(true, true); //TODO Seems some JFace caching problem here (redraw=true)
-                    }
+                    if (!browserShowsCollection())
+                      fFeedView.refreshTableViewer(true, true);
+                    else
+                      fFeedView.refresh(true, true); //TODO Seems some JFace caching problem here (redraw=true)
                   }
                 });
               }
