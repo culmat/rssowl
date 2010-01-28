@@ -420,7 +420,10 @@ public enum Preference {
   ECLIPSE_STICKYBG_COLOR("instance/org.eclipse.ui.workbench/org.rssowl.ui.StickyBGColor", IPreferenceType.STRING, IPreferenceScope.Kind.ECLIPSE), //$NON-NLS-1$
 
   /** Global Eclipse: Search Highlight Background Color */
-  ECLIPSE_SEARCH_COLOR("instance/org.eclipse.ui.workbench/org.rssowl.ui.SearchHighlightBGColor", IPreferenceType.STRING, IPreferenceScope.Kind.ECLIPSE); //$NON-NLS-1$
+  ECLIPSE_SEARCH_COLOR("instance/org.eclipse.ui.workbench/org.rssowl.ui.SearchHighlightBGColor", IPreferenceType.STRING, IPreferenceScope.Kind.ECLIPSE), //$NON-NLS-1$
+
+  /** Global Eclipse: News List Background Color */
+  ECLIPSE_NEWSLIST_BACKGROUND_COLOR("instance/org.eclipse.ui.workbench/org.rssowl.ui.NewsListBackgroundColor", IPreferenceType.STRING, IPreferenceScope.Kind.ECLIPSE); //$NON-NLS-1$
 
   private String fId;
   private IPreferenceType fType;
