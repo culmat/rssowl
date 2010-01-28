@@ -172,12 +172,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
   void setToolBarVisible(boolean visible) {
     getWindowConfigurer().setShowCoolBar(visible);
-
-    /* Hack: To avoid cheese, update Status Line Too */
-    boolean showsStatus = getWindowConfigurer().getShowStatusLine();
-    getWindowConfigurer().setShowStatusLine(!showsStatus);
-    getWindowConfigurer().setShowStatusLine(showsStatus);
-
     getWindowConfigurer().getWindow().getShell().layout();
   }
 
