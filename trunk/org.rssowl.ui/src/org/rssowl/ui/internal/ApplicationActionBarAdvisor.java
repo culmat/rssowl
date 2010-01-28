@@ -535,7 +535,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
             ApplicationWorkbenchWindowAdvisor configurer = ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor;
 
             boolean isToolBarVisible = preferences.getBoolean(DefaultPreferences.SHOW_TOOLBAR);
-            configurer.setToolBarVisible(!isToolBarVisible);
+            configurer.setToolBarVisible(!isToolBarVisible, true);
             preferences.putBoolean(DefaultPreferences.SHOW_TOOLBAR, !isToolBarVisible);
           }
 
@@ -600,7 +600,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
             boolean isToolBarVisible = preferences.getBoolean(DefaultPreferences.SHOW_TOOLBAR);
             if (!isToolBarVisible) {
-              configurer.setToolBarVisible(true);
+              configurer.setToolBarVisible(true, true);
               preferences.putBoolean(DefaultPreferences.SHOW_TOOLBAR, true);
             }
 
@@ -1189,7 +1189,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
       @Override
       public void run() {
         ApplicationWorkbenchWindowAdvisor configurer = ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor;
-        configurer.setToolBarVisible(false);
+        configurer.setToolBarVisible(false, true);
         Owl.getPreferenceService().getGlobalScope().putBoolean(DefaultPreferences.SHOW_TOOLBAR, false);
       }
     });
