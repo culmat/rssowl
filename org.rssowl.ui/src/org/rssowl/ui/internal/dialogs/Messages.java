@@ -228,6 +228,7 @@ public class Messages extends NLS {
   public static String UpdateDialog_MISSING_PERMISSIONS_WARNING;
   public static String UpdateDialog_NEW_VERSION;
   public static String UpdateDialog_NEW_VERSION_MSG;
+  public static String UpdateDialog_QUALIFIER_UPDATE_DESCRIPTION;
   public static String UpdateDialog_UPDATE_AVAILABLE;
   public static String UpdateDialog_UPDATE_ON_STARTUP;
   public static String UpdateDialog_UPDATE_PROVIDER;

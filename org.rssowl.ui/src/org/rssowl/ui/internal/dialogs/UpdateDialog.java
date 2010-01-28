@@ -268,6 +268,7 @@ public class UpdateDialog extends TitleAreaDialog {
     long dlSize = 0;
     String provider = null;
     String description = null;
+    boolean isQualifierUpdate = false;
 
     if (fUpdates != null && fUpdates.length > 0) {
       IFeature oldFeature = fUpdates[0].getOldFeature();
@@ -280,9 +281,18 @@ public class UpdateDialog extends TitleAreaDialog {
         oldVer = oldVersion.getMajorComponent() + "." + oldVersion.getMinorComponent() + "." + oldVersion.getServiceComponent(); //$NON-NLS-1$ //$NON-NLS-2$
       newVer = newVersion.getMajorComponent() + "." + newVersion.getMinorComponent() + "." + newVersion.getServiceComponent(); //$NON-NLS-1$ //$NON-NLS-2$
 
+      /* Special Treat Case of a Qualifier Update */
       if (newVer.equals(oldVer) && oldVersion != null) {
-        newVer += "." + newVersion.getQualifierComponent(); //$NON-NLS-1$
-        oldVer += "." + oldVersion.getQualifierComponent(); //$NON-NLS-1$
+        isQualifierUpdate = true;
+        String newQualifierComponent = newVersion.getQualifierComponent();
+        String oldQualifierComponent = oldVersion.getQualifierComponent();
+        if (newQualifierComponent.length() == 12 && oldQualifierComponent.length() == 12) {
+          newVer += " (" + formatQualifier(newQualifierComponent) + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+          oldVer += " (" + formatQualifier(oldQualifierComponent) + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+        } else {
+          newVer += "." + newQualifierComponent; //$NON-NLS-1$
+          oldVer += "." + oldQualifierComponent; //$NON-NLS-1$
+        }
       }
 
       /* Other */
@@ -290,15 +300,25 @@ public class UpdateDialog extends TitleAreaDialog {
       provider = newFeature.getProvider();
 
       /* Description */
-      ICategory[] categories = newFeature.getSite().getCategories();
-      if (categories.length > 0) {
-        IURLEntry descriptionEntry = categories[0].getDescription();
-        if (descriptionEntry != null)
-          description = descriptionEntry.getAnnotation();
-      }
+      if (!isQualifierUpdate) {
+        ICategory[] categories = newFeature.getSite().getCategories();
+        if (categories.length > 0) {
+          IURLEntry descriptionEntry = categories[0].getDescription();
+          if (descriptionEntry != null)
+            description = descriptionEntry.getAnnotation();
+        }
+      } else
+        description = Messages.UpdateDialog_QUALIFIER_UPDATE_DESCRIPTION;
 
       showUpdateDescription(oldVer, newVer, dlSize, provider, description);
     }
+  }
+
+  private String formatQualifier(String qualifier) {
+    if (qualifier.length() == 12)
+      return qualifier.substring(0, 4) + "-" + qualifier.substring(5, 7) + "-" + qualifier.substring(8, 10); //$NON-NLS-1$ //$NON-NLS-2$
+
+    return qualifier;
   }
 
   private void showUpdateDescription(String oldVer, String newVer, long dlSize, String provider, String description) {
