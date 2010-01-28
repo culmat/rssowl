@@ -406,8 +406,8 @@ public class FeedView extends EditorPart implements IReusableEditor {
         }
         content.append(css.toString());
         content.append("  </head>\n  <body>\n"); //$NON-NLS-1$
-        for (INews newsItemToSave : newsToSave) {
-          String text = labelProvider.getText(newsItemToSave, false);
+        for (int i = 0; i < newsToSave.size(); i++) {
+          String text = labelProvider.getText(newsToSave.get(i), false, i);
           content.append(text);
         }
         content.append("\n  </body>\n</html>"); //$NON-NLS-1$

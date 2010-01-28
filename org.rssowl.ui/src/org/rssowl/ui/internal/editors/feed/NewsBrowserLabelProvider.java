@@ -229,7 +229,16 @@ public class NewsBrowserLabelProvider extends LabelProvider {
    */
   @Override
   public String getText(Object element) {
-    return getText(element, true);
+    return getText(element, true, -1);
+  }
+
+  /**
+   * @param element the element to get a HTML representation from.
+   * @param index the zero-based index of the element from top.
+   * @return the HTML representation for the given element.
+   */
+  public String getText(Object element, int index) {
+    return getText(element, true, index);
   }
 
   /**
@@ -239,6 +248,17 @@ public class NewsBrowserLabelProvider extends LabelProvider {
    * @return the HTML representation for the given element.
    */
   public String getText(Object element, boolean withInternalLinks) {
+    return getText(element, withInternalLinks, -1);
+  }
+
+  /**
+   * @param element the element to get a HTML representation from.
+   * @param withInternalLinks <code>true</code> to include links of the internal
+   * protocol rssowl:// and <code>false</code> otherwise.
+   * @param index the zero-based index of the element from top.
+   * @return the HTML representation for the given element.
+   */
+  public String getText(Object element, boolean withInternalLinks, int index) {
 
     /* Return HTML for a Group */
     if (element instanceof EntityGroup)
@@ -246,7 +266,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
     /* Return HTML for a News */
     else if (element instanceof INews)
-      return getLabel((INews) element, withInternalLinks);
+      return getLabel((INews) element, withInternalLinks, index);
 
     return ""; //$NON-NLS-1$
   }
@@ -430,7 +450,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     return new StringBuilder(capacity);
   }
 
-  private String getLabel(INews news, boolean withInternalLinks) {
+  private String getLabel(INews news, boolean withInternalLinks, int index) {
     String description = news.getDescription();
     if (fStripMediaFromNews)
       description = StringUtils.filterTags(description, fMediaTags, false);
@@ -475,7 +495,10 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     }
 
     /* DIV: NewsItem */
-    div(builder, isUnread ? "newsitemUnread" : "newsitemRead", Dynamic.NEWS.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
+    if (index == 0)
+      div(builder, isUnread ? "newsitemUnread" : "newsitemRead", "border-top: none;", Dynamic.NEWS.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    else
+      div(builder, isUnread ? "newsitemUnread" : "newsitemRead", Dynamic.NEWS.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* DIV: NewsItem/Header */
     div(builder, news.isFlagged() ? "headerSticky" : "header", Dynamic.HEADER.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
@@ -861,6 +884,10 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
   private void div(StringBuilder builder, String cssClass, String id) {
     builder.append("<div id=\"").append(id).append("\" class=\"").append(cssClass).append("\">\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+  }
+
+  private void div(StringBuilder builder, String cssClass, String extraCSS, String id) {
+    builder.append("<div id=\"").append(id).append("\" class=\"").append(cssClass).append("\" style=\"").append(extraCSS).append("\">\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
   }
 
   private void close(StringBuilder builder, String tag) {

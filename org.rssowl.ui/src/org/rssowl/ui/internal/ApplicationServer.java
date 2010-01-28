@@ -30,7 +30,6 @@ import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.ContentViewer;
-import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
@@ -653,7 +652,7 @@ public class ApplicationServer {
       return;
 
     /* Ask for sorted Elements */
-    ILabelProvider labelProvider = (ILabelProvider) viewer.getLabelProvider();
+    NewsBrowserLabelProvider labelProvider = (NewsBrowserLabelProvider) viewer.getLabelProvider();
     Object[] children = new Object[0];
     if (viewer instanceof NewsBrowserViewer)
       children = ((NewsBrowserViewer) viewer).getFlattendChildren(elements);
@@ -702,15 +701,14 @@ public class ApplicationServer {
       writer.write("\n  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n"); //$NON-NLS-1$
 
       /* CSS */
-      if (labelProvider instanceof NewsBrowserLabelProvider)
-        ((NewsBrowserLabelProvider) labelProvider).writeCSS(writer);
+      labelProvider.writeCSS(writer);
 
       /* Open Body */
       writer.write("  </head>\n  <body id=\"owlbody\">\n"); //$NON-NLS-1$
 
       /* Output each Element as HTML */
-      for (Object el : children) {
-        String html = unicodeToEntities(labelProvider.getText(el));
+      for (int i = 0; i < children.length; i++) {
+        String html = unicodeToEntities(labelProvider.getText(children[i], i));
         writer.write(html);
       }
 
