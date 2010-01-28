@@ -419,7 +419,7 @@ public class PreviewFeedDialog extends Dialog {
    */
   @Override
   protected int getDialogBoundsStrategy() {
-    return Dialog.DIALOG_PERSISTLOCATION;
+    return Dialog.DIALOG_PERSISTLOCATION | Dialog.DIALOG_PERSISTSIZE;
   }
 
   /*
