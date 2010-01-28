@@ -170,9 +170,11 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     fPreferences = Owl.getPreferenceService().getGlobalScope();
   }
 
-  void setToolBarVisible(boolean visible) {
+  void setToolBarVisible(boolean visible, boolean layout) {
     getWindowConfigurer().setShowCoolBar(visible);
-    getWindowConfigurer().getWindow().getShell().layout();
+
+    if (layout)
+      getWindowConfigurer().getWindow().getShell().layout();
   }
 
   /**
@@ -193,18 +195,25 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
   }
 
   /*
+   * @see org.eclipse.ui.application.WorkbenchWindowAdvisor#postWindowCreate()
+   */
+  @Override
+  public void postWindowCreate() {
+
+    /* Toolbar & Status Visibility */
+    IPreferenceScope preferences = Owl.getPreferenceService().getGlobalScope();
+    if (!preferences.getBoolean(DefaultPreferences.SHOW_TOOLBAR))
+      setToolBarVisible(false, false);
+    if (!preferences.getBoolean(DefaultPreferences.SHOW_STATUS))
+      setStatusVisible(false, false);
+  }
+
+  /*
    * @see org.eclipse.ui.application.WorkbenchWindowAdvisor#postWindowOpen()
    */
   @Override
   public void postWindowOpen() {
     final Shell shell = getWindowConfigurer().getWindow().getShell();
-
-    /* Toolbar & Status Visibility */
-    IPreferenceScope preferences = Owl.getPreferenceService().getGlobalScope();
-    if (!preferences.getBoolean(DefaultPreferences.SHOW_TOOLBAR))
-      setToolBarVisible(false);
-    if (!preferences.getBoolean(DefaultPreferences.SHOW_STATUS))
-      setStatusVisible(false, true);
 
     /* System Tray */
     SafeRunner.run(new LoggingSafeRunnable() {
