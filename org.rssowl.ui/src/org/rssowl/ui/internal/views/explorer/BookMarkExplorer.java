@@ -225,6 +225,8 @@ public class BookMarkExplorer extends ViewPart {
   private IPreferenceDAO fPrefDAO;
   private IPropertyChangeListener fPropertyChangeListener;
   private boolean fBlockSaveState;
+  private BookMarkFilter.Type fLastFilterType;
+  private BookMarkGrouping.Type fLastGroupType;
 
   /**
    * Returns the preferences key for the selected bookmark set for the given
@@ -848,6 +850,10 @@ public class BookMarkExplorer extends ViewPart {
         if (fBookMarkFilter.getType() != BookMarkFilter.Type.SHOW_ALL)
           doFilter(BookMarkFilter.Type.SHOW_ALL);
 
+        /* Toggle to Previous */
+        else if (fLastFilterType != null)
+          doFilter(fLastFilterType);
+
         /* Show Menu */
         else if (fToolBarManager instanceof ToolBarManager)
           OwlUI.positionDropDownMenu(this, (ToolBarManager) fToolBarManager);
@@ -966,6 +972,10 @@ public class BookMarkExplorer extends ViewPart {
         /* Restore Default */
         if (fBookMarkGrouping.getType() != BookMarkGrouping.Type.NO_GROUPING)
           doGrouping(BookMarkGrouping.Type.NO_GROUPING);
+
+        /* Toggle to previous */
+        else if (fLastGroupType != null)
+          doGrouping(fLastGroupType);
 
         /* Show Menu */
         else if (fToolBarManager instanceof ToolBarManager)
@@ -1116,6 +1126,12 @@ public class BookMarkExplorer extends ViewPart {
 
   private void doFilter(BookMarkFilter.Type type) {
 
+    /* Remember Selection */
+    if (type != BookMarkFilter.Type.SHOW_ALL)
+      fLastFilterType = type;
+    else if (fBookMarkFilter.getType() != BookMarkFilter.Type.SHOW_ALL)
+      fLastFilterType = fBookMarkFilter.getType();
+
     /* Change Filter Type */
     fBookMarkFilter.setType(type);
     fViewer.refresh(false);
@@ -1128,6 +1144,12 @@ public class BookMarkExplorer extends ViewPart {
   }
 
   private void doGrouping(BookMarkGrouping.Type type) {
+
+    /* Remember Selection */
+    if (type != BookMarkGrouping.Type.NO_GROUPING)
+      fLastGroupType = type;
+    else if (fBookMarkGrouping.getType() != BookMarkGrouping.Type.NO_GROUPING)
+      fLastGroupType = fBookMarkGrouping.getType();
 
     /* Temporary change Sorter to reflect grouping */
     if (!fSortByName) {

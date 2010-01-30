@@ -91,7 +91,7 @@ import java.util.List;
 /**
  * The FilterBar is the central control to filter News that are showing in the
  * FeedView. It supports filtering, grouping and a quick-search.
- * 
+ *
  * @author bpasero
  */
 public class FilterBar {
@@ -121,6 +121,8 @@ public class FilterBar {
   private boolean fMaximized;
   private ToolBarManager fFilterToolBar;
   private boolean fBlockRefresh;
+  private NewsFilter.Type fLastFilterType;
+  private NewsGrouping.Type fLastGroupType;
 
   /**
    * @param feedView
@@ -137,7 +139,7 @@ public class FilterBar {
 
   /**
    * Clear the Quick-Search
-   * 
+   *
    * @param refresh
    */
   public void clearQuickSearch(boolean refresh) {
@@ -599,9 +601,13 @@ public class FilterBar {
       @Override
       public void run() {
 
-        /* Restore Default */
+        /* Toggle Show All */
         if (filter.getType() != NewsFilter.Type.SHOW_ALL)
           onFilter(NewsFilter.Type.SHOW_ALL);
+
+        /* Toggle back to previous filter */
+        else if (fLastFilterType != null)
+          onFilter(fLastFilterType);
 
         /* Show Menu */
         else
@@ -844,6 +850,11 @@ public class FilterBar {
   void doFilter(final NewsFilter.Type type, boolean refresh, boolean saveSettings) {
     boolean noChange = fFeedView.getFilter().getType() == type;
 
+    if (type != Type.SHOW_ALL)
+      fLastFilterType = type;
+    else if (fFeedView.getFilter().getType() != Type.SHOW_ALL)
+      fLastFilterType = fFeedView.getFilter().getType();
+
     fFeedView.getFilter().setType(type);
     fFirstToolBarManager.find(FILTER_ACTION).update();
 
@@ -894,9 +905,13 @@ public class FilterBar {
       @Override
       public void run() {
 
-        /* Restore Default */
+        /* Toggle Ungrouped */
         if (fFeedView.getGrouper().getType() != NewsGrouping.Type.NO_GROUPING)
           onGrouping(NewsGrouping.Type.NO_GROUPING);
+
+        /* Toggle back to previous grouping */
+        else if (fLastGroupType != null)
+          onGrouping(fLastGroupType);
 
         /* Show Menu */
         else
@@ -1081,6 +1096,11 @@ public class FilterBar {
 
   void doGrouping(final NewsGrouping.Type type, boolean refresh, boolean saveSettings) {
     boolean noChange = fFeedView.getGrouper().getType() == type;
+
+    if (type != NewsGrouping.Type.NO_GROUPING)
+      fLastGroupType = type;
+    else if (fFeedView.getGrouper().getType() != NewsGrouping.Type.NO_GROUPING)
+      fLastGroupType = fFeedView.getGrouper().getType();
 
     fFeedView.getGrouper().setType(type);
     fFirstToolBarManager.find(GROUP_ACTION).update();
