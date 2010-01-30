@@ -60,6 +60,8 @@ import org.rssowl.core.util.RegExUtils;
 import org.rssowl.core.util.ReparentInfo;
 import org.rssowl.ui.internal.util.ModelUtils;
 
+import java.io.BufferedReader;
+import java.io.StringReader;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1135,5 +1137,158 @@ public class CoreUtilsTest {
 
     assertEquals(rootA, CoreUtils.findFolder(rootD));
     assertEquals(folderA, CoreUtils.findFolder(folderD));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testFindFaviconAbsolute() throws Exception {
+    StringReader reader = new StringReader("<html><link rel=\"shortcut icon\" href=\"http://www.rssowl.org/favicon.ico\"/></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), null).toString());
+
+    reader = new StringReader("<html><link rel=\"shortcut icon\" href='http://www.rssowl.org/favicon.ico'/></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), null).toString());
+
+    reader = new StringReader("<html><link rel=\"shortcut icon\" href=http://www.rssowl.org/favicon.ico /></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), null).toString());
+
+    reader = new StringReader("<html><link rel=\"shortcut icon\" href=\"http://www.rssowl.org/favicon.ico\" /></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), null).toString());
+
+    reader = new StringReader("<html><link rel=\"shortcut icon\" href= \"http://www.rssowl.org/favicon.ico\"/></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), null).toString());
+
+    reader = new StringReader("<html><link rel=\"shortcut icon\" href =\"http://www.rssowl.org/favicon.ico\"/></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), null).toString());
+
+    reader = new StringReader("<html><link rel=\"shortcut icon\" href = \"http://www.rssowl.org/favicon.ico\"/></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), null).toString());
+
+    reader = new StringReader("<html><link rel=\"shortcut icon\" HREF=\"http://www.rssowl.org/favicon.ico\"/></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), null).toString());
+
+    reader = new StringReader("<html><link rel=\"shortcut icon\" href= 'http://www.rssowl.org/favicon.ico'/></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), null).toString());
+
+    reader = new StringReader("<html><link rel=\"shortcut icon\" href ='http://www.rssowl.org/favicon.ico'/></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), null).toString());
+
+    reader = new StringReader("<html><link rel=\"shortcut icon\" href = 'http://www.rssowl.org/favicon.ico'/></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), null).toString());
+
+    reader = new StringReader("<html><link rel=\"shortcut icon\" href =http://www.rssowl.org/favicon.ico /></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), null).toString());
+
+    reader = new StringReader("<html><link rel=\"shortcut icon\" href= http://www.rssowl.org/favicon.ico /></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), null).toString());
+
+    reader = new StringReader("<html><link rel=\"shortcut icon\" href = http://www.rssowl.org/favicon.ico /></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), null).toString());
+
+    reader = new StringReader("<html><link href=\"http://www.rssowl.org/favicon.ico\"/></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), null).toString());
+
+    reader = new StringReader("<html><link hreff=\"http://www.rssowl.org/favicon.ico\"/></html>");
+    assertEquals(null, CoreUtils.findFavicon(new BufferedReader(reader), null));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testFindFaviconRelative() throws Exception {
+    StringReader reader = new StringReader("<html><link rel=\"shortcut icon\" href=\"/favicon.ico\"/></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), URI.create("http://www.rssowl.org")).toString());
+
+    reader = new StringReader("<html><link rel=\"shortcut icon\" href='/favicon.ico'/></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), URI.create("http://www.rssowl.org")).toString());
+
+    reader = new StringReader("<html><link rel=\"shortcut icon\" href=/favicon.ico /></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), URI.create("http://www.rssowl.org")).toString());
+
+    reader = new StringReader("<html><link rel=\"shortcut icon\" href=\"/favicon.ico\" /></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), URI.create("http://www.rssowl.org")).toString());
+
+    reader = new StringReader("<html><link rel=\"shortcut icon\" href= \"/favicon.ico\"/></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), URI.create("http://www.rssowl.org")).toString());
+
+    reader = new StringReader("<html><link rel=\"shortcut icon\" href =\"/favicon.ico\"/></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), URI.create("http://www.rssowl.org")).toString());
+
+    reader = new StringReader("<html><link rel=\"shortcut icon\" href = \"/favicon.ico\"/></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), URI.create("http://www.rssowl.org")).toString());
+
+    reader = new StringReader("<html><link rel=\"shortcut icon\" HREF=\"/favicon.ico\"/></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), URI.create("http://www.rssowl.org")).toString());
+
+    reader = new StringReader("<html><link rel=\"shortcut icon\" href= '/favicon.ico'/></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), URI.create("http://www.rssowl.org")).toString());
+
+    reader = new StringReader("<html><link rel=\"shortcut icon\" href ='/favicon.ico'/></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), URI.create("http://www.rssowl.org")).toString());
+
+    reader = new StringReader("<html><link rel=\"shortcut icon\" href = '/favicon.ico'/></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), URI.create("http://www.rssowl.org")).toString());
+
+    reader = new StringReader("<html><link rel=\"shortcut icon\" href =/favicon.ico /></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), URI.create("http://www.rssowl.org")).toString());
+
+    reader = new StringReader("<html><link rel=\"shortcut icon\" href= /favicon.ico /></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), URI.create("http://www.rssowl.org")).toString());
+
+    reader = new StringReader("<html><link rel=\"shortcut icon\" href = /favicon.ico /></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), URI.create("http://www.rssowl.org")).toString());
+
+    reader = new StringReader("<html><link href=\"/favicon.ico\"/></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), URI.create("http://www.rssowl.org")).toString());
+
+    reader = new StringReader("<html><link rel=\"shortcut icon\" href=\"favicon.ico\"/></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), URI.create("http://www.rssowl.org")).toString());
+
+    reader = new StringReader("<html><link rel=\"shortcut icon\" href='favicon.ico'/></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), URI.create("http://www.rssowl.org")).toString());
+
+    reader = new StringReader("<html><link rel=\"shortcut icon\" href=favicon.ico /></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), URI.create("http://www.rssowl.org")).toString());
+
+    reader = new StringReader("<html><link rel=\"shortcut icon\" href=\"favicon.ico\" /></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), URI.create("http://www.rssowl.org")).toString());
+
+    reader = new StringReader("<html><link rel=\"shortcut icon\" href= \"favicon.ico\"/></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), URI.create("http://www.rssowl.org")).toString());
+
+    reader = new StringReader("<html><link rel=\"shortcut icon\" href =\"favicon.ico\"/></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), URI.create("http://www.rssowl.org")).toString());
+
+    reader = new StringReader("<html><link rel=\"shortcut icon\" href = \"favicon.ico\"/></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), URI.create("http://www.rssowl.org")).toString());
+
+    reader = new StringReader("<html><link rel=\"shortcut icon\" HREF=\"favicon.ico\"/></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), URI.create("http://www.rssowl.org")).toString());
+
+    reader = new StringReader("<html><link rel=\"shortcut icon\" href= 'favicon.ico'/></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), URI.create("http://www.rssowl.org")).toString());
+
+    reader = new StringReader("<html><link rel=\"shortcut icon\" href ='favicon.ico'/></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), URI.create("http://www.rssowl.org")).toString());
+
+    reader = new StringReader("<html><link rel=\"shortcut icon\" href = 'favicon.ico'/></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), URI.create("http://www.rssowl.org")).toString());
+
+    reader = new StringReader("<html><link rel=\"shortcut icon\" href =favicon.ico /></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), URI.create("http://www.rssowl.org")).toString());
+
+    reader = new StringReader("<html><link rel=\"shortcut icon\" href= favicon.ico /></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), URI.create("http://www.rssowl.org")).toString());
+
+    reader = new StringReader("<html><link rel=\"shortcut icon\" href = favicon.ico /></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), URI.create("http://www.rssowl.org")).toString());
+
+    reader = new StringReader("<html><link href=\"favicon.ico\"/></html>");
+    assertEquals("http://www.rssowl.org/favicon.ico", CoreUtils.findFavicon(new BufferedReader(reader), URI.create("http://www.rssowl.org")).toString());
+
+    reader = new StringReader("<html><link hreff=\"favicon.ico\"/></html>");
+    assertEquals(null, CoreUtils.findFavicon(new BufferedReader(reader), URI.create("http://www.rssowl.org")));
   }
 }

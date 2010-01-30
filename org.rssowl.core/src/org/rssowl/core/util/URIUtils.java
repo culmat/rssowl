@@ -304,11 +304,30 @@ public class URIUtils {
     }
 
     StringBuilder buf = new StringBuilder();
-    buf.append("http://"); //$NON-NLS-1$
+    buf.append(HTTP);
     buf.append(host);
     buf.append("/favicon.ico"); //$NON-NLS-1$
 
     return new URI(fastEncode(buf.toString()));
+  }
+
+  /**
+   * @param link the absolute link to convert to a top level URI (e.g.
+   * http://www.rssowl.org/feed.xml becomes http://www.rssowl.org).
+   * @return the top level URL or <code>null</code> if the link is not
+   * convertable.
+   * @throws URISyntaxException in case of any error converting the link to a
+   * top level link.
+   */
+  public static URI toTopLevel(URI link) throws URISyntaxException {
+    if (link == null)
+      return null;
+
+    String host = link.getHost();
+    if (!StringUtils.isSet(host))
+      return null;
+
+    return new URI(HTTP + host);
   }
 
   /**

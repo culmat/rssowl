@@ -186,6 +186,20 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     return Triple.create(feed, conditionalGet, link);
   }
 
+  private IConditionalGet getConditionalGet(URI link, InputStream inS) {
+    IModelFactory typesFactory = Owl.getModelFactory();
+
+    if (inS instanceof IConditionalGetCompatible) {
+      String ifModifiedSince = ((IConditionalGetCompatible) inS).getIfModifiedSince();
+      String ifNoneMatch = ((IConditionalGetCompatible) inS).getIfNoneMatch();
+
+      if (ifModifiedSince != null || ifNoneMatch != null)
+        return typesFactory.createConditionalGet(ifModifiedSince, link, ifNoneMatch);
+    }
+
+    return null;
+  }
+
   private void closeStream(InputStream inS, boolean abort) {
     try {
       if (abort && inS instanceof IAbortable)
@@ -202,25 +216,31 @@ public class DefaultProtocolHandler implements IProtocolHandler {
    * org.eclipse.core.runtime.IProgressMonitor)
    */
   public byte[] getFeedIcon(URI link, IProgressMonitor monitor) {
-    return loadFavicon(link, false, monitor);
-  }
 
-  private IConditionalGet getConditionalGet(URI link, InputStream inS) {
-    IModelFactory typesFactory = Owl.getModelFactory();
+    /* Try to load the Favicon directly from the supplied Link */
+    byte[] favicon = loadFavicon(link, false, false, monitor);
 
-    if (inS instanceof IConditionalGetCompatible) {
-      String ifModifiedSince = ((IConditionalGetCompatible) inS).getIfModifiedSince();
-      String ifNoneMatch = ((IConditionalGetCompatible) inS).getIfNoneMatch();
-
-      if (ifModifiedSince != null || ifNoneMatch != null)
-        return typesFactory.createConditionalGet(ifModifiedSince, link, ifNoneMatch);
+    /* Fallback: Scan the Homepage of the Link for a Favicon entry */
+    if (favicon == null || favicon.length == 0) {
+      try {
+        URI topLevelUri = URIUtils.toTopLevel(link);
+        if (topLevelUri != null) {
+          URI faviconUri = getFavicon(topLevelUri, monitor);
+          if (faviconUri != null && faviconUri.isAbsolute())
+            return loadFavicon(faviconUri, true, false, monitor);
+        }
+      } catch (ConnectionException e) {
+      } catch (URISyntaxException e) {
+      } catch (Throwable t) {
+        Activator.getDefault().logError(t.getMessage(), t);
+      }
     }
 
-    return null;
+    return favicon;
   }
 
   /* Load a possible Favicon from the given Feed */
-  byte[] loadFavicon(URI link, boolean rewriteHost, IProgressMonitor monitor) {
+  byte[] loadFavicon(URI link, boolean isFavicon, boolean rewriteHost, IProgressMonitor monitor) {
     try {
 
       /* Define Properties for Connection */
@@ -229,7 +249,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
       properties.put(IConnectionPropertyConstants.PROGRESS_MONITOR, monitor);
 
       /* Load Favicon */
-      URI faviconLink = URIUtils.toFaviconUrl(link, rewriteHost);
+      URI faviconLink = isFavicon ? link : URIUtils.toFaviconUrl(link, rewriteHost);
       if (faviconLink == null)
         return null;
 
@@ -248,12 +268,12 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     } catch (ConnectionException e) {
 
       /* Try rewriting the Host to obtain the Favicon */
-      if (!rewriteHost) {
+      if (!rewriteHost && !isFavicon) {
         String exceptionName = e.getClass().getName();
 
         /* Only retry in case this is a generic ConnectionException */
         if (ConnectionException.class.getName().equals(exceptionName))
-          return loadFavicon(link, true, monitor);
+          return loadFavicon(link, false, true, monitor);
       }
     } catch (IOException e) {
       /* Ignore */
@@ -262,9 +282,30 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     return null;
   }
 
-  /*
+  private URI getFavicon(URI link, IProgressMonitor monitor) throws ConnectionException {
+
+    /* Define Properties for Connection */
+    Map<Object, Object> properties = new HashMap<Object, Object>();
+    properties.put(IConnectionPropertyConstants.PROGRESS_MONITOR, monitor);
+    properties.put(IConnectionPropertyConstants.CON_TIMEOUT, FAVICON_CON_TIMEOUT);
+
+    /* Open Stream */
+    InputStream ins = openStream(link, properties);
+    BufferedInputStream bufIns = new BufferedInputStream(ins);
+    BufferedReader reader = new BufferedReader(new InputStreamReader(bufIns));
+
+    /* Use real Base if possible */
+    if (ins instanceof HttpConnectionInputStream)
+      return CoreUtils.findFavicon(reader, ((HttpConnectionInputStream) ins).getLink());
+
+    /* Otherwise use request URI */
+    return CoreUtils.findFavicon(reader, link);
+  }
+
+  /**
    * Do not override default URLStreamHandler of HTTP/HTTPS and therefor return
    * NULL.
+   *
    * @see org.rssowl.core.connection.IProtocolHandler#getURLStreamHandler()
    */
   public URLStreamHandlerService getURLStreamHandler() {

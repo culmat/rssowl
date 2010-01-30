@@ -99,7 +99,7 @@ import java.util.Map.Entry;
 
 /**
  * Helper class for various Core operations.
- *
+ * 
  * @author bpasero
  */
 public class CoreUtils {
@@ -121,7 +121,12 @@ public class CoreUtils {
 
   /* Mime Types for Feeds */
   private static final String[] FEED_MIME_TYPES = new String[] { "application/rss+xml", "application/atom+xml", "application/rdf+xml" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-  private static final String HREF = "href="; //$NON-NLS-1$
+
+  /* Favicon Markers */
+  private static final String[] FAVICON_MARKERS = new String[] { "shortcut icon", ".ico" }; //$NON-NLS-1$ //$NON-NLS-2$
+
+  /* Href Variants */
+  private static final String[] HREF_VARIANTS = new String[] { "href = ", "href= ", "href=", "HREF=", "href =" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 
   /* Reserved Characters for Filenames on Windows */
   private static final String[] RESERVED_FILENAME_CHARACTERS_WINDOWS = new String[] { "<", ">", ":", "\"", "/", "\\", "|", "?", "*" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$
@@ -368,7 +373,7 @@ public class CoreUtils {
 
   /**
    * Delete any Folder and Mark that is child of folders contained in the list.
-   *
+   * 
    * @param entities the list to scan for elements that are already contained in
    * existing folders.
    */
@@ -396,7 +401,7 @@ public class CoreUtils {
 
   /**
    * Delete any Folder and Mark that is child of the given Folder
-   *
+   * 
    * @param folder
    * @param entities
    */
@@ -418,7 +423,7 @@ public class CoreUtils {
   /**
    * Returns a Headline for the given News. In general this will be the Title of
    * the News, but if not provided, parts of the Content will be taken instead.
-   *
+   * 
    * @param news The News to get the Headline from.
    * @param replaceEntities <code>true</code> to replace entities and
    * <code>false</code> otherwise.
@@ -506,7 +511,7 @@ public class CoreUtils {
   /**
    * Normalizes the given Title by removing various kinds of response codes
    * (e.g. Re).
-   *
+   * 
    * @param title The title to normalize.
    * @return Returns the normalized Title (that is, response codes have been
    * removed).
@@ -945,7 +950,7 @@ public class CoreUtils {
 
   /**
    * Returns a Set of all Links that are added as Bookmarks.
-   *
+   * 
    * @return Returns a Set of all Links that are added as Bookmarks.
    */
   public static Set<String> getFeedLinks() {
@@ -963,7 +968,7 @@ public class CoreUtils {
   /**
    * Returns the first <code>IBookMark</code> that references the same feed as
    * <code>feedRef</code> or <code>null</code> if none.
-   *
+   * 
    * @param feedRef The desired Feed.
    * @return Returns the first <code>IBookMark</code> that references the given
    * Feed or <code>null</code> if none.
@@ -982,7 +987,7 @@ public class CoreUtils {
   /**
    * Returns the first <code>IBookMark</code> that references the same feed as
    * <code>feedRef</code> or <code>null</code> if none.
-   *
+   * 
    * @param feedRef The desired Feed.
    * @return Returns the first <code>IBookMark</code> that references the given
    * Feed or <code>null</code> if none.
@@ -1248,7 +1253,7 @@ public class CoreUtils {
 
   /**
    * Copies the contents of one stream to another.
-   *
+   * 
    * @param fis the input stream to read from.
    * @param fos the output stream to write to.
    */
@@ -1346,7 +1351,7 @@ public class CoreUtils {
   /**
    * Check if the given searchmark is already existing in the set of
    * subscriptions by comparing names of all parents and conditions.
-   *
+   * 
    * @param search the searchmark to find in the current set of subscriptions.
    * @return <code>true</code> if there is a {@link ISearchMark} that matches
    * the name of the given search including the names of all parent folders or
@@ -1414,7 +1419,7 @@ public class CoreUtils {
   /**
    * Check if the given bin is already existing in the set of subscriptions by
    * comparing names of all parents.
-   *
+   * 
    * @param bin the bin to find in the current set of subscriptions.
    * @return <code>true</code> if there is a {@link INewsBin} that matches the
    * name of the given bin including the names of all parent folders or
@@ -1439,7 +1444,7 @@ public class CoreUtils {
   /**
    * Check if the given folder is already existing in the set of folders by
    * comparing names of all parents.
-   *
+   * 
    * @param folder the folder to find in the current set of folders.
    * @return the {@link IFolder} that matches the name of the given folder
    * including the names of all parent folders or <code>null</code> if none.
@@ -1504,13 +1509,28 @@ public class CoreUtils {
    * <code>null</code> if none.
    */
   public static URI findFeed(BufferedReader reader, URI base) {
+    return findUri(reader, base, FEED_MIME_TYPES);
+  }
+
+  /**
+   * @param reader a {@link BufferedReader} to read from.
+   * @param base the base {@link URI} to resolve any relative {@link URI}
+   * against.
+   * @return a {@link URI} of a favicon found in the content of the reader or
+   * <code>null</code> if none.
+   */
+  public static URI findFavicon(BufferedReader reader, URI base) {
+    return findUri(reader, base, FAVICON_MARKERS);
+  }
+
+  private static URI findUri(BufferedReader reader, URI base, String[] markers) {
     try {
       String line;
       while ((line = reader.readLine()) != null) {
-        for (String feedMimeType : FEED_MIME_TYPES) {
-          int index = line.indexOf(feedMimeType);
+        for (String marker : markers) {
+          int index = line.indexOf(marker);
 
-          /* Mime Type Found */
+          /* Marker Found */
           if (index > -1) {
 
             /* Set index to where the Link Element starts */
@@ -1522,14 +1542,29 @@ public class CoreUtils {
             }
 
             /* Find the HREF */
-            index = line.indexOf(HREF, index);
-            if (index > -1) {
+            String usedHref = null;
+            int hrefIndex = -1;
+            for (String href : HREF_VARIANTS) {
+              hrefIndex = line.indexOf(href, index);
+              if (hrefIndex != -1) {
+                usedHref = href;
+                break;
+              }
+            }
+
+            if (hrefIndex > -1 && usedHref != null) {
+              boolean inQuotes = false;
               StringBuilder str = new StringBuilder();
-              for (int i = index + HREF.length(); i < line.length(); i++) {
+              for (int i = hrefIndex + usedHref.length(); i < line.length(); i++) {
                 char c = line.charAt(i);
 
-                if (c == '\"' || c == '\'')
+                if (c == '\"' || c == '\'') {
+                  if (inQuotes)
+                    break;
+
+                  inQuotes = true;
                   continue;
+                }
 
                 if (Character.isWhitespace(c) || c == '>')
                   break;
@@ -1540,7 +1575,7 @@ public class CoreUtils {
               String linkVal = str.toString();
 
               /* Convert &amp; to & as it is a common character in a URL */
-              linkVal= StringUtils.replaceAll(linkVal, "&amp;", "&"); //$NON-NLS-1$ //$NON-NLS-2$
+              linkVal = StringUtils.replaceAll(linkVal, "&amp;", "&"); //$NON-NLS-1$ //$NON-NLS-2$
 
               /* Handle relative Links */
               try {
