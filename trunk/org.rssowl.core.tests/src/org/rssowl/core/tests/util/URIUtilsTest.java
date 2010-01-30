@@ -156,4 +156,17 @@ public class URIUtilsTest {
     assertEquals("http://www.rssowl.org/path/download.mp3", URIUtils.resolve(base2WithoutTrailingSlash, relativeWithLeadingSlash).toString());
     assertEquals("http://www.rssowl.org/other/path/download.mp3", URIUtils.resolve(base2WithoutTrailingSlash, relativeWithoutLeadingSlash).toString());
   }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testConvertToToplevel() throws Exception {
+    assertEquals("http://www.rssowl.org", URIUtils.toTopLevel(new URI("http://www.rssowl.org")).toString());
+    assertEquals("http://www.rssowl.org", URIUtils.toTopLevel(new URI("http://www.rssowl.org/")).toString());
+    assertEquals("http://rssowl.org", URIUtils.toTopLevel(new URI("http://rssowl.org/")).toString());
+    assertEquals("http://www.rssowl.org", URIUtils.toTopLevel(new URI("feed://www.rssowl.org/")).toString());
+    assertEquals("http://www.rssowl.org", URIUtils.toTopLevel(new URI("http://www.rssowl.org/path/index.html")).toString());
+    assertEquals(null, URIUtils.toTopLevel(new URI("/path/index.html")));
+  }
 }
