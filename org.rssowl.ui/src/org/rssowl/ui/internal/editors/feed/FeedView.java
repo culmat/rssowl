@@ -161,6 +161,9 @@ public class FeedView extends EditorPart implements IReusableEditor {
   /* The last visible Feedview */
   private static FeedView fgLastVisibleFeedView = null;
 
+  /* Flag to indicate if feed change events should be blocked or not */
+  private static boolean fgBlockFeedChangeEvent;
+
   /** ID of this EditorPart */
   public static final String ID = "org.rssowl.ui.FeedView"; //$NON-NLS-1$
 
@@ -1127,6 +1130,10 @@ public class FeedView extends EditorPart implements IReusableEditor {
     /* Handle seen News: Feed Change (also closing the feed view), Closing or Minimize Event */
     else if (event == UIEvent.FEED_CHANGE || event == UIEvent.MINIMIZE || event == UIEvent.TAB_CLOSE) {
 
+      /* Return early if this is a feed change which should be ignored */
+      if (event == UIEvent.FEED_CHANGE && fgBlockFeedChangeEvent)
+        return;
+
       /*
        * TODO This is a workaround to avoid potential race-conditions when closing a Tab. The problem
        * is that both FEED_CHANGE (due to hiding the tab) and TAB_CLOSE (due to actually closing
@@ -2006,5 +2013,13 @@ public class FeedView extends EditorPart implements IReusableEditor {
    */
   Composite getEditorControl() {
     return fParent;
+  }
+
+  /**
+   * @param blockFeedChangeEvent <code>true</code> to block the processing of
+   * feed change events and <code>false</code> otherwise.
+   */
+  public static void setBlockFeedChangeEvent(boolean blockFeedChangeEvent) {
+    fgBlockFeedChangeEvent = blockFeedChangeEvent;
   }
 }
