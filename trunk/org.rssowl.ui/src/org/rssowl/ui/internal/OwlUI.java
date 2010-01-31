@@ -1552,6 +1552,14 @@ public class OwlUI {
    * @param forceActivate
    */
   public static void openInFeedView(IWorkbenchPage page, IStructuredSelection selection, boolean forceActivate, PerformAfterInputSet perform) {
+    try {
+      internalOpenInFeedView(page, selection, forceActivate, perform);
+    } finally {
+      FeedView.setBlockFeedChangeEvent(false);
+    }
+  }
+
+  private static void internalOpenInFeedView(IWorkbenchPage page, IStructuredSelection selection, boolean forceActivate, PerformAfterInputSet perform) {
     List<?> list = selection.toList();
     boolean activateEditor = forceActivate || OpenStrategy.activateOnOpen();
     int openedEditors = 0;
@@ -1564,6 +1572,10 @@ public class OwlUI {
       if (object instanceof INewsMark) {
         INewsMark mark = ((INewsMark) object);
         FeedViewInput input = new FeedViewInput(mark, perform);
+
+        /* Start Blocking Feed Change Events if we open more than one Feed */
+        if (i == 1)
+          FeedView.setBlockFeedChangeEvent(true);
 
         /* Open in existing Feedview if set */
         if (reuseFeedView) {
