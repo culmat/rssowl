@@ -290,16 +290,23 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     properties.put(IConnectionPropertyConstants.CON_TIMEOUT, FAVICON_CON_TIMEOUT);
 
     /* Open Stream */
-    InputStream ins = openStream(link, properties);
-    BufferedInputStream bufIns = new BufferedInputStream(ins);
+    InputStream inS = openStream(link, properties);
+    BufferedInputStream bufIns = new BufferedInputStream(inS);
     BufferedReader reader = new BufferedReader(new InputStreamReader(bufIns));
+    try {
 
-    /* Use real Base if possible */
-    if (ins instanceof HttpConnectionInputStream)
-      return CoreUtils.findFavicon(reader, ((HttpConnectionInputStream) ins).getLink());
+      /* Use real Base if possible */
+      if (inS instanceof HttpConnectionInputStream)
+        return CoreUtils.findFavicon(reader, ((HttpConnectionInputStream) inS).getLink());
 
-    /* Otherwise use request URI */
-    return CoreUtils.findFavicon(reader, link);
+      /* Otherwise use request URI */
+      return CoreUtils.findFavicon(reader, link);
+    }
+
+    /* Finally close the Stream */
+    finally {
+      closeStream(inS, true);
+    }
   }
 
   /**
@@ -719,7 +726,6 @@ public class DefaultProtocolHandler implements IProtocolHandler {
 
     /* Open Stream */
     InputStream inS = openStream(link, properties);
-    Exception error = null;
     try {
 
       /* Buffered Stream to support mark and reset */
@@ -752,22 +758,12 @@ public class DefaultProtocolHandler implements IProtocolHandler {
       title = title.replaceAll(Pattern.quote("<![CDATA["), ""); //$NON-NLS-1$ //$NON-NLS-2$
       title = title.replaceAll(Pattern.quote("]]>"), ""); //$NON-NLS-1$ //$NON-NLS-2$
     } catch (IOException e) {
-      error = e;
       Activator.safeLogError(e.getMessage(), e);
     }
 
     /* Finally close the Stream */
     finally {
-
-      /* Close Stream */
-      try {
-        if (error != null && inS instanceof IAbortable)
-          ((IAbortable) inS).abort();
-        else
-          inS.close();
-      } catch (IOException e) {
-        Activator.safeLogError(e.getMessage(), e);
-      }
+      closeStream(inS, true);
     }
 
     return StringUtils.stripTags(title.trim(), true);
@@ -868,15 +864,22 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     properties.put(IConnectionPropertyConstants.CON_TIMEOUT, FEED_LABEL_CON_TIMEOUT);
 
     /* Open Stream */
-    InputStream ins = openStream(website, properties);
-    BufferedInputStream bufIns = new BufferedInputStream(ins);
+    InputStream inS = openStream(website, properties);
+    BufferedInputStream bufIns = new BufferedInputStream(inS);
     BufferedReader reader = new BufferedReader(new InputStreamReader(bufIns));
+    try {
 
-    /* Use real Base if possible */
-    if (ins instanceof HttpConnectionInputStream)
-      return CoreUtils.findFeed(reader, ((HttpConnectionInputStream) ins).getLink());
+      /* Use real Base if possible */
+      if (inS instanceof HttpConnectionInputStream)
+        return CoreUtils.findFeed(reader, ((HttpConnectionInputStream) inS).getLink());
 
-    /* Otherwise use request URI */
-    return CoreUtils.findFeed(reader, website);
+      /* Otherwise use request URI */
+      return CoreUtils.findFeed(reader, website);
+    }
+
+    /* Finally close the Stream */
+    finally {
+      closeStream(inS, true);
+    }
   }
 }

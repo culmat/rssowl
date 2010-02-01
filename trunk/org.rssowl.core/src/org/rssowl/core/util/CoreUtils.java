@@ -99,7 +99,7 @@ import java.util.Map.Entry;
 
 /**
  * Helper class for various Core operations.
- * 
+ *
  * @author bpasero
  */
 public class CoreUtils {
@@ -373,7 +373,7 @@ public class CoreUtils {
 
   /**
    * Delete any Folder and Mark that is child of folders contained in the list.
-   * 
+   *
    * @param entities the list to scan for elements that are already contained in
    * existing folders.
    */
@@ -401,7 +401,7 @@ public class CoreUtils {
 
   /**
    * Delete any Folder and Mark that is child of the given Folder
-   * 
+   *
    * @param folder
    * @param entities
    */
@@ -423,7 +423,7 @@ public class CoreUtils {
   /**
    * Returns a Headline for the given News. In general this will be the Title of
    * the News, but if not provided, parts of the Content will be taken instead.
-   * 
+   *
    * @param news The News to get the Headline from.
    * @param replaceEntities <code>true</code> to replace entities and
    * <code>false</code> otherwise.
@@ -511,7 +511,7 @@ public class CoreUtils {
   /**
    * Normalizes the given Title by removing various kinds of response codes
    * (e.g. Re).
-   * 
+   *
    * @param title The title to normalize.
    * @return Returns the normalized Title (that is, response codes have been
    * removed).
@@ -950,7 +950,7 @@ public class CoreUtils {
 
   /**
    * Returns a Set of all Links that are added as Bookmarks.
-   * 
+   *
    * @return Returns a Set of all Links that are added as Bookmarks.
    */
   public static Set<String> getFeedLinks() {
@@ -968,7 +968,7 @@ public class CoreUtils {
   /**
    * Returns the first <code>IBookMark</code> that references the same feed as
    * <code>feedRef</code> or <code>null</code> if none.
-   * 
+   *
    * @param feedRef The desired Feed.
    * @return Returns the first <code>IBookMark</code> that references the given
    * Feed or <code>null</code> if none.
@@ -987,7 +987,7 @@ public class CoreUtils {
   /**
    * Returns the first <code>IBookMark</code> that references the same feed as
    * <code>feedRef</code> or <code>null</code> if none.
-   * 
+   *
    * @param feedRef The desired Feed.
    * @return Returns the first <code>IBookMark</code> that references the given
    * Feed or <code>null</code> if none.
@@ -1253,7 +1253,7 @@ public class CoreUtils {
 
   /**
    * Copies the contents of one stream to another.
-   * 
+   *
    * @param fis the input stream to read from.
    * @param fos the output stream to write to.
    */
@@ -1351,7 +1351,7 @@ public class CoreUtils {
   /**
    * Check if the given searchmark is already existing in the set of
    * subscriptions by comparing names of all parents and conditions.
-   * 
+   *
    * @param search the searchmark to find in the current set of subscriptions.
    * @return <code>true</code> if there is a {@link ISearchMark} that matches
    * the name of the given search including the names of all parent folders or
@@ -1419,7 +1419,7 @@ public class CoreUtils {
   /**
    * Check if the given bin is already existing in the set of subscriptions by
    * comparing names of all parents.
-   * 
+   *
    * @param bin the bin to find in the current set of subscriptions.
    * @return <code>true</code> if there is a {@link INewsBin} that matches the
    * name of the given bin including the names of all parent folders or
@@ -1444,7 +1444,7 @@ public class CoreUtils {
   /**
    * Check if the given folder is already existing in the set of folders by
    * comparing names of all parents.
-   * 
+   *
    * @param folder the folder to find in the current set of folders.
    * @return the {@link IFolder} that matches the name of the given folder
    * including the names of all parent folders or <code>null</code> if none.
@@ -1502,7 +1502,8 @@ public class CoreUtils {
   }
 
   /**
-   * @param reader a {@link BufferedReader} to read from.
+   * @param reader a {@link BufferedReader} to read from. The caller is
+   * responsible to close any streams associated with it.
    * @param base the base {@link URI} to resolve any relative {@link URI}
    * against.
    * @return a {@link URI} of a feed found in the content of the reader or
@@ -1513,7 +1514,8 @@ public class CoreUtils {
   }
 
   /**
-   * @param reader a {@link BufferedReader} to read from.
+   * @param reader a {@link BufferedReader} to read from. The caller is
+   * responsible to close any streams associated with it.
    * @param base the base {@link URI} to resolve any relative {@link URI}
    * against.
    * @return a {@link URI} of a favicon found in the content of the reader or
@@ -1605,15 +1607,6 @@ public class CoreUtils {
       Activator.safeLogError(e.getMessage(), e);
     } catch (URISyntaxException e) {
       Activator.safeLogError(e.getMessage(), e);
-    }
-
-    /* Finally close the Reader */
-    finally {
-      try {
-        reader.close();
-      } catch (IOException e) {
-        Activator.safeLogError(e.getMessage(), e);
-      }
     }
 
     return null;
