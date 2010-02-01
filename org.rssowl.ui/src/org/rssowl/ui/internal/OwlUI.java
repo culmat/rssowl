@@ -1821,7 +1821,7 @@ public class OwlUI {
     String sampleState = Messages.OwlUI_UPDATED;
 
     STATE_WIDTH = OwlUI.getTextSize(Display.getDefault(), OwlUI.getBold(HEADLINES_FONT_ID), sampleState).x;
-    STATE_WIDTH += Application.IS_WINDOWS ? 15 : 30; // Bounds of Column requires more space
+    STATE_WIDTH += Application.IS_WINDOWS ? 25 : 30; // Bounds of Column requires more space (arrow indicator)
 
     return STATE_WIDTH;
   }
