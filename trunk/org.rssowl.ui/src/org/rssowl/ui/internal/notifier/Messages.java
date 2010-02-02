@@ -34,7 +34,7 @@ public class Messages extends NLS {
   public static String NotificationPopup_N_SEARCH_MATCHES;
   public static String NotificationPopup_NO_CONTENT;
   public static String NotificationPopup_PAGE_N_OF_M;
-  public static String NotificationPopup_TODAYS_NEWS;
+  public static String NotificationPopup_RECENT_NEWS;
   public static String SearchNotificationItem_NAME_UNREAD_COUNT;
   public static String SearchNotificationItem_NEW_RESULTS;
 

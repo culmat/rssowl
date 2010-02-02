@@ -395,7 +395,7 @@ public class NotificationPopup extends PopupDialog {
 
     String titlePart;
     if (fMode == Mode.RECENT)
-      titlePart = Messages.NotificationPopup_TODAYS_NEWS;
+      titlePart = Messages.NotificationPopup_RECENT_NEWS;
     else if (fMode == Mode.INCOMING_MANUAL)
       titlePart = Messages.NotificationPopup_INCOMING_NEWS;
     else if (newsCount == 0 && searchCount > 0)

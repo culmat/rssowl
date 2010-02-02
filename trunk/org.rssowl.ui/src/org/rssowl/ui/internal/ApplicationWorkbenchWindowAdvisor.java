@@ -86,7 +86,6 @@ import org.rssowl.ui.internal.util.JobRunner;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -773,15 +772,16 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         IModelFactory factory = Owl.getModelFactory();
 
         String newsClassName = INews.class.getName();
-        ISearchField ageField = factory.createSearchField(INews.AGE_IN_DAYS, newsClassName);
-        ISearchCondition ageCondition = factory.createSearchCondition(ageField, SearchSpecifier.IS_LESS_THAN, 1);
-        ISearchField stateField = factory.createSearchField(INews.STATE, newsClassName);
-        ISearchCondition stateCondition = factory.createSearchCondition(stateField, SearchSpecifier.IS, EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED, INews.State.READ));
+        ISearchField ageInDaysField = factory.createSearchField(INews.AGE_IN_DAYS, newsClassName);
+        ISearchField ageInMinutesField = factory.createSearchField(INews.AGE_IN_MINUTES, newsClassName);
+
+        ISearchCondition dayCondition = factory.createSearchCondition(ageInDaysField, SearchSpecifier.IS_LESS_THAN, 1); // From Today after Midnight
+        ISearchCondition recentCondition = factory.createSearchCondition(ageInMinutesField, SearchSpecifier.IS_LESS_THAN, -60 * 6); // Up to 6 Hours Ago
 
         fTodaysNewsSearch = factory.createSearch(null);
-        fTodaysNewsSearch.setMatchAllConditions(true);
-        fTodaysNewsSearch.addSearchCondition(ageCondition);
-        fTodaysNewsSearch.addSearchCondition(stateCondition);
+        fTodaysNewsSearch.setMatchAllConditions(false);
+        fTodaysNewsSearch.addSearchCondition(dayCondition);
+        fTodaysNewsSearch.addSearchCondition(recentCondition);
       }
 
       /* Sort by Id (simulate sorting by date) */
@@ -803,7 +803,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       int counter = 0;
       for (NewsReference reference : recentNews) {
         INews newsitem = reference.resolve();
-        if (newsitem != null) {
+        if (newsitem != null && newsitem.isVisible()) {
           newsToShow.add(newsitem);
 
           if (++counter >= TEASE_LIMIT)
