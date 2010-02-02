@@ -87,7 +87,7 @@ public class HTMLStripReader extends Reader {
         "thetasym", "Ccedil", "ordm", "uArr", "forall", "beta", "fnof", "rho", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
         "micro", "eacute", "omega", "middot", "Gamma", "rlm", "lang", "spades", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
         "supe", "thorn", "ouml", "or", "raquo", "part", "sect", "ldquo", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
-        "hearts", "sigma", "oacute", "apos" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+        "hearts", "sigma", "oacute" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
      };
 
     /* Entity Values */
@@ -110,7 +110,7 @@ public class HTMLStripReader extends Reader {
         982, 203, 934, 205, 34, 218, 927, 8800, 191, 951, 8217, 253, 929, 8595,
         202, 937, 226, 8764, 966, 962, 175, 977, 199, 186, 8657, 8704, 946,
         402, 961, 181, 233, 969, 183, 915, 8207, 9001, 9824, 8839, 254, 246,
-        8744, 187, 8706, 167, 8220, 9829, 963, 243, 39
+        8744, 187, 8706, 167, 8220, 9829, 963, 243
     };
 
     /* Fill Entities */

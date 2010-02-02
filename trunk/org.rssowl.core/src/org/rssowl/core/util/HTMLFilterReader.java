@@ -88,7 +88,7 @@ public class HTMLFilterReader extends Reader {
         "Ecirc", "Omega", "acirc", "sim", "phi", "sigmaf", "macr", "thetasym", "Ccedil", "ordm", "uArr", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$
         "forall", "beta", "fnof", "rho", "micro", "eacute", "omega", "middot", "Gamma", "rlm", "lang", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$
         "spades", "supe", "thorn", "ouml", "or", "raquo", "part", "sect", "ldquo", "hearts", "sigma", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$
-        "oacute", "apos" }; //$NON-NLS-1$ //$NON-NLS-2$
+        "oacute" }; //$NON-NLS-1$
 
     /* Entity Values */
     final char[] entityVal = { 8204, 229, 62, 165, 242, 935, 948, 9002, 8835, 8482, 209, 958, 978, 160,
@@ -105,7 +105,7 @@ public class HTMLFilterReader extends Reader {
         8971, 8194, 8629, 249, 8707, 8773, 952, 8853, 8240, 194, 982, 203, 934, 205, 34, 218, 927, 8800,
         191, 951, 8217, 253, 929, 8595, 202, 937, 226, 8764, 966, 962, 175, 977, 199, 186, 8657, 8704, 946,
         402, 961, 181, 233, 969, 183, 915, 8207, 9001, 9824, 8839, 254, 246, 8744, 187, 8706, 167, 8220,
-        9829, 963, 243, 39 };
+        9829, 963, 243 };
 
     /* Fill Entities */
     for (int i = 0; i < entityName.length; i++)
