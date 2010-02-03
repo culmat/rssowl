@@ -500,8 +500,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
             service.closePopup();
           }
 
-          /* Notifier not showing - invoke single click action */
-          else {
+          /* Notifier not showing - invoke single click action (only if not recently closed) */
+          else if (!service.wasPopupRecentlyClosed()) {
             JobRunner.runInBackgroundThread(doubleClickTime, new Runnable() {
               public void run() {
                 if (lastDoubleClickTime < System.currentTimeMillis() - doubleClickTime) {
