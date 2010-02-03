@@ -43,6 +43,7 @@ import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.BatchedBuffer;
 import org.rssowl.core.util.CoreUtils;
+import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.ApplicationWorkbenchAdvisor;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.Controller;
@@ -77,6 +78,9 @@ public class NotificationService {
 
   /* Singleton instance */
   private static NotificationPopup fgNotificationPopup;
+
+  /* Remember Last Closing Time */
+  private static long fgNotificationPopupCloseTime;
 
   /** Supported Modes of the Notifier */
   public enum Mode {
@@ -138,14 +142,22 @@ public class NotificationService {
    * @return <code>true</code> if the popup notification is currently visible
    * and <code>false</code> otherwise.
    */
-  public boolean isPopupVisible() {
+  public synchronized boolean isPopupVisible() {
     return fgNotificationPopup != null;
+  }
+
+  /**
+   * @return <code>true</code> if the notification popup was recently closed and
+   * <code>false</code> otherwise.
+   */
+  public boolean wasPopupRecentlyClosed() {
+    return System.currentTimeMillis() - fgNotificationPopupCloseTime < 300;
   }
 
   /**
    * Close the notification popup if it is currently showing.
    */
-  public void closePopup() {
+  public synchronized void closePopup() {
     NotificationPopup popup = fgNotificationPopup;
     if (popup != null)
       popup.doClose();
@@ -344,15 +356,32 @@ public class NotificationService {
 
         /* Show News in Popup */
         synchronized (this) {
+
+          /* Popup not yet visible, create new */
           if (fgNotificationPopup == null) {
             fgNotificationPopup = new NotificationPopup(items.size(), mode) {
               @Override
               public boolean doClose() {
                 fgNotificationPopup = null;
+                fgNotificationPopupCloseTime = System.currentTimeMillis();
                 return super.doClose();
               }
             };
-            fgNotificationPopup.open(items);
+
+            try {
+              fgNotificationPopup.open(items);
+            }
+
+            /*
+             * For some reason a NPE is raised from Decorations.restoreFocus(Decorations.java:806)
+             * as outlined in Bug 1389 (NullPointer while clicking on tray icon). It seems like an
+             * issue in Eclipse code that is hard to prevent, as such we have to ensure that the
+             * next invokation of showItems() has a chance to create the notification popup again.
+             */
+            catch (Exception e) {
+              Activator.safeLogError(e.getMessage(), e);
+              fgNotificationPopup = null;
+            }
           }
 
           /* Notifier already opened - Show Items (only for automatic) */
