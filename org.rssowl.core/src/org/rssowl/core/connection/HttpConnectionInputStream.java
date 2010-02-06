@@ -56,6 +56,7 @@ public class HttpConnectionInputStream extends FilterInputStream implements ICon
   private static final String HEADER_RESPONSE_ETAG = "ETag"; //$NON-NLS-1$
   private static final String HEADER_RESPONSE_LAST_MODIFIED = "Last-Modified"; //$NON-NLS-1$
   private static final String HEADER_RESPONSE_CONTENT_LENGTH = "Content-Length"; //$NON-NLS-1$
+  private static final String HEADER_RESPONSE_CONTENT_TYPE = "Content-Type"; //$NON-NLS-1$
 
   private final HttpMethodBase fMethod;
   private final IProgressMonitor fMonitor;
@@ -192,7 +193,7 @@ public class HttpConnectionInputStream extends FilterInputStream implements ICon
 
   /**
    * @return the content length of the content served by this stream or -1 if
-   * not available;
+   * not available.
    */
   public int getContentLength() {
     Header header = fMethod.getResponseHeader(HEADER_RESPONSE_CONTENT_LENGTH);
@@ -206,5 +207,17 @@ public class HttpConnectionInputStream extends FilterInputStream implements ICon
     }
 
     return -1;
+  }
+
+  /**
+   * @return the content type of the content served by this stream or null if
+   * not available.
+   */
+  public String getContentType() {
+    Header header = fMethod.getResponseHeader(HEADER_RESPONSE_CONTENT_TYPE);
+    if (header != null)
+      return header.getValue();
+
+    return null;
   }
 }

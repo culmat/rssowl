@@ -869,11 +869,23 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     BufferedReader reader = new BufferedReader(new InputStreamReader(bufIns));
     try {
 
-      /* Use real Base if possible */
-      if (inS instanceof HttpConnectionInputStream)
-        return CoreUtils.findFeed(reader, ((HttpConnectionInputStream) inS).getLink());
+      /* Our HttpConnectionInputStream */
+      if (inS instanceof HttpConnectionInputStream) {
 
-      /* Otherwise use request URI */
+        /* Check the content type and return early if already a feed */
+        String contentType = ((HttpConnectionInputStream) inS).getContentType();
+        if (contentType != null) {
+          for (String feedContentType : CoreUtils.FEED_MIME_TYPES) {
+            if (contentType.toLowerCase().contains(feedContentType))
+              return website;
+          }
+        }
+
+        /* Use real Base if possible */
+        return CoreUtils.findFeed(reader, ((HttpConnectionInputStream) inS).getLink());
+      }
+
+      /* Normal Stream (use request URI) */
       return CoreUtils.findFeed(reader, website);
     }
 

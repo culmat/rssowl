@@ -113,14 +113,14 @@ public class CoreUtils {
   /** Newsbin Index Value for Long Arrays */
   public static final int NEWSBIN = 2;
 
+  /** Mime Types for Feeds */
+  public static final String[] FEED_MIME_TYPES = new String[] { "application/rss+xml", "application/atom+xml", "application/rdf+xml" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
   /* A Set of Stop Words in English */
   private static final Set<String> STOP_WORDS = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(StringUtils.ENGLISH_STOP_WORDS)));
 
   /* Special case structural actions that need to run as last action */
   private static List<String> STRUCTURAL_ACTIONS = Arrays.asList(new String[] { MoveNewsAction.ID, CopyNewsAction.ID });
-
-  /* Mime Types for Feeds */
-  private static final String[] FEED_MIME_TYPES = new String[] { "application/rss+xml", "application/atom+xml", "application/rdf+xml" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
   /* Favicon Markers */
   private static final String[] FAVICON_MARKERS = new String[] { "shortcut icon", ".ico" }; //$NON-NLS-1$ //$NON-NLS-2$

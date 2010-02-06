@@ -111,7 +111,8 @@ public interface IProtocolHandler {
 
   /**
    * Returns the {@link URI} of the Feed that is available from the given
-   * website or <code>null</code> if none.
+   * website or <code>null</code> if none. If the given {@link URI} already is a
+   * feed, it is up to the implementation whether to return the same object.
    *
    * @param website the website to look for a valid feed.
    * @param monitor an instance of {@link IProgressMonitor} that can be used to
