@@ -61,6 +61,9 @@ public class URIUtils {
   /** The HTTP Protocol */
   public static final String HTTP = "http://"; //$NON-NLS-1$
 
+  /** The FEED Protocol */
+  public static final String FEED = "feed://"; //$NON-NLS-1$
+
   /** Identifier for a Protocol */
   public static final String PROTOCOL_IDENTIFIER = "://"; //$NON-NLS-1$
 
@@ -147,6 +150,9 @@ public class URIUtils {
   public static boolean looksLikeFeedLink(String str, boolean strict) {
     if (!looksLikeLink(str))
       return false;
+
+    if (str.startsWith(FEED))
+      return true;
 
     for (String extension : FEED_EXTENSIONS) {
       if (strict && str.contains("." + extension)) //$NON-NLS-1$
