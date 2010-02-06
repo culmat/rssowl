@@ -291,7 +291,19 @@ public class NewsBrowserLabelProvider extends LabelProvider {
    * @throws IOException In case of an error while writing.
    */
   public void writeCSS(Writer writer) throws IOException {
-    writeCSS(writer, isSingleNewsDisplayed());
+    writeCSS(writer, isSingleNewsDisplayed(), true);
+  }
+
+  /**
+   * Writes the CSS information to the given Writer.
+   *
+   * @param writer the writer to add the CSS information to.
+   * @param withInternalLinks <code>true</code> to include links of the internal
+   * protocol rssowl:// and <code>false</code> otherwise.
+   * @throws IOException In case of an error while writing.
+   */
+  public void writeCSS(Writer writer, boolean withInternalLinks) throws IOException {
+    writeCSS(writer, isSingleNewsDisplayed(), withInternalLinks);
   }
 
   /**
@@ -300,9 +312,11 @@ public class NewsBrowserLabelProvider extends LabelProvider {
    * @param writer the writer to add the CSS information to.
    * @param forSingleNews if <code>true</code>, the site contains a single news,
    * or <code>false</code> if it contains a collection of news.
+   * @param withInternalLinks <code>true</code> to include links of the internal
+   * protocol rssowl:// and <code>false</code> otherwise.
    * @throws IOException In case of an error while writing.
    */
-  public void writeCSS(Writer writer, boolean forSingleNews) throws IOException {
+  public void writeCSS(Writer writer, boolean forSingleNews, boolean withInternalLinks) throws IOException {
 
     /* Open CSS */
     writer.write("<style type=\"text/css\">\n"); //$NON-NLS-1$
@@ -341,7 +355,10 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.write("div.content p { margin-top: 0; padding-top: 0; margin-left: 0; padding-left: 0; }\n"); //$NON-NLS-1$
 
     /* Title */
-    writer.append("div.title { float: left; padding-bottom: 6px; ").append(fBiggerFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    if (fIsIE && withInternalLinks) //Need to set width to avoid float drop bug of delete button (see Bug 1393)
+      writer.append("div.title { width: 90%; float: left; padding-bottom: 6px; ").append(fBiggerFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    else
+      writer.append("div.title { float: left; padding-bottom: 6px; ").append(fBiggerFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
     writer.write("div.title a { color: #009; text-decoration: none; }\n"); //$NON-NLS-1$
     writer.write("div.title a.unread { font-weight: bold; text-decoration: none; }\n"); //$NON-NLS-1$
