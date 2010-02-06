@@ -55,6 +55,9 @@ public class URIUtilsTest {
     assertTrue(URIUtils.looksLikeFeedLink("http://www.domain.de/foobar.rdf"));
     assertTrue(URIUtils.looksLikeFeedLink("http://www.domain.de/foobar.xml"));
     assertTrue(URIUtils.looksLikeFeedLink("http://www.domain.de/foobar.atom"));
+
+    assertTrue(URIUtils.looksLikeFeedLink("feed://www.domain.de/news.php"));
+    assertTrue(URIUtils.looksLikeFeedLink("feed://www.domain.de/foobar.atom"));
   }
 
   /**
