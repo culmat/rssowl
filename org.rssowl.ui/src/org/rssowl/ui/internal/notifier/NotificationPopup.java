@@ -552,7 +552,8 @@ public class NotificationPopup extends PopupDialog {
         boolean newStateSticky = !item.isSticky();
 
         /* Update Background Color */
-        itemLabel.setBackground(newStateSticky ? fStickyBgColor : fInnerContentCircle.getBackground());
+        if (!OwlUI.isHighContrast())
+          itemLabel.setRoundRectangleBackground(newStateSticky ? fStickyBgColor : null);
 
         /* Update Image */
         markStickyLabel.setImage(newStateSticky ? fItemStickyIcon : fItemNonStickyIcon);
@@ -564,7 +565,8 @@ public class NotificationPopup extends PopupDialog {
 
     /* Show Sticky if required */
     if (item.supportsSticky() && item.isSticky()) {
-      itemLabel.setBackground(fStickyBgColor);
+      if (!OwlUI.isHighContrast())
+        itemLabel.setRoundRectangleBackground(fStickyBgColor);
       markStickyLabel.setImage(fItemStickyIcon);
     }
 
