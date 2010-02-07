@@ -621,14 +621,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     clearTease(false);
   }
 
-  /**
-   * Clears teasing in the tray if showing.
-   */
-  public void clearTeaseIfShowing() {
-    if (fTrayTeasing && isMinimizedToTray() && fTrayItem != null && !fTrayItem.isDisposed())
-      clearTease(false);
-  }
-
   private void clearTease(boolean clearTray) {
     if (fTrayTeasing)
       fTrayItem.setImage(OwlUI.getImage(fResources, OwlUI.TRAY_OWL));
