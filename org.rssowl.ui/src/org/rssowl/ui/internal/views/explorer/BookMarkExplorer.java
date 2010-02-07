@@ -1811,8 +1811,8 @@ public class BookMarkExplorer extends ViewPart {
         return false;
     }
 
-    /* Folders are no valid navigation nodes */
-    else if (data instanceof IFolder)
+    /* Folders and Entity Groups are no valid navigation nodes */
+    else if (data instanceof IFolder || data instanceof EntityGroup)
       return false;
 
     return true;
