@@ -70,9 +70,6 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.StringUtils;
-import org.rssowl.ui.internal.Application;
-import org.rssowl.ui.internal.ApplicationWorkbenchAdvisor;
-import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.notifier.NotificationService.Mode;
 import org.rssowl.ui.internal.util.CCLabel;
@@ -155,7 +152,6 @@ public class NotificationPopup extends PopupDialog {
   private FadeJob fFadeJob;
   private Collection<NotificationItem> fInitialItems;
   private final Mode fMode;
-  private boolean fUserInteracted;
 
   private class FadeJob extends UIJob {
     FadeJob() {
@@ -497,7 +493,6 @@ public class NotificationPopup extends PopupDialog {
     MouseAdapter mouseListener = new MouseAdapter() {
       @Override
       public void mouseUp(MouseEvent e) {
-        fUserInteracted = true;
 
         /* Close Popup if required after opening */
         if (fGlobalScope.getBoolean(DefaultPreferences.CLOSE_NOTIFIER_ON_OPEN)) {
@@ -527,7 +522,6 @@ public class NotificationPopup extends PopupDialog {
     markReadLabel.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseDown(MouseEvent e) {
-        fUserInteracted = true;
         boolean newStateRead = !item.isRead();
 
         /* Update Font */
@@ -548,7 +542,6 @@ public class NotificationPopup extends PopupDialog {
     markStickyLabel.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseDown(MouseEvent e) {
-        fUserInteracted = true;
         boolean newStateSticky = !item.isSticky();
 
         /* Update Background Color */
@@ -726,7 +719,6 @@ public class NotificationPopup extends PopupDialog {
     closeButton.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseUp(MouseEvent e) {
-        fUserInteracted = true;
         doClose();
       }
 
@@ -838,7 +830,6 @@ public class NotificationPopup extends PopupDialog {
     fPrevButton.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseUp(MouseEvent e) {
-        fUserInteracted = true;
         onNavPrevious();
       }
 
@@ -858,7 +849,6 @@ public class NotificationPopup extends PopupDialog {
     fNextButton.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseUp(MouseEvent e) {
-        fUserInteracted = true;
         onNavNext();
       }
 
@@ -921,8 +911,6 @@ public class NotificationPopup extends PopupDialog {
   }
 
   private void handleUserAction() {
-    fUserInteracted = true;
-
     if (fMouseOverNotifier || fGlobalScope.getBoolean(DefaultPreferences.STICKY_NOTIFICATION_POPUP))
       return;
 
@@ -1072,13 +1060,6 @@ public class NotificationPopup extends PopupDialog {
       fFooterBgImage.dispose();
     if (fInitialItems != null)
       fInitialItems.clear();
-
-    /* Little Hack: Clear Teasing Status from Tray if user interacted with Notifier */
-    if (fUserInteracted && Application.IS_WINDOWS && fMode == Mode.INCOMING_AUTOMATIC) {
-      ApplicationWorkbenchWindowAdvisor advisor = ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor;
-      if (advisor != null)
-        advisor.clearTeaseIfShowing();
-    }
 
     return super.close();
   }
