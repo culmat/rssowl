@@ -110,6 +110,7 @@ public class CCLabel extends Canvas {
   private int[] gradientPercents;
   private boolean gradientVertical;
   private Color background;
+  private Color roundRectangleBackground;
 
   /**
    * Constructs a new instance of this class given its parent and a style value
@@ -525,6 +526,14 @@ public class CCLabel extends Canvas {
           gc.setBackground(getBackground());
           gc.fillRectangle(rect);
         }
+
+        if (roundRectangleBackground != null) {
+          Color oldBackground = gc.getBackground();
+          gc.setBackground(roundRectangleBackground);
+          gc.fillRoundRectangle(rect.x, rect.y, rect.width, rect.height, 10, 50);
+          if (oldBackground != null)
+            gc.setBackground(oldBackground);
+        }
       }
     } catch (SWTException e) {
       if ((getStyle() & SWT.DOUBLE_BUFFERED) == 0) {
@@ -918,5 +927,14 @@ public class CCLabel extends Canvas {
       }
     } while (pos != -1);
     return lines;
+  }
+
+  /**
+   * @param roundRectangleBackground the color to use as round rectangle
+   * background behind the text or <code>null</code> if none.
+   */
+  public void setRoundRectangleBackground(Color roundRectangleBackground) {
+    this.roundRectangleBackground = roundRectangleBackground;
+    redraw();
   }
 }
