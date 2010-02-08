@@ -68,6 +68,7 @@ public class NewsBrowserControl implements IFeedViewPart {
   private NewsBrowserViewer fViewer;
   private ISelectionListener fSelectionListener;
   private Object fInitialInput;
+  private boolean fInputSet;
   private IPreferenceScope fInputPreferences;
   private IPropertyChangeListener fPropertyChangeListener;
   private boolean fStripMediaFromNews;
@@ -172,6 +173,7 @@ public class NewsBrowserControl implements IFeedViewPart {
 
     /* Remember as initial Input */
     fInitialInput = fViewer.getInput();
+    fInputSet= true;
   }
 
   private Object getInput(Object obj) {
@@ -222,9 +224,10 @@ public class NewsBrowserControl implements IFeedViewPart {
 
         IStructuredSelection selection = (IStructuredSelection) sel;
 
-        /* Restore Initial Input if selection is empty */
-        if (selection.isEmpty())
+        /* Restore Initial Input (if set) if selection is empty */
+        if (selection.isEmpty() && fInputSet) {
           fViewer.setInput(fInitialInput);
+        }
 
         /* Set Elements as Input if 1 Item is selected */
         else if (selection.size() == 1)
