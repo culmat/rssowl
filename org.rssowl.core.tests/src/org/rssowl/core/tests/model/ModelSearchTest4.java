@@ -26,11 +26,14 @@ package org.rssowl.core.tests.model;
 
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.Query;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.junit.Test;
 import org.rssowl.core.internal.persist.News;
+import org.rssowl.core.internal.persist.search.ModelSearchQueries;
 import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ICategory;
@@ -1091,6 +1094,35 @@ public class ModelSearchTest4 extends AbstractModelSearchTest {
     List<SearchHit<NewsReference>> result = fModelSearch.searchNews(conditions, false);
     assertEquals(1, result.size());
     assertEquals("Foo", result.get(0).getResult().resolve().getTitle());
+
+    BooleanQuery.setMaxClauseCount(maxClauseCount);
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testMaxClauseCountForQuery() throws Exception {
+    int maxClauseCount = BooleanQuery.getMaxClauseCount();
+    BooleanQuery.setMaxClauseCount(3);
+
+    IFolderChild root = fFactory.createFolder(null, null, "Root");
+    IFeed feed1 = DynamicDAO.save(fFactory.createFeed(null, new URI("http://www.feed.com/feed1.xml")));
+    IFeed feed2 = DynamicDAO.save(fFactory.createFeed(null, new URI("http://www.feed.com/feed2.xml")));
+    IFeed feed3 = DynamicDAO.save(fFactory.createFeed(null, new URI("http://www.feed.com/feed3.xml")));
+    IFeed feed4 = DynamicDAO.save(fFactory.createFeed(null, new URI("http://www.feed.com/feed4.xml")));
+
+    DynamicDAO.save(fFactory.createBookMark(null, (IFolder) root, new FeedLinkReference(feed1.getLink()), "BM1"));
+    DynamicDAO.save(fFactory.createBookMark(null, (IFolder) root, new FeedLinkReference(feed2.getLink()), "BM1"));
+    DynamicDAO.save(fFactory.createBookMark(null, (IFolder) root, new FeedLinkReference(feed3.getLink()), "BM1"));
+    DynamicDAO.save(fFactory.createBookMark(null, (IFolder) root, new FeedLinkReference(feed4.getLink()), "BM1"));
+
+    ISearchField field = fFactory.createSearchField(INews.LOCATION, fNewsEntityName);
+    List<ISearchCondition> conditions = new ArrayList<ISearchCondition>();
+    conditions.add(fFactory.createSearchCondition(field, SearchSpecifier.IS, ModelUtils.toPrimitive(Collections.singletonList(root))));
+
+    Query query = ModelSearchQueries.createQuery(conditions, false);
+    assertNotNull(query);
 
     BooleanQuery.setMaxClauseCount(maxClauseCount);
   }

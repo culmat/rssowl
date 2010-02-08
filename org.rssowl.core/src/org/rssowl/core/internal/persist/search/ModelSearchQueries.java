@@ -43,6 +43,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.search.BooleanClause.Occur;
+import org.apache.lucene.search.BooleanQuery.TooManyClauses;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.persist.IBookMark;
@@ -124,6 +125,25 @@ public class ModelSearchQueries {
    * @throws IOException in case of an error.
    */
   public static Query createQuery(Collection<ISearchCondition> conditions, boolean matchAllConditions) throws IOException {
+    try {
+      return internalCreateQuery(conditions, matchAllConditions);
+    }
+
+    /* Too Many Clauses - Increase Clauses Limit */
+    catch (TooManyClauses e) {
+
+      /* Disable Clauses Limit */
+      if (BooleanQuery.getMaxClauseCount() != ModelSearchImpl.MAX_CLAUSE_COUNT) {
+        BooleanQuery.setMaxClauseCount(ModelSearchImpl.MAX_CLAUSE_COUNT);
+        return internalCreateQuery(conditions, matchAllConditions);
+      }
+
+      /* Maximum reached */
+      throw e;
+    }
+  }
+
+  private static Query internalCreateQuery(Collection<ISearchCondition> conditions, boolean matchAllConditions) throws IOException {
     BooleanQuery bQuery = new BooleanQuery();
 
     /* Handle Scope Query separately */
@@ -726,7 +746,10 @@ public class ModelSearchQueries {
 
     String escapedString = sb.toString();
 
-    /* This results in a parser exception from QueryParser and thus needs special treatment */
+    /*
+     * This results in a parser exception from QueryParser and thus needs
+     * special treatment
+     */
     if (doubleQuoteCount % 2 != 0) {
       escapedString = escapedString.replace("\"", "\\\""); //$NON-NLS-1$ //$NON-NLS-2$
       if (startsWithDoubleQuote && endsWithDoubleQuote) //Restore Quotes for Phrase Search if necessary
