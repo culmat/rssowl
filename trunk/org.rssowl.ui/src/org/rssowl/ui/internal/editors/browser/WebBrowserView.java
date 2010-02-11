@@ -619,7 +619,7 @@ public class WebBrowserView extends EditorPart implements IReusableEditor {
       perform = PerformAfterInputSet.selectNews(newsReference);
 
     if (newsMark != null)
-      OwlUI.openInFeedView(fEditorSite.getPage(), new StructuredSelection(newsMark), true, perform);
+      OwlUI.openInFeedView(fEditorSite.getPage(), new StructuredSelection(newsMark), true, false, perform);
   }
 
   private void createLocationInput(Composite parent) {

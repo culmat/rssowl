@@ -1702,7 +1702,7 @@ public class BookMarkExplorer extends ViewPart {
     else if (newsScoped)
       perform = PerformAfterInputSet.SELECT_FIRST_NEWS;
 
-    OwlUI.openInFeedView(fViewSite.getPage(), selection, true, perform);
+    OwlUI.openInFeedView(fViewSite.getPage(), selection, true, false, perform);
   }
 
   private ITreeNode navigateInTree(Tree tree, boolean next, boolean unread) {

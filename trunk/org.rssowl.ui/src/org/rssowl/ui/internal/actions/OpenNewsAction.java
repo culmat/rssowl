@@ -195,6 +195,6 @@ public class OpenNewsAction extends Action {
 
     /* Otherwise open the Input in a new Editor */
     else
-      OwlUI.openInFeedView(page, new StructuredSelection(newsmark), true, perform);
+      OwlUI.openInFeedView(page, new StructuredSelection(newsmark), true, false, perform);
   }
 }

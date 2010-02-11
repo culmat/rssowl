@@ -1249,6 +1249,21 @@ public class OwlUI {
   }
 
   /**
+   * @return the number of opened feed views (will not trigger editor
+   * restoring).
+   */
+  public static int getOpenFeedViewCount() {
+    int count = 0;
+    List<IEditorReference> editors = getEditorReferences();
+    for (IEditorReference reference : editors) {
+      if (FeedView.ID.equals(reference.getId()))
+        count++;
+    }
+
+    return count;
+  }
+
+  /**
    * Attempts to find the first active <code>FeedView</code> from the PlatformUI
    * facade. Otherwise, returns <code>NULL</code> if none.
    *
@@ -1540,7 +1555,19 @@ public class OwlUI {
    * @param forceActivate
    */
   public static void openInFeedView(IWorkbenchPage page, IStructuredSelection selection, boolean forceActivate) {
-    openInFeedView(page, selection, forceActivate, null);
+    openInFeedView(page, selection, forceActivate, false);
+  }
+
+  /**
+   * Opens a selection of {@link INewsMark} inside the feed view.
+   *
+   * @param page
+   * @param selection
+   * @param forceActivate
+   * @param ignoreAlreadyOpened
+   */
+  public static void openInFeedView(IWorkbenchPage page, IStructuredSelection selection, boolean forceActivate, boolean ignoreAlreadyOpened) {
+    openInFeedView(page, selection, forceActivate, ignoreAlreadyOpened, null);
   }
 
   /**
@@ -1550,16 +1577,17 @@ public class OwlUI {
    * @param selection
    * @param perform
    * @param forceActivate
+   * @param ignoreAlreadyOpened
    */
-  public static void openInFeedView(IWorkbenchPage page, IStructuredSelection selection, boolean forceActivate, PerformAfterInputSet perform) {
+  public static void openInFeedView(IWorkbenchPage page, IStructuredSelection selection, boolean forceActivate, boolean ignoreAlreadyOpened, PerformAfterInputSet perform) {
     try {
-      internalOpenInFeedView(page, selection, forceActivate, perform);
+      internalOpenInFeedView(page, selection, forceActivate, ignoreAlreadyOpened, perform);
     } finally {
       FeedView.setBlockFeedChangeEvent(false);
     }
   }
 
-  private static void internalOpenInFeedView(IWorkbenchPage page, IStructuredSelection selection, boolean forceActivate, PerformAfterInputSet perform) {
+  private static void internalOpenInFeedView(IWorkbenchPage page, IStructuredSelection selection, boolean forceActivate, boolean ignoreAlreadyOpened, PerformAfterInputSet perform) {
     List<?> list = selection.toList();
     boolean activateEditor = forceActivate || OpenStrategy.activateOnOpen();
     int openedEditors = 0;
@@ -1599,11 +1627,19 @@ public class OwlUI {
             explicitPerform = (existingEditor != null);
           }
 
-          page.openEditor(input, FeedView.ID, activateEditor);
+          /* Open Editor (check for already opened if set) */
+          if (!ignoreAlreadyOpened || page.findEditor(input) == null)
+            page.openEditor(input, FeedView.ID, activateEditor);
+
           openedEditors++;
 
+          /* Pass in Perform Code */
           if (explicitPerform && existingEditor instanceof FeedView)
             ((FeedView) existingEditor).perform(perform);
+
+          /* Break loop if we reuse feed views (thus can only display a single feed) */
+          if (reuseFeedView)
+            break;
         } catch (PartInitException e) {
           Activator.getDefault().getLog().log(e.getStatus());
         }
