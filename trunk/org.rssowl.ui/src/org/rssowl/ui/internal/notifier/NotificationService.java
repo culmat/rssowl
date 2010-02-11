@@ -43,7 +43,6 @@ import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.BatchedBuffer;
 import org.rssowl.core.util.CoreUtils;
-import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.ApplicationWorkbenchAdvisor;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.Controller;
@@ -374,12 +373,11 @@ public class NotificationService {
 
             /*
              * For some reason a NPE is raised from Decorations.restoreFocus(Decorations.java:806)
-             * as outlined in Bug 1389 (NullPointer while clicking on tray icon). It seems like an
-             * issue in Eclipse code that is hard to prevent, as such we have to ensure that the
-             * next invokation of showItems() has a chance to create the notification popup again.
+             * as outlined in Bug 1389 (NullPointer while clicking on tray icon). This is actually
+             * caused by a bug in Eclipse (https://bugs.eclipse.org/bugs/show_bug.cgi?id=212219)
+             * that is only fixed in version 3.5 and newer.
              */
             catch (Exception e) {
-              Activator.safeLogError(e.getMessage(), e);
               fgNotificationPopup = null;
             }
           }
