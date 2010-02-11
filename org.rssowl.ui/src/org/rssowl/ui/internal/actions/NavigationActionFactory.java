@@ -246,7 +246,7 @@ public class NavigationActionFactory implements IExecutableExtensionFactory, IEx
 
         IWorkbenchPage page = OwlUI.getPage();
         if (page != null)
-          OwlUI.openInFeedView(page, new StructuredSelection(mark), true, perform);
+          OwlUI.openInFeedView(page, new StructuredSelection(mark), true, false, perform);
       }
 
       return targetNode != null;

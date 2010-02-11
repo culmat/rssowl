@@ -43,6 +43,7 @@ import org.rssowl.core.persist.event.BookMarkEvent;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.util.EditorUtils;
 import org.rssowl.ui.internal.util.JobRunner;
 
 import java.util.ArrayList;
@@ -222,11 +223,25 @@ public class FeedReloadService {
     if (!newsmarksToOpenOnStartup.isEmpty()) {
       JobRunner.runInUIThread(null, new Runnable() {
         public void run() {
-          IWorkbenchWindow wWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-          IWorkbenchPage page = wWindow != null ? wWindow.getActivePage() : null;
+          IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+          IWorkbenchPage page = (window != null) ? window.getActivePage() : null;
+          if (page != null) {
+            IPreferenceScope preferences = Owl.getPreferenceService().getGlobalScope();
+            boolean reuseFeedView = preferences.getBoolean(DefaultPreferences.ALWAYS_REUSE_FEEDVIEW);
+            int maxOpenEditors = EditorUtils.getOpenEditorLimit();
+            int openFeedViewCount = OwlUI.getOpenFeedViewCount();
 
-          if (page != null)
-            OwlUI.openInFeedView(page, new StructuredSelection(newsmarksToOpenOnStartup));
+            /* Do not open any Feed if reusing the feedview and already having one open */
+            if (reuseFeedView && openFeedViewCount >= 1)
+              return;
+
+            /* Do not open any Feed if already showing max number of Feeds */
+            if (openFeedViewCount >= maxOpenEditors)
+              return;
+
+            /* Open in Feedview */
+            OwlUI.openInFeedView(page, new StructuredSelection(newsmarksToOpenOnStartup), false, true, null);
+          }
         }
       });
     }
