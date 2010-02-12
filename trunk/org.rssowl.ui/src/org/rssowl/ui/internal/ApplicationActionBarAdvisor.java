@@ -456,72 +456,82 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         manager.add(layoutMenu);
 
         /* Zoom (In, Out, Reset) */
-        final boolean isFeedViewActive = OwlUI.getActiveFeedView() != null;
-        MenuManager zoomMenu = new MenuManager(Messages.ApplicationActionBarAdvisor_ZOOM);
-        zoomMenu.add(new Action(Messages.ApplicationActionBarAdvisor_ZOOM_IN) {
-          @Override
-          public void run() {
-            OwlUI.zoomNewsText(true, false);
-          }
+        final MenuManager zoomMenu = new MenuManager(Messages.ApplicationActionBarAdvisor_ZOOM);
+        zoomMenu.setRemoveAllWhenShown(true);
+        zoomMenu.addMenuListener(new IMenuListener() {
+          public void menuAboutToShow(IMenuManager manager) {
+            FeedView activeFeedView = OwlUI.getActiveFeedView();
+            final boolean isZoomingEnabled = (activeFeedView != null && activeFeedView.isBrowserShowingNews());
 
-          @Override
-          public String getId() {
-            return "org.rssowl.ui.ZoomInCommand"; //$NON-NLS-1$
-          }
+            /* Zoom In */
+            zoomMenu.add(new Action(Messages.ApplicationActionBarAdvisor_ZOOM_IN) {
+              @Override
+              public void run() {
+                OwlUI.zoomNewsText(true, false);
+              }
 
-          @Override
-          public String getActionDefinitionId() {
-            return "org.rssowl.ui.ZoomInCommand"; //$NON-NLS-1$
-          }
+              @Override
+              public String getId() {
+                return "org.rssowl.ui.ZoomInCommand"; //$NON-NLS-1$
+              }
 
-          @Override
-          public boolean isEnabled() {
-            return isFeedViewActive;
-          }
-        });
+              @Override
+              public String getActionDefinitionId() {
+                return "org.rssowl.ui.ZoomInCommand"; //$NON-NLS-1$
+              }
 
-        zoomMenu.add(new Action(Messages.ApplicationActionBarAdvisor_ZOOM_OUT) {
-          @Override
-          public void run() {
-            OwlUI.zoomNewsText(false, false);
-          }
+              @Override
+              public boolean isEnabled() {
+                return isZoomingEnabled;
+              }
+            });
 
-          @Override
-          public String getId() {
-            return "org.rssowl.ui.ZoomOutCommand"; //$NON-NLS-1$
-          }
+            /* Zoom Out */
+            zoomMenu.add(new Action(Messages.ApplicationActionBarAdvisor_ZOOM_OUT) {
+              @Override
+              public void run() {
+                OwlUI.zoomNewsText(false, false);
+              }
 
-          @Override
-          public String getActionDefinitionId() {
-            return "org.rssowl.ui.ZoomOutCommand"; //$NON-NLS-1$
-          }
+              @Override
+              public String getId() {
+                return "org.rssowl.ui.ZoomOutCommand"; //$NON-NLS-1$
+              }
 
-          @Override
-          public boolean isEnabled() {
-            return isFeedViewActive;
-          }
-        });
+              @Override
+              public String getActionDefinitionId() {
+                return "org.rssowl.ui.ZoomOutCommand"; //$NON-NLS-1$
+              }
 
-        zoomMenu.add(new Separator());
-        zoomMenu.add(new Action(Messages.ApplicationActionBarAdvisor_RESET) {
-          @Override
-          public void run() {
-            OwlUI.zoomNewsText(false, true);
-          }
+              @Override
+              public boolean isEnabled() {
+                return isZoomingEnabled;
+              }
+            });
 
-          @Override
-          public String getId() {
-            return "org.rssowl.ui.ZoomResetCommand"; //$NON-NLS-1$
-          }
+            /* Reset */
+            zoomMenu.add(new Separator());
+            zoomMenu.add(new Action(Messages.ApplicationActionBarAdvisor_RESET) {
+              @Override
+              public void run() {
+                OwlUI.zoomNewsText(false, true);
+              }
 
-          @Override
-          public String getActionDefinitionId() {
-            return "org.rssowl.ui.ZoomResetCommand"; //$NON-NLS-1$
-          }
+              @Override
+              public String getId() {
+                return "org.rssowl.ui.ZoomResetCommand"; //$NON-NLS-1$
+              }
 
-          @Override
-          public boolean isEnabled() {
-            return isFeedViewActive;
+              @Override
+              public String getActionDefinitionId() {
+                return "org.rssowl.ui.ZoomResetCommand"; //$NON-NLS-1$
+              }
+
+              @Override
+              public boolean isEnabled() {
+                return isZoomingEnabled;
+              }
+            });
           }
         });
 

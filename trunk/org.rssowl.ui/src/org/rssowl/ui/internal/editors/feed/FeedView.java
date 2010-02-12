@@ -108,6 +108,7 @@ import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.TreeTraversal;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Application;
+import org.rssowl.ui.internal.ApplicationServer;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.FolderNewsMark;
 import org.rssowl.ui.internal.OwlUI;
@@ -118,6 +119,7 @@ import org.rssowl.ui.internal.actions.ReloadTypesAction;
 import org.rssowl.ui.internal.actions.RetargetActions;
 import org.rssowl.ui.internal.undo.NewsStateOperation;
 import org.rssowl.ui.internal.undo.UndoStack;
+import org.rssowl.ui.internal.util.CBrowser;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
 import org.rssowl.ui.internal.util.UIBackgroundJob;
@@ -2021,5 +2023,21 @@ public class FeedView extends EditorPart implements IReusableEditor {
    */
   public static void setBlockFeedChangeEvent(boolean blockFeedChangeEvent) {
     fgBlockFeedChangeEvent = blockFeedChangeEvent;
+  }
+
+  /**
+   * @return <code>true</code> if the news browser viewer of this feed view is
+   * showing the contents of a website and <code>false</code> otherwise.
+   */
+  public boolean isBrowserShowingNews() {
+    if (fNewsBrowserControl != null && fNewsBrowserControl.getViewer() != null) {
+      CBrowser browser = fNewsBrowserControl.getViewer().getBrowser();
+      if (browser != null && browser.getControl() != null && !browser.getControl().isDisposed()) {
+        String url = browser.getControl().getUrl();
+        return StringUtils.isSet(url) && ApplicationServer.getDefault().isNewsServerUrl(url);
+      }
+    }
+
+    return false;
   }
 }
