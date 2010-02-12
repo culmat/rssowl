@@ -49,6 +49,8 @@ public class CopyLinkAction extends Action implements IActionDelegate {
   /** ID of this Action */
   public static final String ID = "org.rssowl.ui.CopyLinkAction"; //$NON-NLS-1$
 
+  private ISelection fSelection;
+
   /**
    * Set ID and Action Definition ID.
    */
@@ -65,7 +67,7 @@ public class CopyLinkAction extends Action implements IActionDelegate {
    */
   @Override
   public boolean isEnabled() {
-    ISelection selection = OwlUI.getActiveSelection();
+    ISelection selection = getSelection();
     if (selection != null && !selection.isEmpty() && selection instanceof IStructuredSelection) {
       List<?> list = ((IStructuredSelection) selection).toList();
       for (Object entry : list) {
@@ -82,7 +84,7 @@ public class CopyLinkAction extends Action implements IActionDelegate {
    */
   @Override
   public void run() {
-    ISelection selection = OwlUI.getActiveSelection();
+    ISelection selection = getSelection();
     if (selection != null && !selection.isEmpty() && selection instanceof IStructuredSelection) {
       IStructuredSelection structuredSelection = (IStructuredSelection) selection;
       StringBuilder str = new StringBuilder();
@@ -112,6 +114,17 @@ public class CopyLinkAction extends Action implements IActionDelegate {
     }
   }
 
+  private ISelection getSelection() {
+
+    /* First look for active Selection */
+    ISelection activeSelection = OwlUI.getActiveSelection();
+    if (activeSelection != null && !activeSelection.isEmpty() && activeSelection instanceof IStructuredSelection)
+      return activeSelection;
+
+    /* Fallback to explicitly set one */
+    return fSelection;
+  }
+
   /*
    * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
    */
@@ -122,5 +135,7 @@ public class CopyLinkAction extends Action implements IActionDelegate {
   /*
    * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction, org.eclipse.jface.viewers.ISelection)
    */
-  public void selectionChanged(IAction action, ISelection selection) {}
+  public void selectionChanged(IAction action, ISelection selection) {
+    fSelection = selection;
+  }
 }
