@@ -90,6 +90,7 @@ import org.rssowl.ui.internal.undo.NewsStateOperation;
 import org.rssowl.ui.internal.undo.StickyOperation;
 import org.rssowl.ui.internal.undo.UndoStack;
 import org.rssowl.ui.internal.util.CBrowser;
+import org.rssowl.ui.internal.util.JobRunner;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -379,8 +380,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   }
 
   /*
-   * @see org.rssowl.ui.internal.ILinkHandler#handle(java.lang.String,
-   * java.net.URI)
+   * @see org.rssowl.ui.internal.ILinkHandler#handle(java.lang.String, java.net.URI)
    */
   public void handle(String id, URI link) {
 
@@ -394,7 +394,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
     /* Handler to perform a Search */
     if (queryProvided && (TITLE_HANDLER_ID.equals(id) || AUTHOR_HANDLER_ID.equals(id) || CATEGORY_HANDLER_ID.equals(id) || LABEL_HANDLER_ID.equals(id))) {
-      List<ISearchCondition> conditions = new ArrayList<ISearchCondition>(1);
+      final List<ISearchCondition> conditions = new ArrayList<ISearchCondition>(1);
       String entity = INews.class.getName();
 
       /* Search on Title */
@@ -427,11 +427,16 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
       /* Open Dialog and Search */
       if (conditions.size() >= 1 && !fBrowser.getControl().isDisposed()) {
-        boolean useLowScoreFilter = TITLE_HANDLER_ID.equals(id);
+        final boolean useLowScoreFilter = TITLE_HANDLER_ID.equals(id);
 
-        SearchNewsDialog dialog = new SearchNewsDialog(fBrowser.getControl().getShell(), conditions, true, true);
-        dialog.setUseLowScoreFilter(useLowScoreFilter);
-        dialog.open();
+        /* See Bug 747 - run asynced */
+        delayInUI(new Runnable() {
+          public void run() {
+            SearchNewsDialog dialog = new SearchNewsDialog(fBrowser.getControl().getShell(), conditions, true, true);
+            dialog.setUseLowScoreFilter(useLowScoreFilter);
+            dialog.open();
+          }
+        });
       }
     }
 
@@ -518,51 +523,71 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
     /* Go to Next News */
     else if (NEXT_NEWS_HANDLER_ID.equals(id)) {
-      NavigationActionFactory factory = new NavigationActionFactory();
-      try {
-        factory.setInitializationData(null, null, NavigationActionFactory.NavigationActionType.NEXT_FEED.getId());
-        IWorkbenchWindowActionDelegate action = (IWorkbenchWindowActionDelegate) factory.create();
-        action.run(null);
-      } catch (CoreException e) {
-        /* Ignore */
-      }
+      delayInUI(new Runnable() {
+        public void run() {
+          NavigationActionFactory factory = new NavigationActionFactory();
+          try {
+            factory.setInitializationData(null, null, NavigationActionFactory.NavigationActionType.NEXT_FEED.getId());
+            IWorkbenchWindowActionDelegate action = (IWorkbenchWindowActionDelegate) factory.create();
+            action.run(null);
+          } catch (CoreException e) {
+            /* Ignore */
+          }
+        }
+      });
     }
 
     /* Go to Next Unread News */
     else if (NEXT_UNREAD_NEWS_HANDLER_ID.equals(id)) {
-      NavigationActionFactory factory = new NavigationActionFactory();
-      try {
-        factory.setInitializationData(null, null, NavigationActionFactory.NavigationActionType.NEXT_UNREAD_FEED.getId());
-        IWorkbenchWindowActionDelegate action = (IWorkbenchWindowActionDelegate) factory.create();
-        action.run(null);
-      } catch (CoreException e) {
-        /* Ignore */
-      }
+      delayInUI(new Runnable() {
+        public void run() {
+          NavigationActionFactory factory = new NavigationActionFactory();
+          try {
+            factory.setInitializationData(null, null, NavigationActionFactory.NavigationActionType.NEXT_UNREAD_FEED.getId());
+            IWorkbenchWindowActionDelegate action = (IWorkbenchWindowActionDelegate) factory.create();
+            action.run(null);
+          } catch (CoreException e) {
+            /* Ignore */
+          }
+        }
+      });
     }
 
     /* Go to Previous News */
     else if (PREVIOUS_NEWS_HANDLER_ID.equals(id)) {
-      NavigationActionFactory factory = new NavigationActionFactory();
-      try {
-        factory.setInitializationData(null, null, NavigationActionFactory.NavigationActionType.PREVIOUS_FEED.getId());
-        IWorkbenchWindowActionDelegate action = (IWorkbenchWindowActionDelegate) factory.create();
-        action.run(null);
-      } catch (CoreException e) {
-        /* Ignore */
-      }
+      delayInUI(new Runnable() {
+        public void run() {
+          NavigationActionFactory factory = new NavigationActionFactory();
+          try {
+            factory.setInitializationData(null, null, NavigationActionFactory.NavigationActionType.PREVIOUS_FEED.getId());
+            IWorkbenchWindowActionDelegate action = (IWorkbenchWindowActionDelegate) factory.create();
+            action.run(null);
+          } catch (CoreException e) {
+            /* Ignore */
+          }
+        }
+      });
     }
 
     /* Go to Previous Unread News */
     else if (PREVIOUS_UNREAD_NEWS_HANDLER_ID.equals(id)) {
-      NavigationActionFactory factory = new NavigationActionFactory();
-      try {
-        factory.setInitializationData(null, null, NavigationActionFactory.NavigationActionType.PREVIOUS_UNREAD_FEED.getId());
-        IWorkbenchWindowActionDelegate action = (IWorkbenchWindowActionDelegate) factory.create();
-        action.run(null);
-      } catch (CoreException e) {
-        /* Ignore */
-      }
+      delayInUI(new Runnable() {
+        public void run() {
+          NavigationActionFactory factory = new NavigationActionFactory();
+          try {
+            factory.setInitializationData(null, null, NavigationActionFactory.NavigationActionType.PREVIOUS_UNREAD_FEED.getId());
+            IWorkbenchWindowActionDelegate action = (IWorkbenchWindowActionDelegate) factory.create();
+            action.run(null);
+          } catch (CoreException e) {
+            /* Ignore */
+          }
+        }
+      });
     }
+  }
+
+  private void delayInUI(Runnable runnable) {
+    JobRunner.runInUIThread(0, true, getControl(), runnable);
   }
 
   private INews getNews(String query) {

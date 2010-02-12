@@ -518,14 +518,7 @@ public class CBrowser {
             final URI link = new URI(event.location);
             final String host = link.getHost();
             if (StringUtils.isSet(host) && fLinkHandler.containsKey(host)) {
-
-              /* See Bug 747 - run asynced */
-              JobRunner.runInUIThread(0, true, getControl(), new Runnable() {
-                public void run() {
-                  fLinkHandler.get(host).handle(host, link);
-                }
-              });
-
+              fLinkHandler.get(host).handle(host, link);
               event.doit = false;
               return;
             }
