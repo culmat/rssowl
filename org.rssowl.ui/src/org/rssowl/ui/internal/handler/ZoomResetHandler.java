@@ -28,6 +28,7 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.IHandler;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.editors.feed.FeedView;
 
 /**
  * This {@link IHandler} is required to support key-bindings for programmatic
@@ -41,7 +42,8 @@ public class ZoomResetHandler extends AbstractHandler {
    * @see org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands.ExecutionEvent)
    */
   public Object execute(ExecutionEvent event) {
-    if (OwlUI.getActiveFeedView() != null)
+    FeedView activeFeedView = OwlUI.getActiveFeedView();
+    if (activeFeedView != null && activeFeedView.isBrowserShowingNews())
       OwlUI.zoomNewsText(false, true);
 
     return null; //As per JavaDoc
