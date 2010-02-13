@@ -33,7 +33,6 @@ import org.eclipse.jface.viewers.ContentViewer;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
-import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.ISearchMark;
@@ -737,14 +736,13 @@ public class ApplicationServer {
     for (Object object : elements) {
       if (object instanceof INews) {
         INews news = (INews) object;
-        IFeed feed = news.getFeedReference().resolve();
 
         /* Base-Information explicitly set */
-        if (feed.getBase() != null)
-          return feed.getBase().toString();
+        if (news.getBase() != null)
+          return news.getBase().toString();
 
         /* Use Feed's Link as fallback */
-        return feed.getLink().toString();
+        return news.getFeedLinkAsText();
       }
     }
 
