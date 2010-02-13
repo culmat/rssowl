@@ -67,8 +67,12 @@ public class XMLNamespaceHandler implements INamespaceHandler {
     /* Base URI */
     if ("base".equals(attribute.getName())) { //$NON-NLS-1$
       URI baseUri = URIUtils.createURI(attribute.getValue());
+
+      /* Feed */
       if (baseUri != null && type instanceof IFeed)
         ((IFeed) type).setBase(baseUri);
+
+      /* News */
       else if (baseUri != null && type instanceof INews) {
         INews news = (INews) type;
 
