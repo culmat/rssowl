@@ -223,6 +223,7 @@ public class RDFInterpreter extends BasicInterpreter {
 
   private void processItem(Element element, IFeed feed) {
     INews news = Owl.getModelFactory().createNews(null, feed, new Date(System.currentTimeMillis() - (fNewsCounter++ * 1)));
+    news.setBase(feed.getBase());
 
     /* Interpret Attributes */
     List<?> itemAttributes = element.getAttributes();

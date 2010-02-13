@@ -112,6 +112,7 @@ public class CDFInterpreter extends BasicInterpreter {
 
   private void processItem(Element element, IFeed feed) {
     INews news = Owl.getModelFactory().createNews(null, feed, new Date(System.currentTimeMillis() - (fNewsCounter++ * 1)));
+    news.setBase(feed.getBase());
 
     String baseUrl = feed.getHomepage() != null ? feed.getHomepage().toString() : ""; //$NON-NLS-1$
 

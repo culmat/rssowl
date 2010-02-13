@@ -390,6 +390,7 @@ public class RSSInterpreter extends BasicInterpreter {
 
   private void processItems(Element element, IFeed feed) {
     INews news = Owl.getModelFactory().createNews(null, feed, new Date(System.currentTimeMillis() - (fNewsCounter++ * 1)));
+    news.setBase(feed.getBase());
 
     /* Check wether the Attributes are to be processed by a Contribution */
     processNamespaceAttributes(element, news);
