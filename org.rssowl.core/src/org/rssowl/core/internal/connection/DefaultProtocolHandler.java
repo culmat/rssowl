@@ -162,6 +162,12 @@ public class DefaultProtocolHandler implements IProtocolHandler {
       Owl.getInterpreter().interpret(inS, feed, null);
     } catch (EncodingException e) {
 
+      /* Return on Cancelation or Shutdown */
+      if (monitor.isCanceled()) {
+        closeStream(inS, true);
+        return null;
+      }
+
       /* Re-retrieve InputStream from the Feed's Link */
       inS = openStream(link, properties);
 

@@ -362,11 +362,13 @@ public class Controller {
     fBookMarkListener = new BookMarkAdapter() {
       @Override
       public void entitiesDeleted(Set<BookMarkEvent> events) {
-        for (BookMarkEvent event : events) {
-          Long id = event.getEntity().getId();
-          OwlUI.deleteImage(id);
-          if (id != null)
-            fDeletedBookmarksCache.put(id, id);
+        if (!fShuttingDown) {
+          for (BookMarkEvent event : events) {
+            Long id = event.getEntity().getId();
+            OwlUI.deleteImage(id);
+            if (id != null)
+              fDeletedBookmarksCache.put(id, id);
+          }
         }
       }
     };
@@ -378,25 +380,29 @@ public class Controller {
 
       @Override
       public void entitiesAdded(Set<LabelEvent> events) {
-        updateLabelCommands();
+        if (!fShuttingDown)
+          updateLabelCommands();
       }
 
       @Override
       public void entitiesUpdated(Set<LabelEvent> events) {
-        updateLabelCommands();
+        if (!fShuttingDown) {
+          updateLabelCommands();
 
-        for (LabelEvent event : events) {
-          ILabel oldLabel = event.getOldLabel();
-          ILabel updatedLabel = event.getEntity();
-          if (!oldLabel.getName().equals(updatedLabel.getName())) {
-            updateLabelConditions(oldLabel.getName(), updatedLabel.getName());
+          for (LabelEvent event : events) {
+            ILabel oldLabel = event.getOldLabel();
+            ILabel updatedLabel = event.getEntity();
+            if (!oldLabel.getName().equals(updatedLabel.getName())) {
+              updateLabelConditions(oldLabel.getName(), updatedLabel.getName());
+            }
           }
         }
       }
 
       @Override
       public void entitiesDeleted(Set<LabelEvent> events) {
-        updateLabelCommands();
+        if (!fShuttingDown)
+          updateLabelCommands();
       }
     };
 
@@ -1022,7 +1028,8 @@ public class Controller {
     fShuttingDown = true;
 
     /* Unregister Listeners */
-    unregisterListeners();
+    if (!emergency)
+      unregisterListeners();
 
     /* Stop the Download Service */
     if (!emergency && fDownloadService != null)
