@@ -171,7 +171,7 @@ public class ApplicationServiceImpl implements IApplicationService {
         return;
 
       /* Return early on cancellation */
-      if (monitor.isCanceled())
+      if (monitor.isCanceled() || Owl.isShuttingDown())
         return;
 
       /* Copy over Properties to reloaded Feed to keep them */
@@ -183,7 +183,7 @@ public class ApplicationServiceImpl implements IApplicationService {
       }
 
       /* Return early on cancellation */
-      if (monitor.isCanceled())
+      if (monitor.isCanceled() || Owl.isShuttingDown())
         return;
 
       /* Merge with existing */
@@ -191,7 +191,7 @@ public class ApplicationServiceImpl implements IApplicationService {
       final List<INews> newNewsAdded = getNewNewsAdded(feed);
 
       /* Return early on cancellation */
-      if (monitor.isCanceled())
+      if (monitor.isCanceled() || Owl.isShuttingDown())
         return;
 
       /* Update Date of last added news in Bookmark */
@@ -205,7 +205,7 @@ public class ApplicationServiceImpl implements IApplicationService {
       }
 
       /* Return early on cancellation */
-      if (monitor.isCanceled())
+      if (monitor.isCanceled() || Owl.isShuttingDown())
         return;
 
       /* Update state of added news if equivalent news already exists */
@@ -216,7 +216,7 @@ public class ApplicationServiceImpl implements IApplicationService {
       });
 
       /* Return early on cancellation */
-      if (monitor.isCanceled())
+      if (monitor.isCanceled() || Owl.isShuttingDown())
         return;
 
       /* Retention Policy */
@@ -225,7 +225,7 @@ public class ApplicationServiceImpl implements IApplicationService {
         mergeResult.addUpdatedObject(news);
 
       /* Return early on cancellation */
-      if (monitor.isCanceled())
+      if (monitor.isCanceled() || Owl.isShuttingDown())
         return;
 
       /* Set ID to News and handle Description entity */
@@ -233,7 +233,7 @@ public class ApplicationServiceImpl implements IApplicationService {
       for (INews news : newNewsAdded) {
 
         /* Return early on cancellation */
-        if (monitor.isCanceled())
+        if (monitor.isCanceled() || Owl.isShuttingDown())
           return;
 
         long id;
@@ -251,7 +251,7 @@ public class ApplicationServiceImpl implements IApplicationService {
       }
 
       /* Return early on cancellation */
-      if (monitor.isCanceled())
+      if (monitor.isCanceled() || Owl.isShuttingDown())
         return;
 
       /* Run News Filters */
@@ -265,7 +265,7 @@ public class ApplicationServiceImpl implements IApplicationService {
       });
 
       /* Return early on cancellation and if no filter was running */
-      if (monitor.isCanceled() && !someNewsFiltered.get())
+      if ((monitor.isCanceled() || Owl.isShuttingDown()) && !someNewsFiltered.get())
         return;
 
       try {
@@ -332,7 +332,7 @@ public class ApplicationServiceImpl implements IApplicationService {
       return false;
 
     /* Return early on cancellation */
-    if (monitor.isCanceled())
+    if (monitor.isCanceled() || Owl.isShuttingDown())
       return false;
 
     /* Need to index News and perform Searches */
@@ -349,7 +349,7 @@ public class ApplicationServiceImpl implements IApplicationService {
         for (int i = 0; i < news.size(); i++) {
 
           /* Return early on cancellation */
-          if (monitor.isCanceled())
+          if (monitor.isCanceled() || Owl.isShuttingDown())
             return false;
 
           NewsDocument document = new NewsDocument(news.get(i));
@@ -368,14 +368,14 @@ public class ApplicationServiceImpl implements IApplicationService {
 
     /* Remember the news already filtered */
     List<INews> filteredNews = new ArrayList<INews>(news.size());
-    boolean filterMatchedAll= false;
+    boolean filterMatchedAll = false;
 
     /* Iterate over Filters */
     for (ISearchFilter filter : enabledFilters) {
 
       /* No Search Required */
       if (filter.getSearch() == null) {
-        filterMatchedAll= true;
+        filterMatchedAll = true;
 
         List<INews> remainingNews = new ArrayList<INews>(news);
         remainingNews.removeAll(filteredNews);
@@ -390,7 +390,7 @@ public class ApplicationServiceImpl implements IApplicationService {
       else if (directory != null && searcher[0] != null) {
 
         /* Return early if cancelled and nothing filtered yet */
-        if (monitor.isCanceled() && filteredNews.isEmpty())
+        if ((monitor.isCanceled() || Owl.isShuttingDown()) && filteredNews.isEmpty())
           return false;
 
         try {
@@ -516,7 +516,7 @@ public class ApplicationServiceImpl implements IApplicationService {
     for (INews newsItem : news) {
 
       /* Return early on cancellation */
-      if (monitor.isCanceled())
+      if (monitor.isCanceled() || Owl.isShuttingDown())
         return;
 
       List<NewsReference> equivalentNewsRefs = guidToNewsRefs.get(newsItem.getGuid());

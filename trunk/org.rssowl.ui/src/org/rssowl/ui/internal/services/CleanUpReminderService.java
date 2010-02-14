@@ -35,6 +35,7 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.DateUtils;
+import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.CleanUpAction;
 import org.rssowl.ui.internal.dialogs.CleanUpReminderDialog;
@@ -96,7 +97,7 @@ public class CleanUpReminderService {
           if (shell != null && !monitor.isCanceled() && Platform.isRunning()) {
             JobRunner.runSyncedInUIThread(shell, new Runnable() {
               public void run() {
-                if (monitor.isCanceled() || !Platform.isRunning())
+                if (monitor.isCanceled() || Controller.getDefault().isShuttingDown())
                   return;
 
                 if (CleanUpReminderDialog.getVisibleInstance() == null && new CleanUpReminderDialog(shell).open() == IDialogConstants.OK_ID) {

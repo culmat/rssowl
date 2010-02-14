@@ -602,12 +602,14 @@ public class FeedView extends EditorPart implements IReusableEditor {
               JobRunner.runUIUpdater(new UIBackgroundJob(fParent) {
                 @Override
                 protected void runInBackground(IProgressMonitor monitor) {
-                  fContentProvider.refreshCache(fInput.getMark(), false);
+                  if (!Controller.getDefault().isShuttingDown())
+                    fContentProvider.refreshCache(fInput.getMark(), false);
                 }
 
                 @Override
                 protected void runInUI(IProgressMonitor monitor) {
-                  refresh(true, true);
+                  if (!Controller.getDefault().isShuttingDown())
+                    refresh(true, true);
                 }
 
                 @Override
@@ -800,12 +802,8 @@ public class FeedView extends EditorPart implements IReusableEditor {
     if (fCacheWeights != null && fCacheWeights[0] != fCacheWeights[1]) {
       int weightDiff = (fInitialWeights[0] - fCacheWeights[0]);
       if (Math.abs(weightDiff) > 5) {
-        JobRunner.runInBackgroundThread(new Runnable() {
-          public void run() {
-            int strWeights[] = new int[] { fCacheWeights[0], fCacheWeights[1] };
-            fPreferences.putIntegers(DefaultPreferences.FV_SASHFORM_WEIGHTS, strWeights);
-          }
-        });
+        int strWeights[] = new int[] { fCacheWeights[0], fCacheWeights[1] };
+        fPreferences.putIntegers(DefaultPreferences.FV_SASHFORM_WEIGHTS, strWeights);
       }
     }
   }
