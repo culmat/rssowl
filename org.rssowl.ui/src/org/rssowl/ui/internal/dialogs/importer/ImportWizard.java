@@ -32,7 +32,6 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.PlatformUI;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.interpreter.ITypeImporter;
@@ -250,7 +249,7 @@ public class ImportWizard extends Wizard implements IImportWizard {
         if (explorer != null)
           explorer.saveStateOnDispose(false);
 
-        PlatformUI.getWorkbench().restart();
+        Controller.getDefault().restart();
         return true;
       }
     }

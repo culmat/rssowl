@@ -39,7 +39,6 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.update.configuration.IConfiguredSite;
 import org.eclipse.update.core.SiteManager;
 import org.eclipse.update.operations.IInstallFeatureOperation;
@@ -183,7 +182,7 @@ public class FindUpdatesAction extends Action implements IWorkbenchWindowActionD
         if (!errorUpdating) {
           boolean restart = MessageDialog.openQuestion(fShell, Messages.FindUpdatesAction_RESTART_RSSOWL, Messages.FindUpdatesAction_RESTART_AFTER_UPDATE);
           if (restart)
-            PlatformUI.getWorkbench().restart();
+            Controller.getDefault().restart();
         } else
           MessageDialog.openWarning(fShell, Messages.FindUpdatesAction_CHECK_UPDATES, Messages.FindUpdatesAction_WARNING_UPDATE_FAILED);
       }

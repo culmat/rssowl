@@ -30,7 +30,6 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.ui.PlatformUI;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
@@ -210,7 +209,7 @@ public class CleanUpWizard extends Wizard {
     if (askForRestart.get()) {
       boolean restart = MessageDialog.openQuestion(getShell(), Messages.CleanUpWizard_RESTART_RSSOWL, Messages.CleanUpWizard_RESTART_TO_CLEANUP);
       if (restart)
-        PlatformUI.getWorkbench().restart();
+        Controller.getDefault().restart();
     }
 
     return true;
