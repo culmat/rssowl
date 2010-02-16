@@ -219,6 +219,9 @@ public class Controller {
   /* Flag is set to TRUE when shutting down the application */
   private boolean fShuttingDown;
 
+  /* Flag is set to TRUE when restarting the application */
+  private boolean fRestarting;
+
   /* Service to manage Contexts */
   private ContextService fContextService;
 
@@ -1227,6 +1230,16 @@ public class Controller {
   }
 
   /**
+   * Returns wether the application is in process of restarting.
+   *
+   * @return <code>TRUE</code> if the application is restarting, and
+   * <code>FALSE</code> otherwise.
+   */
+  public boolean isRestarting() {
+    return fRestarting;
+  }
+
+  /**
    * Returns wether the application has finished starting.
    *
    * @return <code>TRUE</code> if the application is started, and
@@ -1436,5 +1449,15 @@ public class Controller {
    */
   public boolean isUpdateDisabled() {
     return fDisableUpdate;
+  }
+
+  /**
+   * Restart the Application.
+   */
+  public void restart() {
+    fRestarting = true;
+
+    /* Run the restart() */
+    PlatformUI.getWorkbench().restart();
   }
 }
