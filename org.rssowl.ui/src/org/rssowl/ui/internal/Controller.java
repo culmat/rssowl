@@ -1027,45 +1027,63 @@ public class Controller {
   public void shutdown(boolean emergency) {
     fShuttingDown = true;
 
+    /* Emergency Shutdown */
+    if (emergency)
+      emergencyShutdown();
+
+    /* Normal Shutdown */
+    else
+      normalShutdown();
+  }
+
+  private void normalShutdown() {
+    fShuttingDown = true;
+
     /* Unregister Listeners */
-    if (!emergency)
-      unregisterListeners();
+    unregisterListeners();
 
     /* Stop the Download Service */
-    if (!emergency && fDownloadService != null)
+    if (fDownloadService != null)
       fDownloadService.stopService();
 
     /* Stop Clean-Up Reminder Service */
-    if (!InternalOwl.TESTING && !emergency && fCleanUpReminderService != null)
+    if (!InternalOwl.TESTING && fCleanUpReminderService != null)
       fCleanUpReminderService.stopService();
 
     /* Stop the Feed Reload Service */
-    if (!InternalOwl.TESTING && !emergency && fFeedReloadService != null)
+    if (!InternalOwl.TESTING && fFeedReloadService != null)
       fFeedReloadService.stopService();
 
     /* Cancel/Seal the reload queue */
-    if (fReloadFeedQueue != null) {
-      if (!emergency)
-        fReloadFeedQueue.cancel(false, true);
-      else
-        fReloadFeedQueue.seal();
-    }
+    if (fReloadFeedQueue != null)
+      fReloadFeedQueue.cancel(false, true);
 
     /* Cancel the feed-save queue (join) */
     if (fSaveFeedQueue != null)
       fSaveFeedQueue.cancel(true, true);
 
     /* Stop the Notification Service */
-    if (!InternalOwl.TESTING && !emergency && fNotificationService != null)
+    if (!InternalOwl.TESTING && fNotificationService != null)
       fNotificationService.stopService();
 
     /* Stop the Saved Search Service */
-    if (!emergency && fSavedSearchService != null)
+    if (fSavedSearchService != null)
       fSavedSearchService.stopService();
 
     /* Shutdown ApplicationServer */
-    if (!emergency)
-      ApplicationServer.getDefault().shutdown();
+    ApplicationServer.getDefault().shutdown();
+  }
+
+  private void emergencyShutdown() {
+    fShuttingDown = true;
+
+    /* Cancel/Seal the reload queue */
+    if (fReloadFeedQueue != null)
+      fReloadFeedQueue.seal();
+
+    /* Cancel the feed-save queue (join) */
+    if (fSaveFeedQueue != null)
+      fSaveFeedQueue.cancel(true, true);
   }
 
   /**
