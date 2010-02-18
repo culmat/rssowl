@@ -361,7 +361,6 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
 
     fRemoveAll = new Button(buttonContainer, SWT.PUSH);
     fRemoveAll.setText(Messages.CredentialsPreferencesPage_REMOVE_ALL);
-    fRemoveAll.setEnabled(fViewer.getTable().getItemCount() > 0);
     fRemoveAll.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -380,7 +379,8 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
 
     /* Set Dummy Input */
     fViewer.setInput(new Object());
-
+    fRemoveAll.setEnabled(fViewer.getTable().getItemCount() > 0);
+    
     /* Listen to Selection Changes */
     fViewer.addSelectionChangedListener(new ISelectionChangedListener() {
       public void selectionChanged(SelectionChangedEvent event) {
@@ -439,6 +439,8 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
           }, siteUri, null);
 
           fViewer.refresh();
+          fRemoveSelected.setEnabled(!fViewer.getSelection().isEmpty());
+          fRemoveAll.setEnabled(fViewer.getTable().getItemCount() > 0);
         }
       } catch (URISyntaxException e) {
         Activator.getDefault().logError(e.getMessage(), e);
