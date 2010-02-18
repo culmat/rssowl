@@ -26,7 +26,6 @@ package org.rssowl.ui.internal.services;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -86,7 +85,7 @@ public class CleanUpReminderService {
       protected IStatus run(final IProgressMonitor monitor) {
 
         /* Check if Reminder should show */
-        if (!monitor.isCanceled() && Platform.isRunning()) {
+        if (!monitor.isCanceled() && !Controller.getDefault().isShuttingDown()) {
 
           /* Check if reminder is enabled */
           if (!fPreferences.getBoolean(DefaultPreferences.CLEAN_UP_REMINDER_STATE))
@@ -94,7 +93,7 @@ public class CleanUpReminderService {
 
           /* Show Reminder */
           final Shell shell = OwlUI.getPrimaryShell();
-          if (shell != null && !monitor.isCanceled() && Platform.isRunning()) {
+          if (shell != null && !monitor.isCanceled() && !Controller.getDefault().isShuttingDown()) {
             JobRunner.runSyncedInUIThread(shell, new Runnable() {
               public void run() {
                 if (monitor.isCanceled() || Controller.getDefault().isShuttingDown())

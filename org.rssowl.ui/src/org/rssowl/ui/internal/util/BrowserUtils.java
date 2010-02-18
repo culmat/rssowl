@@ -39,6 +39,7 @@ import org.rssowl.core.util.StreamGobbler;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Application;
+import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.dialogs.preferences.BrowserPreferencePage;
 import org.rssowl.ui.internal.editors.browser.WebBrowserContext;
@@ -246,6 +247,10 @@ public class BrowserUtils {
         public void run() {
           try {
 
+            /* Return early if shutting down */
+            if (Controller.getDefault().isShuttingDown())
+              return;
+
             /* The default browser was successfully launched once, use again */
             if (webBrowserSuccessfullyOpened) {
               Process proc = Runtime.getRuntime().exec(webBrowser + " -remote openURL(" + link + ")"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -328,6 +333,10 @@ public class BrowserUtils {
     Thread launcher = new Thread("") { //$NON-NLS-1$
       @Override
       public void run() {
+
+        /* Return early if shutting down */
+        if (Controller.getDefault().isShuttingDown())
+          return;
 
         /* Execute custom browser */
         try {

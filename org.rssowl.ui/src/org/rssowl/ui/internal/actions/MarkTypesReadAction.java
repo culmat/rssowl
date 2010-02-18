@@ -173,7 +173,7 @@ public class MarkTypesReadAction extends Action implements IWorkbenchWindowActio
     }
 
     /* Mark News Read */
-    if (news.size() > 0) {
+    if (news.size() > 0 && !Controller.getDefault().isShuttingDown()) {
 
       /* Mark Saved Search Service as in need for a quick Update */
       Controller.getDefault().getSavedSearchService().forceQuickUpdate();
