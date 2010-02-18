@@ -67,6 +67,9 @@ public class URIUtils {
   /** Identifier for a Protocol */
   public static final String PROTOCOL_IDENTIFIER = "://"; //$NON-NLS-1$
 
+  /** Identifies a managed Link to be treated specially */
+  public static final String MANAGED_LINK_IDENTIFIER = "#rssowlmlink"; //$NON-NLS-1$
+
   /* This utility class constructor is hidden */
   private URIUtils() {
   // Protect default constructor
@@ -467,5 +470,36 @@ public class URIUtils {
       return HTTP + link;
 
     return link;
+  }
+
+  /**
+   * @param link the link to convert to a managed link.
+   * @return the same link identified as managed link.
+   */
+  public static String toManaged(String link) {
+    if (StringUtils.isSet(link))
+      return link + MANAGED_LINK_IDENTIFIER;
+
+    return link;
+  }
+
+  /**
+   * @param link the link to convert to a unmanaged link.
+   * @return the same link without managed identifier.
+   */
+  public static String toUnManaged(String link) {
+    if (isManaged(link))
+      return link.substring(0, link.length() - MANAGED_LINK_IDENTIFIER.length());
+
+    return link;
+  }
+
+  /**
+   * @param link the link to check for being managed
+   * @return <code>true</code> if the link is managed and <code>false</code>
+   * otherwise.
+   */
+  public static boolean isManaged(String link) {
+    return StringUtils.isSet(link) && link.endsWith(MANAGED_LINK_IDENTIFIER);
   }
 }

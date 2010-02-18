@@ -412,7 +412,7 @@ public class CBrowser {
                 String url = tempBrowser.getUrl();
                 tempBrowser.dispose();
                 if (StringUtils.isSet(url))
-                  BrowserUtils.openLinkExternal(url);
+                  BrowserUtils.openLinkExternal(URIUtils.toUnManaged(url));
               }
             }
           });
@@ -558,8 +558,11 @@ public class CBrowser {
         if (useExternalBrowser()) {
 
           /* Only proceed if external navigation should not be blocked */
-          if (!fAllowExternalNavigation)
-            return;
+          if (!fAllowExternalNavigation) {
+            boolean isManaged = URIUtils.isManaged(event.location);
+            if (!isManaged) //Workaround for Bug 1347: External Browser not used if page still loading
+              return;
+          }
 
           /* Do not Let local ApplicationServer URLs open */
           if (ApplicationServer.getDefault().isNewsServerUrl(event.location))
@@ -571,7 +574,7 @@ public class CBrowser {
 
           /* Finally, cancel event and open URL external */
           event.doit = false;
-          BrowserUtils.openLinkExternal(event.location);
+          BrowserUtils.openLinkExternal(URIUtils.toUnManaged(event.location));
         }
       }
     });

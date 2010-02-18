@@ -42,6 +42,8 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.PlatformUI;
+import org.rssowl.core.Owl;
+import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ICategory;
@@ -50,6 +52,7 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.ISource;
 import org.rssowl.core.persist.INews.State;
+import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.persist.reference.SearchMarkReference;
 import org.rssowl.core.util.CoreUtils;
@@ -120,6 +123,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   private final NewsBrowserViewer fViewer;
   private boolean fStripMediaFromNews;
   private boolean fForceShowFeedInformation;
+  private boolean fManageLinks;
   private final Calendar fSharedCalendar = Calendar.getInstance();
   private final Map<String, String> fMapFeedLinkToName = new HashMap<String, String>();
 
@@ -144,6 +148,10 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   private NewsBrowserLabelProvider(NewsBrowserViewer viewer, boolean isIE) {
     fViewer = viewer;
     fIsIE = isIE;
+
+    IPreferenceScope preferences = Owl.getPreferenceService().getGlobalScope();
+    fManageLinks = (preferences.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER) || preferences.getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER));
+
     createFonts();
     createColors();
     registerListeners();
@@ -259,6 +267,19 @@ public class NewsBrowserLabelProvider extends LabelProvider {
    * @return the HTML representation for the given element.
    */
   public String getText(Object element, boolean withInternalLinks, int index) {
+    return getText(element, withInternalLinks, true, index);
+  }
+
+  /**
+   * @param element the element to get a HTML representation from.
+   * @param withInternalLinks <code>true</code> to include links of the internal
+   * protocol rssowl:// and <code>false</code> otherwise.
+   * @param withManagedLinks if set to <code>false</code>, the output will not
+   * contain any managed links.
+   * @param index the zero-based index of the element from top.
+   * @return the HTML representation for the given element.
+   */
+  public String getText(Object element, boolean withInternalLinks, boolean withManagedLinks, int index) {
 
     /* Return HTML for a Group */
     if (element instanceof EntityGroup)
@@ -266,7 +287,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
     /* Return HTML for a News */
     else if (element instanceof INews)
-      return getLabel((INews) element, withInternalLinks, index);
+      return getLabel((INews) element, withInternalLinks, withManagedLinks, index);
 
     return ""; //$NON-NLS-1$
   }
@@ -467,7 +488,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     return new StringBuilder(capacity);
   }
 
-  private String getLabel(INews news, boolean withInternalLinks, int index) {
+  private String getLabel(INews news, boolean withInternalLinks, boolean withManagedLinks, int index) {
     String description = news.getDescription();
     if (fStripMediaFromNews)
       description = StringUtils.filterTags(description, fMediaTags, false);
@@ -530,7 +551,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
       /* Link */
       if (hasLink)
-        link(builder, newsLink, newsTitle, cssClass, Dynamic.TITLE.getId(news), color);
+        link(builder, (fManageLinks && withManagedLinks) ? URIUtils.toManaged(newsLink) : newsLink, newsTitle, cssClass, Dynamic.TITLE.getId(news), color);
 
       /* Normal */
       else
@@ -743,7 +764,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
         if (hasLink) {
           builder.append(" "); //$NON-NLS-1$
-          link(builder, newsLink, Messages.NewsBrowserLabelProvider_OPEN_IN_BROWSER, null);
+          link(builder, (fManageLinks && withManagedLinks) ? URIUtils.toManaged(newsLink) : newsLink, Messages.NewsBrowserLabelProvider_OPEN_IN_BROWSER, null);
         }
       }
 
