@@ -380,7 +380,7 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
     /* Set Dummy Input */
     fViewer.setInput(new Object());
     fRemoveAll.setEnabled(fViewer.getTable().getItemCount() > 0);
-    
+
     /* Listen to Selection Changes */
     fViewer.addSelectionChangedListener(new ISelectionChangedListener() {
       public void selectionChanged(SelectionChangedEvent event) {
@@ -482,7 +482,7 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
     List<?> credentialsToRemove = selection.toList();
     for (Object obj : credentialsToRemove) {
       CredentialsModelData data = (CredentialsModelData) obj;
-      remove(data);
+      remove(data, false);
     }
 
     /* Update in UI */
@@ -500,7 +500,7 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
 
     Set<CredentialsModelData> credentials = loadCredentials();
     for (CredentialsModelData data : credentials) {
-      remove(data);
+      remove(data, true);
     }
 
     /* Update in UI */
@@ -509,7 +509,7 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
     fRemoveAll.setEnabled(fViewer.getTable().getItemCount() > 0);
   }
 
-  private void remove(CredentialsModelData data) {
+  private void remove(CredentialsModelData data, boolean all) {
 
     /* Remove normalized link and realm */
     ICredentialsProvider provider = fConService.getCredentialsProvider(data.getNormalizedLink());
@@ -521,28 +521,30 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
       }
     }
 
-    /* Remove all other stored Credentials matching normalized link and realm */
-    Collection<IBookMark> bookmarks = DynamicDAO.loadAll(IBookMark.class);
-    for (IBookMark bookmark : bookmarks) {
-      String realm = (String) bookmark.getProperty(Controller.BM_REALM_PROPERTY);
+    /* Remove all other stored Credentials matching normalized link and realm if set */
+    if (all) {
+      Collection<IBookMark> bookmarks = DynamicDAO.loadAll(IBookMark.class);
+      for (IBookMark bookmark : bookmarks) {
+        String realm = (String) bookmark.getProperty(Controller.BM_REALM_PROPERTY);
 
-      URI feedLink = bookmark.getFeedLinkReference().getLink();
-      URI normalizedLink = URIUtils.normalizeUri(feedLink, true);
+        URI feedLink = bookmark.getFeedLinkReference().getLink();
+        URI normalizedLink = URIUtils.normalizeUri(feedLink, true);
 
-      /*
-       * If realm is null, then this bookmark successfully loaded due to another bookmark
-       * that the user successfully authenticated to. If the realm is not null, then we
-       * have to compare the realm to ensure that no credentials from the same host but
-       * a different realm gets removed.
-       */
-      if ((realm == null || realm.equals(data.getRealm())) && normalizedLink.equals(data.getNormalizedLink())) {
-        provider = fConService.getCredentialsProvider(feedLink);
-        if (provider != null) {
-          try {
-            provider.deleteAuthCredentials(feedLink, null); //Null as per contract in DefaultProtocolHandler
-            bookmark.removeProperty(Controller.BM_REALM_PROPERTY);
-          } catch (CredentialsException e) {
-            Activator.getDefault().logError(e.getMessage(), e);
+        /*
+         * If realm is null, then this bookmark successfully loaded due to another bookmark
+         * that the user successfully authenticated to. If the realm is not null, then we
+         * have to compare the realm to ensure that no credentials from the same host but
+         * a different realm gets removed.
+         */
+        if ((realm == null || realm.equals(data.getRealm())) && normalizedLink.equals(data.getNormalizedLink())) {
+          provider = fConService.getCredentialsProvider(feedLink);
+          if (provider != null) {
+            try {
+              provider.deleteAuthCredentials(feedLink, null); //Null as per contract in DefaultProtocolHandler
+              bookmark.removeProperty(Controller.BM_REALM_PROPERTY);
+            } catch (CredentialsException e) {
+              Activator.getDefault().logError(e.getMessage(), e);
+            }
           }
         }
       }
