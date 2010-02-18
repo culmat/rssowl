@@ -26,6 +26,7 @@ package org.rssowl.core.internal.newsaction;
 
 import org.eclipse.osgi.util.NLS;
 import org.rssowl.core.INewsAction;
+import org.rssowl.core.Owl;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.INews;
@@ -72,7 +73,8 @@ public class GrowlNotifyAction implements INewsAction {
     BatchedBuffer.Receiver<INews> receiver = new BatchedBuffer.Receiver<INews>() {
       public void receive(Collection<INews> items) {
         try {
-          executeCommand(fPathToGrowlNotify, items);
+          if (!Owl.isShuttingDown())
+            executeCommand(fPathToGrowlNotify, items);
         }
 
         /* Log any error message */

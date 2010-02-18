@@ -179,12 +179,14 @@ public class FindUpdatesAction extends Action implements IWorkbenchWindowActionD
       /* Ask to Restart */
       @Override
       protected void runInUI(IProgressMonitor monitor) {
-        if (!errorUpdating) {
-          boolean restart = MessageDialog.openQuestion(fShell, Messages.FindUpdatesAction_RESTART_RSSOWL, Messages.FindUpdatesAction_RESTART_AFTER_UPDATE);
-          if (restart)
-            Controller.getDefault().restart();
-        } else
-          MessageDialog.openWarning(fShell, Messages.FindUpdatesAction_CHECK_UPDATES, Messages.FindUpdatesAction_WARNING_UPDATE_FAILED);
+        if (!Controller.getDefault().isShuttingDown()) {
+          if (!errorUpdating) {
+            boolean restart = MessageDialog.openQuestion(fShell, Messages.FindUpdatesAction_RESTART_RSSOWL, Messages.FindUpdatesAction_RESTART_AFTER_UPDATE);
+            if (restart)
+              Controller.getDefault().restart();
+          } else
+            MessageDialog.openWarning(fShell, Messages.FindUpdatesAction_CHECK_UPDATES, Messages.FindUpdatesAction_WARNING_UPDATE_FAILED);
+        }
       }
     }, true);
   }

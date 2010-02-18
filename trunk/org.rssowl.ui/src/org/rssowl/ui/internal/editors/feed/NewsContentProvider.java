@@ -51,6 +51,7 @@ import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.reference.SearchMarkReference;
 import org.rssowl.core.persist.service.PersistenceException;
+import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.EntityGroupItem;
 import org.rssowl.ui.internal.FolderNewsMark;
@@ -347,11 +348,14 @@ public class NewsContentProvider implements ITreeContentProvider {
 
                   @Override
                   protected void runInBackground(IProgressMonitor monitor) {
-                    fAddedNews = refreshCache(fInput, onlyHandleAddedNews);
+                    if (!Controller.getDefault().isShuttingDown())
+                      fAddedNews = refreshCache(fInput, onlyHandleAddedNews);
                   }
 
                   @Override
                   protected void runInUI(IProgressMonitor monitor) {
+                    if (Controller.getDefault().isShuttingDown())
+                      return;
 
                     /* Check if we need to Refresh at all */
                     if (onlyHandleAddedNews && (fAddedNews == null || fAddedNews.size() == 0))

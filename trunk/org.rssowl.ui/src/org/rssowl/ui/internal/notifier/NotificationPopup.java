@@ -70,6 +70,7 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.StringUtils;
+import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.notifier.NotificationService.Mode;
 import org.rssowl.ui.internal.util.CCLabel;
@@ -161,7 +162,7 @@ public class NotificationPopup extends PopupDialog {
 
     private boolean proceed(IProgressMonitor monitor) {
       Shell shell = getShell();
-      if (monitor.isCanceled() || shell == null || shell.isDisposed() || shell.getDisplay().isDisposed())
+      if (monitor.isCanceled() || shell == null || shell.isDisposed() || shell.getDisplay().isDisposed() || Controller.getDefault().isShuttingDown())
         return false;
 
       return true;
