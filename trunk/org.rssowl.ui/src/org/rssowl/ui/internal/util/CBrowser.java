@@ -330,8 +330,35 @@ public class CBrowser {
    * @param url The URL to browse to.
    */
   public void setUrl(String url) {
+    setUrl(url, false);
+  }
+
+  /**
+   * Browse to the given URL.
+   *
+   * @param url The URL to browse to.
+   * @param allowExternalNavigation <code>true</code> to allow external
+   * navigation and <code>false</code> otherwise.
+   */
+  public void setUrl(String url, boolean allowExternalNavigation) {
     fLastSetUrl = url;
-    fAllowExternalNavigation = false;
+
+    /* Caller wants to allow external navigation - validate first */
+    if (allowExternalNavigation) {
+
+      /*
+       * The only reason to allow external navigation is when the URL is
+       * actually external (non local) and the user has choosen to open
+       * links in the external Browser.
+       */
+      if (StringUtils.isSet(url) && !URIUtils.ABOUT_BLANK.equals(url) && !ApplicationServer.getDefault().isNewsServerUrl(url) && useExternalBrowser())
+        fAllowExternalNavigation = true;
+    }
+
+    /* Normal situation: External navigation blocked until page is loaded */
+    else
+      fAllowExternalNavigation = false;
+
     fBrowser.setUrl(url);
   }
 
@@ -411,7 +438,7 @@ public class CBrowser {
                 String url = tempBrowser.getUrl();
                 tempBrowser.dispose();
                 if (StringUtils.isSet(url))
-                  fBrowser.setUrl(url);
+                  setUrl(url);
               }
             }
           });
@@ -534,7 +561,7 @@ public class CBrowser {
           if (!fAllowExternalNavigation)
             return;
 
-          /* Let local ApplicationServer URLs open */
+          /* Do not Let local ApplicationServer URLs open */
           if (ApplicationServer.getDefault().isNewsServerUrl(event.location))
             return;
 

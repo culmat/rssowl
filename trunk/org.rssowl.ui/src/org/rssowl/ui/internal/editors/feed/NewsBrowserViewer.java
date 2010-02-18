@@ -672,7 +672,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
     /* Input is a URL - display it */
     if (input instanceof String) {
-      fBrowser.getControl().setUrl((String) input);
+      fBrowser.setUrl((String) input, true);
       return;
     }
 
