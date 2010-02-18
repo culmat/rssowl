@@ -172,4 +172,26 @@ public class URIUtilsTest {
     assertEquals("http://www.rssowl.org", URIUtils.toTopLevel(new URI("http://www.rssowl.org/path/index.html")).toString());
     assertEquals(null, URIUtils.toTopLevel(new URI("/path/index.html")));
   }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testManagedLinks() throws Exception {
+    assertEquals("http://www.rssowl.org" + URIUtils.MANAGED_LINK_IDENTIFIER, URIUtils.toManaged("http://www.rssowl.org"));
+    assertEquals("http://www.rssowl.org/foo" + URIUtils.MANAGED_LINK_IDENTIFIER, URIUtils.toManaged("http://www.rssowl.org/foo"));
+    assertEquals(null, URIUtils.toManaged(null));
+    assertEquals("", URIUtils.toManaged(""));
+
+    assertEquals(true, URIUtils.isManaged("http://www.rssowl.org" + URIUtils.MANAGED_LINK_IDENTIFIER));
+    assertEquals(false, URIUtils.isManaged("http://www.rssowl.org" + URIUtils.MANAGED_LINK_IDENTIFIER + "..."));
+    assertEquals(false, URIUtils.isManaged("http://www.rssowl.org"));
+    assertEquals(false, URIUtils.isManaged(""));
+    assertEquals(false, URIUtils.isManaged(null));
+
+    assertEquals("http://www.rssowl.org", URIUtils.toUnManaged("http://www.rssowl.org" + URIUtils.MANAGED_LINK_IDENTIFIER));
+    assertEquals("http://www.rssowl.org/foo", URIUtils.toUnManaged(URIUtils.toManaged("http://www.rssowl.org/foo")));
+    assertEquals(null, URIUtils.toUnManaged(null));
+    assertEquals("", URIUtils.toUnManaged(""));
+  }
 }

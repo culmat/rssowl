@@ -143,7 +143,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * The FeedView is an instance of <code>EditorPart</code> capable of displaying
  * News in a Table-Viewer and Browser-Viewer. It offers controls to Filter and
  * Group them.
- * 
+ *
  * @author bpasero
  */
 public class FeedView extends EditorPart implements IReusableEditor {
@@ -412,7 +412,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
         content.append(css.toString());
         content.append("  </head>\n  <body>\n"); //$NON-NLS-1$
         for (int i = 0; i < newsToSave.size(); i++) {
-          String text = labelProvider.getText(newsToSave.get(i), false, i);
+          String text = labelProvider.getText(newsToSave.get(i), false, false, i);
           content.append(text);
         }
         content.append("\n  </body>\n</html>"); //$NON-NLS-1$
@@ -948,7 +948,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
   /**
    * Sets the given <code>IStructuredSelection</code> to the News-Table showing
    * in the FeedView. Will ignore the selection, if the Table is minimized.
-   * 
+   *
    * @param selection The Selection to show in the News-Table.
    */
   public void setSelection(IStructuredSelection selection) {
@@ -1056,7 +1056,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
    * TODO Find a better solution once its possible to add listeners to
    * {@link IPreferenceScope} and then listen to changes of display-properties.
    * </p>
-   * 
+   *
    * @param refresh If TRUE, refresh the Viewer, FALSE otherwise.
    */
   public void updateFilterAndGrouping(boolean refresh) {
@@ -1087,7 +1087,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
   /**
    * Notifies this editor about a UI-Event just occured. In dependance of the
    * event, the Editor might want to update the state on the displayed News.
-   * 
+   *
    * @param event The UI-Event that just occured as described in the
    * <code>UIEvent</code> enumeration.
    */
@@ -1552,7 +1552,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
   /**
    * Refreshes all parts of this editor.
-   * 
+   *
    * @param delayRedraw If <code>TRUE</code> delay redraw until operation is
    * done.
    * @param updateLabels If <code>TRUE</code> update all Labels.
@@ -1564,7 +1564,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
   /**
    * A special key was pressed from the Quicksearch Input-Field. Handle it.
-   * 
+   *
    * @param traversal The Traversal that occured from the quicksearch.
    */
   void handleQuicksearchTraversalEvent(int traversal) {
@@ -1727,7 +1727,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
   /**
    * Check wether the News-Table-Part of this Editor is visible or not
    * (minmized).
-   * 
+   *
    * @return TRUE if the News-Table-Part is visible, FALSE otherwise.
    */
   boolean isTableViewerVisible() {
@@ -1736,7 +1736,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
   /**
    * Get the shared ViewerFilter used to filter News.
-   * 
+   *
    * @return the shared ViewerFilter used to filter News.
    */
   NewsFilter getFilter() {
@@ -1745,7 +1745,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
   /**
    * Get the shared Viewer-Grouper used to group News.
-   * 
+   *
    * @return the shared Viewer-Grouper used to group News.
    */
   NewsGrouping getGrouper() {
@@ -1909,7 +1909,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
   /**
    * Navigate to the next/previous read or unread News respecting the News-Items
    * that are displayed in the NewsTableControl.
-   * 
+   *
    * @param respectSelection If <code>TRUE</code>, respect the current selected
    * Item from the Tree as starting-node for the navigation, or
    * <code>FALSE</code> otherwise.
@@ -2023,7 +2023,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
   /**
    * Returns the <code>Composite</code> that is the Parent Control of this
    * Editor Part.
-   * 
+   *
    * @return The <code>Composite</code> that is the Parent Control of this
    * Editor Part.
    */

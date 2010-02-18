@@ -245,6 +245,9 @@ public class NewsBrowserControl implements IFeedViewPart {
           String statusText = event.text;
           statusText = URIUtils.fastDecode(statusText);
           statusText = statusText.replaceAll("&", "&&"); //$NON-NLS-1$//$NON-NLS-2$
+          if (URIUtils.isManaged(statusText))
+            statusText= URIUtils.toUnManaged(statusText);
+
           fEditorSite.getActionBars().getStatusLineManager().setMessage(statusText);
         }
       }
