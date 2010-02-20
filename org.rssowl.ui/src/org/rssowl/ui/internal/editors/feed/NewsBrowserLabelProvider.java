@@ -363,7 +363,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     }
 
     /* Main DIV Item Areas */
-    writer.write("div.header { padding: 10px 10px 5px 10px; background-color: #eee; }\n"); //$NON-NLS-1$
+    writer.write("div.header { padding: 10px 10px 5px 10px; background-color: rgb(242,242,242); }\n"); //$NON-NLS-1$
     writer.append("div.headerSticky { padding: 10px 10px 5px 10px; ").append(fStickyBGColorCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     writer.write("div.content { \n"); //$NON-NLS-1$
     writer.write("   padding: 15px 10px 15px 10px; border-top: dotted 1px silver; \n"); //$NON-NLS-1$
