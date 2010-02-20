@@ -1595,6 +1595,12 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
   /* Refresh Table-Viewer if visible */
   void refreshTableViewer(boolean delayRedraw, boolean updateLabels) {
+
+    /* Return on Shutdown */
+    if (Controller.getDefault().isShuttingDown())
+      return;
+
+    /* Only if Table Viewer is visible */
     if (isTableViewerVisible()) {
       boolean groupingEnabled = fNewsGrouping.getType() != NewsGrouping.Type.NO_GROUPING;
 
@@ -1721,6 +1727,12 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
   /* Refresh Browser-Viewer */
   private void refreshBrowserViewer() {
+
+    /* Return on Shutdown */
+    if (Controller.getDefault().isShuttingDown())
+      return;
+
+    /* Refresh */
     fNewsBrowserControl.getViewer().refresh();
   }
 
