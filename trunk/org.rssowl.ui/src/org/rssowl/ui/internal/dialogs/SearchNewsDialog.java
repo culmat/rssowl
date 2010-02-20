@@ -136,6 +136,7 @@ import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.ApplicationActionBarAdvisor;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.ContextMenuCreator;
+import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.AutomateFilterAction;
@@ -1670,6 +1671,10 @@ public class SearchNewsDialog extends TitleAreaDialog {
             ScoredNews scoredNews = ((ScoredNews) object);
             NewsReference newsRef = scoredNews.getNewsReference();
 
+            /* Return on Cancellation or Shutdown */
+            if (monitor.isCanceled() || Controller.getDefault().isShuttingDown())
+              return;
+
             /* News is part of the list */
             if (newsRef.references(event.getEntity())) {
               INews news = event.getEntity();
@@ -1698,6 +1703,10 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
       @Override
       protected void runInUI(IProgressMonitor monitor) {
+
+        /* Return on Cancellation or Shutdown */
+        if (monitor.isCanceled() || Controller.getDefault().isShuttingDown())
+          return;
 
         /* News got Deleted */
         if (fDeletedScoredNews != null) {

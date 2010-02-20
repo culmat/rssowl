@@ -397,10 +397,18 @@ public class NewsContentProvider implements ITreeContentProvider {
 
                 addedNews.add(event);
               }
+
+              /* Return on Shutdown */
+              if (Controller.getDefault().isShuttingDown())
+                return;
             }
 
             /* Event not interesting for us or we are disposed */
             if (addedNews == null || addedNews.size() == 0)
+              return;
+
+            /* Return on Shutdown */
+            if (Controller.getDefault().isShuttingDown())
               return;
 
             /* Handle */
@@ -426,6 +434,12 @@ public class NewsContentProvider implements ITreeContentProvider {
 
             /* Filter News which are from a different Feed than displayed */
             for (NewsEvent event : events) {
+
+              /* Return on Shutdown */
+              if (Controller.getDefault().isShuttingDown())
+                return;
+
+              /* Check if input relates to news events */
               if (isInputRelatedTo(event.getEntity(), EventType.UPDATE)) {
                 INews news = event.getEntity();
                 INews.State oldState = event.getOldNews().getState();
@@ -507,6 +521,10 @@ public class NewsContentProvider implements ITreeContentProvider {
               }
             }
 
+            /* Return on Shutdown */
+            if (Controller.getDefault().isShuttingDown())
+              return;
+
             /* Event not interesting for us or we are disposed */
             if (deletedNews == null || deletedNews.size() == 0)
               return;
@@ -528,6 +546,10 @@ public class NewsContentProvider implements ITreeContentProvider {
   }
 
   private void refreshViewers(final Set<NewsEvent> events, EventType type) {
+
+    /* Return on Shutdown */
+    if (Controller.getDefault().isShuttingDown())
+      return;
 
     /*
      * Optimization: The Browser is likely only showing a single news and thus

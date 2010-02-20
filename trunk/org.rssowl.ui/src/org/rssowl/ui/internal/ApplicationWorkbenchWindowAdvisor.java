@@ -549,6 +549,10 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
             if (!fTrayItem.getVisible() || shell.getVisible())
               return;
 
+            /* Return on Shutdown */
+            if (Controller.getDefault().isShuttingDown())
+              return;
+
             /* Remember Added News (Windows Only and Only if restoring with Doubleclick) */
             if (Application.IS_WINDOWS && fPreferences.getBoolean(DefaultPreferences.RESTORE_TRAY_DOUBLECLICK)) {
               synchronized (fTeasingNewsCache) {

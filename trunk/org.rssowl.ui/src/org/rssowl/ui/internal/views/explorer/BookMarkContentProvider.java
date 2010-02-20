@@ -56,6 +56,7 @@ import org.rssowl.core.persist.event.SearchMarkListener;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.CoreUtils;
+import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.util.JobRunner;
 
@@ -466,6 +467,10 @@ public class BookMarkContentProvider implements ITreeContentProvider {
         JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
           public void run() {
 
+            /* Return on Shutdown */
+            if (Controller.getDefault().isShuttingDown())
+              return;
+
             /* Ask Filter */
             if (fBookmarkFilter.needsRefresh(INews.class, events))
               fViewer.refresh(false);
@@ -485,6 +490,10 @@ public class BookMarkContentProvider implements ITreeContentProvider {
       public void entitiesUpdated(final Set<NewsEvent> events) {
         JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
           public void run() {
+
+            /* Return on Shutdown */
+            if (Controller.getDefault().isShuttingDown())
+              return;
 
             /* Ask Filter */
             if (fBookmarkFilter.needsRefresh(INews.class, events))
@@ -684,6 +693,10 @@ public class BookMarkContentProvider implements ITreeContentProvider {
         affectedFeeds.add(news.getFeedReference());
     }
 
+    /* Return on Shutdown */
+    if (Controller.getDefault().isShuttingDown())
+      return;
+
     /* Update related Entities */
     for (FeedLinkReference feedRef : affectedFeeds)
       updateParents(feedRef);
@@ -696,6 +709,10 @@ public class BookMarkContentProvider implements ITreeContentProvider {
 
     /* Collect all affected BookMarks */
     Collection<IBookMark> affectedBookMarks = fBookMarkDAO.loadAll(feedRef);
+
+    /* Return on Shutdown */
+    if (Controller.getDefault().isShuttingDown())
+      return;
 
     /* Update them including Parents */
     updateMarksAndParents(affectedBookMarks);
@@ -711,6 +728,10 @@ public class BookMarkContentProvider implements ITreeContentProvider {
       collectParents(visibleParents, bookmark);
 
       entitiesToUpdate.addAll(visibleParents);
+
+      /* Return on Shutdown */
+      if (Controller.getDefault().isShuttingDown())
+        return;
     }
 
     /* Update Entities */
@@ -749,6 +770,10 @@ public class BookMarkContentProvider implements ITreeContentProvider {
     List<IFolder> parents = new ArrayList<IFolder>();
     collectParents(parents, folder);
     entitiesToUpdate.addAll(parents);
+
+    /* Return on Shutdown */
+    if (Controller.getDefault().isShuttingDown())
+      return;
 
     /* Update Entities */
     fViewer.update(entitiesToUpdate.toArray(), null);
