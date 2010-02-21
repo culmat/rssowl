@@ -81,6 +81,9 @@ public class CBrowser {
   private static final String XULRUNNER_PROXY_HOST = "network.proxy_host"; //$NON-NLS-1$
   private static final String XULRUNNER_PROXY_PORT = "network.proxy_port"; //$NON-NLS-1$
 
+  /* Delay in millies after a refresh until to allow ext. navigation again (see Bug 1429) */
+  private static final long REFRESH_NAVIGATION_DELAY = 800;
+
   /* Flag to check if Mozilla is available on Windows */
   private static boolean fgMozillaAvailable = true;
 
@@ -104,6 +107,7 @@ public class CBrowser {
 
   private Browser fBrowser;
   private boolean fAllowExternalNavigation;
+  private long fLastRefresh;
   private IPreferenceScope fPreferences;
   private IPreferenceScope fEclipsePreferences;
   private Map<String, ILinkHandler> fLinkHandler;
@@ -287,7 +291,7 @@ public class CBrowser {
         manager.add(new Action(Messages.CBrowser_RELOAD) {
           @Override
           public void run() {
-            fBrowser.refresh();
+            refresh();
           }
 
           @Override
@@ -322,6 +326,14 @@ public class CBrowser {
    */
   public Browser getControl() {
     return fBrowser;
+  }
+
+  /**
+   * Refresh the Browser.
+   */
+  public void refresh() {
+    fLastRefresh = System.currentTimeMillis();
+    fBrowser.refresh();
   }
 
   /**
@@ -557,19 +569,25 @@ public class CBrowser {
         /* Support opening Links in External Browser */
         if (useExternalBrowser()) {
 
-          /* Only proceed if external navigation should not be blocked */
-          if (!fAllowExternalNavigation) {
-            boolean isManaged = URIUtils.isManaged(event.location);
-            if (!isManaged) //Workaround for Bug 1347: External Browser not used if page still loading
-              return;
-          }
+          /* The URL must not be empty or about:blank (Problem on Linux) */
+          if (!StringUtils.isSet(event.location) || URIUtils.ABOUT_BLANK.equals(event.location))
+            return;
 
           /* Do not Let local ApplicationServer URLs open */
           if (ApplicationServer.getDefault().isNewsServerUrl(event.location))
             return;
 
-          /* The URL must not be empty or about:blank (Problem on Linux) */
-          if (!StringUtils.isSet(event.location) || URIUtils.ABOUT_BLANK.equals(event.location))
+          /* Find out if the Link is Managed (under our control) */
+          boolean isManaged = URIUtils.isManaged(event.location);
+
+          /* Only proceed if external navigation should not be blocked */
+          if (!fAllowExternalNavigation) {
+            if (!isManaged) //Workaround for Bug 1347: External Browser not used if page still loading
+              return;
+          }
+
+          /* See Bug 1429: Potential external link opening from Browser.refresh() */
+          if (!isManaged && System.currentTimeMillis() - fLastRefresh < REFRESH_NAVIGATION_DELAY)
             return;
 
           /* Finally, cancel event and open URL external */
