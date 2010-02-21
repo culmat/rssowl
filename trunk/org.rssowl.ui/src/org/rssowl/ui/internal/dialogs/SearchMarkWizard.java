@@ -67,9 +67,11 @@ import org.rssowl.ui.internal.util.FolderChooser;
 import org.rssowl.ui.internal.util.LayoutUtils;
 import org.rssowl.ui.internal.util.FolderChooser.ExpandStrategy;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The {@link SearchMarkWizard} is only used in the Eclipse Integration to
@@ -288,6 +290,11 @@ public class SearchMarkWizard extends Wizard implements INewWizard {
     ISearchCondition locationCondition = fPage.getScopeCondition();
     if (locationCondition != null)
       searchMark.addSearchCondition(locationCondition);
+
+    /* Copy all Properties from Parent or as Specified into this Mark */
+    Map<String, Serializable> properties = folder.getProperties();
+    for (Map.Entry<String, Serializable> property : properties.entrySet())
+      searchMark.setProperty(property.getKey(), property.getValue());
 
     DynamicDAO.save(folder);
 

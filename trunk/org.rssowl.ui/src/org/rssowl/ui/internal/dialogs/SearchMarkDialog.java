@@ -75,9 +75,11 @@ import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Dialog to add saved searches.
@@ -105,6 +107,7 @@ public class SearchMarkDialog extends TitleAreaDialog {
   private LocationControl fLocationControl;
   private boolean fShowLocationConflict;
   private ISearchMark fCreatedSearchMark;
+  private Map<String, Serializable> fProperties;
 
   /**
    * @param shell
@@ -123,10 +126,23 @@ public class SearchMarkDialog extends TitleAreaDialog {
    * @param matchAllConditions
    */
   public SearchMarkDialog(Shell shell, IFolder parent, IFolderChild position, List<ISearchCondition> initialConditions, boolean matchAllConditions) {
+    this(shell, parent, position, initialConditions, matchAllConditions, null);
+  }
+
+  /**
+   * @param shell
+   * @param parent
+   * @param position
+   * @param initialConditions
+   * @param matchAllConditions
+   * @param properties
+   */
+  public SearchMarkDialog(Shell shell, IFolder parent, IFolderChild position, List<ISearchCondition> initialConditions, boolean matchAllConditions, Map<String, Serializable> properties) {
     super(shell);
     fParent = parent;
     fPosition = position;
     fInitialMatchAllConditions = matchAllConditions;
+    fProperties= properties;
     fResources = new LocalResourceManager(JFaceResources.getResources());
     fDialogSettings = Activator.getDefault().getDialogSettings();
     fFirstTimeOpen = (fDialogSettings.getSection(SETTINGS_SECTION) == null);
@@ -172,6 +188,11 @@ public class SearchMarkDialog extends TitleAreaDialog {
     ISearchCondition locationCondition = fLocationControl.toScopeCondition();
     if (locationCondition != null)
       fCreatedSearchMark.addSearchCondition(locationCondition);
+
+    /* Copy all Properties from Parent or as Specified into this Mark */
+    Map<String, Serializable> properties = (fProperties != null) ? fProperties : fParent.getProperties();
+    for (Map.Entry<String, Serializable> property : properties.entrySet())
+      fCreatedSearchMark.setProperty(property.getKey(), property.getValue());
 
     DynamicDAO.save(fParent);
 

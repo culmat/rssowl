@@ -126,7 +126,7 @@ public class AggregateFolderAction implements IObjectActionDelegate {
       ISearchField locationField = factory.createSearchField(INews.LOCATION, INews.class.getName());
       conditions.add(factory.createSearchCondition(locationField, SearchSpecifier.IS, ModelUtils.toPrimitive(Collections.singletonList((IFolderChild) folder))));
 
-      SearchMarkDialog dialog = new SearchMarkDialog(fTargetPart.getSite().getShell(), folder.getParent(), folder, conditions, true);
+      SearchMarkDialog dialog = new SearchMarkDialog(fTargetPart.getSite().getShell(), folder.getParent(), folder, conditions, true, folder.getProperties());
       if (dialog.open() == IDialogConstants.OK_ID)
         locationSearch = dialog.getSearchMark();
       else
