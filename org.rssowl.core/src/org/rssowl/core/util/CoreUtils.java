@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.osgi.util.NLS;
 import org.rssowl.core.Owl;
 import org.rssowl.core.connection.ConnectionException;
+import org.rssowl.core.connection.MonitorCanceledException;
 import org.rssowl.core.connection.UnknownProtocolException;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.newsaction.CopyNewsAction;
@@ -1265,13 +1266,15 @@ public class CoreUtils {
       while ((nbytes = fis.read(buffer)) != -1)
         fos.write(buffer, 0, nbytes);
     } catch (IOException e) {
-      Activator.safeLogError(e.getMessage(), e);
+      if (!(e instanceof MonitorCanceledException))
+        Activator.safeLogError(e.getMessage(), e);
     } finally {
       if (fis != null) {
         try {
           fis.close();
         } catch (IOException e) {
-          Activator.safeLogError(e.getMessage(), e);
+          if (!(e instanceof MonitorCanceledException))
+            Activator.safeLogError(e.getMessage(), e);
         }
       }
 
@@ -1279,7 +1282,8 @@ public class CoreUtils {
         try {
           fos.close();
         } catch (IOException e) {
-          Activator.safeLogError(e.getMessage(), e);
+          if (!(e instanceof MonitorCanceledException))
+            Activator.safeLogError(e.getMessage(), e);
         }
       }
     }
@@ -1604,7 +1608,8 @@ public class CoreUtils {
         }
       }
     } catch (IOException e) {
-      Activator.safeLogError(e.getMessage(), e);
+      if (!(e instanceof MonitorCanceledException))
+        Activator.safeLogError(e.getMessage(), e);
     } catch (URISyntaxException e) {
       Activator.safeLogError(e.getMessage(), e);
     }

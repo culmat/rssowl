@@ -51,6 +51,7 @@ import org.rssowl.core.connection.AuthenticationRequiredException;
 import org.rssowl.core.connection.ConnectionException;
 import org.rssowl.core.connection.CredentialsException;
 import org.rssowl.core.connection.IConnectionPropertyConstants;
+import org.rssowl.core.connection.MonitorCanceledException;
 import org.rssowl.core.connection.NotModifiedException;
 import org.rssowl.core.connection.UnknownProtocolException;
 import org.rssowl.core.internal.InternalOwl;
@@ -771,6 +772,10 @@ public class Controller {
 
       /* Feed has not been Modified Since */
       if (e instanceof NotModifiedException)
+        return Status.OK_STATUS;
+
+      /* Reload was canceled (avoid logging to avoid spam) */
+      if (e.getStatus() != null && e.getStatus().getException() instanceof MonitorCanceledException)
         return Status.OK_STATUS;
 
       /* Report Exceptions as Warnings */
