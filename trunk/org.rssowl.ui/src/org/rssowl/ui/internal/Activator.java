@@ -45,6 +45,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 import org.rssowl.core.Owl;
 import org.rssowl.core.persist.service.PersistenceException;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.LongOperationMonitor;
 
@@ -143,7 +144,12 @@ public class Activator extends AbstractUIPlugin {
     /* Propagate startup to Controller */
     SafeRunner.run(new LoggingSafeRunnable() {
       public void run() throws Exception {
+
+        /* Startup Controller */
         Controller.getDefault().startup();
+
+        /* Log Version Information */
+        safeLogInfo(CoreUtils.getUserAgent());
       }
     });
 
@@ -389,10 +395,10 @@ public class Activator extends AbstractUIPlugin {
    *
    * @param msg The message to log as Info.
    */
-  public void logInfo(String msg) {
-  // TODO Need a better logging facility here
-  // getLog().log(new Status(IStatus.INFO, getBundle().getSymbolicName(),
-  // IStatus.OK, msg, null));
+  public static void safeLogInfo(String msg) {
+    Activator activator= fgPlugin;
+    if (activator != null)
+      activator.getLog().log(new Status(IStatus.INFO, activator.getBundle().getSymbolicName(), IStatus.OK, msg, null));
   }
 
   /**

@@ -41,7 +41,6 @@ import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.util.NLS;
 import org.osgi.service.url.URLStreamHandlerService;
 import org.rssowl.core.Owl;
@@ -127,7 +126,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
   /* Timeout for loading a Favicon */
   private static final int FAVICON_CON_TIMEOUT = 5000;
 
-  private static final String USER_AGENT = getOwlAgent();
+  private static final String USER_AGENT = CoreUtils.getUserAgent();
   private static boolean fgSSLInitialized;
   private static boolean fgFeedProtocolInitialized;
 
@@ -706,17 +705,6 @@ public class DefaultProtocolHandler implements IProtocolHandler {
       }
     }
     return inputStream;
-  }
-
-  private static String getOwlAgent() {
-    String version = Activator.getDefault().getVersion();
-    if ("win32".equals(Platform.getOS())) //$NON-NLS-1$
-      return "RSSOwl/" + version + " (Windows; U; " + "en)"; //$NON-NLS-1$ //$NON-NLS-2$//$NON-NLS-3$
-    else if ("gtk".equals(Platform.getOS())) //$NON-NLS-1$
-      return "RSSOwl/" + version + " (X11; U; " + "en)"; //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-    else if ("carbon".equals(Platform.getOS())) //$NON-NLS-1$
-      return "RSSOwl/" + version + " (Macintosh; U; " + "en)"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-    return "RSSOwl/" + version; //$NON-NLS-1$
   }
 
   /*

@@ -250,7 +250,6 @@ public class ApplicationServer {
       }
     }
 
-    Activator.getDefault().logInfo(Messages.ApplicationServer_INFO_UNABLE_OPEN_PORT);
     return null;
   }
 
@@ -439,8 +438,7 @@ public class ApplicationServer {
             if (StringUtils.isSet(message))
               safeProcess(socket, message);
           } catch (IOException e) {
-            if (Activator.getDefault() != null)
-              Activator.getDefault().logInfo(e.getMessage());
+            /* Ignore */
           }
 
           /* Cleanup */
@@ -451,8 +449,7 @@ public class ApplicationServer {
               if (buffReader != null)
                 buffReader.close();
             } catch (Exception e) {
-              if (Activator.getDefault() != null)
-                Activator.getDefault().logInfo(e.getMessage());
+              /* Ignore */
             }
 
             /* Close the Socket */
@@ -460,8 +457,7 @@ public class ApplicationServer {
               if (socket != null)
                 socket.close();
             } catch (Exception e) {
-              if (Activator.getDefault() != null)
-                Activator.getDefault().logInfo(e.getMessage());
+              /* Ignore */
             }
           }
         }
@@ -513,8 +509,7 @@ public class ApplicationServer {
       outS = new BufferedOutputStream(socket.getOutputStream());
       CoreUtils.copy(OwlUI.class.getResourceAsStream(parameter), outS);
     } catch (IOException e) {
-      if (Activator.getDefault() != null)
-        Activator.getDefault().logInfo(e.getMessage());
+      /* Ignore */
     }
 
     /* Cleanup */
@@ -523,8 +518,7 @@ public class ApplicationServer {
         try {
           outS.close();
         } catch (IOException e) {
-          if (Activator.getDefault() != null)
-            Activator.getDefault().logInfo(e.getMessage());
+          /* Ignore */
         }
       }
     }
@@ -714,8 +708,7 @@ public class ApplicationServer {
       /* End HTML */
       writer.write("\n  </body>\n</html>"); //$NON-NLS-1$
     } catch (IOException e) {
-      if (Activator.getDefault() != null)
-        Activator.getDefault().logInfo(e.getMessage());
+      /* Ignore */
     }
 
     /* Cleanup */
@@ -724,8 +717,7 @@ public class ApplicationServer {
         try {
           writer.close();
         } catch (IOException e) {
-          if (Activator.getDefault() != null)
-            Activator.getDefault().logInfo(e.getMessage());
+          /* Ignore */
         }
       }
     }

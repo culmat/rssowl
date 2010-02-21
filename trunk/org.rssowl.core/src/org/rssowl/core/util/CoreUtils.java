@@ -25,6 +25,7 @@
 package org.rssowl.core.util;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.util.NLS;
 import org.rssowl.core.Owl;
 import org.rssowl.core.connection.ConnectionException;
@@ -1694,5 +1695,19 @@ public class CoreUtils {
     }
 
     return candidate;
+  }
+
+  /**
+   * @return the rssowl user agent string.
+   */
+  public static String getUserAgent() {
+    String version = Activator.getDefault().getVersion();
+    if ("win32".equals(Platform.getOS())) //$NON-NLS-1$
+      return "RSSOwl/" + version + " (Windows; U; " + "en)"; //$NON-NLS-1$ //$NON-NLS-2$//$NON-NLS-3$
+    else if ("gtk".equals(Platform.getOS())) //$NON-NLS-1$
+      return "RSSOwl/" + version + " (X11; U; " + "en)"; //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+    else if ("carbon".equals(Platform.getOS())) //$NON-NLS-1$
+      return "RSSOwl/" + version + " (Macintosh; U; " + "en)"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    return "RSSOwl/" + version; //$NON-NLS-1$
   }
 }

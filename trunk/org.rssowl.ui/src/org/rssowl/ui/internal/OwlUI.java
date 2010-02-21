@@ -882,7 +882,6 @@ public class OwlUI {
    * @param id
    */
   public static void deleteImage(long id) {
-    boolean res = false;
 
     /* Delete from Cache */
     FAVICO_CACHE.remove(id);
@@ -890,12 +889,7 @@ public class OwlUI {
     /* Delete from Disk */
     File file = getImageFile(id);
     if (file != null && file.exists())
-      res = file.delete();
-    else
-      res = true;
-
-    if (!res)
-      Activator.getDefault().logInfo("Unable to delete image with ID " + id); //$NON-NLS-1$
+      file.delete();
   }
 
   /**
@@ -1049,10 +1043,8 @@ public class OwlUI {
 
     path = path.append(fileName);
 
-    if (!res) {
-      activator.logInfo("Unable to get image file with name " + fileName); //$NON-NLS-1$
+    if (!res)
       return null;
-    }
 
     return new File(path.toOSString());
   }
