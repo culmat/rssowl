@@ -173,7 +173,7 @@ public class NewsBrowserControl implements IFeedViewPart {
 
     /* Remember as initial Input */
     fInitialInput = fViewer.getInput();
-    fInputSet= true;
+    fInputSet = true;
   }
 
   private Object getInput(Object obj) {
@@ -242,13 +242,17 @@ public class NewsBrowserControl implements IFeedViewPart {
 
         /* Don't show Status for the Handler Protocol */
         if (event.text != null && !event.text.contains(ILinkHandler.HANDLER_PROTOCOL) && !event.text.contains(LOCALHOST)) {
-          String statusText = event.text;
-          statusText = URIUtils.fastDecode(statusText);
-          statusText = statusText.replaceAll("&", "&&"); //$NON-NLS-1$//$NON-NLS-2$
-          if (URIUtils.isManaged(statusText))
-            statusText= URIUtils.toUnManaged(statusText);
 
-          fEditorSite.getActionBars().getStatusLineManager().setMessage(statusText);
+          /* Do not post to status line if browser is hidden (e.g. hidden tab) */
+          if (!fViewer.getControl().isDisposed() && fViewer.getControl().isVisible()) {
+            String statusText = event.text;
+            statusText = URIUtils.fastDecode(statusText);
+            statusText = statusText.replaceAll("&", "&&"); //$NON-NLS-1$//$NON-NLS-2$
+            if (URIUtils.isManaged(statusText))
+              statusText = URIUtils.toUnManaged(statusText);
+
+            fEditorSite.getActionBars().getStatusLineManager().setMessage(statusText);
+          }
         }
       }
     });

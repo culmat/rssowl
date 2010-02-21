@@ -702,7 +702,7 @@ public class WebBrowserView extends EditorPart implements IReusableEditor {
       public void changed(StatusTextEvent event) {
 
         /* Don't show Status for the Handler Protocol */
-        if (event.text != null && !event.text.contains(ILinkHandler.HANDLER_PROTOCOL))
+        if (event.text != null && !event.text.contains(ILinkHandler.HANDLER_PROTOCOL) && !fBrowser.getControl().isDisposed() && fBrowser.getControl().isVisible())
           fEditorSite.getActionBars().getStatusLineManager().setMessage(event.text);
       }
     });
