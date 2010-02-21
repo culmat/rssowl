@@ -25,6 +25,7 @@
 package org.rssowl.core.util;
 
 import org.apache.lucene.analysis.StopAnalyzer;
+import org.rssowl.core.connection.MonitorCanceledException;
 import org.rssowl.core.internal.Activator;
 
 import java.io.IOException;
@@ -183,13 +184,15 @@ public class StringUtils {
     try {
       return readString(stripReader);
     } catch (IOException e) {
-      Activator.getDefault().logError(e.getMessage(), e);
+      if (!(e instanceof MonitorCanceledException))
+        Activator.getDefault().logError(e.getMessage(), e);
       return str;
     } finally {
       try {
         stripReader.close();
       } catch (IOException e) {
-        Activator.getDefault().logError(e.getMessage(), e);
+        if (!(e instanceof MonitorCanceledException))
+          Activator.getDefault().logError(e.getMessage(), e);
       }
     }
   }

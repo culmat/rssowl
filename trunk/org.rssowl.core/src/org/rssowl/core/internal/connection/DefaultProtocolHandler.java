@@ -56,6 +56,7 @@ import org.rssowl.core.connection.ICredentials;
 import org.rssowl.core.connection.ICredentialsProvider;
 import org.rssowl.core.connection.IProtocolHandler;
 import org.rssowl.core.connection.IProxyCredentials;
+import org.rssowl.core.connection.MonitorCanceledException;
 import org.rssowl.core.connection.NotModifiedException;
 import org.rssowl.core.connection.ProxyAuthenticationRequiredException;
 import org.rssowl.core.internal.Activator;
@@ -764,7 +765,8 @@ public class DefaultProtocolHandler implements IProtocolHandler {
       title = title.replaceAll(Pattern.quote("<![CDATA["), ""); //$NON-NLS-1$ //$NON-NLS-2$
       title = title.replaceAll(Pattern.quote("]]>"), ""); //$NON-NLS-1$ //$NON-NLS-2$
     } catch (IOException e) {
-      Activator.safeLogError(e.getMessage(), e);
+      if (!(e instanceof MonitorCanceledException))
+        Activator.safeLogError(e.getMessage(), e);
     }
 
     /* Finally close the Stream */

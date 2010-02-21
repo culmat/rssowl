@@ -112,6 +112,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.themes.ITheme;
 import org.rssowl.core.Owl;
+import org.rssowl.core.connection.MonitorCanceledException;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
@@ -929,7 +930,8 @@ public class OwlUI {
           try {
             inS.close();
           } catch (IOException e) {
-            Activator.getDefault().logError(e.getMessage(), e);
+            if (!(e instanceof MonitorCanceledException))
+              Activator.getDefault().logError(e.getMessage(), e);
           }
         }
       }
