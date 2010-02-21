@@ -631,7 +631,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   @Override
   public void refresh() {
     if (!fBlockRefresh)
-      fBrowser.getControl().refresh();
+      fBrowser.refresh();
   }
 
   /*

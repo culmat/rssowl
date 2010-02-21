@@ -254,7 +254,7 @@ public class BrowserBar {
     IAction reload = new Action(Messages.BrowserBar_RELOAD) {
       @Override
       public void run() {
-        fBrowser.getControl().refresh();
+        fBrowser.refresh();
         setBusy(true);
       }
     };

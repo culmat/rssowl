@@ -492,7 +492,7 @@ public class WebBrowserView extends EditorPart implements IReusableEditor {
     IAction reload = new Action(Messages.WebBrowserView_RELOAD) {
       @Override
       public void run() {
-        fBrowser.getControl().refresh();
+        fBrowser.refresh();
         setBusy(true);
       }
     };

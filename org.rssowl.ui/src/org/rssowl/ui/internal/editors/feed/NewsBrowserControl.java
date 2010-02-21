@@ -275,7 +275,7 @@ public class NewsBrowserControl implements IFeedViewPart {
           return;
 
         if (OwlUI.NEWS_TEXT_FONT_ID.equals(event.getProperty()) || OwlUI.STICKY_BG_COLOR_ID.equals(event.getProperty()))
-          ((Browser) fViewer.getControl()).refresh();
+          fViewer.getBrowser().refresh();
       }
     };
     PlatformUI.getWorkbench().getThemeManager().addPropertyChangeListener(fPropertyChangeListener);
