@@ -163,7 +163,6 @@ public class NewsBinWizard extends Wizard implements INewWizard {
 
     /* Copy all Properties from Parent into this Mark */
     Map<String, Serializable> properties = parent.getProperties();
-
     for (Map.Entry<String, Serializable> property : properties.entrySet())
       fNewsbin.setProperty(property.getKey(), property.getValue());
 
