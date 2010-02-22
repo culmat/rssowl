@@ -361,8 +361,6 @@ public class NewsColumnSelectionControl extends Composite {
       fNewsColumnViewer.add(NewsColumn.TITLE);
     }
 
-    fNewsColumnViewer.getList().select(fNewsColumnViewer.getList().getItemCount() - 1);
-
     updateRemoveEnablement();
     updateMoveEnablement();
   }
