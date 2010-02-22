@@ -1702,12 +1702,13 @@ public class CoreUtils {
    */
   public static String getUserAgent() {
     String version = Activator.getDefault().getVersion();
-    if ("win32".equals(Platform.getOS())) //$NON-NLS-1$
-      return "RSSOwl/" + version + " (Windows; U; " + "en)"; //$NON-NLS-1$ //$NON-NLS-2$//$NON-NLS-3$
-    else if ("gtk".equals(Platform.getOS())) //$NON-NLS-1$
-      return "RSSOwl/" + version + " (X11; U; " + "en)"; //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-    else if ("carbon".equals(Platform.getOS())) //$NON-NLS-1$
-      return "RSSOwl/" + version + " (Macintosh; U; " + "en)"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    String os = Platform.getOS();
+    if (Platform.OS_WIN32.equals(os))
+      return "RSSOwl/" + version + " (Windows; U; en)"; //$NON-NLS-1$ //$NON-NLS-2$
+    else if (Platform.OS_LINUX.equals(os))
+      return "RSSOwl/" + version + " (X11; U; en)"; //$NON-NLS-1$//$NON-NLS-2$
+    else if (Platform.OS_MACOSX.equals(os))
+      return "RSSOwl/" + version + " (Macintosh; U; en)"; //$NON-NLS-1$ //$NON-NLS-2$
     return "RSSOwl/" + version; //$NON-NLS-1$
   }
 }
