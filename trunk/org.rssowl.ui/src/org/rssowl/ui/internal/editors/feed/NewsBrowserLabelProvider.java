@@ -376,7 +376,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.write("div.content p { margin-top: 0; padding-top: 0; margin-left: 0; padding-left: 0; }\n"); //$NON-NLS-1$
 
     /* Title */
-    if (fIsIE && withInternalLinks) //Need to set width to avoid float drop bug of delete button (see Bug 1393)
+    if (withInternalLinks) //Need to set width to avoid float drop bug of delete button on all OS (see Bug 1393)
       writer.append("div.title { width: 90%; float: left; padding-bottom: 6px; ").append(fBiggerFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     else
       writer.append("div.title { float: left; padding-bottom: 6px; ").append(fBiggerFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
