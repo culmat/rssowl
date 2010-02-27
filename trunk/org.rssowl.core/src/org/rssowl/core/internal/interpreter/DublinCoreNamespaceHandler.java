@@ -52,8 +52,9 @@ import org.rssowl.core.util.URIUtils;
 public class DublinCoreNamespaceHandler implements INamespaceHandler {
 
   /*
-   * @see org.rssowl.core.interpreter.INamespaceHandler#processElement(org.jdom.Element,
-   * org.rssowl.core.interpreter.types.IExtendableType)
+   * @see
+   * org.rssowl.core.interpreter.INamespaceHandler#processElement(org.jdom.Element
+   * , org.rssowl.core.interpreter.types.IExtendableType)
    */
   public void processElement(Element element, IPersistable type) {
     String name = element.getName().toLowerCase();
@@ -90,10 +91,24 @@ public class DublinCoreNamespaceHandler implements INamespaceHandler {
         ((INews) type).setPublishDate(DateUtils.parseDate(element.getText()));
     }
 
-    /* Creator / Publisher */
-    else if ("creator".equals(name) || "publisher".equals(name)) { //$NON-NLS-1$ //$NON-NLS-2$
+    /* Creator */
+    else if ("creator".equals(name)) { //$NON-NLS-1$
       IPerson person = Owl.getModelFactory().createPerson(null, type);
       person.setName(element.getText());
+    }
+
+    /* Publisher (only if creator is not set) */
+    else if ("publisher".equals(name)) { //$NON-NLS-1$
+      boolean usePublisher = true;
+      if (type instanceof IFeed && ((IFeed) type).getAuthor() != null)
+        usePublisher = false;
+      else if (type instanceof INews && ((INews) type).getAuthor() != null)
+        usePublisher = false;
+
+      if (usePublisher) {
+        IPerson person = Owl.getModelFactory().createPerson(null, type);
+        person.setName(element.getText());
+      }
     }
 
     /* Language */
@@ -123,8 +138,9 @@ public class DublinCoreNamespaceHandler implements INamespaceHandler {
   }
 
   /*
-   * @see org.rssowl.core.interpreter.INamespaceHandler#processAttribute(org.jdom.Attribute,
-   * org.rssowl.core.interpreter.types.IExtendableType)
+   * @see
+   * org.rssowl.core.interpreter.INamespaceHandler#processAttribute(org.jdom
+   * .Attribute, org.rssowl.core.interpreter.types.IExtendableType)
    */
   public void processAttribute(Attribute attribute, IPersistable type) {}
 }
