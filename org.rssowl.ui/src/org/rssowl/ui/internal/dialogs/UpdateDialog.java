@@ -316,7 +316,7 @@ public class UpdateDialog extends TitleAreaDialog {
 
   private String formatQualifier(String qualifier) {
     if (qualifier.length() == 12)
-      return qualifier.substring(0, 4) + "-" + qualifier.substring(5, 7) + "-" + qualifier.substring(8, 10); //$NON-NLS-1$ //$NON-NLS-2$
+      return qualifier.substring(0, 4) + "-" + qualifier.substring(4, 6) + "-" + qualifier.substring(6, 8); //$NON-NLS-1$ //$NON-NLS-2$
 
     return qualifier;
   }
