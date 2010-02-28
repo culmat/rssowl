@@ -606,10 +606,10 @@ public class NotificationPopup extends PopupDialog {
     fCloseImageNormal = OwlUI.getImage(fResources, "icons/etool16/close_normal.png"); //$NON-NLS-1$
     fCloseImageHot = OwlUI.getImage(fResources, "icons/etool16/close_hot.png"); //$NON-NLS-1$
     fCloseImagePressed = OwlUI.getImage(fResources, "icons/etool16/close_pressed.png"); //$NON-NLS-1$
-    fMarkReadIcon = OwlUI.getImage(fResources, "icons/elcl16/mark_read.gif"); //$NON-NLS-1$
+    fMarkReadIcon = OwlUI.getImage(fResources, "icons/elcl16/mark_read_light16.gif"); //$NON-NLS-1$
     fMarkReadDisabledIcon = OwlUI.getImage(fResources, "icons/dlcl16/mark_read.gif"); //$NON-NLS-1$
-    fItemStickyIcon = OwlUI.getImage(fResources, OwlUI.NEWS_PINNED);
-    fItemNonStickyIcon = OwlUI.getImage(fResources, OwlUI.NEWS_PIN);
+    fItemStickyIcon = OwlUI.getImage(fResources, "icons/obj16/news_pinned_light16.gif"); //$NON-NLS-1$
+    fItemNonStickyIcon = OwlUI.getImage(fResources, "icons/obj16/news_pin_light16.gif"); //$NON-NLS-1$
     fItemNonStickyDisabledIcon = OwlUI.getImage(fResources, "icons/obj16/news_pin_disabled.gif"); //$NON-NLS-1$
     fPrevImageNormal = OwlUI.getImage(fResources, "icons/etool16/prev_normal.png"); //$NON-NLS-1$
     fPrevImagePressed = OwlUI.getImage(fResources, "icons/etool16/prev_pressed.png"); //$NON-NLS-1$
