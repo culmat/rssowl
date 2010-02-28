@@ -234,11 +234,7 @@ public class EntityPropertyDialog extends Dialog implements IPropertyDialogSite 
    */
   @Override
   protected int getShellStyle() {
-    int style = SWT.TITLE | SWT.BORDER | SWT.APPLICATION_MODAL | getDefaultOrientation();
-
-    /* Follow Apple's Human Interface Guidelines for Application Modal Dialogs */
-    if (!Application.IS_MAC)
-      style |= SWT.CLOSE;
+    int style = SWT.TITLE | SWT.BORDER | SWT.APPLICATION_MODAL | SWT.CLOSE | getDefaultOrientation();
 
     return style;
   }

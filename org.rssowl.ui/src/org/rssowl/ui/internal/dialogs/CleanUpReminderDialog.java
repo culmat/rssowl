@@ -43,7 +43,6 @@ import org.eclipse.swt.widgets.Spinner;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
-import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
@@ -185,11 +184,7 @@ public class CleanUpReminderDialog extends TitleAreaDialog {
    */
   @Override
   protected int getShellStyle() {
-    int style = SWT.TITLE | SWT.BORDER | getDefaultOrientation();
-
-    /* Follow Apple's Human Interface Guidelines for Application Modal Dialogs */
-    if (!Application.IS_MAC)
-      style |= SWT.CLOSE;
+    int style = SWT.TITLE | SWT.BORDER | SWT.CLOSE | getDefaultOrientation();
 
     return style;
   }

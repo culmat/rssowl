@@ -54,7 +54,6 @@ import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.StringUtils;
-import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.BrowserUtils;
 import org.rssowl.ui.internal.util.LayoutUtils;
@@ -387,11 +386,7 @@ public class UpdateDialog extends TitleAreaDialog {
    */
   @Override
   protected int getShellStyle() {
-    int style = SWT.TITLE | SWT.BORDER | SWT.APPLICATION_MODAL | SWT.RESIZE | getDefaultOrientation();
-
-    /* Follow Apple's Human Interface Guidelines for Application Modal Dialogs */
-    if (!Application.IS_MAC)
-      style |= SWT.CLOSE;
+    int style = SWT.TITLE | SWT.BORDER | SWT.APPLICATION_MODAL | SWT.RESIZE | SWT.CLOSE | getDefaultOrientation();
 
     return style;
   }

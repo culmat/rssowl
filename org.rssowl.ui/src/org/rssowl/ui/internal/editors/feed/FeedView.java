@@ -1798,7 +1798,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
     fFilterBar = new FilterBar(this, rootComposite);
 
     /* Separate from SashForm */
-    if (!Application.IS_MAC || fInitialBrowserMaximized) {
+    if (!Application.IS_MAC || fInitialBrowserMaximized || !fInitialLayoutClassic) {
       Label sep = new Label(rootComposite, SWT.SEPARATOR | SWT.HORIZONTAL);
       sep.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     }

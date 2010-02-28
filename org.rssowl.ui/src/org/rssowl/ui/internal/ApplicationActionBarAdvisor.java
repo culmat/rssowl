@@ -281,8 +281,10 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     fileMenu.add(new GroupMarker(IWorkbenchActionConstants.CLOSE_EXT));
     fileMenu.add(new Separator());
     fileMenu.add(getAction(ActionFactory.SAVE_AS.getId()));
-    fileMenu.add(new Separator());
-    fileMenu.add(getAction(ActionFactory.PRINT.getId()));
+    if (!Application.IS_MAC) { //Printing is not supported on Mac
+      fileMenu.add(new Separator());
+      fileMenu.add(getAction(ActionFactory.PRINT.getId()));
+    }
 
     fileMenu.add(new Separator());
     fileMenu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));

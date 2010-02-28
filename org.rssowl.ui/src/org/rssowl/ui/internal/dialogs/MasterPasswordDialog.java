@@ -45,7 +45,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
@@ -256,11 +255,7 @@ public class MasterPasswordDialog extends TitleAreaDialog {
    */
   @Override
   protected int getShellStyle() {
-    int style = SWT.TITLE | SWT.BORDER | SWT.APPLICATION_MODAL | getDefaultOrientation();
-
-    /* Follow Apple's Human Interface Guidelines for Application Modal Dialogs */
-    if (!Application.IS_MAC)
-      style |= SWT.CLOSE;
+    int style = SWT.TITLE | SWT.BORDER | SWT.APPLICATION_MODAL | SWT.CLOSE | getDefaultOrientation();
 
     return style;
   }

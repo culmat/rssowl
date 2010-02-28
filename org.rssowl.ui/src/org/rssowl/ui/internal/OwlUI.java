@@ -2047,6 +2047,8 @@ public class OwlUI {
       return;
 
     int barWidth = verticalBar.getSize().x;
+    if (Application.IS_MAC && barWidth == 0)
+      barWidth= 16; //Can be 0 on Mac
 
     if (wasScrollbarShowing != verticalBar.isVisible()) {
       Rectangle shellBounds = shell.getBounds();

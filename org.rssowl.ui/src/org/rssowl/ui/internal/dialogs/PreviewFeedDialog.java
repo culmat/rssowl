@@ -358,11 +358,7 @@ public class PreviewFeedDialog extends Dialog {
    */
   @Override
   protected int getShellStyle() {
-    int style = SWT.TITLE | SWT.BORDER | SWT.RESIZE | SWT.MIN | SWT.MAX | getDefaultOrientation();
-
-    /* Follow Apple's Human Interface Guidelines for Application Modal Dialogs */
-    if (!Application.IS_MAC)
-      style |= SWT.CLOSE;
+    int style = SWT.TITLE | SWT.BORDER | SWT.RESIZE | SWT.MIN | SWT.MAX | SWT.CLOSE | getDefaultOrientation();
 
     return style;
   }
