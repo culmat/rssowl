@@ -82,7 +82,10 @@ public class CBrowser {
   private static final String XULRUNNER_PROXY_PORT = "network.proxy_port"; //$NON-NLS-1$
 
   /* Delay in millies after a refresh until to allow ext. navigation again (see Bug 1429) */
-  private static final long REFRESH_NAVIGATION_DELAY = 800;
+  private static final long REFRESH_NAVIGATION_DELAY = Application.IS_MAC ? 1000 : 800;
+
+  /* Mac only: Delay in millies after a URL change until to allow ext. navigation again (see Bug 1350) */
+  private static final long URL_CHANGE_NAVIGATION_DELAY = 1000;
 
   /* Flag to check if Mozilla is available on Windows */
   private static boolean fgMozillaAvailable = true;
@@ -108,6 +111,7 @@ public class CBrowser {
   private Browser fBrowser;
   private boolean fAllowExternalNavigation;
   private long fLastRefresh;
+  private long fLastUrlChange;
   private IPreferenceScope fPreferences;
   private IPreferenceScope fEclipsePreferences;
   private Map<String, ILinkHandler> fLinkHandler;
@@ -365,11 +369,15 @@ public class CBrowser {
        */
       if (StringUtils.isSet(url) && !URIUtils.ABOUT_BLANK.equals(url) && !ApplicationServer.getDefault().isNewsServerUrl(url) && useExternalBrowser())
         fAllowExternalNavigation = true;
+      else
+        fLastUrlChange = System.currentTimeMillis();
     }
 
     /* Normal situation: External navigation blocked until page is loaded */
-    else
+    else {
       fAllowExternalNavigation = false;
+      fLastUrlChange = System.currentTimeMillis();
+    }
 
     fBrowser.setUrl(url);
   }
@@ -382,6 +390,7 @@ public class CBrowser {
    */
   public boolean back() {
     fAllowExternalNavigation = false;
+    fLastUrlChange = System.currentTimeMillis();
     return fBrowser.back();
   }
 
@@ -393,6 +402,7 @@ public class CBrowser {
    */
   public boolean forward() {
     fAllowExternalNavigation = false;
+    fLastUrlChange = System.currentTimeMillis();
     return fBrowser.forward();
   }
 
@@ -587,7 +597,12 @@ public class CBrowser {
           }
 
           /* See Bug 1429: Potential external link opening from Browser.refresh() */
-          if (!isManaged && System.currentTimeMillis() - fLastRefresh < REFRESH_NAVIGATION_DELAY)
+          long currentTimeMillis = System.currentTimeMillis();
+          if (!isManaged && currentTimeMillis - fLastRefresh < REFRESH_NAVIGATION_DELAY)
+            return;
+
+          /* See Bug 1350: Potential browser popup when reading articles */
+          if (Application.IS_MAC && !isManaged && currentTimeMillis - fLastUrlChange < URL_CHANGE_NAVIGATION_DELAY)
             return;
 
           /* Finally, cancel event and open URL external */
