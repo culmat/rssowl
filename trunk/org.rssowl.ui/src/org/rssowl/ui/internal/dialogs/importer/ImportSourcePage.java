@@ -51,7 +51,6 @@ import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
-import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.dialogs.welcome.WelcomeWizard;
 import org.rssowl.ui.internal.util.JobRunner;
@@ -350,7 +349,7 @@ public class ImportSourcePage extends WizardPage {
     fImportGoogleReaderRadio = new Button(container, SWT.RADIO);
     fImportGoogleReaderRadio.setText(Messages.ImportSourcePage_IMPORT_GOOGLE_READER);
     fImportGoogleReaderRadio.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-    if (Application.IS_WINDOWS && isWelcome())
+    if (isWelcome())
       ((GridData) fImportGoogleReaderRadio.getLayoutData()).verticalIndent = 10;
     fImportGoogleReaderRadio.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -365,7 +364,7 @@ public class ImportSourcePage extends WizardPage {
     fImportFromRecommendedRadio.setText(Messages.ImportSourcePage_IMPORT_RECOMMENDED);
     fImportFromRecommendedRadio.setSelection(isWelcome());
     fImportFromRecommendedRadio.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-    if (Application.IS_WINDOWS && !isWelcome())
+    if (!isWelcome())
       ((GridData) fImportFromRecommendedRadio.getLayoutData()).verticalIndent = 10;
     fImportFromRecommendedRadio.addSelectionListener(new SelectionAdapter() {
       @Override

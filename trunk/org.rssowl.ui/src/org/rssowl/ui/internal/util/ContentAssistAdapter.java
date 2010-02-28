@@ -33,6 +33,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
+import org.rssowl.ui.internal.Application;
 
 /**
  * An implementation of {@link IControlContentAdapter} with a more clever rule
@@ -61,11 +62,37 @@ public class ContentAssistAdapter implements IControlContentAdapter, IControlCon
     if (fSeparator != ' ')
       fSeparatorStr = fSeparatorStr + " "; //$NON-NLS-1$
 
-    if (control instanceof Text)
-      fTextAdapter = new TextContentAdapter();
-    else if (control instanceof Combo)
-      fComboAdapter = new ComboContentAdapter();
-    else
+    /* Text */
+    if (control instanceof Text) {
+      fTextAdapter = new TextContentAdapter() {
+        @Override
+        public Rectangle getInsertionBounds(Control control) {
+          Rectangle bounds = super.getInsertionBounds(control);
+
+          /* Bug on Mac: Insertion Bounds off by some pixels */
+          if (Application.IS_MAC)
+            bounds.y += 10;
+
+          return bounds;
+        }
+      };
+    }
+
+    /* Combo */
+    else if (control instanceof Combo) {
+      fComboAdapter = new ComboContentAdapter() {
+        @Override
+        public Rectangle getInsertionBounds(Control control) {
+          Rectangle bounds = super.getInsertionBounds(control);
+
+          /* Bug on Mac: Insertion Bounds off by some pixels */
+          if (Application.IS_MAC)
+            bounds.x -= 10;
+
+          return bounds;
+        }
+      };
+    } else
       throw new IllegalArgumentException("Can only be used for Text and Combo Widgets"); //$NON-NLS-1$
   }
 

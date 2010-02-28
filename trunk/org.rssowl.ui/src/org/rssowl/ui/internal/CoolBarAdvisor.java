@@ -737,7 +737,10 @@ public class CoolBarAdvisor {
 
       /* Update Print */
       case PRINT:
-        action.setEnabled(part instanceof FeedView || OwlUI.getActiveFeedView() != null);
+        if (!Application.IS_MAC)
+          action.setEnabled(part instanceof FeedView || OwlUI.getActiveFeedView() != null);
+        else
+          action.setEnabled(false); //Printing is not supported on Mac
         break;
 
       /* Update Mark All Read */
@@ -1292,7 +1295,7 @@ public class CoolBarAdvisor {
         /* Label */
       case LABEL:
         return new ContextMenuCreator() {
-        
+
           @Override
           public Menu createMenu(Control parent) {
             MenuManager manager = new MenuManager();
@@ -1313,7 +1316,7 @@ public class CoolBarAdvisor {
         /* Share */
       case SHARE:
         return new ContextMenuCreator() {
-        
+
           @Override
           public Menu createMenu(Control parent) {
             MenuManager manager = new MenuManager();
@@ -1326,7 +1329,7 @@ public class CoolBarAdvisor {
         /* Bookmarks */
       case BOOKMARKS:
         return new ContextMenuCreator() {
-        
+
           @Override
           public Menu createMenu(Control parent) {
             MenuManager manager = new MenuManager();
@@ -1338,7 +1341,7 @@ public class CoolBarAdvisor {
         /* Attachments */
       case ATTACHMENTS:
         return new ContextMenuCreator() {
-        
+
           @Override
           public Menu createMenu(Control parent) {
             MenuManager manager = new MenuManager();

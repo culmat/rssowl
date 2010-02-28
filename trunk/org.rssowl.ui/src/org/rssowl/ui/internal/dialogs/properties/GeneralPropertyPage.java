@@ -68,6 +68,7 @@ import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.dialogs.properties.IEntityPropertyPage;
 import org.rssowl.ui.dialogs.properties.IPropertyDialogSite;
+import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.FolderChooser;
@@ -197,17 +198,19 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
         nameLabel.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
         nameLabel.setText(Messages.GeneralPropertyPage_NAME);
 
-        Composite nameContainer = new Composite(container, SWT.BORDER);
+        Composite nameContainer = new Composite(container, Application.IS_MAC ? SWT.NONE : SWT.BORDER);
         nameContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
         nameContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
-        nameContainer.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+        if (!Application.IS_MAC)
+          nameContainer.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
-        fNameInput = new Text(nameContainer, SWT.NONE);
+        fNameInput = new Text(nameContainer, Application.IS_MAC ? SWT.BORDER : SWT.NONE);
         fNameInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
         fNameInput.setText(getName(entity));
 
         ToolBar grabTitleBar = new ToolBar(nameContainer, SWT.FLAT);
-        grabTitleBar.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+        if (!Application.IS_MAC)
+          grabTitleBar.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
         ToolItem grabTitleItem = new ToolItem(grabTitleBar, SWT.PUSH);
         grabTitleItem.setImage(OwlUI.getImage(fSite.getResourceManager(), "icons/etool16/info.gif")); //$NON-NLS-1$

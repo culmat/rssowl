@@ -638,7 +638,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
     GC gc = event.gc;
 
     /* Handle selected News (Linux: Note Bug 444) */
-    if ((event.detail & SWT.SELECTED) != 0) {
+    if ((event.detail & SWT.SELECTED) != 0 && (!Application.IS_MAC || !news.isFlagged())) {
       Set<ILabel> labels = CoreUtils.getSortedLabels(news);
 
       /* Some conditions under which we don't override the selection color */
