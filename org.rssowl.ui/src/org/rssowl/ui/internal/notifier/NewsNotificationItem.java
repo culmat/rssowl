@@ -98,6 +98,9 @@ public class NewsNotificationItem extends NotificationItem {
   }
 
   private String extractDescriptionExcerpt(INews news) {
+    if (news == null)
+      return null;
+
     String description = news.getDescription();
     if (!StringUtils.isSet(description))
       return null;
@@ -210,8 +213,10 @@ public class NewsNotificationItem extends NotificationItem {
     fIsNewsSticky = sticky;
 
     INews news = fNewsReference.resolve();
-    news.setFlagged(sticky);
-    DynamicDAO.save(news);
+    if (news != null && news.isVisible()) {
+      news.setFlagged(sticky);
+      DynamicDAO.save(news);
+    }
   }
 
   /*
@@ -230,8 +235,10 @@ public class NewsNotificationItem extends NotificationItem {
     fIsNewsRead = read;
 
     INews news = fNewsReference.resolve();
-    news.setState(read ? INews.State.READ : INews.State.NEW);
-    DynamicDAO.save(news);
+    if (news != null && news.isVisible()) {
+      news.setState(read ? INews.State.READ : INews.State.NEW);
+      DynamicDAO.save(news);
+    }
   }
 
   /*
