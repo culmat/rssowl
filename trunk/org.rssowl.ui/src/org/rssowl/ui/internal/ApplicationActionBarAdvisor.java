@@ -293,6 +293,11 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     fileMenu.add(new GroupMarker(IWorkbenchActionConstants.FILE_END));
     fileMenu.add(new Separator());
 
+    if (Application.IS_LINUX) {
+      fileMenu.add(getAction(ActionFactory.PROPERTIES.getId()));
+      fileMenu.add(new Separator());
+    }
+
     fileMenu.add(getAction(ActionFactory.QUIT.getId()));
   }
 
@@ -329,7 +334,12 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         editMenu.add(new GroupMarker(IWorkbenchActionConstants.EDIT_END));
         editMenu.add(new Separator());
 
-        editMenu.add(getAction(ActionFactory.PROPERTIES.getId()));
+        if (Application.IS_LINUX) {
+          IAction preferences = getAction(ActionFactory.PREFERENCES.getId());
+          preferences.setImageDescriptor(OwlUI.getImageDescriptor("icons/elcl16/preferences.gif")); //$NON-NLS-1$
+          editMenu.add(preferences);
+        } else
+          editMenu.add(getAction(ActionFactory.PROPERTIES.getId()));
       }
     });
   }
@@ -916,16 +926,18 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     toolsMenu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
     toolsMenu.add(new Separator());
     toolsMenu.add(new GroupMarker("end")); //$NON-NLS-1$
-    toolsMenu.add(new Separator());
 
-    /* Preferences */
-    IAction preferences = getAction(ActionFactory.PREFERENCES.getId());
-    preferences.setImageDescriptor(OwlUI.getImageDescriptor("icons/elcl16/preferences.gif")); //$NON-NLS-1$
-    toolsMenu.add(preferences);
-    if (Application.IS_MAC) {
-      IContributionItem item = toolsMenu.find(ActionFactory.PREFERENCES.getId());
-      if (item != null)
-        item.setVisible(false);
+    /* Preferences (Windows, Mac) */
+    if (!Application.IS_LINUX) {
+      toolsMenu.add(new Separator());
+      IAction preferences = getAction(ActionFactory.PREFERENCES.getId());
+      preferences.setImageDescriptor(OwlUI.getImageDescriptor("icons/elcl16/preferences.gif")); //$NON-NLS-1$
+      toolsMenu.add(preferences);
+      if (Application.IS_MAC) {
+        IContributionItem item = toolsMenu.find(ActionFactory.PREFERENCES.getId());
+        if (item != null)
+          item.setVisible(false);
+      }
     }
   }
 
