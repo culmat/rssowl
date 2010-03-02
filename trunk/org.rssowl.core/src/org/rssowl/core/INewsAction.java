@@ -26,8 +26,10 @@ package org.rssowl.core;
 
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.util.CoreUtils;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -40,7 +42,7 @@ import java.util.List;
  * <p>
  * Implementors are asked to not save any news that is passed to the action but
  * rather return the list of entities that have been changed from the
- * {@link #run(List, Object)} method.
+ * {@link #run(List, Map, Object)} method.
  * </p>
  * <p>
  * Contributed via <code>org.rssowl.core.NewsAction</code> Extension Point.
@@ -55,16 +57,20 @@ public interface INewsAction {
    * <p>
    * Implementors are asked to not save any news that is passed to the action
    * but rather return the list of entities that have been changed from the
-   * {@link #run(List, Object)} method.
+   * {@link #run(List, Map, Object)} method.
    * </p>
    *
    * @param news the list of news to perform the operation on.
+   * @param replacements a {@link Map} that is filled with replaced versions of
+   * news items from previous filters. The implementor of this method must
+   * ensure that he operates on the replaced versions if available. Use
+   * {@link CoreUtils#replace(List, Map)} as convinient method.
    * @param data arbitrary data associated with the action.
    * @return a {@link List} of {@link IEntity} that has been changed as a result
    * of the action. The caller must ensure to save these entities. Never
    * <code>null</code>.
    */
-  List<IEntity> run(List<INews> news, Object data);
+  List<IEntity> run(List<INews> news, Map<INews, INews> replacements, Object data);
 
   /**
    * Checks whether the two operations can be used together or not. E.g. an

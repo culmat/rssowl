@@ -27,9 +27,11 @@ package org.rssowl.core.internal.newsaction;
 import org.rssowl.core.INewsAction;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.util.CoreUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * An instance of {@link INewsAction} to mark a list of news as sticky.
@@ -39,11 +41,16 @@ import java.util.List;
 public class MarkStickyNewsAction implements INewsAction {
 
   /*
-   * @see org.rssowl.core.INewsAction#run(java.util.List, java.lang.Object)
+   * @see org.rssowl.core.INewsAction#run(java.util.List, java.util.Map,
+   * java.lang.Object)
    */
-  public List<IEntity> run(List<INews> news, Object data) {
-    List<IEntity> entitiesToSave = new ArrayList<IEntity>(news.size());
+  public List<IEntity> run(List<INews> news, Map<INews, INews> replacements, Object data) {
 
+    /* Ensure to Pickup Replaces */
+    news = CoreUtils.replace(news, replacements);
+
+    /* Run Filter */
+    List<IEntity> entitiesToSave = new ArrayList<IEntity>(news.size());
     for (INews newsitem : news) {
       if (!newsitem.isFlagged()) {
         newsitem.setFlagged(true);

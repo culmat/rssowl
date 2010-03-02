@@ -98,9 +98,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -533,6 +535,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
   private void applyFilterOnChunks(final List<INews> news, ISearchFilter filter) {
     Collection<IFilterAction> actions = CoreUtils.getActions(filter); //Need to sort structural actions to end
     final Set<IEntity> entitiesToSave = new HashSet<IEntity>(news.size());
+    final Map<INews, INews> replacements= new HashMap<INews, INews>();
 
     for (final IFilterAction action : actions) {
       NewsActionDescriptor newsActionDescriptor = fNewsActionPresentationManager.getNewsActionDescriptor(action.getActionId());
@@ -545,7 +548,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
             }
 
             public void run() throws Exception {
-              List<IEntity> changedEntities = newsAction.run(news, action.getData());
+              List<IEntity> changedEntities = newsAction.run(news, replacements, action.getData());
               entitiesToSave.addAll(changedEntities);
             }
           });

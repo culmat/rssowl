@@ -67,8 +67,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -1290,5 +1292,43 @@ public class CoreUtilsTest {
 
     reader = new StringReader("<html><link hreff=\"favicon.ico\"/></html>");
     assertEquals(null, CoreUtils.findFavicon(new BufferedReader(reader), URI.create("http://www.rssowl.org")));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @SuppressWarnings("unchecked")
+  @Test
+  public void testReplace() throws Exception {
+    IFeed feed = fFactory.createFeed(null, new URI("rssowl.org"));
+
+    INews news1 = fFactory.createNews(null, feed, new Date());
+    news1.setTitle("news1");
+
+    INews news2 = fFactory.createNews(null, feed, new Date());
+    news2.setTitle("news2");
+
+    INews news3 = fFactory.createNews(null, feed, new Date());
+    news3.setTitle("news3");
+
+    assertEquals(null, CoreUtils.replace(null, null));
+    assertEquals(null, CoreUtils.replace(null, Collections.EMPTY_MAP));
+    assertEquals(0, CoreUtils.replace(Collections.EMPTY_LIST, null).size());
+    assertEquals(0, CoreUtils.replace(Collections.EMPTY_LIST, Collections.EMPTY_MAP).size());
+
+    Map<INews, INews> replacement= new HashMap<INews, INews>();
+    replacement.put(news1, news3);
+    replacement.put(news3, news1);
+
+    List<INews> allNews= new ArrayList<INews>();
+    allNews.add(news1);
+    allNews.add(news2);
+    allNews.add(news3);
+
+    List<INews> replacedNews = CoreUtils.replace(allNews, replacement);
+    assertEquals(3, replacedNews.size());
+    assertEquals("news3", replacedNews.get(0).getTitle());
+    assertEquals("news2", replacedNews.get(1).getTitle());
+    assertEquals("news1", replacedNews.get(2).getTitle());
   }
 }

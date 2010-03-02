@@ -30,9 +30,11 @@ import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.util.CoreUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * An instance of {@link INewsAction} to label a list of news.
@@ -45,9 +47,15 @@ public class LabelNewsAction implements INewsAction {
   public static final String ID = "org.rssowl.core.LabelNewsAction"; //$NON-NLS-1$
 
   /*
-   * @see org.rssowl.core.INewsAction#run(java.util.List, java.lang.Object)
+   * @see org.rssowl.core.INewsAction#run(java.util.List, java.util.Map,
+   * java.lang.Object)
    */
-  public List<IEntity> run(List<INews> news, Object data) {
+  public List<IEntity> run(List<INews> news, Map<INews, INews> replacements, Object data) {
+
+    /* Ensure to Pickup Replaces */
+    news = CoreUtils.replace(news, replacements);
+
+    /* Run Filter */
     List<IEntity> entitiesToSave = new ArrayList<IEntity>(news.size());
     Long labelId = (Long) data;
     ILabel label = DynamicDAO.load(ILabel.class, labelId);

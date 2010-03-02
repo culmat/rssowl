@@ -30,6 +30,7 @@ import org.rssowl.core.persist.INews;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * An instance of {@link INewsAction} to stop filtering of a news by simply
@@ -40,9 +41,10 @@ import java.util.List;
 public class StopFilterNewsAction implements INewsAction {
 
   /*
-   * @see org.rssowl.core.INewsAction#run(java.util.List, java.lang.Object)
+   * @see org.rssowl.core.INewsAction#run(java.util.List, java.util.Map,
+   * java.lang.Object)
    */
-  public List<IEntity> run(List<INews> news, Object data) {
+  public List<IEntity> run(List<INews> news, Map<INews, INews> replacements, Object data) {
     return Collections.emptyList();
   }
 

@@ -28,6 +28,7 @@ import org.rssowl.core.INewsAction;
 import org.rssowl.core.internal.newsaction.DeleteNewsAction;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.notifier.NotificationService;
@@ -35,6 +36,7 @@ import org.rssowl.ui.internal.notifier.NotificationService.Mode;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * An implementation of {@link INewsAction} to show the news in a notifier.
@@ -44,15 +46,21 @@ import java.util.List;
 public class ShowNotifierNewsAction implements INewsAction {
 
   /*
-   * @see org.rssowl.core.INewsAction#run(java.util.List, java.lang.Object)
+   * @see org.rssowl.core.INewsAction#run(java.util.List, java.util.Map, java.lang.Object)
    */
-  public List<IEntity> run(final List<INews> news, final Object data) {
+  public List<IEntity> run(List<INews> news, Map<INews, INews> replacements, Object data) {
+
+    /* Ensure to Pickup Replaces */
+    news = CoreUtils.replace(news, replacements);
+
+    /* Run Filter */
     NotificationService notificationService = Controller.getDefault().getNotificationService();
     if (data != null && data instanceof String)
       notificationService.show(news, OwlUI.getRGB((String) data), Mode.INCOMING_AUTOMATIC);
     else
       notificationService.show(news, null, Mode.INCOMING_AUTOMATIC);
 
+    /* Nothing to Save */
     return Collections.emptyList();
   }
 

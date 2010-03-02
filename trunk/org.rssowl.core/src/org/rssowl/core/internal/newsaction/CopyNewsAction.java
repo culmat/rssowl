@@ -36,6 +36,7 @@ import org.rssowl.core.util.CoreUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * An instance of {@link INewsAction} to copy a list of news to a bin.
@@ -48,9 +49,15 @@ public class CopyNewsAction implements INewsAction {
   public static final String ID = "org.rssowl.core.CopyNewsAction"; //$NON-NLS-1$
 
   /*
-   * @see org.rssowl.core.INewsAction#run(java.util.List, java.lang.Object)
+   * @see org.rssowl.core.INewsAction#run(java.util.List, java.util.Map,
+   * java.lang.Object)
    */
-  public List<IEntity> run(List<INews> news, Object data) {
+  public List<IEntity> run(List<INews> news, Map<INews, INews> replacements, Object data) {
+
+    /* Ensure to Pickup Replaces */
+    news = CoreUtils.replace(news, replacements);
+
+    /* Run Filter */
     Long[] binIds = (Long[]) data;
     List<INewsBin> bins = CoreUtils.toBins(binIds);
     if (bins.isEmpty())
@@ -75,7 +82,8 @@ public class CopyNewsAction implements INewsAction {
       }
     }
 
-    return Collections.emptyList(); //The original news where not touched at all
+    /* Nothing to Save (the original news where not touched at all) */
+    return Collections.emptyList();
   }
 
   /*
