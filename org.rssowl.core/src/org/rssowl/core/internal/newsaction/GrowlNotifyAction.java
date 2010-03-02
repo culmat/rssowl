@@ -45,6 +45,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -87,10 +88,14 @@ public class GrowlNotifyAction implements INewsAction {
     fBatchedBuffer = new BatchedBuffer<INews>(receiver, BATCH_INTERVAL);
   }
 
-  /**
-   * @see org.rssowl.core.INewsAction#run(java.util.List, java.lang.Object)
+  /*
+   * @see org.rssowl.core.INewsAction#run(java.util.List, java.util.Map,
+   * java.lang.Object)
    */
-  public List<IEntity> run(List<INews> news, Object data) {
+  public List<IEntity> run(List<INews> news, Map<INews, INews> replacements, Object data) {
+
+    /* Ensure to Pickup Replaces */
+    news = CoreUtils.replace(news, replacements);
 
     /* Launch if file exists */
     if (data instanceof String && new File((String) data).exists()) {
@@ -98,6 +103,7 @@ public class GrowlNotifyAction implements INewsAction {
       fBatchedBuffer.addAll(news);
     }
 
+    /* Nothing to Save */
     return Collections.emptyList();
   }
 

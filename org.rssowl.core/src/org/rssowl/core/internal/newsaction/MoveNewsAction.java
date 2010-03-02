@@ -36,6 +36,7 @@ import org.rssowl.core.util.CoreUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * An instance of {@link INewsAction} to move a list of news to a bin.
@@ -48,9 +49,15 @@ public class MoveNewsAction implements INewsAction {
   public static final String ID = "org.rssowl.core.MoveNewsAction"; //$NON-NLS-1$
 
   /*
-   * @see org.rssowl.core.INewsAction#run(java.util.List, java.lang.Object)
+   * @see org.rssowl.core.INewsAction#run(java.util.List, java.util.Map,
+   * java.lang.Object)
    */
-  public List<IEntity> run(List<INews> news, Object data) {
+  public List<IEntity> run(List<INews> news, Map<INews, INews> replacements, Object data) {
+
+    /* Ensure to Pickup Replaces */
+    news = CoreUtils.replace(news, replacements);
+
+    /* Run Filter */
     List<IEntity> entitiesToSave = new ArrayList<IEntity>(news.size());
 
     Long[] binIds = (Long[]) data;
@@ -68,8 +75,13 @@ public class MoveNewsAction implements INewsAction {
           INews newsCopy = Owl.getModelFactory().createNews(newsitem, bin);
           copiedNews.add(newsCopy);
 
-          if (!entitiesToSave.contains(newsitem))
+          /* First Move of the News Item */
+          if (!entitiesToSave.contains(newsitem)) {
             entitiesToSave.add(newsitem);
+
+            /* Indicate that the News is replaced by its copy because it got moved */
+            replacements.put(newsitem, newsCopy);
+          }
         }
       }
 

@@ -121,8 +121,14 @@ public class CoreUtils {
   /* A Set of Stop Words in English */
   private static final Set<String> STOP_WORDS = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(StringUtils.ENGLISH_STOP_WORDS)));
 
-  /* Special case structural actions that need to run as last action */
+  /*
+   * Special case structural actions that need to run as last action (but before
+   * display actions)
+   */
   private static List<String> STRUCTURAL_ACTIONS = Arrays.asList(new String[] { MoveNewsAction.ID, CopyNewsAction.ID });
+
+  /* Special case display actions that need to run as last action */
+  private static List<String> DISPLAY_ACTIONS = Arrays.asList(new String[] { "org.rssowl.ui.ShowNotifierNewsAction" }); //$NON-NLS-1$
 
   /* Favicon Markers */
   private static final String[] FAVICON_MARKERS = new String[] { "shortcut icon", ".ico" }; //$NON-NLS-1$ //$NON-NLS-2$
@@ -147,6 +153,12 @@ public class CoreUtils {
   public static Collection<IFilterAction> getActions(ISearchFilter filter) {
     Set<IFilterAction> actions = new TreeSet<IFilterAction>(new Comparator<IFilterAction>() {
       public int compare(IFilterAction o1, IFilterAction o2) {
+        if (DISPLAY_ACTIONS.contains(o1.getActionId()))
+          return 1;
+
+        if (DISPLAY_ACTIONS.contains(o2.getActionId()))
+          return -1;
+
         if (STRUCTURAL_ACTIONS.contains(o1.getActionId()))
           return 1;
 
@@ -1710,5 +1722,29 @@ public class CoreUtils {
     else if (Platform.OS_MACOSX.equals(os))
       return "RSSOwl/" + version + " (Macintosh; U; en)"; //$NON-NLS-1$ //$NON-NLS-2$
     return "RSSOwl/" + version; //$NON-NLS-1$
+  }
+
+  /**
+   * @param news a {@link List} of {@link INews} that are potentially replaced
+   * with versions from the provided {@link Map}.
+   * @param replacements a {@link Map} of {@link INews} that are to replace
+   * other {@link INews} or <code>null</code> if none.
+   * @return the replaced version of the news list. Will be identical if the
+   * replacements map is empty or <code>null</code>.
+   */
+  public static List<INews> replace(List<INews> news, Map<INews, INews> replacements) {
+    if (replacements == null || replacements.isEmpty())
+      return news;
+
+    List<INews> replacedNews = new ArrayList<INews>();
+    for (INews newsitem : news) {
+      INews replacedItem = replacements.get(newsitem);
+      if (replacedItem != null)
+        replacedNews.add(replacedItem);
+      else
+        replacedNews.add(newsitem);
+    }
+
+    return replacedNews;
   }
 }

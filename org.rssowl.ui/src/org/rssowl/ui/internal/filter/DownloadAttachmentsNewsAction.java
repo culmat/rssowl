@@ -29,6 +29,7 @@ import org.rssowl.core.INewsAction;
 import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Controller;
@@ -38,6 +39,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * An implementation of {@link INewsAction} to download all attachments of the
@@ -51,9 +53,14 @@ public class DownloadAttachmentsNewsAction implements INewsAction {
   public static final String ID = "org.rssowl.ui.DownloadAttachmentsNewsAction"; //$NON-NLS-1$
 
   /*
-   * @see org.rssowl.core.INewsAction#run(java.util.List, java.lang.Object)
+   * @see org.rssowl.core.INewsAction#run(java.util.List, java.util.Map, java.lang.Object)
    */
-  public List<IEntity> run(List<INews> news, Object data) {
+  public List<IEntity> run(List<INews> news, Map<INews, INews> replacements, Object data) {
+
+    /* Ensure to Pickup Replaces */
+    news = CoreUtils.replace(news, replacements);
+
+    /* Run Filter */
     if (data != null && data instanceof String) {
       File folder = new File((String) data);
       if (folder.exists()) {
@@ -79,6 +86,7 @@ public class DownloadAttachmentsNewsAction implements INewsAction {
       }
     }
 
+    /* Nothing to Save */
     return Collections.emptyList();
   }
 

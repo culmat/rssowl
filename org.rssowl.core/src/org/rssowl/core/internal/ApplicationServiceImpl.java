@@ -449,13 +449,14 @@ public class ApplicationServiceImpl implements IApplicationService {
   }
 
   private void applyFilter(ISearchFilter filter, final List<INews> news) {
+    final Map<INews, INews> replacements= new HashMap<INews, INews>();
     Collection<IFilterAction> actions = CoreUtils.getActions(filter); //Need to sort structural actions to end
     for (final IFilterAction action : actions) {
       final INewsAction newsAction = fNewsActions.get(action.getActionId());
       if (newsAction != null) {
         SafeRunner.run(new LoggingSafeRunnable() {
           public void run() throws Exception {
-            newsAction.run(news, action.getData());
+            newsAction.run(news, replacements, action.getData());
           }
         });
       }

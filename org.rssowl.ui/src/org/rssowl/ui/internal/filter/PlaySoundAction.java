@@ -48,9 +48,11 @@ public class PlaySoundAction implements INewsAction {
   private static final long BLOCK_SOUND_REPEAT_VALUE = 5000;
 
   /*
-   * @see org.rssowl.core.INewsAction#run(java.util.List, java.lang.Object)
+   * @see org.rssowl.core.INewsAction#run(java.util.List, java.util.Map, java.lang.Object)
    */
-  public List<IEntity> run(List<INews> news, Object data) {
+  public List<IEntity> run(List<INews> news, Map<INews, INews> replacements, Object data) {
+
+    /* Run Notifier */
     if (AudioUtils.isSupported() && data != null && data instanceof String) {
       Long lastPlayed = fgLastPlayedSoundsMap.get(data);
       if (lastPlayed == null || System.currentTimeMillis() - lastPlayed > BLOCK_SOUND_REPEAT_VALUE) {
@@ -59,6 +61,7 @@ public class PlaySoundAction implements INewsAction {
       }
     }
 
+    /* Nothing to Save */
     return Collections.emptyList();
   }
 
