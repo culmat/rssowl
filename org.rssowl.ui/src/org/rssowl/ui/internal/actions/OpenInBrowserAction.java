@@ -141,13 +141,24 @@ public class OpenInBrowserAction extends Action implements IWorkbenchWindowActio
         IWorkbenchBrowserSupport browserSupport = PlatformUI.getWorkbench().getBrowserSupport();
         try {
           IWebBrowser browser = browserSupport.createBrowser(WebBrowserView.EDITOR_ID);
+
+          /* Our own Web Browser Support is used */
           if (browser instanceof EmbeddedWebBrowser) {
             if (fContext != null)
               ((EmbeddedWebBrowser) browser).setContext(fContext);
             else
               ((EmbeddedWebBrowser) browser).setContext(WebBrowserContext.createFrom(title));
+
+            try {
+              browser.openURL(link.toURL());
+            } catch (MalformedURLException e) { //see Bug 1441
+              ((EmbeddedWebBrowser) browser).openURL(link);
+            }
           }
-          browser.openURL(link.toURL());
+
+          /* Any other Web Browser Support */
+          else
+            browser.openURL(link.toURL());
         } catch (PartInitException e) {
           Activator.getDefault().getLog().log(e.getStatus());
         } catch (MalformedURLException e) {
