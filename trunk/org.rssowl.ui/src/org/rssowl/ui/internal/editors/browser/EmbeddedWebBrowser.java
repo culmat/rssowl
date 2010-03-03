@@ -31,6 +31,7 @@ import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.ui.internal.util.BrowserUtils;
 
+import java.net.URI;
 import java.net.URL;
 
 /**
@@ -81,6 +82,21 @@ public class EmbeddedWebBrowser implements IWebBrowser {
       BrowserUtils.openLinkInternal(url.toExternalForm(), fContext);
   }
 
+  /*
+   * @see org.eclipse.ui.browser.IWebBrowser#openURL(java.net.URL)
+   */
+  public void openURL(URI uri) {
+    Assert.isNotNull(uri);
+
+    /* Open externally */
+    if (useExternalBrowser())
+      openExternal(uri);
+
+    /* Open internally */
+    else
+      BrowserUtils.openLinkInternal(uri.toString(), fContext);
+  }
+
   private boolean useExternalBrowser() {
     IPreferenceScope globalScope = Owl.getPreferenceService().getGlobalScope();
     return globalScope.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER) || globalScope.getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER);
@@ -88,6 +104,10 @@ public class EmbeddedWebBrowser implements IWebBrowser {
 
   private void openExternal(URL url) {
     BrowserUtils.openLinkExternal(url.toExternalForm());
+  }
+
+  private void openExternal(URI uri) {
+    BrowserUtils.openLinkExternal(uri.toString());
   }
 
   /*
