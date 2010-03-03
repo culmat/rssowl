@@ -25,6 +25,7 @@
 package org.rssowl.ui.internal.util;
 
 import org.rssowl.ui.internal.Activator;
+import org.rssowl.ui.internal.Controller;
 
 import java.io.File;
 import java.io.IOException;
@@ -63,22 +64,22 @@ public class AudioUtils {
    * Tries to play the given file.
    *
    * @param file the sound to play.
-   * @return <code>true</code> if playing was successfull and <code>false</code>
-   * otherwise.
    */
-  public static boolean play(String file) {
-    try {
-      doPlay(file);
-      return true;
-    } catch (javax.sound.sampled.UnsupportedAudioFileException e) {
-      Activator.safeLogError(e.getMessage(), e);
-    } catch (IOException e) {
-      Activator.safeLogError(e.getMessage(), e);
-    } catch (javax.sound.sampled.LineUnavailableException e) {
-      Activator.safeLogError(e.getMessage(), e);
-    }
-
-    return false;
+  public static void play(final String file) {
+    JobRunner.runInBackgroundThread(new Runnable() {
+      public void run() {
+        try {
+          if (!Controller.getDefault().isShuttingDown())
+            doPlay(file);
+        } catch (javax.sound.sampled.UnsupportedAudioFileException e) {
+          Activator.safeLogError(e.getMessage(), e);
+        } catch (IOException e) {
+          Activator.safeLogError(e.getMessage(), e);
+        } catch (javax.sound.sampled.LineUnavailableException e) {
+          Activator.safeLogError(e.getMessage(), e);
+        }
+      }
+    });
   }
 
   private static void doPlay(String file) throws javax.sound.sampled.UnsupportedAudioFileException, IOException, javax.sound.sampled.LineUnavailableException {
@@ -101,7 +102,7 @@ public class AudioUtils {
 
       int read = 0;
       byte[] buf = new byte[1024];
-      while ((read = inS.read(buf, 0, buf.length)) != -1)
+      while ((read = inS.read(buf, 0, buf.length)) != -1 && !Controller.getDefault().isShuttingDown())
         line.write(buf, 0, read);
 
       line.drain();
