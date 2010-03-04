@@ -40,12 +40,18 @@ import org.rssowl.ui.internal.actions.CleanUpAction;
 import org.rssowl.ui.internal.dialogs.CleanUpReminderDialog;
 import org.rssowl.ui.internal.util.JobRunner;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 /**
  * A simple service that controls showing a reminder for clean-up if required.
  *
  * @author bpasero@rssowl.org
  */
 public class CleanUpReminderService {
+
+  /* Delay in Millies to try opening the reminder when the Shell is Minimized to Tray */
+  private static final long SHELL_MINIMIZED_RESCHEDULE_DELAY = 1000 * 60 * 5;
+
   private final Job fReminderJob;
   private final IPreferenceScope fPreferences = Owl.getPreferenceService().getGlobalScope();
 
@@ -94,20 +100,33 @@ public class CleanUpReminderService {
           /* Show Reminder */
           final Shell shell = OwlUI.getPrimaryShell();
           if (shell != null && !monitor.isCanceled() && !Controller.getDefault().isShuttingDown()) {
+            final AtomicBoolean needShortReschedule = new AtomicBoolean(false);
+
             JobRunner.runSyncedInUIThread(shell, new Runnable() {
               public void run() {
                 if (monitor.isCanceled() || Controller.getDefault().isShuttingDown())
                   return;
 
-                if (CleanUpReminderDialog.getVisibleInstance() == null && new CleanUpReminderDialog(shell).open() == IDialogConstants.OK_ID) {
+                CleanUpReminderDialog visibleInstance = CleanUpReminderDialog.getVisibleInstance();
+
+                /* Shell is Minimized to Tray, reschedule shortly later */
+                if (visibleInstance == null && !shell.isVisible())
+                  needShortReschedule.set(true);
+
+                /* Open Cleanup Reminder Dialog */
+                else if (visibleInstance == null && new CleanUpReminderDialog(shell).open() == IDialogConstants.OK_ID) {
                   OwlUI.restoreWindow(shell);
                   new CleanUpAction().openWizard(shell);
                 }
               }
             });
 
+            /* Shell is Minimized to Tray, try again after a short delay */
+            if (needShortReschedule.get())
+              fReminderJob.schedule(SHELL_MINIMIZED_RESCHEDULE_DELAY);
+
             /* Store Next Date and reschedule */
-            if (fPreferences.getBoolean(DefaultPreferences.CLEAN_UP_REMINDER_STATE)) {
+            else if (fPreferences.getBoolean(DefaultPreferences.CLEAN_UP_REMINDER_STATE)) {
               storeNextReminderDate();
               reschedule();
             }
