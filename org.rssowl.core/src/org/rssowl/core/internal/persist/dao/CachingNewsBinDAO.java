@@ -21,6 +21,7 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.internal.persist.dao;
 
 import org.rssowl.core.persist.INewsBin;
@@ -30,12 +31,18 @@ import org.rssowl.core.persist.event.NewsBinListener;
 
 import java.util.Set;
 
+/**
+ * Caching DAO for {@link INewsBin}.
+ */
 public final class CachingNewsBinDAO extends CachingDAO<NewsBinDaoImpl, INewsBin, NewsBinListener, NewsBinEvent> implements INewsBinDAO {
 
   public CachingNewsBinDAO() {
     super(new NewsBinDaoImpl());
   }
 
+  /*
+   * @see org.rssowl.core.internal.persist.dao.CachingDAO#createEntityListener()
+   */
   @Override
   protected NewsBinListener createEntityListener() {
     return new NewsBinListener() {
@@ -50,10 +57,8 @@ public final class CachingNewsBinDAO extends CachingDAO<NewsBinDaoImpl, INewsBin
       }
 
       public void entitiesUpdated(Set<NewsBinEvent> events) {
-        /* No action needed */
+      /* No action needed */
       }
     };
   }
-
-
 }

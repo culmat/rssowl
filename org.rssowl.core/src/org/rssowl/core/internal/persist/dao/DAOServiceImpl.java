@@ -73,7 +73,6 @@ public final class DAOServiceImpl extends DAOService  {
   private final INewsDAO fNewsDAO = new NewsDAOImpl();
   private final IPersonDAO fPersonDAO = new PersonDAOImpl();
   private final ISearchConditionDAO fSearchConditionDAO = new SearchConditionDAOImpl();
-  private final ILabelDAO fLabelDAO = new LabelDAOImpl();
 
   /* Internal */
   private final EntitiesToBeIndexedDAOImpl fEntitiesToBeIndexedDAO = new EntitiesToBeIndexedDAOImpl();
@@ -86,6 +85,7 @@ public final class DAOServiceImpl extends DAOService  {
   private final ISearchMarkDAO fSearchMarkDAO = new CachingSearchMarkDAO();
   private final INewsBinDAO fNewsBinDAO = new CachingNewsBinDAO();
   private final ISearchDAO fSearchDAO = new CachingSearchDAO();
+  private final ILabelDAO fLabelDAO= new CachingLabelDAO();
 
   private final Map<Class<?>, Object> fEntityInterfacesToDaosMap = new HashMap<Class<?>, Object>();
   private final Map<Class<?>, Object> fEntityDaoClassesToDaosMap = new HashMap<Class<?>, Object>();

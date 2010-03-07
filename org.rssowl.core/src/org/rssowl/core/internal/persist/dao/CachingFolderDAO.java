@@ -21,6 +21,7 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.internal.persist.dao;
 
 import org.rssowl.core.internal.persist.service.DatabaseEvent;
@@ -39,6 +40,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+/**
+ * Caching DAO for {@link IFolder}.
+ */
 public class CachingFolderDAO extends CachingDAO<FolderDAOImpl, IFolder, FolderListener, FolderEvent> implements IFolderDAO {
 
   /* Dummy value to associate with an Object in the maps */
@@ -50,12 +54,22 @@ public class CachingFolderDAO extends CachingDAO<FolderDAOImpl, IFolder, FolderL
     fRootFolders = new ConcurrentHashMap<IFolder, Object>(4, 0.75f, 1);
   }
 
+  /*
+   * @see
+   * org.rssowl.core.internal.persist.dao.CachingDAO#onDatabaseClosed(org.rssowl
+   * .core.internal.persist.service.DatabaseEvent)
+   */
   @Override
   protected void onDatabaseClosed(DatabaseEvent event) {
     super.onDatabaseClosed(event);
     fRootFolders.clear();
   }
 
+  /*
+   * @see
+   * org.rssowl.core.internal.persist.dao.CachingDAO#onDatabaseOpened(org.rssowl
+   * .core.internal.persist.service.DatabaseEvent)
+   */
   @Override
   protected void onDatabaseOpened(DatabaseEvent event) {
     super.onDatabaseOpened(event);
@@ -63,6 +77,9 @@ public class CachingFolderDAO extends CachingDAO<FolderDAOImpl, IFolder, FolderL
       fRootFolders.put(folder, PRESENT);
   }
 
+  /*
+   * @see org.rssowl.core.internal.persist.dao.CachingDAO#createEntityListener()
+   */
   @Override
   protected FolderListener createEntityListener() {
     return new FolderListener() {
@@ -96,12 +113,17 @@ public class CachingFolderDAO extends CachingDAO<FolderDAOImpl, IFolder, FolderL
     };
   }
 
+  /*
+   * @see org.rssowl.core.persist.dao.IFolderDAO#loadRoots()
+   */
   public Collection<IFolder> loadRoots() throws PersistenceException {
     return Collections.unmodifiableSet(fRootFolders.keySet());
   }
 
+  /*
+   * @see org.rssowl.core.persist.dao.IFolderDAO#reparent(java.util.List)
+   */
   public void reparent(List<ReparentInfo<IFolderChild, IFolder>> reparentInfos) throws PersistenceException {
     getDAO().reparent(reparentInfos);
   }
-
 }

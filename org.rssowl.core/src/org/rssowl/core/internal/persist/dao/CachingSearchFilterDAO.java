@@ -21,6 +21,7 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.internal.persist.dao;
 
 import org.rssowl.core.persist.ISearchFilter;
@@ -30,21 +31,29 @@ import org.rssowl.core.persist.event.SearchFilterListener;
 
 import java.util.Set;
 
+/**
+ * Caching DAO for {@link ISearchFilter}.
+ */
 public class CachingSearchFilterDAO extends CachingDAO<SearchFilterDAOImpl, ISearchFilter, SearchFilterListener, SearchFilterEvent> implements ISearchFilterDAO {
 
   public CachingSearchFilterDAO() {
     super(new SearchFilterDAOImpl());
   }
 
+  /*
+   * @see org.rssowl.core.internal.persist.dao.CachingDAO#createEntityListener()
+   */
   @Override
   protected SearchFilterListener createEntityListener() {
     return new SearchFilterListener() {
       public void entitiesAdded(Set<SearchFilterEvent> events) {
         putAll(events);
       }
+
       public void entitiesDeleted(Set<SearchFilterEvent> events) {
         removeAll(events);
       }
+
       public void entitiesUpdated(Set<SearchFilterEvent> events) {
         putAll(events);
       }

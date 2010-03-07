@@ -31,12 +31,18 @@ import org.rssowl.core.persist.event.SearchListener;
 
 import java.util.Set;
 
+/**
+ * Caching DAO for {@link ISearch}.
+ */
 public class CachingSearchDAO extends CachingDAO<SearchDAOImpl, ISearch, SearchListener, SearchEvent> implements ISearchDAO {
 
   public CachingSearchDAO() {
     super(new SearchDAOImpl());
   }
 
+  /*
+   * @see org.rssowl.core.internal.persist.dao.CachingDAO#createEntityListener()
+   */
   @Override
   protected SearchListener createEntityListener() {
     return new SearchListener() {
@@ -54,7 +60,6 @@ public class CachingSearchDAO extends CachingDAO<SearchDAOImpl, ISearch, SearchL
       public void entitiesUpdated(Set<SearchEvent> events) {
       /* No action needed */
       }
-
     };
   }
 }

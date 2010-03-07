@@ -34,25 +34,29 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Caching DAO for {@link IBookMark}.
+ */
 public final class CachingBookMarkDAO extends CachingDAO<BookMarkDAOImpl, IBookMark, BookMarkListener, BookMarkEvent> implements IBookMarkDAO {
 
   public CachingBookMarkDAO() {
     super(new BookMarkDAOImpl());
   }
 
+  /*
+   * @see org.rssowl.core.internal.persist.dao.CachingDAO#createEntityListener()
+   */
   @Override
   protected BookMarkListener createEntityListener() {
     return new BookMarkListener() {
       public void entitiesAdded(Set<BookMarkEvent> events) {
         for (BookMarkEvent event : events)
           getCache().put(event.getEntity().getId(), event.getEntity());
-
       }
 
       public void entitiesDeleted(Set<BookMarkEvent> events) {
         for (BookMarkEvent event : events)
           getCache().remove(event.getEntity().getId(), event.getEntity());
-
       }
 
       public void entitiesUpdated(Set<BookMarkEvent> events) {
@@ -61,6 +65,11 @@ public final class CachingBookMarkDAO extends CachingDAO<BookMarkDAOImpl, IBookM
     };
   }
 
+  /*
+   * @see
+   * org.rssowl.core.persist.dao.IBookMarkDAO#loadAll(org.rssowl.core.persist
+   * .reference.FeedLinkReference)
+   */
   public Collection<IBookMark> loadAll(FeedLinkReference feedRef) {
     //TODO Check if this is faster than the db query
     Set<IBookMark> marks = new HashSet<IBookMark>(1);
@@ -71,11 +80,16 @@ public final class CachingBookMarkDAO extends CachingDAO<BookMarkDAOImpl, IBookM
     return marks;
   }
 
+  /*
+   * @see
+   * org.rssowl.core.persist.dao.IBookMarkDAO#exists(org.rssowl.core.persist
+   * .reference.FeedLinkReference)
+   */
   public boolean exists(FeedLinkReference feedRef) {
     //TODO Check if this is faster than the db query
     for (IBookMark mark : getCache().values()) {
       if (mark.getFeedLinkReference().equals(feedRef))
-       return true;
+        return true;
     }
     return false;
   }
