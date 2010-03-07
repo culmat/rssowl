@@ -21,6 +21,7 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.internal.persist.dao;
 
 import org.rssowl.core.persist.ISearchCondition;
@@ -31,12 +32,18 @@ import org.rssowl.core.persist.event.SearchMarkListener;
 
 import java.util.Set;
 
+/**
+ * Caching DAO for {@link ISearchMark}.
+ */
 public class CachingSearchMarkDAO extends CachingDAO<SearchMarkDAOImpl, ISearchMark, SearchMarkListener, SearchMarkEvent> implements ISearchMarkDAO {
 
   public CachingSearchMarkDAO() {
     super(new SearchMarkDAOImpl());
   }
 
+  /*
+   * @see org.rssowl.core.internal.persist.dao.CachingDAO#createEntityListener()
+   */
   @Override
   protected SearchMarkListener createEntityListener() {
     return new SearchMarkListener() {
@@ -51,19 +58,29 @@ public class CachingSearchMarkDAO extends CachingDAO<SearchMarkDAOImpl, ISearchM
       }
 
       public void entitiesUpdated(Set<SearchMarkEvent> events) {
-        /* No action needed */
+      /* No action needed */
       }
 
       public void resultsChanged(Set<SearchMarkEvent> events) {
-        /* No action needed */
+      /* No action needed */
       }
     };
   }
 
+  /*
+   * @see
+   * org.rssowl.core.persist.dao.ISearchMarkDAO#fireResultsChanged(java.util
+   * .Set)
+   */
   public void fireResultsChanged(Set<SearchMarkEvent> events) {
     getDAO().fireResultsChanged(events);
   }
 
+  /*
+   * @see
+   * org.rssowl.core.persist.dao.ISearchMarkDAO#load(org.rssowl.core.persist
+   * .ISearchCondition)
+   */
   public ISearchMark load(ISearchCondition searchCondition) {
     for (ISearchMark mark : getCache().values()) {
       if (mark.containsSearchCondition(searchCondition))
@@ -72,9 +89,12 @@ public class CachingSearchMarkDAO extends CachingDAO<SearchMarkDAOImpl, ISearchM
     return null;
   }
 
+  /*
+   * @see
+   * org.rssowl.core.persist.dao.ISearchMarkDAO#visited(org.rssowl.core.persist
+   * .ISearchMark)
+   */
   public void visited(ISearchMark mark) {
     getDAO().visited(mark);
   }
-
-
 }
