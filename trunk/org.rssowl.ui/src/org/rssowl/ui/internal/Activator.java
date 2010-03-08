@@ -44,6 +44,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 import org.rssowl.core.Owl;
+import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.LoggingSafeRunnable;
@@ -149,7 +150,8 @@ public class Activator extends AbstractUIPlugin {
         Controller.getDefault().startup();
 
         /* Log Version Information */
-        safeLogInfo(CoreUtils.getUserAgent());
+        if (!InternalOwl.IS_ECLIPSE)
+          safeLogInfo(CoreUtils.getUserAgent());
       }
     });
 

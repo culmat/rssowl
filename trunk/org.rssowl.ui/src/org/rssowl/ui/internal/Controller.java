@@ -1082,7 +1082,8 @@ public class Controller {
     ApplicationServer.getDefault().shutdown();
 
     /* Log Shutdown Info */
-    Activator.safeLogInfo("RSSOwl Shutting Down"); //$NON-NLS-1$
+    if (!InternalOwl.IS_ECLIPSE)
+      Activator.safeLogInfo("RSSOwl Shutting Down"); //$NON-NLS-1$
   }
 
   private void emergencyShutdown() {
