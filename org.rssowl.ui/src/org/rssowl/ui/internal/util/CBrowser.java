@@ -567,8 +567,11 @@ public class CBrowser {
             final URI link = new URI(event.location);
             final String host = link.getHost();
             if (StringUtils.isSet(host) && fLinkHandler.containsKey(host)) {
-              fLinkHandler.get(host).handle(host, link);
-              event.doit = false;
+              try {
+                fLinkHandler.get(host).handle(host, link);
+              } finally {
+                event.doit = false;
+              }
               return;
             }
           } catch (URISyntaxException e) {
