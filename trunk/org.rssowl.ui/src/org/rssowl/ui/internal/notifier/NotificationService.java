@@ -79,7 +79,7 @@ public class NotificationService {
   private static NotificationPopup fgNotificationPopup;
 
   /* Remember Last Closing Time */
-  private static long fgNotificationPopupCloseTime;
+  private static long fgLastNotificationPopupCloseTime;
 
   /** Supported Modes of the Notifier */
   public enum Mode {
@@ -150,7 +150,7 @@ public class NotificationService {
    * <code>false</code> otherwise.
    */
   public boolean wasPopupRecentlyClosed() {
-    return System.currentTimeMillis() - fgNotificationPopupCloseTime < 300;
+    return System.currentTimeMillis() - fgLastNotificationPopupCloseTime < 300;
   }
 
   /**
@@ -362,7 +362,7 @@ public class NotificationService {
               @Override
               public boolean doClose() {
                 fgNotificationPopup = null;
-                fgNotificationPopupCloseTime = System.currentTimeMillis();
+                fgLastNotificationPopupCloseTime = System.currentTimeMillis();
                 return super.doClose();
               }
             };
