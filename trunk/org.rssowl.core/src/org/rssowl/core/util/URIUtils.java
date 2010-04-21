@@ -61,14 +61,25 @@ public class URIUtils {
   /** The HTTP Protocol */
   public static final String HTTP = "http://"; //$NON-NLS-1$
 
+  /** The HTTPS Protocol */
+  public static final String HTTPS = "https://"; //$NON-NLS-1$
+
   /** The FEED Protocol */
   public static final String FEED = "feed://"; //$NON-NLS-1$
+
+  /** The FEED Identifier */
+  public static final String FEED_IDENTIFIER = "feed:"; //$NON-NLS-1$
 
   /** Identifier for a Protocol */
   public static final String PROTOCOL_IDENTIFIER = "://"; //$NON-NLS-1$
 
+  /** The JavaScript Identifier */
+  public static final String JS_IDENTIFIER = "javascript:"; //$NON-NLS-1$
+
   /** Identifies a managed Link to be treated specially */
-  public static final String MANAGED_LINK_IDENTIFIER = "#rssowlmlink"; //$NON-NLS-1$
+  private static final String MANAGED_LINK_SEPARATOR = "#"; //$NON-NLS-1$
+  private static final String MANAGED_LINK_ANCHOR = "rssowlmlink"; //$NON-NLS-1$
+  public static final String MANAGED_LINK_IDENTIFIER = MANAGED_LINK_SEPARATOR + MANAGED_LINK_ANCHOR;
 
   /* This utility class constructor is hidden */
   private URIUtils() {
@@ -488,8 +499,19 @@ public class URIUtils {
    * @return the same link without managed identifier.
    */
   public static String toUnManaged(String link) {
-    if (isManaged(link))
-      return link.substring(0, link.length() - MANAGED_LINK_IDENTIFIER.length());
+    if (isManaged(link)) {
+
+      /* Link Ends With "#rssowlmlink" */
+      if (link.endsWith(MANAGED_LINK_IDENTIFIER))
+        return link.substring(0, link.length() - MANAGED_LINK_IDENTIFIER.length());
+
+      /*
+       * Bug on Windows with IE: Link Ends With "rssowlmlink". This can happen
+       * if the original link was already using a hash mark in its URL.
+       */
+      else if (link.endsWith(MANAGED_LINK_ANCHOR))
+        return link.substring(0, link.length() - MANAGED_LINK_ANCHOR.length());
+    }
 
     return link;
   }
@@ -500,6 +522,6 @@ public class URIUtils {
    * otherwise.
    */
   public static boolean isManaged(String link) {
-    return StringUtils.isSet(link) && link.endsWith(MANAGED_LINK_IDENTIFIER);
+    return StringUtils.isSet(link) && link.endsWith(MANAGED_LINK_ANCHOR);
   }
 }

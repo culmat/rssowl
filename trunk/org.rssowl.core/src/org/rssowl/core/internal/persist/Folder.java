@@ -275,7 +275,7 @@ public class Folder extends AbstractEntity implements IFolder {
     if (this == folder)
       return true;
 
-    if (!(folder instanceof Folder == false))
+    if (!(folder instanceof Folder))
       return false;
 
     synchronized (folder) {

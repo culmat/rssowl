@@ -80,6 +80,7 @@ import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.INewsBinDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.dao.ISearchMarkDAO;
 import org.rssowl.core.persist.event.BookMarkAdapter;
@@ -1255,15 +1256,20 @@ public class FeedView extends EditorPart implements IReusableEditor {
             new ReloadTypesAction(new StructuredSelection(bookMarksToReload.toArray()), getEditorSite().getShell()).run();
         }
 
-        /* Update some fields due to displaying the mark */
+        /* Mark the Searchmark as visited */
         if (mark instanceof ISearchMark) {
           DynamicDAO.getDAO(ISearchMarkDAO.class).visited((ISearchMark) mark);
         }
 
+        /* Mark the newsbin as visited */
+        else if (mark instanceof INewsBin) {
+          DynamicDAO.getDAO(INewsBinDAO.class).visited((INewsBin) mark);
+		}
+		
         /* TODO Fixme once IBookMarkDAO.visited() is implemented */
         else if (!(mark instanceof FolderNewsMark)) {
           mark.setPopularity(mark.getPopularity() + 1);
-          mark.setLastVisitDate(new Date(System.currentTimeMillis()));
+          mark.setLastVisitDate(new Date());
           DynamicDAO.save(mark);
         }
       }

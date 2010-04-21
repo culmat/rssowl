@@ -158,7 +158,7 @@ public class PreferencesInitializer implements IPreferencesInitializer {
     defaultScope.putInteger(Preference.CLEAN_UP_NEWS_BY_AGE_VALUE.id(), 30);
 
     defaultScope.putBoolean(Preference.CLEAN_UP_REMINDER_STATE.id(), true);
-    defaultScope.putInteger(Preference.CLEAN_UP_REMINDER_DAYS_VALUE.id(), 14);
+    defaultScope.putInteger(Preference.CLEAN_UP_REMINDER_DAYS_VALUE.id(), 30);
   }
 
   /**

@@ -26,6 +26,7 @@ package org.rssowl.core.internal.persist.service;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.rssowl.core.internal.Activator;
 import org.rssowl.core.persist.service.AbstractPersistenceService;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.LongOperationMonitor;
@@ -59,14 +60,39 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
    * @see org.rssowl.core.persist.service.IPersistenceService#shutdown(boolean)
    */
   public void shutdown(boolean emergency) throws PersistenceException {
-    if (!emergency)
-      getIDGenerator().shutdown();
 
+    /* Shutdown ID Generator, Search and DB */
     if (!emergency) {
-      getModelSearch().shutdown(emergency);
+
+      /* ID Generator (safely) */
+      try {
+        getIDGenerator().shutdown();
+      } catch (Exception e) {
+        Activator.safeLogError(e.getMessage(), e);
+      }
+
+      /* Search (safely) */
+      try {
+        getModelSearch().shutdown(emergency);
+      } catch (Exception e) {
+        Activator.safeLogError(e.getMessage(), e);
+      }
+
+      /* DB */
       DBManager.getDefault().shutdown();
-    } else {
-      DBManager.getDefault().shutdown();
+    }
+
+    /* Emergent Exit: Shutdown DB and Search */
+    else {
+
+      /* DB (safely) */
+      try {
+        DBManager.getDefault().shutdown();
+      } catch (Exception e) {
+        Activator.safeLogError(e.getMessage(), e);
+      }
+
+      /* Search */
       getModelSearch().shutdown(emergency);
     }
   }
@@ -78,7 +104,7 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
     DBManager.getDefault().dropDatabase();
     DBManager.getDefault().createDatabase(new LongOperationMonitor(new NullProgressMonitor()) {
       @Override
-      public void beginLongOperation() {
+      public void beginLongOperation(boolean isCancelable) {
       //Do nothing
       }
     });

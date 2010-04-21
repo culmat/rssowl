@@ -58,6 +58,7 @@ import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.INewsBinDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.dao.ISearchMarkDAO;
 import org.rssowl.core.persist.event.AttachmentAdapter;
@@ -90,6 +91,7 @@ import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.FeedReference;
 import org.rssowl.core.persist.reference.FolderReference;
 import org.rssowl.core.persist.reference.LabelReference;
+import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.reference.PersonReference;
 import org.rssowl.core.persist.reference.SearchConditionReference;
@@ -2245,6 +2247,66 @@ public class ModelTest3 {
     } finally {
       DynamicDAO.removeEntityListener(ISearchCondition.class, listener);
     }
+  }
+
+  /**
+   * Tests {@link INewsBinDAO#visited(INewsBin)}.
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testVisitedNewsBin() throws Exception {
+
+    /* Add */
+    IFolder folder = DynamicDAO.save(fFactory.createFolder(null, null, "Folder"));
+
+    INewsBin bin = DynamicDAO.save(fFactory.createNewsBin(null, folder, "News Bin"));
+
+    IFeed feed = DynamicDAO.save(fFactory.createFeed(null, URI.create("http://www.rssowl.org")));
+    INews news1 = fFactory.createNews(null, feed, new Date());
+    INews news2 = fFactory.createNews(null, feed, new Date());
+    INews news3 = fFactory.createNews(null, feed, new Date());
+    DynamicDAO.save(feed);
+
+    DynamicDAO.save(fFactory.createNews(news1, bin));
+    DynamicDAO.save(fFactory.createNews(news2, bin));
+    DynamicDAO.save(fFactory.createNews(news3, bin));
+
+    DynamicDAO.save(bin);
+
+    NewsBinReference binRef = new NewsBinReference(bin.getId());
+    int popularity = bin.getPopularity();
+    Date lastVisitDate = bin.getLastVisitDate();
+
+    if (lastVisitDate == null) {
+      lastVisitDate = new Date();
+    }
+    Thread.sleep(100);
+
+    INewsBinDAO dao = DynamicDAO.getDAO(INewsBinDAO.class);
+    dao.visited(bin);
+    bin = null;
+    System.gc();
+
+    bin = binRef.resolve();
+    assertEquals(popularity + 1, bin.getPopularity());
+    assertTrue(bin.getLastVisitDate().compareTo(lastVisitDate) > 0);
+    assertTrue(bin.getLastVisitDate().compareTo(new Date()) < 0);
+    assertEquals(3, bin.getNews().size());
+
+    bin = null;
+    System.gc();
+
+    bin = binRef.resolve();
+    dao.visited(bin);
+    dao.visited(bin);
+    dao.visited(bin);
+
+    bin = null;
+    System.gc();
+
+    bin = binRef.resolve();
+    assertEquals(3, bin.getNews().size());
   }
 
   /**

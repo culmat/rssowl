@@ -51,7 +51,9 @@ import org.rssowl.ui.internal.util.ModelUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -153,7 +155,7 @@ public class NewsFilter extends ViewerFilter {
 
   /* Misc. */
   private INewsMark fNewsMark;
-  private List<SearchHit<NewsReference>> fCachedPatternMatchingNews;
+  private Map<Long, Long> fCachedPatternMatchingNews;
   private IModelFactory fModelFactory = Owl.getModelFactory();
   private String fPatternString;
 
@@ -297,12 +299,7 @@ public class NewsFilter extends ViewerFilter {
     if (fCachedPatternMatchingNews == null)
       return true;
 
-    for (SearchHit<NewsReference> hit : fCachedPatternMatchingNews) {
-      if (hit.getResult().getId() == news.getId())
-        return true;
-    }
-
-    return false;
+    return fCachedPatternMatchingNews.containsKey(news.getId());
   }
 
   /*
@@ -397,12 +394,12 @@ public class NewsFilter extends ViewerFilter {
     }
   }
 
-  private List<SearchHit<NewsReference>> cacheMatchingNews(String pattern) {
+  private Map<Long, Long> cacheMatchingNews(String pattern) {
     List<ISearchCondition> conditions = new ArrayList<ISearchCondition>(2);
 
     /* Explicitly return on empty String */
     if (!StringUtils.isSet(pattern))
-      return Collections.emptyList();
+      return Collections.emptyMap();
 
     /* Convert to Wildcard Query */
     if (!pattern.endsWith("*")) //$NON-NLS-1$
@@ -453,7 +450,13 @@ public class NewsFilter extends ViewerFilter {
     conditions.add(fModelFactory.createSearchCondition(field, specifier, pattern));
 
     /* Perform Search */
-    return Owl.getPersistenceService().getModelSearch().searchNews(conditions, true);
+    List<SearchHit<NewsReference>> result = Owl.getPersistenceService().getModelSearch().searchNews(conditions, true);
+    Map<Long, Long> resultMap = new HashMap<Long, Long>(result.size());
+    for (SearchHit<NewsReference> hit : result) {
+      resultMap.put(hit.getResult().getId(), hit.getResult().getId());
+    }
+
+    return resultMap;
   }
 
   /**

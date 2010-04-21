@@ -130,9 +130,16 @@ public final class InternalOwl {
   public void shutdown(boolean emergency) {
     fShuttingDown = true;
 
-    if (!emergency && fConnectionService != null)
-      fConnectionService.shutdown();
+    /* Shutdown Connection Manager (safely) */
+    if (!emergency && fConnectionService != null) {
+      try {
+        fConnectionService.shutdown();
+      } catch (Exception e) {
+        Activator.safeLogError(e.getMessage(), e);
+      }
+    }
 
+    /* Shutdown Persistence Service */
     if (fPersistenceService != null)
       fPersistenceService.shutdown(emergency);
   }

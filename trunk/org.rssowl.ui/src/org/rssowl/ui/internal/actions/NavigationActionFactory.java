@@ -94,7 +94,7 @@ public class NavigationActionFactory implements IExecutableExtensionFactory, IEx
       else {
 
         /* 1.) Navigate in opened FeedView */
-        if (navigateOnActiveFeedView())
+        if (fType.isNewsScoped() && navigateOnActiveFeedView())
           return;
 
         /* 2.) Navigate in opened Explorer */
@@ -155,7 +155,7 @@ public class NavigationActionFactory implements IExecutableExtensionFactory, IEx
       FeedView activeFeedView = OwlUI.getActiveFeedView();
 
       /* Run on active FeedView if any */
-      if (fType.isNewsScoped() && activeFeedView != null) {
+      if (activeFeedView != null) {
         boolean success = activeFeedView.navigate(true, false, fType.isNext(), fType.isUnread());
 
         /* For unread & next news, consider all news of the active feed */

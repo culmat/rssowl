@@ -144,13 +144,13 @@ public class BrowserUtils {
     if (localHref.contains(" ")) //$NON-NLS-1$
       localHref = "\"" + localHref + "\""; //$NON-NLS-1$ //$NON-NLS-2$
 
-    /* Open Default External Browser */
-    if (!Owl.getPreferenceService().getGlobalScope().getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER))
-      useDefaultBrowser(localHref);
-
     /* Open Custom External Browser */
-    else
+    if (Owl.isStarted() && Owl.getPreferenceService().getGlobalScope().getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER))
       useCustomBrowser(localHref);
+
+    /* Open Default External Browser */
+    else
+      useDefaultBrowser(localHref);
   }
 
   /**
@@ -161,8 +161,21 @@ public class BrowserUtils {
    * @param body The Body of the new Mail or NULL if none.
    */
   public static void sendMail(String subject, String body) {
+    sendMail(null, subject, body);
+  }
+
+  /**
+   * Open the default Mail Application with the given Subject and Body for a new
+   * Mail.
+   *
+   * @param address The Address of the new Mail or NULL if none.
+   * @param subject The Subject of the new Mail or NULL if none.
+   * @param body The Body of the new Mail or NULL if none.
+   */
+  public static void sendMail(String address, String subject, String body) {
     StringBuilder str = new StringBuilder();
     str.append("mailto:"); //$NON-NLS-1$
+    str.append(address != null ? URIUtils.mailToUrllEncode(address) : ""); //$NON-NLS-1$
     str.append("?body="); //$NON-NLS-1$
     str.append(body != null ? URIUtils.mailToUrllEncode(body) : ""); //$NON-NLS-1$
     str.append("&subject="); //$NON-NLS-1$

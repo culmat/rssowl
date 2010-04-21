@@ -57,7 +57,6 @@ import org.rssowl.ui.internal.util.UIBackgroundJob;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.DateFormat;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -69,6 +68,10 @@ import java.util.Set;
 public class InformationPropertyPage implements IEntityPropertyPage {
   private List<IEntity> fEntities;
   private final DateFormat fDateFormat = OwlUI.getShortDateFormat();
+  private boolean fInfoComputed = false;
+  private Composite fContainer;
+  private Label fDescriptionLabel;
+  private Link fHomepageLink;
 
   /*
    * @see org.rssowl.ui.dialogs.properties.IEntityPropertyPage#init(org.rssowl.ui.dialogs.properties.IPropertyDialogSite, java.util.List)
@@ -82,11 +85,11 @@ public class InformationPropertyPage implements IEntityPropertyPage {
    * @see org.rssowl.ui.dialogs.properties.IEntityPropertyPage#createContents(org.eclipse.swt.widgets.Composite)
    */
   public Control createContents(Composite parent) {
-    Composite container = new Composite(parent, SWT.NONE);
-    container.setLayout(LayoutUtils.createGridLayout(2, 10, 10));
+    fContainer = new Composite(parent, SWT.NONE);
+    fContainer.setLayout(LayoutUtils.createGridLayout(2, 10, 10));
 
     /* Status */
-    createLabel(container, Messages.InformationPropertyPage_STATUS, true);
+    createLabel(fContainer, Messages.InformationPropertyPage_STATUS, true);
 
     final IBookMark bm = (IBookMark) fEntities.get(0);
     String message;
@@ -108,16 +111,16 @@ public class InformationPropertyPage implements IEntityPropertyPage {
     else
       message = Messages.InformationPropertyPage_LOADED_OK;
 
-    Label msgLabel = new Label(container, SWT.WRAP);
+    Label msgLabel = new Label(fContainer, SWT.WRAP);
     msgLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
     ((GridData) msgLabel.getLayoutData()).widthHint = 300;
     msgLabel.setText(message);
 
     /* Link to Feedvalidator in case of an error */
     if (bm.isErrorLoading()) {
-      new Label(container, SWT.None);
+      new Label(fContainer, SWT.None);
 
-      Link validateLink = new Link(container, SWT.None);
+      Link validateLink = new Link(fContainer, SWT.None);
       validateLink.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
       validateLink.setText(Messages.InformationPropertyPage_FIND_OUT_MORE);
       validateLink.addSelectionListener(new SelectionAdapter() {
@@ -137,88 +140,35 @@ public class InformationPropertyPage implements IEntityPropertyPage {
     }
 
     /* Feed: Description */
-    createLabel(container, Messages.InformationPropertyPage_DESCRIPTION, true);
+    createLabel(fContainer, Messages.InformationPropertyPage_DESCRIPTION, true);
 
-    final Label descriptionLabel = new Label(container, SWT.WRAP);
-    descriptionLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
-    ((GridData) descriptionLabel.getLayoutData()).widthHint = 300;
+    fDescriptionLabel = new Label(fContainer, SWT.WRAP);
+    fDescriptionLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
+    ((GridData) fDescriptionLabel.getLayoutData()).widthHint = 300;
 
     /* Feed: Homepage */
-    createLabel(container, Messages.InformationPropertyPage_HOMEPAGE, true);
+    createLabel(fContainer, Messages.InformationPropertyPage_HOMEPAGE, true);
 
-    final Link homepageLink = new Link(container, SWT.NONE);
-    homepageLink.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-
-    /* Load from Background */
-    JobRunner.runUIUpdater(new UIBackgroundJob(container) {
-      private String description;
-      private URI homepage;
-
-      @Override
-      protected void runInBackground(IProgressMonitor monitor) {
-        IFeed feed = bm.getFeedLinkReference().resolve();
-        if (feed != null) {
-          description = StringUtils.stripTags(feed.getDescription(), true);
-          homepage = feed.getHomepage();
-        }
-      }
-
-      @Override
-      protected void runInUI(IProgressMonitor monitor) {
-        descriptionLabel.setText(StringUtils.isSet(description) ? description : Messages.InformationPropertyPage_NONE);
-        homepageLink.setText(homepage != null ? "<a>" + homepage.toString() + "</a>" : Messages.InformationPropertyPage_NONE); //$NON-NLS-1$ //$NON-NLS-2$
-        if (homepage != null) {
-          homepageLink.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-              OpenInBrowserAction action = new OpenInBrowserAction();
-              action.selectionChanged(null, new StructuredSelection(homepage));
-              action.run();
-            }
-          });
-        }
-        descriptionLabel.getParent().layout(true, true);
-      }
-    });
+    fHomepageLink = new Link(fContainer, SWT.NONE);
+    fHomepageLink.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     /* Created */
     if (bm.getCreationDate() != null) {
-      createLabel(container, Messages.InformationPropertyPage_CREATED, true);
-      createLabel(container, fDateFormat.format(bm.getCreationDate()), false);
+      createLabel(fContainer, Messages.InformationPropertyPage_CREATED, true);
+      createLabel(fContainer, fDateFormat.format(bm.getCreationDate()), false);
     }
 
     /* Last Visited */
-    createLabel(container, Messages.InformationPropertyPage_LAST_VISITED, true);
+    createLabel(fContainer, Messages.InformationPropertyPage_LAST_VISITED, true);
     if (bm.getLastVisitDate() != null)
-      createLabel(container, fDateFormat.format(bm.getLastVisitDate()), false);
+      createLabel(fContainer, fDateFormat.format(bm.getLastVisitDate()), false);
     else
-      createLabel(container, Messages.InformationPropertyPage_NEVER, false);
+      createLabel(fContainer, Messages.InformationPropertyPage_NEVER, false);
 
     /* News Count */
-    createLabel(container, Messages.InformationPropertyPage_NEWS_COUNT, true);
-    int totalCount = bm.getNewsCount(INews.State.getVisible());
-    int newCount = bm.getNewsCount(EnumSet.of(INews.State.NEW));
-    int unreadCount = bm.getNewsCount(EnumSet.of(INews.State.UNREAD));
-    int updatedCount = bm.getNewsCount(EnumSet.of(INews.State.UPDATED));
+    createLabel(fContainer, Messages.InformationPropertyPage_NEWS_COUNT, true);
 
-    if (newCount != 0 && unreadCount != 0 && updatedCount != 0)
-      createLabel(container, NLS.bind(Messages.InformationPropertyPage_N_NEW_UNREAD_UPDATED, new Object[] { totalCount, newCount, unreadCount, updatedCount }), false);
-    else if (newCount != 0 && unreadCount != 0)
-      createLabel(container, NLS.bind(Messages.InformationPropertyPage_N_NEW_UNREAD, new Object[] { totalCount, newCount, unreadCount }), false);
-    else if (unreadCount != 0 && updatedCount != 0)
-      createLabel(container, NLS.bind(Messages.InformationPropertyPage_N_UNREAD_UPDATED, new Object[] { totalCount, unreadCount, updatedCount }), false);
-    else if (newCount != 0 && updatedCount != 0)
-      createLabel(container, NLS.bind(Messages.InformationPropertyPage_N_NEW_UPDATED, new Object[] { totalCount, newCount, updatedCount }), false);
-    else if (newCount != 0)
-      createLabel(container, NLS.bind(Messages.InformationPropertyPage_N_NEW, new Object[] { totalCount, newCount }), false);
-    else if (unreadCount != 0)
-      createLabel(container, NLS.bind(Messages.InformationPropertyPage_N_UNREAD, new Object[] { totalCount, unreadCount }), false);
-    else if (updatedCount != 0)
-      createLabel(container, NLS.bind(Messages.InformationPropertyPage_N_UPDATED, new Object[] { totalCount, updatedCount }), false);
-    else
-      createLabel(container, String.valueOf(totalCount), false);
-
-    return container;
+    return fContainer;
   }
 
   /*
@@ -254,5 +204,87 @@ public class InformationPropertyPage implements IEntityPropertyPage {
   /*
    * @see org.rssowl.ui.dialogs.properties.IEntityPropertyPage#setFocus()
    */
-  public void setFocus() {}
+  public void setFocus() {
+    if (!fInfoComputed) {
+      fInfoComputed = true;
+
+      /* Load from Background */
+      JobRunner.runUIUpdater(new UIBackgroundJob(fContainer) {
+        private String description;
+        private URI homepage;
+        private int totalCount;
+        private int newCount;
+        private int unreadCount;
+        private int updatedCount;
+
+        @Override
+        protected void runInBackground(IProgressMonitor monitor) {
+          IBookMark bm = (IBookMark) fEntities.get(0);
+          IFeed feed = bm.getFeedLinkReference().resolve();
+          if (feed != null) {
+            description = StringUtils.stripTags(feed.getDescription(), true);
+            homepage = feed.getHomepage();
+          }
+
+          /* News Counts */
+          List<INews> news = bm.getNews(INews.State.getVisible());
+          totalCount = news.size();
+          for (INews newsitem : news) {
+            switch (newsitem.getState()) {
+              case NEW:
+                newCount++;
+                break;
+              case UNREAD:
+                unreadCount++;
+                break;
+              case UPDATED:
+                updatedCount++;
+                break;
+            }
+          }
+        }
+
+        @Override
+        protected void runInUI(IProgressMonitor monitor) {
+
+          /* Description */
+          fDescriptionLabel.setText(StringUtils.isSet(description) ? description : Messages.InformationPropertyPage_NONE);
+
+          /* Homepage */
+          fHomepageLink.setText(homepage != null ? "<a>" + homepage.toString() + "</a>" : Messages.InformationPropertyPage_NONE); //$NON-NLS-1$ //$NON-NLS-2$
+          if (homepage != null) {
+            fHomepageLink.addSelectionListener(new SelectionAdapter() {
+              @Override
+              public void widgetSelected(SelectionEvent e) {
+                OpenInBrowserAction action = new OpenInBrowserAction();
+                action.selectionChanged(null, new StructuredSelection(homepage));
+                action.run();
+              }
+            });
+          }
+
+          /* News Count */
+          if (newCount != 0 && unreadCount != 0 && updatedCount != 0)
+            createLabel(fContainer, NLS.bind(Messages.InformationPropertyPage_N_NEW_UNREAD_UPDATED, new Object[] { totalCount, newCount, unreadCount, updatedCount }), false);
+          else if (newCount != 0 && unreadCount != 0)
+            createLabel(fContainer, NLS.bind(Messages.InformationPropertyPage_N_NEW_UNREAD, new Object[] { totalCount, newCount, unreadCount }), false);
+          else if (unreadCount != 0 && updatedCount != 0)
+            createLabel(fContainer, NLS.bind(Messages.InformationPropertyPage_N_UNREAD_UPDATED, new Object[] { totalCount, unreadCount, updatedCount }), false);
+          else if (newCount != 0 && updatedCount != 0)
+            createLabel(fContainer, NLS.bind(Messages.InformationPropertyPage_N_NEW_UPDATED, new Object[] { totalCount, newCount, updatedCount }), false);
+          else if (newCount != 0)
+            createLabel(fContainer, NLS.bind(Messages.InformationPropertyPage_N_NEW, new Object[] { totalCount, newCount }), false);
+          else if (unreadCount != 0)
+            createLabel(fContainer, NLS.bind(Messages.InformationPropertyPage_N_UNREAD, new Object[] { totalCount, unreadCount }), false);
+          else if (updatedCount != 0)
+            createLabel(fContainer, NLS.bind(Messages.InformationPropertyPage_N_UPDATED, new Object[] { totalCount, updatedCount }), false);
+          else
+            createLabel(fContainer, String.valueOf(totalCount), false);
+
+          /* Update Layout */
+          fContainer.layout(true, true);
+        }
+      });
+    }
+  }
 }

@@ -111,10 +111,12 @@ public class DB4OIDGenerator implements IDGenerator, DatabaseListener {
   }
 
   public synchronized void shutdown() {
-    fMax = fCurrent;
-    fCounter.setValue(fCurrent + 1);
-    fDb.store(fCounter);
-    fDb.commit();
+    if (fCounter != null) { //Could be NULL if DB never opened
+      fMax = fCurrent;
+      fCounter.setValue(fCurrent + 1);
+      fDb.store(fCounter);
+      fDb.commit();
+    }
   }
 
   private Counter loadCounter() {

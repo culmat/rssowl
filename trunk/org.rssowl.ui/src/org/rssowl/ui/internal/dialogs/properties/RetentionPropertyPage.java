@@ -47,13 +47,17 @@ import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.RetentionStrategy;
 import org.rssowl.ui.dialogs.properties.IEntityPropertyPage;
 import org.rssowl.ui.dialogs.properties.IPropertyDialogSite;
+import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -349,14 +353,22 @@ public class RetentionPropertyPage implements IEntityPropertyPage {
         @Override
         protected IStatus run(IProgressMonitor monitor) {
           try {
-            monitor.beginTask(Messages.RetentionPropertyPage_PERFORMING_CLEANUP, fEntities.size());
-
+            Set<IBookMark> bookmarks = new HashSet<IBookMark>();
             for (IEntity entity : fEntities) {
               if (entity instanceof IBookMark)
-                RetentionStrategy.process((IBookMark) entity);
+                bookmarks.add((IBookMark) entity);
               else if (entity instanceof IFolder)
-                RetentionStrategy.process((IFolder) entity);
+                CoreUtils.fillBookMarks(bookmarks, Collections.singleton((IFolder) entity));
+            }
 
+            monitor.beginTask(Messages.RetentionPropertyPage_PERFORMING_CLEANUP, bookmarks.size());
+
+            for (IBookMark bookmark : bookmarks) {
+              if (Controller.getDefault().isShuttingDown() || monitor.isCanceled())
+                break;
+
+              monitor.subTask(bookmark.getName());
+              RetentionStrategy.process(bookmark);
               monitor.worked(1);
             }
           } finally {

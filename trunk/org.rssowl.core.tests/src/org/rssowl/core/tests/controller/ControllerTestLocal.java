@@ -62,15 +62,15 @@ public class ControllerTestLocal {
   }
 
   private int getNewCount(IFeed feed) {
-    return loadNewsCounter().getNewCount(feed.getLink());
+    return loadNewsCounter().getNewCount(feed.getLink().toString());
   }
 
   private int getUnreadCount(IFeed feed) {
-    return loadNewsCounter().getUnreadCount(feed.getLink());
+    return loadNewsCounter().getUnreadCount(feed.getLink().toString());
   }
 
   private int getStickyCount(IFeed feed) {
-    return loadNewsCounter().getStickyCount(feed.getLink());
+    return loadNewsCounter().getStickyCount(feed.getLink().toString());
   }
 
   /**

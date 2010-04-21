@@ -29,8 +29,6 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
   private static final String BUNDLE_NAME = "org.rssowl.ui.internal.messages"; //$NON-NLS-1$
   public static String Activator_ERROR_STARTUP;
-  public static String Application_ERROR_STARTUP;
-  public static String Application_STARTUP_ERROR;
   public static String ApplicationActionBarAdvisor_ABOUT_RSSOWL;
   public static String ApplicationActionBarAdvisor_ATTACHMENTS;
   public static String ApplicationActionBarAdvisor_BOOKMARKS;
@@ -96,7 +94,6 @@ public class Messages extends NLS {
   public static String ApplicationActionBarAdvisor_ZOOM;
   public static String ApplicationActionBarAdvisor_ZOOM_IN;
   public static String ApplicationActionBarAdvisor_ZOOM_OUT;
-  public static String ApplicationServer_INFO_UNABLE_OPEN_PORT;
   public static String ApplicationWorkbenchWindowAdvisor_N_INCOMING_NEWS;
   public static String ApplicationWorkbenchWindowAdvisor_RESTORE;
   public static String Controller_ERROR;

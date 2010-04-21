@@ -27,6 +27,9 @@ package org.rssowl.ui.internal.undo;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.widgets.Display;
+import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.util.LoggingSafeRunnable;
 
 import java.util.ArrayList;
@@ -165,7 +168,18 @@ public class UndoStack {
     if (!isUndoSupported())
       return;
 
-    fOperations.get(fCurrentIndex).undo();
+    final IUndoOperation undoOperation = fOperations.get(fCurrentIndex);
+    Runnable undoRunnable = new Runnable() {
+      public void run() {
+        undoOperation.undo();
+      }
+    };
+
+    if (undoOperation.isLongRunning() && !InternalOwl.TESTING)
+      BusyIndicator.showWhile(Display.getDefault(), undoRunnable);
+    else
+      undoRunnable.run();
+
     fCurrentIndex--;
     notifyUndoPerformed();
   }
@@ -179,7 +193,19 @@ public class UndoStack {
       return;
 
     fCurrentIndex++;
-    fOperations.get(fCurrentIndex).redo();
+
+    final IUndoOperation redoOperation = fOperations.get(fCurrentIndex);
+    Runnable redoRunnable = new Runnable() {
+      public void run() {
+        redoOperation.redo();
+      }
+    };
+
+    if (redoOperation.isLongRunning() && !InternalOwl.TESTING)
+      BusyIndicator.showWhile(Display.getDefault(), redoRunnable);
+    else
+      redoRunnable.run();
+
     notifyRedoPerformed();
   }
 

@@ -47,6 +47,7 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.tests.TestUtils;
+import org.rssowl.core.tests.TestUtils.NullProgressLongOperationMonitor;
 import org.rssowl.core.util.SearchHit;
 
 import java.net.URI;
@@ -81,7 +82,7 @@ public class ModelSearchTest1 extends AbstractModelSearchTest {
     entitiesToBeIndexed = DBHelper.getEntitiesToBeIndexedDAO().load();
     assertEquals(2, entitiesToBeIndexed.size());
     Owl.getPersistenceService().shutdown(true);
-    Owl.getPersistenceService().startup(null);
+    Owl.getPersistenceService().startup(new NullProgressLongOperationMonitor());
 
     entitiesToBeIndexed = DBHelper.getEntitiesToBeIndexedDAO().load();
     assertEquals(2, entitiesToBeIndexed.size());
@@ -90,7 +91,7 @@ public class ModelSearchTest1 extends AbstractModelSearchTest {
     }
 
     Owl.getPersistenceService().shutdown(false);
-    Owl.getPersistenceService().startup(null);
+    Owl.getPersistenceService().startup(new NullProgressLongOperationMonitor());
     assertEquals(0, entitiesToBeIndexed.size());
   }
 

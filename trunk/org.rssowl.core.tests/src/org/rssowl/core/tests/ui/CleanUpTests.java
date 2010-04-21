@@ -26,6 +26,7 @@ package org.rssowl.core.tests.ui;
 
 import static junit.framework.Assert.assertEquals;
 
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
@@ -109,7 +110,7 @@ public class CleanUpTests {
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
-      model.generate();
+      model.generate(new NullProgressMonitor());
       List<CleanUpGroup> tasks = model.getTasks();
 
       /* Assert Empty (except default ops) */
@@ -120,7 +121,7 @@ public class CleanUpTests {
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
-      model.generate();
+      model.generate(new NullProgressMonitor());
       List<CleanUpGroup> groups = model.getTasks();
 
       /* Assert Filled */
@@ -138,7 +139,7 @@ public class CleanUpTests {
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
-      model.generate();
+      model.generate(new NullProgressMonitor());
       List<CleanUpGroup> tasks = model.getTasks();
 
       /* Assert Empty (except default ops) */
@@ -149,7 +150,7 @@ public class CleanUpTests {
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
-      model.generate();
+      model.generate(new NullProgressMonitor());
       List<CleanUpGroup> tasks = model.getTasks();
 
       /* Assert Empty (except default ops) */
@@ -160,7 +161,7 @@ public class CleanUpTests {
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
-      model.generate();
+      model.generate(new NullProgressMonitor());
       List<CleanUpGroup> groups = model.getTasks();
 
       /* Assert Filled */
@@ -177,7 +178,7 @@ public class CleanUpTests {
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
-      model.generate();
+      model.generate(new NullProgressMonitor());
       List<CleanUpGroup> groups = model.getTasks();
 
       /* Assert Filled */
@@ -243,7 +244,7 @@ public class CleanUpTests {
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
-      model.generate();
+      model.generate(new NullProgressMonitor());
       List<CleanUpGroup> groups = model.getTasks();
 
       /* Assert Filled */
@@ -296,7 +297,7 @@ public class CleanUpTests {
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
-      model.generate();
+      model.generate(new NullProgressMonitor());
       List<CleanUpGroup> groups = model.getTasks();
 
       /* Assert Filled */
@@ -363,7 +364,7 @@ public class CleanUpTests {
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
-      model.generate();
+      model.generate(new NullProgressMonitor());
       List<CleanUpGroup> groups = model.getTasks();
 
       /* Assert Filled */
@@ -431,7 +432,7 @@ public class CleanUpTests {
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
-      model.generate();
+      model.generate(new NullProgressMonitor());
       List<CleanUpGroup> groups = model.getTasks();
 
       /* Assert Filled */
@@ -454,7 +455,7 @@ public class CleanUpTests {
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
-      model.generate();
+      model.generate(new NullProgressMonitor());
       List<CleanUpGroup> groups = model.getTasks();
 
       /* Assert Filled */
@@ -513,7 +514,7 @@ public class CleanUpTests {
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
-      model.generate();
+      model.generate(new NullProgressMonitor());
       List<CleanUpGroup> groups = model.getTasks();
 
       /* Assert Filled */
@@ -531,7 +532,7 @@ public class CleanUpTests {
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
-      model.generate();
+      model.generate(new NullProgressMonitor());
       List<CleanUpGroup> groups = model.getTasks();
 
       /* Assert Empty */
@@ -584,7 +585,7 @@ public class CleanUpTests {
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
-      model.generate();
+      model.generate(new NullProgressMonitor());
       List<CleanUpGroup> groups = model.getTasks();
 
       /* Assert Filled */
@@ -602,7 +603,7 @@ public class CleanUpTests {
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
-      model.generate();
+      model.generate(new NullProgressMonitor());
       List<CleanUpGroup> groups = model.getTasks();
 
       /* Assert Filled */
@@ -661,7 +662,7 @@ public class CleanUpTests {
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
-      model.generate();
+      model.generate(new NullProgressMonitor());
       List<CleanUpGroup> groups = model.getTasks();
 
       /* Assert Empty */
@@ -673,7 +674,7 @@ public class CleanUpTests {
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
-      model.generate();
+      model.generate(new NullProgressMonitor());
       List<CleanUpGroup> groups = model.getTasks();
 
       /* Assert Filled */
@@ -733,7 +734,7 @@ public class CleanUpTests {
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
-      model.generate();
+      model.generate(new NullProgressMonitor());
       List<CleanUpGroup> groups = model.getTasks();
 
       /* Assert Empty */
@@ -747,7 +748,7 @@ public class CleanUpTests {
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
-      model.generate();
+      model.generate(new NullProgressMonitor());
       List<CleanUpGroup> groups = model.getTasks();
 
       /* Assert Filled */
@@ -806,7 +807,7 @@ public class CleanUpTests {
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
-      model.generate();
+      model.generate(new NullProgressMonitor());
       List<CleanUpGroup> groups = model.getTasks();
 
       /* Assert Empty */
@@ -820,7 +821,7 @@ public class CleanUpTests {
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
-      model.generate();
+      model.generate(new NullProgressMonitor());
       List<CleanUpGroup> groups = model.getTasks();
 
       /* Assert Filled */
@@ -885,7 +886,7 @@ public class CleanUpTests {
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
-      model.generate();
+      model.generate(new NullProgressMonitor());
       List<CleanUpGroup> groups = model.getTasks();
 
       /* Assert Filled */
@@ -949,7 +950,7 @@ public class CleanUpTests {
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
-      model.generate();
+      model.generate(new NullProgressMonitor());
       List<CleanUpGroup> groups = model.getTasks();
 
       /* Assert Filled */

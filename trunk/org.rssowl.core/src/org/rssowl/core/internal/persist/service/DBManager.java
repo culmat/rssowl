@@ -21,6 +21,7 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.internal.persist.service;
 
 import org.eclipse.core.runtime.Assert;
@@ -31,6 +32,8 @@ import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.osgi.util.NLS;
+import org.rssowl.core.Owl;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.internal.persist.AbstractEntity;
@@ -56,11 +59,13 @@ import org.rssowl.core.persist.service.DiskFullException;
 import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.persist.service.InsufficientFilePermissionException;
 import org.rssowl.core.persist.service.PersistenceException;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.LongOperationMonitor;
 
 import com.db4o.Db4o;
 import com.db4o.ObjectContainer;
+import com.db4o.ObjectSet;
 import com.db4o.config.Configuration;
 import com.db4o.config.ObjectClass;
 import com.db4o.config.ObjectField;
@@ -70,9 +75,11 @@ import com.db4o.ext.Db4oIOException;
 import com.db4o.query.Query;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -89,6 +96,29 @@ public class DBManager {
   private static final int MAX_BACKUPS_COUNT = 2;
   private static final String FORMAT_FILE_NAME = "format2"; //$NON-NLS-1$
   private static DBManager fInstance;
+
+  /* Backup Times */
+  private static final int ONLINE_BACKUP_INITIAL = 1000 * 60 * 10; //10 Minutes
+  private static final int ONLINE_BACKUP_INTERVAL = 1000 * 60 * 60 * 4; //4 Hours
+  private static final int OFFLINE_BACKUP_INTERVAL = 1000 * 60 * 60 * 24 * 7; //7 Days
+
+  /* Defrag Tasks Work Ticks */
+  private static final int DEFRAG_TOTAL_WORK = 10000000; //100% (but don't fill to 100% to leave room for backup)
+  private static final int DEFRAG_SUB_WORK_LABELS = 100000; //1%
+  private static final int DEFRAG_SUB_WORK_FOLDERS = 500000; //5%
+  private static final int DEFRAG_SUB_WORK_BINS = 1000000; //10%
+  private static final int DEFRAG_SUB_WORK_FEEDS = 3000000; //30%
+  private static final int DEFRAG_SUB_WORK_DESCRIPTIONS = 3000000; //30%
+  private static final int DEFRAG_SUB_WORK_PREFERENCES = 100000; //1%
+  private static final int DEFRAG_SUB_WORK_FILTERS = 100000; //1%
+  private static final int DEFRAG_SUB_WORK_CONDITIONAL_GET = 100000; //1%
+  private static final int DEFRAG_SUB_WORK_COUNTERS = 100000; //1%
+  private static final int DEFRAG_SUB_WORK_EVENTS = 100000; //1%
+  private static final int DEFRAG_SUB_WORK_COMMITT_DESTINATION = 300000; //3%
+  private static final int DEFRAG_SUB_WORK_CLOSE_DESTINATION = 100000; //1%
+  private static final int DEFRAG_SUB_WORK_CLOSE_SOURCE = 100000; //1%
+  private static final int DEFRAG_SUB_WORK_FINISH = 100000; //1%
+
   private ObjectContainer fObjectContainer;
   private final ReadWriteLock fLock = new ReentrantReadWriteLock();
   private final List<DatabaseListener> fEntityStoreListeners = new CopyOnWriteArrayList<DatabaseListener>();
@@ -100,20 +130,19 @@ public class DBManager {
   public static DBManager getDefault() {
     if (fInstance == null)
       fInstance = new DBManager();
+
     return fInstance;
   }
 
   /**
    * Load and initialize the contributed DataBase.
-   * @param monitor
    *
-   * @throws PersistenceException In case of an error while initializing and loading the
-   * contributed DataBase.
+   * @param monitor
+   * @throws PersistenceException In case of an error while initializing and
+   * loading the contributed DataBase.
    */
   public void startup(LongOperationMonitor monitor) throws PersistenceException {
-    /* Initialise */
     EventManager.getInstance();
-
     createDatabase(monitor);
   }
 
@@ -121,7 +150,7 @@ public class DBManager {
     if (listener instanceof EventManager)
       fEntityStoreListeners.add(0, listener);
     else if (listener instanceof DB4OIDGenerator) {
-      if (fEntityStoreListeners.get(0) instanceof EventManager)
+      if (!fEntityStoreListeners.isEmpty() && fEntityStoreListeners.get(0) instanceof EventManager)
         fEntityStoreListeners.add(1, listener);
       else
         fEntityStoreListeners.add(0, listener);
@@ -139,32 +168,34 @@ public class DBManager {
     }
   }
 
-  /**
-   * There was an error creating the
-   */
   private void createEmptyObjectContainer(Configuration config, IStatus status) {
-    /* Log in case there's also an exception creating an empty object container */
-    Activator.getDefault().getLog().log(status);
+    Activator.getDefault().getLog().log(status); //Log in case there's also an exception creating an empty object container
     fObjectContainer = Db4o.openFile(config, getDBFilePath());
   }
 
   private IStatus createObjectContainer(Configuration config) {
     IStatus status = null;
+
+    /* Open the DB */
     try {
       fObjectContainer = Db4o.openFile(config, getDBFilePath());
       status = Status.OK_STATUS;
-    } catch (Throwable e) {
+    }
+
+    /* Error opening the DB - try to recover */
+    catch (Throwable e) {
+      if (!(e instanceof OutOfMemoryError))
+        Activator.safeLogError(e.getMessage(), e);
+
       if (e instanceof Error)
         throw (Error) e;
 
       File file = new File(getDBFilePath());
-
       if (!file.exists())
-        throw new DiskFullException("Failed to create an empty database. This seems to indicate that the disk is full. Please fix the issue and restart RSSOwl.", e); //$NON-NLS-1$
+        throw new DiskFullException("Failed to create an empty database. This seems to indicate that the disk is full. Please free some space on the disk and restart RSSOwl.", e); //$NON-NLS-1$
 
       if (!file.canRead() || (!file.canWrite()))
-        throw new InsufficientFilePermissionException("Current user has no permission to read and/or write file: " + file + ". Please fix the issue and restart RSSOwl.", null); //$NON-NLS-1$ //$NON-NLS-2$
-
+        throw new InsufficientFilePermissionException("Current user has no permission to read and/or write file: " + file + ". Please make sure to start RSSOwl with sufficient permissions.", null); //$NON-NLS-1$ //$NON-NLS-2$
 
       BackupService backupService = createOnlineBackupService();
       if (backupService == null || e instanceof DatabaseFileLockedException)
@@ -173,10 +204,11 @@ public class DBManager {
       BackupService scheduledBackupService = createScheduledBackupService(null);
       File currentDbCorruptedFile = backupService.getCorruptedFile(null);
       DBHelper.rename(backupService.getFileToBackup(), currentDbCorruptedFile);
+
       /*
        * There was no online back-up file. This could only happen if the problem
-       * happened on the first start-up or if the user never used the application
-       * for more than 10 minutes.
+       * happened on the first start-up or if the user never used the
+       * application for more than 10 minutes.
        */
       if (backupService.getBackupFile(0) == null) {
         status = Activator.getDefault().createErrorStatus("Database file is corrupted and no back-up could be found. The corrupted file has been saved to: " + currentDbCorruptedFile.getAbsolutePath(), e); //$NON-NLS-1$
@@ -191,8 +223,11 @@ public class DBManager {
     Job job = new Job("Back-up service") { //$NON-NLS-1$
       @Override
       protected IStatus run(IProgressMonitor monitor) {
-        backupService.backup(true);
-        schedule(getOnlineBackupDelay(false));
+        if (!Owl.isShuttingDown()) {
+          backupService.backup(true, monitor);
+          schedule(getOnlineBackupDelay(false));
+        }
+
         return Status.OK_STATUS;
       }
     };
@@ -204,7 +239,7 @@ public class DBManager {
   private void checkDirPermissions() {
     File dir = new File(Activator.getDefault().getStateLocation().toOSString());
     if (!dir.canRead() || (!dir.canWrite()))
-      throw new InsufficientFilePermissionException("Current user has no permission to read from and/or write to directory: " + dir + "Please fix the issue and restart RSSOwl.", null); //$NON-NLS-1$ //$NON-NLS-2$
+      throw new InsufficientFilePermissionException("Current user has no permission to read from and/or write to directory: " + dir + ". Please make sure to start RSSOwl with sufficient permissions.", null); //$NON-NLS-1$ //$NON-NLS-2$
   }
 
   private IStatus restoreFromBackup(Configuration config, Throwable startupException, File currentDbCorruptedFile, BackupService... backupServices) {
@@ -253,17 +288,19 @@ public class DBManager {
 
   private boolean shouldReindex(MigrationResult migrationResult, IStatus startupStatus) {
     boolean shouldReindex = migrationResult.isReindex() || (!startupStatus.isOK());
-    if (shouldReindex)
+    if (shouldReindex) {
+      System.setProperty("rssowl.reindex", "true"); //$NON-NLS-1$ //$NON-NLS-2$ //Let others know by setting property
       return true;
+    }
 
     return Boolean.getBoolean("rssowl.reindex"); //$NON-NLS-1$
   }
 
   private long getOnlineBackupDelay(boolean initial) {
     if (initial)
-      return 1000 * 60 * 10;
+      return ONLINE_BACKUP_INITIAL;
 
-    return getLongProperty("rssowl.onlinebackup.interval", 1000 * 60 * 60 * 4); //$NON-NLS-1$
+    return getLongProperty("rssowl.onlinebackup.interval", ONLINE_BACKUP_INTERVAL); //$NON-NLS-1$
   }
 
   private long getLongProperty(String propertyName, long defaultValue) {
@@ -291,16 +328,40 @@ public class DBManager {
 
     BackupService backupService = new BackupService(file, ".onlinebak", 2); //$NON-NLS-1$
     backupService.setBackupStrategy(new BackupService.BackupStrategy() {
-      public void backup(File originFile, File destinationFile) {
+      public void backup(File originFile, File destinationFile, IProgressMonitor monitor) {
+        File marker = getOnlineBackupMarkerFile();
         try {
+
+          /* Create Marker that Onlinebackup is Performed */
+          if (!marker.exists())
+            safeCreate(marker);
+
           /* Relies on fObjectContainer being set before calling backup */
           fObjectContainer.ext().backup(destinationFile.getAbsolutePath());
         } catch (Db4oIOException e) {
           throw new PersistenceException(e);
+        } finally {
+          safeDelete(marker);
         }
       }
     });
     return backupService;
+  }
+
+  private void safeCreate(File file) {
+    try {
+      file.createNewFile();
+    } catch (Exception e) {
+      /* Ignore */
+    }
+  }
+
+  private void safeDelete(File file) {
+    try {
+      file.delete();
+    } catch (Exception e) {
+      /* Ignore */
+    }
   }
 
   /**
@@ -312,7 +373,26 @@ public class DBManager {
   }
 
   /**
+   * @return the File indicating whether the online backup terminated normally
+   * or not.
+   */
+  public File getOnlineBackupMarkerFile() {
+    File dir = new File(Activator.getDefault().getStateLocation().toOSString());
+    return new File(dir, "onlinebakmarker"); //$NON-NLS-1$
+  }
+
+  /**
+   * @return the File indicating whether the reindexing of news terminated
+   * normally or not.
+   */
+  public File getReindexMarkerFile() {
+    File dir = new File(Activator.getDefault().getStateLocation().toOSString());
+    return new File(dir, "reindexmarker"); //$NON-NLS-1$
+  }
+
+  /**
    * Internal method, exposed for tests only.
+   *
    * @return the path to the db file.
    */
   public static final String getDBFilePath() {
@@ -331,58 +411,108 @@ public class DBManager {
   }
 
   public void createDatabase(LongOperationMonitor progressMonitor) throws PersistenceException {
+
+    /* Assert File Permissions */
     checkDirPermissions();
-    Configuration config = createConfiguration();
+
+    /* Create Configuration and check for Migration */
+    Configuration config = createConfiguration(false);
     int workspaceVersion = getWorkspaceFormatVersion();
     MigrationResult migrationResult = new MigrationResult(false, false, false);
 
     SubMonitor subMonitor = null;
     try {
+
+      /* Log previously failing Online Backup */
+      try {
+        if (getOnlineBackupMarkerFile().exists()) {
+          Activator.safeLogInfo("Detected an Online Backup that did not complete"); //$NON-NLS-1$
+          safeDelete(getOnlineBackupMarkerFile());
+        }
+      } catch (Exception e) {
+        /* Ignore */
+      }
+
+      /* Log previously failing Reindexing */
+      try {
+        if (getReindexMarkerFile().exists()) {
+          Activator.safeLogInfo("Detected a Search Re-Indexing that did not complete"); //$NON-NLS-1$
+          safeDelete(getReindexMarkerFile());
+        }
+      } catch (Exception e) {
+        /* Ignore */
+      }
+
+      /* Perform Migration if necessary */
       if (workspaceVersion != getCurrentFormatVersion()) {
-        progressMonitor.beginLongOperation();
+        progressMonitor.beginLongOperation(false);
         subMonitor = SubMonitor.convert(progressMonitor, Messages.DBManager_RSSOWL_MIGRATION, 100);
+
         //TODO Have a better way to allocate the ticks to the child. We need
         //to be able to do it dynamically based on whether a reindex is required or not.
         migrationResult = migrate(workspaceVersion, getCurrentFormatVersion(), subMonitor.newChild(70));
       }
 
+      /* Perform Defrag if necessary */
       if (!defragmentIfNecessary(progressMonitor, subMonitor)) {
+
+        /* Defragment */
         if (migrationResult.isDefragmentDatabase())
           defragment(progressMonitor, subMonitor);
+
         /*
          * We only run the time-based back-up if a defragment has not taken
          * place because we always back-up during defragment.
          */
         else
-          scheduledBackup();
+          scheduledBackup(progressMonitor);
       }
 
+      /* Open the DB */
       startupStatus = createObjectContainer(config);
 
+      /* Notify Listeners that DB is opened */
       if (startupStatus.isOK())
         fireDatabaseEvent(new DatabaseEvent(fObjectContainer, fLock), true);
 
+      /* Re-Index Search Index if necessary */
       boolean shouldReindex = shouldReindex(migrationResult, startupStatus);
       if (subMonitor == null && shouldReindex) {
-        progressMonitor.beginLongOperation();
-        subMonitor = SubMonitor.convert(progressMonitor, Messages.DBManager_RSSOWL_REINDEX, 20);
+        progressMonitor.beginLongOperation(false);
+        subMonitor = SubMonitor.convert(progressMonitor, Messages.DBManager_PROGRESS_WAIT, 20);
       }
 
       IModelSearch modelSearch = InternalOwl.getDefault().getPersistenceService().getModelSearch();
-      if (shouldReindex || migrationResult.isOptimizeIndex()) {
+      if (!progressMonitor.isCanceled() && (shouldReindex || migrationResult.isOptimizeIndex())) {
         modelSearch.startup();
-        if (shouldReindex)
-          modelSearch.reindexAll(subMonitor != null ? subMonitor.newChild(20) : new NullProgressMonitor());
-        if (migrationResult.isOptimizeIndex())
+        if (shouldReindex && !progressMonitor.isCanceled()) {
+          Activator.safeLogInfo("Start: Search Re-Indexing"); //$NON-NLS-1$
+
+          File marker = getReindexMarkerFile();
+          try {
+
+            /* Create Marker that Reindexing is Performed */
+            if (!marker.exists())
+              safeCreate(marker);
+
+            /* Reindex Search Index */
+            modelSearch.reindexAll(subMonitor != null ? subMonitor.newChild(20) : new NullProgressMonitor());
+          } finally {
+            safeDelete(marker);
+          }
+
+          if (progressMonitor.isCanceled())
+            Activator.safeLogInfo("Cancelled: Search Re-Indexing"); //$NON-NLS-1$
+          else
+            Activator.safeLogInfo("Finished: Search Re-Indexing"); //$NON-NLS-1$
+        }
+
+        /* Optimize Index if Necessary */
+        if (migrationResult.isOptimizeIndex() && !progressMonitor.isCanceled())
           modelSearch.optimize();
       }
-
     } finally {
-      /*
-       * If we perform the migration, the subMonitor is not null. Otherwise we
-       * don't show progress.
-       */
-      if (subMonitor != null)
+      if (subMonitor != null) //If we perform the migration, the subMonitor is not null. Otherwise we don't show progress.
         progressMonitor.done();
     }
   }
@@ -391,12 +521,12 @@ public class DBManager {
     return new BackupService(new File(getDBFilePath()), ".backup", MAX_BACKUPS_COUNT, getDBLastBackUpFile(), backupFrequency); //$NON-NLS-1$
   }
 
-  private void scheduledBackup() {
+  private void scheduledBackup(IProgressMonitor monitor) {
     if (!new File(getDBFilePath()).exists())
       return;
 
-    long sevenDays = getLongProperty("rssowl.offlinebackup.interval", 1000 * 60 * 60 * 24 * 7); //$NON-NLS-1$
-    createScheduledBackupService(sevenDays).backup(false);
+    long sevenDays = getLongProperty("rssowl.offlinebackup.interval", OFFLINE_BACKUP_INTERVAL); //$NON-NLS-1$
+    createScheduledBackupService(sevenDays).backup(false, monitor);
   }
 
   public File getDBLastBackUpFile() {
@@ -406,9 +536,11 @@ public class DBManager {
   }
 
   private MigrationResult migrate(final int workspaceFormat, int currentFormat, IProgressMonitor progressMonitor) {
+    Activator.safeLogInfo(NLS.bind("Migrating RSSOwl (from version {0} to version {1}", workspaceFormat, currentFormat)); //$NON-NLS-1$
+
     ConfigurationFactory configFactory = new ConfigurationFactory() {
       public Configuration createConfiguration() {
-        return DBManager.createConfiguration();
+        return DBManager.createConfiguration(false);
       }
     };
     Migration migration = new Migrations().getMigration(workspaceFormat, currentFormat);
@@ -421,7 +553,8 @@ public class DBManager {
 
     /*
      * Copy the db file to a permanent back-up where the file name includes the
-     * workspaceFormat number. This will only be deleted after another migration.
+     * workspaceFormat number. This will only be deleted after another
+     * migration.
      */
     final BackupService backupService = new BackupService(dbFile, backupFileSuffix + workspaceFormat, 1);
     backupService.setLayoutStrategy(new BackupService.BackupLayoutStrategy() {
@@ -439,11 +572,11 @@ public class DBManager {
         throw new UnsupportedOperationException("No rotation supported because maxBackupCount is 1"); //$NON-NLS-1$
       }
     });
-    backupService.backup(true);
+    backupService.backup(true, new NullProgressMonitor());
 
     /* Create a copy of the db file to use for the migration */
     File migDbFile = backupService.getTempBackupFile();
-    DBHelper.copyFile(dbFile, migDbFile);
+    DBHelper.copyFileNIO(dbFile, migDbFile);
 
     /* Migrate the copy */
     MigrationResult migrationResult = migration.migrate(configFactory, migDbFile.getAbsolutePath(), progressMonitor);
@@ -552,151 +685,386 @@ public class DBManager {
   private void defragment(LongOperationMonitor progressMonitor, SubMonitor subMonitor) {
     SubMonitor monitor;
     if (subMonitor == null) {
-      progressMonitor.beginLongOperation();
-      String monitorText = Messages.DBManager_RSSOWL_CLEANUP;
-      subMonitor = SubMonitor.convert(progressMonitor, monitorText, 100);
-      monitor = subMonitor.newChild(100);
+      progressMonitor.beginLongOperation(true);
+      String monitorText = Messages.DBManager_PROGRESS_WAIT;
+      subMonitor = SubMonitor.convert(progressMonitor, monitorText, DEFRAG_TOTAL_WORK);
+      monitor = subMonitor.newChild(DEFRAG_TOTAL_WORK);
 
       /*
-       * This should not be needed, but things don't work properly when it's
-       * not called.
+       * This should not be needed, but things don't work properly when it's not
+       * called.
        */
-      monitor.beginTask(monitorText, 100);
+      monitor.beginTask(monitorText, DEFRAG_TOTAL_WORK);
     } else {
       monitor = subMonitor.newChild(10);
       monitor.setWorkRemaining(100);
     }
 
+    Activator.safeLogInfo("Start: Database Defragmentation"); //$NON-NLS-1$
+
     BackupService backupService = createScheduledBackupService(null);
-    File file = new File(getDBFilePath());
-    File defragmentedFile = backupService.getTempBackupFile();
-    copyDatabase(file, defragmentedFile, monitor);
-    backupService.backup(true);
-    DBHelper.rename(defragmentedFile, file);
+    File database = new File(getDBFilePath());
+    File defragmentedDatabase = backupService.getTempBackupFile();
+
+    /* User might have cancelled the operation */
+    if (monitor.isCanceled()) {
+      Activator.safeLogInfo("Cancelled: Database Defragmentation"); //$NON-NLS-1$
+      return;
+    }
+
+    /* Defrag */
+    monitor.subTask(Messages.DBManager_IMPROVING_APP_PERFORMANCE);
+    copyDatabase(database, defragmentedDatabase, monitor);
+
+    /* User might have cancelled the operation */
+    if (monitor.isCanceled()) {
+      Activator.safeLogInfo("Cancelled: Database Defragmentation"); //$NON-NLS-1$
+      defragmentedDatabase.delete();
+      return;
+    }
+
+    /* Backup */
+    monitor.subTask(Messages.DBManager_CREATING_DB_BACKUP);
+    backupService.backup(true, monitor);
+
+    /* User might have cancelled the operation */
+    if (monitor.isCanceled()) {
+      Activator.safeLogInfo("Cancelled: Database Defragmentation"); //$NON-NLS-1$
+      defragmentedDatabase.delete();
+      return;
+    }
+
+    /* Rename Defragmented DB to real DB */
+    DBHelper.rename(defragmentedDatabase, database);
+
+    /* Finished */
+    monitor.done();
+    Activator.safeLogInfo("Finished: Database Defragmentation"); //$NON-NLS-1$
   }
 
   /**
-   * Internal method. Made public for testing.
+   * Internal method. Made public for testing. Creates a copy of the database
+   * that has all essential data structures. At the moment, this means not
+   * copying NewsCounter and IConditionalGets since they will be re-populated
+   * eventually.
    *
-   * Creates a copy of the database that has all essential data structures.
-   * At the moment, this means not copying NewsCounter and
-   * IConditionalGets since they will be re-populated eventually.
    * @param source
    * @param destination
    * @param monitor
-   *
    */
   public final static void copyDatabase(File source, File destination, IProgressMonitor monitor) {
-    ObjectContainer sourceDb = Db4o.openFile(createConfiguration(), source.getAbsolutePath());
-    ObjectContainer destinationDb = Db4o.openFile(createConfiguration(), destination.getAbsolutePath());
+    ObjectContainer sourceDb = Db4o.openFile(createConfiguration(true), source.getAbsolutePath());
+    ObjectContainer destinationDb = Db4o.openFile(createConfiguration(true), destination.getAbsolutePath());
 
-    /*
-     * Keep labels in memory to avoid duplicate copies when cascading feed.
-     */
+    /* User might have cancelled the operation */
+    if (isCanceled(monitor, sourceDb, destinationDb))
+      return;
+
+    /* Labels (keep in memory to avoid duplicate copies when cascading feed) */
     List<Label> labels = new ArrayList<Label>();
-    for (Label label : sourceDb.query(Label.class)) {
-      labels.add(label);
-      sourceDb.activate(label, Integer.MAX_VALUE);
-      destinationDb.ext().store(label, Integer.MAX_VALUE);
-    }
+    ObjectSet<Label> allLabels = sourceDb.query(Label.class);
+    int available = DEFRAG_SUB_WORK_LABELS;
+    if (!allLabels.isEmpty()) {
+      int chunk = available / allLabels.size();
+      for (Label label : allLabels) {
+        if (isCanceled(monitor, sourceDb, destinationDb))
+          return;
 
-    monitor.worked(5);
-    for (Folder type : sourceDb.query(Folder.class)) {
-      sourceDb.activate(type, Integer.MAX_VALUE);
-      if (type.getParent() == null) {
-        destinationDb.ext().store(type, Integer.MAX_VALUE);
+        labels.add(label);
+        sourceDb.activate(label, Integer.MAX_VALUE);
+        destinationDb.ext().store(label, Integer.MAX_VALUE);
+        monitor.worked(chunk);
       }
-    }
-    monitor.worked(15);
+      allLabels = null;
+    } else
+      monitor.worked(available);
+
+    /* User might have cancelled the operation */
+    if (isCanceled(monitor, sourceDb, destinationDb))
+      return;
+
+    /* Folders */
+    ObjectSet<Folder> allFolders = sourceDb.query(Folder.class);
+    available = DEFRAG_SUB_WORK_FOLDERS;
+    if (!allFolders.isEmpty()) {
+      int chunk = available / allFolders.size();
+      for (Folder type : allFolders) {
+        if (isCanceled(monitor, sourceDb, destinationDb))
+          return;
+
+        sourceDb.activate(type, Integer.MAX_VALUE);
+        if (type.getParent() == null)
+          destinationDb.ext().store(type, Integer.MAX_VALUE);
+
+        monitor.worked(chunk);
+      }
+      allFolders = null;
+    } else
+      monitor.worked(available);
+
+    /* User might have cancelled the operation */
+    if (isCanceled(monitor, sourceDb, destinationDb))
+      return;
 
     /*
      * We use destinationDb for the query here because we have already copied
-     * the NewsBins at this stage and we may need to fix the NewsBin in case
-     * it contains stale news refs.
+     * the NewsBins at this stage and we may need to fix the NewsBin in case it
+     * contains stale news refs.
      */
-    for (NewsBin newsBin : destinationDb.query(NewsBin.class)) {
-      destinationDb.activate(newsBin, Integer.MAX_VALUE);
-      List<NewsReference> staleNewsRefs = new ArrayList<NewsReference>(0);
-      for (NewsReference newsRef : newsBin.getNewsRefs()) {
-        Query query = sourceDb.query();
-        query.constrain(News.class);
-        query.descend("fId").constrain(newsRef.getId()); //$NON-NLS-1$
-        Iterator<?> newsIt = query.execute().iterator();
-        if (!newsIt.hasNext()) {
-          Activator.getDefault().logError("NewsBin " + newsBin + " has reference to news with id: " + newsRef.getId() + ", but that news does not exist.", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-          staleNewsRefs.add(newsRef);
-          continue;
+    ObjectSet<NewsBin> allBins = destinationDb.query(NewsBin.class);
+    available = DEFRAG_SUB_WORK_BINS;
+    if (!allBins.isEmpty()) {
+      int chunk = available / allBins.size();
+      for (NewsBin newsBin : allBins) {
+        if (isCanceled(monitor, sourceDb, destinationDb))
+          return;
+
+        destinationDb.activate(newsBin, Integer.MAX_VALUE);
+        List<NewsReference> staleNewsRefs = new ArrayList<NewsReference>(0);
+        for (NewsReference newsRef : newsBin.getNewsRefs()) {
+          if (isCanceled(monitor, sourceDb, destinationDb))
+            return;
+
+          Query query = sourceDb.query();
+          query.constrain(News.class);
+          query.descend("fId").constrain(newsRef.getId()); //$NON-NLS-1$
+          Iterator<?> newsIt = query.execute().iterator();
+          if (!newsIt.hasNext()) {
+            Activator.getDefault().logError("NewsBin " + newsBin + " has reference to news with id: " + newsRef.getId() + ", but that news does not exist.", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            staleNewsRefs.add(newsRef);
+            continue;
+          }
+          Object news = newsIt.next();
+          sourceDb.activate(news, Integer.MAX_VALUE);
+          destinationDb.ext().store(news, Integer.MAX_VALUE);
         }
-        Object news = newsIt.next();
-        sourceDb.activate(news, Integer.MAX_VALUE);
-        destinationDb.ext().store(news, Integer.MAX_VALUE);
-      }
-      if (!staleNewsRefs.isEmpty()) {
-        newsBin.removeNewsRefs(staleNewsRefs);
-        destinationDb.ext().store(newsBin, Integer.MAX_VALUE);
-      }
-    }
 
-    monitor.worked(25);
+        if (!staleNewsRefs.isEmpty()) {
+          if (isCanceled(monitor, sourceDb, destinationDb))
+            return;
 
+          newsBin.removeNewsRefs(staleNewsRefs);
+          destinationDb.ext().store(newsBin, Integer.MAX_VALUE);
+        }
+
+        monitor.worked(chunk);
+      }
+      allBins = null;
+    } else
+      monitor.worked(available);
+
+    /* User might have cancelled the operation */
+    if (isCanceled(monitor, sourceDb, destinationDb))
+      return;
+
+    /* Feeds */
+    available = DEFRAG_SUB_WORK_FEEDS;
     int feedCounter = 0;
     NewsCounter newsCounter = new NewsCounter();
-    for (Feed feed : sourceDb.query(Feed.class)) {
-      sourceDb.activate(feed, Integer.MAX_VALUE);
-      addNewsCounterItem(newsCounter, feed);
-      destinationDb.ext().store(feed, Integer.MAX_VALUE);
+    ObjectSet<Feed> allFeeds = sourceDb.query(Feed.class);
+    if (!allFeeds.isEmpty()) {
+      int chunk = available / allFeeds.size();
 
-      ++feedCounter;
-      if (feedCounter % 40 == 0)
-        System.gc();
-    }
-    System.gc();
+      for (Feed feed : allFeeds) {
+        if (isCanceled(monitor, sourceDb, destinationDb))
+          return;
+
+        sourceDb.activate(feed, Integer.MAX_VALUE);
+        addNewsCounterItem(newsCounter, feed);
+        destinationDb.ext().store(feed, Integer.MAX_VALUE);
+
+        ++feedCounter;
+        if (feedCounter % 40 == 0) {
+          destinationDb.commit();
+          System.gc();
+        }
+
+        monitor.worked(chunk);
+      }
+      allFeeds = null;
+      destinationDb.commit();
+      System.gc();
+    } else
+      monitor.worked(available);
+
+    /* User might have cancelled the operation */
+    if (isCanceled(monitor, sourceDb, destinationDb))
+      return;
 
     destinationDb.ext().store(newsCounter, Integer.MAX_VALUE);
-    monitor.worked(30);
 
+    /* User might have cancelled the operation */
+    if (isCanceled(monitor, sourceDb, destinationDb))
+      return;
+
+    /* Description */
+    available = DEFRAG_SUB_WORK_DESCRIPTIONS;
     int descriptionCounter = 0;
-    for (Description description : sourceDb.query(Description.class)) {
-      sourceDb.activate(description, Integer.MAX_VALUE);
-      destinationDb.ext().store(description, Integer.MAX_VALUE);
+    ObjectSet<Description> allDescriptions = sourceDb.query(Description.class);
+    if (!allDescriptions.isEmpty()) {
+      int chunk = Math.max(1, available / allDescriptions.size());
 
-      ++descriptionCounter;
-      if (descriptionCounter % 600 == 0)
-        System.gc();
-    }
-    monitor.worked(10);
+      for (Description description : allDescriptions) {
+        if (isCanceled(monitor, sourceDb, destinationDb))
+          return;
 
-    for (Preference pref : sourceDb.query(Preference.class)) {
-      sourceDb.activate(pref, Integer.MAX_VALUE);
-      destinationDb.ext().store(pref, Integer.MAX_VALUE);
-    }
+        sourceDb.activate(description, Integer.MAX_VALUE);
+        destinationDb.ext().store(description, Integer.MAX_VALUE);
 
-    for (ISearchFilter filter : sourceDb.query(SearchFilter.class)) {
-      sourceDb.activate(filter, Integer.MAX_VALUE);
-      destinationDb.ext().store(filter, Integer.MAX_VALUE);
-    }
+        ++descriptionCounter;
+        if (descriptionCounter % 600 == 0) {
+          destinationDb.commit();
+          System.gc();
+        }
 
-    monitor.worked(5);
+        monitor.worked(chunk);
+      }
+
+      allDescriptions = null;
+      destinationDb.commit();
+      System.gc();
+    } else
+      monitor.worked(available);
+
+    /* User might have cancelled the operation */
+    if (isCanceled(monitor, sourceDb, destinationDb))
+      return;
+
+    /* Preferences */
+    available = DEFRAG_SUB_WORK_PREFERENCES;
+    ObjectSet<Preference> allPreferences = sourceDb.query(Preference.class);
+    if (!allPreferences.isEmpty()) {
+      int chunk = available / allPreferences.size();
+
+      for (Preference pref : allPreferences) {
+        if (isCanceled(monitor, sourceDb, destinationDb))
+          return;
+
+        sourceDb.activate(pref, Integer.MAX_VALUE);
+        destinationDb.ext().store(pref, Integer.MAX_VALUE);
+
+        monitor.worked(chunk);
+      }
+
+      allPreferences = null;
+    } else
+      monitor.worked(available);
+
+    /* User might have cancelled the operation */
+    if (isCanceled(monitor, sourceDb, destinationDb))
+      return;
+
+    /* Filter */
+    available = DEFRAG_SUB_WORK_FILTERS;
+    ObjectSet<SearchFilter> allFilters = sourceDb.query(SearchFilter.class);
+    if (!allFilters.isEmpty()) {
+      int chunk = available / allFilters.size();
+
+      for (ISearchFilter filter : allFilters) {
+        if (isCanceled(monitor, sourceDb, destinationDb))
+          return;
+
+        sourceDb.activate(filter, Integer.MAX_VALUE);
+        destinationDb.ext().store(filter, Integer.MAX_VALUE);
+        monitor.worked(chunk);
+      }
+
+      allFilters = null;
+    } else
+      monitor.worked(available);
+
+    /* User might have cancelled the operation */
+    if (isCanceled(monitor, sourceDb, destinationDb))
+      return;
+
+    /* Counter */
     List<Counter> counterSet = sourceDb.query(Counter.class);
     Counter counter = counterSet.iterator().next();
     sourceDb.activate(counter, Integer.MAX_VALUE);
     destinationDb.ext().store(counter, Integer.MAX_VALUE);
+
+    monitor.worked(DEFRAG_SUB_WORK_COUNTERS);
+
+    /* User might have cancelled the operation */
+    if (isCanceled(monitor, sourceDb, destinationDb))
+      return;
+
+    /* Entity Id By Event Type */
     EntityIdsByEventType entityIdsByEventType = sourceDb.query(EntityIdsByEventType.class).iterator().next();
     sourceDb.activate(entityIdsByEventType, Integer.MAX_VALUE);
     destinationDb.ext().store(entityIdsByEventType, Integer.MAX_VALUE);
 
+    monitor.worked(DEFRAG_SUB_WORK_EVENTS);
+
+    /* User might have cancelled the operation */
+    if (isCanceled(monitor, sourceDb, destinationDb))
+      return;
+
+    /* Conditional Get */
+    available = DEFRAG_SUB_WORK_CONDITIONAL_GET;
+    ObjectSet<ConditionalGet> allConditionalGets = sourceDb.query(ConditionalGet.class);
+    if (!allConditionalGets.isEmpty()) {
+      int chunk = available / allConditionalGets.size();
+      for (ConditionalGet conditionalGet : allConditionalGets) {
+        if (isCanceled(monitor, sourceDb, destinationDb))
+          return;
+
+        sourceDb.activate(conditionalGet, Integer.MAX_VALUE);
+        destinationDb.ext().store(conditionalGet, Integer.MAX_VALUE);
+        monitor.worked(chunk);
+      }
+      allConditionalGets = null;
+    } else
+      monitor.worked(available);
+
+    /* User might have cancelled the operation */
+    if (isCanceled(monitor, sourceDb, destinationDb))
+      return;
+
     sourceDb.close();
+    monitor.worked(DEFRAG_SUB_WORK_CLOSE_SOURCE);
+
+    /* User might have cancelled the operation */
+    if (monitor.isCanceled()) {
+      destinationDb.close();
+      return;
+    }
+
     destinationDb.commit();
+    monitor.worked(DEFRAG_SUB_WORK_COMMITT_DESTINATION);
+
+    /* User might have cancelled the operation */
+    if (monitor.isCanceled()) {
+      destinationDb.close();
+      return;
+    }
+
     destinationDb.close();
+    monitor.worked(DEFRAG_SUB_WORK_CLOSE_DESTINATION);
+
+    /* User might have cancelled the operation */
+    if (monitor.isCanceled())
+      return;
+
     System.gc();
-    monitor.worked(10);
+    monitor.worked(DEFRAG_SUB_WORK_FINISH);
+  }
+
+  private static boolean isCanceled(IProgressMonitor monitor, ObjectContainer source, ObjectContainer dest) {
+    if (monitor.isCanceled()) {
+      source.close();
+      dest.close();
+      return true;
+    }
+
+    return false;
   }
 
   private static void addNewsCounterItem(NewsCounter newsCounter, Feed feed) {
     Map<State, Integer> stateToCountMap = feed.getNewsCount();
     int unreadCount = getCount(stateToCountMap, EnumSet.of(State.NEW, State.UNREAD, State.UPDATED));
     Integer newCount = stateToCountMap.get(INews.State.NEW);
-    newsCounter.put(feed.getLink(), new NewsCounterItem(newCount, unreadCount, feed.getStickyCount()));
+    newsCounter.put(feed.getLink().toString(), new NewsCounterItem(newCount, unreadCount, feed.getStickyCount()));
   }
 
   private static int getCount(Map<State, Integer> stateToCountMap, Set<State> states) {
@@ -709,29 +1077,40 @@ public class DBManager {
 
   /**
    * Internal method, exposed for tests only.
+   *
+   * @param forDefrag if <code>true</code> the configuration will be improved
+   * for the defrag process and <code>false</code> otherwise to return a normal
+   * configuration suitable for the application.
    * @return Configuration
    */
-  public static final Configuration createConfiguration() {
+  public static final Configuration createConfiguration(boolean forDefrag) {
     Configuration config = Db4o.newConfiguration();
     //TODO We can use dbExists to configure our parameters for a more
     //efficient startup. For example, the following could be used. We'd have
     //to include a file when we need to evolve the schema or something similar
     //config.detectSchemaChanges(false)
 
-//    config.blockSize(8);
-//    config.bTreeCacheHeight(0);
-//    config.bTreeNodeSize(100);
-//    config.diagnostic().addListener(new DiagnosticListener() {
-//      public void onDiagnostic(Diagnostic d) {
-//        System.out.println(d);
-//      }
-//    });
-//    config.messageLevel(3);
+    //    config.blockSize(8);
+    //    config.bTreeCacheHeight(0);
+    //    config.bTreeNodeSize(100);
+    //    config.diagnostic().addListener(new DiagnosticListener() {
+    //      public void onDiagnostic(Diagnostic d) {
+    //        System.out.println(d);
+    //      }
+    //    });
+
+    config.setOut(new PrintStream(new ByteArrayOutputStream()) {
+      @Override
+      public void write(byte[] buf, int off, int len) {
+        if (buf != null && len >= 0 && off >= 0 && off <= buf.length - len)
+          CoreUtils.appendLogMessage(new String(buf, off, len));
+      }
+    });
 
     config.lockDatabaseFile(false);
-    config.queries().evaluationMode(QueryEvaluationMode.IMMEDIATE);
+    config.queries().evaluationMode(forDefrag ? QueryEvaluationMode.LAZY : QueryEvaluationMode.IMMEDIATE);
     config.automaticShutDown(false);
-	config.callbacks(false);
+    config.callbacks(false);
     config.activationDepth(2);
     config.callConstructors(true);
     config.exceptionsOnNotStorable(true);
@@ -781,7 +1160,7 @@ public class DBManager {
     oc.objectField("fStateOrdinal").indexed(true); //$NON-NLS-1$
   }
 
-  private static void configureFeed(Configuration config)  {
+  private static void configureFeed(Configuration config) {
     ObjectClass oc = config.objectClass(Feed.class);
 
     ObjectField linkText = oc.objectField("fLinkText"); //$NON-NLS-1$
@@ -794,8 +1173,8 @@ public class DBManager {
   /**
    * Shutdown the contributed Database.
    *
-   * @throws PersistenceException In case of an error while shutting down the contributed
-   * DataBase.
+   * @throws PersistenceException In case of an error while shutting down the
+   * contributed DataBase.
    */
   public void shutdown() throws PersistenceException {
     fLock.writeLock().lock();

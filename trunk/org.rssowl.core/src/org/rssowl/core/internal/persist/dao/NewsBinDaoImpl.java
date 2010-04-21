@@ -21,13 +21,20 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.internal.persist.dao;
 
 import org.rssowl.core.internal.persist.NewsBin;
+import org.rssowl.core.internal.persist.service.DBHelper;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.dao.INewsBinDAO;
 import org.rssowl.core.persist.event.NewsBinEvent;
 import org.rssowl.core.persist.event.NewsBinListener;
+import org.rssowl.core.persist.service.PersistenceException;
+
+import com.db4o.ext.Db4oException;
+
+import java.util.Date;
 
 public class NewsBinDaoImpl extends AbstractEntityDAO<INewsBin, NewsBinListener, NewsBinEvent> implements INewsBinDAO {
 
@@ -43,5 +50,21 @@ public class NewsBinDaoImpl extends AbstractEntityDAO<INewsBin, NewsBinListener,
   @Override
   protected NewsBinEvent createDeleteEventTemplate(INewsBin entity) {
     return createSaveEventTemplate(entity);
+  }
+
+  public void visited(INewsBin mark) {
+    fWriteLock.lock();
+    try {
+      mark.setLastVisitDate(new Date());
+      mark.setPopularity(mark.getPopularity() + 1);
+      preSave(mark);
+      fDb.ext().store(mark, 1);
+      fDb.commit();
+    } catch (Db4oException e) {
+      throw new PersistenceException(e);
+    } finally {
+      fWriteLock.unlock();
+    }
+    DBHelper.cleanUpAndFireEvents();
   }
 }

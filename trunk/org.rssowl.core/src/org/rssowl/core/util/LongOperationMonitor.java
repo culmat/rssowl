@@ -36,6 +36,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
  */
 public abstract class LongOperationMonitor implements IProgressMonitor {
   private final IProgressMonitor fMonitor;
+  private boolean fIsLongOperationRunning;
 
   /**
    * @param monitor The progress monitor to wrap around.
@@ -47,8 +48,22 @@ public abstract class LongOperationMonitor implements IProgressMonitor {
   /**
    * Indicates that a long operation is about to start. Implementors can then
    * decide to show a progress dialog for instance.
+   *
+   * @param isCancelable set to <code>true</code> in case the operation can be
+   * cancelled and <code>false</code> otherwise.
    */
-  public abstract void beginLongOperation();
+  public void beginLongOperation(boolean isCancelable) {
+    fIsLongOperationRunning = true;
+  }
+
+  /**
+   * @return <code>true</code> if
+   * {@link LongOperationMonitor#beginLongOperation(boolean)} has been called
+   * and <code>false</code> otherwise.
+   */
+  public boolean isLongOperationRunning() {
+    return fIsLongOperationRunning;
+  }
 
   /*
    * @see org.eclipse.core.runtime.IProgressMonitor#beginTask(java.lang.String,
@@ -87,7 +102,8 @@ public abstract class LongOperationMonitor implements IProgressMonitor {
   }
 
   /*
-   * @see org.eclipse.core.runtime.IProgressMonitor#setTaskName(java.lang.String)
+   * @see
+   * org.eclipse.core.runtime.IProgressMonitor#setTaskName(java.lang.String)
    */
   public void setTaskName(String name) {
     fMonitor.setTaskName(name);

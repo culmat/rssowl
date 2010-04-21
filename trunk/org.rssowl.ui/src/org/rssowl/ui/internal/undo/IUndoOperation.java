@@ -46,4 +46,10 @@ public interface IUndoOperation {
    * Asks to redo this operation.
    */
   void redo();
+
+  /**
+   * @return <code>true</code> if the user should be presented with progress
+   * while this operation is running and <code>false</code> otherwise.
+   */
+  boolean isLongRunning();
 }

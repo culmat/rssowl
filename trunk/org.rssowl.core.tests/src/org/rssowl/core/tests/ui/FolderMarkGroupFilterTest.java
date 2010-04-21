@@ -285,17 +285,17 @@ public class FolderMarkGroupFilterTest {
 
     NewsCounter count = new NewsCounter();
     NewsCounterItem item = new NewsCounterItem(1, 0, 0);
-    count.put(feed1.getLink(), item);
+    count.put(feed1.getLink().toString(), item);
     ((BookMark) bookmark1).setNewsCounter(count);
 
     count = new NewsCounter();
     item = new NewsCounterItem(0, 1, 0);
-    count.put(feed2.getLink(), item);
+    count.put(feed2.getLink().toString(), item);
     ((BookMark) bookmark2).setNewsCounter(count);
 
     count = new NewsCounter();
     item = new NewsCounterItem(0, 0, 1);
-    count.put(feed3.getLink(), item);
+    count.put(feed3.getLink().toString(), item);
     ((BookMark) bookmark3).setNewsCounter(count);
 
     INews news = fFactory.createNews(null, fFactory.createFeed(null, new URI("feed4")), new Date());

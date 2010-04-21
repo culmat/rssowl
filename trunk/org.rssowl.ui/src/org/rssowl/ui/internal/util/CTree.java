@@ -150,7 +150,7 @@ public class CTree {
     if (verticalBar != null) {
       int barWidth = verticalBar.getSize().x;
       if (Application.IS_MAC && barWidth == 0)
-        barWidth= 16; //Can be 0 on Mac
+        barWidth = 16; //Can be 0 on Mac
 
       totalWidth -= barWidth;
     }
@@ -193,12 +193,25 @@ public class CTree {
       else if (data.getSize() == CColumnLayoutData.Size.FIXED) {
         int widthHint = data.getWidthHint();
 
-        /* Bug on Windows: First column in tree always needs extra space for expand/collapse */
+        /* Windows: First column in tree always needs extra space for expand/collapse */
         if (Application.IS_WINDOWS && i == 0) {
           if (fIsFlat)
             widthHint += 25;
           else
             widthHint += 45;
+        }
+
+        /* Linux: First column in tree always needs extra space for expand/collapse */
+        else if (Application.IS_LINUX && i == 0) {
+          if (fIsFlat)
+            widthHint += 20;
+          else
+            widthHint += 40;
+        }
+
+        /* Mac: First column in tree always needs extra space for expand/collapse */
+        else if (Application.IS_MAC && i == 0) {
+          widthHint += 20;
         }
 
         freeWidth -= widthHint;

@@ -34,5 +34,12 @@ import org.rssowl.core.persist.event.NewsBinListener;
  * @author Ismael Juma (ismael@juma.me.uk)
  */
 public interface INewsBinDAO extends IEntityDAO<INewsBin, NewsBinListener, NewsBinEvent> {
-  // No new methods
+
+  /**
+   * Records a visit to the mark and saves it to the database. This method is
+   * fast because it avoids to save all the news references inside the bin.
+   *
+   * @param mark INewsBin that has been visited.
+   */
+  void visited(INewsBin mark);
 }

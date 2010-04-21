@@ -31,24 +31,16 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 import org.rssowl.core.Owl;
-import org.rssowl.core.internal.InternalOwl;
-import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.LongOperationMonitor;
+import org.rssowl.ui.internal.dialogs.StartupProgressDialog;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -81,6 +73,8 @@ public class Activator extends AbstractUIPlugin {
 
   private Thread fShutdownHook;
   private IStatus fStartupStatus = Status.OK_STATUS;
+  private String fVersion;
+  private String fNl;
 
   /**
    * The constructor.
@@ -95,6 +89,17 @@ public class Activator extends AbstractUIPlugin {
   @Override
   public void start(BundleContext context) throws Exception {
     super.start(context);
+    fVersion = (String) fgPlugin.getBundle().getHeaders().get("Bundle-Version"); //$NON-NLS-1$
+    fNl = System.getProperty("line.separator"); //$NON-NLS-1$
+    if (fNl == null)
+      fNl = "\n"; //$NON-NLS-1$
+
+    /* Log Version Information */
+    try {
+      safeLogInfo("RSSOwl Starting Up (" + getUserAgent() + ")"); //$NON-NLS-1$ //$NON-NLS-2$
+    } catch (Exception e) {
+      /* Something seriously went wrong using the Platform Log */
+    }
 
     /*
      * Start internal Server (chance that System.exit() gets called!). It is cruicial
@@ -120,7 +125,8 @@ public class Activator extends AbstractUIPlugin {
         /* Shutdown UI */
         SafeRunner.run(new LoggingSafeRunnable() {
           public void run() throws Exception {
-            Controller.getDefault().shutdown(true);
+            if (Owl.isStarted() || Controller.isInitialized())
+              Controller.getDefault().shutdown(true);
           }
         });
 
@@ -130,6 +136,14 @@ public class Activator extends AbstractUIPlugin {
             Owl.shutdown(true);
           }
         });
+
+        /* Check for Log Message from Core */
+        String logMessages = CoreUtils.getAndFlushLogMessages();
+        if (logMessages != null && logMessages.length() > 0)
+          safeLogError(logMessages, null);
+
+        /* Log Shutdown Info */
+        safeLogInfo("RSSOwl Shutting Down (emergency)" + fNl); //$NON-NLS-1$
       }
     };
     fShutdownHook.setPriority(Thread.MAX_PRIORITY);
@@ -147,11 +161,8 @@ public class Activator extends AbstractUIPlugin {
       public void run() throws Exception {
 
         /* Startup Controller */
-        Controller.getDefault().startup();
-
-        /* Log Version Information */
-        if (!InternalOwl.IS_ECLIPSE)
-          safeLogInfo(CoreUtils.getUserAgent());
+        if (Owl.isStarted())
+          Controller.getDefault().startup();
       }
     });
 
@@ -161,7 +172,8 @@ public class Activator extends AbstractUIPlugin {
         public void run() throws Exception {
           Display.getDefault().asyncExec(new Runnable() {
             public void run() {
-              Controller.getDefault().postWindowOpen();
+              if (Owl.isStarted())
+                Controller.getDefault().postWindowOpen();
             }
           });
         }
@@ -173,44 +185,55 @@ public class Activator extends AbstractUIPlugin {
 
     /* Dialog to show progress */
     Display.setAppName("RSSOwl"); //$NON-NLS-1$
-    Display display = Display.getDefault();
-    final ProgressMonitorDialog dialog = new ProgressMonitorDialog(new Shell(display)) {
-      @Override
-      protected Point getInitialLocation(Point initialSize) {
-        Rectangle displayBounds = getParentShell().getDisplay().getPrimaryMonitor().getBounds();
-        Point shellSize = getInitialSize();
-        int x = displayBounds.x + (displayBounds.width - shellSize.x) >> 1;
-        int y = displayBounds.y + (displayBounds.height - shellSize.y) >> 1;
-
-        return new Point(x, y);
-      }
-
-      @Override
-      protected Point getInitialSize() {
-        int minWidth = 400;
-        int minHeight = getShell().computeSize(minWidth, SWT.DEFAULT).y;
-
-        return new Point(minWidth, minHeight);
-      }
-
-      @Override
-      protected Control createButtonBar(Composite parent) {
-        return null;
-      }
-    };
+    Display.getDefault(); //Create the Display
+    final StartupProgressDialog dialog = new StartupProgressDialog();
     dialog.setOpenOnRun(false);
 
     /* Runnable to start core */
     IRunnableWithProgress runnable = new IRunnableWithProgress() {
       public void run(IProgressMonitor monitor) {
         LongOperationMonitor callbackMonitor = new LongOperationMonitor(monitor) {
+          private boolean updateUi = true;
+
           @Override
-          public void beginLongOperation() {
-            Display.getDefault().syncExec(new Runnable() {
-              public void run() {
-                dialog.open();
+          public void beginLongOperation(boolean isCancelable) {
+            if (!isLongOperationRunning()) {
+              super.beginLongOperation(isCancelable);
+              dialog.open();
+            }
+          }
+
+          @Override
+          public void worked(int work) {
+            super.worked(work);
+            if (updateUi)
+              updateUi();
+          }
+
+          @Override
+          public void subTask(String name) {
+            super.subTask(name);
+            if (updateUi)
+              updateUi();
+          }
+
+          private void updateUi() {
+            Display display = Display.getDefault();
+            try {
+              if (!isCanceled() && !display.isDisposed() && dialog.getShell() != null && !dialog.getShell().isDisposed()) {
+                display.readAndDispatch();
+                display.update();
               }
-            });
+            }
+
+            /*
+             * Ensure to catch any Exception here and disable the update of the
+             * UI given that the operation being performed can be a critical one.
+             */
+            catch (Exception e) {
+              updateUi = false;
+              logError(e.getMessage(), e);
+            }
           }
         };
 
@@ -225,8 +248,8 @@ public class Activator extends AbstractUIPlugin {
           Activator.getDefault().getLog().log(Activator.this.fStartupStatus);
         }
 
-        /* Handle Persistence Exception */
-        catch (PersistenceException e) {
+        /* Handle Exception (because any exception here is a show stopper) */
+        catch (Exception e) {
           Activator.this.fStartupStatus = createErrorStatus(e.getMessage(), e);
           Activator.getDefault().getLog().log(Activator.this.fStartupStatus);
         }
@@ -235,7 +258,7 @@ public class Activator extends AbstractUIPlugin {
 
     /* Execute the Runnable */
     try {
-      dialog.run(false, false, runnable);
+      dialog.run(false, true, runnable);
     } catch (InvocationTargetException e) {
       logError(e.getMessage(), e);
     } catch (InterruptedException e) {
@@ -351,7 +374,8 @@ public class Activator extends AbstractUIPlugin {
     /* Propagate shutdown to Controller */
     SafeRunner.run(new LoggingSafeRunnable() {
       public void run() throws Exception {
-        Controller.getDefault().shutdown(false);
+        if (Owl.isStarted() || Controller.isInitialized())
+          Controller.getDefault().shutdown(false);
       }
     });
 
@@ -398,7 +422,7 @@ public class Activator extends AbstractUIPlugin {
    * @param msg The message to log as Info.
    */
   public static void safeLogInfo(String msg) {
-    Activator activator= fgPlugin;
+    Activator activator = fgPlugin;
     if (activator != null)
       activator.getLog().log(new Status(IStatus.INFO, activator.getBundle().getSymbolicName(), IStatus.OK, msg, null));
   }
@@ -470,5 +494,16 @@ public class Activator extends AbstractUIPlugin {
    */
   public IStatus createInfoStatus(String msg, Exception e) {
     return new Status(IStatus.INFO, Activator.getDefault().getBundle().getSymbolicName(), IStatus.INFO, msg, e);
+  }
+
+  private String getUserAgent() {
+    String os = Platform.getOS();
+    if (Platform.OS_WIN32.equals(os))
+      return "RSSOwl/" + fVersion + " (Windows; U; en)"; //$NON-NLS-1$ //$NON-NLS-2$
+    else if (Platform.OS_LINUX.equals(os))
+      return "RSSOwl/" + fVersion + " (X11; U; en)"; //$NON-NLS-1$//$NON-NLS-2$
+    else if (Platform.OS_MACOSX.equals(os))
+      return "RSSOwl/" + fVersion + " (Macintosh; U; en)"; //$NON-NLS-1$ //$NON-NLS-2$
+    return "RSSOwl/" + fVersion; //$NON-NLS-1$
   }
 }

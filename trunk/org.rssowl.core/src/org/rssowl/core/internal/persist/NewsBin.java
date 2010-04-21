@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.Set;
 
 public class NewsBin extends Mark implements INewsBin   {
-
   private NewsContainer fNewsContainer;
 
   /**

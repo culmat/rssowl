@@ -153,7 +153,7 @@ public class ControllerTestNetwork {
     /* Delete Folder */
     DynamicDAO.deleteAll(Collections.singleton(folder));
 
-    assertNull(Owl.getPersistenceService().getDAOService().getNewsCounterDAO().load().get(feed.getLink()));
+    assertNull(Owl.getPersistenceService().getDAOService().getNewsCounterDAO().load().get(feed.getLink().toString()));
   }
 
   /**
@@ -229,15 +229,15 @@ public class ControllerTestNetwork {
   }
 
   private int getNewCount(IFeed feed) {
-    return loadNewsCounter().getNewCount(feed.getLink());
+    return loadNewsCounter().getNewCount(feed.getLink().toString());
   }
 
   private int getUnreadCount(IFeed feed) {
-    return loadNewsCounter().getUnreadCount(feed.getLink());
+    return loadNewsCounter().getUnreadCount(feed.getLink().toString());
   }
 
   private int getStickyCount(IFeed feed) {
-    return loadNewsCounter().getStickyCount(feed.getLink());
+    return loadNewsCounter().getStickyCount(feed.getLink().toString());
   }
 
   /**

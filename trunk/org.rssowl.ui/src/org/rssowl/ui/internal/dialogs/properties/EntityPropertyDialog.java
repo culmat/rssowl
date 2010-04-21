@@ -33,6 +33,8 @@ import org.eclipse.jface.resource.ResourceManager;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -181,6 +183,13 @@ public class EntityPropertyDialog extends Dialog implements IPropertyDialogSite 
     /* TabFolder containing the Pages */
     fTabFolder = new TabFolder(composite, SWT.None);
     fTabFolder.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
+    fTabFolder.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        if (e.item instanceof TabItem && e.item.getData() instanceof IEntityPropertyPage)
+          ((IEntityPropertyPage) e.item.getData()).setFocus();
+      }
+    });
 
     /* For each Page - create TabItem */
     for (EntityPropertyPageWrapper pageWrapper : fPages) {

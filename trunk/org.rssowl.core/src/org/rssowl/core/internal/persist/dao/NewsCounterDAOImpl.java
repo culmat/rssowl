@@ -95,7 +95,7 @@ public final class NewsCounterDAOImpl extends AbstractPersistableDAO<NewsCounter
     Collection<IFeed> feeds = DBHelper.loadAllFeeds(fDb);
 
     for (IFeed feed : feeds)
-      newsCounter.put(feed.getLink(), doCount(feed));
+      newsCounter.put(feed.getLink().toString(), doCount(feed));
 
     return newsCounter;
   }

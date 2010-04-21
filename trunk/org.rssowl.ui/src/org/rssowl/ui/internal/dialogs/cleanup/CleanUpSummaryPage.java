@@ -345,12 +345,12 @@ public class CleanUpSummaryPage extends WizardPage {
       IRunnableWithProgress runnable = new IRunnableWithProgress() {
         public void run(IProgressMonitor monitor) {
           monitor.beginTask(Messages.CleanUpSummaryPage_WAIT_GENERATE_PREVIEW, IProgressMonitor.UNKNOWN);
-          onGenerateSummary(operations, selection);
+          onGenerateSummary(operations, selection, monitor);
         }
       };
 
       try {
-        getContainer().run(true, false, runnable);
+        getContainer().run(true, true, runnable);
       } catch (InvocationTargetException e) {
         Activator.getDefault().logError(e.getMessage(), e);
       } catch (InterruptedException e) {
@@ -359,9 +359,9 @@ public class CleanUpSummaryPage extends WizardPage {
     }
   }
 
-  private void onGenerateSummary(CleanUpOperations operations, Set<IBookMark> selection) {
+  private void onGenerateSummary(CleanUpOperations operations, Set<IBookMark> selection, IProgressMonitor monitor) {
     final CleanUpModel model = new CleanUpModel(operations, selection);
-    model.generate();
+    model.generate(monitor);
 
     /* Show in Viewer */
     JobRunner.runInUIThread(fViewer.getTree(), new Runnable() {
@@ -415,7 +415,7 @@ public class CleanUpSummaryPage extends WizardPage {
       if (firstElement instanceof BookMarkTask) {
         IBookMark bookmark = ((BookMarkTask) firstElement).getMark();
 
-        PreviewFeedDialog dialog = new PreviewFeedDialog(getShell(), bookmark, bookmark.getFeedLinkReference().resolve());
+        PreviewFeedDialog dialog = new PreviewFeedDialog(getShell(), bookmark, bookmark.getFeedLinkReference());
         dialog.setBlockOnOpen(false);
         dialog.open();
       }

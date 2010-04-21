@@ -558,7 +558,7 @@ public class CBrowser {
       public void changing(LocationEvent event) {
 
         /* Update JavaScript enabled state */
-        if (StringUtils.isSet(event.location) && !URIUtils.ABOUT_BLANK.equals(event.location))
+        if (StringUtils.isSet(event.location) && !URIUtils.ABOUT_BLANK.equals(event.location) && !event.location.startsWith(URIUtils.JS_IDENTIFIER))
           setScriptDisabled(shouldDisableScript(event.location));
 
         /* Handle Application Protocol */

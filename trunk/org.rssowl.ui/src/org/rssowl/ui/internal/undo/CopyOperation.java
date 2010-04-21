@@ -46,6 +46,10 @@ import java.util.Map.Entry;
  * @author bpasero
  */
 public class CopyOperation implements IUndoOperation {
+
+  /* Limit when this operation is becoming a long running one */
+  private static final int LONG_RUNNING_LIMIT = 50;
+
   private final Map<State, List<NewsReference>> fCopiedNews;
   final int fNewsCount;
   final INewsDAO fNewsDao = DynamicDAO.getDAO(INewsDAO.class);
@@ -100,5 +104,12 @@ public class CopyOperation implements IUndoOperation {
       /* Set old state back to all news */
       fNewsDao.setState(resolvedNews, oldState, false, false);
     }
+  }
+
+  /*
+   * @see org.rssowl.ui.internal.undo.IUndoOperation#isLongRunning()
+   */
+  public boolean isLongRunning() {
+    return fNewsCount > LONG_RUNNING_LIMIT;
   }
 }

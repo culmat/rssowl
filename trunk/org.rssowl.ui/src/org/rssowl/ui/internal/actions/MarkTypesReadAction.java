@@ -140,7 +140,7 @@ public class MarkTypesReadAction extends Action implements IWorkbenchWindowActio
         fillNews(((FolderNewsMark) element).getFolder(), news, retentionHelperMap);
       else if (element instanceof INewsMark)
         fillNews((INewsMark) element, news);
-      else if (element instanceof INews && enumSet.contains(((INews)element).getState()))
+      else if (element instanceof INews && enumSet.contains(((INews) element).getState()))
         news.add((INews) element);
     }
 
@@ -191,7 +191,7 @@ public class MarkTypesReadAction extends Action implements IWorkbenchWindowActio
   private void fillNews(IFolder folder, Collection<INews> news, Map<IBookMark, Collection<INews>> bookMarkNewsMap) {
     List<IFolderChild> children = folder.getChildren();
     for (IFolderChild child : children) {
-      if (child instanceof IBookMark && containsUnread(((IBookMark) child)))
+      if (child instanceof IBookMark)
         fillNews((IBookMark) child, news, bookMarkNewsMap);
       else if (child instanceof INewsMark)
         fillNews((INewsMark) child, news);
@@ -200,19 +200,17 @@ public class MarkTypesReadAction extends Action implements IWorkbenchWindowActio
     }
   }
 
-  private boolean containsUnread(IBookMark mark) {
-    return mark.getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)) > 0;
-  }
-
   private void fillNews(IBookMark bookmark, Collection<INews> news, Map<IBookMark, Collection<INews>> bookMarkNewsMap) {
     IPreferenceScope bookMarkPrefs = Owl.getPreferenceService().getEntityScope(bookmark);
     boolean requiresRetention = bookMarkPrefs.getBoolean(DefaultPreferences.DEL_READ_NEWS_STATE);
 
     final EnumSet<State> enumSet = EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED);
+
     /* Retention on read News required, load *read* as well */
     if (requiresRetention) {
       Collection<INews> feedsNews = fNewsDao.loadAll(bookmark.getFeedLinkReference(), INews.State.getVisible());
       for (INews newsItem : feedsNews) {
+
         /* Do not add READ news */
         if (enumSet.contains(newsItem.getState()))
           news.add(newsItem);
@@ -221,7 +219,7 @@ public class MarkTypesReadAction extends Action implements IWorkbenchWindowActio
     }
 
     /* No retention required, just load the ones being affected */
-    else {
+    else if (bookmark.getNewsCount(enumSet) > 0) {
       news.addAll(fNewsDao.loadAll(bookmark.getFeedLinkReference(), enumSet));
     }
   }

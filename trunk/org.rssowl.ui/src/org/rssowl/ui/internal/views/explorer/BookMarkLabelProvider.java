@@ -85,6 +85,13 @@ public class BookMarkLabelProvider extends CellLabelProvider {
   private final boolean fUseDialogFont;
   private boolean fUseFavicons = true;
 
+  /* Helper to compute a Folders Decoration */
+  private static class FolderDecorationHelper {
+    int fNewCount;
+    int fUnreadCount;
+    boolean fHasSticky;
+  }
+
   /** Default Constructor */
   public BookMarkLabelProvider() {
     this(true);
@@ -154,8 +161,6 @@ public class BookMarkLabelProvider extends CellLabelProvider {
     Object element = cell.getElement();
     int unreadNewsCount = 0;
     int newNewsCount = 0;
-    int stickyNewsCount = 0;
-    boolean hasNew = false;
 
     /* Create Label for a Folder */
     if (element instanceof IFolder) {
@@ -163,9 +168,12 @@ public class BookMarkLabelProvider extends CellLabelProvider {
       boolean hasSticky = false;
 
       if (fIndicateState) {
-        hasSticky = hasSticky(folder);
-        unreadNewsCount = getNewsCount(folder, true);
-        newNewsCount = getNewsCount(folder, false);
+        FolderDecorationHelper helper = new FolderDecorationHelper();
+        computeFolderDecoration(folder, helper);
+
+        hasSticky = helper.fHasSticky;
+        unreadNewsCount = helper.fUnreadCount;
+        newNewsCount = helper.fNewCount;
       }
 
       /* Image */
@@ -200,6 +208,8 @@ public class BookMarkLabelProvider extends CellLabelProvider {
 
     /* Create generic Label for instances of INewsMark */
     else if (element instanceof INewsMark) {
+      boolean hasNew = false;
+      int stickyNewsCount = 0;
       INewsMark newsmark = (INewsMark) element;
 
       if (fIndicateState) {
@@ -334,46 +344,24 @@ public class BookMarkLabelProvider extends CellLabelProvider {
     return false;
   }
 
-  private boolean hasSticky(IFolder folder) {
-
-    /* Go through all Folders and Bookmarks */
-    List<IFolderChild> children = folder.getChildren();
-    for (IFolderChild child : children) {
-      if (child instanceof IBookMark) {
-        IBookMark bookmark = (IBookMark) child;
-        if (bookmark.getStickyNewsCount() > 0)
-          return true;
-      }
-
-      /* Folder */
-      else if (child instanceof IFolder)
-        return hasSticky((IFolder) child);
-    }
-
-    return false;
-  }
-
-  private int getNewsCount(IFolder folder, boolean unread) {
-    int count = 0;
-
-    /* Go through all Folders and Marks */
+  private void computeFolderDecoration(IFolder folder, FolderDecorationHelper helper) {
     List<IFolderChild> children = folder.getChildren();
     for (IFolderChild child : children) {
 
+      /* News Mark */
       if (child instanceof INewsMark) {
         INewsMark newsMark = (INewsMark) child;
-        if (unread)
-          count += getUnreadNewsCount(newsMark);
-        else
-          count += newsMark.getNewsCount(EnumSet.of(INews.State.NEW));
+        helper.fUnreadCount += getUnreadNewsCount(newsMark);
+        helper.fNewCount += newsMark.getNewsCount(EnumSet.of(INews.State.NEW));
+
+        if (!helper.fHasSticky && newsMark instanceof IBookMark && ((IBookMark) newsMark).getStickyNewsCount() > 0)
+          helper.fHasSticky = true;
       }
 
       /* Folder */
       else if (child instanceof IFolder)
-        count += getNewsCount((IFolder) child, unread);
+        computeFolderDecoration((IFolder) child, helper);
     }
-
-    return count;
   }
 
   private int getUnreadNewsCount(INewsMark newsMark) {
