@@ -439,6 +439,9 @@ public class OwlUI {
 
     private Image internalCreateImage(boolean returnMissingImageOnError, Device device) {
       try {
+        if (Application.IS_LINUX) //Use native loading on Linux to support alpha in ICO
+          return new Image(device, fFaviconFile.toString());
+
         ImageLoader loader = new ImageLoader();
         ImageData[] datas = loader.load(fFaviconFile.toString());
         if (datas != null && datas.length > 0)

@@ -465,7 +465,7 @@ public class ConnectionTests {
 
     List<String> links = RegExUtils.extractLinksFromText(content, false);
     assertTrue(!links.isEmpty());
-    assertTrue(links.size() > 50);
+    assertTrue(links.size() > 40);
   }
 
   /**
@@ -485,7 +485,7 @@ public class ConnectionTests {
 
     List<String> links = RegExUtils.extractLinksFromText(content, false);
     assertTrue(!links.isEmpty());
-    assertTrue(links.size() > 50);
+    assertTrue(links.size() > 40);
   }
 
   /**
@@ -505,7 +505,7 @@ public class ConnectionTests {
 
     List<String> links = RegExUtils.extractLinksFromText(content, false);
     assertTrue(!links.isEmpty());
-    assertTrue(links.size() > 50);
+    assertTrue(links.size() > 40);
   }
 
   /**

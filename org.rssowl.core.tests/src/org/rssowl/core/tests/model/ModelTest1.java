@@ -60,6 +60,7 @@ import org.rssowl.core.persist.event.NewsAdapter;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.NewsListener;
 import org.rssowl.core.persist.reference.FeedLinkReference;
+import org.rssowl.core.tests.TestUtils.NullProgressLongOperationMonitor;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.net.URI;
@@ -895,7 +896,7 @@ public class ModelTest1 {
     Runtime.getRuntime().gc();
 
     Owl.getPersistenceService().shutdown(false);
-    Owl.getPersistenceService().startup(null);
+    Owl.getPersistenceService().startup(new NullProgressLongOperationMonitor());
 
     Collection<ISearchMark> sms = DynamicDAO.loadAll(ISearchMark.class);
     assertEquals(1, sms.size());
@@ -941,7 +942,7 @@ public class ModelTest1 {
     Runtime.getRuntime().gc();
 
     Owl.getPersistenceService().shutdown(false);
-    Owl.getPersistenceService().startup(null);
+    Owl.getPersistenceService().startup(new NullProgressLongOperationMonitor());
 
     Collection<ISearchMark> sms = DynamicDAO.loadAll(ISearchMark.class);
     assertEquals(1, sms.size());
@@ -997,7 +998,7 @@ public class ModelTest1 {
     Runtime.getRuntime().gc();
 
     Owl.getPersistenceService().shutdown(false);
-    Owl.getPersistenceService().startup(null);
+    Owl.getPersistenceService().startup(new NullProgressLongOperationMonitor());
 
     Collection<ISearchMark> sms = DynamicDAO.loadAll(ISearchMark.class);
     assertEquals(1, sms.size());
@@ -1068,7 +1069,7 @@ public class ModelTest1 {
     Runtime.getRuntime().gc();
 
     Owl.getPersistenceService().shutdown(false);
-    Owl.getPersistenceService().startup(null);
+    Owl.getPersistenceService().startup(new NullProgressLongOperationMonitor());
 
     Collection<ISearchMark> sms = DynamicDAO.loadAll(ISearchMark.class);
     assertEquals(1, sms.size());
@@ -1134,7 +1135,7 @@ public class ModelTest1 {
     Runtime.getRuntime().gc();
 
     Owl.getPersistenceService().shutdown(false);
-    Owl.getPersistenceService().startup(null);
+    Owl.getPersistenceService().startup(new NullProgressLongOperationMonitor());
 
     Collection<ISearchMark> sms = DynamicDAO.loadAll(ISearchMark.class);
     assertEquals(1, sms.size());

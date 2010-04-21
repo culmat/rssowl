@@ -249,10 +249,10 @@ public class DeleteTypesAction extends Action implements IObjectActionDelegate {
   }
 
   private void restoreEditorsIfNecessary(List<IEntity> entitiesToDelete) {
-    boolean restore= false;
+    boolean restore = false;
     for (IEntity entity : entitiesToDelete) {
       if (entity instanceof IFolderChild) {
-        restore= true;
+        restore = true;
         break;
       }
     }
@@ -262,26 +262,38 @@ public class DeleteTypesAction extends Action implements IObjectActionDelegate {
   }
 
   private boolean shouldRunInBackground(List<IEntity> entities, List<INews> newsToDelete) {
-    int newsCount = newsToDelete.size();
+    AtomicInteger newsCount = new AtomicInteger();
+    newsCount.addAndGet(newsToDelete.size());
 
-    AtomicInteger count = new AtomicInteger();
     for (IEntity entity : entities)
-      countNews(entity, count);
+      countNewsWithLimit(entity, newsCount, RUN_IN_BACKGROUND_CAP);
 
-    newsCount += count.get();
-    return newsCount > RUN_IN_BACKGROUND_CAP;
+    return newsCount.get() > RUN_IN_BACKGROUND_CAP;
   }
 
-  private void countNews(IEntity entity, AtomicInteger count) {
+  private void countNewsWithLimit(IEntity entity, AtomicInteger count, int limit) {
+
+    /* Check Limit first */
+    if (count.get() > limit)
+      return;
+
+    /* Bookmark */
     if (entity instanceof IBookMark)
       count.addAndGet(((IBookMark) entity).getNewsCount(INews.State.getVisible()));
+
+    /* News Bin */
     else if (entity instanceof INewsBin)
       count.addAndGet(((INewsBin) entity).getNewsCount(INews.State.getVisible()));
+
+    /* Folder */
     else if (entity instanceof IFolder) {
       IFolder folder = (IFolder) entity;
       List<IFolderChild> children = folder.getChildren();
       for (IFolderChild child : children) {
-        countNews(child, count);
+        if (count.get() > limit)
+          return;
+
+        countNewsWithLimit(child, count, limit);
       }
     }
   }
@@ -291,7 +303,7 @@ public class DeleteTypesAction extends Action implements IObjectActionDelegate {
     /* Runnable with Progress */
     IRunnableWithProgress runnableWithProgress = new IRunnableWithProgress() {
       public void run(IProgressMonitor monitor) {
-        monitor.beginTask(Messages.DeleteTypesAction_WAIT_DELETE, -1);
+        monitor.beginTask(Messages.DeleteTypesAction_WAIT_DELETE, IProgressMonitor.UNKNOWN);
         try {
           deleteRunnable.run();
         } finally {

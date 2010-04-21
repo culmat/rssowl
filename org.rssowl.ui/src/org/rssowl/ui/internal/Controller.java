@@ -255,6 +255,7 @@ public class Controller {
   private boolean fShowWelcome;
   private boolean fPortable;
   private boolean fDisableUpdate;
+  private String fNl;
 
   /**
    * A listener that informs when a {@link IBookMark} is getting reloaded from
@@ -340,6 +341,9 @@ public class Controller {
     fConnectionTimeout = getSystemProperty(FEED_CON_TIMEOUT_PROPERTY, DEFAULT_FEED_CON_TIMEOUT, DEFAULT_FEED_CON_TIMEOUT);
     fPortable = System.getProperty(PORTABLE_PROPERTY) != null;
     fDisableUpdate = Boolean.getBoolean(DISABLE_UPDATE_PROPERTY);
+    fNl= System.getProperty("line.separator"); //$NON-NLS-1$
+    if (!StringUtils.isSet(fNl))
+      fNl= "\n"; //$NON-NLS-1$
   }
 
   private int getSystemProperty(String key, int minValue, int defaultValue) {
@@ -470,6 +474,14 @@ public class Controller {
       fInstance = new Controller();
 
     return fInstance;
+  }
+
+  /**
+   * @return <code>true</code> if the {@link Controller} has been initialized
+   * before and <code>false</code> otherwise.
+   */
+  public static boolean isInitialized() {
+    return fInstance != null;
   }
 
   /**
@@ -778,8 +790,8 @@ public class Controller {
       if (e.getStatus() != null && e.getStatus().getException() instanceof MonitorCanceledException)
         return Status.OK_STATUS;
 
-      /* Report Exceptions as Warnings */
-      return createWarningStatus(e.getStatus(), bookmark, feedLink);
+      /* Report Exceptions as Info to avoid Log Spam */
+      return createInfoStatus(e.getStatus(), bookmark, feedLink);
     }
 
     /* Save Error State to the Bookmark if present */
@@ -1080,10 +1092,6 @@ public class Controller {
 
     /* Shutdown ApplicationServer */
     ApplicationServer.getDefault().shutdown();
-
-    /* Log Shutdown Info */
-    if (!InternalOwl.IS_ECLIPSE)
-      Activator.safeLogInfo("RSSOwl Shutting Down"); //$NON-NLS-1$
   }
 
   private void emergencyShutdown() {
@@ -1329,16 +1337,24 @@ public class Controller {
     ImportUtils.doImport(null, types, false);
   }
 
-  private IStatus createWarningStatus(IStatus status, IBookMark bookmark, URI feedLink) {
-    StringBuilder msg = new StringBuilder();
-    msg.append(NLS.bind(Messages.Controller_ERROR_LOADING, bookmark.getName()));
+  private IStatus createInfoStatus(IStatus status, IBookMark bookmark, URI feedLink) {
+    StringBuilder msg = createLogEntry(bookmark, feedLink, status.getMessage());
+    return new Status(IStatus.INFO, status.getPlugin(), status.getCode(), msg.toString(), null);
+  }
 
-    if (StringUtils.isSet(status.getMessage()))
-      msg.append("\n").append(NLS.bind(Messages.Controller_PROBLEM, status.getMessage())); //$NON-NLS-1$
+  StringBuilder createLogEntry(IBookMark bookmark, URI feedLink, String msg) {
+    StringBuilder entry = new StringBuilder();
+    entry.append(NLS.bind(Messages.Controller_ERROR_LOADING, bookmark.getName()));
 
-    msg.append("\n").append(NLS.bind(Messages.Controller_LINK, feedLink)); //$NON-NLS-1$
+    if (StringUtils.isSet(msg))
+      entry.append(fNl).append(NLS.bind(Messages.Controller_PROBLEM, msg));
 
-    return new Status(IStatus.WARNING, status.getPlugin(), status.getCode(), msg.toString(), null);
+    if (feedLink != null)
+      entry.append(fNl).append(NLS.bind(Messages.Controller_LINK, feedLink));
+    else if (bookmark.getFeedLinkReference() != null)
+      entry.append(fNl).append(NLS.bind(Messages.Controller_LINK, bookmark.getFeedLinkReference().getLinkAsText()));
+
+    return entry;
   }
 
   /*

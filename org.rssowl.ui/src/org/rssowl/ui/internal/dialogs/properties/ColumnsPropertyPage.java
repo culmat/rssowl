@@ -128,9 +128,7 @@ public class ColumnsPropertyPage implements IEntityPropertyPage {
   /*
    * @see org.rssowl.ui.dialogs.properties.IEntityPropertyPage#setFocus()
    */
-  public void setFocus() {
-    fColumnSelectionControl.setFocus();
-  }
+  public void setFocus() {}
 
   /*
    * @see org.rssowl.ui.dialogs.properties.IEntityPropertyPage#performOk(java.util.Set)

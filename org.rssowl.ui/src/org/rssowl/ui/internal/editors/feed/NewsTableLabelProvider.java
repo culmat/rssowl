@@ -639,10 +639,14 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
 
     /* Handle selected News (Linux: Note Bug 444) */
     if ((event.detail & SWT.SELECTED) != 0 && (Application.IS_WINDOWS || !news.isFlagged())) {
-      Set<ILabel> labels = CoreUtils.getSortedLabels(news);
 
-      /* Some conditions under which we don't override the selection color */
-      if (labels.isEmpty() || !scrollable.isFocusControl())
+      /* Do not override selection color if not focus control */
+      if (!scrollable.isFocusControl())
+        return;
+
+      /* Load Labels */
+      Set<ILabel> labels = CoreUtils.getSortedLabels(news);
+      if (labels.isEmpty())
         return;
 
       ILabel label = labels.iterator().next();
@@ -687,13 +691,19 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
     /* Handle News List Background Color if set */
     else if (fNewsBgGradientStartColor != null && fNewsBgGradientEndColor != null) {
       int index = 0;
+
+      /* Tree */
       if (event.item instanceof TreeItem) {
         TreeItem item = (TreeItem) event.item;
-        if (item.getParentItem() != null)
-          index = item.getParentItem().indexOf(item);
+        TreeItem parentItem = item.getParentItem();
+        if (parentItem != null)
+          index = parentItem.indexOf(item);
         else
           index = item.getParent().indexOf(item);
-      } else if (event.item instanceof TableItem) {
+      }
+
+      /* Table */
+      else if (event.item instanceof TableItem) {
         TableItem item = (TableItem) event.item;
         index = item.getParent().indexOf(item);
       }

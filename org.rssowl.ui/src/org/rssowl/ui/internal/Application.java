@@ -28,7 +28,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
-import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
@@ -46,6 +46,7 @@ import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.actions.NewBookMarkAction;
+import org.rssowl.ui.internal.dialogs.StartupErrorDialog;
 import org.rssowl.ui.internal.util.JobRunner;
 
 import java.net.URI;
@@ -68,7 +69,7 @@ public class Application implements IApplication {
   public static final boolean IS_MAC = "carbon".equals(SWT.getPlatform()); //$NON-NLS-1$
 
   /** Flag to indicate RSSOwl integrated to Eclipse or not */
-  public static final boolean IS_ECLIPSE= InternalOwl.IS_ECLIPSE;
+  public static final boolean IS_ECLIPSE = InternalOwl.IS_ECLIPSE;
 
   /*
    * @see org.eclipse.equinox.app.IApplication#start(org.eclipse.equinox.app.IApplicationContext)
@@ -103,10 +104,8 @@ public class Application implements IApplication {
 
       /* Check Startup Status */
       IStatus startupStatus = Activator.getDefault().getStartupStatus();
-      if (startupStatus.getSeverity() == IStatus.ERROR) {
-        ErrorDialog.openError(new Shell(), Messages.Application_STARTUP_ERROR, Messages.Application_ERROR_STARTUP, startupStatus);
-        return IApplication.EXIT_OK;
-      }
+      if (startupStatus.getSeverity() == IStatus.ERROR)
+        return handleStartupError(startupStatus);
 
       /* Create the Workbench */
       fWorkbenchAdvisor = new ApplicationWorkbenchAdvisor(runAfterUIStartup);
@@ -118,6 +117,14 @@ public class Application implements IApplication {
     } finally {
       display.dispose();
     }
+  }
+
+  private int handleStartupError(IStatus errorStatus) {
+    StartupErrorDialog dialog = new StartupErrorDialog(errorStatus);
+    if (dialog.open() == IDialogConstants.RETRY_ID)
+      return IApplication.EXIT_RESTART;
+
+    return IApplication.EXIT_OK;
   }
 
   private boolean hasProtocolHandler(String link) {
@@ -193,14 +200,21 @@ public class Application implements IApplication {
     if (shell == null)
       return;
 
+    /* Bug with Firefox: HTTPS feeds start with "feed:https://" */
+    final String normalizedLink;
+    if (link.startsWith(URIUtils.FEED_IDENTIFIER + URIUtils.HTTPS))
+      normalizedLink = URIUtils.HTTPS + link.substring((URIUtils.FEED_IDENTIFIER + URIUtils.HTTPS).length());
+    else
+      normalizedLink = link;
+
     /* Check for existing BookMark */
-    final IBookMark existingBookMark = getBookMark(link);
+    final IBookMark existingBookMark = getBookMark(normalizedLink);
     JobRunner.runInUIThread(shell, new Runnable() {
       public void run() {
 
         /* Open Dialog to add this new BookMark */
         if (existingBookMark == null) {
-          new NewBookMarkAction(shell, null, null, link).run(null);
+          new NewBookMarkAction(shell, null, null, normalizedLink).run(null);
         }
 
         /* Display selected Feed since its existing already */
@@ -227,6 +241,24 @@ public class Application implements IApplication {
     Collection<IBookMark> existingBookmarks = DynamicDAO.getDAO(IBookMarkDAO.class).loadAll(new FeedLinkReference(linkAsURI));
     if (existingBookmarks.size() > 0)
       return existingBookmarks.iterator().next();
+
+    /* Try again swapping feed:// with http:// and vice versa */
+    if (link.startsWith(URIUtils.FEED) || link.startsWith(URIUtils.HTTP)) {
+      if (link.startsWith(URIUtils.FEED))
+        link = URIUtils.HTTP + link.substring(URIUtils.FEED.length());
+      else if (link.startsWith(URIUtils.HTTP))
+        link = URIUtils.FEED + link.substring(URIUtils.HTTP.length());
+
+      try {
+        linkAsURI = new URI(URIUtils.fastEncode(link));
+      } catch (URISyntaxException e) {
+        return null;
+      }
+
+      existingBookmarks = DynamicDAO.getDAO(IBookMarkDAO.class).loadAll(new FeedLinkReference(linkAsURI));
+      if (existingBookmarks.size() > 0)
+        return existingBookmarks.iterator().next();
+    }
 
     return null;
   }

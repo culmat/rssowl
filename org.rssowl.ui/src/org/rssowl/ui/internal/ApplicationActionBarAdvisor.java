@@ -82,6 +82,7 @@ import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.IBookMarkDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.Pair;
@@ -131,6 +132,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
@@ -1073,6 +1076,16 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         String file = dialog.open();
         if (StringUtils.isSet(file)) {
           try {
+
+            /* Check for Log Message from Core to have a complete log */
+            String logMessages = CoreUtils.getAndFlushLogMessages();
+            if (logMessages != null && logMessages.length() > 0)
+              Activator.safeLogError(logMessages, null);
+
+            /* Help to find out where the log is coming from */
+            Activator.safeLogInfo("Error Log Exported"); //$NON-NLS-1$
+
+            /* Export Log File */
             File logFile = Platform.getLogFileLocation().toFile();
             InputStream inS;
             if (logFile.exists())
@@ -1081,7 +1094,39 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
               inS = new ByteArrayInputStream(new byte[0]);
             FileOutputStream outS = new FileOutputStream(new File(file));
             CoreUtils.copy(inS, outS);
+
+            /* Append a Report of Feeds that are not loading if any */
+            String nl = System.getProperty("line.separator"); //$NON-NLS-1$
+            if (!StringUtils.isSet(nl))
+              nl= "\n"; //$NON-NLS-1$
+
+            StringBuilder errorReport = new StringBuilder();
+            Collection<IBookMark> bookmarks = DynamicDAO.getDAO(IBookMarkDAO.class).loadAll();
+            for (IBookMark bookmark : bookmarks) {
+              if (bookmark.isErrorLoading()) {
+                Object errorObj = bookmark.getProperty(Controller.LOAD_ERROR_KEY);
+                if (errorObj != null && errorObj instanceof String) {
+                  errorReport.append(Controller.getDefault().createLogEntry(bookmark, null, (String) errorObj));
+                  errorReport.append(nl).append(nl);
+                }
+              }
+            }
+
+            if (errorReport.length() > 0) {
+              FileWriter writer = new FileWriter(new File(file), true);
+              try {
+                writer.append(nl).append(nl).append(nl);
+                writer.write("--- Summary of Feeds that are not Loading -----------------------------------------------"); //$NON-NLS-1$
+                writer.append(nl).append(nl);
+                writer.write(errorReport.toString());
+                writer.close();
+              } finally {
+                writer.close();
+              }
+            }
           } catch (FileNotFoundException e) {
+            Activator.getDefault().logError(e.getMessage(), e);
+          } catch (IOException e) {
             Activator.getDefault().logError(e.getMessage(), e);
           }
         }

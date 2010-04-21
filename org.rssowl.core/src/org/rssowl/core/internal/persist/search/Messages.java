@@ -34,7 +34,8 @@ public class Messages extends NLS {
   public static String IndexingTask_INDEXING_FEED;
   public static String ModelSearchImpl_ERROR_SEARCH;
   public static String ModelSearchImpl_ERROR_WILDCARDS;
-  public static String ModelSearchImpl_RE_INDEXING_NEWS;
+  public static String ModelSearchImpl_PROGRESS_WAIT;
+  public static String ModelSearchImpl_REINDEX_SEARCH_INDEX;
 
   private Messages() {}
 

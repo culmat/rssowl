@@ -63,7 +63,7 @@ public class RetentionStrategy {
     internalProcess(folder, newsToDelete);
 
     /* Perform Deletion */
-    if (newsToDelete.size() > 0)
+    if (newsToDelete.size() > 0 && !Owl.isShuttingDown())
       Owl.getPersistenceService().getDAOService().getNewsDAO().setState(newsToDelete, INews.State.DELETED, false, false);
   }
 
@@ -117,7 +117,7 @@ public class RetentionStrategy {
     List<INews> newsToDelete = getNewsToDelete(bookmark, news);
 
     /* Perform Deletion */
-    if (newsToDelete.size() > 0)
+    if (newsToDelete.size() > 0 && !Owl.isShuttingDown())
       Owl.getPersistenceService().getDAOService().getNewsDAO().setState(newsToDelete, INews.State.DELETED, false, false);
 
     return newsToDelete;

@@ -40,7 +40,7 @@ import java.util.Set;
 public final class CachingBookMarkDAO extends CachingDAO<BookMarkDAOImpl, IBookMark, BookMarkListener, BookMarkEvent> implements IBookMarkDAO {
 
   public CachingBookMarkDAO() {
-    super(new BookMarkDAOImpl());
+    super(new BookMarkDAOImpl(), 5);
   }
 
   /*

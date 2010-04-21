@@ -34,7 +34,9 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.rssowl.core.Owl;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.LoggingSafeRunnable;
+import org.rssowl.core.util.StringUtils;
 
 /**
  * The main plugin class to be used in the desktop.
@@ -47,6 +49,7 @@ public class Activator extends Plugin {
   private BundleContext fContext;
   private String fVersion;
   private IProxyService fProxyService;
+  private String fNl;
 
   /**
    * The constructor.
@@ -63,6 +66,9 @@ public class Activator extends Plugin {
     super.start(context);
     fContext = context;
     fVersion = (String) fgPlugin.getBundle().getHeaders().get("Bundle-Version"); //$NON-NLS-1$
+    fNl= System.getProperty("line.separator"); //$NON-NLS-1$
+    if (!StringUtils.isSet(fNl))
+      fNl= "\n"; //$NON-NLS-1$
 
     /* Use the LogBridge as Logger */
     System.setProperty("org.apache.commons.logging.Log", "org.rssowl.core.internal.LogBridge"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -110,6 +116,14 @@ public class Activator extends Plugin {
       }
     });
 
+    /* Check for Log Message from Core */
+    String logMessages = CoreUtils.getAndFlushLogMessages();
+    if (logMessages != null && logMessages.length() > 0)
+      safeLogError(logMessages, null);
+
+    /* Log Shutdown Info */
+    logInfo("RSSOwl Shutting Down (normal)" + fNl); //$NON-NLS-1$
+
     /* Proceed */
     super.stop(context);
     fContext = null;
@@ -152,6 +166,16 @@ public class Activator extends Plugin {
   public static void safeLogError(String msg, Throwable e) {
     if (fgPlugin != null)
       fgPlugin.logError(msg, e);
+  }
+
+  /**
+   * Log an Info Message.
+   *
+   * @param msg The message to log as Info.
+   */
+  public static void safeLogInfo(String msg) {
+    if (fgPlugin != null)
+      fgPlugin.logInfo(msg);
   }
 
   /**

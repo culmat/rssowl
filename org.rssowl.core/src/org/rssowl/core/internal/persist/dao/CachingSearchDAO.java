@@ -37,7 +37,7 @@ import java.util.Set;
 public class CachingSearchDAO extends CachingDAO<SearchDAOImpl, ISearch, SearchListener, SearchEvent> implements ISearchDAO {
 
   public CachingSearchDAO() {
-    super(new SearchDAOImpl());
+    super(new SearchDAOImpl(), Integer.MAX_VALUE);
   }
 
   /*

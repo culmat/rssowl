@@ -50,6 +50,11 @@ import java.util.Set;
  * provide the news of all bookmarks, bins and saved searches inside a folder.
  * The {@link FolderNewsMark} is created dynamically whenever a folder is opened
  * in the feedview and is never persisted to the DB.
+ * <p>
+ * TODO This class is not very good in terms of performance because it has to
+ * load all news of the folder on the fly to produce the news container. When then
+ * opened from the feedview, these news get resolved again and thereby twice.
+ * </p>
  *
  * @author bpasero
  */

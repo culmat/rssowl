@@ -1432,11 +1432,11 @@ public class ReloadTestLocal {
   }
 
   private int getNewCount(IFeed feed) {
-    return loadNewsCounter().getNewCount(feed.getLink());
+    return loadNewsCounter().getNewCount(feed.getLink().toString());
   }
 
   private int getUnreadCount(IFeed feed) {
-    return loadNewsCounter().getUnreadCount(feed.getLink());
+    return loadNewsCounter().getUnreadCount(feed.getLink().toString());
   }
 
   @Test

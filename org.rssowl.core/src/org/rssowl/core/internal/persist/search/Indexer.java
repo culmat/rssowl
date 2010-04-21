@@ -139,12 +139,16 @@ public class Indexer {
   }
 
   /**
-   * TODO Provide generic method that can deal with any entity!
-   *
-   * @param entities
-   * @param isUpdate
+   * Index the List of Entities.
    */
   synchronized void index(List<INews> entities, boolean isUpdate) {
+    index(entities, isUpdate, true);
+  }
+
+  /**
+   * Index the List of Entities.
+   */
+  synchronized void index(List<INews> entities, boolean isUpdate, boolean acid) {
     int docCount = 0;
 
     /* For each Event */
@@ -164,16 +168,17 @@ public class Indexer {
           /* Update Event */
           if (isUpdate) {
             Term term = createTerm(news);
-            fUncommittedNews.addUpdatedEntity(news);
+            if (acid)
+              fUncommittedNews.addUpdatedEntity(news);
             fIndexWriter.updateDocument(term, newsDoc.getDocument());
           }
 
           /* Added Event */
           else {
-            fUncommittedNews.addPersistedEntity(news);
+            if (acid)
+              fUncommittedNews.addPersistedEntity(news);
             fIndexWriter.addDocument(newsDoc.getDocument());
           }
-
         }
       } catch (IOException e) {
         Activator.getDefault().getLog().log(Activator.getDefault().createErrorStatus(e.getMessage(), e));
@@ -196,10 +201,7 @@ public class Indexer {
   }
 
   /**
-   * TODO Provide generic method that can deal with any Event!
-   *
-   * @param entities
-   * @throws IOException
+   * Remove Entities from the Index.
    */
   synchronized void removeFromIndex(Collection<NewsReference> entities) throws IOException {
     int docCount = 0;
@@ -254,7 +256,9 @@ public class Indexer {
         fJobQueue.seal();
     }
 
-    unregisterListeners();
+    if (Owl.isStarted())
+      unregisterListeners();
+
     dispose();
 
     if (!emergency) {
@@ -332,24 +336,26 @@ public class Indexer {
     /* Listen to Model Events */
     registerListeners();
 
-    /* Index outstanding news */
-    if (!InternalOwl.TESTING) {
-      Job delayedIndexJob = new Job(Messages.Indexer_INDEX_FROM_SHUTDOWN) {
-        @Override
-        protected IStatus run(IProgressMonitor monitor) {
-          for (IndexingTask task : getIndexOutstandingEntitiesTasks())
-            fJobQueue.schedule(task);
+    /* Index outstanding news (only in case we are not reindexing) */
+    if (!Boolean.getBoolean("rssowl.reindex")) { //$NON-NLS-1$
+      if (!InternalOwl.TESTING) {
+        Job delayedIndexJob = new Job(Messages.Indexer_INDEX_FROM_SHUTDOWN) {
+          @Override
+          protected IStatus run(IProgressMonitor monitor) {
+            for (IndexingTask task : getIndexOutstandingEntitiesTasks())
+              fJobQueue.schedule(task);
 
-          return Status.OK_STATUS;
-        }
-      };
+            return Status.OK_STATUS;
+          }
+        };
 
-      delayedIndexJob.setSystem(true);
-      delayedIndexJob.setUser(false);
-      delayedIndexJob.schedule(1000);
-    } else {
-      for (IndexingTask task : getIndexOutstandingEntitiesTasks())
-        task.run(new NullProgressMonitor());
+        delayedIndexJob.setSystem(true);
+        delayedIndexJob.setUser(false);
+        delayedIndexJob.schedule(1000);
+      } else {
+        for (IndexingTask task : getIndexOutstandingEntitiesTasks())
+          task.run(new NullProgressMonitor());
+      }
     }
   }
 

@@ -31,7 +31,6 @@ import org.rssowl.core.persist.NewsCounterItem;
 import org.rssowl.core.persist.dao.INewsCounterDAO;
 import org.rssowl.core.persist.event.FeedEvent;
 import org.rssowl.core.persist.event.NewsEvent;
-import org.rssowl.core.persist.reference.FeedLinkReference;
 
 import com.db4o.ObjectContainer;
 
@@ -66,14 +65,12 @@ public final class NewsCounterService {
         if (news.getState() == INews.State.DELETED) //Could be DELETED from filters
           continue;
 
-        FeedLinkReference feedRef = news.getFeedReference();
-
-        NewsCounterItem newsCounterItem = fNewsCounter.get(feedRef.getLink());
+        NewsCounterItem newsCounterItem = fNewsCounter.get(news.getFeedLinkAsText());
 
         /* Create Counter if not yet done */
         if (newsCounterItem == null) {
           newsCounterItem = new NewsCounterItem();
-          fNewsCounter.put(feedRef.getLink(), newsCounterItem);
+          fNewsCounter.put(news.getFeedLinkAsText(), newsCounterItem);
           newsCounterUpdated = true;
         }
 
@@ -86,7 +83,7 @@ public final class NewsCounterService {
           newsCounterItem.incrementStickyCounter();
 
         if (!newsCounterUpdated)
-          updatedCounterItems.put(feedRef.getLink().toString(), newsCounterItem);
+          updatedCounterItems.put(news.getFeedLinkAsText(), newsCounterItem);
       }
       if (newsCounterUpdated)
         fDb.ext().store(fNewsCounter, Integer.MAX_VALUE);
@@ -122,7 +119,7 @@ public final class NewsCounterService {
         if (oldStateUnread == currentStateUnread && oldStateNew == currentStateNew && oldStateSticky == newStateSticky)
           continue;
 
-        NewsCounterItem counterItem = fNewsCounter.get(currentNews.getFeedReference().getLink());
+        NewsCounterItem counterItem = fNewsCounter.get(currentNews.getFeedLinkAsText());
 
         /* News became read */
         if (oldStateUnread && !currentStateUnread)
@@ -148,7 +145,7 @@ public final class NewsCounterService {
         else if (!oldStateSticky && newStateSticky)
           counterItem.incrementStickyCounter();
 
-        updatedCounterItems.put(currentNews.getFeedReference().getLink().toString(), counterItem);
+        updatedCounterItems.put(currentNews.getFeedLinkAsText(), counterItem);
       }
       for (NewsCounterItem counterItem : updatedCounterItems.values())
         fDb.store(counterItem);
@@ -165,7 +162,7 @@ public final class NewsCounterService {
         if (news.getParentId() != 0)
           continue;
 
-        NewsCounterItem counterItem = fNewsCounter.get(news.getFeedReference().getLink());
+        NewsCounterItem counterItem = fNewsCounter.get(news.getFeedLinkAsText());
 
         /* Update Counter */
         if (news.getState() == INews.State.NEW)
@@ -175,7 +172,7 @@ public final class NewsCounterService {
         if (news.isFlagged() && (!EnumSet.of(INews.State.DELETED, INews.State.HIDDEN).contains(news.getState())))
           counterItem.decrementStickyCounter();
 
-        updatedCounterItems.put(news.getFeedReference().getLink().toString(), counterItem);
+        updatedCounterItems.put(news.getFeedLinkAsText(), counterItem);
       }
       for (NewsCounterItem counterItem : updatedCounterItems.values())
         fDb.store(counterItem);
@@ -189,7 +186,7 @@ public final class NewsCounterService {
     synchronized (fNewsCounter) {
       for (FeedEvent feedEvent : feedEvents) {
         IFeed feed = feedEvent.getEntity();
-        fNewsCounter.remove(feed.getLink());
+        fNewsCounter.remove(feed.getLink().toString());
       }
       fDb.ext().store(fNewsCounter, Integer.MAX_VALUE);
     }

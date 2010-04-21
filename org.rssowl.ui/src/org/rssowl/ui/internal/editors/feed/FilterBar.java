@@ -33,6 +33,7 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyAdapter;
@@ -47,6 +48,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -386,8 +388,14 @@ public class FilterBar {
         /* Clear Search immediately */
         if (fSearchInput.getText().length() == 0 && fFeedView.getFilter().isPatternSet()) {
           fFeedView.getFilter().setPattern(fSearchInput.getText());
-          if (!fBlockRefresh)
-            fFeedView.refresh(true, false);
+          if (!fBlockRefresh) {
+            BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+              public void run() {
+                fFeedView.refresh(true, false);
+              }
+            });
+          }
+
           setClearBarVisible(false);
         }
 
@@ -395,8 +403,12 @@ public class FilterBar {
         else if (fSearchInput.getText().length() > 0) {
           fQuickSearchTracker.run(new TaskAdapter() {
             public IStatus run(IProgressMonitor monitor) {
-              fFeedView.getFilter().setPattern(fSearchInput.getText());
-              fFeedView.refresh(true, false);
+              BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+                public void run() {
+                  fFeedView.getFilter().setPattern(fSearchInput.getText());
+                  fFeedView.refresh(true, false);
+                }
+              });
               setClearBarVisible(true);
               return Status.OK_STATUS;
             }

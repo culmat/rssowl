@@ -38,7 +38,7 @@ import java.util.Set;
 public class CachingSearchMarkDAO extends CachingDAO<SearchMarkDAOImpl, ISearchMark, SearchMarkListener, SearchMarkEvent> implements ISearchMarkDAO {
 
   public CachingSearchMarkDAO() {
-    super(new SearchMarkDAOImpl());
+    super(new SearchMarkDAOImpl(), 5);
   }
 
   /*

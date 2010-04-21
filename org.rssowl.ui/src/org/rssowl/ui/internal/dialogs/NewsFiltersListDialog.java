@@ -332,7 +332,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
     fMoveUpButton.setEnabled(false);
     applyDialogFont(fMoveUpButton);
     setButtonLayoutData(fMoveUpButton);
-    ((GridData)fMoveUpButton.getLayoutData()).verticalIndent= 10;
+    ((GridData) fMoveUpButton.getLayoutData()).verticalIndent = 10;
     fMoveUpButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -491,7 +491,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
     IRunnableWithProgress runnable = new IRunnableWithProgress() {
       public void run(IProgressMonitor monitor) {
         List<List<SearchHit<NewsReference>>> chunks = toChunks(FILTER_CHUNK_SIZE, news);
-        monitor.beginTask(Messages.NewsFiltersListDialog_WAIT_FILTER_APPLIED, chunks.size());
+        monitor.beginTask(NLS.bind(Messages.NewsFiltersListDialog_WAIT_FILTER_APPLIED, filter.getName()), chunks.size());
 
         if (monitor.isCanceled())
           return;
@@ -535,7 +535,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
   private void applyFilterOnChunks(final List<INews> news, ISearchFilter filter) {
     Collection<IFilterAction> actions = CoreUtils.getActions(filter); //Need to sort structural actions to end
     final Set<IEntity> entitiesToSave = new HashSet<IEntity>(news.size());
-    final Map<INews, INews> replacements= new HashMap<INews, INews>();
+    final Map<INews, INews> replacements = new HashMap<INews, INews>();
 
     for (final IFilterAction action : actions) {
       NewsActionDescriptor newsActionDescriptor = fNewsActionPresentationManager.getNewsActionDescriptor(action.getActionId());
@@ -717,12 +717,12 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
 
   /* Ensure that after Delete, the orders are in sync again */
   private void fixOrderAfterDelete() {
-    List<ISearchFilter> filtersToSave= new ArrayList<ISearchFilter>();
+    List<ISearchFilter> filtersToSave = new ArrayList<ISearchFilter>();
 
     TableItem[] items = fViewer.getTable().getItems();
     for (int i = 0; i < items.length; i++) {
       TableItem item = items[i];
-      ISearchFilter filter= (ISearchFilter) item.getData();
+      ISearchFilter filter = (ISearchFilter) item.getData();
       filter.setOrder(i);
 
       filtersToSave.add(filter);

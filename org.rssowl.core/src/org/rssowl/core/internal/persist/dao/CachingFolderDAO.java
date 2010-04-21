@@ -50,7 +50,7 @@ public class CachingFolderDAO extends CachingDAO<FolderDAOImpl, IFolder, FolderL
   private final ConcurrentMap<IFolder, Object> fRootFolders;
 
   public CachingFolderDAO() {
-    super(new FolderDAOImpl());
+    super(new FolderDAOImpl(), 5);
     fRootFolders = new ConcurrentHashMap<IFolder, Object>(4, 0.75f, 1);
   }
 

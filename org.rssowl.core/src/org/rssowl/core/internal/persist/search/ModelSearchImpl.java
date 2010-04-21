@@ -45,8 +45,6 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.InternalOwl;
-import org.rssowl.core.internal.persist.service.DBHelper;
-import org.rssowl.core.internal.persist.service.EntityIdsByEventType;
 import org.rssowl.core.persist.IGuid;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearch;
@@ -62,6 +60,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -379,7 +378,7 @@ public class ModelSearchImpl implements IModelSearch {
       /* Make sure the searcher is in sync */
       final IndexSearcher currentSearcher = getCurrentSearcher();
       final List<SearchHit<NewsReference>> resultList = new ArrayList<SearchHit<NewsReference>>();
-      final Map<Long, Long> searchResultNewsIds= new HashMap<Long, Long>();
+      final Map<Long, Long> searchResultNewsIds = new HashMap<Long, Long>();
 
       /* Use custom hit collector for performance reasons */
       HitCollector collector = new HitCollector() {
@@ -578,44 +577,76 @@ public class ModelSearchImpl implements IModelSearch {
    * .runtime.IProgressMonitor)
    */
   public void reindexAll(IProgressMonitor monitor) throws PersistenceException {
+
     /* May be used before Owl is completely set-up */
     Collection<INews> newsList = InternalOwl.getDefault().getPersistenceService().getDAOService().getNewsDAO().loadAll();
 
-    monitor.beginTask(Messages.ModelSearchImpl_RE_INDEXING_NEWS, newsList.size());
+    /* User might have cancelled the operation */
+    if (monitor.isCanceled())
+      return;
 
-    EntityIdsByEventType entitiesToBeIndexed = DBHelper.getEntitiesToBeIndexedDAO().load();
+    /* Begin Task */
+    monitor.beginTask(Messages.ModelSearchImpl_PROGRESS_WAIT, newsList.size());
+    monitor.subTask(Messages.ModelSearchImpl_REINDEX_SEARCH_INDEX);
 
-    /* Ensure that we don't lose entities on dirty shutdown */
-    synchronized (entitiesToBeIndexed) {
-      for (INews news : newsList)
-        entitiesToBeIndexed.addUpdatedEntity(news);
-    }
-
-    DBHelper.getEntitiesToBeIndexedDAO().save(entitiesToBeIndexed);
-    /* Lock the indexer for the duration of the reindexing */
-    synchronized (fIndexer) {
-      /* Delete the Index first */
-      clearIndex();
-
-      /*
-       * Re-Index all Entities: News. newsList is a LazyList so news are only
-       * activated on retrieval
-       */
-      for (INews news : newsList) {
-        if (monitor.isCanceled())
-          break;
-
-        /* We don't pass the whole list at once to be able to report progress. */
-        List<INews> indexList = new ArrayList<INews>(1);
-        indexList.add(news);
-        fIndexer.index(indexList, false);
-        monitor.worked(1);
-      }
-      /* Commit in order to avoid first search slowdown */
-      fIndexer.flushIfNecessary();
-    }
+    /* Reindex in Chunks to reduce memory consumption */
+    reindexInChunks(newsList.iterator(), monitor);
 
     /* Finished */
     monitor.done();
+  }
+
+  private void reindexInChunks(Iterator<INews> iterator, IProgressMonitor monitor) {
+    int chunkSize = 1000;
+    boolean isFirstRun = true;
+
+    /* User might have cancelled the operation */
+    if (monitor.isCanceled())
+      return;
+
+    /* Lock the indexer for the duration of the reindexing */
+    synchronized (fIndexer) {
+
+      /* Delete the Index first */
+      clearIndex();
+
+      /* Proceed until finished indexing all News Items */
+      while (iterator.hasNext()) {
+
+        /* Obtain the next chunk of news from the List */
+        List<INews> newsChunkToBeIndexed = new ArrayList<INews>(chunkSize);
+        for (int i = 0; i < chunkSize && iterator.hasNext(); i++)
+          newsChunkToBeIndexed.add(iterator.next());
+
+        /* Return if nothing to do */
+        if (newsChunkToBeIndexed.isEmpty())
+          break;
+
+        /* Flush frequently to optimize memory usage during reindexing */
+        if (!isFirstRun)
+          fIndexer.flushIfNecessary();
+
+        /* Index News Items */
+        for (INews newsitem : newsChunkToBeIndexed) {
+
+          /* We don't pass the whole list at once to be able to report progress. */
+          List<INews> indexList = new ArrayList<INews>(1);
+          indexList.add(newsitem);
+          fIndexer.index(indexList, false, false); //Disable ACID Support
+          monitor.worked(1);
+        }
+
+        isFirstRun = false;
+      }
+    }
+
+    /* Finally we refresh the searchers (this will trigger flushIfNecessary()) */
+    IndexSearcher currentSearcher = null;
+    try {
+      currentSearcher = getCurrentSearcher();
+    } finally {
+      if (currentSearcher != null)
+        disposeIfNecessary(currentSearcher);
+    }
   }
 }

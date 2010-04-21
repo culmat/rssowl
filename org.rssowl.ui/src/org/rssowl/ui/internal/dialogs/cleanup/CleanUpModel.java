@@ -24,6 +24,7 @@
 
 package org.rssowl.ui.internal.dialogs.cleanup;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.osgi.util.NLS;
 import org.rssowl.core.Owl;
 import org.rssowl.core.persist.IBookMark;
@@ -106,8 +107,12 @@ public class CleanUpModel {
     return fFactory.createSearchCondition(fLocationField, SearchSpecifier.IS, value);
   }
 
-  /** Calculate Tasks */
-  public void generate() {
+  /**
+   * Calculate Tasks
+   *
+   * @param monitor
+   */
+  public void generate(IProgressMonitor monitor) {
     Set<IBookMark> bookmarksToDelete = new HashSet<IBookMark>();
     Map<IBookMark, Set<NewsReference>> newsToDelete = new HashMap<IBookMark, Set<NewsReference>>();
 
@@ -116,6 +121,10 @@ public class CleanUpModel {
     recommendedTasks.addTask(new DefragDatabaseTask(recommendedTasks));
     recommendedTasks.addTask(new OptimizeSearchTask(recommendedTasks));
     fTasks.add(recommendedTasks);
+
+    /* Return if user cancelled the preview */
+    if (monitor.isCanceled())
+      return;
 
     /* 1.) Delete BookMarks that have Last Visit > X Days ago */
     if (fOps.deleteFeedByLastVisit()) {
@@ -140,6 +149,10 @@ public class CleanUpModel {
       if (!group.isEmpty())
         fTasks.add(group);
     }
+
+    /* Return if user cancelled the preview */
+    if (monitor.isCanceled())
+      return;
 
     /* 2.) Delete BookMarks that have not updated in X Days */
     if (fOps.deleteFeedByLastUpdate()) {
@@ -177,6 +190,10 @@ public class CleanUpModel {
         fTasks.add(group);
     }
 
+    /* Return if user cancelled the preview */
+    if (monitor.isCanceled())
+      return;
+
     /* 3.) Delete BookMarks that have Connection Error */
     if (fOps.deleteFeedsByConError()) {
       CleanUpGroup group = new CleanUpGroup(Messages.CleanUpModel_DELETE_CON_ERROR);
@@ -191,6 +208,10 @@ public class CleanUpModel {
       if (!group.isEmpty())
         fTasks.add(group);
     }
+
+    /* Return if user cancelled the preview */
+    if (monitor.isCanceled())
+      return;
 
     /* 4.) Delete Duplicate BookMarks */
     if (fOps.deleteFeedsByDuplicates()) {
@@ -231,6 +252,10 @@ public class CleanUpModel {
         fTasks.add(group);
     }
 
+    /* Return if user cancelled the preview */
+    if (monitor.isCanceled())
+      return;
+
     /* Reusable State Condition */
     EnumSet<State> states = fOps.keepUnreadNews() ? EnumSet.of(INews.State.READ) : EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED, INews.State.READ);
     ISearchField stateField = fFactory.createSearchField(INews.STATE, fNewsName);
@@ -255,6 +280,10 @@ public class CleanUpModel {
       /* For each selected Bookmark */
       for (IBookMark mark : fBookmarks) {
 
+        /* Return if user cancelled the preview */
+        if (monitor.isCanceled())
+          return;
+
         /* Ignore if Bookmark gets already deleted */
         if (bookmarksToDelete.contains(mark))
           continue;
@@ -267,17 +296,24 @@ public class CleanUpModel {
           conditions.addAll(labelConditions);
 
         /* Check if result count exceeds limit */
-        List<SearchHit<NewsReference>> results = filterInvalidResults(fModelSearch.searchNews(conditions, true));
+        List<SearchHit<NewsReference>> results = filterInvalidResults(fModelSearch.searchNews(conditions, true), monitor);
         if (results.size() > fOps.getMaxNewsCountPerFeed()) {
           int toDeleteValue = results.size() - fOps.getMaxNewsCountPerFeed();
 
           /* Resolve News */
           List<INews> resolvedNews = new ArrayList<INews>(results.size());
           for (SearchHit<NewsReference> result : results) {
+            if (monitor.isCanceled())
+              return;
+
             INews resolvedNewsItem = result.getResult().resolve();
             if (resolvedNewsItem != null)
               resolvedNews.add(resolvedNewsItem);
           }
+
+          /* Return if user cancelled the preview */
+          if (monitor.isCanceled())
+            return;
 
           /* Sort by Date */
           Collections.sort(resolvedNews, new Comparator<INews>() {
@@ -286,20 +322,28 @@ public class CleanUpModel {
             }
           });
 
+          /* Return if user cancelled the preview */
+          if (monitor.isCanceled())
+            return;
+
           Set<NewsReference> newsOfMarkToDelete = new HashSet<NewsReference>();
           for (int i = 0; i < resolvedNews.size() && i < toDeleteValue; i++)
             newsOfMarkToDelete.add(new NewsReference(resolvedNews.get(i).getId()));
 
-          if (!newsOfMarkToDelete.isEmpty()) {
+          if (!newsOfMarkToDelete.isEmpty() && !monitor.isCanceled()) {
             newsToDelete.put(mark, newsOfMarkToDelete);
             group.addTask(new NewsTask(group, mark, newsOfMarkToDelete));
           }
         }
       }
 
-      if (!group.isEmpty())
+      if (!group.isEmpty() && !monitor.isCanceled())
         fTasks.add(group);
     }
+
+    /* Return if user cancelled the preview */
+    if (monitor.isCanceled())
+      return;
 
     /* 5.) Delete News with an age > X Days */
     if (fOps.deleteNewsByAge()) {
@@ -310,6 +354,10 @@ public class CleanUpModel {
 
       /* For each selected Bookmark */
       for (IBookMark mark : fBookmarks) {
+
+        /* Return if user cancelled the preview */
+        if (monitor.isCanceled())
+          return;
 
         /* Ignore if Bookmark gets already deleted */
         if (bookmarksToDelete.contains(mark))
@@ -323,13 +371,17 @@ public class CleanUpModel {
         if (fOps.keepLabeledNews())
           conditions.addAll(labelConditions);
 
-        List<SearchHit<NewsReference>> results = filterInvalidResults(fModelSearch.searchNews(conditions, true));
+        List<SearchHit<NewsReference>> results = filterInvalidResults(fModelSearch.searchNews(conditions, true), monitor);
         Set<NewsReference> newsOfMarkToDelete = new HashSet<NewsReference>();
         for (SearchHit<NewsReference> result : results)
           newsOfMarkToDelete.add(result.getResult());
 
         if (!newsOfMarkToDelete.isEmpty()) {
           Collection<NewsReference> existingNewsOfMarkToDelete = newsToDelete.get(mark);
+
+          /* Return if user cancelled the preview */
+          if (monitor.isCanceled())
+            return;
 
           /* First time the Mark is treated */
           if (existingNewsOfMarkToDelete == null) {
@@ -349,9 +401,13 @@ public class CleanUpModel {
         }
       }
 
-      if (!group.isEmpty())
+      if (!group.isEmpty() && !monitor.isCanceled())
         fTasks.add(group);
     }
+
+    /* Return if user cancelled the preview */
+    if (monitor.isCanceled())
+      return;
 
     /* 6.) Delete Read News */
     if (fOps.deleteReadNews()) {
@@ -362,6 +418,10 @@ public class CleanUpModel {
 
       /* For each selected Bookmark */
       for (IBookMark mark : fBookmarks) {
+
+        /* Return if user cancelled the preview */
+        if (monitor.isCanceled())
+          return;
 
         /* Ignore if Bookmark gets already deleted */
         if (bookmarksToDelete.contains(mark))
@@ -374,12 +434,12 @@ public class CleanUpModel {
         if (fOps.keepLabeledNews())
           conditions.addAll(labelConditions);
 
-        List<SearchHit<NewsReference>> results = filterInvalidResults(fModelSearch.searchNews(conditions, true));
+        List<SearchHit<NewsReference>> results = filterInvalidResults(fModelSearch.searchNews(conditions, true), monitor);
         Set<NewsReference> newsOfMarkToDelete = new HashSet<NewsReference>();
         for (SearchHit<NewsReference> result : results)
           newsOfMarkToDelete.add(result.getResult());
 
-        if (!newsOfMarkToDelete.isEmpty()) {
+        if (!newsOfMarkToDelete.isEmpty() && !monitor.isCanceled()) {
           Collection<NewsReference> existingNewsOfMarkToDelete = newsToDelete.get(mark);
 
           /* First time the Mark is treated */
@@ -400,16 +460,19 @@ public class CleanUpModel {
         }
       }
 
-      if (!group.isEmpty())
+      if (!group.isEmpty() && !monitor.isCanceled())
         fTasks.add(group);
     }
   }
 
   /* TODO Have to test if Entity really exists (bug 337) */
-  private List<SearchHit<NewsReference>> filterInvalidResults(List<SearchHit<NewsReference>> results) {
+  private List<SearchHit<NewsReference>> filterInvalidResults(List<SearchHit<NewsReference>> results, IProgressMonitor monitor) {
     List<SearchHit<NewsReference>> validResults = new ArrayList<SearchHit<NewsReference>>(results.size());
 
     for (SearchHit<NewsReference> searchHit : results) {
+      if (monitor.isCanceled())
+        break;
+
       if (fNewsDao.exists(searchHit.getResult().getId()))
         validResults.add(searchHit);
     }

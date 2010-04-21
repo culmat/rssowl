@@ -121,6 +121,9 @@ public class CoreUtils {
   /* A Set of Stop Words in English */
   private static final Set<String> STOP_WORDS = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(StringUtils.ENGLISH_STOP_WORDS)));
 
+  /* A buffer that can be used to add log entries from db4o */
+  private static final StringBuffer fgLogBuffer = new StringBuffer();
+
   /*
    * Special case structural actions that need to run as last action (but before
    * display actions)
@@ -1746,5 +1749,40 @@ public class CoreUtils {
     }
 
     return replacedNews;
+  }
+
+  /**
+   * @param str the String to append to the Log Buffer.
+   */
+  public static void appendLogMessage(String str) {
+    if (str != null)
+      fgLogBuffer.append(str);
+  }
+
+  /**
+   * @return the collection of Log entries for this session. The collection is
+   * cleared when calling this method to avoid duplicate logging.
+   */
+  public static String getAndFlushLogMessages() {
+    String str = fgLogBuffer.toString();
+    fgLogBuffer.setLength(0);
+    return str;
+  }
+
+  /**
+   * @param bookmarks the collection of bookmarks to fill from the given
+   * folders.
+   * @param folders the folders to extract all bookmarks from.
+   */
+  public static void fillBookMarks(Collection<IBookMark> bookmarks, Collection<IFolder> folders) {
+    for (IFolder folder : folders) {
+      List<IFolderChild> children = folder.getChildren();
+      for (IFolderChild child : children) {
+        if (child instanceof IBookMark)
+          bookmarks.add((IBookMark) child);
+        else if (child instanceof IFolder)
+          fillBookMarks(bookmarks, Collections.singleton((IFolder) child));
+      }
+    }
   }
 }

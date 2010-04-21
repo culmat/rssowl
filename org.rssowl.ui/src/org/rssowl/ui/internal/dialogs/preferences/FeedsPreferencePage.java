@@ -67,7 +67,9 @@ import org.rssowl.ui.internal.util.ModelUtils;
 import org.rssowl.ui.internal.util.NewsColumnSelectionControl;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Preferences related to Feeds.
@@ -611,10 +613,17 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
         @Override
         protected IStatus run(IProgressMonitor monitor) {
           try {
-            monitor.beginTask(Messages.FeedsPreferencePage_PERFORMNG_CLEANUP, rootFolders.size());
+            Set<IBookMark> bookmarks = new HashSet<IBookMark>();
+            CoreUtils.fillBookMarks(bookmarks, rootFolders);
 
-            for (IFolder rootFolder : rootFolders) {
-              RetentionStrategy.process(rootFolder);
+            monitor.beginTask(Messages.FeedsPreferencePage_PERFORMNG_CLEANUP, bookmarks.size());
+
+            for (IBookMark bookmark : bookmarks) {
+              if (Controller.getDefault().isShuttingDown() || monitor.isCanceled())
+                break;
+
+              monitor.subTask(bookmark.getName());
+              RetentionStrategy.process(bookmark);
               monitor.worked(1);
             }
           } finally {

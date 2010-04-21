@@ -37,7 +37,7 @@ import java.util.Set;
 public final class CachingNewsBinDAO extends CachingDAO<NewsBinDaoImpl, INewsBin, NewsBinListener, NewsBinEvent> implements INewsBinDAO {
 
   public CachingNewsBinDAO() {
-    super(new NewsBinDaoImpl());
+    super(new NewsBinDaoImpl(), 5);
   }
 
   /*
@@ -60,5 +60,14 @@ public final class CachingNewsBinDAO extends CachingDAO<NewsBinDaoImpl, INewsBin
       /* No action needed */
       }
     };
+  }
+
+  /*
+   * @see
+   * org.rssowl.core.persist.dao.INewsBinDAO#visited(org.rssowl.core.persist
+   * .INewsBin)
+   */
+  public void visited(INewsBin mark) {
+    getDAO().visited(mark);
   }
 }

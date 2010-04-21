@@ -45,6 +45,10 @@ import java.util.Map.Entry;
  * @author bpasero
  */
 public class StickyOperation implements IUndoOperation {
+
+  /* Limit when this operation is becoming a long running one */
+  private static final int LONG_RUNNING_LIMIT = 50;
+
   private final Map<Boolean, List<NewsReference>> fOldStickyStates;
   private final boolean fMakeSticky;
   private final int fNewsCount;
@@ -130,5 +134,12 @@ public class StickyOperation implements IUndoOperation {
 
     /* Set state back to all news */
     DynamicDAO.saveAll(resolvedNews);
+  }
+
+  /*
+   * @see org.rssowl.ui.internal.undo.IUndoOperation#isLongRunning()
+   */
+  public boolean isLongRunning() {
+    return fNewsCount > LONG_RUNNING_LIMIT;
   }
 }

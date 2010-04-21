@@ -21,10 +21,14 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.internal.persist.service;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.persist.service.PersistenceException;
+import org.rssowl.core.util.LongOperationMonitor;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,34 +36,36 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class BackupService {
+  private static final int MIN_SIZE_FOR_PROGRESS = 1024 * 1024 * 100; //100 MB
 
-  interface BackupStrategy    {
-    void backup(File originFile, File destinationFile);
+  interface BackupStrategy {
+    void backup(File originFile, File destinationFile, IProgressMonitor monitor);
   }
 
-  interface BackupLayoutStrategy    {
+  interface BackupLayoutStrategy {
     List<File> findBackupFiles();
 
     /**
-     * Responsible for rotating back-up files to allow BackupService to save
-     * a new back-up.
-     *
-     * <p>Note that this method is only called if maxBackupsCount
-     * is higher than 1. If maxBackupsCount is equal to 1, the back-up files are
-     * simply deleted to create space for the new one.</p>
+     * Responsible for rotating back-up files to allow BackupService to save a
+     * new back-up.
+     * <p>
+     * Note that this method is only called if maxBackupsCount is higher than 1.
+     * If maxBackupsCount is equal to 1, the back-up files are simply deleted to
+     * create space for the new one.
+     * </p>
      *
      * @param backupFiles files to be rotated.
      */
     void rotateBackups(List<File> backupFiles);
   }
 
-
   static class DefaultBackupLayoutStrategy implements BackupLayoutStrategy {
     private final File fBackupFile;
 
-    DefaultBackupLayoutStrategy(File backupFile)    {
+    DefaultBackupLayoutStrategy(File backupFile) {
       fBackupFile = backupFile;
     }
+
     public List<File> findBackupFiles() {
       int index = 0;
       List<File> backupFiles = new ArrayList<File>(5);
@@ -102,11 +108,10 @@ public final class BackupService {
     this(fileToBackup, backupFileSuffix, maxBackupsCount, null, null);
   }
 
-  public BackupService(File fileToBackup, String backupFileSuffix, int maxBackupsCount,
-      File backupTimestampFile, Long backupFrequency) {
+  public BackupService(File fileToBackup, String backupFileSuffix, int maxBackupsCount, File backupTimestampFile, Long backupFrequency) {
     Assert.isNotNull(fileToBackup, "fileToBackup"); //$NON-NLS-1$
     Assert.isLegal(fileToBackup.isFile(), "fileToBackup must be a file: " + fileToBackup.getAbsolutePath()); //$NON-NLS-1$
-    Assert.isLegal(backupFileSuffix  != null && backupFileSuffix.length() > 0, "backupSuffix should contain a non-empty String"); //$NON-NLS-1$
+    Assert.isLegal(backupFileSuffix != null && backupFileSuffix.length() > 0, "backupSuffix should contain a non-empty String"); //$NON-NLS-1$
     Assert.isLegal(maxBackupsCount > 0, "filesKeptCount should be higher than 0"); //$NON-NLS-1$
     if (backupFrequency != null)
       Assert.isNotNull(backupTimestampFile, "backupTimestampFile should not be null if backupFrequency is not null"); //$NON-NLS-1$
@@ -119,8 +124,23 @@ public final class BackupService {
 
     fLayoutStrategy = new DefaultBackupLayoutStrategy(getBackupFile());
     fBackupStrategy = new BackupStrategy() {
-      public void backup(File originFile, File destinationFile) {
-        DBHelper.copyFile(originFile, destinationFile);
+      public void backup(File originFile, File destinationFile, IProgressMonitor monitor) {
+
+        /* Indicate that a long operation is starting if file is large */
+        if (originFile.length() > MIN_SIZE_FOR_PROGRESS && monitor instanceof LongOperationMonitor && !((LongOperationMonitor) monitor).isLongOperationRunning()) {
+          if (!InternalOwl.IS_ECLIPSE) //Avoid the Progress Dialog on Startup for Eclipse
+            ((LongOperationMonitor) monitor).beginLongOperation(true);
+
+          int chunks = (int) (originFile.length() / DBHelper.BUFFER);
+          monitor.beginTask(Messages.DBManager_PROGRESS_WAIT, chunks);
+          monitor.subTask(Messages.DBManager_CREATING_DB_BACKUP);
+        }
+
+        /* Copy by IO */
+        DBHelper.copyFileIO(originFile, destinationFile, monitor);
+
+        if (monitor.isCanceled())
+          destinationFile.delete();
       }
     };
   }
@@ -131,8 +151,9 @@ public final class BackupService {
 
   /**
    * This overrides where the back-up is made from. It's useful if fileToBackup
-   * is being used, there's a copy available and the back-up file name should
-   * be relative to fileToBackup.
+   * is being used, there's a copy available and the back-up file name should be
+   * relative to fileToBackup.
+   *
    * @param alias
    */
   public void setFileToBackupAlias(File alias) {
@@ -165,28 +186,42 @@ public final class BackupService {
   }
 
   /**
-   * Backs up the file in any of the following:
+   * Backs up the file in any of the following: <li>force is {@code true}.</li>
+   * <li>backupTimestampFile is {@code null}.</li> <li>The time since the last
+   * backup is higher or equal than backupFrequency.</li>
    *
-   * <li>force is {@code true}.</li>
-   * <li>backupTimestampFile is {@code null}.</li>
-   * <li>The time since the last backup is higher or equal than backupFrequency.</li>
-   *
-   * @param force
+   * @param force if <code>true</code>, will not check for the last backup
+   * timestamp.
+   * @param monitor a {@link IProgressMonitor} to properly report progress.
    * @return {@code true} if a backup took place.
    * @throws PersistenceException if a problem occurs during back-up.
    */
-  public boolean backup(boolean force) throws PersistenceException  {
+  public boolean backup(boolean force, IProgressMonitor monitor) throws PersistenceException {
     if (!shouldBackup(force))
       return false;
 
-    prepareBackup();
+    boolean backupSuccess = false;
+    try {
+      prepareBackup();
 
-    File sourceFile = fFileToBackup;
-    if (fFileToBackupAlias != null)
-      sourceFile = fFileToBackupAlias;
+      File sourceFile = fFileToBackup;
+      if (fFileToBackupAlias != null)
+        sourceFile = fFileToBackupAlias;
 
-    fBackupStrategy.backup(sourceFile, getBackupFile());
-    writeBackupTimestamp();
+      fBackupStrategy.backup(sourceFile, getBackupFile(), monitor);
+      backupSuccess = true;
+    } finally {
+
+      /*
+       * If an error occurs during backup we want to give the user a chance to
+       * restart without the backup failing over and over again, thereby we
+       * write the time of the backup attempt not only when the backup was
+       * successfull but also when the backup was scheduled on startup.
+       */
+      if (backupSuccess || !force)
+        writeBackupTimestamp();
+    }
+
     return true;
   }
 
@@ -200,8 +235,7 @@ public final class BackupService {
     }
 
     try {
-      long lastBackupTimestamp = Long.parseLong(DBHelper.readFirstLineFromFile(
-          fBackupTimestampFile));
+      long lastBackupTimestamp = Long.parseLong(DBHelper.readFirstLineFromFile(fBackupTimestampFile));
       long now = System.currentTimeMillis();
       return (now - lastBackupTimestamp) >= fBackupFrequency.longValue();
     } catch (NumberFormatException e) {

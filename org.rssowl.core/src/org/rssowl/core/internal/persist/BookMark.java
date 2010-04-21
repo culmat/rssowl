@@ -185,10 +185,10 @@ public class BookMark extends Mark implements IBookMark {
   public synchronized int getNewsCount(Set<State> states) {
     if (fNewsCounter != null) {
       if (states.equals(EnumSet.of(INews.State.NEW)))
-        return fNewsCounter.getNewCount(getFeedLinkReference().getLink());
+        return fNewsCounter.getNewCount(fFeedLink);
 
       if (states.equals(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)))
-        return fNewsCounter.getUnreadCount(getFeedLinkReference().getLink());
+        return fNewsCounter.getUnreadCount(fFeedLink);
     }
 
     return getNews(states).size();
@@ -220,7 +220,7 @@ public class BookMark extends Mark implements IBookMark {
 
   public synchronized int getStickyNewsCount() {
     if (fNewsCounter != null)
-      return fNewsCounter.getStickyCount(getFeedLinkReference().getLink());
+      return fNewsCounter.getStickyCount(fFeedLink);
 
     int stickyCount = 0;
     for (INews news : getNews()) {

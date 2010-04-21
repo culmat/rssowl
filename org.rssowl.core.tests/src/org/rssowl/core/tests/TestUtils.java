@@ -24,6 +24,7 @@
 
 package org.rssowl.core.tests;
 
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.junit.Assert;
 import org.rssowl.core.IApplicationService;
 import org.rssowl.core.Owl;
@@ -31,6 +32,7 @@ import org.rssowl.core.internal.ApplicationServiceImpl;
 import org.rssowl.core.internal.persist.MergeResult;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.ITask;
+import org.rssowl.core.util.LongOperationMonitor;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -112,5 +114,14 @@ public class TestUtils {
     }
 
     return queue.getDuration();
+  }
+
+  public static class NullProgressLongOperationMonitor extends LongOperationMonitor {
+    public NullProgressLongOperationMonitor() {
+      super(new NullProgressMonitor());
+    }
+
+    @Override
+    public void beginLongOperation(boolean isCancelable) {}
   }
 }

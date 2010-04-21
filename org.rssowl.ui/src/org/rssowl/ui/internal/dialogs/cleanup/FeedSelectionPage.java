@@ -209,7 +209,7 @@ public class FeedSelectionPage extends WizardPage {
         if (element instanceof IBookMark) {
           IBookMark bookmark = (IBookMark) element;
 
-          PreviewFeedDialog dialog = new PreviewFeedDialog(getShell(), bookmark, bookmark.getFeedLinkReference().resolve());
+          PreviewFeedDialog dialog = new PreviewFeedDialog(getShell(), bookmark, bookmark.getFeedLinkReference());
           dialog.setBlockOnOpen(false);
           dialog.open();
 

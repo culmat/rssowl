@@ -21,8 +21,11 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.internal.persist.service;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.InternalOwl;
@@ -86,13 +89,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Helper for DB related tasks.
+ */
 public final class DBHelper {
+  static final int BUFFER = 32768;
 
   private DBHelper() {
     super();
   }
 
-  public static void rename(File origin, File destination) throws PersistenceException  {
+  public static void rename(File origin, File destination) throws PersistenceException {
+
     /* Try atomic rename first. If that fails, rely on delete + rename */
     if (!origin.renameTo(destination)) {
       destination.delete();
@@ -119,7 +127,7 @@ public final class DBHelper {
     }
   }
 
-  public static final void copyFile(File originFile, File destinationFile) {
+  public static final void copyFileNIO(File originFile, File destinationFile) {
     FileInputStream inputStream = null;
     FileOutputStream outputStream = null;
     try {
@@ -141,16 +149,15 @@ public final class DBHelper {
       }
 
     } catch (IOException e) {
-      Activator.getDefault().logError("Failed to copy file using NIO. Falling " + //$NON-NLS-1$
-      		"back to traditional IO", e); //$NON-NLS-1$
-      copyFileWithoutNio(originFile, destinationFile);
+      Activator.getDefault().logError("Failed to copy file using NIO. Falling back to traditional IO", e); //$NON-NLS-1$
+      copyFileIO(originFile, destinationFile, new NullProgressMonitor());
     } finally {
       closeQuietly(inputStream);
       closeQuietly(outputStream);
     }
   }
 
-  private static void copyFileWithoutNio(File originFile, File destinationFile) {
+  public static void copyFileIO(File originFile, File destinationFile, IProgressMonitor monitor) {
     FileInputStream inputStream = null;
     FileOutputStream outputStream = null;
     try {
@@ -160,10 +167,11 @@ public final class DBHelper {
         destinationFile.createNewFile();
       outputStream = new FileOutputStream(destinationFile);
 
-      byte[] buf = new byte[8192];
       int i = 0;
-      while ((i = inputStream.read(buf)) != -1) {
+      byte[] buf = new byte[BUFFER];
+      while ((i = inputStream.read(buf)) != -1 && !monitor.isCanceled()) {
         outputStream.write(buf, 0, i);
+        monitor.worked(1);
       }
     } catch (IOException e) {
       throw new PersistenceException(e);
@@ -205,6 +213,7 @@ public final class DBHelper {
     EventManager.getInstance().clear();
     return eventNotifiers;
   }
+
   public static final void cleanUpAndFireEvents() {
     fireEvents(cleanUpEvents());
   }
@@ -246,7 +255,6 @@ public final class DBHelper {
     if (entity != null)
       db.store(entity);
   }
-
 
   private static void saveEntities(ObjectContainer db, List<? extends IEntity> entities) {
     for (IEntity entity : entities)
@@ -295,7 +303,7 @@ public final class DBHelper {
   }
 
   @SuppressWarnings("unchecked")
-  private static List<Feed> getFeeds(ObjectContainer db, URI link){
+  private static List<Feed> getFeeds(ObjectContainer db, URI link) {
     Query query = db.query();
     query.constrain(Feed.class);
     query.descend("fLinkText").constrain(link.toString()); //$NON-NLS-1$
@@ -447,7 +455,7 @@ public final class DBHelper {
       newsToUpdate.add(event);
   }
 
-  public static NewsEventRunnable getNewsEventRunnables(List<EventRunnable<?>> eventRunnables)  {
+  public static NewsEventRunnable getNewsEventRunnables(List<EventRunnable<?>> eventRunnables) {
     for (EventRunnable<?> eventRunnable : eventRunnables) {
       if (eventRunnable instanceof NewsEventRunnable)
         return (NewsEventRunnable) eventRunnable;
@@ -509,15 +517,14 @@ public final class DBHelper {
     }
   }
 
-  static void removeFeedsAfterNewsBinUpdate(ObjectContainer db,
-      Set<FeedLinkReference> removedFeedRefs) {
+  static void removeFeedsAfterNewsBinUpdate(ObjectContainer db, Set<FeedLinkReference> removedFeedRefs) {
 
     NewsCounter newsCounter = DynamicDAO.getDAO(INewsCounterDAO.class).load();
     boolean changed = false;
     for (FeedLinkReference feedRef : removedFeedRefs) {
       if ((countBookMarkReference(db, feedRef) == 0) && !feedHasNewsWithCopies(db, feedRef)) {
-          db.delete(feedRef.resolve());
-          changed = true;
+        db.delete(feedRef.resolve());
+        changed = true;
       }
     }
     if (changed)
@@ -530,7 +537,7 @@ public final class DBHelper {
   }
 
   @SuppressWarnings("unchecked")
-  public static Collection<IBookMark> loadAllBookMarks(ObjectContainer db, FeedLinkReference feedRef)  {
+  public static Collection<IBookMark> loadAllBookMarks(ObjectContainer db, FeedLinkReference feedRef) {
     Query query = db.query();
     query.constrain(BookMark.class);
     query.descend("fFeedLink").constrain(feedRef.getLink().toString()); //$NON-NLS-1$
@@ -562,6 +569,7 @@ public final class DBHelper {
       }
     }
   }
+
   public static Collection<IFeed> loadAllFeeds(ObjectContainer db) {
     ObjectSet<? extends IFeed> entities = db.query(Feed.class);
     return new LazyList<IFeed>(entities, db);

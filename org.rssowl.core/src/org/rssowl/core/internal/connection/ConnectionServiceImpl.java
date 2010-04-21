@@ -35,6 +35,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.util.NLS;
 import org.osgi.service.url.URLConstants;
 import org.osgi.service.url.URLStreamHandlerService;
+import org.rssowl.core.Owl;
 import org.rssowl.core.connection.ConnectionException;
 import org.rssowl.core.connection.CredentialsException;
 import org.rssowl.core.connection.IConnectionService;
@@ -143,7 +144,8 @@ public class ConnectionServiceImpl implements IConnectionService {
   }
 
   private void unregisterListeners() {
-    DynamicDAO.removeEntityListener(IFeed.class, fFeedListener);
+    if (Owl.isStarted())
+      DynamicDAO.removeEntityListener(IFeed.class, fFeedListener);
   }
 
   /*

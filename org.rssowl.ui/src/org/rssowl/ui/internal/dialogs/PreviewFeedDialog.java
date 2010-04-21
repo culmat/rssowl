@@ -54,6 +54,7 @@ import org.rssowl.core.interpreter.ParserException;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Activator;
@@ -87,7 +88,10 @@ public class PreviewFeedDialog extends Dialog {
   private static final int DIALOG_HEIGHT_DLUS = 400;
   private static final String DIALOG_SETTINGS_KEY = "org.rssowl.ui.internal.dialogs.PreviewFeedDialog"; //$NON-NLS-1$
 
+  private static final int MAX_NEWS_SHOWN = 50;
+
   private IBookMark fBookmark;
+  private FeedLinkReference fFeedReference;
   private IFeed fLoadedFeed;
   private CBrowser fBrowser;
   private boolean fFirstTimeOpen;
@@ -101,7 +105,16 @@ public class PreviewFeedDialog extends Dialog {
    * @param bookmark
    */
   public PreviewFeedDialog(Shell parentShell, IBookMark bookmark) {
-    this(parentShell, bookmark, null);
+    this(parentShell, bookmark, null, null);
+  }
+
+  /**
+   * @param parentShell
+   * @param bookmark
+   * @param feedReference
+   */
+  public PreviewFeedDialog(Shell parentShell, IBookMark bookmark, FeedLinkReference feedReference) {
+    this(parentShell, bookmark, null, feedReference);
   }
 
   /**
@@ -110,9 +123,14 @@ public class PreviewFeedDialog extends Dialog {
    * @param feed
    */
   public PreviewFeedDialog(Shell parentShell, IBookMark bookmark, IFeed feed) {
+    this(parentShell, bookmark, feed, null);
+  }
+
+  PreviewFeedDialog(Shell parentShell, IBookMark bookmark, IFeed feed, FeedLinkReference feedReference) {
     super(parentShell);
     fBookmark = bookmark;
     fLoadedFeed = feed;
+    fFeedReference = feedReference;
     fFirstTimeOpen = (Activator.getDefault().getDialogSettings().getSection(DIALOG_SETTINGS_KEY) == null);
     createFonts();
   }
@@ -196,23 +214,29 @@ public class PreviewFeedDialog extends Dialog {
         /* Otherwise Load Feed */
         try {
 
+          /* Resolve Feed if existing */
+          if (fFeedReference != null)
+            feed = fFeedReference.resolve();
+
           /* Create Temporary Feed */
-          feed = Owl.getModelFactory().createFeed(null, fBookmark.getFeedLinkReference().getLink());
+          if (feed == null || feed.getVisibleNews().isEmpty()) {
+            feed = Owl.getModelFactory().createFeed(null, fBookmark.getFeedLinkReference().getLink());
 
-          /* Return if dialog closed */
-          if (monitor.isCanceled() || getShell().isDisposed() || fBrowser.getControl().isDisposed())
-            return;
+            /* Return if dialog closed */
+            if (monitor.isCanceled() || getShell().isDisposed() || fBrowser.getControl().isDisposed())
+              return;
 
-          /* Retrieve Stream */
-          IProtocolHandler handler = Owl.getConnectionService().getHandler(feed.getLink());
-          InputStream inS = handler.openStream(feed.getLink(), monitor, null);
+            /* Retrieve Stream */
+            IProtocolHandler handler = Owl.getConnectionService().getHandler(feed.getLink());
+            InputStream inS = handler.openStream(feed.getLink(), monitor, null);
 
-          /* Return if dialog closed */
-          if (monitor.isCanceled() || getShell().isDisposed() || fBrowser.getControl().isDisposed())
-            return;
+            /* Return if dialog closed */
+            if (monitor.isCanceled() || getShell().isDisposed() || fBrowser.getControl().isDisposed())
+              return;
 
-          /* Interpret Feed */
-          Owl.getInterpreter().interpret(inS, feed, null);
+            /* Interpret Feed */
+            Owl.getInterpreter().interpret(inS, feed, null);
+          }
         } catch (ConnectionException e) {
           error = e;
           Activator.safeLogError(e.getMessage(), e);
@@ -268,7 +292,10 @@ public class PreviewFeedDialog extends Dialog {
 
   private void showFeed(final IFeed feed) {
     if (feed != null && !fBrowser.getControl().isDisposed()) {
-      List<INews> news = feed.getNews();
+      List<INews> news = feed.getNewsByStates(INews.State.getVisible());
+      int newsCount= news.size();
+      if (news.size() > MAX_NEWS_SHOWN)
+        news = news.subList(0, MAX_NEWS_SHOWN);
 
       /* Start HTML */
       StringBuilder html = new StringBuilder();
@@ -325,7 +352,7 @@ public class PreviewFeedDialog extends Dialog {
       if (StringUtils.isSet(fBookmark.getName())) {
         StringBuilder str = new StringBuilder();
         if (feed.getHomepage() != null) {
-          str.append(NLS.bind(Messages.PreviewFeedDialog_FOUND_N_NEWS_HOMEPAGE, news.size(), fBookmark.getName()));
+          str.append(NLS.bind(Messages.PreviewFeedDialog_FOUND_N_NEWS_HOMEPAGE, newsCount, fBookmark.getName()));
           fStatusLabel.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -333,7 +360,7 @@ public class PreviewFeedDialog extends Dialog {
             }
           });
         } else
-          str.append(NLS.bind(Messages.PreviewFeedDialog_FOUND_N_NEWS, news.size(), fBookmark.getName()));
+          str.append(NLS.bind(Messages.PreviewFeedDialog_FOUND_N_NEWS, newsCount, fBookmark.getName()));
 
         fStatusLabel.setText(str.toString());
       }

@@ -52,6 +52,9 @@ import java.util.Map.Entry;
 public class NewsStateOperation implements IUndoOperation {
   private static final EnumSet<INews.State> SUPPORTED_STATES = EnumSet.of(INews.State.HIDDEN, INews.State.READ, INews.State.UNREAD);
 
+  /* Limit when this operation is becoming a long running one */
+  private static final int LONG_RUNNING_LIMIT = 50;
+
   private final Map<State, List<NewsReference>> fOldStates;
   private final State fNewState;
   private final int fNewsCount;
@@ -147,5 +150,12 @@ public class NewsStateOperation implements IUndoOperation {
       /* Set state back to all news */
       fNewsDao.setState(resolvedNews, fNewState, fAffectEquivalentNews, false);
     }
+  }
+
+  /*
+   * @see org.rssowl.ui.internal.undo.IUndoOperation#isLongRunning()
+   */
+  public boolean isLongRunning() {
+    return fNewsCount > LONG_RUNNING_LIMIT;
   }
 }
