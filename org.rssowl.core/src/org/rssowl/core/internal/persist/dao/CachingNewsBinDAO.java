@@ -24,11 +24,18 @@
 
 package org.rssowl.core.internal.persist.dao;
 
+import org.rssowl.core.internal.InternalOwl;
+import org.rssowl.core.internal.persist.service.DatabaseEvent;
+import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.INewsBin;
+import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.persist.dao.INewsBinDAO;
 import org.rssowl.core.persist.event.NewsBinEvent;
 import org.rssowl.core.persist.event.NewsBinListener;
+import org.rssowl.core.util.CoreUtils;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -37,7 +44,23 @@ import java.util.Set;
 public final class CachingNewsBinDAO extends CachingDAO<NewsBinDaoImpl, INewsBin, NewsBinListener, NewsBinEvent> implements INewsBinDAO {
 
   public CachingNewsBinDAO() {
-    super(new NewsBinDaoImpl(), 5);
+    super(new NewsBinDaoImpl());
+  }
+
+  /*
+   * @see
+   * org.rssowl.core.internal.persist.dao.CachingDAO#onDatabaseOpened(org.rssowl
+   * .core.internal.persist.service.DatabaseEvent)
+   */
+  @Override
+  protected void onDatabaseOpened(DatabaseEvent event) {
+    IFolderDAO folderDAO = InternalOwl.getDefault().getPersistenceService().getDAOService().getFolderDAO();
+    Collection<IFolder> roots = folderDAO.loadRoots();
+    Set<INewsBin> newsbins = new HashSet<INewsBin>();
+    CoreUtils.fillNewsBins(newsbins, roots);
+    for (INewsBin newsbin : newsbins) {
+      getCache().put(newsbin.getId(), newsbin);
+    }
   }
 
   /*

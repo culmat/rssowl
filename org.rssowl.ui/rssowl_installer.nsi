@@ -293,6 +293,7 @@ Section ""
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\RSSOwl.lnk" "$INSTDIR\rssowl.exe" "" "$INSTDIR\rssowl.ico"
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
     CreateShortcut "$QUICKLAUNCH\RSSOwl.lnk" "$INSTDIR\rssowl.exe" "" "$INSTDIR\rssowl.ico"
+    CreateShortCut "$DESKTOP\RSSOwl.lnk" "$INSTDIR\rssowl.exe" "" "$INSTDIR\rssowl.ico"
   !insertmacro MUI_STARTMENU_WRITE_END
   
   WriteINIStr "$SMPROGRAMS\$STARTMENU_FOLDER\Visit Homepage.url" "InternetShortcut" "URL" "http://www.rssowl.org"

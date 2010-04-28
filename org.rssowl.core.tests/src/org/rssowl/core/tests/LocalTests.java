@@ -32,6 +32,7 @@ import org.rssowl.core.tests.controller.ReloadTestLocal;
 import org.rssowl.core.tests.importer.ImporterTest;
 import org.rssowl.core.tests.interpreter.InterpreterTest;
 import org.rssowl.core.tests.model.ApplicationLayerTest;
+import org.rssowl.core.tests.model.CachingDAOTest;
 import org.rssowl.core.tests.model.DBManagerTest;
 import org.rssowl.core.tests.model.ModelSearchTest1;
 import org.rssowl.core.tests.model.ModelSearchTest2;
@@ -81,6 +82,7 @@ import org.rssowl.core.tests.util.URIUtilsTest;
   ModelSearchTest3.class,
   ModelSearchTest4.class,
   DBManagerTest.class,
+  CachingDAOTest.class,
   PreferencesScopeTest.class,
   MergeUtilsTest.class,
   INewsTest.class,

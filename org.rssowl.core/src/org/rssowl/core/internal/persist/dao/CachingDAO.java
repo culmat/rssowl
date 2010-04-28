@@ -57,11 +57,9 @@ public abstract class CachingDAO<D extends AbstractEntityDAO<T, L, E>, T extends
 
   private final D fDAO;
   private final ConcurrentMap<Long, T> fCache;
-  private final int fActivationDepth;
 
-  public CachingDAO(D dao, int activationDepth)    {
+  public CachingDAO(D dao)    {
     fDAO = dao;
-    fActivationDepth = activationDepth;
     fDAO.addEntityListener(createEntityListener());
     fCache = new ConcurrentHashMap<Long, T>(16, 0.75f, 1);
     DBManager.getDefault().addEntityStoreListener(new DatabaseListener() {
@@ -89,7 +87,7 @@ public abstract class CachingDAO<D extends AbstractEntityDAO<T, L, E>, T extends
   }
 
   protected void onDatabaseOpened(@SuppressWarnings("unused") DatabaseEvent event) {
-    for (T entity : fDAO.loadAll(fActivationDepth))
+    for (T entity : fDAO.loadAll())
       fCache.put(entity.getId(), entity);
   }
 

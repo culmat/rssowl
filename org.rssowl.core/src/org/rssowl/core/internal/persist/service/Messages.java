@@ -30,6 +30,7 @@ public class Messages extends NLS {
   private static final String BUNDLE_NAME = "org.rssowl.core.internal.persist.service.messages"; //$NON-NLS-1$
   public static String DBManager_CREATING_DB_BACKUP;
   public static String DBManager_IMPROVING_APP_PERFORMANCE;
+  public static String DBManager_OPTIMIZING_NEWSFEEDS;
   public static String DBManager_PROGRESS_WAIT;
   public static String DBManager_RSSOWL_MIGRATION;
 

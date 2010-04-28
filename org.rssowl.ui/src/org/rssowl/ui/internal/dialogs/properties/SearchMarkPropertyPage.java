@@ -204,7 +204,11 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
     /* Search Conditions List */
     fSearchConditionList = new SearchConditionList(conditionsContainer, SWT.None, conditions.getSecond());
     fSearchConditionList.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-    fSearchConditionList.setVisibleItemCount(3);
+
+    if (conditions.getSecond().size() <= 3)
+      fSearchConditionList.setVisibleItemCount(3);
+    else //Workaround for Bug 1544: State Condition not enough width in propertes when scrollbar showing
+      fSearchConditionList.setVisibleItemCount(Math.min(5, conditions.getSecond().size()));
 
     if (CoreUtils.isLocationConflict(mark.getSearchConditions()))
       fSite.setMessage(Messages.SearchMarkPropertyPage_LOCATION_WARNING, IPropertyDialogSite.MessageType.WARNING);
