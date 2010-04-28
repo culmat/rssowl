@@ -31,10 +31,12 @@ import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.persist.event.FolderEvent;
 import org.rssowl.core.persist.event.FolderListener;
 import org.rssowl.core.persist.service.PersistenceException;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.ReparentInfo;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -50,7 +52,7 @@ public class CachingFolderDAO extends CachingDAO<FolderDAOImpl, IFolder, FolderL
   private final ConcurrentMap<IFolder, Object> fRootFolders;
 
   public CachingFolderDAO() {
-    super(new FolderDAOImpl(), 5);
+    super(new FolderDAOImpl());
     fRootFolders = new ConcurrentHashMap<IFolder, Object>(4, 0.75f, 1);
   }
 
@@ -72,9 +74,20 @@ public class CachingFolderDAO extends CachingDAO<FolderDAOImpl, IFolder, FolderL
    */
   @Override
   protected void onDatabaseOpened(DatabaseEvent event) {
-    super.onDatabaseOpened(event);
-    for (IFolder folder : getDAO().loadRoots())
+
+    /* Load Root Folders */
+    Collection<IFolder> roots = getDAO().loadRoots();
+    for (IFolder folder : roots) {
       fRootFolders.put(folder, PRESENT);
+      getCache().put(folder.getId(), folder);
+    }
+
+    /* Cache all Folders from Roots */
+    Set<IFolder> folders = new HashSet<IFolder>();
+    CoreUtils.fillFolders(folders, roots);
+    for (IFolder folder : folders) {
+      getCache().put(folder.getId(), folder);
+    }
   }
 
   /*

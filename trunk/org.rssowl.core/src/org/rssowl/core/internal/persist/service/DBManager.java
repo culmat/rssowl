@@ -71,7 +71,6 @@ import com.db4o.config.ObjectClass;
 import com.db4o.config.ObjectField;
 import com.db4o.config.QueryEvaluationMode;
 import com.db4o.ext.DatabaseFileLockedException;
-import com.db4o.ext.Db4oIOException;
 import com.db4o.query.Query;
 
 import java.io.BufferedReader;
@@ -98,8 +97,8 @@ public class DBManager {
   private static DBManager fInstance;
 
   /* Backup Times */
-  private static final int ONLINE_BACKUP_INITIAL = 1000 * 60 * 10; //10 Minutes
-  private static final int ONLINE_BACKUP_INTERVAL = 1000 * 60 * 60 * 4; //4 Hours
+  private static final int ONLINE_BACKUP_INITIAL = 1000 * 60 * 30; //30 Minutes
+  private static final int ONLINE_BACKUP_INTERVAL = 1000 * 60 * 60 * 8; //8 Hours
   private static final int OFFLINE_BACKUP_INTERVAL = 1000 * 60 * 60 * 24 * 7; //7 Days
 
   /* Defrag Tasks Work Ticks */
@@ -224,7 +223,11 @@ public class DBManager {
       @Override
       protected IStatus run(IProgressMonitor monitor) {
         if (!Owl.isShuttingDown()) {
-          backupService.backup(true, monitor);
+          try {
+            backupService.backup(true, monitor);
+          } catch (PersistenceException e) {
+            Activator.safeLogError(e.getMessage(), e);
+          }
           schedule(getOnlineBackupDelay(false));
         }
 
@@ -526,7 +529,11 @@ public class DBManager {
       return;
 
     long sevenDays = getLongProperty("rssowl.offlinebackup.interval", OFFLINE_BACKUP_INTERVAL); //$NON-NLS-1$
-    createScheduledBackupService(sevenDays).backup(false, monitor);
+    try {
+      createScheduledBackupService(sevenDays).backup(false, monitor);
+    } catch (PersistenceException e) {
+      Activator.safeLogError(e.getMessage(), e);
+    }
   }
 
   public File getDBLastBackUpFile() {
@@ -863,11 +870,17 @@ public class DBManager {
     NewsCounter newsCounter = new NewsCounter();
     ObjectSet<Feed> allFeeds = sourceDb.query(Feed.class);
     if (!allFeeds.isEmpty()) {
-      int chunk = available / allFeeds.size();
+      int allFeedsSize = allFeeds.size();
+      int chunk = available / allFeedsSize;
 
+      int i = 1;
       for (Feed feed : allFeeds) {
         if (isCanceled(monitor, sourceDb, destinationDb))
           return;
+
+        /* Introduce own label as feed copying can be very time consuming */
+        monitor.subTask(NLS.bind(Messages.DBManager_OPTIMIZING_NEWSFEEDS, i, allFeedsSize));
+        i++;
 
         sourceDb.activate(feed, Integer.MAX_VALUE);
         addNewsCounterItem(newsCounter, feed);
@@ -886,6 +899,9 @@ public class DBManager {
       System.gc();
     } else
       monitor.worked(available);
+
+    /* Back to normal subtask label */
+    monitor.subTask(Messages.DBManager_IMPROVING_APP_PERFORMANCE);
 
     /* User might have cancelled the operation */
     if (isCanceled(monitor, sourceDb, destinationDb))

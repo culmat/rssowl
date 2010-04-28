@@ -37,7 +37,7 @@ import java.util.Set;
 public class CachingLabelDAO extends CachingDAO<LabelDAOImpl, ILabel, LabelListener, LabelEvent> implements ILabelDAO {
 
   public CachingLabelDAO() {
-    super(new LabelDAOImpl(), Integer.MAX_VALUE);
+    super(new LabelDAOImpl());
   }
 
   /*

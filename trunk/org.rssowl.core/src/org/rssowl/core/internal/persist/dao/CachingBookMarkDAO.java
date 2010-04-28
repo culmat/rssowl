@@ -24,11 +24,16 @@
 
 package org.rssowl.core.internal.persist.dao;
 
+import org.rssowl.core.internal.InternalOwl;
+import org.rssowl.core.internal.persist.service.DatabaseEvent;
 import org.rssowl.core.persist.IBookMark;
+import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.dao.IBookMarkDAO;
+import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.persist.event.BookMarkEvent;
 import org.rssowl.core.persist.event.BookMarkListener;
 import org.rssowl.core.persist.reference.FeedLinkReference;
+import org.rssowl.core.util.CoreUtils;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -40,7 +45,23 @@ import java.util.Set;
 public final class CachingBookMarkDAO extends CachingDAO<BookMarkDAOImpl, IBookMark, BookMarkListener, BookMarkEvent> implements IBookMarkDAO {
 
   public CachingBookMarkDAO() {
-    super(new BookMarkDAOImpl(), 5);
+    super(new BookMarkDAOImpl());
+  }
+
+  /*
+   * @see
+   * org.rssowl.core.internal.persist.dao.CachingDAO#onDatabaseOpened(org.rssowl
+   * .core.internal.persist.service.DatabaseEvent)
+   */
+  @Override
+  protected void onDatabaseOpened(DatabaseEvent event) {
+    IFolderDAO folderDAO = InternalOwl.getDefault().getPersistenceService().getDAOService().getFolderDAO();
+    Collection<IFolder> roots = folderDAO.loadRoots();
+    Set<IBookMark> bookmarks = new HashSet<IBookMark>();
+    CoreUtils.fillBookMarks(bookmarks, roots);
+    for (IBookMark bookmark : bookmarks) {
+      getCache().put(bookmark.getId(), bookmark);
+    }
   }
 
   /*

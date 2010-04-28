@@ -1785,4 +1785,52 @@ public class CoreUtils {
       }
     }
   }
+
+  /**
+   * @param searchmarks the collection of searchmarks to fill from the given
+   * folders.
+   * @param folders the folders to extract all searchmarks from.
+   */
+  public static void fillSearchMarks(Collection<ISearchMark> searchmarks, Collection<IFolder> folders) {
+    for (IFolder folder : folders) {
+      List<IFolderChild> children = folder.getChildren();
+      for (IFolderChild child : children) {
+        if (child instanceof ISearchMark)
+          searchmarks.add((ISearchMark) child);
+        else if (child instanceof IFolder)
+          fillSearchMarks(searchmarks, Collections.singleton((IFolder) child));
+      }
+    }
+  }
+
+  /**
+   * @param newsbins the collection of newsbins to fill from the given folders.
+   * @param folders the folders to extract all newsbins from.
+   */
+  public static void fillNewsBins(Collection<INewsBin> newsbins, Collection<IFolder> folders) {
+    for (IFolder folder : folders) {
+      List<IFolderChild> children = folder.getChildren();
+      for (IFolderChild child : children) {
+        if (child instanceof INewsBin)
+          newsbins.add((INewsBin) child);
+        else if (child instanceof IFolder)
+          fillNewsBins(newsbins, Collections.singleton((IFolder) child));
+      }
+    }
+  }
+
+  /**
+   * @param foldersList the collection of folders to fill from the given
+   * folders.
+   * @param folders the folders to extract all newsbins from.
+   */
+  public static void fillFolders(Collection<IFolder> foldersList, Collection<IFolder> folders) {
+    for (IFolder folder : folders) {
+      List<IFolder> children = folder.getFolders();
+      for (IFolder child : children) {
+        foldersList.add(child);
+        fillFolders(foldersList, Collections.singleton(child));
+      }
+    }
+  }
 }

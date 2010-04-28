@@ -24,12 +24,19 @@
 
 package org.rssowl.core.internal.persist.dao;
 
+import org.rssowl.core.internal.InternalOwl;
+import org.rssowl.core.internal.persist.service.DatabaseEvent;
+import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchMark;
+import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.persist.dao.ISearchMarkDAO;
 import org.rssowl.core.persist.event.SearchMarkEvent;
 import org.rssowl.core.persist.event.SearchMarkListener;
+import org.rssowl.core.util.CoreUtils;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -38,7 +45,23 @@ import java.util.Set;
 public class CachingSearchMarkDAO extends CachingDAO<SearchMarkDAOImpl, ISearchMark, SearchMarkListener, SearchMarkEvent> implements ISearchMarkDAO {
 
   public CachingSearchMarkDAO() {
-    super(new SearchMarkDAOImpl(), 5);
+    super(new SearchMarkDAOImpl());
+  }
+
+  /*
+   * @see
+   * org.rssowl.core.internal.persist.dao.CachingDAO#onDatabaseOpened(org.rssowl
+   * .core.internal.persist.service.DatabaseEvent)
+   */
+  @Override
+  protected void onDatabaseOpened(DatabaseEvent event) {
+    IFolderDAO folderDAO = InternalOwl.getDefault().getPersistenceService().getDAOService().getFolderDAO();
+    Collection<IFolder> roots = folderDAO.loadRoots();
+    Set<ISearchMark> searchmarks = new HashSet<ISearchMark>();
+    CoreUtils.fillSearchMarks(searchmarks, roots);
+    for (ISearchMark searchmark : searchmarks) {
+      getCache().put(searchmark.getId(), searchmark);
+    }
   }
 
   /*

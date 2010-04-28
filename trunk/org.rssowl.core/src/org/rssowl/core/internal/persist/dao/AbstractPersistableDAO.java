@@ -106,13 +106,9 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
    * @see org.rssowl.core.model.internal.db4o.dao.PersistableDAO#loadAll()
    */
   public Collection<T> loadAll() {
-    return loadAll(Integer.MAX_VALUE);
-  }
-
-  protected Collection<T> loadAll(int activationDepth) {
     try {
       List<? extends T> entities = fDb.query(fEntityClass);
-      activateAll(entities, activationDepth);
+      activateAll(entities);
 
       return new ArrayList<T>(entities);
     } catch (Db4oException e) {
@@ -121,12 +117,8 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
   }
 
   protected final <C extends Collection<O>, O> C activateAll(C collection) {
-    return activateAll(collection, Integer.MAX_VALUE);
-  }
-
-  protected final <C extends Collection<O>, O> C activateAll(C collection, int depth) {
     for (O o : collection)
-      fDb.ext().activate(o, depth);
+      fDb.ext().activate(o, Integer.MAX_VALUE);
 
     return collection;
   }

@@ -21,6 +21,7 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.internal.persist.dao;
 
 import org.rssowl.core.persist.IAttachment;
@@ -62,8 +63,9 @@ import org.rssowl.core.persist.dao.ISearchMarkDAO;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class DAOServiceImpl extends DAOService  {
+public final class DAOServiceImpl extends DAOService {
 
+  /* Entity DAOs */
   private final IPreferenceDAO fPreferencesDAO = new PreferencesDAOImpl();
   private final IAttachmentDAO fAttachmentDAO = new AttachmentDAOImpl();
   private final ICategoryDAO fCategoryDAO = new CategoryDAOImpl();
@@ -73,25 +75,26 @@ public final class DAOServiceImpl extends DAOService  {
   private final INewsDAO fNewsDAO = new NewsDAOImpl();
   private final IPersonDAO fPersonDAO = new PersonDAOImpl();
   private final ISearchConditionDAO fSearchConditionDAO = new SearchConditionDAOImpl();
-
-  /* Internal */
   private final EntitiesToBeIndexedDAOImpl fEntitiesToBeIndexedDAO = new EntitiesToBeIndexedDAOImpl();
   private final IDescriptionDAO fDescriptionDAO = new DescriptionDAOImpl();
 
-  /* Caching DAOs */
-  private final ISearchFilterDAO fSearchFilterDAO= new CachingSearchFilterDAO();
+  /* Caching DAOs (ordering is very important and must remain in this way) */
+  private final ISearchFilterDAO fSearchFilterDAO = new CachingSearchFilterDAO();
   private final IFolderDAO fFolderDAO = new CachingFolderDAO();
   private final IBookMarkDAO fBookMarkDAO = new CachingBookMarkDAO();
   private final ISearchMarkDAO fSearchMarkDAO = new CachingSearchMarkDAO();
   private final INewsBinDAO fNewsBinDAO = new CachingNewsBinDAO();
   private final ISearchDAO fSearchDAO = new CachingSearchDAO();
-  private final ILabelDAO fLabelDAO= new CachingLabelDAO();
+  private final ILabelDAO fLabelDAO = new CachingLabelDAO();
 
+  /* Mapping */
   private final Map<Class<?>, Object> fEntityInterfacesToDaosMap = new HashMap<Class<?>, Object>();
   private final Map<Class<?>, Object> fEntityDaoClassesToDaosMap = new HashMap<Class<?>, Object>();
   private final Map<Class<?>, Object> fEntityClassesToDaosMap = new HashMap<Class<?>, Object>();
 
   public DAOServiceImpl() {
+
+    /* Map DAO Interface to DAO */
     fEntityDaoClassesToDaosMap.put(IAttachmentDAO.class, fAttachmentDAO);
     fEntityDaoClassesToDaosMap.put(IBookMarkDAO.class, fBookMarkDAO);
     fEntityDaoClassesToDaosMap.put(ICategoryDAO.class, fCategoryDAO);
@@ -108,12 +111,12 @@ public final class DAOServiceImpl extends DAOService  {
     fEntityDaoClassesToDaosMap.put(INewsBinDAO.class, fNewsBinDAO);
     fEntityDaoClassesToDaosMap.put(ISearchDAO.class, fSearchDAO);
     fEntityDaoClassesToDaosMap.put(ISearchFilterDAO.class, fSearchFilterDAO);
-
     for (Object value : fEntityDaoClassesToDaosMap.values()) {
       IPersistableDAO<?> dao = (IPersistableDAO<?>) value;
       putInEntityClassesToDaosMap(dao);
     }
 
+    /* Map Entity Interface to DAO */
     fEntityInterfacesToDaosMap.put(IAttachment.class, fAttachmentDAO);
     fEntityInterfacesToDaosMap.put(IBookMark.class, fBookMarkDAO);
     fEntityInterfacesToDaosMap.put(ICategory.class, fCategoryDAO);
@@ -216,7 +219,7 @@ public final class DAOServiceImpl extends DAOService  {
 
   @Override
   public ISearchFilterDAO getSearchFilterDAO() {
-   return fSearchFilterDAO;
+    return fSearchFilterDAO;
   }
 
   @Override
