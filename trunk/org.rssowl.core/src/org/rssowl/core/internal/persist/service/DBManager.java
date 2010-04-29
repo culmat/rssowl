@@ -71,6 +71,7 @@ import com.db4o.config.ObjectClass;
 import com.db4o.config.ObjectField;
 import com.db4o.config.QueryEvaluationMode;
 import com.db4o.ext.DatabaseFileLockedException;
+import com.db4o.ext.Db4oIOException;
 import com.db4o.query.Query;
 
 import java.io.BufferedReader;
