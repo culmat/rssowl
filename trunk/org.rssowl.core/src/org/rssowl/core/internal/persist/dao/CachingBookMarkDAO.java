@@ -55,12 +55,16 @@ public final class CachingBookMarkDAO extends CachingDAO<BookMarkDAOImpl, IBookM
    */
   @Override
   protected void onDatabaseOpened(DatabaseEvent event) {
-    IFolderDAO folderDAO = InternalOwl.getDefault().getPersistenceService().getDAOService().getFolderDAO();
-    Collection<IFolder> roots = folderDAO.loadRoots();
-    Set<IBookMark> bookmarks = new HashSet<IBookMark>();
-    CoreUtils.fillBookMarks(bookmarks, roots);
-    for (IBookMark bookmark : bookmarks) {
-      getCache().put(bookmark.getId(), bookmark);
+    if (USE_LEGACY_CACHE_ACTIVATION)
+      super.onDatabaseOpened(event);
+    else {
+      IFolderDAO folderDAO = InternalOwl.getDefault().getPersistenceService().getDAOService().getFolderDAO();
+      Collection<IFolder> roots = folderDAO.loadRoots();
+      Set<IBookMark> bookmarks = new HashSet<IBookMark>();
+      CoreUtils.fillBookMarks(bookmarks, roots);
+      for (IBookMark bookmark : bookmarks) {
+        getCache().put(bookmark.getId(), bookmark);
+      }
     }
   }
 

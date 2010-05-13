@@ -74,19 +74,25 @@ public class CachingFolderDAO extends CachingDAO<FolderDAOImpl, IFolder, FolderL
    */
   @Override
   protected void onDatabaseOpened(DatabaseEvent event) {
+    if (USE_LEGACY_CACHE_ACTIVATION) {
+      super.onDatabaseOpened(event);
+      for (IFolder folder : getDAO().loadRoots())
+        fRootFolders.put(folder, PRESENT);
+    } else {
 
-    /* Load Root Folders */
-    Collection<IFolder> roots = getDAO().loadRoots();
-    for (IFolder folder : roots) {
-      fRootFolders.put(folder, PRESENT);
-      getCache().put(folder.getId(), folder);
-    }
+      /* Load Root Folders */
+      Collection<IFolder> roots = getDAO().loadRoots();
+      for (IFolder folder : roots) {
+        fRootFolders.put(folder, PRESENT);
+        getCache().put(folder.getId(), folder);
+      }
 
-    /* Cache all Folders from Roots */
-    Set<IFolder> folders = new HashSet<IFolder>();
-    CoreUtils.fillFolders(folders, roots);
-    for (IFolder folder : folders) {
-      getCache().put(folder.getId(), folder);
+      /* Cache all Folders from Roots */
+      Set<IFolder> folders = new HashSet<IFolder>();
+      CoreUtils.fillFolders(folders, roots);
+      for (IFolder folder : folders) {
+        getCache().put(folder.getId(), folder);
+      }
     }
   }
 
