@@ -55,7 +55,7 @@ public abstract class CachingDAO<D extends AbstractEntityDAO<T, L, E>, T extends
     L createEntityListener();
   }
 
-  protected static final boolean USE_LEGACY_CACHE_ACTIVATION = false;
+  protected static final boolean USE_LEGACY_CACHE_ACTIVATION = true;
 
   private final D fDAO;
   private final ConcurrentMap<Long, T> fCache;
