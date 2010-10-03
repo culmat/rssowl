@@ -855,11 +855,11 @@ public class ImportElementsPage extends WizardPage {
             return;
           }
 
-          /* Obtain SID */
-          String googleSID = SyncUtils.getGoogleSID(credentials.getUsername(), credentials.getPassword(), monitor);
+          /* Obtain Auth Token */
+          String googleAuthToken = SyncUtils.getGoogleAuthToken(credentials.getUsername(), credentials.getPassword(), monitor);
 
           /* Open Stream */
-          in = openStream(URI.create(GOOGLE_READER_OPML_URI), monitor, INITIAL_CON_TIMEOUT, false, false, googleSID);
+          in = openStream(URI.create(GOOGLE_READER_OPML_URI), monitor, INITIAL_CON_TIMEOUT, false, false, googleAuthToken);
 
           /* Return on Cancellation */
           if (monitor.isCanceled() || Controller.getDefault().isShuttingDown()) {
@@ -1167,15 +1167,18 @@ public class ImportElementsPage extends WizardPage {
     }
   }
 
-  private InputStream openStream(URI link, IProgressMonitor monitor, int timeout, boolean setAcceptLanguage, boolean isLocalized, String cookie) throws ConnectionException {
+  private InputStream openStream(URI link, IProgressMonitor monitor, int timeout, boolean setAcceptLanguage, boolean isLocalized, String authToken) throws ConnectionException {
     IProtocolHandler handler = Owl.getConnectionService().getHandler(link);
 
     Map<Object, Object> properties = new HashMap<Object, Object>();
     properties.put(IConnectionPropertyConstants.CON_TIMEOUT, timeout);
 
-    /* Set Cookie if set */
-    if (StringUtils.isSet(cookie))
-      properties.put(IConnectionPropertyConstants.COOKIE, cookie);
+    /* Set Authorization Header if required */
+    if (StringUtils.isSet(authToken)) {
+      Map<String, String> headers = new HashMap<String, String>();
+      headers.put("Authorization", SyncUtils.getGoogleAuthorizationHeader(authToken)); //$NON-NLS-1$
+      properties.put(IConnectionPropertyConstants.HEADERS, headers);
+    }
 
     /* Set the Accept-Language Header */
     if (setAcceptLanguage) {

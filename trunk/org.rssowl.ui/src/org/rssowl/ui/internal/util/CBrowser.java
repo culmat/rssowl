@@ -80,6 +80,9 @@ public class CBrowser {
   /* System Properties to configure proxy with XULRunner */
   private static final String XULRUNNER_PROXY_HOST = "network.proxy_host"; //$NON-NLS-1$
   private static final String XULRUNNER_PROXY_PORT = "network.proxy_port"; //$NON-NLS-1$
+  /* System Property to force disable XULRunner even if registered */
+  private static final String DISABLE_XULRUNNER = "noXulrunner"; //$NON-NLS-1$
+
 
   /* Delay in millies after a refresh until to allow ext. navigation again (see Bug 1429) */
   private static final long REFRESH_NAVIGATION_DELAY = Application.IS_MAC ? 1000 : 800;
@@ -110,6 +113,7 @@ public class CBrowser {
 
   private Browser fBrowser;
   private boolean fAllowExternalNavigation;
+  private boolean fDisableXulrunner;
   private long fLastRefresh;
   private long fLastUrlChange;
   private IPreferenceScope fPreferences;
@@ -124,6 +128,7 @@ public class CBrowser {
   public CBrowser(Composite parent, int style) {
     fPreferences = Owl.getPreferenceService().getGlobalScope();
     fEclipsePreferences = Owl.getPreferenceService().getEclipseScope();
+    fDisableXulrunner= System.getProperty(DISABLE_XULRUNNER) != null;
     try {
       fBrowser = createBrowser(parent, style);
     } catch (SWTError e) {
@@ -144,7 +149,7 @@ public class CBrowser {
   }
 
   private boolean useMozilla() {
-    return Application.IS_WINDOWS && fgMozillaAvailable;
+    return Application.IS_WINDOWS && fgMozillaAvailable && !fDisableXulrunner;
   }
 
   /**
@@ -565,7 +570,7 @@ public class CBrowser {
         if (event.location != null && event.location.contains(ILinkHandler.HANDLER_PROTOCOL)) {
           try {
             final URI link = new URI(event.location);
-            final String host = link.getHost();
+            final String host = URIUtils.safeGetHost(link);
             if (StringUtils.isSet(host) && fLinkHandler.containsKey(host)) {
               try {
                 fLinkHandler.get(host).handle(host, link);

@@ -268,4 +268,13 @@ public class DownloadJobQueue {
       }
     }
   }
+
+  /**
+   * @return <code>true</code> if there are active download jobs running and
+   * <code>false</code> otherwise.
+   */
+  public boolean isWorking() {
+    Job[] activeDownloads = Job.getJobManager().find(this);
+    return activeDownloads != null && activeDownloads.length > 0;
+  }
 }

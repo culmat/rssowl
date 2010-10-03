@@ -383,6 +383,7 @@ public class BrowserBar {
       fLocationInput = new Text(parent, SWT.BORDER | SWT.SINGLE | SWT.SEARCH);
     else
       fLocationInput = new Text(parent, SWT.BORDER | SWT.SINGLE);
+    OwlUI.makeAccessible(fLocationInput, Messages.BrowserBar_ENTER_WEBSITE_PHRASE);
     fLocationInput.setMessage(Messages.BrowserBar_ENTER_WEBSITE_PHRASE);
     fLocationInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
     fLocationInput.addSelectionListener(new SelectionAdapter() {

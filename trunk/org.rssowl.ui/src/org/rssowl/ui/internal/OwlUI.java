@@ -60,6 +60,10 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.SWTException;
+import org.eclipse.swt.accessibility.ACC;
+import org.eclipse.swt.accessibility.AccessibleAdapter;
+import org.eclipse.swt.accessibility.AccessibleEvent;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.events.DragDetectEvent;
 import org.eclipse.swt.events.DragDetectListener;
@@ -89,6 +93,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Item;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.ScrollBar;
@@ -2051,7 +2057,7 @@ public class OwlUI {
 
     int barWidth = verticalBar.getSize().x;
     if (Application.IS_MAC && barWidth == 0)
-      barWidth= 16; //Can be 0 on Mac
+      barWidth = 16; //Can be 0 on Mac
 
     if (wasScrollbarShowing != verticalBar.isVisible()) {
       Rectangle shellBounds = shell.getBounds();
@@ -2523,5 +2529,54 @@ public class OwlUI {
     }
 
     return DateFormat.getTimeInstance(DateFormat.SHORT);
+  }
+
+  /**
+   * @param control the control to provide an accessible name for.
+   * @param label the label control to take the label from.
+   */
+  public static void makeAccessible(Control control, Control label) {
+    if (label == null || label.isDisposed())
+      return;
+
+    if (label instanceof Button)
+      makeAccessible(control, ((Button) label).getText());
+    else if (label instanceof Label)
+      makeAccessible(control, ((Label) label).getText());
+    else if (label instanceof CLabel)
+      makeAccessible(control, ((CLabel) label).getText());
+  }
+
+  /**
+   * @param control the control to provide an accessible name for.
+   * @param name the name for the control to be used in accessible environments.
+   */
+  public static void makeAccessible(final Control control, String name) {
+
+    /* Strip Mnemonics */
+    final String accessibleName;
+    if (name.contains("&")) //$NON-NLS-1$
+      accessibleName = StringUtils.replaceAll(name, "&", ""); //$NON-NLS-1$ //$NON-NLS-2$
+    else
+      accessibleName = name;
+
+    /* Apply Accessible Name */
+    if (control != null && !control.isDisposed()) {
+      control.getAccessible().addAccessibleListener(new AccessibleAdapter() {
+        @Override
+        public void getName(AccessibleEvent e) {
+          if (control instanceof Tree || control instanceof Table) {
+            if (e.childID == ACC.CHILDID_SELF)
+              e.result = accessibleName;
+            else if (!control.isDisposed()) {
+              Widget widget = control.getDisplay().findWidget(control, e.childID);
+              if (widget != null && widget instanceof Item)
+                e.result = NLS.bind(Messages.OwlUI_ACCESSIBLE_NAME, ((Item) widget).getText());
+            }
+          } else
+            e.result = accessibleName;
+        }
+      });
+    }
   }
 }

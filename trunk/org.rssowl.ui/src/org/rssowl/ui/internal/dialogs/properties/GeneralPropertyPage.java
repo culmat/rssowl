@@ -205,10 +205,12 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
           nameContainer.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
         fNameInput = new Text(nameContainer, Application.IS_MAC ? SWT.BORDER : SWT.NONE);
+        OwlUI.makeAccessible(fNameInput, nameLabel);
         fNameInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
         fNameInput.setText(getName(entity));
 
         ToolBar grabTitleBar = new ToolBar(nameContainer, SWT.FLAT);
+        OwlUI.makeAccessible(grabTitleBar, Messages.GeneralPropertyPage_LOAD_NAME);
         if (!Application.IS_MAC)
           grabTitleBar.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
@@ -232,6 +234,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
         nameLabel.setText(Messages.GeneralPropertyPage_NAME);
 
         fNameInput = new Text(container, SWT.BORDER);
+        OwlUI.makeAccessible(fNameInput, nameLabel);
         fNameInput.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
         fNameInput.setText(getName(entity));
       }

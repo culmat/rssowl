@@ -30,6 +30,8 @@ import org.eclipse.jface.fieldassist.SimpleContentProposalProvider;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -39,6 +41,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
@@ -254,10 +257,18 @@ public class ImportSourcePage extends WizardPage {
     sourceInputContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     fResourceInput = new Combo(sourceInputContainer, SWT.DROP_DOWN | SWT.BORDER);
+    OwlUI.makeAccessible(fResourceInput, fImportFromResourceRadio);
     fResourceInput.setEnabled(fImportFromResourceRadio.getSelection());
     fResourceInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+
     if (StringUtils.isSet(fWebsite))
       fResourceInput.setText(fWebsite);
+    else if (!isWelcome() && !fIsKewordSearch) {
+      String cbLink = loadInitialLinkFromClipboard(sourceInputContainer.getDisplay());
+      if (StringUtils.isSet(cbLink))
+        fResourceInput.setText(cbLink);
+    }
+
     if (fImportFromResourceRadio.getSelection())
       fResourceInput.setFocus();
 
@@ -288,6 +299,19 @@ public class ImportSourcePage extends WizardPage {
     });
   }
 
+  private String loadInitialLinkFromClipboard(Display display) {
+    Clipboard cb = new Clipboard(display);
+    TextTransfer transfer = TextTransfer.getInstance();
+    String data = (String) cb.getContents(transfer);
+    data = (data != null) ? data.trim() : null;
+    cb.dispose();
+
+    if (URIUtils.looksLikeLink(data))
+      return URIUtils.ensureProtocol(data);
+
+    return null;
+  }
+
   private void createImportKeywordControls(Composite container) {
     fImportFromKeywordRadio = new Button(container, SWT.RADIO);
     fImportFromKeywordRadio.setSelection(fIsKewordSearch && !isWelcome());
@@ -313,6 +337,7 @@ public class ImportSourcePage extends WizardPage {
     keywordInputContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     fKeywordInput = new Combo(keywordInputContainer, SWT.DROP_DOWN | SWT.BORDER);
+    OwlUI.makeAccessible(fKeywordInput, fImportFromKeywordRadio);
     fKeywordInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
     fKeywordInput.setEnabled(fImportFromKeywordRadio.getSelection());
     if (fImportFromKeywordRadio.getSelection()) {

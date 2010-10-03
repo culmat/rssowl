@@ -48,10 +48,6 @@ import org.rssowl.ui.internal.util.LayoutUtils;
  * @author bpasero
  */
 public class ConfirmDialog extends TitleAreaDialog {
-
-  /* Min. width of the dialog in DLUs */
-  private static final int dialogMinWidth = 320;
-
   private String fDialogHeaderMessage;
   private String fDialogMessage;
   private Button fNeverAskAgainCheck;
@@ -199,7 +195,7 @@ public class ConfirmDialog extends TitleAreaDialog {
   @Override
   protected void initializeBounds() {
     super.initializeBounds();
-    Point bestSize = getShell().computeSize(convertHorizontalDLUsToPixels(dialogMinWidth), SWT.DEFAULT);
+    Point bestSize = getShell().computeSize(convertHorizontalDLUsToPixels(OwlUI.MIN_DIALOG_WIDTH_DLU), SWT.DEFAULT);
     Point location = getInitialLocation(bestSize);
     getShell().setBounds(location.x, location.y, bestSize.x, bestSize.y);
   }

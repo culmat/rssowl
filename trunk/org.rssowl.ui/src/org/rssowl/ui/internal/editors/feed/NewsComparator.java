@@ -42,6 +42,7 @@ import org.rssowl.ui.internal.editors.feed.NewsGrouping.Group;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -132,19 +133,19 @@ public class NewsComparator extends ViewerComparator implements Comparator<INews
         case DATE:
           return compareByDate(news1, news2, false);
 
-        /* Sort by Publish Date */
+          /* Sort by Publish Date */
         case PUBLISHED:
           return compareByDate(news1.getPublishDate(), news2.getPublishDate(), false);
 
-        /* Sort by Modified Date */
+          /* Sort by Modified Date */
         case MODIFIED:
           return compareByDate(news1.getModifiedDate(), news2.getModifiedDate(), false);
 
-        /* Sort by Received Date */
+          /* Sort by Received Date */
         case RECEIVED:
           return compareByDate(news1.getReceiveDate(), news2.getReceiveDate(), false);
 
-        /* Sort by Title */
+          /* Sort by Title */
         case TITLE:
           result = compareByTitle(CoreUtils.getHeadline(news1, true), CoreUtils.getHeadline(news2, true));
           break;
@@ -317,15 +318,45 @@ public class NewsComparator extends ViewerComparator implements Comparator<INews
   }
 
   private int compareByLabels(Set<ILabel> labels1, Set<ILabel> labels2) {
-    if (labels1.isEmpty())
+
+    /* Detect cases of empty Labels first */
+    if (labels1.isEmpty() && labels2.isEmpty())
+      return 0;
+    else if (labels1.isEmpty())
       return fAscending ? 1 : -1;
     else if (labels2.isEmpty())
       return fAscending ? -1 : 1;
 
-    ILabel label1 = labels1.iterator().next();
-    ILabel label2 = labels2.iterator().next();
+    /* Now compare all labels as there can be more than one assigned */
+    int result = 0;
+    Iterator<ILabel> labels1Iterator = labels1.iterator();
+    Iterator<ILabel> labels2Iterator = labels2.iterator();
+    while (labels1Iterator.hasNext() && labels2Iterator.hasNext()) {
+      ILabel label1 = labels1Iterator.next();
+      ILabel label2 = labels2Iterator.next();
 
-    int result = label1.getOrder() < label2.getOrder() ? -1 : 1;
+      /* Labels identical at this point */
+      if (label1.getOrder() == label2.getOrder()) {
+
+        /* Look for the next label to compare if still labels present */
+        if (labels1Iterator.hasNext() && labels2Iterator.hasNext())
+          continue;
+
+        /* Sort news with more labels below */
+        if (labels1Iterator.hasNext())
+          result = -1;
+
+        /* Otherwise keep label above */
+        else
+          result = 1;
+
+        break;
+      }
+
+      /* Labels not identical - compare order and break */
+      result = label1.getOrder() < label2.getOrder() ? -1 : 1;
+      break;
+    }
 
     /* Respect ascending / descending Order */
     return fAscending ? result : result * -1;

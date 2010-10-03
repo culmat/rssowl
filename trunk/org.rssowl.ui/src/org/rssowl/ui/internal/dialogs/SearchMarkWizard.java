@@ -112,6 +112,7 @@ public class SearchMarkWizard extends Wizard implements INewWizard {
       nameContainer.setBackground(control.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
       fNameInput = new Text(nameContainer, SWT.SINGLE);
+      OwlUI.makeAccessible(fNameInput, nameLabel);
       fNameInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
       fNameInput.addModifyListener(new ModifyListener() {
         public void modifyText(ModifyEvent e) {
@@ -120,6 +121,7 @@ public class SearchMarkWizard extends Wizard implements INewWizard {
       });
 
       ToolBar generateTitleBar = new ToolBar(nameContainer, SWT.FLAT);
+      OwlUI.makeAccessible(generateTitleBar, Messages.SearchMarkDialog_CREATE_NAME_FROM_CONDITIONS);
       generateTitleBar.setBackground(control.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
       ToolItem generateTitleItem = new ToolItem(generateTitleBar, SWT.PUSH);

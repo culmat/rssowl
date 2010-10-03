@@ -196,6 +196,7 @@ public class FeedDefinitionPage extends WizardPage {
     ((GridLayout) textIndent.getLayout()).marginBottom = 10;
 
     fFeedLinkInput = new Text(textIndent, SWT.BORDER);
+    OwlUI.makeAccessible(fFeedLinkInput, fFeedByLinkButton);
     fFeedLinkInput.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     GC gc = new GC(fFeedLinkInput);
@@ -256,6 +257,7 @@ public class FeedDefinitionPage extends WizardPage {
     ((GridLayout) textIndent.getLayout()).marginLeft = 10;
 
     fKeywordInput = new Text(textIndent, SWT.BORDER);
+    OwlUI.makeAccessible(fKeywordInput, fFeedByKeywordButton);
     fKeywordInput.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     fKeywordInput.setEnabled(false);
     fKeywordInput.addModifyListener(new ModifyListener() {

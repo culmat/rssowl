@@ -341,9 +341,9 @@ public class Controller {
     fConnectionTimeout = getSystemProperty(FEED_CON_TIMEOUT_PROPERTY, DEFAULT_FEED_CON_TIMEOUT, DEFAULT_FEED_CON_TIMEOUT);
     fPortable = System.getProperty(PORTABLE_PROPERTY) != null;
     fDisableUpdate = Boolean.getBoolean(DISABLE_UPDATE_PROPERTY);
-    fNl= System.getProperty("line.separator"); //$NON-NLS-1$
+    fNl = System.getProperty("line.separator"); //$NON-NLS-1$
     if (!StringUtils.isSet(fNl))
-      fNl= "\n"; //$NON-NLS-1$
+      fNl = "\n"; //$NON-NLS-1$
   }
 
   private int getSystemProperty(String key, int minValue, int defaultValue) {
@@ -1480,6 +1480,13 @@ public class Controller {
    * Restart the Application.
    */
   public void restart() {
+
+    /* First Check for active Downloads */
+    if (fDownloadService.isActive()) {
+      MessageDialog.openWarning(OwlUI.getActiveShell(), Messages.Controller_RESTART_RSSOWL, Messages.Controller_ACTIVE_DOWNLOADS_WARNING);
+      return;
+    }
+
     fRestarting = true;
 
     /* Run the restart() */

@@ -433,8 +433,10 @@ public class BookMarkContentProvider implements ITreeContentProvider {
             fViewer.update(updatedSearchMarks.toArray(), null);
 
             /* Update Parents */
-            for (ISearchMark searchMark : updatedSearchMarks)
-              updateFolderAndParents(searchMark.getParent());
+            if (!fBookmarkGrouping.isActive()) {
+              for (ISearchMark searchMark : updatedSearchMarks)
+                updateFolderAndParents(searchMark.getParent());
+            }
           }
         });
       }
@@ -682,7 +684,7 @@ public class BookMarkContentProvider implements ITreeContentProvider {
     for (NewsEvent event : events) {
       INews news = event.getEntity();
       long parentId = news.getParentId();
-      if (parentId != 0) {
+      if (!fBookmarkGrouping.isActive() && parentId != 0) {
         if (!handledBins.contains(parentId)) {
           INewsBin bin = newsBinDao.load(parentId);
           if (bin != null) //Could have been deleted meanwhile
@@ -723,15 +725,17 @@ public class BookMarkContentProvider implements ITreeContentProvider {
     entitiesToUpdate.addAll(bookmarks);
 
     /* Collect parents */
-    for (IBookMark bookmark : bookmarks) {
-      List<IFolder> visibleParents = new ArrayList<IFolder>();
-      collectParents(visibleParents, bookmark);
+    if (!fBookmarkGrouping.isActive()) {
+      for (IBookMark bookmark : bookmarks) {
+        List<IFolder> visibleParents = new ArrayList<IFolder>();
+        collectParents(visibleParents, bookmark);
 
-      entitiesToUpdate.addAll(visibleParents);
+        entitiesToUpdate.addAll(visibleParents);
 
-      /* Return on Shutdown */
-      if (Controller.getDefault().isShuttingDown())
-        return;
+        /* Return on Shutdown */
+        if (Controller.getDefault().isShuttingDown())
+          return;
+      }
     }
 
     /* Update Entities */
