@@ -194,4 +194,13 @@ public class URIUtilsTest {
     assertEquals(null, URIUtils.toUnManaged(null));
     assertEquals("", URIUtils.toUnManaged(""));
   }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testSafeGetHost() throws Exception {
+    assertEquals("foo.de", URIUtils.safeGetHost(URI.create("http://foo.de")));
+    assertEquals("foo_bar.de", URIUtils.safeGetHost(URI.create("http://foo_bar.de")));
+  }
 }

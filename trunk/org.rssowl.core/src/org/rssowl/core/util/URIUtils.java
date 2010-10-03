@@ -24,6 +24,7 @@
 
 package org.rssowl.core.util;
 
+import org.apache.commons.httpclient.URIException;
 import org.rssowl.core.internal.Activator;
 
 import java.io.UnsupportedEncodingException;
@@ -110,8 +111,8 @@ public class URIUtils {
   public static URI normalizeUri(URI link, boolean withPort) {
     try {
       if (withPort)
-        return new URI(link.getScheme(), null, link.getHost(), link.getPort(), null, null, null);
-      return new URI(link.getScheme(), link.getHost(), null, null);
+        return new URI(link.getScheme(), null, safeGetHost(link), link.getPort(), null, null, null);
+      return new URI(link.getScheme(), safeGetHost(link), null, null);
     } catch (URISyntaxException e) {
       Activator.getDefault().logError(e.getMessage(), e);
     }
@@ -304,7 +305,7 @@ public class URIUtils {
    * @throws URISyntaxException In case of a malformed URI.
    */
   public static URI toFaviconUrl(URI link, boolean rewriteHost) throws URISyntaxException {
-    String host = link.getHost();
+    String host = safeGetHost(link);
 
     if (!StringUtils.isSet(host))
       return null;
@@ -343,7 +344,7 @@ public class URIUtils {
     if (link == null)
       return null;
 
-    String host = link.getHost();
+    String host = safeGetHost(link);
     if (!StringUtils.isSet(host))
       return null;
 
@@ -523,5 +524,32 @@ public class URIUtils {
    */
   public static boolean isManaged(String link) {
     return StringUtils.isSet(link) && link.endsWith(MANAGED_LINK_ANCHOR);
+  }
+
+  /**
+   * The JDK implementation of {@link URI} will return <code>null</code> for
+   * urls that contain an underscore. This method will fall back to Apache
+   * Commons version of {@link org.apache.commons.httpclient.URI} to get the
+   * host information in this case.
+   *
+   * @param uri the {@link URI} to retrieve the host from.
+   * @return the host of the given {@link URI} or <code>null</code> if none.
+   */
+  public static String safeGetHost(URI uri) {
+
+    /* Try JDK URI */
+    String host = uri.getHost();
+    if (host != null)
+      return host;
+
+    /* Fallback to Apache Commons URI */
+    try {
+      org.apache.commons.httpclient.URI altUri = new org.apache.commons.httpclient.URI(uri.toString(), false);
+      return altUri.getHost();
+    } catch (URIException e) {
+      /* Ignore */
+    }
+
+    return null;
   }
 }

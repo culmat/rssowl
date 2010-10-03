@@ -173,13 +173,6 @@
             sortKey="90">
       </newsAction>
       <newsAction
-            class="org.rssowl.core.internal.newsaction.MarkReadNewsAction"
-            id="org.rssowl.core.MarkReadNewsAction"
-            name="%MARK_READ_ACTION"
-            forcable="true"
-            sortKey="85">
-      </newsAction>
-      <newsAction
             class="org.rssowl.core.internal.newsaction.MarkStickyNewsAction"
             id="org.rssowl.core.MarkStickyNewsAction"
             name="%MARK_STICKY_ACTION"
@@ -192,6 +185,20 @@
             name="%LABEL_ACTION"
             forcable="true"
             sortKey="80">
+      </newsAction>
+      <newsAction
+            class="org.rssowl.core.internal.newsaction.MarkReadNewsAction"
+            id="org.rssowl.core.MarkReadNewsAction"
+            name="%MARK_READ_ACTION"
+            forcable="true"
+            sortKey="75">
+      </newsAction>
+      <newsAction
+            class="org.rssowl.core.internal.newsaction.MarkUnreadNewsAction"
+            id="org.rssowl.core.MarkUnreadNewsAction"
+            name="%MARK_UNREAD_ACTION"
+            forcable="true"
+            sortKey="74">
       </newsAction>
       <newsAction
             class="org.rssowl.core.internal.newsaction.StopFilterNewsAction"

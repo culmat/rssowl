@@ -74,6 +74,7 @@ public class NewsFilterTest {
   private static final String MOVE_NEWS_ID = "org.rssowl.core.MoveNewsAction";
   private static final String COPY_NEWS_ID = "org.rssowl.core.CopyNewsAction";
   private static final String MARK_READ_ID = "org.rssowl.core.MarkReadNewsAction";
+  private static final String MARK_UNREAD_ID = "org.rssowl.core.MarkUnreadNewsAction";
   private static final String MARK_STICKY_ID = "org.rssowl.core.MarkStickyNewsAction";
   private static final String LABEL_NEWS_ID = "org.rssowl.core.LabelNewsAction";
   private static final String STOP_FILTER_ID = "org.rssowl.core.StopFilterAction";
@@ -122,6 +123,42 @@ public class NewsFilterTest {
     assertEquals(3, news.size());
     for (INews newsitem : news) {
       assertEquals(INews.State.READ, newsitem.getState());
+    }
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void test_MarkUnread_MatchAll() throws Exception {
+    IBookMark bm = createBookMark("local1");
+    IFeed feed = fFactory.createFeed(null, bm.getFeedLinkReference().getLink());
+
+    INews news1 = createNews(feed, "News1");
+    news1.setState(INews.State.NEW);
+
+    INews news2 = createNews(feed, "News2");
+    news2.setState(INews.State.NEW);
+
+    INews news3 = createNews(feed, "News3");
+    news3.setState(INews.State.NEW);
+
+    ISearchFilter filter = fFactory.createSearchFilter(null, null, "All News");
+    filter.setMatchAllNews(true);
+    filter.setEnabled(true);
+
+    IFilterAction action = fFactory.createFilterAction(MARK_UNREAD_ID);
+    filter.addAction(action);
+
+    DynamicDAO.save(filter);
+
+    fAppService.handleFeedReload(bm, feed, null, false, new NullProgressMonitor());
+
+    List<INews> news = bm.getFeedLinkReference().resolve().getNews();
+    assertEquals(3, bm.getNewsCount(EnumSet.of(INews.State.UNREAD)));
+    assertEquals(3, news.size());
+    for (INews newsitem : news) {
+      assertEquals(INews.State.UNREAD, newsitem.getState());
     }
   }
 
