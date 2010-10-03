@@ -39,6 +39,7 @@ import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.core.util.URIUtils;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -242,7 +243,7 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
     if (!proxyService.isProxiesEnabled())
       return null;
 
-    String host = link.getHost();
+    String host = URIUtils.safeGetHost(link);
     boolean isSSL = "https".equals(link.getScheme()); //$NON-NLS-1$
 
     /* Retrieve Proxy Data */

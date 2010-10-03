@@ -430,6 +430,8 @@ public class ConnectionTests {
     for (IConfigurationElement element : elements) {
       String id = element.getAttribute("id");
       String url = element.getAttribute("url");
+      if ("org.rssowl.ui.DiggKeywordFeed".equals(id))
+        continue;
 
       String feedUrlStr = StringUtils.replaceAll(url, URL_INPUT_TOKEN, URIUtils.urlEncode(keywords));
       URI feedUrl = new URI(feedUrlStr);
@@ -532,14 +534,17 @@ public class ConnectionTests {
    */
   @Test
   public void testGoogleReaderSync() throws Exception {
-    String sid = SyncUtils.getGoogleSID("rssowl@mailinator.com", "rssowl.org", new NullProgressMonitor());
-    assertNotNull(sid);
+    String authToken = SyncUtils.getGoogleAuthToken("rssowl@mailinator.com", "rssowl.org", new NullProgressMonitor());
+    assertNotNull(authToken);
 
     URI uri = URI.create("https://www.google.com/reader/subscriptions/export");
     IProtocolHandler handler = Owl.getConnectionService().getHandler(uri);
 
     Map<Object, Object> properties = new HashMap<Object, Object>();
-    properties.put(IConnectionPropertyConstants.COOKIE, sid);
+
+    Map<String, String> headers = new HashMap<String, String>();
+    headers.put("Authorization", SyncUtils.getGoogleAuthorizationHeader(authToken)); //$NON-NLS-1$
+    properties.put(IConnectionPropertyConstants.HEADERS, headers);
 
     InputStream inS = handler.openStream(uri, new NullProgressMonitor(), properties);
 

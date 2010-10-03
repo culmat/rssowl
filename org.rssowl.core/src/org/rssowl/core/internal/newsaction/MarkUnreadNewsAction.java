@@ -35,11 +35,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * An instance of {@link INewsAction} to mark a list of news as read.
+ * An instance of {@link INewsAction} to mark a list of news as unread.
  *
  * @author bpasero
  */
-public class MarkReadNewsAction implements INewsAction {
+public class MarkUnreadNewsAction implements INewsAction {
 
   /*
    * @see org.rssowl.core.INewsAction#run(java.util.List, java.util.Map,
@@ -54,8 +54,8 @@ public class MarkReadNewsAction implements INewsAction {
     List<IEntity> entitiesToSave = new ArrayList<IEntity>(news.size());
     for (INews newsitem : news) {
       State state = newsitem.getState();
-      if (state == INews.State.NEW || state == INews.State.UNREAD || state == INews.State.UPDATED) {
-        newsitem.setState(INews.State.READ);
+      if (state == INews.State.NEW || state == INews.State.READ || state == INews.State.UPDATED) {
+        newsitem.setState(INews.State.UNREAD);
         entitiesToSave.add(newsitem);
       }
     }
@@ -67,7 +67,7 @@ public class MarkReadNewsAction implements INewsAction {
    * @see org.rssowl.core.INewsAction#isConflicting(org.rssowl.core.INewsAction)
    */
   public boolean conflictsWith(INewsAction otherAction) {
-    return otherAction instanceof DeleteNewsAction || otherAction instanceof MarkUnreadNewsAction;
+    return otherAction instanceof DeleteNewsAction || otherAction instanceof MarkReadNewsAction;
   }
 
   /*

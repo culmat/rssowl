@@ -50,18 +50,26 @@ public class SyncUtils {
   /** Google Client Login Site */
   public static final String GOOGLE_LOGIN = "https://www.google.com/accounts/ClientLogin"; //$NON-NLS-1$
 
+  /* Google Auth Identifier */
+  private static final String AUTH_IDENTIFIER = "Auth="; //$NON-NLS-1$
+
+  /* Google Auth Header */
+  private static final String GOOGLE_LOGIN_HEADER_VALUE = "GoogleLogin auth="; //$NON-NLS-1$
+
   /**
-   * Obtains the Google SID to perform REST operations for Google Services.
+   * Obtains the Google Auth Token to perform REST operations for Google
+   * Services.
    *
    * @param email the user account for google
    * @param pw the password for the user account
    * @param monitor an instance of {@link IProgressMonitor} that can be used to
    * cancel the operation and report progress.
-   * @return the google SID for the given account or <code>null</code> if none.
+   * @return the google Auth Token for the given account or <code>null</code> if
+   * none.
    * @throws ConnectionException Checked Exception to be used in case of any
    * Exception.
    */
-  public static String getGoogleSID(String email, String pw, IProgressMonitor monitor) throws ConnectionException {
+  public static String getGoogleAuthToken(String email, String pw, IProgressMonitor monitor) throws ConnectionException {
     try {
       URI uri = new URI(GOOGLE_LOGIN);
       IProtocolHandler handler = Owl.getConnectionService().getHandler(uri);
@@ -85,8 +93,8 @@ public class SyncUtils {
           reader = new BufferedReader(new InputStreamReader(inS));
           String line;
           while (!monitor.isCanceled() && (line = reader.readLine()) != null) {
-            if (line.startsWith("SID=")) //$NON-NLS-1$
-              return line;
+            if (line.startsWith(AUTH_IDENTIFIER))
+              return line.substring(AUTH_IDENTIFIER.length());
           }
         } finally {
           if (reader != null)
@@ -100,5 +108,15 @@ public class SyncUtils {
     }
 
     return null;
+  }
+
+  /**
+   * @param authToken the authorization token that can be obtained from
+   * {@link SyncUtils#getGoogleAuthToken(String, String, IProgressMonitor)}
+   * @return a header value that can be used inside <code>Authorization</code>
+   * to get access to Google Services.
+   */
+  public static String getGoogleAuthorizationHeader(String authToken) {
+    return GOOGLE_LOGIN_HEADER_VALUE + authToken;
   }
 }

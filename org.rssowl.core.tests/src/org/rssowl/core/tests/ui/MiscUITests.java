@@ -316,15 +316,20 @@ public class MiscUITests {
   @Test
   public void testNewsComparator() throws Exception {
     IFeed feed = Owl.getModelFactory().createFeed(null, new URI("feed"));
+
     INews news1 = Owl.getModelFactory().createNews(null, feed, new Date(0));
     news1.setTitle("A News");
+
     INews news2 = Owl.getModelFactory().createNews(null, feed, new Date(100));
     news2.setTitle("B News");
+
     INews news3 = Owl.getModelFactory().createNews(null, feed, new Date());
     news3.setTitle("C News");
     DynamicDAO.save(feed);
 
     NewsComparator comp = new NewsComparator();
+
+    /* By Title */
     comp.setSortBy(NewsColumn.TITLE);
     comp.setAscending(true);
     Object[] elements = new Object[] { news1, news2, news3 };
@@ -334,6 +339,7 @@ public class MiscUITests {
     assertEquals("B News", ((INews) elements[1]).getTitle());
     assertEquals("C News", ((INews) elements[2]).getTitle());
 
+    /* By Date */
     comp.setSortBy(NewsColumn.DATE);
     comp.setAscending(false);
 
@@ -342,6 +348,129 @@ public class MiscUITests {
     assertEquals("C News", ((INews) elements[0]).getTitle());
     assertEquals("B News", ((INews) elements[1]).getTitle());
     assertEquals("A News", ((INews) elements[2]).getTitle());
+
+    /* By Label */
+    comp.setSortBy(NewsColumn.LABELS);
+
+    comp.sort(null, elements);
+
+    assertEquals("C News", ((INews) elements[0]).getTitle());
+    assertEquals("B News", ((INews) elements[1]).getTitle());
+    assertEquals("A News", ((INews) elements[2]).getTitle());
+
+    ILabel label1 = Owl.getModelFactory().createLabel(null, "Label 1");
+    label1.setOrder(0);
+
+    ILabel label2 = Owl.getModelFactory().createLabel(null, "Label 2");
+    label2.setOrder(1);
+
+    ILabel label3 = Owl.getModelFactory().createLabel(null, "Label 3");
+    label3.setOrder(2);
+
+    news1.addLabel(label1);
+    comp.setAscending(true);
+
+    comp.sort(null, elements);
+
+    /*
+     * News 1: Label_1
+     * News 3: -
+     * News 2: -
+     */
+    assertEquals("A News", ((INews) elements[0]).getTitle());
+    assertEquals("C News", ((INews) elements[1]).getTitle());
+    assertEquals("B News", ((INews) elements[2]).getTitle());
+
+    news1.addLabel(label2);
+
+    comp.sort(null, elements);
+
+    /*
+     * News 1: Label_1, Label_2
+     * News 3: -
+     * News 2: -
+     */
+    assertEquals("A News", ((INews) elements[0]).getTitle());
+    assertEquals("C News", ((INews) elements[1]).getTitle());
+    assertEquals("B News", ((INews) elements[2]).getTitle());
+
+    news2.addLabel(label1);
+
+    comp.sort(null, elements);
+
+    /*
+     * News 1: Label_1, Label_2
+     * News 2: Label_1
+     * News 3: -
+     */
+    assertEquals("A News", ((INews) elements[0]).getTitle());
+    assertEquals("B News", ((INews) elements[1]).getTitle());
+    assertEquals("C News", ((INews) elements[2]).getTitle());
+
+    comp.setAscending(false);
+    comp.sort(null, elements);
+
+    /*
+     * News 3: -
+     * News 2: Label_1
+     * News 1: Label_1, Label_2
+     */
+    assertEquals("C News", ((INews) elements[0]).getTitle());
+    assertEquals("B News", ((INews) elements[1]).getTitle());
+    assertEquals("A News", ((INews) elements[2]).getTitle());
+
+    news3.addLabel(label2);
+
+    comp.setAscending(true);
+    comp.sort(null, elements);
+
+    /*
+     * News 1: Label_1, Label_2
+     * News 2: Label_1
+     * News 3: Label_2
+     */
+    assertEquals("A News", ((INews) elements[0]).getTitle());
+    assertEquals("B News", ((INews) elements[1]).getTitle());
+    assertEquals("C News", ((INews) elements[2]).getTitle());
+
+    news3.addLabel(label1);
+
+    comp.sort(null, elements);
+
+    /*
+     * News 3: Label_1, Label_2
+     * News 1: Label_1, Label_2
+     * News 2: Label_1
+     */
+    assertEquals("C News", ((INews) elements[0]).getTitle());
+    assertEquals("A News", ((INews) elements[1]).getTitle());
+    assertEquals("B News", ((INews) elements[2]).getTitle());
+
+    news3.addLabel(label3);
+
+    comp.sort(null, elements);
+
+    /*
+     * News 3: Label_1, Label_2, Label_3
+     * News 1: Label_1, Label_2
+     * News 2: Label_1
+     */
+    assertEquals("C News", ((INews) elements[0]).getTitle());
+    assertEquals("A News", ((INews) elements[1]).getTitle());
+    assertEquals("B News", ((INews) elements[2]).getTitle());
+
+    news2.addLabel(label3);
+
+    comp.sort(null, elements);
+
+    /*
+     * News 3: Label_1, Label_2, Label_3
+     * News 1: Label_1, Label_2
+     * News 2: Label_1, Label_3
+     */
+    assertEquals("C News", ((INews) elements[0]).getTitle());
+    assertEquals("A News", ((INews) elements[1]).getTitle());
+    assertEquals("B News", ((INews) elements[2]).getTitle());
   }
 
   /**
