@@ -627,6 +627,7 @@ public class WebBrowserView extends EditorPart implements IReusableEditor {
       fLocationInput = new Text(parent, SWT.BORDER | SWT.SINGLE | SWT.SEARCH);
     else
       fLocationInput = new Text(parent, SWT.BORDER | SWT.SINGLE);
+    OwlUI.makeAccessible(fLocationInput, Messages.WebBrowserView_ENTER_WEBSITE_PHRASE);
     fLocationInput.setMessage(Messages.WebBrowserView_ENTER_WEBSITE_PHRASE);
     fLocationInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
     if (fInput.getUrl() != null)

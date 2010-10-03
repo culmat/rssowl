@@ -286,6 +286,7 @@ public class SearchMarkDialog extends TitleAreaDialog {
     nameContainer.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
     fNameInput = new Text(nameContainer, SWT.SINGLE);
+    OwlUI.makeAccessible(fNameInput, nameLabel);
     fNameInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
     fNameInput.addModifyListener(new ModifyListener() {
       public void modifyText(ModifyEvent e) {
@@ -294,6 +295,7 @@ public class SearchMarkDialog extends TitleAreaDialog {
     });
 
     ToolBar generateTitleBar = new ToolBar(nameContainer, SWT.FLAT);
+    OwlUI.makeAccessible(generateTitleBar, Messages.SearchMarkDialog_CREATE_NAME_FROM_CONDITIONS);
     generateTitleBar.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
     ToolItem generateTitleItem = new ToolItem(generateTitleBar, SWT.PUSH);

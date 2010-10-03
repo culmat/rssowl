@@ -46,6 +46,7 @@ public class Messages extends NLS {
   public static String SearchConditionItem_HOURS;
   public static String SearchConditionItem_MINUTES;
   public static String SearchConditionItem_SEARCH_HELP;
+  public static String SearchConditionItem_SEARCH_VALUE_FIELD;
   public static String SearchConditionItem_TRUE;
   public static String SearchConditionList_ADD_CONDITION;
   public static String SearchConditionList_AGE;

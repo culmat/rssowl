@@ -96,6 +96,7 @@ public class Messages extends NLS {
   public static String ApplicationActionBarAdvisor_ZOOM_OUT;
   public static String ApplicationWorkbenchWindowAdvisor_N_INCOMING_NEWS;
   public static String ApplicationWorkbenchWindowAdvisor_RESTORE;
+  public static String Controller_ACTIVE_DOWNLOADS_WARNING;
   public static String Controller_ERROR;
   public static String Controller_ERROR_LOADING;
   public static String Controller_ERROR_STARTING_SERVER;
@@ -107,6 +108,7 @@ public class Messages extends NLS {
   public static String Controller_MY_BOOKMARKS;
   public static String Controller_PERSONAL;
   public static String Controller_PROBLEM;
+  public static String Controller_RESTART_RSSOWL;
   public static String Controller_START_ERROR_MSG;
   public static String Controller_STARTUP_ERROR;
   public static String Controller_TODO;
@@ -177,6 +179,7 @@ public class Messages extends NLS {
   public static String DefaultStatusHandler_ERROR_OUT_OF_MEMORY;
   public static String EntityGroup_GROUP;
 
+  public static String OwlUI_ACCESSIBLE_NAME;
   public static String OwlUI_CONTENT_ASSIST;
   public static String OwlUI_HOUR;
   public static String OwlUI_HOUR_MINUTE;

@@ -130,10 +130,12 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
       nameContainer.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
     fNameInput = new Text(nameContainer, Application.IS_MAC ? SWT.BORDER : SWT.NONE);
+    OwlUI.makeAccessible(fNameInput, nameLabel);
     fNameInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
     fNameInput.setText(mark.getName());
 
     ToolBar generateTitleBar = new ToolBar(nameContainer, SWT.FLAT);
+    OwlUI.makeAccessible(generateTitleBar, Messages.SearchMarkPropertyPage_NAME_FROM_CONDITION);
     if (!Application.IS_MAC)
       generateTitleBar.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
@@ -208,7 +210,7 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
     if (conditions.getSecond().size() <= 3)
       fSearchConditionList.setVisibleItemCount(3);
     else //Workaround for Bug 1544: State Condition not enough width in propertes when scrollbar showing
-      fSearchConditionList.setVisibleItemCount(Math.min(5, conditions.getSecond().size()));
+      fSearchConditionList.setVisibleItemCount(Math.min(7, conditions.getSecond().size()));
 
     if (CoreUtils.isLocationConflict(mark.getSearchConditions()))
       fSite.setMessage(Messages.SearchMarkPropertyPage_LOCATION_WARNING, IPropertyDialogSite.MessageType.WARNING);

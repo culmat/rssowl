@@ -474,4 +474,12 @@ public class DownloadService {
         /* Ignore */}
     }
   }
+
+  /**
+   * @return <code>true</code> if there are active download jobs running and
+   * <code>false</code> otherwise.
+   */
+  public boolean isActive() {
+    return fDownloadQueue.isWorking();
+  }
 }

@@ -212,7 +212,7 @@ public class LoginDialog extends TitleAreaDialog {
       hostLabelValue.append(fLink.getScheme()).append(PROTOCOL_SEPARATOR);
 
     /* Read Host */
-    hostLabelValue.append(fLink.getHost());
+    hostLabelValue.append(URIUtils.safeGetHost(fLink));
 
     /* Show Value */
     hostLabel.setText(hostLabelValue.toString());

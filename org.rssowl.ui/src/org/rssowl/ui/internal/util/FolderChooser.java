@@ -279,6 +279,7 @@ public class FolderChooser extends Composite implements DisposeListener {
     toolbarContainer.setBackground(fParent.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
     fAddFolderBar = new ToolBar(toolbarContainer, SWT.FLAT);
+    OwlUI.makeAccessible(fAddFolderBar, Messages.FolderChooser_NEW_FOLDER);
     fAddFolderBar.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, true));
     fAddFolderBar.setBackground(fParent.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
     fAddFolderBar.setCursor(headerContainer.getDisplay().getSystemCursor(SWT.CURSOR_ARROW));
@@ -296,6 +297,7 @@ public class FolderChooser extends Composite implements DisposeListener {
     });
 
     ToolBar toggleBar = new ToolBar(toolbarContainer, SWT.FLAT);
+    OwlUI.makeAccessible(toggleBar, Messages.FolderChooser_SHOW_FOLDERS);
     toggleBar.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, true));
     ((GridData) toggleBar.getLayoutData()).exclude = !fExpandable;
     toggleBar.setBackground(fParent.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));

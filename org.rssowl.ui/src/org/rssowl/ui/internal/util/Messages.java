@@ -40,6 +40,7 @@ public class Messages extends NLS {
   public static String ColorPicker_BARBERRY_GREEN;
   public static String ColorPicker_BARN_RED;
   public static String ColorPicker_CHOCOLATE_BROWN;
+  public static String ColorPicker_COLOR_LABEL;
   public static String ColorPicker_DRIFTWOOD;
   public static String ColorPicker_FEDERAL_BLUE;
   public static String ColorPicker_LEXINGTON_GREEN;

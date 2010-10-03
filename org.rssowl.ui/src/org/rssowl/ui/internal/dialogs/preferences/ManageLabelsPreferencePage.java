@@ -57,16 +57,9 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.rssowl.core.Owl;
 import org.rssowl.core.persist.ILabel;
-import org.rssowl.core.persist.INews;
-import org.rssowl.core.persist.ISearchCondition;
-import org.rssowl.core.persist.ISearchField;
-import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.ILabelDAO;
-import org.rssowl.core.persist.reference.NewsReference;
-import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.util.CoreUtils;
-import org.rssowl.core.util.SearchHit;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
@@ -79,10 +72,7 @@ import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author bpasero
@@ -96,8 +86,6 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
   private TreeViewer fViewer;
   private Button fMoveDownButton;
   private Button fMoveUpButton;
-  private IModelSearch fModelSearch = Owl.getPersistenceService().getModelSearch();
-  private ISearchField fLabelField = Owl.getModelFactory().createSearchField(INews.LABEL, INews.class.getName());
 
   /** Leave for reflection */
   public ManageLabelsPreferencePage() {
@@ -355,17 +343,9 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
 
       ConfirmDialog dialog = new ConfirmDialog(getShell(), Messages.ManageLabelsPreferencePage_CONFIRM_DELETE, Messages.ManageLabelsPreferencePage_NO_UNDO, msg, null);
       if (dialog.open() == IDialogConstants.OK_ID) {
-        for (ILabel label : selectedLabels) {
 
-          /* Remove Label from any News containing it */
-          Collection<INews> affectedNews = findNewsWithLabel(label);
-          for (INews news : affectedNews) {
-            news.removeLabel(label);
-          }
-
-          Controller.getDefault().getSavedSearchService().forceQuickUpdate();
-          DynamicDAO.saveAll(affectedNews);
-        }
+        /* Can have an impact on news, thereby force quick update */
+        Controller.getDefault().getSavedSearchService().forceQuickUpdate();
 
         /* Delete Label from DB */
         DynamicDAO.deleteAll(selectedLabels);
@@ -390,24 +370,6 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
     }
 
     DynamicDAO.saveAll(labelsToSave);
-  }
-
-  private Collection<INews> findNewsWithLabel(ILabel label) {
-    List<INews> news = new ArrayList<INews>();
-
-    ISearchCondition condition = Owl.getModelFactory().createSearchCondition(fLabelField, SearchSpecifier.IS, label.getName());
-    List<SearchHit<NewsReference>> result = fModelSearch.searchNews(Collections.singleton(condition), false);
-
-    for (SearchHit<NewsReference> hit : result) {
-      INews newsitem = hit.getResult().resolve();
-      if (newsitem != null) {
-        Set<ILabel> newsLabels = newsitem.getLabels();
-        if (newsLabels != null && newsLabels.contains(label))
-          news.add(newsitem);
-      }
-    }
-
-    return news;
   }
 
   private void createViewer(Composite container) {

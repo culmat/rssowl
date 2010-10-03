@@ -165,6 +165,7 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
       fUseInternalBrowser.setSelection(!fUseDefaultExternalBrowser.getSelection() && !fUseCustomExternalBrowser.getSelection());
 
       fCustomBrowserInput = new Text(group, SWT.BORDER);
+      OwlUI.makeAccessible(fCustomBrowserInput, fUseCustomExternalBrowser);
       fCustomBrowserInput.setEnabled(fUseCustomExternalBrowser.getSelection());
       fCustomBrowserInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
 

@@ -228,10 +228,13 @@ public class LocationControl extends Composite {
       };
 
       fFilteredTree.setInitialText(""); //$NON-NLS-1$
-      if (fMode == Mode.SEARCH_LOCATION)
+      if (fMode == Mode.SEARCH_LOCATION) {
         fFilteredTree.getFilterControl().setMessage(Messages.LocationControl_FILTER_LOCATIONS);
-      else
+        OwlUI.makeAccessible(fFilteredTree.getFilterControl(), Messages.LocationControl_FILTER_LOCATIONS);
+      } else {
         fFilteredTree.getFilterControl().setMessage(Messages.LocationControl_FILTER_BINS);
+        OwlUI.makeAccessible(fFilteredTree.getFilterControl(), Messages.LocationControl_FILTER_BINS);
+      }
       fFilteredTree.getViewer().getControl().setFocus();
 
       /* Filter when Typing into Tree */

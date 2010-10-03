@@ -37,6 +37,7 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -534,6 +535,7 @@ public class SearchConditionItem extends Composite {
         case ISearchValueType.STRING:
         case ISearchValueType.LINK: {
           final Text text = new Text(inputField, SWT.BORDER);
+          OwlUI.makeAccessible(text, NLS.bind(Messages.SearchConditionItem_SEARCH_VALUE_FIELD, field.getName()));
           text.addListener(SWT.Modify, new Listener() {
             public void handleEvent(Event event) {
               fInputValue = text.getText();

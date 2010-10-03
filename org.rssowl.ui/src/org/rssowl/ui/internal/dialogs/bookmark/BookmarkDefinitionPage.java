@@ -117,6 +117,7 @@ public class BookmarkDefinitionPage extends WizardPage {
     nameLabel.setText(Messages.BookmarkDefinitionPage_NAME);
 
     fNameInput = new Text(container, SWT.BORDER);
+    OwlUI.makeAccessible(fNameInput, nameLabel);
     fNameInput.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     fNameInput.addModifyListener(new ModifyListener() {
       public void modifyText(ModifyEvent e) {

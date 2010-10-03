@@ -64,10 +64,6 @@ import java.io.InputStream;
  * @author bpasero
  */
 public class StartupErrorDialog extends TitleAreaDialog {
-
-  /* Min. width of the dialog in DLUs */
-  private static final int dialogMinWidth = 320;
-
   private LocalResourceManager fResources;
   private final IStatus fErrorStatus;
 
@@ -203,7 +199,7 @@ public class StartupErrorDialog extends TitleAreaDialog {
   @Override
   protected void initializeBounds() {
     super.initializeBounds();
-    Point bestSize = getShell().computeSize(convertHorizontalDLUsToPixels(dialogMinWidth), SWT.DEFAULT);
+    Point bestSize = getShell().computeSize(convertHorizontalDLUsToPixels(OwlUI.MIN_DIALOG_WIDTH_DLU), SWT.DEFAULT);
     Point location = getInitialLocation(bestSize);
     getShell().setBounds(location.x, location.y, bestSize.x, bestSize.y);
   }

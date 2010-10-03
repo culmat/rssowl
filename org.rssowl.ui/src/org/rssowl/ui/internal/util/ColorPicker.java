@@ -132,6 +132,7 @@ public class ColorPicker {
 
   private void initControl(int style) {
     fBar = new ToolBar(fParent, style);
+    OwlUI.makeAccessible(fBar, Messages.ColorPicker_COLOR_LABEL);
     fBar.addDisposeListener(new DisposeListener() {
       public void widgetDisposed(DisposeEvent e) {
         fColorMenu.dispose();

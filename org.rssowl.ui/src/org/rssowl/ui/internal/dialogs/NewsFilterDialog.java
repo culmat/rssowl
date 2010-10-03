@@ -363,6 +363,7 @@ public class NewsFilterDialog extends TitleAreaDialog {
     nameContainer.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
     fNameInput = new Text(nameContainer, SWT.SINGLE);
+    OwlUI.makeAccessible(fNameInput, nameLabel);
     fNameInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
     if (fEditedFilter != null) {
       fNameInput.setText(fEditedFilter.getName());
@@ -384,6 +385,7 @@ public class NewsFilterDialog extends TitleAreaDialog {
     ((GridData) fNameInput.getLayoutData()).widthHint = entryFieldWidth; //Required to avoid large spanning dialog for long Links
 
     ToolBar generateTitleBar = new ToolBar(nameContainer, SWT.FLAT);
+    OwlUI.makeAccessible(generateTitleBar, Messages.NewsFilterDialog_CREATE_NAME_FROM_CONDITIONS);
     generateTitleBar.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
     ToolItem generateTitleItem = new ToolItem(generateTitleBar, SWT.PUSH);
