@@ -2234,7 +2234,7 @@ public class ModelSearchTest4 extends AbstractModelSearchTest {
           (c > 57 && c < 65) || // :, ;, <, =, >, ?, @
           (c > 90 && c < 97) || // [, \, ], ^, _, `
           (c > 122 && c < 127) || // {, |, }, ~
-          (c == '§') //Not part of ASCII
+          (String.valueOf(c).equals("§")) //Not part of ASCII //$NON-NLS-1$
       ) {
         String s = Character.toString(c);
         if (s.equals("<") || s.equals(">") || s.equals("?") || s.equals("*") || s.equals("\""))
