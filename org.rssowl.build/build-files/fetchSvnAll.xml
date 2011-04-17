@@ -32,8 +32,8 @@
     </antcall>
     <antcall target="svn.co">
       <param name="target" value="plugins"/>
-      <param name="element.id" value="org.rssowl.lib.httpsclient"/>
-      <param name="project.name" value="/trunk/org.rssowl.lib.httpsclient"/>
+      <param name="element.id" value="org.rssowl.lib.httpclient"/>
+      <param name="project.name" value="/trunk/org.rssowl.lib.httpclient"/>
       <param name="url" value="https://rssowl.svn.sourceforge.net/svnroot/rssowl"/>
     </antcall>
     <antcall target="svn.co">
