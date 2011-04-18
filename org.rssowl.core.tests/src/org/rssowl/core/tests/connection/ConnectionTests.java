@@ -580,9 +580,7 @@ public class ConnectionTests {
   @Test
   public void testNewsTransformerEmbedded() throws Exception {
     String link = "http://www.rssowl.org/node/258";
-
-    LinkTransformer transformer = Controller.getDefault().getLinkTransformer("org.rssowl.ui.ReadabilityTransformer");
-    String transformedUrl = transformer.toTransformedUrl(link) + "&embedded";
+    String transformedUrl = Controller.getDefault().getEmbeddedTransformedUrl(link);
 
     InputStream inS = Owl.getConnectionService().getHandler(new URI(transformedUrl)).openStream(new URI(transformedUrl), null, new HashMap<Object, Object>());
     String content = StringUtils.readString(new BufferedReader(new InputStreamReader(inS)));

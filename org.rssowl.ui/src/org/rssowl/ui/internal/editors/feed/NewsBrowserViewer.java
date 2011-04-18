@@ -84,7 +84,6 @@ import org.rssowl.ui.internal.ApplicationActionBarAdvisor;
 import org.rssowl.ui.internal.ApplicationServer;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.ILinkHandler;
-import org.rssowl.ui.internal.LinkTransformer;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.ArchiveNewsAction;
 import org.rssowl.ui.internal.actions.AutomateFilterAction;
@@ -143,10 +142,6 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   static final String PREVIOUS_UNREAD_NEWS_HANDLER_ID = "org.rssowl.ui.PreviousUnreadNews"; //$NON-NLS-1$
   static final String TRANSFORM_HANDLER_ID = "org.rssowl.ui.TransformNews"; //$NON-NLS-1$
   static final String RELATED_NEWS_MENU_HANDLER_ID = "org.rssowl.ui.RelatedNewsMenu"; //$NON-NLS-1$
-
-  /* News Transformation Constants */
-  private static final String TRANSFORMER_ID = "org.rssowl.ui.ReadabilityTransformer"; //$NON-NLS-1$
-  private static final String TRANSFORMER_EMBEDDED_PARAMETER = "&embedded"; //$NON-NLS-1$
 
   private Object fInput;
   private CBrowser fBrowser;
@@ -791,8 +786,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     Job.getJobManager().cancel(fTransformationJobFamily);
 
     /* Load news content in background and update HTML afterwards */
-    LinkTransformer transformer = Controller.getDefault().getLinkTransformer(TRANSFORMER_ID);
-    final String transformedUrl = transformer.toTransformedUrl(link) + TRANSFORMER_EMBEDDED_PARAMETER;
+    final String transformedUrl = Controller.getDefault().getEmbeddedTransformedUrl(link);
     UIBackgroundJob transformationJob = new UIBackgroundJob(fBrowser.getControl(), Messages.NewsBrowserViewer_RETRIEVING_ARTICLE_CONTENT, fTransformationJobFamily) {
       StringBuilder result = new StringBuilder();
 
@@ -914,7 +908,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   /**
    * A special way of refreshing this viewer with additional options to control
    * the behavior.
-   *
+   * 
    * @param restoreInput if set to <code>true</code> will restore the initial
    * input that was set to the browser in case the user navigated to a different
    * URL.
@@ -1030,7 +1024,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
   /**
    * Adds the given filter to this viewer.
-   *
+   * 
    * @param filter a viewer filter
    */
   public void addFilter(ViewerFilter filter) {
@@ -1046,7 +1040,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
    * Removes the given filter from this viewer, and triggers refiltering and
    * resorting of the elements if required. Has no effect if the identical
    * filter is not registered.
-   *
+   * 
    * @param filter a viewer filter
    */
   public void removeFilter(ViewerFilter filter) {
