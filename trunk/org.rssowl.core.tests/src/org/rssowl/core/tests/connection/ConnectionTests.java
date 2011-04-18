@@ -59,6 +59,7 @@ import org.rssowl.core.util.SyncUtils;
 import org.rssowl.core.util.Triple;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Controller;
+import org.rssowl.ui.internal.LinkTransformer;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -551,5 +552,25 @@ public class ConnectionTests {
 
     List<? extends IEntity> elements = Owl.getInterpreter().importFrom(inS);
     assertTrue(!elements.isEmpty());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testNewsTransformer() throws Exception {
+    String link = "http://www.rssowl.org/node/258";
+
+    List<LinkTransformer> transformers = Controller.getDefault().getLinkTransformers();
+    for (LinkTransformer transformer : transformers) {
+      String transformedUrl = transformer.toTransformedUrl(link);
+
+      InputStream inS = Owl.getConnectionService().getHandler(new URI(transformedUrl)).openStream(new URI(transformedUrl), null, new HashMap<Object, Object>());
+      String content = StringUtils.readString(new BufferedReader(new InputStreamReader(inS)));
+      assertNotNull(content);
+
+      List<String> links = RegExUtils.extractLinksFromText(content, false);
+      assertTrue(!links.isEmpty());
+    }
   }
 }
