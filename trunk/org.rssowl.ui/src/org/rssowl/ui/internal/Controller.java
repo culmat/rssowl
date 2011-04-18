@@ -252,6 +252,10 @@ public class Controller {
   private static final String LEGACY_PREF_LAYOUT_CLASSIC = "org.rssowl.ui.internal.editors.feed.LayoutVertical"; //$NON-NLS-1$
   private static final String LEGACY_PREF_BROWSER_MAXIMIZED = "org.rssowl.ui.internal.editors.feed.BrowserMaximized"; //$NON-NLS-1$
 
+  /* News Transformation Constants */
+  private static final String DEFAULT_TRANSFORMER_ID = "org.rssowl.ui.ReadabilityTransformer"; //$NON-NLS-1$
+  private static final String DEFAULT_TRANSFORMER_EMBEDDED_PARAMETER = "&embedded"; //$NON-NLS-1$
+
   /* Misc. */
   private final IApplicationService fAppService;
   private CleanUpReminderService fCleanUpReminderService;
@@ -1120,6 +1124,17 @@ public class Controller {
       return transformer;
 
     return getLinkTransformers().get(0);
+  }
+
+  /**
+   * @param link the link to transform to be shown in an embedded context.
+   * @return a link that will be transformed so that it can be showed in an
+   * embedded context.
+   */
+  public String getEmbeddedTransformedUrl(String link) {
+    LinkTransformer transformer = getLinkTransformer(DEFAULT_TRANSFORMER_ID);
+
+    return transformer.toTransformedUrl(link) + DEFAULT_TRANSFORMER_EMBEDDED_PARAMETER;
   }
 
   /**
