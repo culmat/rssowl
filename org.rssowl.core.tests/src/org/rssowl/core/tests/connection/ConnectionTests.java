@@ -573,4 +573,22 @@ public class ConnectionTests {
       assertTrue(!links.isEmpty());
     }
   }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testNewsTransformerEmbedded() throws Exception {
+    String link = "http://www.rssowl.org/node/258";
+
+    LinkTransformer transformer = Controller.getDefault().getLinkTransformer("org.rssowl.ui.ReadabilityTransformer");
+    String transformedUrl = transformer.toTransformedUrl(link) + "&embedded";
+
+    InputStream inS = Owl.getConnectionService().getHandler(new URI(transformedUrl)).openStream(new URI(transformedUrl), null, new HashMap<Object, Object>());
+    String content = StringUtils.readString(new BufferedReader(new InputStreamReader(inS)));
+    assertNotNull(content);
+
+    List<String> links = RegExUtils.extractLinksFromText(content, false);
+    assertTrue(!links.isEmpty());
+  }
 }
