@@ -1452,76 +1452,78 @@ public class ModelSearchTest4 extends AbstractModelSearchTest {
 
     /* First add some Types */
     IFeed feed = fFactory.createFeed(null, new URI("http://www.feed.com/feed.xml"));
-    INews news = createNews(feed, "IBMöäüßMicrosoft", "http://www.news.com/news1.html", State.READ);
+    INews news = createNews(feed, "IBM\u00f6\u00e4\u00fc\u00dfMicrosoft", "http://www.news.com/news1.html", State.READ);
     createNews(feed, "Foo", "http://www.news.com/news2.html", State.READ); //Used to validate count of results == 1
     createNews(feed, "Bar", "http://www.news.com/news3.html", State.READ); //Used to validate count of results == 1
 
     ICategory category = fFactory.createCategory(null, news);
-    category.setName("AppleöäüßGoogle");
+    category.setName("Apple\u00f6\u00e4\u00fc\u00dfGoogle");
 
     DynamicDAO.save(feed);
 
     /* Wait for Indexer */
     waitForIndexer();
 
+    int index = 0;
+
     ISearchField field = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
     ISearchField catField = fFactory.createSearchField(INews.CATEGORIES, fNewsEntityName);
 
-    ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "IBMöäüßMicrosoft");
+    ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "IBM\u00f6\u00e4\u00fc\u00dfMicrosoft");
     List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
-    assertSame(result, news);
+    assertSame(String.valueOf(index++), result, news);
 
-    condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "\"IBMöäüßMicrosoft\"");
+    condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "\"IBM\u00f6\u00e4\u00fc\u00dfMicrosoft\"");
     result = fModelSearch.searchNews(list(condition), false);
-    assertSame(result, news);
+    assertSame(String.valueOf(index++), result, news);
 
-    condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "IBMöäüßMicr*");
+    condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "IBM\u00f6\u00e4\u00fc\u00dfMicr*");
     result = fModelSearch.searchNews(list(condition), false);
-    assertSame(result, news);
+    assertSame(String.valueOf(index++), result, news);
 
-    condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "IBMöäüßMicr?soft");
+    condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "IBM\u00f6\u00e4\u00fc\u00dfMicr?soft");
     result = fModelSearch.searchNews(list(condition), false);
-    assertSame(result, news);
+    assertSame(String.valueOf(index++), result, news);
 
-    condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "I?MöäüßMicrosoft");
+    condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "I?M\u00f6\u00e4\u00fc\u00dfMicrosoft");
     result = fModelSearch.searchNews(list(condition), false);
-    assertSame(result, news);
+    assertSame(String.valueOf(index++), result, news);
 
-    condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "IBMö*ßMicrosoft");
+    condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "IBM\u00f6*\u00dfMicrosoft");
     result = fModelSearch.searchNews(list(condition), false);
-    assertSame(result, news);
+    assertSame(String.valueOf(index++), result, news);
 
-    condition = fFactory.createSearchCondition(catField, SearchSpecifier.IS, "AppleöäüßGoogle");
+    condition = fFactory.createSearchCondition(catField, SearchSpecifier.IS, "Apple\u00f6\u00e4\u00fc\u00dfGoogle");
     result = fModelSearch.searchNews(list(condition), false);
-    assertSame(result, news);
+    assertSame(String.valueOf(index++), result, news);
 
-    condition = fFactory.createSearchCondition(catField, SearchSpecifier.IS, "Appleö?üßGoogle");
+    condition = fFactory.createSearchCondition(catField, SearchSpecifier.IS, "Apple\u00f6?\u00fc\u00dfGoogle");
     result = fModelSearch.searchNews(list(condition), false);
-    assertSame(result, news);
+    assertSame(String.valueOf(index++), result, news);
 
-    condition = fFactory.createSearchCondition(catField, SearchSpecifier.BEGINS_WITH, "Appleö");
+    condition = fFactory.createSearchCondition(catField, SearchSpecifier.BEGINS_WITH, "Apple\u00f6");
     result = fModelSearch.searchNews(list(condition), false);
-    assertSame(result, news);
+    assertSame(String.valueOf(index++), result, news);
 
     condition = fFactory.createSearchCondition(catField, SearchSpecifier.BEGINS_WITH, "App*");
     result = fModelSearch.searchNews(list(condition), false);
-    assertSame(result, news);
+    assertSame(String.valueOf(index++), result, news);
 
     condition = fFactory.createSearchCondition(catField, SearchSpecifier.BEGINS_WITH, "App?");
     result = fModelSearch.searchNews(list(condition), false);
-    assertSame(result, news);
+    assertSame(String.valueOf(index++), result, news);
 
-    condition = fFactory.createSearchCondition(catField, SearchSpecifier.ENDS_WITH, "ßGoogle");
+    condition = fFactory.createSearchCondition(catField, SearchSpecifier.ENDS_WITH, "\u00dfGoogle");
     result = fModelSearch.searchNews(list(condition), false);
-    assertSame(result, news);
+    assertSame(String.valueOf(index++), result, news);
 
     condition = fFactory.createSearchCondition(catField, SearchSpecifier.ENDS_WITH, "?Google");
     result = fModelSearch.searchNews(list(condition), false);
-    assertSame(result, news);
+    assertSame(String.valueOf(index++), result, news);
 
-    condition = fFactory.createSearchCondition(catField, SearchSpecifier.ENDS_WITH, "*ßGoogle");
+    condition = fFactory.createSearchCondition(catField, SearchSpecifier.ENDS_WITH, "*\u00dfGoogle");
     result = fModelSearch.searchNews(list(condition), false);
-    assertSame(result, news);
+    assertSame(String.valueOf(index++), result, news);
   }
 
   /**
