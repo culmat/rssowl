@@ -159,7 +159,6 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   private IModelFactory fFactory;
   private IPreferenceScope fPreferences = Owl.getPreferenceService().getGlobalScope();
   private INewsDAO fNewsDao = DynamicDAO.getDAO(INewsDAO.class);
-  private final Object fTransformationJobFamily = new Object();
 
   /* This viewer's sorter. <code>null</code> means there is no sorter. */
   private ViewerComparator fSorter;
@@ -782,12 +781,13 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     js.append(getElementById(Dynamic.FULL_CONTENT_LINK.getId(news)).append(".blur(); ")); //$NON-NLS-1$
     fBrowser.execute(js.toString());
 
-    /* First cancel all running jobs if any */
-    Job.getJobManager().cancel(fTransformationJobFamily);
+    /* First cancel all running jobs for this news if any */
+    NewsReference reference = news.toReference();
+    Job.getJobManager().cancel(reference);
 
     /* Load news content in background and update HTML afterwards */
     final String transformedUrl = Controller.getDefault().getEmbeddedTransformedUrl(link);
-    UIBackgroundJob transformationJob = new UIBackgroundJob(fBrowser.getControl(), Messages.NewsBrowserViewer_RETRIEVING_ARTICLE_CONTENT, fTransformationJobFamily) {
+    UIBackgroundJob transformationJob = new UIBackgroundJob(fBrowser.getControl(), Messages.NewsBrowserViewer_RETRIEVING_ARTICLE_CONTENT, reference) {
       StringBuilder result = new StringBuilder();
 
       @Override
@@ -908,7 +908,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   /**
    * A special way of refreshing this viewer with additional options to control
    * the behavior.
-   *
+   * 
    * @param restoreInput if set to <code>true</code> will restore the initial
    * input that was set to the browser in case the user navigated to a different
    * URL.
@@ -1024,7 +1024,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
   /**
    * Adds the given filter to this viewer.
-   *
+   * 
    * @param filter a viewer filter
    */
   public void addFilter(ViewerFilter filter) {
@@ -1040,7 +1040,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
    * Removes the given filter from this viewer, and triggers refiltering and
    * resorting of the elements if required. Has no effect if the identical
    * filter is not registered.
-   *
+   * 
    * @param filter a viewer filter
    */
   public void removeFilter(ViewerFilter filter) {
