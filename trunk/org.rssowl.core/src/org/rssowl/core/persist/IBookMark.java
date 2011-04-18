@@ -66,6 +66,9 @@ public interface IBookMark extends INewsMark {
    */
   void setFeedLinkReference(FeedLinkReference feedLinkRef);
 
+  /*
+   * @see org.rssowl.core.persist.IEntity#toReference()
+   */
   BookMarkReference toReference();
 
   /**

@@ -560,6 +560,9 @@ public interface INews extends IEntity, MergeCapable<INews>, Reparentable<IFeed>
    */
   long getParentId();
 
+  /*
+   * @see org.rssowl.core.persist.IEntity#toReference()
+   */
   NewsReference toReference();
 
   /**
