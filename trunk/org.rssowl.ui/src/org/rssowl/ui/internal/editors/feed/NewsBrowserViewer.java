@@ -799,7 +799,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
             BufferedReader reader = null;
             try {
               InputStream inS = handler.openStream(uri, monitor, null);
-              reader = new BufferedReader(new InputStreamReader(inS));
+              reader = new BufferedReader(new InputStreamReader(inS, "UTF-8")); //$NON-NLS-1$
               String line;
               while (!monitor.isCanceled() && (line = reader.readLine()) != null) {
                 result.append(line);
@@ -908,7 +908,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   /**
    * A special way of refreshing this viewer with additional options to control
    * the behavior.
-   * 
+   *
    * @param restoreInput if set to <code>true</code> will restore the initial
    * input that was set to the browser in case the user navigated to a different
    * URL.
@@ -1024,7 +1024,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
   /**
    * Adds the given filter to this viewer.
-   * 
+   *
    * @param filter a viewer filter
    */
   public void addFilter(ViewerFilter filter) {
@@ -1040,7 +1040,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
    * Removes the given filter from this viewer, and triggers refiltering and
    * resorting of the elements if required. Has no effect if the identical
    * filter is not registered.
-   * 
+   *
    * @param filter a viewer filter
    */
   public void removeFilter(ViewerFilter filter) {
