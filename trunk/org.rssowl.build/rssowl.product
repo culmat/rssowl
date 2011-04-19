@@ -8,11 +8,13 @@
       <text>
          RSSOwl
 
-Version: 2.1.0
-Build id: Nightly
+Version: 2.1
+Build Id: Beta
+
+RSSOwl is licensed under the terms of the Eclipse Public License version 1.0.
+http://www.rssowl.org/legal/epl-v10.html
 
 (c) Copyright RSSOwl contributors and others 2005, 2010.  All rights reserved.
-Visit http://www.rssowl.org
       </text>
    </aboutInfo>
 
@@ -69,9 +71,9 @@ RSSOwl Development Team - initial API and implementation
    </plugins>
 
    <features>
-      <feature id="org.rssowl" version="2.1.0.qualifier"/>
       <feature id="org.eclipse.rcp" version="3.4.200.R342_v20090122-989JESTEbig-SVaL8UJHcYBr4A63"/>
       <feature id="org.rssowl.dependencies" version="2.0.0"/>
+      <feature id="org.rssowl" version="2.1.0.qualifier"/>
    </features>
 
 
