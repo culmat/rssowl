@@ -181,7 +181,7 @@ public class StartupProgressDialog extends ProgressMonitorDialog {
    */
   @Override
   protected Point getInitialSize() {
-    int minWidth = 450;
+    int minWidth = 380; //Do not overlap with splash width (400 pixels)
     int minHeight = getShell().computeSize(minWidth, SWT.DEFAULT).y;
 
     return new Point(minWidth, minHeight);
