@@ -97,7 +97,7 @@
 	</target>
 	
 	<target name="-unpack.eclipse.linux" unless="is.windows" depends="-set.eclipse.local.tar.server,-set.eclipse.local.tar.non.server">
-		<untar src="${eclipse.local.tar}" overwrite="true" dest="${eclipse.installation.dir}/.." compression="gzip"/>		
+		<unzip src="${eclipse.local.tar}" overwrite="true" dest="${eclipse.installation.dir}/.."/>		
 	</target>
 	
 	<target name="test">
