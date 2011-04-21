@@ -160,12 +160,13 @@ public class SearchMarkWizard extends Wizard implements INewWizard {
 
       /* Separator */
       Label sep = new Label(topControlsContainer, SWT.SEPARATOR | SWT.VERTICAL);
-      sep.setLayoutData(new GridData(SWT.DEFAULT, 20));
+      sep.setLayoutData(new GridData(SWT.DEFAULT, 16));
 
       /* Scope */
       Composite scopeContainer = new Composite(topControlsContainer, SWT.None);
       scopeContainer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
       scopeContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0, 0, 5, false));
+      ((GridLayout)scopeContainer.getLayout()).marginLeft = 2;
 
       Label locationLabel = new Label(scopeContainer, SWT.NONE);
       locationLabel.setText(Messages.SearchMarkDialog_SEARCH_IN);

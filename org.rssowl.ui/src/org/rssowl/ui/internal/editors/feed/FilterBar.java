@@ -224,6 +224,7 @@ public class FilterBar {
     Composite searchContainer = new Composite(parent, SWT.NONE);
     searchContainer.setLayout(LayoutUtils.createGridLayout(Application.IS_MAC ? 2 : 3, 0, 0, 0, 0, false));
     ((GridLayout) searchContainer.getLayout()).marginTop = 1;
+    ((GridLayout) searchContainer.getLayout()).marginRight = 3;
     searchContainer.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
     ((GridData) searchContainer.getLayoutData()).widthHint = 250;
 
