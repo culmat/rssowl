@@ -45,14 +45,10 @@ public class Messages extends NLS {
   public static String FilterBar_CLEAR;
   public static String FilterBar_FILTER_NEWS;
   public static String FilterBar_GROUP_NEWS;
-  public static String FilterBar_HIDE_HEADLINES;
   public static String FilterBar_HIGHLIGHT;
   public static String FilterBar_OTHER;
   public static String FilterBar_QUICK_SEARCH;
-  public static String FilterBar_RESTORE_DEFAULTS;
   public static String FilterBar_SAVE_SEARCH;
-  public static String FilterBar_SHOW_HEADLINES;
-  public static String FilterBar_VISIBLE_COLUMNS;
   public static String NewsBrowserControl_ADDITIONAL_NEWS_INFO;
   public static String NewsBrowserControl_CLOSE;
   public static String NewsBrowserLabelProvider_ARCHIVE;

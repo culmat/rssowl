@@ -1541,9 +1541,6 @@ public class FeedView extends EditorPart implements IReusableEditor {
     /* Hide the Info Bar if it is visible */
     fNewsBrowserControl.setInfoBarVisible(false);
 
-    /* Update some tool items from the filter tool bar */
-    fFilterBar.updateToolbars();
-
     /* Layout */
     fNewsTableControlContainer.layout();
     fBrowserViewerControlContainer.layout();
