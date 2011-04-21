@@ -49,7 +49,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Text;
@@ -105,19 +104,13 @@ public class FilterBar {
   /* Action to Group News */
   private static final String GROUP_ACTION = "org.rssowl.ui.internal.editors.feed.GroupAction"; //$NON-NLS-1$
 
-  /* Columns */
-  private static final String COLUMNS_ACTION = "org.rssowl.ui.internal.editors.feed.ColumnsAction"; //$NON-NLS-1$
-
-  /* Maximize Browser */
-  private static final String TOGGLE_MAXIMIZED_ACTION = "org.rssowl.ui.internal.editors.feed.ToggleMaximizedAction"; //$NON-NLS-1$
-
   /* Action to Quicksearch */
   private static final String QUICKSEARCH_ACTION = "org.rssowl.ui.internal.editors.feed.QuickSearchAction"; //$NON-NLS-1$
 
   private Composite fParent;
   private Composite fContainer;
-  private ToolBarManager fSecondToolBarManager;
-  private ToolBarManager fFirstToolBarManager;
+  private ToolBarManager fLeftToolBarManager;
+  private ToolBarManager fRightToolBarManager;
   private FeedView fFeedView;
   private JobTracker fQuickSearchTracker;
   private Text fSearchInput;
@@ -181,40 +174,25 @@ public class FilterBar {
 
   private void createControl() {
     fContainer = new Composite(fParent, SWT.NONE);
-    fContainer.setLayout(LayoutUtils.createGridLayout(5, 3, 0));
+    fContainer.setLayout(LayoutUtils.createGridLayout(5, 3, 0, 0, 0, false));
     fContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     updateVisibility();
 
-    /* Filter */
-    fFirstToolBarManager = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+    /* Left Toolbar with Filter and Grouping */
+    fLeftToolBarManager = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
     createFilterBar();
     createGrouperBar();
-    fFirstToolBarManager.createControl(fContainer);
-    fFirstToolBarManager.getControl().setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
-
-    /* Separator */
-    Label sep = new Label(fContainer, SWT.SEPARATOR | SWT.VERTICAL);
-    sep.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
-    ((GridData) sep.getLayoutData()).heightHint = 18;
-
-    fSecondToolBarManager = new ToolBarManager(SWT.FLAT);
-
-    /* Toggle Layout */
-    createLayoutBar();
-
-    /* Highlight Searches */
-    createHighlightBar();
-
-    fSecondToolBarManager.createControl(fContainer);
-    fSecondToolBarManager.getControl().setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
-
-    /* Separator */
-    sep = new Label(fContainer, SWT.SEPARATOR | SWT.VERTICAL);
-    sep.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
-    ((GridData) sep.getLayoutData()).heightHint = 18;
+    fLeftToolBarManager.createControl(fContainer);
+    fLeftToolBarManager.getControl().setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
 
     /* Quick Search */
     createQuickSearch(fContainer);
+
+    /* Right Toolbar with Highlighting */
+    fRightToolBarManager = new ToolBarManager(SWT.FLAT);
+    createHighlightBar();
+    fRightToolBarManager.createControl(fContainer);
+    fRightToolBarManager.getControl().setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
   }
 
   void updateVisibility() {
@@ -238,7 +216,7 @@ public class FilterBar {
     highlightSearchAction.setToolTipText(Messages.FilterBar_HIGHLIGHT);
     highlightSearchAction.setChecked(fGlobalPreferences.getBoolean(DefaultPreferences.FV_HIGHLIGHT_SEARCH_RESULTS));
 
-    fSecondToolBarManager.add(highlightSearchAction);
+    fRightToolBarManager.add(highlightSearchAction);
   }
 
   /* Quick Search */
@@ -247,7 +225,7 @@ public class FilterBar {
     searchContainer.setLayout(LayoutUtils.createGridLayout(Application.IS_MAC ? 2 : 3, 0, 0, 0, 0, false));
     ((GridLayout) searchContainer.getLayout()).marginTop = 1;
     searchContainer.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
-    ((GridData) searchContainer.getLayoutData()).widthHint = 180;
+    ((GridData) searchContainer.getLayoutData()).widthHint = 250;
 
     final ToolBarManager manager = new ToolBarManager(SWT.FLAT);
     final NewsFilter filter = fFeedView.getFilter();
@@ -495,140 +473,6 @@ public class FilterBar {
     }
   }
 
-  /* Layout */
-  private void createLayoutBar() {
-    final ImageDescriptor columnsImgDisabled = OwlUI.getImageDescriptor("icons/dtool16/columns.gif"); //$NON-NLS-1$
-
-    /* Set Columns */
-    IAction columnDropdown = new Action(Messages.FilterBar_VISIBLE_COLUMNS, IAction.AS_DROP_DOWN_MENU) {
-      @Override
-      public void run() {
-        OwlUI.positionDropDownMenu(this, fSecondToolBarManager);
-      }
-
-      @Override
-      public ImageDescriptor getImageDescriptor() {
-        return OwlUI.COLUMNS;
-      }
-
-      @Override
-      public ImageDescriptor getDisabledImageDescriptor() {
-        return columnsImgDisabled;
-      }
-
-      @Override
-      public boolean isEnabled() {
-        return !isNewspaperLayout();
-      }
-    };
-    columnDropdown.setId(COLUMNS_ACTION);
-
-    columnDropdown.setMenuCreator(new ContextMenuCreator() {
-
-      @Override
-      public Menu createMenu(Control parent) {
-        Menu menu = new Menu(parent);
-
-        MenuItem restoreDefaults = new MenuItem(menu, SWT.None);
-        restoreDefaults.setText(Messages.FilterBar_RESTORE_DEFAULTS);
-        restoreDefaults.addSelectionListener(new SelectionAdapter() {
-          @Override
-          public void widgetSelected(SelectionEvent e) {
-            NewsColumnViewModel defaultModel = NewsColumnViewModel.createDefault(false);
-            onColumnsChange(defaultModel);
-          }
-        });
-
-        new MenuItem(menu, SWT.SEPARATOR);
-
-        final NewsColumnViewModel model = getColumnModel();
-        NewsColumn[] columns = NewsColumn.values();
-        for (final NewsColumn column : columns) {
-          if (column.isSelectable()) {
-            MenuItem item = new MenuItem(menu, SWT.CHECK);
-            item.setText(column.getName());
-            if (model.contains(column))
-              item.setSelection(true);
-
-            item.addSelectionListener(new SelectionAdapter() {
-              @Override
-              public void widgetSelected(SelectionEvent e) {
-                if (model.contains(column))
-                  model.removeColumn(column);
-                else
-                  model.addColumn(column);
-
-                onColumnsChange(model);
-              }
-            });
-          }
-        }
-
-        return menu;
-      }
-    });
-
-    fSecondToolBarManager.add(columnDropdown);
-
-    /* Maximize / Minimize Browser */
-    final ImageDescriptor img = OwlUI.getImageDescriptor("icons/etool16/browsermaximized.gif"); //$NON-NLS-1$
-
-    IAction toggleMaximized = new Action("", IAction.AS_CHECK_BOX) { //$NON-NLS-1$
-
-      @Override
-      public void run() {
-        fFeedView.toggleNewspaperLayout();
-      }
-
-      @Override
-      public ImageDescriptor getImageDescriptor() {
-        return img;
-      }
-
-      @Override
-      public boolean isChecked() {
-        return isNewspaperLayout();
-      }
-
-      @Override
-      public String getToolTipText() {
-        if (isNewspaperLayout())
-          return Messages.FilterBar_SHOW_HEADLINES;
-
-        return Messages.FilterBar_HIDE_HEADLINES;
-      }
-    };
-    toggleMaximized.setId(TOGGLE_MAXIMIZED_ACTION);
-
-    fSecondToolBarManager.add(toggleMaximized);
-  }
-
-  private NewsColumnViewModel getColumnModel() {
-    FeedViewInput input = ((FeedViewInput) fFeedView.getEditorInput());
-    return NewsColumnViewModel.loadFrom(Owl.getPreferenceService().getEntityScope(input.getMark()));
-  }
-
-  private void onColumnsChange(NewsColumnViewModel newModel) {
-    FeedViewInput input = ((FeedViewInput) fFeedView.getEditorInput());
-
-    /* Save only into Entity if the Entity was configured with Column Settings before */
-    IPreferenceScope entityPrefs = Owl.getPreferenceService().getEntityScope(input.getMark());
-    if (entityPrefs.hasKey(DefaultPreferences.BM_NEWS_COLUMNS) || entityPrefs.hasKey(DefaultPreferences.BM_NEWS_SORT_COLUMN) || entityPrefs.hasKey(DefaultPreferences.BM_NEWS_SORT_ASCENDING)) {
-      newModel.saveTo(entityPrefs);
-      if (input.getMark() instanceof FolderNewsMark)
-        DynamicDAO.save(((FolderNewsMark) input.getMark()).getFolder());
-      else
-        DynamicDAO.save(input.getMark());
-    }
-
-    /* Save Globally */
-    else
-      newModel.saveTo(fGlobalPreferences);
-
-    /* Update Columns of all visible Feedviews */
-    EditorUtils.updateColumns();
-  }
-
   /* News Filter */
   private void createFilterBar() {
     final NewsFilter filter = fFeedView.getFilter();
@@ -647,7 +491,7 @@ public class FilterBar {
 
         /* Show Menu */
         else
-          OwlUI.positionDropDownMenu(this, fFirstToolBarManager);
+          OwlUI.positionDropDownMenu(this, fLeftToolBarManager);
       }
 
       @Override
@@ -668,7 +512,7 @@ public class FilterBar {
     ActionContributionItem item = new ActionContributionItem(newsFilterAction);
     item.setMode(ActionContributionItem.MODE_FORCE_TEXT);
 
-    fFirstToolBarManager.add(item);
+    fLeftToolBarManager.add(item);
 
     newsFilterAction.setMenuCreator(new ContextMenuCreator() {
 
@@ -892,7 +736,7 @@ public class FilterBar {
       fLastFilterType = fFeedView.getFilter().getType();
 
     fFeedView.getFilter().setType(type);
-    fFirstToolBarManager.find(FILTER_ACTION).update();
+    fLeftToolBarManager.find(FILTER_ACTION).update();
 
     /* No need to refresh or save settings if nothing changed */
     if (noChange)
@@ -951,7 +795,7 @@ public class FilterBar {
 
         /* Show Menu */
         else
-          OwlUI.positionDropDownMenu(this, fFirstToolBarManager);
+          OwlUI.positionDropDownMenu(this, fLeftToolBarManager);
       }
 
       @Override
@@ -1122,7 +966,7 @@ public class FilterBar {
     ActionContributionItem item = new ActionContributionItem(newsGroup);
     item.setMode(ActionContributionItem.MODE_FORCE_TEXT);
 
-    fFirstToolBarManager.add(item);
+    fLeftToolBarManager.add(item);
   }
 
   private void onGrouping(NewsGrouping.Type type) {
@@ -1139,7 +983,7 @@ public class FilterBar {
       fLastGroupType = fFeedView.getGrouper().getType();
 
     fFeedView.getGrouper().setType(type);
-    fFirstToolBarManager.find(GROUP_ACTION).update();
+    fLeftToolBarManager.find(GROUP_ACTION).update();
 
     /* No need to refresh or save settings if nothing changed */
     if (noChange)
@@ -1192,10 +1036,5 @@ public class FilterBar {
     /* Save Globally */
     else
       fGlobalPreferences.putInteger(key, value);
-  }
-
-  void updateToolbars() {
-    fSecondToolBarManager.find(TOGGLE_MAXIMIZED_ACTION).update();
-    fSecondToolBarManager.find(COLUMNS_ACTION).update();
   }
 }
