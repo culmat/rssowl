@@ -377,7 +377,7 @@ public class FilterBar {
       public void keyPressed(KeyEvent e) {
         if (e.keyCode == SWT.ESC) {
           clearQuickSearch(true);
-          fFeedView.handleQuicksearchTraversalEvent(SWT.TRAVERSE_RETURN);
+          fFeedView.handleQuicksearchTraversalEvent(SWT.TRAVERSE_RETURN, true);
         }
       }
     });
@@ -387,7 +387,7 @@ public class FilterBar {
       public void keyTraversed(TraverseEvent e) {
         if (e.detail == SWT.TRAVERSE_RETURN || e.detail == SWT.TRAVERSE_PAGE_NEXT || e.detail == SWT.TRAVERSE_PAGE_PREVIOUS) {
           e.doit = false;
-          fFeedView.handleQuicksearchTraversalEvent(e.detail);
+          fFeedView.handleQuicksearchTraversalEvent(e.detail, false);
         }
       }
     });
@@ -457,7 +457,7 @@ public class FilterBar {
         @Override
         public void run() {
           clearQuickSearch(true);
-          fFeedView.handleQuicksearchTraversalEvent(SWT.TRAVERSE_RETURN);
+          fFeedView.handleQuicksearchTraversalEvent(SWT.TRAVERSE_RETURN, true);
         }
       };
 

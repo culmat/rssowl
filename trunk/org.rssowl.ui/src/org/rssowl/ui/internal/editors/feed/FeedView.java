@@ -1705,8 +1705,10 @@ public class FeedView extends EditorPart implements IReusableEditor {
    * A special key was pressed from the Quicksearch Input-Field. Handle it.
    *
    * @param traversal The Traversal that occured from the quicksearch.
+   * @param clear If <code>true</code> indicates that the quicksearch was
+   * cleared.
    */
-  void handleQuicksearchTraversalEvent(int traversal) {
+  void handleQuicksearchTraversalEvent(int traversal, boolean clear) {
 
     /* Enter was hit */
     if ((traversal & SWT.TRAVERSE_RETURN) != 0) {
@@ -1716,7 +1718,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
         Tree tree = (Tree) fNewsTableControl.getViewer().getControl();
         if (tree.getItemCount() > 0) {
           IStructuredSelection lastSelection = fNewsTableControl.getLastNonEmptySelection();
-          if (lastSelection.isEmpty())
+          if (lastSelection.isEmpty() || !clear) //When not clearing, select the first result from the list
             lastSelection = new StructuredSelection(tree.getItem(0).getData());
 
           fNewsTableControl.getViewer().setSelection(lastSelection);
