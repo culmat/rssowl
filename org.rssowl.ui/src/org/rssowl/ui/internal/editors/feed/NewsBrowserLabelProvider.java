@@ -392,7 +392,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.append("div.group { color: #678; ").append(fBiggestFontCSS).append(" font-weight: bold; margin: 10px 0px 10px 5px; padding-bottom: 3px; border-bottom: 2px solid #678; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     writer.append("span.groupNote { ").append(fNormalFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
-    /* Main DIV per Item */
+    /* News Container (Single News) */
     if (forSingleNews) {
       if (!fShowFooter || !withInternalLinks) {
         writer.write("div.newsitemUnread { margin: 0; }\n"); //$NON-NLS-1$
@@ -401,23 +401,40 @@ public class NewsBrowserLabelProvider extends LabelProvider {
         writer.write("div.newsitemUnread { margin: 0; border-bottom: dotted 1px silver; }\n"); //$NON-NLS-1$
         writer.write("div.newsitemRead { margin: 0; border-bottom: dotted 1px silver; }\n"); //$NON-NLS-1$
       }
-    } else {
-      writer.write("div.newsitemUnread { margin: 0px 0px 25px 0px; border-top: dotted 1px silver; border-bottom: dotted 1px silver; }\n"); //$NON-NLS-1$
-      writer.write("div.newsitemRead { margin: 0px 0px 25px 0px; border-top: dotted 1px silver; border-bottom: dotted 1px silver; }\n"); //$NON-NLS-1$
     }
 
-    /* Main DIV Item Areas */
-    writer.write("div.header { padding: 10px 10px 5px 10px; background-color: rgb(242,242,242); }\n"); //$NON-NLS-1$
-    writer.append("div.headerSticky { padding: 10px 10px 5px 10px; ").append(fStickyBGColorCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    /* News Container (Many News - Newspaper Layout) */
+    else {
+      writer.write("div.newsitemUnread { margin: 0px 0px 20px 0px; border-bottom: dotted 1px silver; }\n"); //$NON-NLS-1$
+      writer.write("div.newsitemRead { margin: 0px 0px 20px 0px; border-bottom: dotted 1px silver; }\n"); //$NON-NLS-1$
+    }
+
+    /* Header */
+    if (!forSingleNews) {
+      writer.write("div.header { padding: 10px 10px 5px 10px; border-top: 1px dotted white; }\n"); //$NON-NLS-1$
+      writer.append("div.headerSticky { padding: 10px 10px 5px 10px; ").append(fStickyBGColorCSS).append(" border-top: 1px dotted silver; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    } else {
+      writer.write("div.header { padding: 10px 10px 5px 10px; background-color: rgb(242,242,242); }\n"); //$NON-NLS-1$
+      writer.append("div.headerSticky { padding: 10px 10px 5px 10px; ").append(fStickyBGColorCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    }
+
+    /* Content */
     writer.write("div.content { \n"); //$NON-NLS-1$
     writer.write("   padding: 15px 10px 15px 10px; border-top: dotted 1px silver; \n"); //$NON-NLS-1$
     writer.append("  background-color: #fff; clear: both; ").append(fNormalFontCSS).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
     writer.write("}\n"); //$NON-NLS-1$
-    writer.write("div.footer { background-color: rgb(248,248,248); padding: 3px 5px 3px 5px; line-height: 20px; border-top: dotted 1px silver; clear: both; }\n"); //$NON-NLS-1$
-    writer.append("div.footerSticky { ").append(fStickyBGColorCSS).append(" padding: 3px 5px 3px 5px; line-height: 20px; border-top: dotted 1px silver; clear: both; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* Restrict the style of embedded Paragraphs */
     writer.write("div.content p { margin-top: 0; padding-top: 0; margin-left: 0; padding-left: 0; }\n"); //$NON-NLS-1$
+
+    /* Footer */
+    if (!forSingleNews) {
+      writer.write("div.footer { padding: 3px 5px 3px 5px; line-height: 20px; border-top: dotted 1px silver; clear: both; }\n"); //$NON-NLS-1$
+      writer.append("div.footerSticky { ").append(fStickyBGColorCSS).append(" padding: 3px 5px 3px 5px; line-height: 20px; border-top: dotted 1px silver; clear: both; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    } else {
+      writer.write("div.footer { background-color: rgb(248,248,248); padding: 3px 5px 3px 5px; line-height: 20px; border-top: dotted 1px silver; clear: both; }\n"); //$NON-NLS-1$
+      writer.append("div.footerSticky { ").append(fStickyBGColorCSS).append(" padding: 3px 5px 3px 5px; line-height: 20px; border-top: dotted 1px silver; clear: both; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    }
 
     /* Title */
     if (withInternalLinks) //Need to set width to avoid float drop bug of delete button on all OS (see Bug 1393)
@@ -587,7 +604,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       div(builder, "delete"); //$NON-NLS-1$
 
       String link = HANDLER_PROTOCOL + DELETE_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
-      imageLink(builder, link, Messages.NewsBrowserLabelProvider_DELETE, Messages.NewsBrowserLabelProvider_DELETE, "/icons/elcl16/remove_light.gif", "remove_light.gif", null, null); //$NON-NLS-1$ //$NON-NLS-2$
+      imageLink(builder, link, Messages.NewsBrowserLabelProvider_DELETE, Messages.NewsBrowserLabelProvider_DELETE, "/icons/elcl16/remove_small.gif", "remove_small.gif", null, null); //$NON-NLS-1$ //$NON-NLS-2$
 
       /* DIV: NewsItem/Header/Delete */
       close(builder, "div"); //$NON-NLS-1$
