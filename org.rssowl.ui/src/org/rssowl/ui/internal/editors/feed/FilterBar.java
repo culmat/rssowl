@@ -111,6 +111,7 @@ public class FilterBar {
   private Composite fContainer;
   private ToolBarManager fLeftToolBarManager;
   private ToolBarManager fRightToolBarManager;
+  private IAction fHighlightSearchAction;
   private FeedView fFeedView;
   private JobTracker fQuickSearchTracker;
   private Text fSearchInput;
@@ -140,7 +141,7 @@ public class FilterBar {
     return !hideFilterBar;
   }
 
-  boolean isNewspaperLayout() {
+  private boolean isHeadlinesLayout() {
     FeedViewInput input = ((FeedViewInput) fFeedView.getEditorInput());
     Layout layout = null;
     if (input != null)
@@ -148,7 +149,7 @@ public class FilterBar {
     else
       layout = OwlUI.getLayout(fGlobalPreferences);
 
-    return (layout == Layout.NEWSPAPER);
+    return (layout == Layout.HEADLINES);
   }
 
   /**
@@ -205,7 +206,7 @@ public class FilterBar {
   }
 
   private void createHighlightBar() {
-    IAction highlightSearchAction = new Action(Messages.FilterBar_HIGHLIGHT, IAction.AS_CHECK_BOX) {
+    fHighlightSearchAction = new Action(Messages.FilterBar_HIGHLIGHT, IAction.AS_CHECK_BOX) {
       @Override
       public void run() {
         fGlobalPreferences.putBoolean(DefaultPreferences.FV_HIGHLIGHT_SEARCH_RESULTS, isChecked());
@@ -214,11 +215,27 @@ public class FilterBar {
       }
     };
 
-    highlightSearchAction.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/highlight.gif")); //$NON-NLS-1$
-    highlightSearchAction.setToolTipText(Messages.FilterBar_HIGHLIGHT);
-    highlightSearchAction.setChecked(fGlobalPreferences.getBoolean(DefaultPreferences.FV_HIGHLIGHT_SEARCH_RESULTS));
+    fHighlightSearchAction.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/highlight.gif")); //$NON-NLS-1$
+    fHighlightSearchAction.setToolTipText(Messages.FilterBar_HIGHLIGHT);
+    fHighlightSearchAction.setChecked(fGlobalPreferences.getBoolean(DefaultPreferences.FV_HIGHLIGHT_SEARCH_RESULTS));
 
-    fRightToolBarManager.add(highlightSearchAction);
+    fRightToolBarManager.add(fHighlightSearchAction);
+  }
+
+  private boolean setHighlight(boolean enabled) {
+
+    /* Highlighting is unsupported when headlines layout is used */
+    if (isHeadlinesLayout())
+      return false;
+
+    /* Return if already in same state */
+    if (enabled == fHighlightSearchAction.isChecked())
+      return false;
+
+    fGlobalPreferences.putBoolean(DefaultPreferences.FV_HIGHLIGHT_SEARCH_RESULTS, enabled);
+    fHighlightSearchAction.setChecked(enabled);
+
+    return true;
   }
 
   /* Quick Search */
@@ -394,6 +411,8 @@ public class FilterBar {
 
     /* Run search when text is entered */
     fSearchInput.addModifyListener(new ModifyListener() {
+      private boolean highlightChanged = false;
+
       public void modifyText(ModifyEvent e) {
 
         /* Clear Search immediately */
@@ -402,6 +421,10 @@ public class FilterBar {
           if (!fBlockRefresh) {
             BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
               public void run() {
+                if (highlightChanged) {
+                  setHighlight(false);
+                  highlightChanged = false;
+                }
                 fFeedView.refresh(true, false);
               }
             });
@@ -416,6 +439,8 @@ public class FilterBar {
             public IStatus run(IProgressMonitor monitor) {
               BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
                 public void run() {
+                  if (setHighlight(true))
+                    highlightChanged = true;
                   fFeedView.getFilter().setPattern(fSearchInput.getText());
                   fFeedView.refresh(true, false);
                 }
