@@ -50,6 +50,7 @@ public class EntityGroup implements IActionFilter {
   List<EntityGroupItem> fItems;
   private final Integer fSortKey;
   private final RGB fColorHint;
+  private int fSizeHint;
 
   /**
    * Creates a new EntityGroup with the given ID. Note that inside one Viewer
@@ -183,6 +184,22 @@ public class EntityGroup implements IActionFilter {
    */
   public RGB getColorHint() {
     return fColorHint;
+  }
+
+  /**
+   * @param sizeHint a hint on the number of elements this group shows, which
+   * can be different from the items inside if a filter is enabled by the user.
+   */
+  public void setSizeHint(int sizeHint) {
+    fSizeHint = sizeHint;
+  }
+
+  /**
+   * @return a hint on the number of elements this group shows, which can be
+   * different from the items inside if a filter is enabled by the user.
+   */
+  public int getSizeHint() {
+    return fSizeHint;
   }
 
   /*
