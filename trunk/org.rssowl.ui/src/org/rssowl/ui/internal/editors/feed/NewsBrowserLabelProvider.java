@@ -404,11 +404,11 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     /* News Container (Many News - Newspaper Layout) */
     else {
       if (isGroupingEnabled()) {
-        writer.write("div.newsitemUnread { margin: 0px 0px 20px 10px; }\n"); //$NON-NLS-1$
-        writer.write("div.newsitemRead { margin: 0px 0px 20px 10px; }\n"); //$NON-NLS-1$
+        writer.write("div.newsitemUnread { margin: 0px 0px 20px 10px; border-bottom: 1px solid white; }\n"); //$NON-NLS-1$
+        writer.write("div.newsitemRead { margin: 0px 0px 20px 10px; border-bottom: 1px solid white; }\n"); //$NON-NLS-1$
       } else {
-        writer.write("div.newsitemUnread { margin: 0px 0px 20px 0px; }\n"); //$NON-NLS-1$
-        writer.write("div.newsitemRead { margin: 0px 0px 20px 0px; }\n"); //$NON-NLS-1$
+        writer.write("div.newsitemUnread { margin: 0px 0px 20px 0px; border-bottom: 1px solid white; }\n"); //$NON-NLS-1$
+        writer.write("div.newsitemRead { margin: 0px 0px 20px 0px; border-bottom: 1px solid white; }\n"); //$NON-NLS-1$
       }
     }
 
@@ -417,10 +417,10 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       writer.write("div.header { padding: 10px 10px 5px 10px; background-color: rgb(242,242,242); }\n"); //$NON-NLS-1$
       writer.append("div.headerSticky { padding: 10px 10px 5px 10px; ").append(fStickyBGColorCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     } else if (isGroupingEnabled()) {
-      writer.write("div.header { padding: 10px 10px 5px 5px; border-top: 1px dotted white; }\n"); //$NON-NLS-1$
+      writer.write("div.header { padding: 10px 10px 5px 5px; border-top: 1px solid white; }\n"); //$NON-NLS-1$
       writer.append("div.headerSticky { padding: 10px 10px 5px 5px; ").append(fStickyBGColorCSS).append(" border-top: 1px dotted silver; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     } else {
-      writer.write("div.header { padding: 10px 10px 5px 10px; border-top: 1px dotted white; }\n"); //$NON-NLS-1$
+      writer.write("div.header { padding: 10px 10px 5px 10px; border-top: 1px solid white; }\n"); //$NON-NLS-1$
       writer.append("div.headerSticky { padding: 10px 10px 5px 10px; ").append(fStickyBGColorCSS).append(" border-top: 1px dotted silver; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
@@ -438,8 +438,8 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       writer.write("div.footer { background-color: rgb(248,248,248); padding: 3px 5px 3px 5px; line-height: 20px; border-top: dotted 1px silver; border-bottom: dotted 1px silver; clear: both; }\n"); //$NON-NLS-1$
       writer.append("div.footerSticky { ").append(fStickyBGColorCSS).append(" padding: 3px 5px 3px 5px; line-height: 20px; border-top: dotted 1px silver; border-bottom: dotted 1px silver; clear: both; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     } else {
-      writer.write("div.footer { padding: 3px 5px 3px 5px; line-height: 20px; border-top: dotted 1px silver; clear: both; }\n"); //$NON-NLS-1$
-      writer.write("div.footerSticky { padding: 3px 5px 3px 5px; line-height: 20px; border-top: dotted 1px silver; clear: both; }\n"); //$NON-NLS-1$
+      writer.write("div.footer { padding: 3px 5px 3px 5px; line-height: 20px; border-top: dotted 1px silver; border-bottom: 1px solid white; clear: both; }\n"); //$NON-NLS-1$
+      writer.append("div.footerSticky { ").append(fStickyBGColorCSS).append(" padding: 3px 5px 3px 5px; line-height: 20px; border-top: dotted 1px silver; border-bottom: 1px dotted silver; clear: both; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
       writer.write("div.clearingFooter { clear: both; }\n"); //$NON-NLS-1$
     }
 
