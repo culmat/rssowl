@@ -157,6 +157,8 @@ public class FilterBar {
    * @param refresh
    */
   public void clearQuickSearch(boolean refresh) {
+    setClearBarVisible(false);
+
     if (fSearchInput.getText().length() != 0) {
       fBlockRefresh = !refresh;
       try {
@@ -373,8 +375,10 @@ public class FilterBar {
     fSearchInput.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(KeyEvent e) {
-        if (e.keyCode == SWT.ESC)
+        if (e.keyCode == SWT.ESC) {
           clearQuickSearch(true);
+          fFeedView.handleQuicksearchTraversalEvent(SWT.TRAVERSE_RETURN);
+        }
       }
     });
 
@@ -453,6 +457,7 @@ public class FilterBar {
         @Override
         public void run() {
           clearQuickSearch(true);
+          fFeedView.handleQuicksearchTraversalEvent(SWT.TRAVERSE_RETURN);
         }
       };
 
@@ -467,7 +472,7 @@ public class FilterBar {
   }
 
   void setClearBarVisible(boolean visible) {
-    if (fFilterToolBar != null && ((GridData) fFilterToolBar.getControl().getLayoutData()).exclude == visible) {
+    if (fFilterToolBar != null && !fFilterToolBar.getControl().isDisposed() && ((GridData) fFilterToolBar.getControl().getLayoutData()).exclude == visible) {
       ((GridData) fFilterToolBar.getControl().getLayoutData()).exclude = !visible;
       fFilterToolBar.getControl().setVisible(visible);
       fFilterToolBar.getControl().getParent().layout();
