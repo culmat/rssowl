@@ -88,7 +88,6 @@ import org.rssowl.ui.internal.ILinkHandler;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.ArchiveNewsAction;
 import org.rssowl.ui.internal.actions.AutomateFilterAction;
-import org.rssowl.ui.internal.actions.CreateFilterAction.PresetAction;
 import org.rssowl.ui.internal.actions.MakeNewsStickyAction;
 import org.rssowl.ui.internal.actions.MarkAllNewsReadAction;
 import org.rssowl.ui.internal.actions.MoveCopyNewsToBinAction;
@@ -96,6 +95,7 @@ import org.rssowl.ui.internal.actions.NavigationActionFactory;
 import org.rssowl.ui.internal.actions.OpenInExternalBrowserAction;
 import org.rssowl.ui.internal.actions.OpenNewsAction;
 import org.rssowl.ui.internal.actions.ToggleReadStateAction;
+import org.rssowl.ui.internal.actions.CreateFilterAction.PresetAction;
 import org.rssowl.ui.internal.dialogs.SearchNewsDialog;
 import org.rssowl.ui.internal.editors.feed.NewsBrowserLabelProvider.Dynamic;
 import org.rssowl.ui.internal.undo.NewsStateOperation;
@@ -1140,7 +1140,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     js.append("var body = document.getElementById(\"owlbody\"); "); //$NON-NLS-1$
     js.append("var divs = body.childNodes; "); //$NON-NLS-1$
 
-    /* Next News */
+    /* Next News (need to fake Y position by some pixels to avoid the same news being selected over and over) */
     if (next) {
       js.append("  for (var i = 1; i < divs.length; i++) { "); //$NON-NLS-1$
       js.append("    if (divs[i].nodeType != 1) { "); //$NON-NLS-1$
@@ -1148,16 +1148,16 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       js.append("    } "); //$NON-NLS-1$
       js.append("    var divPosY = divs[i].offsetTop; "); //$NON-NLS-1$
       if (unread) {
-        js.append("  if (divPosY > scrollPosY && divs[i].className == \"newsitemUnread\") { "); //$NON-NLS-1$
+        js.append("  if (divPosY > scrollPosY + 15 && divs[i].className == \"newsitemUnread\") { "); //$NON-NLS-1$
       } else
-        js.append("  if (divPosY > scrollPosY) { "); //$NON-NLS-1$
+        js.append("  if (divPosY > scrollPosY + 15 && (divs[i].className == \"newsitemUnread\" || divs[i].className == \"newsitemRead\")) { "); //$NON-NLS-1$
       js.append("      divs[i].scrollIntoView(true); "); //$NON-NLS-1$
       js.append("      break; "); //$NON-NLS-1$
       js.append("    } "); //$NON-NLS-1$
       js.append("  } "); //$NON-NLS-1$
     }
 
-    /* Previous News */
+    /* Previous News (need to fake Y position by some pixels to avoid the same news being selected over and over) */
     else {
       js.append("  for (var i = divs.length - 1; i >= 0; i--) { "); //$NON-NLS-1$
       js.append("    if (divs[i].nodeType != 1) { "); //$NON-NLS-1$
@@ -1165,9 +1165,9 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       js.append("    } "); //$NON-NLS-1$
       js.append("    var divPosY = divs[i].offsetTop; "); //$NON-NLS-1$
       if (unread) {
-        js.append("  if (divPosY < scrollPosY - 10 && divs[i].className == \"newsitemUnread\") { "); //$NON-NLS-1$
+        js.append("  if (divPosY < scrollPosY - 15 && divs[i].className == \"newsitemUnread\") { "); //$NON-NLS-1$
       } else
-        js.append("  if (divPosY < scrollPosY - 10) { "); //$NON-NLS-1$
+        js.append("  if (divPosY < scrollPosY - 15 && (divs[i].className == \"newsitemUnread\" || divs[i].className == \"newsitemRead\")) { "); //$NON-NLS-1$
       js.append("      divs[i].scrollIntoView(true); "); //$NON-NLS-1$
       js.append("      break; "); //$NON-NLS-1$
       js.append("    } "); //$NON-NLS-1$
