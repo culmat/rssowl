@@ -83,6 +83,7 @@ import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.ApplicationActionBarAdvisor;
 import org.rssowl.ui.internal.ApplicationServer;
 import org.rssowl.ui.internal.Controller;
+import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.ILinkHandler;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.ArchiveNewsAction;
@@ -908,7 +909,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   /**
    * A special way of refreshing this viewer with additional options to control
    * the behavior.
-   * 
+   *
    * @param restoreInput if set to <code>true</code> will restore the initial
    * input that was set to the browser in case the user navigated to a different
    * URL.
@@ -1024,7 +1025,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
   /**
    * Adds the given filter to this viewer.
-   * 
+   *
    * @param filter a viewer filter
    */
   public void addFilter(ViewerFilter filter) {
@@ -1040,7 +1041,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
    * Removes the given filter from this viewer, and triggers refiltering and
    * resorting of the elements if required. Has no effect if the identical
    * filter is not registered.
-   * 
+   *
    * @param filter a viewer filter
    */
   public void removeFilter(ViewerFilter filter) {
@@ -1276,6 +1277,8 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
             /* Only add if there are Childs */
             if (sortedChilds.length > 0) {
               flatList.add(group);
+              if (group instanceof EntityGroup)
+                ((EntityGroup) group).setSizeHint(sortedChilds.length);
               flatList.addAll(Arrays.asList(sortedChilds));
             }
           }
