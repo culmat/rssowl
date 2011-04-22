@@ -332,7 +332,15 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     return input instanceof INews;
   }
 
+  private boolean isEntityGroupDisplayed() {
+    Object input = fViewer != null ? fViewer.getInput() : null;
+    return input instanceof EntityGroup;
+  }
+
   private boolean isGroupingEnabled() {
+    if (isEntityGroupDisplayed())
+      return false; //Entity Group as input does not count here
+
     if (fViewer != null) {
       IContentProvider cp = fViewer.getContentProvider();
       if (cp instanceof NewsContentProvider)
@@ -430,8 +438,8 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       writer.write("div.footer { background-color: rgb(248,248,248); padding: 3px 5px 3px 5px; line-height: 20px; border-top: dotted 1px silver; border-bottom: dotted 1px silver; clear: both; }\n"); //$NON-NLS-1$
       writer.append("div.footerSticky { ").append(fStickyBGColorCSS).append(" padding: 3px 5px 3px 5px; line-height: 20px; border-top: dotted 1px silver; border-bottom: dotted 1px silver; clear: both; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     } else {
-      writer.write("div.footer { padding: 3px 5px 3px 5px; line-height: 20px; border-top: dotted 1px silver; border-bottom: dotted 1px white; clear: both; }\n"); //$NON-NLS-1$
-      writer.append("div.footerSticky { ").append(fStickyBGColorCSS).append(" padding: 3px 5px 3px 5px; line-height: 20px; border-top: dotted 1px silver; border-bottom: dotted 1px silver; clear: both; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+      writer.write("div.footer { padding: 3px 5px 3px 5px; line-height: 20px; border-top: dotted 1px silver; clear: both; }\n"); //$NON-NLS-1$
+      writer.write("div.footerSticky { padding: 3px 5px 3px 5px; line-height: 20px; border-top: dotted 1px silver; clear: both; }\n"); //$NON-NLS-1$
       writer.write("div.clearingFooter { clear: both; }\n"); //$NON-NLS-1$
     }
 
