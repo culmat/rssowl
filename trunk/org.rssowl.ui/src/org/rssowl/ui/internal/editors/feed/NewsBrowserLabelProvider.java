@@ -556,15 +556,16 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     }
 
     /* DIV: NewsItem */
-    if (index == 0)
-      div(builder, isUnread ? "newsitemUnread" : "newsitemRead", "border-top: none;", Dynamic.NEWS.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-    else if (fIsNewsListBGColorDefined && index % 2 != 0)
+    if (index != 0 && fIsNewsListBGColorDefined && index % 2 != 0)
       div(builder, isUnread ? "newsitemUnread" : "newsitemRead", fNewsListBGColorCSS, Dynamic.NEWS.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
     else
       div(builder, isUnread ? "newsitemUnread" : "newsitemRead", Dynamic.NEWS.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* DIV: NewsItem/Header */
-    div(builder, news.isFlagged() ? "headerSticky" : "header", Dynamic.HEADER.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
+    if (index == 0)
+      div(builder, news.isFlagged() ? "headerSticky" : "header", "border-top: none;", Dynamic.HEADER.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    else
+      div(builder, news.isFlagged() ? "headerSticky" : "header", Dynamic.HEADER.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* News Title */
     {
