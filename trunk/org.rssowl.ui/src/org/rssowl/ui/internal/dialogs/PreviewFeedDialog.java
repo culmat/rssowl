@@ -346,19 +346,6 @@ public class PreviewFeedDialog extends Dialog {
       /* Open Body */
       html.append("  </head>\n  <body id=\"owlbody\">\n"); //$NON-NLS-1$
 
-      /* Title */
-      if (StringUtils.isSet(fBookmark.getName())) {
-        html.append("<div class=\"group\">"); //$NON-NLS-1$
-        html.append(fBookmark.getName());
-        html.append("<span class=\"groupNote\">"); //$NON-NLS-1$
-        if (news.size() == 1)
-          html.append(Messages.PreviewFeedDialog_ONE_ARTICLE);
-        else
-          html.append(NLS.bind(Messages.PreviewFeedDialog_N_ARTICLES, news.size()));
-        html.append("</span>"); //$NON-NLS-1$
-        html.append("</div>"); //$NON-NLS-1$
-      }
-
       /* Write News */
       for (INews item : news) {
         html.append(fLabelProvider.getText(item, false));
