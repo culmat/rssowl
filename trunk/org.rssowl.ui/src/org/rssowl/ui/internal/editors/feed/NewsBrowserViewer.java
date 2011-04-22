@@ -420,7 +420,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
               final String author = StringUtils.isSet(name) ? name : email;
               if (StringUtils.isSet(author)) {
                 manager.add(new Separator());
-                manager.add(new Action(NLS.bind(Messages.NewsBrowserViewer_AUTHORED_BY, author)) {
+                manager.add(new Action(NLS.bind(Messages.NewsBrowserViewer_AUTHORED_BY, escapeForMenu(author))) {
                   @Override
                   public void run() {
                     List<ISearchCondition> conditions = new ArrayList<ISearchCondition>(1);
@@ -442,7 +442,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
               if (news.getCategories().size() == 1) {
                 final String name = news.getCategories().get(0).getName();
                 if (StringUtils.isSet(name)) {
-                  manager.add(new Action(NLS.bind(Messages.NewsBrowserViewer_CATEGORIZED_N, name)) {
+                  manager.add(new Action(NLS.bind(Messages.NewsBrowserViewer_CATEGORIZED_N, escapeForMenu(name))) {
                     @Override
                     public void run() {
                       List<ISearchCondition> conditions = new ArrayList<ISearchCondition>(1);
@@ -463,7 +463,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
                 for (ICategory category : news.getCategories()) {
                   final String name = category.getName();
                   if (StringUtils.isSet(name)) {
-                    categoriesMenu.add(new Action(name) {
+                    categoriesMenu.add(new Action(escapeForMenu(name)) {
                       @Override
                       public void run() {
                         List<ISearchCondition> conditions = new ArrayList<ISearchCondition>(1);
@@ -485,7 +485,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
             if (!news.getLabels().isEmpty()) {
               manager.add(new Separator());
               for (final ILabel label : news.getLabels()) {
-                manager.add(new Action(NLS.bind(Messages.NewsBrowserViewer_LABELED_N, label.getName())) {
+                manager.add(new Action(NLS.bind(Messages.NewsBrowserViewer_LABELED_N, escapeForMenu(label.getName()))) {
                   @Override
                   public void run() {
                     List<ISearchCondition> conditions = new ArrayList<ISearchCondition>(1);
@@ -506,6 +506,10 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
     /* Create  */
     fFindRelatedContextMenu = manager.createContextMenu(fBrowser.getControl().getShell());
+  }
+
+  private String escapeForMenu(String str) {
+    return StringUtils.replaceAll(str, "&", "&&"); //$NON-NLS-1$ //$NON-NLS-2$
   }
 
   private void doSearch(final List<ISearchCondition> conditions, final boolean useLowScoreFilter) {
@@ -939,7 +943,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
    * to do something.
    */
   protected void onRefresh() {
-    //Do nothing here.
+  //Do nothing here.
   }
 
   /*
