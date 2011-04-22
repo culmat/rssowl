@@ -173,6 +173,8 @@ public class Messages extends NLS {
   public static String PreviewFeedDialog_FOUND_N_NEWS_HOMEPAGE;
   public static String PreviewFeedDialog_LOAD_FEED;
   public static String PreviewFeedDialog_LOAD_FEED_N;
+  public static String PreviewFeedDialog_N_ARTICLES;
+  public static String PreviewFeedDialog_ONE_ARTICLE;
   public static String PreviewFeedDialog_PREVIEW;
   public static String PreviewFeedDialog_PREVIEW_OF;
   public static String PreviewFeedDialog_UNABLE_LOAD_FEED;

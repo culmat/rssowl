@@ -50,9 +50,9 @@ import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
-import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.ISource;
+import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.reference.SearchMarkReference;
@@ -64,8 +64,8 @@ import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.ApplicationServer;
 import org.rssowl.ui.internal.EntityGroup;
-import org.rssowl.ui.internal.FolderNewsMark.FolderNewsMarkReference;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.FolderNewsMark.FolderNewsMarkReference;
 import org.rssowl.ui.internal.util.CBrowser;
 
 import java.io.IOException;
@@ -251,7 +251,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     int small = normal - 1;
     int verysmall = normal - 2;
     int bigger = normal + 1;
-    int biggest = bigger + 6;
+    int biggest = bigger + 2;
 
     String fontUnit = "pt"; //$NON-NLS-1$
     fNormalFontCSS = "font-size: " + normal + fontUnit + ";"; //$NON-NLS-1$ //$NON-NLS-2$
@@ -389,7 +389,8 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.write("div.hidden { display: none; }\n"); //$NON-NLS-1$
 
     /* Group */
-    writer.append("div.group { color: #678; ").append(fBiggestFontCSS).append(" font-weight: bold; padding: 10px 0px 10px 5px; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("div.group { color: #678; ").append(fBiggestFontCSS).append(" font-weight: bold; margin: 10px 0px 10px 5px; padding-bottom: 3px; border-bottom: 2px solid #678; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("span.groupNote { ").append(fNormalFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* Main DIV per Item */
     if (forSingleNews) {
@@ -488,6 +489,24 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       span(builder, StringUtils.htmlEscape(group.getName()), null, OwlUI.toString(group.getColorHint()));
     else
       builder.append(StringUtils.htmlEscape(group.getName()));
+
+    /* Group Note (number of articles and filtered elements if any) */
+    int sizeHint = group.getSizeHint();
+    int sizeDiff = group.getEntities().size() - sizeHint;
+    String groupNote;
+    if (sizeHint == 1) {
+      if (sizeDiff == 0)
+        groupNote = Messages.NewsBrowserLabelProvider_ONE_ARTICLE;
+      else
+        groupNote = NLS.bind(Messages.NewsBrowserLabelProvider_ONE_ARTICLE_N_FILTERED, sizeDiff);
+    } else {
+      if (sizeDiff == 0)
+        groupNote = NLS.bind(Messages.NewsBrowserLabelProvider_N_ARTICLES, sizeHint);
+      else
+        groupNote = NLS.bind(Messages.NewsBrowserLabelProvider_N_ARTICLES_M_FILTERED, sizeHint, sizeDiff);
+    }
+
+    span(builder, groupNote, "groupNote", null, null); //$NON-NLS-1$
 
     /* Close: Group */
     close(builder, "div"); //$NON-NLS-1$
