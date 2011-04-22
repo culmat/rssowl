@@ -39,6 +39,7 @@ import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.TRANSFORM_HA
 
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -335,6 +336,16 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     return input instanceof INews;
   }
 
+  private boolean isGroupingEnabled() {
+    if (fViewer != null) {
+      IContentProvider cp = fViewer.getContentProvider();
+      if (cp instanceof NewsContentProvider)
+        return ((NewsContentProvider) cp).isGroupingEnabled();
+    }
+
+    return false;
+  }
+
   private boolean showFeedInformation() {
     if (fForceShowFeedInformation)
       return true;
@@ -389,7 +400,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.write("div.hidden { display: none; }\n"); //$NON-NLS-1$
 
     /* Group */
-    writer.append("div.group { color: #678; ").append(fBiggestFontCSS).append(" font-weight: bold; margin: 10px 0px 10px 5px; padding-bottom: 3px; border-bottom: 2px solid #678; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("div.group { color: #678; ").append(fBiggestFontCSS).append(" font-weight: bold; margin: 10px 0px 5px 5px; padding-bottom: 3px; border-bottom: 2px solid #678; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     writer.append("span.groupNote { ").append(fNormalFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* News Container (Single News) */
@@ -405,14 +416,24 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
     /* News Container (Many News - Newspaper Layout) */
     else {
-      writer.write("div.newsitemUnread { margin: 0px 0px 20px 0px; border-bottom: dotted 1px silver; }\n"); //$NON-NLS-1$
-      writer.write("div.newsitemRead { margin: 0px 0px 20px 0px; border-bottom: dotted 1px silver; }\n"); //$NON-NLS-1$
+      if (isGroupingEnabled()) {
+        writer.write("div.newsitemUnread { margin: 0px 0px 20px 10px; border-bottom: dotted 1px silver; }\n"); //$NON-NLS-1$
+        writer.write("div.newsitemRead { margin: 0px 0px 20px 10px; border-bottom: dotted 1px silver; }\n"); //$NON-NLS-1$
+      } else {
+        writer.write("div.newsitemUnread { margin: 0px 0px 20px 0px; border-bottom: dotted 1px silver; }\n"); //$NON-NLS-1$
+        writer.write("div.newsitemRead { margin: 0px 0px 20px 0px; border-bottom: dotted 1px silver; }\n"); //$NON-NLS-1$
+      }
     }
 
     /* Header */
     if (!forSingleNews) {
-      writer.write("div.header { padding: 10px 10px 5px 10px; border-top: 1px dotted white; }\n"); //$NON-NLS-1$
-      writer.append("div.headerSticky { padding: 10px 10px 5px 10px; ").append(fStickyBGColorCSS).append(" border-top: 1px dotted silver; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+      if (isGroupingEnabled()) {
+        writer.write("div.header { padding: 10px 10px 5px 5px; border-top: 1px dotted white; }\n"); //$NON-NLS-1$
+        writer.append("div.headerSticky { padding: 10px 10px 5px 5px; ").append(fStickyBGColorCSS).append(" border-top: 1px dotted silver; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+      } else {
+        writer.write("div.header { padding: 10px 10px 5px 10px; border-top: 1px dotted white; }\n"); //$NON-NLS-1$
+        writer.append("div.headerSticky { padding: 10px 10px 5px 10px; ").append(fStickyBGColorCSS).append(" border-top: 1px dotted silver; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+      }
     } else {
       writer.write("div.header { padding: 10px 10px 5px 10px; background-color: rgb(242,242,242); }\n"); //$NON-NLS-1$
       writer.append("div.headerSticky { padding: 10px 10px 5px 10px; ").append(fStickyBGColorCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
