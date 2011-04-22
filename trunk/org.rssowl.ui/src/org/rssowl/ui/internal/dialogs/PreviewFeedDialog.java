@@ -337,7 +337,7 @@ public class PreviewFeedDialog extends Dialog {
       /* CSS */
       try {
         StringWriter writer = new StringWriter();
-        fLabelProvider.writeCSS(writer, false);
+        fLabelProvider.writeCSS(writer, false, false);
         html.append(writer.toString());
       } catch (IOException e) {
         /* Will Never Happen */

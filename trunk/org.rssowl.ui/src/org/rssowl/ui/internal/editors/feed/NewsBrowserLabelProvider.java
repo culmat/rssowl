@@ -364,18 +364,6 @@ public class NewsBrowserLabelProvider extends LabelProvider {
    * Writes the CSS information to the given Writer.
    *
    * @param writer the writer to add the CSS information to.
-   * @param withInternalLinks <code>true</code> to include links of the internal
-   * protocol rssowl:// and <code>false</code> otherwise.
-   * @throws IOException In case of an error while writing.
-   */
-  public void writeCSS(Writer writer, boolean withInternalLinks) throws IOException {
-    writeCSS(writer, isSingleNewsDisplayed(), withInternalLinks);
-  }
-
-  /**
-   * Writes the CSS information to the given Writer.
-   *
-   * @param writer the writer to add the CSS information to.
    * @param forSingleNews if <code>true</code>, the site contains a single news,
    * or <code>false</code> if it contains a collection of news.
    * @param withInternalLinks <code>true</code> to include links of the internal
@@ -449,6 +437,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     } else {
       writer.write("div.footer { padding: 3px 5px 3px 5px; line-height: 20px; border-top: dotted 1px silver; clear: both; }\n"); //$NON-NLS-1$
       writer.append("div.footerSticky { ").append(fStickyBGColorCSS).append(" padding: 3px 5px 3px 5px; line-height: 20px; border-top: dotted 1px silver; clear: both; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+      writer.write("div.clearingFooter { clear: both; }\n"); //$NON-NLS-1$
     }
 
     /* Title */
@@ -783,7 +772,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     if (!labels.isEmpty())
       builder.append(Messages.NewsBrowserLabelProvider_LABELS).append(" "); //$NON-NLS-1$
 
-    /* Append Labels to Footer */
+    /* Append Labels to Header */
     int c = 0;
     for (ILabel label : labels) {
       c++;
@@ -917,6 +906,12 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       close(builder, "div"); //$NON-NLS-1$
 
       /* Close: NewsItem/Footer */
+      close(builder, "div"); //$NON-NLS-1$
+    }
+
+    /* Even though no footer wanted, need to have a div with clear:both to avoid hanging images from content */
+    else {
+      div(builder, "clearingFooter"); //$NON-NLS-1$
       close(builder, "div"); //$NON-NLS-1$
     }
 
