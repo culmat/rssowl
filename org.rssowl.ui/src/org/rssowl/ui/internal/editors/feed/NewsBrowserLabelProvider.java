@@ -426,17 +426,15 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     }
 
     /* Header */
-    if (!forSingleNews) {
-      if (isGroupingEnabled()) {
-        writer.write("div.header { padding: 10px 10px 5px 5px; border-top: 1px dotted white; }\n"); //$NON-NLS-1$
-        writer.append("div.headerSticky { padding: 10px 10px 5px 5px; ").append(fStickyBGColorCSS).append(" border-top: 1px dotted silver; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
-      } else {
-        writer.write("div.header { padding: 10px 10px 5px 10px; border-top: 1px dotted white; }\n"); //$NON-NLS-1$
-        writer.append("div.headerSticky { padding: 10px 10px 5px 10px; ").append(fStickyBGColorCSS).append(" border-top: 1px dotted silver; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
-      }
-    } else {
+    if (forSingleNews) {
       writer.write("div.header { padding: 10px 10px 5px 10px; background-color: rgb(242,242,242); }\n"); //$NON-NLS-1$
       writer.append("div.headerSticky { padding: 10px 10px 5px 10px; ").append(fStickyBGColorCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    } else if (isGroupingEnabled()) {
+      writer.write("div.header { padding: 10px 10px 5px 5px; border-top: 1px dotted white; }\n"); //$NON-NLS-1$
+      writer.append("div.headerSticky { padding: 10px 10px 5px 5px; ").append(fStickyBGColorCSS).append(" border-top: 1px dotted silver; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    } else {
+      writer.write("div.header { padding: 10px 10px 5px 10px; border-top: 1px dotted white; }\n"); //$NON-NLS-1$
+      writer.append("div.headerSticky { padding: 10px 10px 5px 10px; ").append(fStickyBGColorCSS).append(" border-top: 1px dotted silver; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     /* Content */
@@ -449,11 +447,11 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.write("div.content p { margin-top: 0; padding-top: 0; margin-left: 0; padding-left: 0; }\n"); //$NON-NLS-1$
 
     /* Footer */
-    if (!forSingleNews) {
-      writer.write("div.footer { padding: 3px 5px 3px 5px; line-height: 20px; border-top: dotted 1px silver; clear: both; }\n"); //$NON-NLS-1$
+    if (forSingleNews) {
+      writer.write("div.footer { background-color: rgb(248,248,248); padding: 3px 5px 3px 5px; line-height: 20px; border-top: dotted 1px silver; clear: both; }\n"); //$NON-NLS-1$
       writer.append("div.footerSticky { ").append(fStickyBGColorCSS).append(" padding: 3px 5px 3px 5px; line-height: 20px; border-top: dotted 1px silver; clear: both; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     } else {
-      writer.write("div.footer { background-color: rgb(248,248,248); padding: 3px 5px 3px 5px; line-height: 20px; border-top: dotted 1px silver; clear: both; }\n"); //$NON-NLS-1$
+      writer.write("div.footer { padding: 3px 5px 3px 5px; line-height: 20px; border-top: dotted 1px silver; clear: both; }\n"); //$NON-NLS-1$
       writer.append("div.footerSticky { ").append(fStickyBGColorCSS).append(" padding: 3px 5px 3px 5px; line-height: 20px; border-top: dotted 1px silver; clear: both; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
