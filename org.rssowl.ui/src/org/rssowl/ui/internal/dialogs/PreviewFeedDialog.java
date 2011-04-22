@@ -348,7 +348,7 @@ public class PreviewFeedDialog extends Dialog {
 
       /* Write News */
       for (int i = 0; i < news.size(); i++) {
-        html.append(fLabelProvider.getText(news.get(i), false, i));
+        html.append(fLabelProvider.getText(news.get(i), false, true, i));
       }
 
       /* End HTML */

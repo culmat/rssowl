@@ -701,7 +701,7 @@ public class ApplicationServer {
 
       /* Output each Element as HTML */
       for (int i = 0; i < children.length; i++) {
-        String html = unicodeToEntities(labelProvider.getText(children[i], i));
+        String html = unicodeToEntities(labelProvider.getText(children[i], true, true, i));
         writer.write(html);
       }
 
