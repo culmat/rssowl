@@ -60,7 +60,9 @@ import org.rssowl.ui.internal.editors.browser.WebBrowserView;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -85,7 +87,7 @@ public class CBrowser {
   private static final String DISABLE_XULRUNNER = "noXulrunner"; //$NON-NLS-1$
 
   /* Delay in millies after a refresh until to allow ext. navigation again (see Bug 1429) */
-  private static final long REFRESH_NAVIGATION_DELAY = Application.IS_MAC ? 1000 : 800;
+  private static final long REFRESH_NAVIGATION_DELAY = 3000;
 
   /* Mac only: Delay in millies after a URL change until to allow ext. navigation again (see Bug 1350) */
   private static final long URL_CHANGE_NAVIGATION_DELAY = 1000;
@@ -110,6 +112,9 @@ public class CBrowser {
   private static final int FEATURE_SECURITYBAND = 9;
   private static final int FEATURE_DISABLE_NAVIGATION_SOUNDS = 21;
   private static final int SET_FEATURE_ON_PROCESS = 0x2;
+
+  /* Blacklist of common iframes that cause external window opening */
+  private static final List<String> EXTERNAL_BLACKLIST = Arrays.asList("/plugins/like.php", "scribd.com/embeds", "youtube.com/embed/"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
   private Browser fBrowser;
   private boolean fAllowExternalNavigation;
@@ -647,6 +652,12 @@ public class CBrowser {
           /* See Bug 1350: Potential browser popup when reading articles */
           if (Application.IS_MAC && !isManaged && currentTimeMillis - fLastUrlChange < URL_CHANGE_NAVIGATION_DELAY)
             return;
+
+          /* Check for common URLs that are blacklisted */
+          for (String blacklistItem : EXTERNAL_BLACKLIST) {
+            if (event.location.contains(blacklistItem))
+              return;
+          }
 
           /* Finally, cancel event and open URL external */
           event.doit = false;
