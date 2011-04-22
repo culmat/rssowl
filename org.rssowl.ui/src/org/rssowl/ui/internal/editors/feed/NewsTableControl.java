@@ -106,7 +106,6 @@ import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.StatusLineUpdater;
 import org.rssowl.ui.internal.actions.ArchiveNewsAction;
 import org.rssowl.ui.internal.actions.AutomateFilterAction;
-import org.rssowl.ui.internal.actions.CreateFilterAction.PresetAction;
 import org.rssowl.ui.internal.actions.MakeNewsStickyAction;
 import org.rssowl.ui.internal.actions.MarkAllNewsReadAction;
 import org.rssowl.ui.internal.actions.MoveCopyNewsToBinAction;
@@ -114,6 +113,7 @@ import org.rssowl.ui.internal.actions.OpenInBrowserAction;
 import org.rssowl.ui.internal.actions.OpenInExternalBrowserAction;
 import org.rssowl.ui.internal.actions.OpenNewsAction;
 import org.rssowl.ui.internal.actions.ToggleReadStateAction;
+import org.rssowl.ui.internal.actions.CreateFilterAction.PresetAction;
 import org.rssowl.ui.internal.editors.browser.WebBrowserContext;
 import org.rssowl.ui.internal.undo.NewsStateOperation;
 import org.rssowl.ui.internal.undo.UndoStack;
@@ -223,6 +223,7 @@ public class NewsTableControl implements IFeedViewPart {
   private FeedViewInput fEditorInput;
   private boolean fBlockColumMoveEvent;
   private IStructuredSelection fLastSelection = StructuredSelection.EMPTY;
+  private IStructuredSelection fLastNonEmptySelection = StructuredSelection.EMPTY;
   private long fLastColumnActionInvokedMillies;
   private Menu fAttachmentsMenu;
 
@@ -287,6 +288,13 @@ public class NewsTableControl implements IFeedViewPart {
    */
   IStructuredSelection getLastSelection() {
     return fLastSelection;
+  }
+
+  /**
+   * return the last non empty selection in the table viewer.
+   */
+  IStructuredSelection getLastNonEmptySelection() {
+    return fLastNonEmptySelection;
   }
 
   private void initDragAndDrop() {
@@ -667,6 +675,8 @@ public class NewsTableControl implements IFeedViewPart {
 
     /* Remember */
     fLastSelection = (IStructuredSelection) event.getSelection();
+    if (!fLastSelection.isEmpty())
+      fLastNonEmptySelection = fLastSelection;
 
     /* Check Flag */
     if (fBlockNewsStateTracker.get())
