@@ -282,27 +282,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
    */
   @Override
   public String getText(Object element) {
-    return getText(element, true, -1);
-  }
-
-  /**
-   * @param element the element to get a HTML representation from.
-   * @param index the zero-based index of the element from top.
-   * @return the HTML representation for the given element.
-   */
-  public String getText(Object element, int index) {
-    return getText(element, true, index);
-  }
-
-  /**
-   * @param element the element to get a HTML representation from.
-   * @param withInternalLinks <code>true</code> to include links of the internal
-   * protocol rssowl:// and <code>false</code> otherwise.
-   * @param index the zero-based index of the element from top.
-   * @return the HTML representation for the given element.
-   */
-  public String getText(Object element, boolean withInternalLinks, int index) {
-    return getText(element, withInternalLinks, true, index);
+    return getText(element, true, true, -1);
   }
 
   /**
