@@ -392,7 +392,7 @@ public class NewsBrowserControl implements IFeedViewPart {
           return;
 
         String property = event.getProperty();
-        if (OwlUI.NEWS_TEXT_FONT_ID.equals(property) || OwlUI.STICKY_BG_COLOR_ID.equals(property) || OwlUI.LINK_FG_COLOR_ID.equals(property))
+        if (OwlUI.NEWS_TEXT_FONT_ID.equals(property) || OwlUI.STICKY_BG_COLOR_ID.equals(property) || OwlUI.LINK_FG_COLOR_ID.equals(property) || OwlUI.NEWS_LIST_BG_COLOR_ID.equals(property))
           fViewer.getBrowser().refresh();
       }
     };

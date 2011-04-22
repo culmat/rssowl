@@ -347,8 +347,8 @@ public class PreviewFeedDialog extends Dialog {
       html.append("  </head>\n  <body id=\"owlbody\">\n"); //$NON-NLS-1$
 
       /* Write News */
-      for (INews item : news) {
-        html.append(fLabelProvider.getText(item, false));
+      for (int i = 0; i < news.size(); i++) {
+        html.append(fLabelProvider.getText(news.get(i), false, i));
       }
 
       /* End HTML */

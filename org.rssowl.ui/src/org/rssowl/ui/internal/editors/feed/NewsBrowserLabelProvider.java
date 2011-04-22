@@ -142,6 +142,8 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   private String fBiggerFontCSS;
   private String fBiggestFontCSS;
   private String fStickyBGColorCSS;
+  private String fNewsListBGColorCSS;
+  private boolean fIsNewsListBGColorDefined;
   private String fLinkFGColorCSS;
   private IPropertyChangeListener fPropertyChangeListener;
   private final boolean fIsIE;
@@ -225,7 +227,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
         String property = event.getProperty();
         if (OwlUI.NEWS_TEXT_FONT_ID.equals(property))
           createFonts();
-        else if (OwlUI.STICKY_BG_COLOR_ID.equals(property) || OwlUI.LINK_FG_COLOR_ID.equals(property))
+        else if (OwlUI.STICKY_BG_COLOR_ID.equals(property) || OwlUI.LINK_FG_COLOR_ID.equals(property) || OwlUI.NEWS_LIST_BG_COLOR_ID.equals(property))
           createColors();
       }
     };
@@ -269,6 +271,10 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
     RGB linkRgb = OwlUI.getThemeRGB(OwlUI.LINK_FG_COLOR_ID, new RGB(0, 0, 153));
     fLinkFGColorCSS = "color: rgb(" + linkRgb.red + "," + linkRgb.green + "," + linkRgb.blue + ");"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+
+    RGB newsListRgb = OwlUI.getThemeRGB(OwlUI.NEWS_LIST_BG_COLOR_ID, new RGB(255, 255, 255));
+    fNewsListBGColorCSS = "background-color: rgb(" + newsListRgb.red + "," + newsListRgb.green + "," + newsListRgb.blue + ");"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+    fIsNewsListBGColorDefined = !newsListRgb.equals(new RGB(255, 255, 255));
   }
 
   /*
@@ -286,16 +292,6 @@ public class NewsBrowserLabelProvider extends LabelProvider {
    */
   public String getText(Object element, int index) {
     return getText(element, true, index);
-  }
-
-  /**
-   * @param element the element to get a HTML representation from.
-   * @param withInternalLinks <code>true</code> to include links of the internal
-   * protocol rssowl:// and <code>false</code> otherwise.
-   * @return the HTML representation for the given element.
-   */
-  public String getText(Object element, boolean withInternalLinks) {
-    return getText(element, withInternalLinks, -1);
   }
 
   /**
@@ -590,6 +586,8 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     /* DIV: NewsItem */
     if (index == 0)
       div(builder, isUnread ? "newsitemUnread" : "newsitemRead", "border-top: none;", Dynamic.NEWS.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    else if (fIsNewsListBGColorDefined && index % 2 != 0)
+      div(builder, isUnread ? "newsitemUnread" : "newsitemRead", fNewsListBGColorCSS, Dynamic.NEWS.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
     else
       div(builder, isUnread ? "newsitemUnread" : "newsitemRead", Dynamic.NEWS.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -809,7 +807,10 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     {
 
       /* DIV: NewsItem/Content */
-      div(builder, "content", Dynamic.CONTENT.getId(news)); //$NON-NLS-1$
+      if (index != 0 && fIsNewsListBGColorDefined && index % 2 != 0)
+        div(builder, "content", fNewsListBGColorCSS, Dynamic.CONTENT.getId(news)); //$NON-NLS-1$
+      else
+        div(builder, "content", Dynamic.CONTENT.getId(news)); //$NON-NLS-1$
 
       /* Content is provided */
       if (StringUtils.isSet(description) && !description.equals(news.getTitle()))
