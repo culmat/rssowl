@@ -1393,6 +1393,10 @@ public class FeedView extends EditorPart implements IReusableEditor {
         if (reused)
           updateLayout(false);
 
+        /* Hide the Info Bar if it is visible */
+        if (reused)
+          fNewsBrowserControl.setInfoBarVisible(false);
+
         /* Set input to News-Table if Visible */
         if (!fBgMonitor.isCanceled() && isTableViewerVisible())
           stableSetInputToNewsTable(mark, oldSelection);
