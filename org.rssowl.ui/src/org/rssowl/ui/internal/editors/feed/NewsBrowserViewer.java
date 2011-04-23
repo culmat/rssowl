@@ -84,6 +84,7 @@ import org.rssowl.ui.internal.ApplicationActionBarAdvisor;
 import org.rssowl.ui.internal.ApplicationServer;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
+import org.rssowl.ui.internal.EntityGroupItem;
 import org.rssowl.ui.internal.ILinkHandler;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.ArchiveNewsAction;
@@ -103,6 +104,7 @@ import org.rssowl.ui.internal.undo.StickyOperation;
 import org.rssowl.ui.internal.undo.UndoStack;
 import org.rssowl.ui.internal.util.CBrowser;
 import org.rssowl.ui.internal.util.JobRunner;
+import org.rssowl.ui.internal.util.ModelUtils;
 import org.rssowl.ui.internal.util.UIBackgroundJob;
 
 import java.io.BufferedReader;
@@ -119,8 +121,10 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author bpasero
@@ -135,6 +139,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   static final String ATTACHMENT_HANDLER_ID = "org.rssowl.ui.DownloadAttachment"; //$NON-NLS-1$
   static final String ATTACHMENTS_MENU_HANDLER_ID = "org.rssowl.ui.AttachmentsMenu"; //$NON-NLS-1$
   static final String LABELS_MENU_HANDLER_ID = "org.rssowl.ui.LabelsMenu"; //$NON-NLS-1$
+  static final String GROUP_MENU_HANDLER_ID = "org.rssowl.ui.GroupMenu"; //$NON-NLS-1$
   static final String NEWS_MENU_HANDLER_ID = "org.rssowl.ui.NewsMenu"; //$NON-NLS-1$
   static final String SHARE_NEWS_MENU_HANDLER_ID = "org.rssowl.ui.ShareNewsMenu"; //$NON-NLS-1$
   static final String NEXT_NEWS_HANDLER_ID = "org.rssowl.ui.NextNews"; //$NON-NLS-1$
@@ -167,6 +172,9 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   /* This viewer's filters (element type: <code>ViewerFilter</code>). */
   private List<ViewerFilter> fFilters;
   private NewsFilter fNewsFilter;
+
+  /* Keeps a mapping between visible Entity Groups and their News */
+  private final Map<Long, Set<Long>> fMapEntityGroupToNews = new ConcurrentHashMap<Long, Set<Long>>();
 
   /**
    * @param parent
@@ -204,6 +212,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     fBrowser.addLinkHandler(ATTACHMENT_HANDLER_ID, this);
     fBrowser.addLinkHandler(ATTACHMENTS_MENU_HANDLER_ID, this);
     fBrowser.addLinkHandler(LABELS_MENU_HANDLER_ID, this);
+    fBrowser.addLinkHandler(GROUP_MENU_HANDLER_ID, this);
     fBrowser.addLinkHandler(NEWS_MENU_HANDLER_ID, this);
     fBrowser.addLinkHandler(SHARE_NEWS_MENU_HANDLER_ID, this);
     fBrowser.addLinkHandler(NEXT_NEWS_HANDLER_ID, this);
@@ -323,9 +332,8 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
         }
 
         /* Share */
-        {
+        if (!ModelUtils.isEntityGroupSelected(fCurrentSelection))
           ApplicationActionBarAdvisor.fillShareMenu(manager, fCurrentSelection, new SameShellProvider(fBrowser.getControl().getShell()), false);
-        }
 
         manager.add(new Separator("filter")); //$NON-NLS-1$
         manager.add(new Separator("copy")); //$NON-NLS-1$
@@ -646,6 +654,20 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       }
     }
 
+    /* Group Context Menu */
+    else if (queryProvided && GROUP_MENU_HANDLER_ID.equals(id)) {
+      EntityGroup group = getEntityGroup(query);
+      if (group != null) {
+
+        /* Show Menu */
+        setSelection(new StructuredSelection(group));
+        Point cursorLocation = fBrowser.getControl().getDisplay().getCursorLocation();
+        cursorLocation.y = cursorLocation.y + 16;
+        fNewsContextMenu.setLocation(cursorLocation);
+        fNewsContextMenu.setVisible(true);
+      }
+    }
+
     /* News Context Menu */
     else if (queryProvided && NEWS_MENU_HANDLER_ID.equals(id)) {
       INews news = getNews(query);
@@ -864,13 +886,46 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     JobRunner.runInUIThread(0, true, getControl(), runnable);
   }
 
+  private long getId(String query) {
+    return Long.parseLong(query);
+  }
+
   private INews getNews(String query) {
     try {
-      long id = Long.parseLong(query);
+      long id = getId(query);
       return fNewsDao.load(id);
     } catch (NullPointerException e) {
       return null;
     }
+  }
+
+  private EntityGroup getEntityGroup(String query) {
+    long id = getId(query);
+
+    /* Try to resolve the news from the mapping table */
+    Set<Long> newsIds = fMapEntityGroupToNews.get(id);
+    if (newsIds != null) {
+      List<INews> news = new ArrayList<INews>(newsIds.size());
+      for (Long newsId : newsIds) {
+        try {
+          INews item = fNewsDao.load(newsId);
+          if (item != null)
+            news.add(item);
+        } catch (NullPointerException e) {
+          continue;
+        }
+      }
+
+      /* Create a temporary new EntityGroup to be used from the context menu */
+      EntityGroup group = new EntityGroup(id, String.valueOf(id));
+      for (INews item : news) {
+        new EntityGroupItem(group, item);
+      }
+
+      return group;
+    }
+
+    return null;
   }
 
   /*
@@ -913,7 +968,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   /**
    * A special way of refreshing this viewer with additional options to control
    * the behavior.
-   *
+   * 
    * @param restoreInput if set to <code>true</code> will restore the initial
    * input that was set to the browser in case the user navigated to a different
    * URL.
@@ -1029,7 +1084,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
   /**
    * Adds the given filter to this viewer.
-   *
+   * 
    * @param filter a viewer filter
    */
   public void addFilter(ViewerFilter filter) {
@@ -1045,7 +1100,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
    * Removes the given filter from this viewer, and triggers refiltering and
    * resorting of the elements if required. Has no effect if the identical
    * filter is not registered.
-   *
+   * 
    * @param filter a viewer filter
    */
   public void removeFilter(ViewerFilter filter) {
@@ -1266,6 +1321,9 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       if (cp.isGroupingEnabled() && !isNews(input)) {
         List<Object> flatList = new ArrayList<Object>();
 
+        /* Rebuild the mapping of Entity Group to News inside here */
+        fMapEntityGroupToNews.clear();
+
         /* Wrap into Object-Array */
         if (!(input instanceof Object[]))
           input = new Object[] { input };
@@ -1280,9 +1338,24 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
             /* Only add if there are Childs */
             if (sortedChilds.length > 0) {
+
+              /* Add the Group itself */
               flatList.add(group);
-              if (group instanceof EntityGroup)
+
+              /* Keep the Group in memory to support Group specific actions */
+              if (group instanceof EntityGroup) {
+                Set<Long> list = new HashSet<Long>(sortedChilds.length);
+                fMapEntityGroupToNews.put(((EntityGroup) group).getId(), list);
+                for (Object child : sortedChilds) {
+                  if (child instanceof INews)
+                    list.add(((INews) child).getId());
+                }
+
+                /* Store the actual number of news of the group too */
                 ((EntityGroup) group).setSizeHint(sortedChilds.length);
+              }
+
+              /* Add childs of group to the list */
               flatList.addAll(Arrays.asList(sortedChilds));
             }
           }

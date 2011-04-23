@@ -29,6 +29,7 @@ import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.ARCHIVE_HAND
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.ATTACHMENTS_MENU_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.ATTACHMENT_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.DELETE_HANDLER_ID;
+import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.GROUP_MENU_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.LABELS_MENU_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.NEWS_MENU_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.RELATED_NEWS_MENU_HANDLER_ID;
@@ -298,7 +299,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
     /* Return HTML for a Group */
     if (element instanceof EntityGroup)
-      return getLabel((EntityGroup) element);
+      return getLabel((EntityGroup) element, withInternalLinks);
 
     /* Return HTML for a News */
     else if (element instanceof INews)
@@ -373,6 +374,9 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
     /* Group */
     writer.append("div.group { color: #678; ").append(fBiggestFontCSS).append(" font-weight: bold; margin: 10px 0px 5px 5px; padding-bottom: 3px; border-bottom: 2px solid #678; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("div.group a { color: #678; ").append(fBiggestFontCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("div.group a:hover { color: #678; ").append(fBiggestFontCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("div.group a:visited { color: #678; ").append(fBiggestFontCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     writer.append("span.groupNote { ").append(fNormalFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* News Container (Single News) */
@@ -483,16 +487,30 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.write("</style>\n"); //$NON-NLS-1$
   }
 
-  private String getLabel(EntityGroup group) {
+  private String getLabel(EntityGroup group, boolean withInternalLinks) {
     StringBuilder builder = new StringBuilder();
 
-    /* DIV: Group */
-    div(builder, "group"); //$NON-NLS-1$
-
+    String groupName = StringUtils.htmlEscape(group.getName());
+    String groupColor = null;
     if (group.getColorHint() != null && !group.getColorHint().equals(new RGB(255, 255, 255)))
-      span(builder, StringUtils.htmlEscape(group.getName()), null, OwlUI.toString(group.getColorHint()));
+      groupColor = OwlUI.toString(group.getColorHint());
+
+    /* DIV: Group */
+    if (groupColor == null)
+      div(builder, "group"); //$NON-NLS-1$
     else
-      builder.append(StringUtils.htmlEscape(group.getName()));
+      div(builder, "group", "border-bottom-color: rgb(" + groupColor + ");", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+    /* Let the group name be a link to invoke actions on all news inside */
+    if (withInternalLinks) {
+      String link = HANDLER_PROTOCOL + GROUP_MENU_HANDLER_ID + "?" + group.getId(); //$NON-NLS-1$
+      link(builder, link, groupName, null, null, groupColor);
+    }
+
+    /* Not using internal links */
+    else {
+      span(builder, groupName, null, groupColor);
+    }
 
     /* Group Note (number of articles and filtered elements if any) */
     int sizeHint = group.getSizeHint();
@@ -510,7 +528,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
         groupNote = NLS.bind(Messages.NewsBrowserLabelProvider_N_ARTICLES_M_FILTERED, sizeHint, sizeDiff);
     }
 
-    span(builder, groupNote, "groupNote", null, null); //$NON-NLS-1$
+    span(builder, groupNote, "groupNote", null, groupColor); //$NON-NLS-1$
 
     /* Close: Group */
     close(builder, "div"); //$NON-NLS-1$
