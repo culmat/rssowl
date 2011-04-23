@@ -65,6 +65,7 @@ import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchField;
+import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
@@ -109,14 +110,14 @@ public class FilterBar {
 
   private Composite fParent;
   private Composite fContainer;
-  private ToolBarManager fLeftToolBarManager;
-  private ToolBarManager fRightToolBarManager;
+  private ToolBarManager fFilterGroupingToolBarManager;
+  private ToolBarManager fClearQuicksearchToolBar;
+  private ToolBarManager fHighlightToolBarManager;
   private IAction fHighlightSearchAction;
   private FeedView fFeedView;
   private JobTracker fQuickSearchTracker;
   private Text fSearchInput;
   private IPreferenceScope fGlobalPreferences;
-  private ToolBarManager fFilterToolBar;
   private boolean fBlockRefresh;
   private NewsFilter.Type fLastFilterType;
   private NewsGrouping.Type fLastGroupType;
@@ -152,13 +153,21 @@ public class FilterBar {
     return (layout == Layout.HEADLINES);
   }
 
+  private boolean isSearchMark() {
+    FeedViewInput input = ((FeedViewInput) fFeedView.getEditorInput());
+    if (input != null && input.getMark() instanceof ISearchMark)
+      return true;
+
+    return false;
+  }
+
   /**
    * Clear the Quick-Search
    *
    * @param refresh
    */
   public void clearQuickSearch(boolean refresh) {
-    setClearBarVisible(false);
+    setSearchControlsVisible(false);
 
     if (fSearchInput.getText().length() != 0) {
       fBlockRefresh = !refresh;
@@ -182,20 +191,14 @@ public class FilterBar {
     updateVisibility();
 
     /* Left Toolbar with Filter and Grouping */
-    fLeftToolBarManager = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+    fFilterGroupingToolBarManager = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
     createFilterBar();
     createGrouperBar();
-    fLeftToolBarManager.createControl(fContainer);
-    fLeftToolBarManager.getControl().setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+    fFilterGroupingToolBarManager.createControl(fContainer);
+    fFilterGroupingToolBarManager.getControl().setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
 
     /* Quick Search */
     createQuickSearch(fContainer);
-
-    /* Right Toolbar with Highlighting */
-    fRightToolBarManager = new ToolBarManager(SWT.FLAT);
-    createHighlightBar();
-    fRightToolBarManager.createControl(fContainer);
-    fRightToolBarManager.getControl().setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
   }
 
   void updateVisibility() {
@@ -205,23 +208,6 @@ public class FilterBar {
     fContainer.setVisible(isVisible);
   }
 
-  private void createHighlightBar() {
-    fHighlightSearchAction = new Action(Messages.FilterBar_HIGHLIGHT, IAction.AS_CHECK_BOX) {
-      @Override
-      public void run() {
-        fGlobalPreferences.putBoolean(DefaultPreferences.FV_HIGHLIGHT_SEARCH_RESULTS, isChecked());
-        if (fFeedView.isBrowserViewerVisible())
-          fFeedView.getNewsBrowserControl().getViewer().refresh();
-      }
-    };
-
-    fHighlightSearchAction.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/highlight.gif")); //$NON-NLS-1$
-    fHighlightSearchAction.setToolTipText(Messages.FilterBar_HIGHLIGHT);
-    fHighlightSearchAction.setChecked(fGlobalPreferences.getBoolean(DefaultPreferences.FV_HIGHLIGHT_SEARCH_RESULTS));
-
-    fRightToolBarManager.add(fHighlightSearchAction);
-  }
-
   private boolean setHighlight(boolean enabled) {
 
     /* Highlighting is unsupported when headlines layout is used */
@@ -229,11 +215,12 @@ public class FilterBar {
       return false;
 
     /* Return if already in same state */
-    if (enabled == fHighlightSearchAction.isChecked())
+    boolean isHighlightEnabled = fGlobalPreferences.getBoolean(DefaultPreferences.FV_HIGHLIGHT_SEARCH_RESULTS);
+    if (enabled == isHighlightEnabled)
       return false;
 
-    fGlobalPreferences.putBoolean(DefaultPreferences.FV_HIGHLIGHT_SEARCH_RESULTS, enabled);
-    fHighlightSearchAction.setChecked(enabled);
+    fGlobalPreferences.putBoolean(DefaultPreferences.FV_HIGHLIGHT_SEARCH_RESULTS, !isHighlightEnabled);
+    fHighlightSearchAction.setChecked(!isHighlightEnabled);
 
     return true;
   }
@@ -241,11 +228,10 @@ public class FilterBar {
   /* Quick Search */
   private void createQuickSearch(Composite parent) {
     Composite searchContainer = new Composite(parent, SWT.NONE);
-    searchContainer.setLayout(LayoutUtils.createGridLayout(Application.IS_MAC ? 2 : 3, 0, 0, 0, 0, false));
+    searchContainer.setLayout(LayoutUtils.createGridLayout(Application.IS_MAC ? 3 : 4, 0, 0, 0, 0, false));
     ((GridLayout) searchContainer.getLayout()).marginTop = 1;
-    ((GridLayout) searchContainer.getLayout()).marginRight = 3;
     searchContainer.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
-    ((GridData) searchContainer.getLayoutData()).widthHint = 250;
+    ((GridData) searchContainer.getLayoutData()).widthHint = 280;
 
     final ToolBarManager manager = new ToolBarManager(SWT.FLAT);
     final NewsFilter filter = fFeedView.getFilter();
@@ -430,7 +416,7 @@ public class FilterBar {
             });
           }
 
-          setClearBarVisible(false);
+          setSearchControlsVisible(false);
         }
 
         /* Run Search in JobTracker */
@@ -445,7 +431,7 @@ public class FilterBar {
                   fFeedView.refresh(true, false);
                 }
               });
-              setClearBarVisible(true);
+              setSearchControlsVisible(true);
               return Status.OK_STATUS;
             }
           });
@@ -470,9 +456,9 @@ public class FilterBar {
     /* Clear Button */
     if (!Application.IS_MAC) {
       ToolBar toolBar = new ToolBar(searchContainer, SWT.FLAT | SWT.HORIZONTAL);
-      fFilterToolBar = new ToolBarManager(toolBar);
-      fFilterToolBar.getControl().setBackground(parent.getBackground());
-      fFilterToolBar.getControl().setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
+      fClearQuicksearchToolBar = new ToolBarManager(toolBar);
+      toolBar.setBackground(parent.getBackground());
+      toolBar.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
 
       /* Initially Hide */
       ((GridData) toolBar.getLayoutData()).exclude = true;
@@ -489,19 +475,67 @@ public class FilterBar {
       clearTextAction.setToolTipText(Messages.FilterBar_CLEAR);
       clearTextAction.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/clear.gif")); //$NON-NLS-1$
 
-      fFilterToolBar.add(clearTextAction);
-
-      fFilterToolBar.update(false);
-      fFilterToolBar.getControl().setVisible(false);
+      fClearQuicksearchToolBar.add(clearTextAction);
+      fClearQuicksearchToolBar.update(false);
     }
+
+    /* Highlight Button */
+    ToolBar toolBar = new ToolBar(searchContainer, SWT.FLAT | SWT.HORIZONTAL);
+    fHighlightToolBarManager = new ToolBarManager(toolBar);
+    toolBar.setBackground(parent.getBackground());
+    toolBar.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
+    ((GridData) toolBar.getLayoutData()).horizontalIndent = 2;
+
+    /* Set Initial State based on Input and Layout */
+    boolean show = isSearchMark() && !isHeadlinesLayout();
+    ((GridData) toolBar.getLayoutData()).exclude = !show;
+    toolBar.setVisible(show);
+
+    fHighlightSearchAction = new Action(Messages.FilterBar_HIGHLIGHT, IAction.AS_CHECK_BOX) {
+      @Override
+      public void run() {
+        fGlobalPreferences.putBoolean(DefaultPreferences.FV_HIGHLIGHT_SEARCH_RESULTS, isChecked());
+        if (fFeedView.isBrowserViewerVisible())
+          fFeedView.getNewsBrowserControl().getViewer().refresh();
+      }
+    };
+
+    fHighlightSearchAction.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/highlight.gif")); //$NON-NLS-1$
+    fHighlightSearchAction.setToolTipText(Messages.FilterBar_HIGHLIGHT);
+    fHighlightSearchAction.setChecked(fGlobalPreferences.getBoolean(DefaultPreferences.FV_HIGHLIGHT_SEARCH_RESULTS));
+
+    fHighlightToolBarManager.add(fHighlightSearchAction);
+    fHighlightToolBarManager.update(false);
   }
 
-  void setClearBarVisible(boolean visible) {
-    if (fFilterToolBar != null && !fFilterToolBar.getControl().isDisposed() && ((GridData) fFilterToolBar.getControl().getLayoutData()).exclude == visible) {
-      ((GridData) fFilterToolBar.getControl().getLayoutData()).exclude = !visible;
-      fFilterToolBar.getControl().setVisible(visible);
-      fFilterToolBar.getControl().getParent().layout();
+  void setSearchControlsVisible(boolean visible) {
+    if (!isVisible())
+      return;
+
+    boolean layout = false;
+
+    /* Clear */
+    if (fClearQuicksearchToolBar != null && !fClearQuicksearchToolBar.getControl().isDisposed() && ((GridData) fClearQuicksearchToolBar.getControl().getLayoutData()).exclude == visible) {
+      ((GridData) fClearQuicksearchToolBar.getControl().getLayoutData()).exclude = !visible;
+      fClearQuicksearchToolBar.getControl().setVisible(visible);
+      layout = true;
     }
+
+    /* Highlight */
+    if (isHeadlinesLayout())
+      visible = false; //Never show highlight bar for headlines layout
+    else if (isSearchMark())
+      visible = true; //Always show highlight bar for saved searches
+
+    if (fHighlightToolBarManager != null && !fHighlightToolBarManager.getControl().isDisposed() && ((GridData) fHighlightToolBarManager.getControl().getLayoutData()).exclude == visible) {
+      ((GridData) fHighlightToolBarManager.getControl().getLayoutData()).exclude = !visible;
+      fHighlightToolBarManager.getControl().setVisible(visible);
+      layout = true;
+    }
+
+    /* Layout as necessary */
+    if (layout)
+      fClearQuicksearchToolBar.getControl().getParent().layout();
   }
 
   /* News Filter */
@@ -522,7 +556,7 @@ public class FilterBar {
 
         /* Show Menu */
         else
-          OwlUI.positionDropDownMenu(this, fLeftToolBarManager);
+          OwlUI.positionDropDownMenu(this, fFilterGroupingToolBarManager);
       }
 
       @Override
@@ -543,7 +577,7 @@ public class FilterBar {
     ActionContributionItem item = new ActionContributionItem(newsFilterAction);
     item.setMode(ActionContributionItem.MODE_FORCE_TEXT);
 
-    fLeftToolBarManager.add(item);
+    fFilterGroupingToolBarManager.add(item);
 
     newsFilterAction.setMenuCreator(new ContextMenuCreator() {
 
@@ -767,7 +801,7 @@ public class FilterBar {
       fLastFilterType = fFeedView.getFilter().getType();
 
     fFeedView.getFilter().setType(type);
-    fLeftToolBarManager.find(FILTER_ACTION).update();
+    fFilterGroupingToolBarManager.find(FILTER_ACTION).update();
 
     /* No need to refresh or save settings if nothing changed */
     if (noChange)
@@ -826,7 +860,7 @@ public class FilterBar {
 
         /* Show Menu */
         else
-          OwlUI.positionDropDownMenu(this, fLeftToolBarManager);
+          OwlUI.positionDropDownMenu(this, fFilterGroupingToolBarManager);
       }
 
       @Override
@@ -997,7 +1031,7 @@ public class FilterBar {
     ActionContributionItem item = new ActionContributionItem(newsGroup);
     item.setMode(ActionContributionItem.MODE_FORCE_TEXT);
 
-    fLeftToolBarManager.add(item);
+    fFilterGroupingToolBarManager.add(item);
   }
 
   private void onGrouping(NewsGrouping.Type type) {
@@ -1014,7 +1048,7 @@ public class FilterBar {
       fLastGroupType = fFeedView.getGrouper().getType();
 
     fFeedView.getGrouper().setType(type);
-    fLeftToolBarManager.find(GROUP_ACTION).update();
+    fFilterGroupingToolBarManager.find(GROUP_ACTION).update();
 
     /* No need to refresh or save settings if nothing changed */
     if (noChange)
