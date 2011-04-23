@@ -917,7 +917,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       }
 
       /* Create a temporary new EntityGroup to be used from the context menu */
-      EntityGroup group = new EntityGroup(id, String.valueOf(id));
+      EntityGroup group = new EntityGroup(id, NewsGrouping.GROUP_CATEGORY_ID);
       for (INews item : news) {
         new EntityGroupItem(group, item);
       }
@@ -968,7 +968,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   /**
    * A special way of refreshing this viewer with additional options to control
    * the behavior.
-   * 
+   *
    * @param restoreInput if set to <code>true</code> will restore the initial
    * input that was set to the browser in case the user navigated to a different
    * URL.
@@ -1084,7 +1084,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
   /**
    * Adds the given filter to this viewer.
-   * 
+   *
    * @param filter a viewer filter
    */
   public void addFilter(ViewerFilter filter) {
@@ -1100,7 +1100,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
    * Removes the given filter from this viewer, and triggers refiltering and
    * resorting of the elements if required. Has no effect if the identical
    * filter is not registered.
-   * 
+   *
    * @param filter a viewer filter
    */
   public void removeFilter(ViewerFilter filter) {
