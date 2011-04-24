@@ -34,6 +34,7 @@ import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.LABELS_MENU_
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.NEWS_MENU_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.RELATED_NEWS_MENU_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.SHARE_NEWS_MENU_HANDLER_ID;
+import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.TOGGLE_GROUP_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.TOGGLE_READ_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.TOGGLE_STICKY_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.TRANSFORM_HANDLER_ID;
@@ -106,6 +107,8 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     TOGGLE_READ_IMG("toggleReadImg"), //$NON-NLS-1$
     TOGGLE_STICKY_LINK("toggleStickyLink"), //$NON-NLS-1$
     TOGGLE_STICKY_IMG("toggleStickyImg"), //$NON-NLS-1$
+    TOGGLE_GROUP_LINK("toggleGroupLink"), //$NON-NLS-1$
+    TOGGLE_GROUP_IMG("toggleGroupImg"), //$NON-NLS-1$
     LABELS_MENU_LINK("labelsMenuLink"), //$NON-NLS-1$
     ARCHIVE_LINK("archiveLink"), //$NON-NLS-1$
     SHARE_MENU_LINK("shareMenuLink"), //$NON-NLS-1$
@@ -125,6 +128,14 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
     Dynamic(String id) {
       fId = id;
+    }
+
+    String getId(long id) {
+      return fId + id;
+    }
+
+    String getId(EntityGroup group) {
+      return fId + group.getId();
     }
 
     String getId(INews news) {
@@ -501,9 +512,15 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     else
       div(builder, "group", "border-bottom-color: rgb(" + groupColor + ");", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-    /* Let the group name be a link to invoke actions on all news inside */
+    /* Let the group name be a link to invoke actions on all news inside and provide a toggle */
     if (withInternalLinks) {
-      String link = HANDLER_PROTOCOL + GROUP_MENU_HANDLER_ID + "?" + group.getId(); //$NON-NLS-1$
+
+      /* Toggle to Expand / Collapse */
+      String link = HANDLER_PROTOCOL + TOGGLE_GROUP_HANDLER_ID + "?" + group.getId(); //$NON-NLS-1$
+      imageLink(builder, link, null, null, "/icons/elcl16/expanded.gif", "expanded.gif", Dynamic.TOGGLE_GROUP_LINK.getId(group), Dynamic.TOGGLE_GROUP_IMG.getId(group)); //$NON-NLS-1$ //$NON-NLS-2$
+
+      /* Group Name as Link */
+      link = HANDLER_PROTOCOL + GROUP_MENU_HANDLER_ID + "?" + group.getId(); //$NON-NLS-1$
       link(builder, link, groupName, null, null, groupColor);
     }
 
