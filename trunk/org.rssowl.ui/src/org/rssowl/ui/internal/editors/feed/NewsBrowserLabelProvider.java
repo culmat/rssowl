@@ -470,10 +470,10 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.append("div.subline { margin: 0; padding: 0; clear: left; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     writer.append("table.subline { margin: 0; padding: 0; }\n"); //$NON-NLS-1$
     writer.append("tr.subline { margin: 0; padding: 0; }\n"); //$NON-NLS-1$
-    writer.append("td.firstactionsubline { text-align: left; width: 22px; margin: 0; padding: 0; color: rgb(80, 80, 80); ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
-    writer.append("td.firstactionsubline a { width: 22px; }\n"); //$NON-NLS-1$
-    writer.append("td.otheractionsubline { text-align: center; width: 24px; margin: 0; padding: 0; color: rgb(80, 80, 80); ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
-    writer.append("td.otheractionsubline a { width: 24px; }\n"); //$NON-NLS-1$
+    writer.append("td.firstactionsubline { text-align: left; width: 20px; margin: 0; padding: 0; color: rgb(80, 80, 80); ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("td.firstactionsubline a { width: 20px; }\n"); //$NON-NLS-1$
+    writer.append("td.otheractionsubline { text-align: center; width: 22px; margin: 0; padding: 0; color: rgb(80, 80, 80); ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("td.otheractionsubline a { width: 22px; }\n"); //$NON-NLS-1$
     writer.append("td.subline { margin: 0; padding: 0; color: rgb(80, 80, 80); padding-right: 5px; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     writer.append("td.sublineseparator { margin: 0; padding: 0; color: rgb(140, 140, 140); padding-right: 5px; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     writer.append("td.actionsublineseparator { margin: 0; padding: 0; color: rgb(140, 140, 140); padding-left: 4px; padding-right: 5px; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
