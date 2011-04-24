@@ -89,6 +89,7 @@ import org.rssowl.ui.internal.ILinkHandler;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.ArchiveNewsAction;
 import org.rssowl.ui.internal.actions.AutomateFilterAction;
+import org.rssowl.ui.internal.actions.CreateFilterAction.PresetAction;
 import org.rssowl.ui.internal.actions.MakeNewsStickyAction;
 import org.rssowl.ui.internal.actions.MarkAllNewsReadAction;
 import org.rssowl.ui.internal.actions.MoveCopyNewsToBinAction;
@@ -96,7 +97,6 @@ import org.rssowl.ui.internal.actions.NavigationActionFactory;
 import org.rssowl.ui.internal.actions.OpenInExternalBrowserAction;
 import org.rssowl.ui.internal.actions.OpenNewsAction;
 import org.rssowl.ui.internal.actions.ToggleReadStateAction;
-import org.rssowl.ui.internal.actions.CreateFilterAction.PresetAction;
 import org.rssowl.ui.internal.dialogs.SearchNewsDialog;
 import org.rssowl.ui.internal.editors.feed.NewsBrowserLabelProvider.Dynamic;
 import org.rssowl.ui.internal.undo.NewsStateOperation;
@@ -139,6 +139,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   static final String ATTACHMENT_HANDLER_ID = "org.rssowl.ui.DownloadAttachment"; //$NON-NLS-1$
   static final String ATTACHMENTS_MENU_HANDLER_ID = "org.rssowl.ui.AttachmentsMenu"; //$NON-NLS-1$
   static final String LABELS_MENU_HANDLER_ID = "org.rssowl.ui.LabelsMenu"; //$NON-NLS-1$
+  static final String TOGGLE_GROUP_HANDLER_ID = "org.rssowl.ui.ToggleGroup"; //$NON-NLS-1$
   static final String GROUP_MENU_HANDLER_ID = "org.rssowl.ui.GroupMenu"; //$NON-NLS-1$
   static final String NEWS_MENU_HANDLER_ID = "org.rssowl.ui.NewsMenu"; //$NON-NLS-1$
   static final String SHARE_NEWS_MENU_HANDLER_ID = "org.rssowl.ui.ShareNewsMenu"; //$NON-NLS-1$
@@ -212,6 +213,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     fBrowser.addLinkHandler(ATTACHMENT_HANDLER_ID, this);
     fBrowser.addLinkHandler(ATTACHMENTS_MENU_HANDLER_ID, this);
     fBrowser.addLinkHandler(LABELS_MENU_HANDLER_ID, this);
+    fBrowser.addLinkHandler(TOGGLE_GROUP_HANDLER_ID, this);
     fBrowser.addLinkHandler(GROUP_MENU_HANDLER_ID, this);
     fBrowser.addLinkHandler(NEWS_MENU_HANDLER_ID, this);
     fBrowser.addLinkHandler(SHARE_NEWS_MENU_HANDLER_ID, this);
@@ -654,6 +656,14 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       }
     }
 
+    /* Toggle Group Items Visibility */
+    else if (queryProvided && TOGGLE_GROUP_HANDLER_ID.equals(id)) {
+      long groupId = getId(query);
+      Set<Long> newsIds = getNewsIds(groupId);
+      if (newsIds != null)
+        toggleVisibility(groupId, newsIds);
+    }
+
     /* Group Context Menu */
     else if (queryProvided && GROUP_MENU_HANDLER_ID.equals(id)) {
       EntityGroup group = getEntityGroup(query);
@@ -789,6 +799,44 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       if (news != null)
         transformNews(news);
     }
+  }
+
+  private void toggleVisibility(long groupId, Set<Long> newsIds) {
+    String expandedImgUri;
+    String collapsedImgUri;
+    if (fBrowser.isIE()) {
+      expandedImgUri = OwlUI.getImageUri("/icons/elcl16/expanded.gif", "expanded.gif"); //$NON-NLS-1$ //$NON-NLS-2$
+      collapsedImgUri = OwlUI.getImageUri("/icons/elcl16/collapsed.gif", "collapsed.gif"); //$NON-NLS-1$ //$NON-NLS-2$
+    } else {
+      expandedImgUri = ApplicationServer.getDefault().toResourceUrl("/icons/elcl16/expanded.gif"); //$NON-NLS-1$
+      collapsedImgUri = ApplicationServer.getDefault().toResourceUrl("/icons/elcl16/collapsed.gif"); //$NON-NLS-1$
+    }
+
+    StringBuilder js = new StringBuilder();
+    js.append(getElementById(Dynamic.TOGGLE_GROUP_LINK.getId(groupId)).append(".blur(); ")); //$NON-NLS-1$
+    js.append("var expand = false; "); //$NON-NLS-1$
+    js.append("var toggle = ").append(getElementById(Dynamic.TOGGLE_GROUP_IMG.getId(groupId))).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
+    js.append("if (!toggle.className || toggle.className == '') {"); //$NON-NLS-1$
+    js.append(getElementById(Dynamic.TOGGLE_GROUP_IMG.getId(groupId)).append(".src = '" + collapsedImgUri + "'; ")); //$NON-NLS-1$ //$NON-NLS-2$
+    js.append("  toggle.className = 'collapsed';"); //$NON-NLS-1$
+    js.append("} else {"); //$NON-NLS-1$
+    js.append(getElementById(Dynamic.TOGGLE_GROUP_IMG.getId(groupId)).append(".src = '" + expandedImgUri + "'; ")); //$NON-NLS-1$ //$NON-NLS-2$
+    js.append("  toggle.className = '';"); //$NON-NLS-1$
+    js.append("  expand = true;"); //$NON-NLS-1$
+    js.append("}"); //$NON-NLS-1$
+
+    for (Long id : newsIds) {
+      js.append("var node = ").append(getElementById(Dynamic.NEWS.getId(id))).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
+      js.append("if (node != null) { "); //$NON-NLS-1$
+      js.append("  if (expand) { "); //$NON-NLS-1$
+      js.append("     node.style.display='block';"); //$NON-NLS-1$
+      js.append("   } else {"); //$NON-NLS-1$
+      js.append("     node.style.display='none';"); //$NON-NLS-1$
+      js.append("   } "); //$NON-NLS-1$
+      js.append("}"); //$NON-NLS-1$
+    }
+
+    fBrowser.execute(js.toString());
   }
 
   private void blur(String elementId) {
@@ -928,6 +976,11 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     return null;
   }
 
+  private Set<Long> getNewsIds(long groupId) {
+    Set<Long> newsIds = fMapEntityGroupToNews.get(groupId);
+    return newsIds;
+  }
+
   /*
    * @see org.eclipse.jface.viewers.ContentViewer#setLabelProvider(org.eclipse.jface.viewers.IBaseLabelProvider)
    */
@@ -998,7 +1051,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
    * to do something.
    */
   protected void onRefresh() {
-  //Do nothing here.
+    //Do nothing here.
   }
 
   /*
