@@ -471,7 +471,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.append("table.subline { margin: 0; padding: 0; }\n"); //$NON-NLS-1$
     writer.append("tr.subline { margin: 0; padding: 0; }\n"); //$NON-NLS-1$
     writer.append("td.firstactionsubline { margin: 0; padding: 0; color: rgb(80, 80, 80); ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
-    writer.append("td.firstactionsubline a { width: 24px; text-align: left; }\n"); //$NON-NLS-1$
+    writer.append("td.firstactionsubline a { width: 22px; text-align: left; }\n"); //$NON-NLS-1$
     writer.append("td.otheractionsubline { margin: 0; padding: 0; color: rgb(80, 80, 80); ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     writer.append("td.otheractionsubline a { width: 24px; text-align: center; }\n"); //$NON-NLS-1$
     writer.append("td.subline { margin: 0; padding: 0; color: rgb(80, 80, 80); padding-right: 5px; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
