@@ -53,9 +53,9 @@ import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.ISource;
-import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.reference.SearchMarkReference;
@@ -67,8 +67,8 @@ import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.ApplicationServer;
 import org.rssowl.ui.internal.EntityGroup;
-import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.FolderNewsMark.FolderNewsMarkReference;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.CBrowser;
 
 import java.io.IOException;
@@ -470,8 +470,13 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.append("div.subline { margin: 0; padding: 0; clear: left; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     writer.append("table.subline { margin: 0; padding: 0; }\n"); //$NON-NLS-1$
     writer.append("tr.subline { margin: 0; padding: 0; }\n"); //$NON-NLS-1$
-    writer.append("td.subline { margin: 0; padding: 0; color: rgb(80, 80, 80); padding-right: 8px; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
-    writer.append("td.sublineseparator { margin: 0; padding: 0; color: rgb(140, 140, 140); padding-right: 8px; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("td.firstactionsubline { margin: 0; padding: 0; color: rgb(80, 80, 80); ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("td.firstactionsubline a { width: 24px; text-align: left; }\n"); //$NON-NLS-1$
+    writer.append("td.otheractionsubline { margin: 0; padding: 0; color: rgb(80, 80, 80); ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("td.otheractionsubline a { width: 24px; text-align: center; }\n"); //$NON-NLS-1$
+    writer.append("td.subline { margin: 0; padding: 0; color: rgb(80, 80, 80); padding-right: 5px; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("td.sublineseparator { margin: 0; padding: 0; color: rgb(140, 140, 140); padding-right: 5px; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("td.actionsublineseparator { margin: 0; padding: 0; color: rgb(140, 140, 140); padding-left: 4px; padding-right: 5px; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* Date */
     writer.append("div.date { float: left; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -644,43 +649,43 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     if (withInternalLinks) {
 
       /* Toggle Read */
-      builder.append("<td class=\"subline\">"); //$NON-NLS-1$
+      builder.append("<td class=\"firstactionsubline\">"); //$NON-NLS-1$
       String link = HANDLER_PROTOCOL + TOGGLE_READ_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
       String text = (news.getState() == INews.State.READ) ? Messages.NewsBrowserLabelProvider_MARK_UNREAD : Messages.NewsBrowserLabelProvider_MARK_READ;
       imageLink(builder, link, text, text, "/icons/elcl16/mark_read_light.gif", "mark_read_light.gif", Dynamic.TOGGLE_READ_LINK.getId(news), Dynamic.TOGGLE_READ_IMG.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
       builder.append("</td>"); //$NON-NLS-1$
 
       /* Toggle Sticky */
-      builder.append("<td class=\"subline\">"); //$NON-NLS-1$
+      builder.append("<td class=\"otheractionsubline\">"); //$NON-NLS-1$
       link = HANDLER_PROTOCOL + TOGGLE_STICKY_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
       imageLink(builder, link, Messages.NewsBrowserLabelProvider_STICKY, Messages.NewsBrowserLabelProvider_STICKY, news.isFlagged() ? "/icons/obj16/news_pinned_light.gif" : "/icons/obj16/news_pin_light.gif", news.isFlagged() ? "news_pinned_light.gif" : "news_pin_light.gif", Dynamic.TOGGLE_STICKY_LINK.getId(news), Dynamic.TOGGLE_STICKY_IMG.getId(news)); //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$ //$NON-NLS-4$
       builder.append("</td>"); //$NON-NLS-1$
 
       /* Assign Labels */
-      builder.append("<td class=\"subline\">"); //$NON-NLS-1$
+      builder.append("<td class=\"otheractionsubline\">"); //$NON-NLS-1$
       link = HANDLER_PROTOCOL + LABELS_MENU_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
       imageLink(builder, link, Messages.NewsBrowserLabelProvider_ASSIGN_LABELS, Messages.NewsBrowserLabelProvider_LABEL, "/icons/elcl16/labels_light.gif", "labels_light.gif", Dynamic.LABELS_MENU_LINK.getId(news), null); //$NON-NLS-1$ //$NON-NLS-2$
       builder.append("</td>"); //$NON-NLS-1$
 
       /* Archive News */
-      builder.append("<td class=\"subline\">"); //$NON-NLS-1$
+      builder.append("<td class=\"otheractionsubline\">"); //$NON-NLS-1$
       link = HANDLER_PROTOCOL + ARCHIVE_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
       imageLink(builder, link, Messages.NewsBrowserLabelProvider_ARCHIVE_NEWS, Messages.NewsBrowserLabelProvider_ARCHIVE, "/icons/etool16/archive_light.gif", "archive_light.gif", Dynamic.ARCHIVE_LINK.getId(news), null); //$NON-NLS-1$ //$NON-NLS-2$
       builder.append("</td>"); //$NON-NLS-1$
 
       /* Share News Context Menu */
-      builder.append("<td class=\"subline\">"); //$NON-NLS-1$
+      builder.append("<td class=\"otheractionsubline\">"); //$NON-NLS-1$
       link = HANDLER_PROTOCOL + SHARE_NEWS_MENU_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
       imageLink(builder, link, Messages.NewsBrowserLabelProvider_SHARE_NEWS, Messages.NewsBrowserLabelProvider_SHARE, "/icons/elcl16/share_light.gif", "share_light.gif", Dynamic.SHARE_MENU_LINK.getId(news), null); //$NON-NLS-1$ //$NON-NLS-2$
       builder.append("</td>"); //$NON-NLS-1$
 
       /* News Context Menu */
-      builder.append("<td class=\"subline\">"); //$NON-NLS-1$
+      builder.append("<td class=\"otheractionsubline\">"); //$NON-NLS-1$
       link = HANDLER_PROTOCOL + NEWS_MENU_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
       imageLink(builder, link, Messages.NewsBrowserLabelProvider_MENU, Messages.NewsBrowserLabelProvider_MENU, "/icons/obj16/menu_light.gif", "menu_light.gif", Dynamic.NEWS_MENU_LINK.getId(news), null); //$NON-NLS-1$ //$NON-NLS-2$
       builder.append("</td>"); //$NON-NLS-1$
 
-      builder.append("<td class=\"sublineseparator\">"); //$NON-NLS-1$
+      builder.append("<td class=\"actionsublineseparator\">"); //$NON-NLS-1$
       builder.append("|"); //$NON-NLS-1$
       builder.append("</td>"); //$NON-NLS-1$
     }
