@@ -155,8 +155,8 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   private String fBiggestFontCSS;
   private String fStickyBGColorCSS;
   private String fNewsListBGColorCSS;
-  private boolean fIsNewsListBGColorDefined;
   private String fLinkFGColorCSS;
+  private boolean fIsNewsListBGColorDefined;
   private IPropertyChangeListener fPropertyChangeListener;
   private final boolean fIsIE;
   private final NewsBrowserViewer fViewer;
