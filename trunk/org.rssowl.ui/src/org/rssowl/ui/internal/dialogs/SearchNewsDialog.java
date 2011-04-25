@@ -822,6 +822,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     NewsBrowserLabelProvider labelProvider = new NewsBrowserLabelProvider(fBrowserViewer);
     labelProvider.setShowFooter(false);
     labelProvider.setForceShowFeedInformation(true);
+    labelProvider.setStripMediaFromNews(!fPreferences.getBoolean(DefaultPreferences.BM_LOAD_IMAGES));
     fBrowserViewer.setLabelProvider(labelProvider);
 
     /* Set input when selection in result viewer changes */
