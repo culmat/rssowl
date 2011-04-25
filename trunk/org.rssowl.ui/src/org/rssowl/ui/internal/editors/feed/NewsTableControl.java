@@ -103,9 +103,11 @@ import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.FolderNewsMark;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.OwlUI.Layout;
 import org.rssowl.ui.internal.StatusLineUpdater;
 import org.rssowl.ui.internal.actions.ArchiveNewsAction;
 import org.rssowl.ui.internal.actions.AutomateFilterAction;
+import org.rssowl.ui.internal.actions.CreateFilterAction.PresetAction;
 import org.rssowl.ui.internal.actions.MakeNewsStickyAction;
 import org.rssowl.ui.internal.actions.MarkAllNewsReadAction;
 import org.rssowl.ui.internal.actions.MoveCopyNewsToBinAction;
@@ -113,7 +115,6 @@ import org.rssowl.ui.internal.actions.OpenInBrowserAction;
 import org.rssowl.ui.internal.actions.OpenInExternalBrowserAction;
 import org.rssowl.ui.internal.actions.OpenNewsAction;
 import org.rssowl.ui.internal.actions.ToggleReadStateAction;
-import org.rssowl.ui.internal.actions.CreateFilterAction.PresetAction;
 import org.rssowl.ui.internal.editors.browser.WebBrowserContext;
 import org.rssowl.ui.internal.undo.NewsStateOperation;
 import org.rssowl.ui.internal.undo.UndoStack;
@@ -255,6 +256,11 @@ public class NewsTableControl implements IFeedViewPart {
     fNewsStateTracker = new MarkReadTracker(fInputPreferences.getInteger(DefaultPreferences.MARK_READ_IN_MILLIS), false);
     fNewsStateTracker.setUpdateDelayDynamically(true);
   }
+
+  /*
+   * @see org.rssowl.ui.internal.editors.feed.IFeedViewPart#onLayoutChanged(org.rssowl.ui.internal.OwlUI.Layout)
+   */
+  public void onLayoutChanged(Layout newLayout) {}
 
   /*
    * @see org.rssowl.ui.internal.editors.feed.IFeedViewPart#createPart(org.eclipse.swt.widgets.Composite)

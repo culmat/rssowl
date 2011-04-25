@@ -147,6 +147,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     }
   }
 
+  /* Colors and Fonts */
   private String fNewsFontFamily;
   private String fNormalFontCSS;
   private String fVerySmallFontCSS;
@@ -158,12 +159,15 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   private String fLinkFGColorCSS;
   private boolean fIsNewsListBGColorDefined;
   private IPropertyChangeListener fPropertyChangeListener;
-  private final boolean fIsIE;
+
+  /* Label Provider State */
   private final NewsBrowserViewer fViewer;
+  private final boolean fIsIE;
   private boolean fStripMediaFromNews;
   private boolean fForceShowFeedInformation;
   private boolean fManageLinks;
   private boolean fShowFooter;
+  private boolean fHeadlinesOnly;
   private final long fTodayInMillies;
   private final Map<String, String> fMapFeedLinkToName = new HashMap<String, String>();
 
@@ -219,6 +223,15 @@ public class NewsBrowserLabelProvider extends LabelProvider {
    */
   public void setShowFooter(boolean showFooter) {
     fShowFooter = showFooter;
+  }
+
+  /**
+   * @param headlinesOnly if set to <code>true</code> only show headlines of
+   * news and not the content, <code>false</code> otherwise. Default is
+   * <code>false</code>.
+   */
+  public void setHeadlinesOnly(boolean headlinesOnly) {
+    fHeadlinesOnly = headlinesOnly;
   }
 
   /*
@@ -424,7 +437,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.write("   padding: 15px 10px 15px 10px; border-top: dotted 1px silver; \n"); //$NON-NLS-1$
     writer.append("  background-color: #fff; clear: both; ").append(fNormalFontCSS).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
     writer.write("}\n"); //$NON-NLS-1$
-
+    
     /* Restrict the style of embedded Paragraphs */
     writer.write("div.content p { margin-top: 0; padding-top: 0; margin-left: 0; padding-left: 0; }\n"); //$NON-NLS-1$
 

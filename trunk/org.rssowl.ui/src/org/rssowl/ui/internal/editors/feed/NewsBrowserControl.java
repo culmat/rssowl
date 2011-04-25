@@ -63,6 +63,7 @@ import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.ILinkHandler;
 import org.rssowl.ui.internal.LinkTransformer;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.OwlUI.Layout;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 /**
@@ -80,6 +81,7 @@ public class NewsBrowserControl implements IFeedViewPart {
   private IPreferenceScope fInputPreferences;
   private IPropertyChangeListener fPropertyChangeListener;
   private boolean fStripMediaFromNews;
+  private boolean fHeadlinesOnly;
   private NewsComparator fNewsSorter;
   private FeedViewInput fEditorInput;
   private Composite fInfoBar;
@@ -99,8 +101,20 @@ public class NewsBrowserControl implements IFeedViewPart {
     fEditorInput = input;
     fInputPreferences = Owl.getPreferenceService().getEntityScope(input.getMark());
     fStripMediaFromNews = !fInputPreferences.getBoolean(DefaultPreferences.BM_LOAD_IMAGES);
-    if (fViewer != null && fViewer.getLabelProvider() != null)
+    fHeadlinesOnly = (OwlUI.getLayout(fInputPreferences) == Layout.HEADLINES);
+    if (fViewer != null && fViewer.getLabelProvider() != null) {
       ((NewsBrowserLabelProvider) fViewer.getLabelProvider()).setStripMediaFromNews(fStripMediaFromNews);
+      ((NewsBrowserLabelProvider) fViewer.getLabelProvider()).setHeadlinesOnly(fHeadlinesOnly);
+    }
+  }
+
+  /*
+   * @see org.rssowl.ui.internal.editors.feed.IFeedViewPart#onLayoutChanged(org.rssowl.ui.internal.OwlUI.Layout)
+   */
+  public void onLayoutChanged(Layout newLayout) {
+    fHeadlinesOnly = (newLayout == Layout.HEADLINES);
+    if (fViewer != null && fViewer.getLabelProvider() != null)
+      ((NewsBrowserLabelProvider) fViewer.getLabelProvider()).setHeadlinesOnly(fHeadlinesOnly);
   }
 
   /*
@@ -214,6 +228,7 @@ public class NewsBrowserControl implements IFeedViewPart {
     /* Create LabelProvider */
     NewsBrowserLabelProvider labelProvider = new NewsBrowserLabelProvider(fViewer);
     labelProvider.setStripMediaFromNews(fStripMediaFromNews);
+    labelProvider.setHeadlinesOnly(fHeadlinesOnly);
     fViewer.setLabelProvider(labelProvider);
 
     /* Create Sorter */
