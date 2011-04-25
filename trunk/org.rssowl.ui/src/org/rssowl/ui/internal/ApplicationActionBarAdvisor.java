@@ -627,7 +627,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
           selectedGroupIndex = ModelUtils.loadIntegerValueWithFallback(globalPreferences, DefaultPreferences.BM_NEWS_GROUPING, globalPreferences, DefaultPreferences.FV_GROUP_TYPE);
 
         final NewsGrouping.Type selectedGroup = NewsGrouping.Type.values()[selectedGroupIndex];
-        NewsGrouping.Type[] groups = new NewsGrouping.Type[] { NewsGrouping.Type.NO_GROUPING, NewsGrouping.Type.GROUP_BY_DATE, NewsGrouping.Type.GROUP_BY_AUTHOR, NewsGrouping.Type.GROUP_BY_CATEGORY, NewsGrouping.Type.GROUP_BY_TOPIC, NewsGrouping.Type.GROUP_BY_STATE, NewsGrouping.Type.GROUP_BY_STICKY, NewsGrouping.Type.GROUP_BY_LABEL, NewsGrouping.Type.GROUP_BY_FEED };
+        NewsGrouping.Type[] groups = new NewsGrouping.Type[] { NewsGrouping.Type.NO_GROUPING, NewsGrouping.Type.GROUP_BY_DATE, NewsGrouping.Type.GROUP_BY_AUTHOR, NewsGrouping.Type.GROUP_BY_CATEGORY, NewsGrouping.Type.GROUP_BY_TOPIC, NewsGrouping.Type.GROUP_BY_FEED, NewsGrouping.Type.GROUP_BY_STATE, NewsGrouping.Type.GROUP_BY_STICKY, NewsGrouping.Type.GROUP_BY_LABEL };
         for (final NewsGrouping.Type group : groups) {
           groupMenu.add(new Action(group.getName(), IAction.AS_RADIO_BUTTON) {
             @Override
@@ -643,7 +643,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
           });
 
           /* Add Separators to improve readability of grouping options */
-          if (group == NewsGrouping.Type.NO_GROUPING || group == NewsGrouping.Type.GROUP_BY_TOPIC || group == NewsGrouping.Type.GROUP_BY_STICKY)
+          if (group == NewsGrouping.Type.NO_GROUPING || group == NewsGrouping.Type.GROUP_BY_FEED || group == NewsGrouping.Type.GROUP_BY_STICKY)
             groupMenu.add(new Separator());
         }
 
