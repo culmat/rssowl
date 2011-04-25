@@ -382,7 +382,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
         /* Layout */
         MenuManager layoutMenu = new MenuManager(Messages.ApplicationActionBarAdvisor_LAYOUT);
-        layoutMenu.add(new Action(Messages.ApplicationActionBarAdvisor_CLASSIC_VIEW, IAction.AS_RADIO_BUTTON) {
+        layoutMenu.add(new Action(Messages.ApplicationActionBarAdvisor_CLASSIC_LAYOUT, IAction.AS_RADIO_BUTTON) {
           @Override
           public void run() {
             if (super.isChecked()) //Need to use parent scope to get real selection state from UI and not Model
@@ -395,7 +395,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
           }
         });
 
-        layoutMenu.add(new Action(Messages.ApplicationActionBarAdvisor_VERTICAL_VIEW, IAction.AS_RADIO_BUTTON) {
+        layoutMenu.add(new Action(Messages.ApplicationActionBarAdvisor_VERTICAL_LAYOUT, IAction.AS_RADIO_BUTTON) {
           @Override
           public void run() {
             if (super.isChecked()) //Need to use parent scope to get real selection state from UI and not Model
@@ -408,20 +408,22 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
           }
         });
 
-        layoutMenu.add(new Action(Messages.ApplicationActionBarAdvisor_HEADLINES_VIEW, IAction.AS_RADIO_BUTTON) {
+        layoutMenu.add(new Action(Messages.ApplicationActionBarAdvisor_LIST_LAYOUT, IAction.AS_RADIO_BUTTON) {
           @Override
           public void run() {
             if (super.isChecked()) //Need to use parent scope to get real selection state from UI and not Model
-              updateLayoutPreferences(globalPreferences, entityPreferences, Layout.HEADLINES);
+              updateLayoutPreferences(globalPreferences, entityPreferences, Layout.LIST);
           }
 
           @Override
           public boolean isChecked() {
-            return layout == Layout.HEADLINES;
+            return layout == Layout.LIST;
           }
         });
 
-        layoutMenu.add(new Action(Messages.ApplicationActionBarAdvisor_NEWSPAPER_VIEW, IAction.AS_RADIO_BUTTON) {
+        layoutMenu.add(new Separator());
+
+        layoutMenu.add(new Action(Messages.ApplicationActionBarAdvisor_NEWSPAPER_LAYOUT, IAction.AS_RADIO_BUTTON) {
           @Override
           public void run() {
             if (super.isChecked()) //Need to use parent scope to get real selection state from UI and not Model
@@ -434,50 +436,16 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
           }
         });
 
-        layoutMenu.add(new Separator());
-        layoutMenu.add(new Action(Messages.ApplicationActionBarAdvisor_TABBED_BROWSING, IAction.AS_CHECK_BOX) {
+        layoutMenu.add(new Action(Messages.ApplicationActionBarAdvisor_HEADLINES_LAYOUT, IAction.AS_RADIO_BUTTON) {
           @Override
           public void run() {
-            boolean tabbedBrowsingEnabled = isChecked();
-
-            /* Disable Tabbed Browsing */
-            if (tabbedBrowsingEnabled) {
-
-              /* Close other Tabs if necessary */
-              boolean doit = true;
-              IWorkbenchPage page = OwlUI.getPage();
-              if (page != null) {
-                IEditorReference[] editorReferences = page.getEditorReferences();
-                if (editorReferences.length > 1) {
-                  MessageBox confirmDialog = new MessageBox(page.getWorkbenchWindow().getShell(), SWT.ICON_QUESTION | SWT.YES | SWT.NO);
-                  confirmDialog.setText(Messages.ApplicationActionBarAdvisor_DISABLE_TABBED_BROWSING);
-                  confirmDialog.setMessage(NLS.bind(Messages.ApplicationActionBarAdvisor_TABS_MESSAGE, editorReferences.length));
-                  if (confirmDialog.open() == SWT.YES)
-                    OwlUI.closeOtherEditors();
-                  else
-                    doit = false;
-                }
-              }
-
-              /* Update Preferences */
-              if (doit) {
-                eclipsePrefs.putBoolean(DefaultPreferences.ECLIPSE_MULTIPLE_TABS, false);
-                eclipsePrefs.putBoolean(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS, true);
-                eclipsePrefs.putInteger(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS_THRESHOLD, 1);
-              }
-            }
-
-            /* Enable Tabbed Browsing */
-            else {
-              eclipsePrefs.putBoolean(DefaultPreferences.ECLIPSE_MULTIPLE_TABS, true);
-              eclipsePrefs.putBoolean(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS, false);
-              eclipsePrefs.putInteger(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS_THRESHOLD, 5);
-            }
+            if (super.isChecked()) //Need to use parent scope to get real selection state from UI and not Model
+              updateLayoutPreferences(globalPreferences, entityPreferences, Layout.HEADLINES);
           }
 
           @Override
           public boolean isChecked() {
-            return OwlUI.isTabbedBrowsingEnabled();
+            return layout == Layout.HEADLINES;
           }
         });
 
@@ -856,8 +824,55 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
           }
         });
 
-        /* Fullscreen Mode */
+        /* Tabbed Browsing */
         manager.add(new Separator());
+        manager.add(new Action(Messages.ApplicationActionBarAdvisor_TABBED_BROWSING, IAction.AS_CHECK_BOX) {
+          @Override
+          public void run() {
+            boolean tabbedBrowsingEnabled = isChecked();
+
+            /* Disable Tabbed Browsing */
+            if (tabbedBrowsingEnabled) {
+
+              /* Close other Tabs if necessary */
+              boolean doit = true;
+              IWorkbenchPage page = OwlUI.getPage();
+              if (page != null) {
+                IEditorReference[] editorReferences = page.getEditorReferences();
+                if (editorReferences.length > 1) {
+                  MessageBox confirmDialog = new MessageBox(page.getWorkbenchWindow().getShell(), SWT.ICON_QUESTION | SWT.YES | SWT.NO);
+                  confirmDialog.setText(Messages.ApplicationActionBarAdvisor_DISABLE_TABBED_BROWSING);
+                  confirmDialog.setMessage(NLS.bind(Messages.ApplicationActionBarAdvisor_TABS_MESSAGE, editorReferences.length));
+                  if (confirmDialog.open() == SWT.YES)
+                    OwlUI.closeOtherEditors();
+                  else
+                    doit = false;
+                }
+              }
+
+              /* Update Preferences */
+              if (doit) {
+                eclipsePrefs.putBoolean(DefaultPreferences.ECLIPSE_MULTIPLE_TABS, false);
+                eclipsePrefs.putBoolean(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS, true);
+                eclipsePrefs.putInteger(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS_THRESHOLD, 1);
+              }
+            }
+
+            /* Enable Tabbed Browsing */
+            else {
+              eclipsePrefs.putBoolean(DefaultPreferences.ECLIPSE_MULTIPLE_TABS, true);
+              eclipsePrefs.putBoolean(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS, false);
+              eclipsePrefs.putInteger(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS_THRESHOLD, 5);
+            }
+          }
+
+          @Override
+          public boolean isChecked() {
+            return OwlUI.isTabbedBrowsingEnabled();
+          }
+        });
+
+        /* Fullscreen Mode */
         manager.add(new Action(Messages.ApplicationActionBarAdvisor_FULL_SCREEN, IAction.AS_CHECK_BOX) {
           @Override
           public void run() {

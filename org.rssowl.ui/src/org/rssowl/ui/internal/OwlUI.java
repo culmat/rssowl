@@ -435,10 +435,11 @@ public class OwlUI {
 
   /** Supported Feedview Layouts */
   public enum Layout {
-    CLASSIC(Messages.OwlUI_CLASSIC_VIEW),
-    VERTICAL(Messages.OwlUI_VERTICAL_VIEW),
-    HEADLINES(Messages.OwlUI_HEADLINES_VIEW),
-    NEWSPAPER(Messages.OwlUI_NEWSPAPER_VIEW);
+    CLASSIC(Messages.OwlUI_CLASSIC_LAYOUT),
+    VERTICAL(Messages.OwlUI_VERTICAL_LAYOUT),
+    LIST(Messages.OwlUI_LIST_LAYOUT),
+    NEWSPAPER(Messages.OwlUI_NEWSPAPER_LAYOUT),
+    HEADLINES(Messages.OwlUI_HEADLINES_LAYOUT);
 
     private String fName;
 

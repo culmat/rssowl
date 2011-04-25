@@ -303,8 +303,8 @@ public class DisplayPropertyPage implements IEntityPropertyPage {
   }
 
   private void updateDisplayButtons() {
-    boolean isNewspaperLayout = (fLayoutCombo.getSelectionIndex() == Layout.NEWSPAPER.ordinal());
-    boolean isHeadlinesLayout = (fLayoutCombo.getSelectionIndex() == Layout.HEADLINES.ordinal());
+    boolean isNewspaperLayout = (fLayoutCombo.getSelectionIndex() == Layout.NEWSPAPER.ordinal() || fLayoutCombo.getSelectionIndex() == Layout.HEADLINES.ordinal());
+    boolean isListLayout = (fLayoutCombo.getSelectionIndex() == Layout.LIST.ordinal());
 
     /* Force selection to first radio if using newspaper layout */
     if (isNewspaperLayout && !fDisplayContentsOfNewsRadio.getSelection()) {
@@ -313,12 +313,12 @@ public class DisplayPropertyPage implements IEntityPropertyPage {
     }
 
     /* Update Enablement */
-    fDisplayContentsOfNewsRadio.setEnabled(!isHeadlinesLayout);
-    fLoadImagesForNewsCheck.setEnabled(!isHeadlinesLayout && (fDisplayContentsOfNewsRadio.getSelection() || fOpenSiteForEmptyNewsCheck.getSelection()));
-    fOpenLinkOfNewsRadio.setEnabled(!isHeadlinesLayout && !isNewspaperLayout);
-    fOpenSiteForEmptyNewsCheck.setEnabled(!isHeadlinesLayout && !isNewspaperLayout && fOpenLinkOfNewsRadio.getSelection());
-    fUseTransformerCheck.setEnabled(!isHeadlinesLayout && !isNewspaperLayout && fOpenLinkOfNewsRadio.getSelection());
-    fLinkTransformerViewer.getCombo().setEnabled(!isHeadlinesLayout && !isNewspaperLayout && fOpenLinkOfNewsRadio.getSelection() && fUseTransformerCheck.getSelection());
+    fDisplayContentsOfNewsRadio.setEnabled(!isListLayout);
+    fLoadImagesForNewsCheck.setEnabled(!isListLayout && (fDisplayContentsOfNewsRadio.getSelection() || fOpenSiteForEmptyNewsCheck.getSelection()));
+    fOpenLinkOfNewsRadio.setEnabled(!isListLayout && !isNewspaperLayout);
+    fOpenSiteForEmptyNewsCheck.setEnabled(!isListLayout && !isNewspaperLayout && fOpenLinkOfNewsRadio.getSelection());
+    fUseTransformerCheck.setEnabled(!isListLayout && !isNewspaperLayout && fOpenLinkOfNewsRadio.getSelection());
+    fLinkTransformerViewer.getCombo().setEnabled(!isListLayout && !isNewspaperLayout && fOpenLinkOfNewsRadio.getSelection() && fUseTransformerCheck.getSelection());
   }
 
   /*

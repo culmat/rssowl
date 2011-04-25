@@ -142,7 +142,7 @@ public class FilterBar {
     return !hideFilterBar;
   }
 
-  private boolean isHeadlinesLayout() {
+  private boolean isListLayout() {
     FeedViewInput input = ((FeedViewInput) fFeedView.getEditorInput());
     Layout layout = null;
     if (input != null)
@@ -150,7 +150,7 @@ public class FilterBar {
     else
       layout = OwlUI.getLayout(fGlobalPreferences);
 
-    return (layout == Layout.HEADLINES);
+    return (layout == Layout.LIST);
   }
 
   private boolean isSearchMark() {
@@ -211,7 +211,7 @@ public class FilterBar {
   private boolean setHighlight(boolean enabled) {
 
     /* Highlighting is unsupported when headlines layout is used */
-    if (isHeadlinesLayout())
+    if (isListLayout())
       return false;
 
     /* Return if already in same state */
@@ -488,7 +488,7 @@ public class FilterBar {
     ((GridData) toolBar.getLayoutData()).horizontalIndent = 2;
 
     /* Set Initial State based on Input and Layout */
-    boolean show = isSearchMark() && !isHeadlinesLayout();
+    boolean show = isSearchMark() && !isListLayout();
     ((GridData) toolBar.getLayoutData()).exclude = !show;
     toolBar.setVisible(show);
 
@@ -531,7 +531,7 @@ public class FilterBar {
     }
 
     /* Highlight */
-    if (isHeadlinesLayout())
+    if (isListLayout())
       visible = false; //Never show highlight bar for headlines layout
     else if (isSearchMark())
       visible = true; //Always show highlight bar for saved searches
