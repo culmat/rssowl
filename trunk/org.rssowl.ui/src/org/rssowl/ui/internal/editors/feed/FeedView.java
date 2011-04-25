@@ -113,9 +113,9 @@ import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.ApplicationServer;
 import org.rssowl.ui.internal.Controller;
+import org.rssowl.ui.internal.Controller.BookMarkLoadListener;
 import org.rssowl.ui.internal.FolderNewsMark;
 import org.rssowl.ui.internal.OwlUI;
-import org.rssowl.ui.internal.Controller.BookMarkLoadListener;
 import org.rssowl.ui.internal.OwlUI.Layout;
 import org.rssowl.ui.internal.actions.DeleteTypesAction;
 import org.rssowl.ui.internal.actions.FindAction;
@@ -1378,14 +1378,14 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
         long value = entityPreferences.getLong(DefaultPreferences.NM_SELECTED_NEWS);
         if (value > 0) {
-          boolean isHeadlinesLayout = (OwlUI.getLayout(entityPreferences) == Layout.HEADLINES);
+          boolean isListLayout = (OwlUI.getLayout(entityPreferences) == Layout.LIST);
           boolean openEmptyNews = entityPreferences.getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_EMPTY_NEWS);
           boolean openAllNews = entityPreferences.getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_NEWS);
           boolean useTransformer = entityPreferences.getBoolean(DefaultPreferences.BM_USE_TRANSFORMER);
           boolean useExternalBrowser = OwlUI.useExternalBrowser();
 
           /* Only re-select if this has not the potential of opening in external Browser */
-          if (!useExternalBrowser || isHeadlinesLayout || useTransformer || (!openAllNews && !openEmptyNews))
+          if (!useExternalBrowser || isListLayout || useTransformer || (!openAllNews && !openEmptyNews))
             oldSelection = new StructuredSelection(new NewsReference(value));
         }
 
@@ -1529,13 +1529,13 @@ public class FeedView extends EditorPart implements IReusableEditor {
       fSashForm.setOrientation(SWT.HORIZONTAL);
     }
 
-    /* Headlines Layout */
-    else if (layout == Layout.HEADLINES) {
+    /* List Layout */
+    else if (layout == Layout.LIST) {
       maximizeTable(updateInput);
     }
 
-    /* Newspaper Layout */
-    else if (layout == Layout.NEWSPAPER) {
+    /* Newspaper / Headlines Layout */
+    else if (layout == Layout.NEWSPAPER || layout == Layout.HEADLINES) {
       maximizeBrowser(updateInput);
     }
 
@@ -1632,8 +1632,8 @@ public class FeedView extends EditorPart implements IReusableEditor {
       ((GridData) fHorizontalBrowserSep.getLayoutData()).exclude = !fBrowserBar.isVisible();
     }
 
-    /* Newspaper Layout */
-    else if (layout == Layout.NEWSPAPER) {
+    /* Newspaper / Headlines Layout */
+    else if (layout == Layout.NEWSPAPER || layout == Layout.HEADLINES) {
       fHorizontalBrowserSep.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
       ((GridData) fHorizontalBrowserSep.getLayoutData()).exclude = !fBrowserBar.isVisible();
     }
@@ -1966,7 +1966,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
     fHorizontalFilterTableSep.setVisible(showSeparator);
 
     /* SashForm dividing Feed and News View */
-    boolean useClassicLayout = (fInitialLayout == Layout.CLASSIC || fInitialLayout == Layout.NEWSPAPER || fInitialLayout == Layout.HEADLINES);
+    boolean useClassicLayout = (fInitialLayout != Layout.VERTICAL);
     fSashForm = new SashForm(fRootComposite, (useClassicLayout ? SWT.VERTICAL : SWT.HORIZONTAL) | SWT.SMOOTH);
     fSashForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
@@ -2041,7 +2041,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
       }
 
       /* Browser Maximized */
-      else if (fInitialLayout == Layout.NEWSPAPER) {
+      else if (fInitialLayout == Layout.NEWSPAPER || fInitialLayout == Layout.HEADLINES) {
         fHorizontalBrowserSep.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
         ((GridData) fHorizontalBrowserSep.getLayoutData()).exclude = !fBrowserBar.isVisible();
       }
@@ -2069,9 +2069,9 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
     /* SashForm weights */
     fSashForm.setWeights(fInitialWeights);
-    if (fInitialLayout == Layout.NEWSPAPER)
+    if (fInitialLayout == Layout.NEWSPAPER || fInitialLayout == Layout.HEADLINES)
       fSashForm.setMaximizedControl(fBrowserViewerControlContainer);
-    else if (fInitialLayout == Layout.HEADLINES)
+    else if (fInitialLayout == Layout.LIST)
       fSashForm.setMaximizedControl(fNewsTableControlContainer);
 
     /* Create the shared Content-Provider */

@@ -46,7 +46,6 @@ public class Messages extends NLS {
   public static String FilterBar_FILTER_NEWS;
   public static String FilterBar_GROUP_NEWS;
   public static String FilterBar_HIGHLIGHT;
-  public static String FilterBar_OTHER;
   public static String FilterBar_QUICK_SEARCH;
   public static String FilterBar_SAVE_SEARCH;
   public static String NewsBrowserControl_ADDITIONAL_NEWS_INFO;
