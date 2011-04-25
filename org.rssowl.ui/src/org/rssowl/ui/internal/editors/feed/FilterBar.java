@@ -429,6 +429,7 @@ public class FilterBar {
                     highlightChanged = true;
                   fFeedView.getFilter().setPattern(fSearchInput.getText());
                   fFeedView.refresh(true, false);
+                  updateBrowserSelection();
                 }
               });
               setSearchControlsVisible(true);
@@ -506,6 +507,14 @@ public class FilterBar {
 
     fHighlightToolBarManager.add(fHighlightSearchAction);
     fHighlightToolBarManager.update(false);
+  }
+
+  private void updateBrowserSelection() {
+    if (fFeedView.isTableViewerVisible() && fFeedView.isBrowserViewerVisible() && fFeedView.isBrowserShowingNews()) {
+      NewsTableControl newsTable = fFeedView.getNewsTableControl();
+      if (newsTable.getViewer().getSelection().isEmpty())
+        fFeedView.getNewsBrowserControl().setPartInput(null);
+    }
   }
 
   void setSearchControlsVisible(boolean visible) {
@@ -819,6 +828,9 @@ public class FilterBar {
       /* Refresh All */
       else
         fFeedView.refresh(true, false);
+
+      /* Update Selection */
+      updateBrowserSelection();
     }
 
     /* Update Settings */
@@ -831,8 +843,10 @@ public class FilterBar {
     fSearchInput.setMessage(fFeedView.getFilter().getSearchTarget().getName());
     fSearchInput.setFocus();
 
-    if (fSearchInput.getText().length() > 0)
+    if (fSearchInput.getText().length() > 0) {
       fFeedView.refresh(true, false);
+      updateBrowserSelection();
+    }
 
     /* Update Settings */
     JobRunner.runInBackgroundThread(new Runnable() {
