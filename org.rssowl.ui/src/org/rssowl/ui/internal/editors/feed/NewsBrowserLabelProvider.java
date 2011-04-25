@@ -201,7 +201,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
    * @param stripMediaFromNews <code>true</code> to strip images and other media
    * from the news and <code>false</code> otherwise.
    */
-  void setStripMediaFromNews(boolean stripMediaFromNews) {
+  public void setStripMediaFromNews(boolean stripMediaFromNews) {
     fStripMediaFromNews = stripMediaFromNews;
   }
 
