@@ -28,18 +28,19 @@ import org.eclipse.jface.viewers.ContentViewer;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.widgets.Composite;
+import org.rssowl.ui.internal.OwlUI.Layout;
 
 /**
  * Instances of <code>IFeedViewPart</code> live inside a FeedView and provide
  * Viewer-Functionality by wrapping around a ContentViewer.
- * 
+ *
  * @author bpasero
  */
 public interface IFeedViewPart {
 
   /**
    * Initializes the Part with an instance of <code>IFeedViewSite</code>.
-   * 
+   *
    * @param feedViewSite The primary interface between a feed view part and the
    * workbench and feed view it is contained in.
    */
@@ -47,21 +48,21 @@ public interface IFeedViewPart {
 
   /**
    * Asks the Part to create it.
-   * 
+   *
    * @param parent The parent composite of the Part.
    */
   void createPart(Composite parent);
 
   /**
    * Get the Viewer of this Part.
-   * 
+   *
    * @return The Viewer of this Part.
    */
   ContentViewer getViewer();
 
   /**
    * Initializes this Parts Viewer with the shared ContentProvider and Filter.
-   * 
+   *
    * @param contentProvider The shared News-ContentProvider.
    * @param filter The shared News-Filter.
    */
@@ -69,18 +70,26 @@ public interface IFeedViewPart {
 
   /**
    * Sets an input to this Parts Viewer.
-   * 
+   *
    * @param input The Input to set into this Parts Viewer.
    */
   void setPartInput(Object input);
 
   /**
-   * Notified the Part about the <code>FeedViewInput</code> that has been set to
+   * Notifies the Part about the {@link FeedViewInput} that has been set to
    * show.
-   * 
-   * @param input the <code>FeedViewInput</code> that has been set to show.
+   *
+   * @param input the {@link FeedViewInput} that has been set to show.
    */
   void onInputChanged(FeedViewInput input);
+
+  /**
+   * Notifies the Part about a new {@link Layout} that is being used in the
+   * {@link FeedView}.
+   *
+   * @param newLayout the new {@link Layout} being used.
+   */
+  void onLayoutChanged(Layout newLayout);
 
   /**
    * Disposes this Part.

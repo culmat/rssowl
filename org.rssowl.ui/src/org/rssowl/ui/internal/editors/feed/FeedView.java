@@ -266,7 +266,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
    */
   @Override
   public void doSave(IProgressMonitor monitor) {
-  /* Not Supported */
+    /* Not Supported */
   }
 
   /*
@@ -594,11 +594,11 @@ public class FeedView extends EditorPart implements IReusableEditor {
       }
 
       public void entitiesDeleted(Set<SearchConditionEvent> events) {
-      /* Ignore Due to Bug 1140 (http://dev.rssowl.org/show_bug.cgi?id=1140) */
+        /* Ignore Due to Bug 1140 (http://dev.rssowl.org/show_bug.cgi?id=1140) */
       }
 
       public void entitiesUpdated(Set<SearchConditionEvent> events) {
-      /* Ignore Due to Bug 1140 (http://dev.rssowl.org/show_bug.cgi?id=1140) */
+        /* Ignore Due to Bug 1140 (http://dev.rssowl.org/show_bug.cgi?id=1140) */
       }
 
       /* We rely on the implementation detail that updating a SM means deleting/adding conditions */
@@ -1517,6 +1517,10 @@ public class FeedView extends EditorPart implements IReusableEditor {
     if (fInitialLayout == layout)
       return;
 
+    /* Notify Controls */
+    fNewsTableControl.onLayoutChanged(layout);
+    fNewsBrowserControl.onLayoutChanged(layout);
+
     /* Classic Layout (default) */
     if (layout == Layout.CLASSIC) {
       restoreTable(updateInput);
@@ -1537,6 +1541,8 @@ public class FeedView extends EditorPart implements IReusableEditor {
     /* Newspaper / Headlines Layout */
     else if (layout == Layout.NEWSPAPER || layout == Layout.HEADLINES) {
       maximizeBrowser(updateInput);
+      if (updateInput && (fInitialLayout == Layout.NEWSPAPER || fInitialLayout == Layout.HEADLINES))
+        refreshBrowserViewer(); //A change between Newspaper and Headlines needs a refresh due to the different CSS
     }
 
     /* Update Separators */
