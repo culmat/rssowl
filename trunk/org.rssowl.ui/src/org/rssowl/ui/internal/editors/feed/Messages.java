@@ -82,6 +82,7 @@ public class Messages extends NLS {
   public static String NewsBrowserViewer_BY_CATEGORY;
   public static String NewsBrowserViewer_CATEGORIZED_N;
   public static String NewsBrowserViewer_COPY_TO;
+  public static String NewsBrowserViewer_DOWNLOAD_CONTENT;
   public static String NewsBrowserViewer_FULL_CONTENT;
   public static String NewsBrowserViewer_LABELED_N;
   public static String NewsBrowserViewer_LABELS;
@@ -90,6 +91,7 @@ public class Messages extends NLS {
   public static String NewsBrowserViewer_MARK_READ;
   public static String NewsBrowserViewer_MARK_UNREAD;
   public static String NewsBrowserViewer_MOVE_TO;
+  public static String NewsBrowserViewer_NO_CONTENT;
   public static String NewsBrowserViewer_RETRIEVING_ARTICLE_CONTENT;
   public static String NewsBrowserViewer_SIMILAR_CONTENT;
   public static String NewsColumn_ATTACHMENTS;
