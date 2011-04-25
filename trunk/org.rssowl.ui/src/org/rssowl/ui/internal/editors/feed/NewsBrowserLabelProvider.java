@@ -213,6 +213,14 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     fStripMediaFromNews = stripMediaFromNews;
   }
 
+  /* Removes Media Tags from the provided String if the provider is configured to do so */
+  String stripMediaTagsIfNecessary(String str) {
+    if (fStripMediaFromNews)
+      return StringUtils.filterTags(str, fMediaTags, false);
+
+    return str;
+  }
+
   /**
    * @param forceShowFeedInformation if <code>true</code> will show the name of
    * a feed of a news when shown, <code>false</code> otherwise.
@@ -589,11 +597,8 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
   private String getLabel(INews news, boolean withInternalLinks, boolean withManagedLinks, int index) {
     String description = null; //Fetch description lazily if only headlines shown
-    if (!fHeadlinesOnly) {
-      description = news.getDescription();
-      if (fStripMediaFromNews)
-        description = StringUtils.filterTags(description, fMediaTags, false);
-    }
+    if (!fHeadlinesOnly)
+      description = stripMediaTagsIfNecessary(news.getDescription());
 
     StringBuilder builder = getBuilder(news, description);
 
