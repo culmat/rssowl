@@ -857,7 +857,14 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
     /* Provide News Content as needed */
     String description = news.getDescription();
-    if (!StringUtils.isSet(description) || description.equals(news.getTitle())) {
+    if (StringUtils.isSet(description) && !description.equals(news.getTitle())) {
+      IBaseLabelProvider labelProvider = getLabelProvider();
+      if (labelProvider instanceof NewsBrowserLabelProvider)
+        description = ((NewsBrowserLabelProvider) labelProvider).stripMediaTagsIfNecessary(description);
+    }
+
+    /* Content is not provided */
+    else {
       String newsLink = CoreUtils.getLink(news);
 
       StringBuilder emptyDescription = new StringBuilder();
