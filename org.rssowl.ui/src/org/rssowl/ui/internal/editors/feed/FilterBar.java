@@ -949,17 +949,23 @@ public class FilterBar {
           }
         });
 
+        /* Group: By Feed */
+        final MenuItem groupByFeed = new MenuItem(menu, SWT.RADIO);
+        groupByFeed.setText(NewsGrouping.Type.GROUP_BY_FEED.getName());
+        groupByFeed.setSelection(grouping.getType() == NewsGrouping.Type.GROUP_BY_FEED);
+        groupByFeed.addSelectionListener(new SelectionAdapter() {
+          @Override
+          public void widgetSelected(SelectionEvent e) {
+            if (groupByFeed.getSelection() && grouping.getType() != NewsGrouping.Type.GROUP_BY_FEED)
+              onGrouping(NewsGrouping.Type.GROUP_BY_FEED);
+          }
+        });
+
         /* Separator */
         new MenuItem(menu, SWT.SEPARATOR);
 
-        /* Group: By Other */
-        final MenuItem groupByOther = new MenuItem(menu, SWT.CASCADE);
-        groupByOther.setText(Messages.FilterBar_OTHER);
-        Menu otherMenu = new Menu(groupByOther);
-        groupByOther.setMenu(otherMenu);
-
         /* Group: By State */
-        final MenuItem groupByState = new MenuItem(otherMenu, SWT.RADIO);
+        final MenuItem groupByState = new MenuItem(menu, SWT.RADIO);
         groupByState.setText(NewsGrouping.Type.GROUP_BY_STATE.getName());
         groupByState.setSelection(grouping.getType() == NewsGrouping.Type.GROUP_BY_STATE);
         groupByState.addSelectionListener(new SelectionAdapter() {
@@ -971,7 +977,7 @@ public class FilterBar {
         });
 
         /* Group: By Stickyness */
-        final MenuItem groupByStickyness = new MenuItem(otherMenu, SWT.RADIO);
+        final MenuItem groupByStickyness = new MenuItem(menu, SWT.RADIO);
         groupByStickyness.setText(NewsGrouping.Type.GROUP_BY_STICKY.getName());
         groupByStickyness.setSelection(grouping.getType() == NewsGrouping.Type.GROUP_BY_STICKY);
         groupByStickyness.addSelectionListener(new SelectionAdapter() {
@@ -983,10 +989,10 @@ public class FilterBar {
         });
 
         /* Separator */
-        new MenuItem(otherMenu, SWT.SEPARATOR);
+        new MenuItem(menu, SWT.SEPARATOR);
 
         /* Group: By Label */
-        final MenuItem groupByLabel = new MenuItem(otherMenu, SWT.RADIO);
+        final MenuItem groupByLabel = new MenuItem(menu, SWT.RADIO);
         groupByLabel.setText(NewsGrouping.Type.GROUP_BY_LABEL.getName());
         groupByLabel.setSelection(grouping.getType() == NewsGrouping.Type.GROUP_BY_LABEL);
         groupByLabel.addSelectionListener(new SelectionAdapter() {
@@ -994,33 +1000,6 @@ public class FilterBar {
           public void widgetSelected(SelectionEvent e) {
             if (groupByLabel.getSelection() && grouping.getType() != NewsGrouping.Type.GROUP_BY_LABEL)
               onGrouping(NewsGrouping.Type.GROUP_BY_LABEL);
-          }
-        });
-
-        /* Group: By Rating */
-        final MenuItem groupByRating = new MenuItem(otherMenu, SWT.RADIO);
-        groupByRating.setText(NewsGrouping.Type.GROUP_BY_RATING.getName());
-        groupByRating.setSelection(grouping.getType() == NewsGrouping.Type.GROUP_BY_RATING);
-        groupByRating.addSelectionListener(new SelectionAdapter() {
-          @Override
-          public void widgetSelected(SelectionEvent e) {
-            if (groupByRating.getSelection() && grouping.getType() != NewsGrouping.Type.GROUP_BY_RATING)
-              onGrouping(NewsGrouping.Type.GROUP_BY_RATING);
-          }
-        });
-
-        /* Separator */
-        new MenuItem(otherMenu, SWT.SEPARATOR);
-
-        /* Group: By Feed */
-        final MenuItem groupByFeed = new MenuItem(otherMenu, SWT.RADIO);
-        groupByFeed.setText(NewsGrouping.Type.GROUP_BY_FEED.getName());
-        groupByFeed.setSelection(grouping.getType() == NewsGrouping.Type.GROUP_BY_FEED);
-        groupByFeed.addSelectionListener(new SelectionAdapter() {
-          @Override
-          public void widgetSelected(SelectionEvent e) {
-            if (groupByFeed.getSelection() && grouping.getType() != NewsGrouping.Type.GROUP_BY_FEED)
-              onGrouping(NewsGrouping.Type.GROUP_BY_FEED);
           }
         });
 
