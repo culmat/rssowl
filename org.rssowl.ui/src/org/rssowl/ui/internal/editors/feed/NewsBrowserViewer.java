@@ -118,6 +118,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -139,6 +140,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   static final String ATTACHMENT_HANDLER_ID = "org.rssowl.ui.DownloadAttachment"; //$NON-NLS-1$
   static final String ATTACHMENTS_MENU_HANDLER_ID = "org.rssowl.ui.AttachmentsMenu"; //$NON-NLS-1$
   static final String LABELS_MENU_HANDLER_ID = "org.rssowl.ui.LabelsMenu"; //$NON-NLS-1$
+  static final String TOGGLE_NEWS_HANDLER_ID = "org.rssowl.ui.ToggleNews"; //$NON-NLS-1$
   static final String TOGGLE_GROUP_HANDLER_ID = "org.rssowl.ui.ToggleGroup"; //$NON-NLS-1$
   static final String GROUP_MENU_HANDLER_ID = "org.rssowl.ui.GroupMenu"; //$NON-NLS-1$
   static final String NEWS_MENU_HANDLER_ID = "org.rssowl.ui.NewsMenu"; //$NON-NLS-1$
@@ -213,6 +215,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     fBrowser.addLinkHandler(ATTACHMENT_HANDLER_ID, this);
     fBrowser.addLinkHandler(ATTACHMENTS_MENU_HANDLER_ID, this);
     fBrowser.addLinkHandler(LABELS_MENU_HANDLER_ID, this);
+    fBrowser.addLinkHandler(TOGGLE_NEWS_HANDLER_ID, this);
     fBrowser.addLinkHandler(TOGGLE_GROUP_HANDLER_ID, this);
     fBrowser.addLinkHandler(GROUP_MENU_HANDLER_ID, this);
     fBrowser.addLinkHandler(NEWS_MENU_HANDLER_ID, this);
@@ -656,6 +659,13 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       }
     }
 
+    /* Toggle News Item Visibility */
+    else if (queryProvided && TOGGLE_NEWS_HANDLER_ID.equals(id)) {
+      INews news = getNews(query);
+      if (news != null)
+        toggleVisibility(news);
+    }
+
     /* Toggle Group Items Visibility */
     else if (queryProvided && TOGGLE_GROUP_HANDLER_ID.equals(id)) {
       long groupId = getId(query);
@@ -801,6 +811,85 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     }
   }
 
+  private void toggleVisibility(INews news) {
+    String expandedImgUri;
+    String collapsedImgUri;
+    if (fBrowser.isIE()) {
+      expandedImgUri = OwlUI.getImageUri("/icons/elcl16/expanded.gif", "expanded.gif"); //$NON-NLS-1$ //$NON-NLS-2$
+      collapsedImgUri = OwlUI.getImageUri("/icons/elcl16/collapsed.gif", "collapsed.gif"); //$NON-NLS-1$ //$NON-NLS-2$
+    } else {
+      expandedImgUri = ApplicationServer.getDefault().toResourceUrl("/icons/elcl16/expanded.gif"); //$NON-NLS-1$
+      collapsedImgUri = ApplicationServer.getDefault().toResourceUrl("/icons/elcl16/collapsed.gif"); //$NON-NLS-1$
+    }
+
+    /* Toggle Triangle Image */
+    final StringBuilder js = new StringBuilder();
+    js.append(getElementById(Dynamic.TOGGLE_NEWS_LINK.getId(news)).append(".blur(); ")); //$NON-NLS-1$
+    js.append("var expand = true; "); //$NON-NLS-1$
+    js.append("var toggle = ").append(getElementById(Dynamic.TOGGLE_NEWS_IMG.getId(news))).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
+    js.append("if (!toggle.className || toggle.className == '') {"); //$NON-NLS-1$
+    js.append(getElementById(Dynamic.TOGGLE_NEWS_IMG.getId(news)).append(".src = '" + expandedImgUri + "'; ")); //$NON-NLS-1$ //$NON-NLS-2$
+    js.append("  toggle.className = 'expanded';"); //$NON-NLS-1$
+    js.append("} else {"); //$NON-NLS-1$
+    js.append(getElementById(Dynamic.TOGGLE_NEWS_IMG.getId(news)).append(".src = '" + collapsedImgUri + "'; ")); //$NON-NLS-1$ //$NON-NLS-2$
+    js.append("  toggle.className = '';"); //$NON-NLS-1$
+    js.append("  expand = false;"); //$NON-NLS-1$
+    js.append("}"); //$NON-NLS-1$
+
+    /* Toggle News Div Visibility */
+    boolean varDefined = false;
+    Set<Dynamic> elements = EnumSet.of(Dynamic.SUBLINE, Dynamic.CONTENT, Dynamic.FOOTER);
+    for (Dynamic element : elements) {
+      if (!varDefined) {
+        js.append("var "); //$NON-NLS-1$
+        varDefined = true;
+      }
+
+      js.append("node = ").append(getElementById(element.getId(news))).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
+      js.append("if (node != null) { "); //$NON-NLS-1$
+      js.append("  if (expand) { "); //$NON-NLS-1$
+      js.append("     node.style.display='block';"); //$NON-NLS-1$
+      js.append("   } else {"); //$NON-NLS-1$
+      js.append("     node.style.display='none';"); //$NON-NLS-1$
+      js.append("   } "); //$NON-NLS-1$
+      js.append("}"); //$NON-NLS-1$
+    }
+
+    /* Provide News Content as needed */
+    String description = news.getDescription();
+    if (!StringUtils.isSet(description) || description.equals(news.getTitle())) {
+      String newsLink = CoreUtils.getLink(news);
+
+      StringBuilder emptyDescription = new StringBuilder();
+      emptyDescription.append(Messages.NewsBrowserViewer_NO_CONTENT);
+      if (StringUtils.isSet(newsLink)) {
+        String link = HANDLER_PROTOCOL + TRANSFORM_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
+        emptyDescription.append(" <a href=\"").append(link).append("\">").append(Messages.NewsBrowserViewer_DOWNLOAD_CONTENT).append("</a>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      }
+
+      description = emptyDescription.toString();
+    }
+
+    js.append("if (expand) { "); //$NON-NLS-1$
+    js.append(getElementById(Dynamic.CONTENT.getId(news)).append(".innerHTML = '" + escapeForInnerHtml(description) + "'; ")); //$NON-NLS-1$ //$NON-NLS-2$
+    js.append("}"); //$NON-NLS-1$
+
+    /* Block external navigation while setting innerHTML */
+    fBrowser.blockExternalNavigationWhile(new Runnable() {
+      public void run() {
+        fBrowser.execute(js.toString());
+      }
+    });
+
+    /* Update State if not already marked as read */
+    if (news.getState() != INews.State.READ && !isGroupingByState()) { //Ignore if grouping by state to avoid refresh
+      Set<INews> singleNewsSet = Collections.singleton(news);
+      boolean affectEquivalentNews = OwlUI.markReadDuplicates();
+      UndoStack.getInstance().addOperation(new NewsStateOperation(singleNewsSet, INews.State.READ, affectEquivalentNews));
+      fNewsDao.setState(singleNewsSet, INews.State.READ, affectEquivalentNews, false);
+    }
+  }
+
   private void toggleVisibility(long groupId, Set<Long> newsIds) {
     String expandedImgUri;
     String collapsedImgUri;
@@ -914,8 +1003,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   private void showTransformation(INews news, String result) {
 
     /* Make the result suitable to be used in JavaScript */
-    result = StringUtils.replaceAll(result, "\"", "\\\""); //$NON-NLS-1$ //$NON-NLS-2$
-    result = StringUtils.replaceAll(result, "'", "\\'"); //$NON-NLS-1$ //$NON-NLS-2$
+    result = escapeForInnerHtml(result);
 
     final StringBuilder js = new StringBuilder();
     js.append(getElementById(Dynamic.CONTENT.getId(news)).append(".innerHTML='").append(result).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -928,6 +1016,14 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
         fBrowser.execute(js.toString());
       }
     });
+  }
+
+  private String escapeForInnerHtml(String str) {
+    str = StringUtils.replaceAll(str, "\"", "\\\""); //$NON-NLS-1$ //$NON-NLS-2$
+    str = StringUtils.replaceAll(str, "'", "\\'"); //$NON-NLS-1$ //$NON-NLS-2$
+    str = StringUtils.replaceAll(str, "\n", " "); //$NON-NLS-1$ //$NON-NLS-2$
+
+    return str;
   }
 
   private void delayInUI(Runnable runnable) {
@@ -1662,5 +1758,13 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     }
 
     return Collections.emptyList();
+  }
+
+  private boolean isGroupingByState() {
+    IContentProvider cp = getContentProvider();
+    if (cp instanceof NewsContentProvider)
+      return ((NewsContentProvider) cp).isGroupingByState();
+
+    return false;
   }
 }

@@ -35,6 +35,7 @@ import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.NEWS_MENU_HA
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.RELATED_NEWS_MENU_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.SHARE_NEWS_MENU_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.TOGGLE_GROUP_HANDLER_ID;
+import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.TOGGLE_NEWS_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.TOGGLE_READ_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.TOGGLE_STICKY_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.TRANSFORM_HANDLER_ID;
@@ -103,12 +104,15 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   enum Dynamic {
     NEWS("newsitem"), //$NON-NLS-1$
     TITLE("title"), //$NON-NLS-1$
+    SUBLINE("subline"), //$NON-NLS-1$
     TOGGLE_READ_LINK("toggleRead"), //$NON-NLS-1$
     TOGGLE_READ_IMG("toggleReadImg"), //$NON-NLS-1$
     TOGGLE_STICKY_LINK("toggleStickyLink"), //$NON-NLS-1$
     TOGGLE_STICKY_IMG("toggleStickyImg"), //$NON-NLS-1$
     TOGGLE_GROUP_LINK("toggleGroupLink"), //$NON-NLS-1$
     TOGGLE_GROUP_IMG("toggleGroupImg"), //$NON-NLS-1$
+    TOGGLE_NEWS_LINK("toggleNewsLink"), //$NON-NLS-1$
+    TOGGLE_NEWS_IMG("toggleNewsImg"), //$NON-NLS-1$
     LABELS_MENU_LINK("labelsMenuLink"), //$NON-NLS-1$
     ARCHIVE_LINK("archiveLink"), //$NON-NLS-1$
     SHARE_MENU_LINK("shareMenuLink"), //$NON-NLS-1$
@@ -437,7 +441,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.write("   padding: 15px 10px 15px 10px; border-top: dotted 1px silver; \n"); //$NON-NLS-1$
     writer.append("  background-color: #fff; clear: both; ").append(fNormalFontCSS).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
     writer.write("}\n"); //$NON-NLS-1$
-    
+
     /* Restrict the style of embedded Paragraphs */
     writer.write("div.content p { margin-top: 0; padding-top: 0; margin-left: 0; padding-left: 0; }\n"); //$NON-NLS-1$
 
@@ -584,9 +588,13 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   }
 
   private String getLabel(INews news, boolean withInternalLinks, boolean withManagedLinks, int index) {
-    String description = news.getDescription();
-    if (fStripMediaFromNews)
-      description = StringUtils.filterTags(description, fMediaTags, false);
+    String description = null; //Fetch description lazily if only headlines shown
+    if (!fHeadlinesOnly) {
+      description = news.getDescription();
+      if (fStripMediaFromNews)
+        description = StringUtils.filterTags(description, fMediaTags, false);
+    }
+
     StringBuilder builder = getBuilder(news, description);
 
     String newsTitle = CoreUtils.getHeadline(news, false);
@@ -626,6 +634,12 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       /* DIV: NewsItem/Header/Title */
       div(builder, "title"); //$NON-NLS-1$
 
+      /* Triangle to expand/collapse News if headlines only */
+      if (fHeadlinesOnly) {
+        String link = HANDLER_PROTOCOL + TOGGLE_NEWS_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
+        imageLink(builder, link, null, null, "/icons/elcl16/collapsed.gif", "collapsed.gif", Dynamic.TOGGLE_NEWS_LINK.getId(news), Dynamic.TOGGLE_NEWS_IMG.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
+      }
+
       String cssClass = isUnread ? "unread" : "read"; //$NON-NLS-1$ //$NON-NLS-2$
 
       /* Link */
@@ -654,7 +668,10 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     }
 
     /* DIV: NewsItem/Header/Subline */
-    div(builder, "subline"); //$NON-NLS-1$
+    if (fHeadlinesOnly) //Hidden initially in headlines mode
+      div(builder, "subline", "display: none;", Dynamic.SUBLINE.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
+    else
+      div(builder, "subline", Dynamic.SUBLINE.getId(news)); //$NON-NLS-1$
     builder.append("<table class=\"subline\">"); //$NON-NLS-1$
     builder.append("<tr class=\"subline\">"); //$NON-NLS-1$
 
@@ -833,26 +850,32 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     {
 
       /* DIV: NewsItem/Content */
+      String extraCSS = ""; //$NON-NLS-1$
       if (index != 0 && fIsNewsListBGColorDefined && index % 2 != 0)
-        div(builder, "content", fNewsListBGColorCSS, Dynamic.CONTENT.getId(news)); //$NON-NLS-1$
-      else
-        div(builder, "content", Dynamic.CONTENT.getId(news)); //$NON-NLS-1$
+        extraCSS = fNewsListBGColorCSS;
 
-      /* Content is provided */
-      if (StringUtils.isSet(description) && !description.equals(news.getTitle()))
-        builder.append(description);
+      if (fHeadlinesOnly) //Hidden initially in headlines mode
+        extraCSS += " display: none;"; //$NON-NLS-1$
 
-      /* Content is not provided */
-      else {
+      div(builder, "content", extraCSS, Dynamic.CONTENT.getId(news)); //$NON-NLS-1$
 
-        /* Inform the user */
-        builder.append(Messages.NewsBrowserLabelProvider_NO_CONTENT);
+      /* Content is provided and should be displayed */
+      if (!fHeadlinesOnly) {
+        if (StringUtils.isSet(description) && description != null && !description.equals(news.getTitle()))
+          builder.append(description);
 
-        /* Provide a link to attempt to download the news content and show it */
-        if (withInternalLinks && hasLink) {
-          builder.append(" "); //$NON-NLS-1$
-          String link = HANDLER_PROTOCOL + TRANSFORM_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
-          link(builder, link, Messages.NewsBrowserLabelProvider_ATTEMPT_DOWNLOAD_AND_DISPLAY, null);
+        /* Content is not provided */
+        else {
+
+          /* Inform the user */
+          builder.append(Messages.NewsBrowserLabelProvider_NO_CONTENT);
+
+          /* Provide a link to attempt to download the news content and show it */
+          if (withInternalLinks && hasLink) {
+            builder.append(" "); //$NON-NLS-1$
+            String link = HANDLER_PROTOCOL + TRANSFORM_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
+            link(builder, link, Messages.NewsBrowserLabelProvider_ATTEMPT_DOWNLOAD_AND_DISPLAY, null);
+          }
         }
       }
 
@@ -864,7 +887,10 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     if (withInternalLinks && fShowFooter) {
 
       /* DIV: NewsItem/Footer */
-      div(builder, news.isFlagged() ? "footerSticky" : "footer", Dynamic.FOOTER.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
+      if (fHeadlinesOnly) //Hidden initially in headlines mode
+        div(builder, news.isFlagged() ? "footerSticky" : "footer", "display: none;", Dynamic.FOOTER.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      else
+        div(builder, news.isFlagged() ? "footerSticky" : "footer", Dynamic.FOOTER.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
 
       /* DIV: NewsItem/Footer/Footerline */
       div(builder, "footerline"); //$NON-NLS-1$
