@@ -1029,6 +1029,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     str = StringUtils.replaceAll(str, "\"", "\\\""); //$NON-NLS-1$ //$NON-NLS-2$
     str = StringUtils.replaceAll(str, "'", "\\'"); //$NON-NLS-1$ //$NON-NLS-2$
     str = StringUtils.replaceAll(str, "\n", " "); //$NON-NLS-1$ //$NON-NLS-2$
+    str = StringUtils.replaceAll(str, "\r", " "); //$NON-NLS-1$ //$NON-NLS-2$
 
     return str;
   }
