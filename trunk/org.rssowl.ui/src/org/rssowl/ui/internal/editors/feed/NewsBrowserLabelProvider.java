@@ -66,6 +66,7 @@ import org.rssowl.core.util.ExpandingReader;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
+import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.ApplicationServer;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.FolderNewsMark.FolderNewsMarkReference;
@@ -74,6 +75,7 @@ import org.rssowl.ui.internal.util.CBrowser;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URI;
 import java.text.DateFormat;
@@ -99,6 +101,9 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
   /* Potential Media Tags */
   private final Set<String> fMediaTags = new HashSet<String>(Arrays.asList(new String[] { "img", "applet", "embed", "area", "frame", "frameset", "iframe", "map", "object" })); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$
+
+  /* Windows only: Mark of the Web */
+  private static final String IE_MOTW = "<!-- saved from url=(0014)about:internet -->"; //$NON-NLS-1$
 
   /* Dynamic HTML in Content */
   enum Dynamic {
@@ -1122,5 +1127,86 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       builder.append(" id=\"").append(id).append("\""); //$NON-NLS-1$ //$NON-NLS-2$
 
     builder.append(">").append(content).append("</span>\n"); //$NON-NLS-1$ //$NON-NLS-2$
+  }
+
+  /**
+   * Renders the provided list of elements in HTML for reading.
+   *
+   * @param elements the elements to render as HTML.
+   * @param base a URI that should be used as base URI for the HTML document.
+   * @param withManagedLinks if set to <code>false</code>, the output will not
+   * contain any managed links.
+   * @return a HTML document with the elements provided rendered properly for
+   * reading.
+   */
+  public String render(Object[] elements, URI base, boolean withManagedLinks) {
+
+    /* Store existing settings to restore later */
+    boolean stripMediaFromNews = fStripMediaFromNews;
+    boolean showFooter = fShowFooter;
+    boolean headlinesOnly = fHeadlinesOnly;
+    boolean showFeedInformation = fForceShowFeedInformation;
+
+    fStripMediaFromNews = false;
+    fShowFooter = false;
+    fHeadlinesOnly = false;
+    fForceShowFeedInformation = true;
+    try {
+      return internalRender(elements, base, withManagedLinks);
+    } finally {
+      fStripMediaFromNews = stripMediaFromNews;
+      fShowFooter = showFooter;
+      fHeadlinesOnly = headlinesOnly;
+      fForceShowFeedInformation = showFeedInformation;
+    }
+  }
+
+  private String internalRender(Object[] elements, URI base, boolean withManagedLinks) {
+
+    /* Start HTML */
+    StringBuilder html = new StringBuilder();
+    html.append("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n"); //$NON-NLS-1$
+
+    /* Windows only: Mark of the Web */
+    if (Application.IS_WINDOWS) {
+      html.append(IE_MOTW);
+      html.append("\n"); //$NON-NLS-1$
+    }
+
+    /* Head */
+    html.append("<html>\n  <head>\n"); //$NON-NLS-1$
+
+    /* Append Base URI if available */
+    if (base != null) {
+      html.append("  <base href=\""); //$NON-NLS-1$
+      html.append(base);
+      html.append("\">"); //$NON-NLS-1$
+    }
+
+    /* Meta */
+    html.append("\n  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n"); //$NON-NLS-1$
+
+    /* CSS */
+    try {
+      StringWriter writer = new StringWriter();
+      writeCSS(writer, elements.length == 1, false);
+      html.append(writer.toString());
+    } catch (IOException e) {
+      /* Will Never Happen */
+    }
+
+    /* Open Body */
+    html.append("  </head>\n  <body id=\"owlbody\">\n"); //$NON-NLS-1$
+
+    /* Write News */
+    for (int i = 0; i < elements.length; i++) {
+      if (elements[i] instanceof INews)
+        html.append(getText(elements[i], false, withManagedLinks, i));
+    }
+
+    /* End HTML */
+    html.append("\n  </body>\n</html>"); //$NON-NLS-1$
+
+    return html.toString();
   }
 }
