@@ -177,7 +177,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
   /**
    * Creates a new Browser LabelProvider for News
-   *
+   * 
    * @param browser
    */
   public NewsBrowserLabelProvider(CBrowser browser) {
@@ -186,7 +186,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
   /**
    * Creates a new Browser LabelProvider for News
-   *
+   * 
    * @param viewer
    */
   public NewsBrowserLabelProvider(NewsBrowserViewer viewer) {
@@ -377,7 +377,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
   /**
    * Writes the CSS information to the given Writer.
-   *
+   * 
    * @param writer the writer to add the CSS information to.
    * @throws IOException In case of an error while writing.
    */
@@ -387,7 +387,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
   /**
    * Writes the CSS information to the given Writer.
-   *
+   * 
    * @param writer the writer to add the CSS information to.
    * @param forSingleNews if <code>true</code>, the site contains a single news,
    * or <code>false</code> if it contains a collection of news.
@@ -647,13 +647,19 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
       String cssClass = isUnread ? "unread" : "read"; //$NON-NLS-1$ //$NON-NLS-2$
 
-      /* Link */
-      if (hasLink)
-        link(builder, (fManageLinks && withManagedLinks) ? URIUtils.toManaged(newsLink) : newsLink, newsTitle, cssClass, Dynamic.TITLE.getId(news), color);
+      /* Let click on Title expand news */
+      if (fHeadlinesOnly) {
+        String link = HANDLER_PROTOCOL + TOGGLE_NEWS_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
+        link(builder, link, newsTitle, cssClass, Dynamic.TITLE.getId(news), color);
+      }
 
-      /* Normal */
-      else
-        span(builder, newsTitle, cssClass, Dynamic.TITLE.getId(news), color);
+      /* Otherwise treat normally */
+      else {
+        if (hasLink)
+          link(builder, (fManageLinks && withManagedLinks) ? URIUtils.toManaged(newsLink) : newsLink, newsTitle, cssClass, Dynamic.TITLE.getId(news), color);
+        else
+          span(builder, newsTitle, cssClass, Dynamic.TITLE.getId(news), color);
+      }
 
       /* Close: NewsItem/Header/Title */
       close(builder, "div"); //$NON-NLS-1$

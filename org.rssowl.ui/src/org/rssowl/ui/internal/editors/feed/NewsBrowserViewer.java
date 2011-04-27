@@ -817,6 +817,8 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   }
 
   private void toggleVisibility(INews news) {
+    String newsLink = CoreUtils.getLink(news);
+
     String expandedImgUri;
     String collapsedImgUri;
     if (fBrowser.isIE()) {
@@ -830,6 +832,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     /* Toggle Triangle Image */
     final StringBuilder js = new StringBuilder();
     js.append(getElementById(Dynamic.TOGGLE_NEWS_LINK.getId(news)).append(".blur(); ")); //$NON-NLS-1$
+    js.append(getElementById(Dynamic.TITLE.getId(news)).append(".blur(); ")); //$NON-NLS-1$
     js.append("var expand = true; "); //$NON-NLS-1$
     js.append("var toggle = ").append(getElementById(Dynamic.TOGGLE_NEWS_IMG.getId(news))).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
     js.append("if (!toggle.className || toggle.className == '') {"); //$NON-NLS-1$
@@ -870,8 +873,6 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
     /* Content is not provided */
     else {
-      String newsLink = CoreUtils.getLink(news);
-
       StringBuilder emptyDescription = new StringBuilder();
       emptyDescription.append(Messages.NewsBrowserViewer_NO_CONTENT);
       if (StringUtils.isSet(newsLink)) {
@@ -882,8 +883,14 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       description = emptyDescription.toString();
     }
 
+    /* Insert Content on expand and update Title Link as necessary */
     js.append("if (expand) { "); //$NON-NLS-1$
     js.append(getElementById(Dynamic.CONTENT.getId(news)).append(".innerHTML = '" + escapeForInnerHtml(description) + "'; ")); //$NON-NLS-1$ //$NON-NLS-2$
+    if (StringUtils.isSet(newsLink))
+      js.append(getElementById(Dynamic.TITLE.getId(news)).append(".href = '" + URIUtils.toManaged(newsLink) + "'; ")); //$NON-NLS-1$ //$NON-NLS-2$
+    js.append("} else {"); //$NON-NLS-1$
+    js.append(getElementById(Dynamic.CONTENT.getId(news)).append(".innerHTML = ''; ")); //$NON-NLS-1$
+    js.append(getElementById(Dynamic.TITLE.getId(news)).append(".href = '" + (HANDLER_PROTOCOL + TOGGLE_NEWS_HANDLER_ID + "?" + news.getId()) + "'; ")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     js.append("}"); //$NON-NLS-1$
 
     /* Block external navigation while setting innerHTML */
