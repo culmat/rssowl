@@ -28,6 +28,7 @@ import static org.rssowl.ui.internal.ILinkHandler.HANDLER_PROTOCOL;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.ARCHIVE_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.ATTACHMENTS_MENU_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.ATTACHMENT_HANDLER_ID;
+import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.COLLAPSE_GROUP_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.DELETE_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.EXPAND_NEWS_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.GROUP_MENU_HANDLER_ID;
@@ -35,7 +36,6 @@ import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.LABELS_MENU_
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.NEWS_MENU_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.RELATED_NEWS_MENU_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.SHARE_NEWS_MENU_HANDLER_ID;
-import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.TOGGLE_GROUP_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.TOGGLE_READ_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.TOGGLE_STICKY_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.TRANSFORM_HANDLER_ID;
@@ -116,6 +116,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     LABELS_MENU_LINK("labelsMenuLink"), //$NON-NLS-1$
     ARCHIVE_LINK("archiveLink"), //$NON-NLS-1$
     SHARE_MENU_LINK("shareMenuLink"), //$NON-NLS-1$
+    GROUP_MENU_LINK("groupMenuLink"), //$NON-NLS-1$
     NEWS_MENU_LINK("newsMenuLink"), //$NON-NLS-1$
     HEADER("header"), //$NON-NLS-1$
     CONTENT("content"), //$NON-NLS-1$
@@ -545,12 +546,12 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     if (withInternalLinks) {
 
       /* Toggle to Expand / Collapse */
-      String link = HANDLER_PROTOCOL + TOGGLE_GROUP_HANDLER_ID + "?" + group.getId(); //$NON-NLS-1$
+      String link = HANDLER_PROTOCOL + COLLAPSE_GROUP_HANDLER_ID + "?" + group.getId(); //$NON-NLS-1$
       imageLink(builder, link, null, null, "/icons/elcl16/expanded.gif", "expanded.gif", Dynamic.TOGGLE_GROUP_LINK.getId(group), Dynamic.TOGGLE_GROUP_IMG.getId(group)); //$NON-NLS-1$ //$NON-NLS-2$
 
       /* Group Name as Link */
       link = HANDLER_PROTOCOL + GROUP_MENU_HANDLER_ID + "?" + group.getId(); //$NON-NLS-1$
-      link(builder, link, groupName, null, null, groupColor);
+      link(builder, link, groupName, null, Dynamic.GROUP_MENU_LINK.getId(group), groupColor);
     }
 
     /* Not using internal links */

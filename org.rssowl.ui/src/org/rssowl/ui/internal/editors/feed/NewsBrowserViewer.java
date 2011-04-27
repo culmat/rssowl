@@ -143,7 +143,8 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   static final String LABELS_MENU_HANDLER_ID = "org.rssowl.ui.LabelsMenu"; //$NON-NLS-1$
   static final String EXPAND_NEWS_HANDLER_ID = "org.rssowl.ui.ExpandNews"; //$NON-NLS-1$
   static final String COLLAPSE_NEWS_HANDLER_ID = "org.rssowl.ui.CollapseNews"; //$NON-NLS-1$
-  static final String TOGGLE_GROUP_HANDLER_ID = "org.rssowl.ui.ToggleGroup"; //$NON-NLS-1$
+  static final String EXPAND_GROUP_HANDLER_ID = "org.rssowl.ui.ExpandGroup"; //$NON-NLS-1$
+  static final String COLLAPSE_GROUP_HANDLER_ID = "org.rssowl.ui.CollapseGroup"; //$NON-NLS-1$
   static final String GROUP_MENU_HANDLER_ID = "org.rssowl.ui.GroupMenu"; //$NON-NLS-1$
   static final String NEWS_MENU_HANDLER_ID = "org.rssowl.ui.NewsMenu"; //$NON-NLS-1$
   static final String SHARE_NEWS_MENU_HANDLER_ID = "org.rssowl.ui.ShareNewsMenu"; //$NON-NLS-1$
@@ -226,7 +227,8 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     fBrowser.addLinkHandler(LABELS_MENU_HANDLER_ID, this);
     fBrowser.addLinkHandler(EXPAND_NEWS_HANDLER_ID, this);
     fBrowser.addLinkHandler(COLLAPSE_NEWS_HANDLER_ID, this);
-    fBrowser.addLinkHandler(TOGGLE_GROUP_HANDLER_ID, this);
+    fBrowser.addLinkHandler(EXPAND_GROUP_HANDLER_ID, this);
+    fBrowser.addLinkHandler(COLLAPSE_GROUP_HANDLER_ID, this);
     fBrowser.addLinkHandler(GROUP_MENU_HANDLER_ID, this);
     fBrowser.addLinkHandler(NEWS_MENU_HANDLER_ID, this);
     fBrowser.addLinkHandler(SHARE_NEWS_MENU_HANDLER_ID, this);
@@ -677,17 +679,20 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     }
 
     /* Toggle Group Items Visibility */
-    else if (queryProvided && TOGGLE_GROUP_HANDLER_ID.equals(id)) {
+    else if (queryProvided && (EXPAND_GROUP_HANDLER_ID.equals(id) || COLLAPSE_GROUP_HANDLER_ID.equals(id))) {
       long groupId = getId(query);
       Set<Long> newsIds = getNewsIds(groupId);
       if (newsIds != null)
-        toggleVisibility(groupId, newsIds);
+        setVisibility(groupId, newsIds, EXPAND_GROUP_HANDLER_ID.equals(id));
     }
 
     /* Group Context Menu */
     else if (queryProvided && GROUP_MENU_HANDLER_ID.equals(id)) {
       EntityGroup group = getEntityGroup(query);
       if (group != null) {
+
+        /* Remove Focus from Link */
+        blur(Dynamic.GROUP_MENU_LINK.getId(group));
 
         /* Show Menu */
         setSelection(new StructuredSelection(group));
@@ -941,41 +946,39 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       fExpandedNews.remove(news.getId());
   }
 
-  private void toggleVisibility(long groupId, Set<Long> newsIds) {
-    String expandedImgUri;
-    String collapsedImgUri;
-    if (fBrowser.isIE()) {
-      expandedImgUri = OwlUI.getImageUri("/icons/elcl16/expanded.gif", "expanded.gif"); //$NON-NLS-1$ //$NON-NLS-2$
-      collapsedImgUri = OwlUI.getImageUri("/icons/elcl16/collapsed.gif", "collapsed.gif"); //$NON-NLS-1$ //$NON-NLS-2$
-    } else {
-      expandedImgUri = ApplicationServer.getDefault().toResourceUrl("/icons/elcl16/expanded.gif"); //$NON-NLS-1$
-      collapsedImgUri = ApplicationServer.getDefault().toResourceUrl("/icons/elcl16/collapsed.gif"); //$NON-NLS-1$
-    }
+  private void setVisibility(long groupId, Set<Long> newsIds, boolean visible) {
 
+    /* Image */
     StringBuilder js = new StringBuilder();
-    js.append(getElementById(Dynamic.TOGGLE_GROUP_LINK.getId(groupId)).append(".blur(); ")); //$NON-NLS-1$
-    js.append("var expand = false; "); //$NON-NLS-1$
-    js.append("var toggle = ").append(getElementById(Dynamic.TOGGLE_GROUP_IMG.getId(groupId))).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
-    js.append("if (!toggle.className || toggle.className == '') {"); //$NON-NLS-1$
-    js.append(getElementById(Dynamic.TOGGLE_GROUP_IMG.getId(groupId)).append(".src = '" + collapsedImgUri + "'; ")); //$NON-NLS-1$ //$NON-NLS-2$
-    js.append("  toggle.className = 'collapsed';"); //$NON-NLS-1$
-    js.append("} else {"); //$NON-NLS-1$
-    js.append(getElementById(Dynamic.TOGGLE_GROUP_IMG.getId(groupId)).append(".src = '" + expandedImgUri + "'; ")); //$NON-NLS-1$ //$NON-NLS-2$
-    js.append("  toggle.className = '';"); //$NON-NLS-1$
-    js.append("  expand = true;"); //$NON-NLS-1$
-    js.append("}"); //$NON-NLS-1$
+    String newToggleImgUri;
+    if (fBrowser.isIE())
+      newToggleImgUri = visible ? OwlUI.getImageUri("/icons/elcl16/expanded.gif", "expanded.gif") : OwlUI.getImageUri("/icons/elcl16/collapsed.gif", "collapsed.gif"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+    else
+      newToggleImgUri = visible ? ApplicationServer.getDefault().toResourceUrl("/icons/elcl16/expanded.gif") : ApplicationServer.getDefault().toResourceUrl("/icons/elcl16/collapsed.gif"); //$NON-NLS-1$ //$NON-NLS-2$
 
+    /* Blur Links */
+    js.append(getElementById(Dynamic.TOGGLE_GROUP_LINK.getId(groupId)).append(".blur(); ")); //$NON-NLS-1$
+
+    /* Update Links */
+    String link = HANDLER_PROTOCOL + (visible ? COLLAPSE_GROUP_HANDLER_ID : EXPAND_GROUP_HANDLER_ID) + "?" + groupId; //$NON-NLS-1$
+    js.append(getElementById(Dynamic.TOGGLE_GROUP_LINK.getId(groupId)).append(".href='").append(link).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$
+
+    /* Update Triangle Image */
+    js.append(getElementById(Dynamic.TOGGLE_GROUP_IMG.getId(groupId)).append(".src = '" + newToggleImgUri + "'; ")); //$NON-NLS-1$ //$NON-NLS-2$
+
+    /* Update Visibility */
     for (Long id : newsIds) {
-      js.append("var node = ").append(getElementById(Dynamic.NEWS.getId(id))).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
-      js.append("if (node != null) { "); //$NON-NLS-1$
-      js.append("  if (expand) { "); //$NON-NLS-1$
-      js.append("     node.style.display='block';"); //$NON-NLS-1$
-      js.append("   } else {"); //$NON-NLS-1$
-      js.append("     node.style.display='none';"); //$NON-NLS-1$
-      js.append("   } "); //$NON-NLS-1$
-      js.append("}"); //$NON-NLS-1$
+      if (visible)
+        js.append(getElementById(Dynamic.NEWS.getId(id))).append(".style.display='block'; "); //$NON-NLS-1$
+      else
+        js.append(getElementById(Dynamic.NEWS.getId(id))).append(".style.display='none'; "); //$NON-NLS-1$
     }
 
+    /* Scroll expanded group into view as necessary */
+    if (visible)
+      js.append(getElementById(Dynamic.TOGGLE_GROUP_IMG.getId(groupId))).append(".scrollIntoView(true); "); //$NON-NLS-1$
+
+    /* Execute */
     fBrowser.execute(js.toString());
   }
 
