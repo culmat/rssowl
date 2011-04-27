@@ -178,6 +178,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   private boolean fManageLinks;
   private boolean fShowFooter;
   private boolean fHeadlinesOnly;
+  private boolean fForceNoGrouping;
   private final long fTodayInMillies;
   private final Map<String, String> fMapFeedLinkToName = new HashMap<String, String>();
 
@@ -363,6 +364,9 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   private boolean isGroupingEnabled() {
     if (isEntityGroupDisplayed())
       return false; //Entity Group as input does not count here
+
+    if (fForceNoGrouping)
+      return false; //Special case where content is rendered for outside the application
 
     if (fViewer != null) {
       IContentProvider cp = fViewer.getContentProvider();
@@ -1151,6 +1155,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     fShowFooter = false;
     fHeadlinesOnly = false;
     fForceShowFeedInformation = true;
+    fForceNoGrouping = true;
     try {
       return internalRender(elements, base, withManagedLinks);
     } finally {
@@ -1158,6 +1163,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       fShowFooter = showFooter;
       fHeadlinesOnly = headlinesOnly;
       fForceShowFeedInformation = showFeedInformation;
+      fForceNoGrouping = false;
     }
   }
 
