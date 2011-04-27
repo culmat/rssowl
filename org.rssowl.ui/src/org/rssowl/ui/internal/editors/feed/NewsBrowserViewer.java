@@ -980,10 +980,15 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
     /* Blur Links */
     js.append(getElementById(Dynamic.TOGGLE_GROUP_LINK.getId(groupId)).append(".blur(); ")); //$NON-NLS-1$
+    js.append(getElementById(Dynamic.GROUP_MENU_LINK.getId(groupId)).append(".blur(); ")); //$NON-NLS-1$
 
     /* Update Links */
-    String link = HANDLER_PROTOCOL + (visible ? COLLAPSE_GROUP_HANDLER_ID : EXPAND_GROUP_HANDLER_ID) + "?" + groupId; //$NON-NLS-1$
-    js.append(getElementById(Dynamic.TOGGLE_GROUP_LINK.getId(groupId)).append(".href='").append(link).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$
+    String toggleVisibilityLink = HANDLER_PROTOCOL + (visible ? COLLAPSE_GROUP_HANDLER_ID : EXPAND_GROUP_HANDLER_ID) + "?" + groupId; //$NON-NLS-1$
+    js.append(getElementById(Dynamic.TOGGLE_GROUP_LINK.getId(groupId)).append(".href='").append(toggleVisibilityLink).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$
+    if (visible)
+      js.append(getElementById(Dynamic.GROUP_MENU_LINK.getId(groupId)).append(".href='").append(HANDLER_PROTOCOL + GROUP_MENU_HANDLER_ID + "?" + groupId).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    else
+      js.append(getElementById(Dynamic.GROUP_MENU_LINK.getId(groupId)).append(".href='").append(toggleVisibilityLink).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* Update Triangle Image */
     js.append(getElementById(Dynamic.TOGGLE_GROUP_IMG.getId(groupId)).append(".src = '" + newToggleImgUri + "'; ")); //$NON-NLS-1$ //$NON-NLS-2$
