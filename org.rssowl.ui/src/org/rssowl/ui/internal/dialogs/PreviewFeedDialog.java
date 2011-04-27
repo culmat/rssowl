@@ -59,7 +59,6 @@ import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Activator;
-import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.OpenInBrowserAction;
 import org.rssowl.ui.internal.editors.feed.NewsBrowserLabelProvider;
@@ -68,10 +67,7 @@ import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
 import org.rssowl.ui.internal.util.UIBackgroundJob;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
-import java.net.URI;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -84,10 +80,6 @@ import java.util.List;
  * @author bpasero
  */
 public class PreviewFeedDialog extends Dialog {
-
-  /* Windows only: Mark of the Web */
-  private static final String IE_MOTW = "<!-- saved from url=(0014)about:internet -->"; //$NON-NLS-1$
-
   private static final int DIALOG_WIDTH_DLUS = 600;
   private static final int DIALOG_HEIGHT_DLUS = 400;
   private static final String DIALOG_SETTINGS_KEY = "org.rssowl.ui.internal.dialogs.PreviewFeedDialog"; //$NON-NLS-1$
@@ -310,52 +302,11 @@ public class PreviewFeedDialog extends Dialog {
       if (news.size() > MAX_NEWS_SHOWN)
         news = news.subList(0, MAX_NEWS_SHOWN);
 
-      /* Start HTML */
-      StringBuilder html = new StringBuilder();
-      html.append("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n"); //$NON-NLS-1$
-
-      /* Windows only: Mark of the Web */
-      if (Application.IS_WINDOWS) {
-        html.append(IE_MOTW);
-        html.append("\n"); //$NON-NLS-1$
-      }
-
-      /* Head */
-      html.append("<html>\n  <head>\n"); //$NON-NLS-1$
-
-      /* Append Base URI if available */
-      URI base = (feed.getBase() != null) ? feed.getBase() : feed.getLink();
-      if (base != null) {
-        html.append("  <base href=\""); //$NON-NLS-1$
-        html.append(base);
-        html.append("\">"); //$NON-NLS-1$
-      }
-
-      /* Meta */
-      html.append("\n  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n"); //$NON-NLS-1$
-
-      /* CSS */
-      try {
-        StringWriter writer = new StringWriter();
-        fLabelProvider.writeCSS(writer, false, false);
-        html.append(writer.toString());
-      } catch (IOException e) {
-        /* Will Never Happen */
-      }
-
-      /* Open Body */
-      html.append("  </head>\n  <body id=\"owlbody\">\n"); //$NON-NLS-1$
-
-      /* Write News */
-      for (int i = 0; i < news.size(); i++) {
-        html.append(fLabelProvider.getText(news.get(i), false, true, i));
-      }
-
-      /* End HTML */
-      html.append("\n  </body>\n</html>"); //$NON-NLS-1$
+      /* Render Elements */
+      String html = fLabelProvider.render(news.toArray(), (feed.getBase() != null) ? feed.getBase() : feed.getLink(), true);
 
       /* Apply to Browser */
-      fBrowser.getControl().setText(html.toString());
+      fBrowser.getControl().setText(html);
 
       /* Also Update Status */
       if (StringUtils.isSet(fBookmark.getName())) {

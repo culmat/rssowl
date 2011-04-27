@@ -1570,6 +1570,15 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
    * @return An flattend array of Objects.
    */
   public Object[] getFlattendChildren(Object input) {
+    return getFlattendChildren(input, true);
+  }
+
+  /**
+   * @param input Can either be an Array of Feeds or News
+   * @param withGroups if <code>true</code> also return groups if present.
+   * @return An flattend array of Objects.
+   */
+  public Object[] getFlattendChildren(Object input, boolean withGroups) {
 
     /* Using NewsContentProvider */
     if (input != null && getContentProvider() instanceof NewsContentProvider) {
@@ -1598,7 +1607,8 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
             if (sortedChilds.length > 0) {
 
               /* Add the Group itself */
-              flatList.add(group);
+              if (withGroups)
+                flatList.add(group);
 
               /* Keep the Group in memory to support Group specific actions */
               if (group instanceof EntityGroup) {
@@ -1620,7 +1630,8 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
           /* Otherwise just add */
           else {
-            flatList.add(group);
+            if (withGroups)
+              flatList.add(group);
           }
         }
 

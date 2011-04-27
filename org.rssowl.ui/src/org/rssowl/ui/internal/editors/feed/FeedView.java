@@ -134,7 +134,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -408,36 +407,26 @@ public class FeedView extends EditorPart implements IReusableEditor {
           }
         }
 
-        /* Create Content for each Item */
-        content.append("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n"); //$NON-NLS-1$
-        content.append("<html>\n  <head>\n"); //$NON-NLS-1$
-        content.append("\n  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n"); //$NON-NLS-1$
-        StringWriter css = new StringWriter();
-        try {
-          labelProvider.writeCSS(css, newsToSave.size() == 1, false);
-        } catch (IOException e) {
-          /* Ignore */
-        }
-        content.append(css.toString());
-        content.append("  </head>\n  <body>\n"); //$NON-NLS-1$
-        for (int i = 0; i < newsToSave.size(); i++) {
-          String text = labelProvider.getText(newsToSave.get(i), false, false, i);
-          content.append(text);
-        }
-        content.append("\n  </body>\n</html>"); //$NON-NLS-1$
+        /* Render Elements */
+        String text = labelProvider.render(newsToSave.toArray(), null, false);
+        content.append(text);
       }
     }
 
     /* Save from Browser */
     else {
-      content.append(fNewsBrowserControl.getViewer().getBrowser().getControl().getText());
+      NewsBrowserViewer viewer = fNewsBrowserControl.getViewer();
+      Object[] elements = fContentProvider.getElements(fInput.getMark().toReference());
+      elements = viewer.getFlattendChildren(elements, false);
+
+      /* Render Elements */
+      String text = labelProvider.render(elements, null, false);
+      content.append(text);
     }
 
-    if (content.length() == 0)
-      return;
-
     /* Write into File */
-    CoreUtils.write(fileName, content);
+    if (content.length() > 0)
+      CoreUtils.write(fileName, content);
   }
 
   /*
