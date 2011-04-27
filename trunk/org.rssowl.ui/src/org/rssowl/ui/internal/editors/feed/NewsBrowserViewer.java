@@ -886,9 +886,24 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       js.append(getElementById(Dynamic.CONTENT.getId(news)).append(".innerHTML = ''; ")); //$NON-NLS-1$
     }
 
-    /* Scroll expanded news into view */
-    if (visible)
+    /* Scroll expanded news into view as necessary */
+    if (visible) {
+      if (fBrowser.isIE()) {
+        js.append("var scrollPosY = document.body.scrollTop; "); //$NON-NLS-1$
+        js.append("var windowHeight = document.body.clientHeight; "); //$NON-NLS-1$
+      } else {
+        js.append("var scrollPosY = window.pageYOffset; "); //$NON-NLS-1$
+        js.append("var windowHeight = window.innerHeight; "); //$NON-NLS-1$
+      }
+
+      js.append("var divPosY = ").append(getElementById(Dynamic.NEWS.getId(news))).append(".offsetTop; "); //$NON-NLS-1$ //$NON-NLS-2$
+      js.append("var divHeight = ").append(getElementById(Dynamic.NEWS.getId(news))).append(".offsetHeight; "); //$NON-NLS-1$ //$NON-NLS-2$
+      js.append("if (scrollPosY > divPosY) {"); //$NON-NLS-1$ //Scroll up to reveal the top of the news
       js.append(getElementById(Dynamic.NEWS.getId(news))).append(".scrollIntoView(true); "); //$NON-NLS-1$
+      js.append("} else if (scrollPosY + windowHeight < divPosY + divHeight) {"); //$NON-NLS-1$ //Scroll down to reveal the bottom of the news
+      js.append(getElementById(Dynamic.NEWS.getId(news))).append(".scrollIntoView(false); "); //$NON-NLS-1$
+      js.append("}"); //$NON-NLS-1$
+    }
 
     /* Collapse other visible news */
     if (visible) {
