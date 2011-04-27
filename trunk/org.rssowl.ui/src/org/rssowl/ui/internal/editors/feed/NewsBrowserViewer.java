@@ -1036,7 +1036,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
     /* Indicate Progress */
     StringBuilder js = new StringBuilder();
-    js.append(getElementById(Dynamic.FULL_CONTENT_LINK_TEXT.getId(news)).append(".innerText='").append(Messages.NewsBrowserViewer_LOADING).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$
+    js.append(getElementById(Dynamic.FULL_CONTENT_LINK_TEXT.getId(news)).append(".innerHTML='").append(Messages.NewsBrowserViewer_LOADING).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$
     js.append(getElementById(Dynamic.FULL_CONTENT_LINK.getId(news)).append(".blur(); ")); //$NON-NLS-1$
     fBrowser.execute(js.toString());
 
@@ -1102,7 +1102,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
     final StringBuilder js = new StringBuilder();
     js.append(getElementById(Dynamic.CONTENT.getId(news)).append(".innerHTML='").append(result).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$
-    js.append(getElementById(Dynamic.FULL_CONTENT_LINK_TEXT.getId(news)).append(".innerText='").append(Messages.NewsBrowserViewer_FULL_CONTENT).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$
+    js.append(getElementById(Dynamic.FULL_CONTENT_LINK_TEXT.getId(news)).append(".innerHTML='").append(Messages.NewsBrowserViewer_FULL_CONTENT).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$
     js.append(getElementById(Dynamic.NEWS.getId(news))).append(".scrollIntoView(true); "); //$NON-NLS-1$
 
     /* Block external navigation while setting innerHTML */
@@ -1114,6 +1114,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   }
 
   private String escapeForInnerHtml(String str) {
+    boolean isIE = fBrowser.isIE();
     StringBuilder result = new StringBuilder(str.length());
 
     BufferedReader reader = new BufferedReader(new StringReader(str));
@@ -1122,7 +1123,10 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       while ((line = reader.readLine()) != null) {
         line = StringUtils.replaceAll(line, "\"", "\\\""); //$NON-NLS-1$ //$NON-NLS-2$
         line = StringUtils.replaceAll(line, "'", "\\'"); //$NON-NLS-1$ //$NON-NLS-2$
-        result.append(line.trim()).append("\\").append(fNl); //$NON-NLS-1$ //Escape newlines using backslash in JS
+        if (isIE) //IE: Escape newlines using backslash in JS
+          result.append(line.trim()).append("\\").append(fNl); //$NON-NLS-1$
+        else //Others: Normalize newlines to whitespaces
+          result.append(line.trim()).append(" "); //$NON-NLS-1$
       }
     } catch (IOException e) {
     }
