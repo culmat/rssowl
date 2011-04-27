@@ -28,12 +28,14 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -988,13 +990,26 @@ public class NewsTableControl implements IFeedViewPart {
         }
 
         /* Share */
-        {
+        boolean entityGroupSelected = ModelUtils.isEntityGroupSelected(selection);
+        if (!entityGroupSelected)
           ApplicationActionBarAdvisor.fillShareMenu(manager, selection, new SameShellProvider(fViewer.getTree().getShell()), false);
-        }
 
         manager.add(new Separator("filter")); //$NON-NLS-1$
         manager.add(new Separator("copy")); //$NON-NLS-1$
         manager.add(new GroupMarker("edit")); //$NON-NLS-1$
+
+        /* Collapse Groups */
+        if (entityGroupSelected) {
+          manager.add(new Separator());
+          ImageDescriptor icon = OwlUI.getImageDescriptor("icons/etool16/collapseall.gif");//$NON-NLS-1$
+          manager.add(new Action(Messages.NewsTableControl_COLLAPSE_GROUPS, icon) {
+            @Override
+            public void run() {
+              fViewer.collapseAll();
+            };
+          });
+        }
+
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
         /* Show in Feed (only for searchmarks) */
