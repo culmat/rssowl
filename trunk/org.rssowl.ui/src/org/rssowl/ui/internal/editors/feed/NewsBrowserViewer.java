@@ -183,7 +183,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   private final Map<Long, Set<Long>> fMapEntityGroupToNews = new ConcurrentHashMap<Long, Set<Long>>();
 
   /* Keeps track of expanded news during the session if using headlines layout */
-  private final Set<NewsReference> fExpandedNews = new HashSet<NewsReference>();
+  private final Set<Long> fExpandedNews = new HashSet<Long>();
 
   /**
    * @param parent
@@ -822,9 +822,13 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   }
 
   private void setVisibility(INews news, boolean visible) {
-    final StringBuilder js = new StringBuilder();
+
+    /* Return early if visibility already matches state */
+    if (visible == fExpandedNews.contains(news.getId()))
+      return;
 
     /* Link and Image */
+    final StringBuilder js = new StringBuilder();
     String newsLink = CoreUtils.getLink(news);
     String newToggleImgUri;
     if (fBrowser.isIE())
@@ -889,8 +893,8 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     /* Collapse other visible news */
     if (visible) {
       List<INews> newsToCollapse = new ArrayList<INews>(1);
-      for (NewsReference reference : fExpandedNews) {
-        INews item = reference.resolve();
+      for (Long id : fExpandedNews) {
+        INews item = DynamicDAO.load(INews.class, id);
         if (item != null)
           newsToCollapse.add(item);
       }
@@ -917,9 +921,9 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
     /* Update Cache of Expanded News */
     if (visible)
-      fExpandedNews.add(news.toReference());
+      fExpandedNews.add(news.getId());
     else
-      fExpandedNews.remove(news.toReference());
+      fExpandedNews.remove(news.getId());
   }
 
   private void toggleVisibility(long groupId, Set<Long> newsIds) {
@@ -1748,7 +1752,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
           INews news = (INews) element;
 
           /* Remove from Caches if necessary */
-          fExpandedNews.remove(news.toReference());
+          fExpandedNews.remove(news.getId());
           for (Set<Long> newsIds : newsIdSets) {
             newsIds.remove(news.getId());
           }
