@@ -183,7 +183,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   private NewsFilter fNewsFilter;
 
   /* Keeps a mapping between visible Entity Groups and their News */
-  private final Map<Long, Set<Long>> fMapEntityGroupToNews = new ConcurrentHashMap<Long, Set<Long>>();
+  private final Map<Long, List<Long>> fMapEntityGroupToNews = new ConcurrentHashMap<Long, List<Long>>();
 
   /* Keeps track of expanded news during the session if using headlines layout */
   private final Set<Long> fExpandedNews = new HashSet<Long>();
@@ -366,10 +366,10 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
           manager.add(new Action(Messages.NewsBrowserViewer_COLLAPSE_GROUPS, icon) {
             @Override
             public void run() {
-              Set<Entry<Long, Set<Long>>> entries = fMapEntityGroupToNews.entrySet();
-              for (Entry<Long, Set<Long>> entry : entries) {
+              Set<Entry<Long, List<Long>>> entries = fMapEntityGroupToNews.entrySet();
+              for (Entry<Long, List<Long>> entry : entries) {
                 Long groupId = entry.getKey();
-                Set<Long> newsIds = entry.getValue();
+                List<Long> newsIds = entry.getValue();
                 if (newsIds != null && !newsIds.isEmpty())
                   setVisibility(groupId, newsIds, false);
               }
@@ -703,7 +703,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     /* Toggle Group Items Visibility */
     else if (queryProvided && (EXPAND_GROUP_HANDLER_ID.equals(id) || COLLAPSE_GROUP_HANDLER_ID.equals(id))) {
       long groupId = getId(query);
-      Set<Long> newsIds = getNewsIds(groupId);
+      List<Long> newsIds = getNewsIds(groupId);
       if (newsIds != null)
         setVisibility(groupId, newsIds, EXPAND_GROUP_HANDLER_ID.equals(id));
     }
@@ -968,7 +968,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       fExpandedNews.remove(news.getId());
   }
 
-  private void setVisibility(long groupId, Set<Long> newsIds, boolean visible) {
+  private void setVisibility(long groupId, List<Long> newsIds, boolean visible) {
 
     /* Image */
     StringBuilder js = new StringBuilder();
@@ -1002,8 +1002,22 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     }
 
     /* Scroll expanded group into view as necessary */
-    if (visible)
+    if (visible && !newsIds.isEmpty()) {
+      if (fBrowser.isIE()) {
+        js.append("var scrollPosY = document.body.scrollTop; "); //$NON-NLS-1$
+        js.append("var windowHeight = document.body.clientHeight; "); //$NON-NLS-1$
+      } else {
+        js.append("var scrollPosY = window.pageYOffset; "); //$NON-NLS-1$
+        js.append("var windowHeight = window.innerHeight; "); //$NON-NLS-1$
+      }
+
+      long lastNewsId = newsIds.get(newsIds.size() - 1);
+      js.append("var divPosY = ").append(getElementById(Dynamic.NEWS.getId(lastNewsId))).append(".offsetTop; "); //$NON-NLS-1$ //$NON-NLS-2$
+      js.append("var divHeight = ").append(getElementById(Dynamic.NEWS.getId(lastNewsId))).append(".offsetHeight; "); //$NON-NLS-1$ //$NON-NLS-2$
+      js.append("if (scrollPosY + windowHeight < divPosY + divHeight) {"); //$NON-NLS-1$ //Scroll up to reveal as much news as possible from the group
       js.append(getElementById(Dynamic.TOGGLE_GROUP_IMG.getId(groupId))).append(".scrollIntoView(true); "); //$NON-NLS-1$
+      js.append("}"); //$NON-NLS-1$
+    }
 
     /* Execute */
     fBrowser.execute(js.toString());
@@ -1137,7 +1151,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     long id = getId(query);
 
     /* Try to resolve the news from the mapping table */
-    Set<Long> newsIds = fMapEntityGroupToNews.get(id);
+    List<Long> newsIds = fMapEntityGroupToNews.get(id);
     if (newsIds != null) {
       List<INews> news = new ArrayList<INews>(newsIds.size());
       for (Long newsId : newsIds) {
@@ -1162,8 +1176,8 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     return null;
   }
 
-  private Set<Long> getNewsIds(long groupId) {
-    Set<Long> newsIds = fMapEntityGroupToNews.get(groupId);
+  private List<Long> getNewsIds(long groupId) {
+    List<Long> newsIds = fMapEntityGroupToNews.get(groupId);
     return newsIds;
   }
 
@@ -1588,7 +1602,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
               /* Keep the Group in memory to support Group specific actions */
               if (group instanceof EntityGroup) {
-                Set<Long> list = new HashSet<Long>(sortedChilds.length);
+                List<Long> list = new ArrayList<Long>(sortedChilds.length);
                 fMapEntityGroupToNews.put(((EntityGroup) group).getId(), list);
                 for (Object child : sortedChilds) {
                   if (child instanceof INews)
@@ -1791,14 +1805,14 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       if (toggleJS)
         fBrowser.setScriptDisabled(false);
 
-      Collection<Set<Long>> newsIdSets = fMapEntityGroupToNews.values();
+      Collection<List<Long>> newsIdLists = fMapEntityGroupToNews.values();
       for (Object element : elements) {
         if (element instanceof INews) {
           INews news = (INews) element;
 
           /* Remove from Caches if necessary */
           fExpandedNews.remove(news.getId());
-          for (Set<Long> newsIds : newsIdSets) {
+          for (List<Long> newsIds : newsIdLists) {
             newsIds.remove(news.getId());
           }
 
