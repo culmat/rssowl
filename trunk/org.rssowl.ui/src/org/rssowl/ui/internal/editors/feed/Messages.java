@@ -81,6 +81,7 @@ public class Messages extends NLS {
   public static String NewsBrowserViewer_AUTHORED_BY;
   public static String NewsBrowserViewer_BY_CATEGORY;
   public static String NewsBrowserViewer_CATEGORIZED_N;
+  public static String NewsBrowserViewer_COLLAPSE_GROUPS;
   public static String NewsBrowserViewer_COPY_TO;
   public static String NewsBrowserViewer_DOWNLOAD_CONTENT;
   public static String NewsBrowserViewer_FULL_CONTENT;
@@ -169,6 +170,7 @@ public class Messages extends NLS {
   public static String NewsGrouping_UNREAD;
   public static String NewsGrouping_UPDATED;
   public static String NewsGrouping_YESTERDAY;
+  public static String NewsTableControl_COLLAPSE_GROUPS;
   public static String NewsTableControl_COPY_TO;
   public static String NewsTableControl_MARK;
   public static String NewsTableControl_MOVE_TO;

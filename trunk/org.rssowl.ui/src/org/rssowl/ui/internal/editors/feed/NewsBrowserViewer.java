@@ -35,6 +35,7 @@ import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ContentViewer;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
@@ -124,6 +125,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
@@ -349,12 +351,32 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
         }
 
         /* Share */
-        if (!ModelUtils.isEntityGroupSelected(fCurrentSelection))
+        boolean entityGroupSelected = ModelUtils.isEntityGroupSelected(fCurrentSelection);
+        if (!entityGroupSelected)
           ApplicationActionBarAdvisor.fillShareMenu(manager, fCurrentSelection, new SameShellProvider(fBrowser.getControl().getShell()), false);
 
         manager.add(new Separator("filter")); //$NON-NLS-1$
         manager.add(new Separator("copy")); //$NON-NLS-1$
         manager.add(new GroupMarker("edit")); //$NON-NLS-1$
+
+        /* Collapse All */
+        if (entityGroupSelected) {
+          manager.add(new Separator());
+          ImageDescriptor icon = OwlUI.getImageDescriptor("icons/etool16/collapseall.gif"); //$NON-NLS-1$
+          manager.add(new Action(Messages.NewsBrowserViewer_COLLAPSE_GROUPS, icon) {
+            @Override
+            public void run() {
+              Set<Entry<Long, Set<Long>>> entries = fMapEntityGroupToNews.entrySet();
+              for (Entry<Long, Set<Long>> entry : entries) {
+                Long groupId = entry.getKey();
+                Set<Long> newsIds = entry.getValue();
+                if (newsIds != null && !newsIds.isEmpty())
+                  setVisibility(groupId, newsIds, false);
+              }
+            };
+          });
+        }
+
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
         /* Fill Contributions if Context Menu not registered */
