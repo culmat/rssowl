@@ -111,6 +111,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -168,6 +169,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   private IModelFactory fFactory;
   private IPreferenceScope fPreferences = Owl.getPreferenceService().getGlobalScope();
   private INewsDAO fNewsDao = DynamicDAO.getDAO(INewsDAO.class);
+  private String fNl;
 
   /* This viewer's sorter. <code>null</code> means there is no sorter. */
   private ViewerComparator fSorter;
@@ -206,6 +208,9 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     fServer = ApplicationServer.getDefault();
     fServer.register(fId, this);
     fFactory = Owl.getModelFactory();
+    fNl = System.getProperty("line.separator"); //$NON-NLS-1$
+    if (!StringUtils.isSet(fNl))
+      fNl = "\n"; //$NON-NLS-1$
 
     /* Register Link Handler */
     fBrowser.addLinkHandler(TOGGLE_READ_HANDLER_ID, this);
@@ -1026,12 +1031,20 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   }
 
   private String escapeForInnerHtml(String str) {
-    str = StringUtils.replaceAll(str, "\"", "\\\""); //$NON-NLS-1$ //$NON-NLS-2$
-    str = StringUtils.replaceAll(str, "'", "\\'"); //$NON-NLS-1$ //$NON-NLS-2$
-    str = StringUtils.replaceAll(str, "\n", " "); //$NON-NLS-1$ //$NON-NLS-2$
-    str = StringUtils.replaceAll(str, "\r", " "); //$NON-NLS-1$ //$NON-NLS-2$
+    StringBuilder result = new StringBuilder(str.length());
 
-    return str;
+    BufferedReader reader = new BufferedReader(new StringReader(str));
+    String line;
+    try {
+      while ((line = reader.readLine()) != null) {
+        line = StringUtils.replaceAll(line, "\"", "\\\""); //$NON-NLS-1$ //$NON-NLS-2$
+        line = StringUtils.replaceAll(line, "'", "\\'"); //$NON-NLS-1$ //$NON-NLS-2$
+        result.append(line.trim()).append("\\").append(fNl); //$NON-NLS-1$ //Escape newlines using backslash in JS
+      }
+    } catch (IOException e) {
+    }
+
+    return result.toString();
   }
 
   private void delayInUI(Runnable runnable) {
