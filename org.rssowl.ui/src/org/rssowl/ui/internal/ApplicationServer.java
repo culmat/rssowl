@@ -647,8 +647,10 @@ public class ApplicationServer {
     /* Ask for sorted Elements */
     NewsBrowserLabelProvider labelProvider = (NewsBrowserLabelProvider) viewer.getLabelProvider();
     Object[] children = new Object[0];
-    if (viewer instanceof NewsBrowserViewer)
+    if (viewer instanceof NewsBrowserViewer) {
+      ((NewsBrowserViewer) viewer).clearCaches();
       children = ((NewsBrowserViewer) viewer).getFlattendChildren(elements);
+    }
 
     /* Write HTML to the Receiver */
     BufferedWriter writer = null;

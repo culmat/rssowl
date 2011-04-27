@@ -141,7 +141,8 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   static final String ATTACHMENT_HANDLER_ID = "org.rssowl.ui.DownloadAttachment"; //$NON-NLS-1$
   static final String ATTACHMENTS_MENU_HANDLER_ID = "org.rssowl.ui.AttachmentsMenu"; //$NON-NLS-1$
   static final String LABELS_MENU_HANDLER_ID = "org.rssowl.ui.LabelsMenu"; //$NON-NLS-1$
-  static final String TOGGLE_NEWS_HANDLER_ID = "org.rssowl.ui.ToggleNews"; //$NON-NLS-1$
+  static final String EXPAND_NEWS_HANDLER_ID = "org.rssowl.ui.ExpandNews"; //$NON-NLS-1$
+  static final String COLLAPSE_NEWS_HANDLER_ID = "org.rssowl.ui.CollapseNews"; //$NON-NLS-1$
   static final String TOGGLE_GROUP_HANDLER_ID = "org.rssowl.ui.ToggleGroup"; //$NON-NLS-1$
   static final String GROUP_MENU_HANDLER_ID = "org.rssowl.ui.GroupMenu"; //$NON-NLS-1$
   static final String NEWS_MENU_HANDLER_ID = "org.rssowl.ui.NewsMenu"; //$NON-NLS-1$
@@ -180,6 +181,9 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
   /* Keeps a mapping between visible Entity Groups and their News */
   private final Map<Long, Set<Long>> fMapEntityGroupToNews = new ConcurrentHashMap<Long, Set<Long>>();
+
+  /* Keeps track of expanded news during the session if using headlines layout */
+  private final Set<NewsReference> fExpandedNews = new HashSet<NewsReference>();
 
   /**
    * @param parent
@@ -220,7 +224,8 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     fBrowser.addLinkHandler(ATTACHMENT_HANDLER_ID, this);
     fBrowser.addLinkHandler(ATTACHMENTS_MENU_HANDLER_ID, this);
     fBrowser.addLinkHandler(LABELS_MENU_HANDLER_ID, this);
-    fBrowser.addLinkHandler(TOGGLE_NEWS_HANDLER_ID, this);
+    fBrowser.addLinkHandler(EXPAND_NEWS_HANDLER_ID, this);
+    fBrowser.addLinkHandler(COLLAPSE_NEWS_HANDLER_ID, this);
     fBrowser.addLinkHandler(TOGGLE_GROUP_HANDLER_ID, this);
     fBrowser.addLinkHandler(GROUP_MENU_HANDLER_ID, this);
     fBrowser.addLinkHandler(NEWS_MENU_HANDLER_ID, this);
@@ -665,10 +670,10 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     }
 
     /* Toggle News Item Visibility */
-    else if (queryProvided && TOGGLE_NEWS_HANDLER_ID.equals(id)) {
+    else if (queryProvided && (EXPAND_NEWS_HANDLER_ID.equals(id) || COLLAPSE_NEWS_HANDLER_ID.equals(id))) {
       INews news = getNews(query);
       if (news != null)
-        toggleVisibility(news);
+        setVisibility(news, EXPAND_NEWS_HANDLER_ID.equals(id));
     }
 
     /* Toggle Group Items Visibility */
@@ -816,82 +821,84 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     }
   }
 
-  private void toggleVisibility(INews news) {
-    String newsLink = CoreUtils.getLink(news);
-
-    String expandedImgUri;
-    String collapsedImgUri;
-    if (fBrowser.isIE()) {
-      expandedImgUri = OwlUI.getImageUri("/icons/elcl16/expanded.gif", "expanded.gif"); //$NON-NLS-1$ //$NON-NLS-2$
-      collapsedImgUri = OwlUI.getImageUri("/icons/elcl16/collapsed.gif", "collapsed.gif"); //$NON-NLS-1$ //$NON-NLS-2$
-    } else {
-      expandedImgUri = ApplicationServer.getDefault().toResourceUrl("/icons/elcl16/expanded.gif"); //$NON-NLS-1$
-      collapsedImgUri = ApplicationServer.getDefault().toResourceUrl("/icons/elcl16/collapsed.gif"); //$NON-NLS-1$
-    }
-
-    /* Toggle Triangle Image */
+  private void setVisibility(INews news, boolean visible) {
     final StringBuilder js = new StringBuilder();
+
+    /* Link and Image */
+    String newsLink = CoreUtils.getLink(news);
+    String newToggleImgUri;
+    if (fBrowser.isIE())
+      newToggleImgUri = visible ? OwlUI.getImageUri("/icons/elcl16/expanded.gif", "expanded.gif") : OwlUI.getImageUri("/icons/elcl16/collapsed.gif", "collapsed.gif"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+    else
+      newToggleImgUri = visible ? ApplicationServer.getDefault().toResourceUrl("/icons/elcl16/expanded.gif") : ApplicationServer.getDefault().toResourceUrl("/icons/elcl16/collapsed.gif"); //$NON-NLS-1$ //$NON-NLS-2$
+
+    /* Blur Links */
     js.append(getElementById(Dynamic.TOGGLE_NEWS_LINK.getId(news)).append(".blur(); ")); //$NON-NLS-1$
     js.append(getElementById(Dynamic.TITLE.getId(news)).append(".blur(); ")); //$NON-NLS-1$
-    js.append("var expand = true; "); //$NON-NLS-1$
-    js.append("var toggle = ").append(getElementById(Dynamic.TOGGLE_NEWS_IMG.getId(news))).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
-    js.append("if (!toggle.className || toggle.className == '') {"); //$NON-NLS-1$
-    js.append(getElementById(Dynamic.TOGGLE_NEWS_IMG.getId(news)).append(".src = '" + expandedImgUri + "'; ")); //$NON-NLS-1$ //$NON-NLS-2$
-    js.append("  toggle.className = 'expanded';"); //$NON-NLS-1$
-    js.append("} else {"); //$NON-NLS-1$
-    js.append(getElementById(Dynamic.TOGGLE_NEWS_IMG.getId(news)).append(".src = '" + collapsedImgUri + "'; ")); //$NON-NLS-1$ //$NON-NLS-2$
-    js.append("  toggle.className = '';"); //$NON-NLS-1$
-    js.append("  expand = false;"); //$NON-NLS-1$
-    js.append("}"); //$NON-NLS-1$
 
-    /* Toggle News Div Visibility */
-    boolean varDefined = false;
+    /* Update Links */
+    String link = HANDLER_PROTOCOL + (visible ? COLLAPSE_NEWS_HANDLER_ID : EXPAND_NEWS_HANDLER_ID) + "?" + news.getId(); //$NON-NLS-1$
+    js.append(getElementById(Dynamic.TOGGLE_NEWS_LINK.getId(news)).append(".href='").append(link).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$
+    if (visible && StringUtils.isSet(newsLink))
+      js.append(getElementById(Dynamic.TITLE.getId(news)).append(".href = '" + URIUtils.toManaged(newsLink) + "'; ")); //$NON-NLS-1$ //$NON-NLS-2$
+    else
+      js.append(getElementById(Dynamic.TITLE.getId(news)).append(".href='").append(link).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$
+
+    /* Update Triangle Image */
+    js.append(getElementById(Dynamic.TOGGLE_NEWS_IMG.getId(news)).append(".src = '" + newToggleImgUri + "'; ")); //$NON-NLS-1$ //$NON-NLS-2$
+
+    /* Update News Div Visibility */
     Set<Dynamic> elements = EnumSet.of(Dynamic.SUBLINE, Dynamic.CONTENT, Dynamic.FOOTER);
     for (Dynamic element : elements) {
-      if (!varDefined) {
-        js.append("var "); //$NON-NLS-1$
-        varDefined = true;
+      if (visible)
+        js.append(getElementById(element.getId(news))).append(".style.display='block'; "); //$NON-NLS-1$
+      else
+        js.append(getElementById(element.getId(news))).append(".style.display='none'; "); //$NON-NLS-1$
+    }
+
+    /* Update News Content as needed */
+    if (visible) {
+      String description = news.getDescription();
+      if (StringUtils.isSet(description) && !description.equals(news.getTitle())) {
+        IBaseLabelProvider labelProvider = getLabelProvider();
+        if (labelProvider instanceof NewsBrowserLabelProvider)
+          description = ((NewsBrowserLabelProvider) labelProvider).stripMediaTagsIfNecessary(description);
       }
 
-      js.append("node = ").append(getElementById(element.getId(news))).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
-      js.append("if (node != null) { "); //$NON-NLS-1$
-      js.append("  if (expand) { "); //$NON-NLS-1$
-      js.append("     node.style.display='block';"); //$NON-NLS-1$
-      js.append("   } else {"); //$NON-NLS-1$
-      js.append("     node.style.display='none';"); //$NON-NLS-1$
-      js.append("   } "); //$NON-NLS-1$
-      js.append("}"); //$NON-NLS-1$
-    }
+      /* Content is not provided */
+      else {
+        StringBuilder emptyDescription = new StringBuilder();
+        emptyDescription.append(Messages.NewsBrowserViewer_NO_CONTENT);
+        if (StringUtils.isSet(newsLink)) {
+          link = HANDLER_PROTOCOL + TRANSFORM_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
+          emptyDescription.append(" <a href=\"").append(link).append("\">").append(Messages.NewsBrowserViewer_DOWNLOAD_CONTENT).append("</a>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        }
 
-    /* Provide News Content as needed */
-    String description = news.getDescription();
-    if (StringUtils.isSet(description) && !description.equals(news.getTitle())) {
-      IBaseLabelProvider labelProvider = getLabelProvider();
-      if (labelProvider instanceof NewsBrowserLabelProvider)
-        description = ((NewsBrowserLabelProvider) labelProvider).stripMediaTagsIfNecessary(description);
-    }
-
-    /* Content is not provided */
-    else {
-      StringBuilder emptyDescription = new StringBuilder();
-      emptyDescription.append(Messages.NewsBrowserViewer_NO_CONTENT);
-      if (StringUtils.isSet(newsLink)) {
-        String link = HANDLER_PROTOCOL + TRANSFORM_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
-        emptyDescription.append(" <a href=\"").append(link).append("\">").append(Messages.NewsBrowserViewer_DOWNLOAD_CONTENT).append("</a>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        description = emptyDescription.toString();
       }
 
-      description = emptyDescription.toString();
+      js.append(getElementById(Dynamic.CONTENT.getId(news)).append(".innerHTML = '" + escapeForInnerHtml(description) + "'; ")); //$NON-NLS-1$ //$NON-NLS-2$
+    } else {
+      js.append(getElementById(Dynamic.CONTENT.getId(news)).append(".innerHTML = ''; ")); //$NON-NLS-1$
     }
 
-    /* Insert Content on expand and update Title Link as necessary */
-    js.append("if (expand) { "); //$NON-NLS-1$
-    js.append(getElementById(Dynamic.CONTENT.getId(news)).append(".innerHTML = '" + escapeForInnerHtml(description) + "'; ")); //$NON-NLS-1$ //$NON-NLS-2$
-    if (StringUtils.isSet(newsLink))
-      js.append(getElementById(Dynamic.TITLE.getId(news)).append(".href = '" + URIUtils.toManaged(newsLink) + "'; ")); //$NON-NLS-1$ //$NON-NLS-2$
-    js.append("} else {"); //$NON-NLS-1$
-    js.append(getElementById(Dynamic.CONTENT.getId(news)).append(".innerHTML = ''; ")); //$NON-NLS-1$
-    js.append(getElementById(Dynamic.TITLE.getId(news)).append(".href = '" + (HANDLER_PROTOCOL + TOGGLE_NEWS_HANDLER_ID + "?" + news.getId()) + "'; ")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-    js.append("}"); //$NON-NLS-1$
+    /* Scroll expanded news into view */
+    if (visible)
+      js.append(getElementById(Dynamic.NEWS.getId(news))).append(".scrollIntoView(true); "); //$NON-NLS-1$
+
+    /* Collapse other visible news */
+    if (visible) {
+      List<INews> newsToCollapse = new ArrayList<INews>(1);
+      for (NewsReference reference : fExpandedNews) {
+        INews item = reference.resolve();
+        if (item != null)
+          newsToCollapse.add(item);
+      }
+
+      for (INews iNews : newsToCollapse) {
+        setVisibility(iNews, false);
+      }
+    }
 
     /* Block external navigation while setting innerHTML */
     fBrowser.blockExternalNavigationWhile(new Runnable() {
@@ -901,12 +908,18 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     });
 
     /* Update State if not already marked as read */
-    if (news.getState() != INews.State.READ && !isGroupingByState()) { //Ignore if grouping by state to avoid refresh
+    if (visible && news.getState() != INews.State.READ && !isGroupingByState()) { //Ignore if grouping by state to avoid refresh
       Set<INews> singleNewsSet = Collections.singleton(news);
       boolean affectEquivalentNews = OwlUI.markReadDuplicates();
       UndoStack.getInstance().addOperation(new NewsStateOperation(singleNewsSet, INews.State.READ, affectEquivalentNews));
       fNewsDao.setState(singleNewsSet, INews.State.READ, affectEquivalentNews, false);
     }
+
+    /* Update Cache of Expanded News */
+    if (visible)
+      fExpandedNews.add(news.toReference());
+    else
+      fExpandedNews.remove(news.toReference());
   }
 
   private void toggleVisibility(long groupId, Set<Long> newsIds) {
@@ -1482,6 +1495,14 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   }
 
   /**
+   * Asks this viewer to clear all caches. Typically called when refreshing.
+   */
+  public void clearCaches() {
+    fExpandedNews.clear();
+    fMapEntityGroupToNews.clear();
+  }
+
+  /**
    * @param input Can either be an Array of Feeds or News
    * @return An flattend array of Objects.
    */
@@ -1497,9 +1518,6 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
        */
       if (cp.isGroupingEnabled() && !isNews(input)) {
         List<Object> flatList = new ArrayList<Object>();
-
-        /* Rebuild the mapping of Entity Group to News inside here */
-        fMapEntityGroupToNews.clear();
 
         /* Wrap into Object-Array */
         if (!(input instanceof Object[]))
@@ -1724,14 +1742,23 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       if (toggleJS)
         fBrowser.setScriptDisabled(false);
 
+      Collection<Set<Long>> newsIdSets = fMapEntityGroupToNews.values();
       for (Object element : elements) {
         if (element instanceof INews) {
           INews news = (INews) element;
+
+          /* Remove from Caches if necessary */
+          fExpandedNews.remove(news.toReference());
+          for (Set<Long> newsIds : newsIdSets) {
+            newsIds.remove(news.getId());
+          }
+
+          /* Set Hidden */
           StringBuilder js = new StringBuilder();
           js.append("var node = ").append(getElementById(Dynamic.NEWS.getId(news))).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
           js.append("if (node != null) { "); //$NON-NLS-1$
-          js.append("node.className='hidden';"); //$NON-NLS-1$
-          js.append(" } "); //$NON-NLS-1$
+          js.append("node.style.display='none';"); //$NON-NLS-1$
+          js.append("} "); //$NON-NLS-1$
 
           boolean res = fBrowser.getControl().execute(js.toString());
           if (!res)
