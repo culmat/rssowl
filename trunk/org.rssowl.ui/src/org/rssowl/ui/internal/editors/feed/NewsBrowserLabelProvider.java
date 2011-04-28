@@ -229,6 +229,35 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     return str;
   }
 
+  /* Highlight search terms if any */
+  String highlightSearchTermsIfNecessary(String str) {
+    if (fViewer != null) {
+      Collection<String> wordsToHighlight = fViewer.getHighlightedWords();
+      if (!wordsToHighlight.isEmpty()) {
+        StringBuilder highlightedResult = new StringBuilder(str.length());
+
+        RGB searchRGB = OwlUI.getThemeRGB(OwlUI.SEARCH_HIGHLIGHT_BG_COLOR_ID, new RGB(255, 255, 0));
+        String preHighlight = "<span style=\"background-color:rgb(" + OwlUI.toString(searchRGB) + ");\">"; //$NON-NLS-1$ //$NON-NLS-2$
+        String postHighlight = "</span>"; //$NON-NLS-1$
+
+        ExpandingReader resultHighlightReader = new ExpandingReader(new StringReader(str), wordsToHighlight, preHighlight, postHighlight, true);
+
+        int len = 0;
+        char[] buf = new char[1000];
+        try {
+          while ((len = resultHighlightReader.read(buf)) != -1)
+            highlightedResult.append(buf, 0, len);
+
+          return highlightedResult.toString();
+        } catch (IOException e) {
+          Activator.getDefault().logError(e.getMessage(), e);
+        }
+      }
+    }
+
+    return str;
+  }
+
   /**
    * @param forceShowFeedInformation if <code>true</code> will show the name of
    * a feed of a news when shown, <code>false</code> otherwise.
@@ -1110,34 +1139,8 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       close(builder, "div"); //$NON-NLS-1$
     }
 
-    String result = builder.toString();
-
-    /* Highlight Support */
-    if (fViewer != null) {
-      Collection<String> wordsToHighlight = fViewer.getHighlightedWords();
-      if (!wordsToHighlight.isEmpty()) {
-        StringBuilder highlightedResult = new StringBuilder(result.length());
-
-        RGB searchRGB = OwlUI.getThemeRGB(OwlUI.SEARCH_HIGHLIGHT_BG_COLOR_ID, new RGB(255, 255, 0));
-        String preHighlight = "<span style=\"background-color:rgb(" + OwlUI.toString(searchRGB) + ");\">"; //$NON-NLS-1$ //$NON-NLS-2$
-        String postHighlight = "</span>"; //$NON-NLS-1$
-
-        ExpandingReader resultHighlightReader = new ExpandingReader(new StringReader(result), wordsToHighlight, preHighlight, postHighlight, true);
-
-        int len = 0;
-        char[] buf = new char[1000];
-        try {
-          while ((len = resultHighlightReader.read(buf)) != -1)
-            highlightedResult.append(buf, 0, len);
-
-          return highlightedResult.toString();
-        } catch (IOException e) {
-          Activator.getDefault().logError(e.getMessage(), e);
-        }
-      }
-    }
-
-    return result;
+    /* Highlight Support (if search is active) */
+    return highlightSearchTermsIfNecessary(builder.toString());
   }
 
   private void div(StringBuilder builder, String cssClass) {

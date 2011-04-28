@@ -896,8 +896,10 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       String description = news.getDescription();
       if (StringUtils.isSet(description) && !description.equals(news.getTitle())) {
         IBaseLabelProvider labelProvider = getLabelProvider();
-        if (labelProvider instanceof NewsBrowserLabelProvider)
+        if (labelProvider instanceof NewsBrowserLabelProvider) {
           description = ((NewsBrowserLabelProvider) labelProvider).stripMediaTagsIfNecessary(description);
+          description = ((NewsBrowserLabelProvider) labelProvider).highlightSearchTermsIfNecessary(description);
+        }
       }
 
       /* Content is not provided */
@@ -1110,6 +1112,13 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   }
 
   private void showTransformation(INews news, String result) {
+
+    /* Support stripping media tags if set and highlight search terms if any */
+    IBaseLabelProvider labelProvider = getLabelProvider();
+    if (labelProvider instanceof NewsBrowserLabelProvider) {
+      result = ((NewsBrowserLabelProvider) labelProvider).stripMediaTagsIfNecessary(result);
+      result = ((NewsBrowserLabelProvider) labelProvider).highlightSearchTermsIfNecessary(result);
+    }
 
     /* Make the result suitable to be used in JavaScript */
     result = escapeForInnerHtml(result);
