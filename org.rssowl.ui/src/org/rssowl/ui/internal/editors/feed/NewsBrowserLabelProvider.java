@@ -475,10 +475,6 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     /* Title */
     if (!withInternalLinks)
       writer.append("div.title { float: left; ").append(fBiggerFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
-    writer.append("div.title a { ").append(fLinkFGColorCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
-    writer.append("div.title a.unread { font-weight: bold; text-decoration: none; }\n"); //$NON-NLS-1$
-    writer.append("div.title a:hover { ").append(fLinkFGColorCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
-    writer.append("div.title a:visited { ").append(fLinkFGColorCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     writer.append("div.title span.unread { font-weight: bold; }\n"); //$NON-NLS-1$
 
     /* Author */
@@ -532,8 +528,14 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   /* Common CSS for Headlines Layout */
   private void writeCommonHeadlinesCSS(Writer writer) throws IOException {
 
-    /* Title */
+    /* Title (Collapsed) */
     writer.append("div.title {  ").append(fBiggerFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("div.title a { color: black; text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.append("div.title a.unread { font-weight: bold; text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.append("div.title a:hover { color: black; text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.append("div.title a:visited { color: black; text-decoration: none; }\n"); //$NON-NLS-1$
+
+    /* Title (Expanded) */
     writer.append("div.titleExpanded { width: 90%; float: left; ").append(fBiggerFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     writer.append("div.titleExpanded a { ").append(fLinkFGColorCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     writer.append("div.titleExpanded a.unread { font-weight: bold; text-decoration: none; }\n"); //$NON-NLS-1$
@@ -556,6 +558,10 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
     /* Title */
     writer.append("div.title { width: 90%; float: left; padding-bottom: 6px; ").append(fBiggerFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("div.title a { ").append(fLinkFGColorCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("div.title a.unread { font-weight: bold; text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.append("div.title a:hover { ").append(fLinkFGColorCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("div.title a:visited { ").append(fLinkFGColorCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* Delete */
     writer.append("div.delete { text-align: right; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
