@@ -135,6 +135,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -381,6 +382,15 @@ public class FeedView extends EditorPart implements IReusableEditor {
     StringBuilder content = new StringBuilder();
     NewsBrowserLabelProvider labelProvider = (NewsBrowserLabelProvider) fNewsBrowserControl.getViewer().getLabelProvider();
 
+    URI base = null;
+    if (fInput.getMark() instanceof IBookMark) {
+      try {
+        base = new URI(((IBookMark) fInput.getMark()).getFeedLinkReference().getLinkAsText());
+      } catch (URISyntaxException e) {
+        /* Ignore and fallback to not using a Base at all */
+      }
+    }
+
     /* Save from Table */
     if (isTableViewerVisible()) {
       Tree tree = fNewsTableControl.getViewer().getTree();
@@ -408,7 +418,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
         }
 
         /* Render Elements */
-        String text = labelProvider.render(newsToSave.toArray(), null, false);
+        String text = labelProvider.render(newsToSave.toArray(), base, false);
         content.append(text);
       }
     }
@@ -420,7 +430,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
       elements = viewer.getFlattendChildren(elements, false);
 
       /* Render Elements */
-      String text = labelProvider.render(elements, null, false);
+      String text = labelProvider.render(elements, base, false);
       content.append(text);
     }
 
