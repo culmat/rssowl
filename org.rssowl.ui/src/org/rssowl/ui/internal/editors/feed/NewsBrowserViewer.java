@@ -857,35 +857,39 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     /* Link and Image */
     final StringBuilder js = new StringBuilder();
     String newsLink = CoreUtils.getLink(news);
-    String newToggleImgUri;
-    if (fBrowser.isIE())
-      newToggleImgUri = visible ? OwlUI.getImageUri("/icons/elcl16/expanded.gif", "expanded.gif") : OwlUI.getImageUri("/icons/elcl16/collapsed.gif", "collapsed.gif"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-    else
-      newToggleImgUri = visible ? ApplicationServer.getDefault().toResourceUrl("/icons/elcl16/expanded.gif") : ApplicationServer.getDefault().toResourceUrl("/icons/elcl16/collapsed.gif"); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* Blur Links */
-    js.append(getElementById(Dynamic.TOGGLE_NEWS_LINK.getId(news)).append(".blur(); ")); //$NON-NLS-1$
-    js.append(getElementById(Dynamic.TITLE.getId(news)).append(".blur(); ")); //$NON-NLS-1$
+    js.append(getElementById(Dynamic.TITLE_LINK.getId(news)).append(".blur(); ")); //$NON-NLS-1$
 
     /* Update Links */
     String link = HANDLER_PROTOCOL + (visible ? COLLAPSE_NEWS_HANDLER_ID : EXPAND_NEWS_HANDLER_ID) + "?" + news.getId(); //$NON-NLS-1$
-    js.append(getElementById(Dynamic.TOGGLE_NEWS_LINK.getId(news)).append(".href='").append(link).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$
     if (visible && StringUtils.isSet(newsLink))
-      js.append(getElementById(Dynamic.TITLE.getId(news)).append(".href = '" + URIUtils.toManaged(newsLink) + "'; ")); //$NON-NLS-1$ //$NON-NLS-2$
+      js.append(getElementById(Dynamic.TITLE_LINK.getId(news)).append(".href = '" + URIUtils.toManaged(newsLink) + "'; ")); //$NON-NLS-1$ //$NON-NLS-2$
     else
-      js.append(getElementById(Dynamic.TITLE.getId(news)).append(".href='").append(link).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$
-
-    /* Update Triangle Image */
-    js.append(getElementById(Dynamic.TOGGLE_NEWS_IMG.getId(news)).append(".src = '" + newToggleImgUri + "'; ")); //$NON-NLS-1$ //$NON-NLS-2$
+      js.append(getElementById(Dynamic.TITLE_LINK.getId(news)).append(".href='").append(link).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* Update News Div Visibility */
-    Set<Dynamic> elements = EnumSet.of(Dynamic.SUBLINE, Dynamic.CONTENT, Dynamic.FOOTER);
+    Set<Dynamic> elements = EnumSet.of(Dynamic.SUBLINE, Dynamic.DELETE, Dynamic.CONTENT, Dynamic.FOOTER);
     for (Dynamic element : elements) {
       if (visible)
         js.append(getElementById(element.getId(news))).append(".style.display='block'; "); //$NON-NLS-1$
       else
         js.append(getElementById(element.getId(news))).append(".style.display='none'; "); //$NON-NLS-1$
     }
+
+    /* Update Headlines Separator if present */
+    js.append("if (").append(getElementById(Dynamic.HEADLINE_SEPARATOR.getId(news))).append(" != null) {"); //$NON-NLS-1$ //$NON-NLS-2$
+    if (visible)
+      js.append(getElementById(Dynamic.HEADLINE_SEPARATOR.getId(news))).append(".style.display='none'; "); //$NON-NLS-1$
+    else
+      js.append(getElementById(Dynamic.HEADLINE_SEPARATOR.getId(news))).append(".style.display='block'; "); //$NON-NLS-1$
+    js.append("}"); //$NON-NLS-1$
+
+    /* Update Title CSS */
+    if (visible)
+      js.append(getElementById(Dynamic.TITLE.getId(news))).append(".className='titleExpanded'; "); //$NON-NLS-1$
+    else
+      js.append(getElementById(Dynamic.TITLE.getId(news))).append(".className='title'; "); //$NON-NLS-1$
 
     /* Update News Content as needed */
     if (visible) {
@@ -995,10 +999,20 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
     /* Update Visibility */
     for (Long id : newsIds) {
+
+      /* News Item */
       if (visible)
         js.append(getElementById(Dynamic.NEWS.getId(id))).append(".style.display='block'; "); //$NON-NLS-1$
       else
         js.append(getElementById(Dynamic.NEWS.getId(id))).append(".style.display='none'; "); //$NON-NLS-1$
+
+      /* Separator if using headlines layout */
+      js.append("if (").append(getElementById(Dynamic.HEADLINE_SEPARATOR.getId(id))).append(" != null) {"); //$NON-NLS-1$ //$NON-NLS-2$
+      if (visible)
+        js.append(getElementById(Dynamic.HEADLINE_SEPARATOR.getId(id))).append(".style.display='block'; "); //$NON-NLS-1$
+      else
+        js.append(getElementById(Dynamic.HEADLINE_SEPARATOR.getId(id))).append(".style.display='none'; "); //$NON-NLS-1$
+      js.append("}"); //$NON-NLS-1$
     }
 
     /* Scroll expanded group into view as necessary */
@@ -1741,7 +1755,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
           boolean isRead = (INews.State.READ == news.getState());
           js.append(getElementById(Dynamic.NEWS.getId(news)).append(isRead ? ".className='newsitemRead'; " : ".className='newsitemUnread'; ")); //$NON-NLS-1$ //$NON-NLS-2$
-          js.append(getElementById(Dynamic.TITLE.getId(news)).append(isRead ? ".className='read'; " : ".className='unread'; ")); //$NON-NLS-1$ //$NON-NLS-2$
+          js.append(getElementById(Dynamic.TITLE_LINK.getId(news)).append(isRead ? ".className='read'; " : ".className='unread'; ")); //$NON-NLS-1$ //$NON-NLS-2$
           js.append(getElementById(Dynamic.TOGGLE_READ_LINK.getId(news)).append(isRead ? ".title='" + markUnread + "'; " : ".title='" + markRead + "'; ")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
           js.append(getElementById(Dynamic.TOGGLE_READ_IMG.getId(news)).append(isRead ? ".alt='" + markUnread + "'; " : ".alt='" + markRead + "'; ")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
         }
@@ -1768,7 +1782,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
           String color = (labels.isEmpty()) ? defaultColor : "rgb(" + OwlUI.toString(OwlUI.getRGB(labels.iterator().next())) + ")"; //$NON-NLS-1$ //$NON-NLS-2$
           if ("rgb(0,0,0)".equals(color)) //Don't let black override link color //$NON-NLS-1$
             color = defaultColor;
-          js.append(getElementById(Dynamic.TITLE.getId(news)).append(".style.color='").append(color).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$
+          js.append(getElementById(Dynamic.TITLE_LINK.getId(news)).append(".style.color='").append(color).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$
 
           if (labels.isEmpty()) {
             js.append(getElementById(Dynamic.LABELS_SEPARATOR.getId(news)).append(".style.display='none'; ")); //$NON-NLS-1$

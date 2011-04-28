@@ -109,15 +109,15 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   enum Dynamic {
     NEWS("newsitem"), //$NON-NLS-1$
     TITLE("title"), //$NON-NLS-1$
+    TITLE_LINK("titleLink"), //$NON-NLS-1$
     SUBLINE("subline"), //$NON-NLS-1$
+    DELETE("delete"), //$NON-NLS-1$
     TOGGLE_READ_LINK("toggleRead"), //$NON-NLS-1$
     TOGGLE_READ_IMG("toggleReadImg"), //$NON-NLS-1$
     TOGGLE_STICKY_LINK("toggleStickyLink"), //$NON-NLS-1$
     TOGGLE_STICKY_IMG("toggleStickyImg"), //$NON-NLS-1$
     TOGGLE_GROUP_LINK("toggleGroupLink"), //$NON-NLS-1$
     TOGGLE_GROUP_IMG("toggleGroupImg"), //$NON-NLS-1$
-    TOGGLE_NEWS_LINK("toggleNewsLink"), //$NON-NLS-1$
-    TOGGLE_NEWS_IMG("toggleNewsImg"), //$NON-NLS-1$
     LABELS_MENU_LINK("labelsMenuLink"), //$NON-NLS-1$
     ARCHIVE_LINK("archiveLink"), //$NON-NLS-1$
     SHARE_MENU_LINK("shareMenuLink"), //$NON-NLS-1$
@@ -132,7 +132,8 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     FULL_CONTENT_LINK("fullContentLink"), //$NON-NLS-1$
     FULL_CONTENT_LINK_TEXT("fullContentLinkText"), //$NON-NLS-1$
     LABELS("labels"), //$NON-NLS-1$
-    LABELS_SEPARATOR("labelsSeparator"); //$NON-NLS-1$
+    LABELS_SEPARATOR("labelsSeparator"), //$NON-NLS-1$
+    HEADLINE_SEPARATOR("headlineSeparator"); //$NON-NLS-1$
 
     private String fId;
 
@@ -295,8 +296,8 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     }
 
     int normal = fontHeight;
-    int small = normal - 1;
     int verysmall = normal - 2;
+    int small = normal - 1;
     int bigger = normal + 1;
     int biggest = bigger + 2;
 
@@ -406,88 +407,86 @@ public class NewsBrowserLabelProvider extends LabelProvider {
    * @throws IOException In case of an error while writing.
    */
   public void writeCSS(Writer writer, boolean forSingleNews, boolean withInternalLinks) throws IOException {
+    boolean isGroupingEnabled = isGroupingEnabled();
 
     /* Open CSS */
     writer.write("<style type=\"text/css\">\n"); //$NON-NLS-1$
+
+    /* Common CSS Rules */
+    writeCommonCSS(writer, forSingleNews, withInternalLinks);
+
+    /* Common Headlines Layout Rules */
+    if (fHeadlinesOnly)
+      writeCommonHeadlinesCSS(writer);
+
+    /* Common Newspaper Layout Rules */
+    else
+      writeCommonNewspaperCSS(writer);
+
+    /* Single News */
+    if (forSingleNews)
+      writesingleNewsCSS(writer);
+
+    /* Headlines Grouped */
+    else if (isGroupingEnabled && fHeadlinesOnly)
+      writeHeadlinesGroupedCSS(writer);
+
+    /* Newspaper Grouped */
+    else if (isGroupingEnabled && !fHeadlinesOnly)
+      writeNewspaperGroupedCSS(writer);
+
+    /* Headlines Ungrouped */
+    else if (!isGroupingEnabled && fHeadlinesOnly)
+      writeHeadlinesUngroupedCSS(writer);
+
+    /* Newspaper Ungrouped */
+    else if (!isGroupingEnabled && !fHeadlinesOnly)
+      writeNewspaperUngroupedCSS(writer);
+
+    writer.write("</style>\n"); //$NON-NLS-1$
+  }
+
+  /* Common CSS in all Layouts */
+  private void writeCommonCSS(Writer writer, boolean forSingleNews, boolean withInternalLinks) throws IOException {
 
     /* General */
     writer.append("body { overflow: auto; margin: 0; font-family: ").append(fNewsFontFamily).append(",Verdanna,sans-serif; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     writer.append("a { ").append(fLinkFGColorCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     writer.append("a:hover { ").append(fLinkFGColorCSS).append(" text-decoration: underline; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     writer.append("a:visited { ").append(fLinkFGColorCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
-    writer.write("img { border: none; }\n"); //$NON-NLS-1$
+    writer.append("img { border: none; }\n"); //$NON-NLS-1$
 
     /* Group */
-    writer.append("div.group { color: #678; ").append(fBiggestFontCSS).append(" font-weight: bold; margin: 10px 0px 5px 5px; padding-bottom: 3px; border-bottom: 2px solid #678; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("div.group { color: #678; ").append(fBiggestFontCSS).append(" font-weight: bold; margin: 10px 0px 5px 5px; padding-bottom: 3px; border-bottom: 1px solid #678; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     writer.append("div.group a { color: #678; ").append(fBiggestFontCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     writer.append("div.group a:hover { color: #678; ").append(fBiggestFontCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     writer.append("div.group a:visited { color: #678; ").append(fBiggestFontCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     writer.append("span.groupNote { ").append(fNormalFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
-    /* News Container (Single News) */
-    if (forSingleNews) {
-      writer.write("div.newsitemUnread { margin: 0; }\n"); //$NON-NLS-1$
-      writer.write("div.newsitemRead { margin: 0; }\n"); //$NON-NLS-1$
-    }
-
-    /* News Container (Many News - Newspaper Layout) */
-    else {
-      if (isGroupingEnabled()) {
-        writer.write("div.newsitemUnread { margin: 0px 0px 20px 10px; border-bottom: 1px solid white; }\n"); //$NON-NLS-1$
-        writer.write("div.newsitemRead { margin: 0px 0px 20px 10px; border-bottom: 1px solid white; }\n"); //$NON-NLS-1$
-      } else {
-        writer.write("div.newsitemUnread { margin: 0px 0px 20px 0px; border-bottom: 1px solid white; }\n"); //$NON-NLS-1$
-        writer.write("div.newsitemRead { margin: 0px 0px 20px 0px; border-bottom: 1px solid white; }\n"); //$NON-NLS-1$
-      }
-    }
-
-    /* Header */
-    if (forSingleNews) {
-      writer.write("div.header { padding: 10px 10px 5px 10px; background-color: rgb(242,242,242); }\n"); //$NON-NLS-1$
-      writer.append("div.headerSticky { padding: 10px 10px 5px 10px; ").append(fStickyBGColorCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
-    } else if (isGroupingEnabled()) {
-      writer.write("div.header { padding: 10px 10px 5px 5px; border-top: 1px solid white; }\n"); //$NON-NLS-1$
-      writer.append("div.headerSticky { padding: 10px 10px 5px 5px; ").append(fStickyBGColorCSS).append(" border-top: 1px dotted silver; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
-    } else {
-      writer.write("div.header { padding: 10px 10px 5px 10px; border-top: 1px solid white; }\n"); //$NON-NLS-1$
-      writer.append("div.headerSticky { padding: 10px 10px 5px 10px; ").append(fStickyBGColorCSS).append(" border-top: 1px dotted silver; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
-    }
-
     /* Content */
-    writer.write("div.content { \n"); //$NON-NLS-1$
-    writer.write("   padding: 15px 10px 15px 10px; border-top: dotted 1px silver; \n"); //$NON-NLS-1$
+    writer.append("div.content { \n"); //$NON-NLS-1$
+    writer.append("   padding: 15px 10px 15px 10px; border-top: dotted 1px silver; \n"); //$NON-NLS-1$
     writer.append("  background-color: #fff; clear: both; ").append(fNormalFontCSS).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
-    writer.write("}\n"); //$NON-NLS-1$
+    writer.append("}\n"); //$NON-NLS-1$
 
     /* Restrict the style of embedded Paragraphs */
-    writer.write("div.content p { margin-top: 0; padding-top: 0; margin-left: 0; padding-left: 0; }\n"); //$NON-NLS-1$
-
-    /* Footer */
-    if (forSingleNews) {
-      writer.write("div.footer { background-color: rgb(248,248,248); padding: 3px 5px 3px 5px; line-height: 20px; border-top: dotted 1px silver; border-bottom: dotted 1px silver; clear: both; }\n"); //$NON-NLS-1$
-      writer.append("div.footerSticky { ").append(fStickyBGColorCSS).append(" padding: 3px 5px 3px 5px; line-height: 20px; border-top: dotted 1px silver; border-bottom: dotted 1px silver; clear: both; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
-    } else {
-      writer.write("div.footer { padding: 3px 5px 3px 5px; line-height: 20px; border-top: dotted 1px silver; border-bottom: 1px solid white; clear: both; }\n"); //$NON-NLS-1$
-      writer.append("div.footerSticky { ").append(fStickyBGColorCSS).append(" padding: 3px 5px 3px 5px; line-height: 20px; border-top: dotted 1px silver; border-bottom: 1px dotted silver; clear: both; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
-      writer.write("div.clearingFooter { clear: both; }\n"); //$NON-NLS-1$
-    }
+    writer.write("div.content p { margin-top: 0 !important; padding-top: 0 !important; margin-left: 0 !important; padding-left: 0 !important; }\n"); //$NON-NLS-1$
 
     /* Title */
-    if (withInternalLinks) //Need to set width to avoid float drop bug of delete button on all OS (see Bug 1393)
-      writer.append("div.title { width: 90%; float: left; padding-bottom: 6px; ").append(fBiggerFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
-    else
-      writer.append("div.title { float: left; padding-bottom: 6px; ").append(fBiggerFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
-
+    if (!withInternalLinks)
+      writer.append("div.title { float: left; ").append(fBiggerFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     writer.append("div.title a { ").append(fLinkFGColorCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
-    writer.write("div.title a.unread { font-weight: bold; text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.append("div.title a.unread { font-weight: bold; text-decoration: none; }\n"); //$NON-NLS-1$
     writer.append("div.title a:hover { ").append(fLinkFGColorCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     writer.append("div.title a:visited { ").append(fLinkFGColorCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("div.title span.unread { font-weight: bold; }\n"); //$NON-NLS-1$
 
     /* Author */
-    writer.write("a.author { color: rgb(80,80,80); text-decoration: none; }\n"); //$NON-NLS-1$
-    writer.write("a.author:hover { color: rgb(80,80,80); text-decoration: none; }\n"); //$NON-NLS-1$
-    writer.write("a.author:active { color: rgb(80,80,80); text-decoration: none; }\n"); //$NON-NLS-1$
-    writer.write("a.author:visited { color: rgb(80,80,80); text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.append("div.author { text-align: right; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("a.author { color: rgb(80,80,80); text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.append("a.author:hover { color: rgb(80,80,80); text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.append("a.author:active { color: rgb(80,80,80); text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.append("a.author:visited { color: rgb(80,80,80); text-decoration: none; }\n"); //$NON-NLS-1$
 
     /* Comments */
     writer.write("a.comments { color: rgb(80,80,80); text-decoration: none; }\n"); //$NON-NLS-1$
@@ -495,13 +494,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.write("a.comments:active { color: rgb(80,80,80); text-decoration: none; }\n"); //$NON-NLS-1$
     writer.write("a.comments:visited { color: rgb(80,80,80); text-decoration: none; }\n"); //$NON-NLS-1$
 
-    writer.write("div.title span.unread { font-weight: bold; }\n"); //$NON-NLS-1$
-
-    /* Delete */
-    writer.append("div.delete { text-align: right; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
-
     /* Subline */
-    writer.append("div.subline { margin: 0; padding: 0; clear: left; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     writer.append("table.subline { margin: 0; padding: 0; }\n"); //$NON-NLS-1$
     writer.append("tr.subline { margin: 0; padding: 0; }\n"); //$NON-NLS-1$
     writer.append("td.firstactionsubline { text-align: left; width: 20px; margin: 0; padding: 0; color: rgb(80, 80, 80); ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -515,9 +508,6 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     /* Date */
     writer.append("div.date { float: left; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
-    /* Author */
-    writer.append("div.author { text-align: right; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
-
     /* Footer Line */
     writer.append("div.footerline { clear: both; ").append(fVerySmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     writer.append("div.footerline a { ").append(fLinkFGColorCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -528,13 +518,123 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.append("td.footerline { margin: 0; padding: 0; padding-right: 5px; ").append(fVerySmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     writer.append("td.footerlineseparator { margin: 0; padding: 0; color: rgb(140, 140, 140); padding-right: 5px; ").append(fVerySmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
+    /* Clearing Footer */
+    if (!forSingleNews)
+      writer.write("div.clearingFooter { clear: both; }\n"); //$NON-NLS-1$
+
     /* Quotes */
     writer.write("span.quote_lvl1 { color: #660066; }\n"); //$NON-NLS-1$
     writer.write("span.quote_lvl2 { color: #007777; }\n"); //$NON-NLS-1$
     writer.write("span.quote_lvl3 { color: #3377ff; }\n"); //$NON-NLS-1$
     writer.write("span.quote_lvl4 { color: #669966; }\n"); //$NON-NLS-1$
+  }
 
-    writer.write("</style>\n"); //$NON-NLS-1$
+  /* Common CSS for Headlines Layout */
+  private void writeCommonHeadlinesCSS(Writer writer) throws IOException {
+
+    /* Title */
+    writer.append("div.title {  ").append(fBiggerFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("div.titleExpanded { width: 90%; float: left; ").append(fBiggerFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("div.titleExpanded a { ").append(fLinkFGColorCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("div.titleExpanded a.unread { font-weight: bold; text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.append("div.titleExpanded a:hover { ").append(fLinkFGColorCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("div.titleExpanded a:visited { ").append(fLinkFGColorCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+
+    /* Delete */
+    writer.append("div.delete { padding-top: 5px; text-align: right; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+
+    /* Subline */
+    writer.append("div.subline { margin: 6px 0px 0px 0px; padding: 0; clear: left; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+
+    /* Footer */
+    writer.append("      div.footer { padding: 3px 5px 3px 5px; line-height: 20px; border-top: dotted 1px silver; clear: both; }\n"); //$NON-NLS-1$
+    writer.append("div.footerSticky { padding: 3px 5px 3px 5px; line-height: 20px; border-top: dotted 1px silver; clear: both; ").append(fStickyBGColorCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+  }
+
+  /* Common CSS for Newspaper Layout */
+  private void writeCommonNewspaperCSS(Writer writer) throws IOException {
+
+    /* Title */
+    writer.append("div.title { width: 90%; float: left; padding-bottom: 6px; ").append(fBiggerFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+
+    /* Delete */
+    writer.append("div.delete { text-align: right; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+
+    /* Subline */
+    writer.append("div.subline { margin: 0; padding: 0; clear: left; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+
+    /* Footer */
+    writer.append("      div.footer { padding: 3px 5px 3px 5px; line-height: 20px; border-top: dotted 1px silver; border-bottom: 1px solid white; clear: both; }\n"); //$NON-NLS-1$
+    writer.append("div.footerSticky { padding: 3px 5px 3px 5px; line-height: 20px; border-top: dotted 1px silver; border-bottom: 1px dotted silver; clear: both; ").append(fStickyBGColorCSS).append("}\n"); //$NON-NLS-1$ //$NON-NLS-2$
+  }
+
+  /* Single News */
+  private void writesingleNewsCSS(Writer writer) throws IOException {
+
+    /* News Container */
+    writer.write("  div.newsitemRead { margin: 0; }\n"); //$NON-NLS-1$
+    writer.write("div.newsitemUnread { margin: 0; }\n"); //$NON-NLS-1$
+
+    /* Header */
+    writer.append("      div.header { padding: 10px 10px 5px 10px; background-color: rgb(242,242,242); }\n"); //$NON-NLS-1$
+    writer.append("div.headerSticky { padding: 10px 10px 5px 10px; ").append(fStickyBGColorCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+
+    writer.write("       div.footer { padding: 3px 5px 3px 5px; line-height: 20px; border-top: dotted 1px silver; border-bottom: dotted 1px silver; clear: both; background-color: rgb(248,248,248); }\n"); //$NON-NLS-1$
+    writer.append("div.footerSticky { padding: 3px 5px 3px 5px; line-height: 20px; border-top: dotted 1px silver; border-bottom: dotted 1px silver; clear: both; ").append(fStickyBGColorCSS).append("}\n"); //$NON-NLS-1$ //$NON-NLS-2$
+  }
+
+  /* Newspaper Ungrouped */
+  private void writeNewspaperUngroupedCSS(Writer writer) throws IOException {
+
+    /* News Container */
+    writer.write("div.newsitemRead   { margin: 0px 0px 20px 0px; border-bottom: 1px solid white; }\n"); //$NON-NLS-1$
+    writer.write("div.newsitemUnread { margin: 0px 0px 20px 0px; border-bottom: 1px solid white; }\n"); //$NON-NLS-1$
+
+    /* Header */
+    writer.append("      div.header { padding: 10px 10px 5px 10px; border-top: 1px solid white; }\n"); //$NON-NLS-1$
+    writer.append("div.headerSticky { padding: 10px 10px 5px 10px; border-top: 1px dotted silver; ").append(fStickyBGColorCSS).append("}\n"); //$NON-NLS-1$ //$NON-NLS-2$
+  }
+
+  /* Newspaper Grouped */
+  private void writeNewspaperGroupedCSS(Writer writer) throws IOException {
+
+    /* News Container */
+    writer.write("  div.newsitemRead { margin: 0px 0px 20px 10px; border-bottom: 1px solid white; }\n"); //$NON-NLS-1$
+    writer.write("div.newsitemUnread { margin: 0px 0px 20px 10px; border-bottom: 1px solid white; }\n"); //$NON-NLS-1$
+
+    /* Header */
+    writer.append("      div.header { padding: 10px 10px 5px 5px; border-top: 1px solid white; }\n"); //$NON-NLS-1$
+    writer.append("div.headerSticky { padding: 10px 10px 5px 5px; border-top: 1px dotted silver; ").append(fStickyBGColorCSS).append("}\n"); //$NON-NLS-1$ //$NON-NLS-2$
+  }
+
+  /* Headlines Ungrouped */
+  private void writeHeadlinesUngroupedCSS(Writer writer) throws IOException {
+
+    /* News Container */
+    writer.write("  div.newsitemRead { margin: 0px 0px 0px 0px; }\n"); //$NON-NLS-1$
+    writer.write("div.newsitemUnread { margin: 0px 0px 0px 0px; }\n"); //$NON-NLS-1$
+
+    /* Header */
+    writer.write("       div.header { padding: 5px 10px 5px 10px; }\n"); //$NON-NLS-1$
+    writer.append("div.headerSticky { padding: 5px 10px 5px 10px; ").append(fStickyBGColorCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+
+    /* Headlines Separator */
+    writer.append("div.headlinesSeparator { margin: 0; padding: 0; border-bottom: 1px dotted silver; }\n"); //$NON-NLS-1$
+  }
+
+  /* Headlines Grouped */
+  private void writeHeadlinesGroupedCSS(Writer writer) throws IOException {
+
+    /* News Container */
+    writer.write("  div.newsitemRead { margin: 0px 0px 0px 10px; }\n"); //$NON-NLS-1$
+    writer.write("div.newsitemUnread { margin: 0px 0px 0px 10px; }\n"); //$NON-NLS-1$
+
+    /* Header */
+    writer.write("       div.header { padding: 5px 10px 5px 5px; }\n"); //$NON-NLS-1$
+    writer.append("div.headerSticky { padding: 5px 10px 5px 5px; ").append(fStickyBGColorCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+
+    /* Headlines Separator */
+    writer.append("div.headlinesSeparator { margin: 0px 0px 0px 10px; padding: 0; border-bottom: 1px dotted silver; }\n"); //$NON-NLS-1$
   }
 
   private String getLabel(EntityGroup group, boolean withInternalLinks) {
@@ -646,28 +746,22 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     {
 
       /* DIV: NewsItem/Header/Title */
-      div(builder, "title"); //$NON-NLS-1$
-
-      /* Triangle to expand/collapse News if headlines only */
-      if (fHeadlinesOnly) {
-        String link = HANDLER_PROTOCOL + EXPAND_NEWS_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
-        imageLink(builder, link, null, null, "/icons/elcl16/collapsed.gif", "collapsed.gif", Dynamic.TOGGLE_NEWS_LINK.getId(news), Dynamic.TOGGLE_NEWS_IMG.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
-      }
+      div(builder, "title", Dynamic.TITLE.getId(news)); //$NON-NLS-1$
 
       String cssClass = isUnread ? "unread" : "read"; //$NON-NLS-1$ //$NON-NLS-2$
 
       /* Let click on Title expand news */
       if (fHeadlinesOnly) {
         String link = HANDLER_PROTOCOL + EXPAND_NEWS_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
-        link(builder, link, newsTitle, cssClass, Dynamic.TITLE.getId(news), color);
+        link(builder, link, newsTitle, cssClass, Dynamic.TITLE_LINK.getId(news), color);
       }
 
       /* Otherwise treat normally */
       else {
         if (hasLink)
-          link(builder, (fManageLinks && withManagedLinks) ? URIUtils.toManaged(newsLink) : newsLink, newsTitle, cssClass, Dynamic.TITLE.getId(news), color);
+          link(builder, (fManageLinks && withManagedLinks) ? URIUtils.toManaged(newsLink) : newsLink, newsTitle, cssClass, Dynamic.TITLE_LINK.getId(news), color);
         else
-          span(builder, newsTitle, cssClass, Dynamic.TITLE.getId(news), color);
+          span(builder, newsTitle, cssClass, Dynamic.TITLE_LINK.getId(news), color);
       }
 
       /* Close: NewsItem/Header/Title */
@@ -678,7 +772,10 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     if (withInternalLinks) {
 
       /* DIV: NewsItem/Header/Delete */
-      div(builder, "delete"); //$NON-NLS-1$
+      if (fHeadlinesOnly)
+        div(builder, "delete", "display: none;", Dynamic.DELETE.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
+      else
+        div(builder, "delete", Dynamic.DELETE.getId(news)); //$NON-NLS-1$
 
       String link = HANDLER_PROTOCOL + DELETE_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
       imageLink(builder, link, Messages.NewsBrowserLabelProvider_DELETE, Messages.NewsBrowserLabelProvider_DELETE, "/icons/elcl16/remove_small.gif", "remove_small.gif", null, null); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1000,6 +1097,12 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
     /* Close: NewsItem */
     close(builder, "div"); //$NON-NLS-1$
+
+    /* Headlines Separator */
+    if (fHeadlinesOnly) {
+      div(builder, "headlinesSeparator", Dynamic.HEADLINE_SEPARATOR.getId(news)); //$NON-NLS-1$
+      close(builder, "div"); //$NON-NLS-1$
+    }
 
     String result = builder.toString();
 
