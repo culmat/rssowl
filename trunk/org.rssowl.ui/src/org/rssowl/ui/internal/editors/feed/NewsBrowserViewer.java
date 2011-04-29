@@ -944,7 +944,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
       js.append("var divPosY = ").append(getElementById(Dynamic.NEWS.getId(news))).append(".offsetTop; "); //$NON-NLS-1$ //$NON-NLS-2$
       js.append("var divHeight = ").append(getElementById(Dynamic.NEWS.getId(news))).append(".offsetHeight; "); //$NON-NLS-1$ //$NON-NLS-2$
-      js.append("if (scrollPosY > divPosY) {"); //$NON-NLS-1$ //Scroll up to reveal the top of the news
+      js.append("if (scrollPosY > divPosY || divHeight > windowHeight) {"); //$NON-NLS-1$ //Scroll up to reveal the top of the news (also scroll up if the news is larger the client height
       js.append(getElementById(Dynamic.NEWS.getId(news))).append(".scrollIntoView(true); "); //$NON-NLS-1$
       js.append("} else if (scrollPosY + windowHeight < divPosY + divHeight) {"); //$NON-NLS-1$ //Scroll down to reveal the bottom of the news
       js.append(getElementById(Dynamic.NEWS.getId(news))).append(".scrollIntoView(false); "); //$NON-NLS-1$
