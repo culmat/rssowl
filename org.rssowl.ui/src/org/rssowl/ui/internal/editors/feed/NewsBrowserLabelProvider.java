@@ -110,6 +110,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     NEWS("newsitem"), //$NON-NLS-1$
     TITLE("title"), //$NON-NLS-1$
     TITLE_LINK("titleLink"), //$NON-NLS-1$
+    SUBTITLE_LINK("subtitleLink"), //$NON-NLS-1$
     SUBLINE("subline"), //$NON-NLS-1$
     DELETE("delete"), //$NON-NLS-1$
     TOGGLE_READ_LINK("toggleRead"), //$NON-NLS-1$
@@ -572,6 +573,11 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.append("div.titleExpanded a:hover { ").append(fLinkFGColorCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     writer.append("div.titleExpanded a:visited { ").append(fLinkFGColorCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
+    /* Subtitle */
+    writer.append("a.subtitle { font-style: italic; text-decoration: none; padding-left: 10px; color: rgb(80, 80, 80); ").append(fVerySmallFontCSS).append(" }"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("a.subtitle:hover { font-style: italic; text-decoration: none; padding-left: 10px; color: rgb(80, 80, 80); ").append(fVerySmallFontCSS).append(" }"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("a.subtitle:visited { font-style: italic; text-decoration: none; padding-left: 10px; color: rgb(80, 80, 80); ").append(fVerySmallFontCSS).append(" }"); //$NON-NLS-1$ //$NON-NLS-2$
+
     /* Delete */
     writer.append("div.delete { padding-top: 5px; text-align: right; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -796,6 +802,62 @@ public class NewsBrowserLabelProvider extends LabelProvider {
         /* Expand News when clicking on Title */
         link = HANDLER_PROTOCOL + EXPAND_NEWS_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
         link(builder, link, newsTitle, cssClass, Dynamic.TITLE_LINK.getId(news), color);
+
+        /* Subtitle */
+        StringBuilder subtitleContent = new StringBuilder();
+
+        /* Subtitle: Date */
+        {
+          Date newsDate = DateUtils.getRecentDate(news);
+          if (DateUtils.isAfterIncludingToday(newsDate, fTodayInMillies))
+            subtitleContent.append(fTimeFormat.format(newsDate));
+          else
+            subtitleContent.append(fDateFormat.format(newsDate));
+        }
+
+        /* Subtitle: Author */
+        {
+          IPerson author = news.getAuthor();
+          if (author != null) {
+            subtitleContent.append(" | "); //$NON-NLS-1$
+
+            String name = author.getName();
+            String email = (author.getEmail() != null) ? author.getEmail().toASCIIString() : null;
+            if (email != null && !email.contains("mail:")) //$NON-NLS-1$
+              email = "mailto:" + email; //$NON-NLS-1$
+
+            /* Use name as email if valid */
+            if (email == null && name.contains("@") && !name.contains(" ")) //$NON-NLS-1$ //$NON-NLS-2$
+              email = name;
+
+            if (StringUtils.isSet(name) && email != null)
+              link(subtitleContent, email, NLS.bind(Messages.NewsBrowserLabelProvider_BY_AUTHOR, StringUtils.htmlEscape(name)), "author"); //$NON-NLS-1$
+            else if (StringUtils.isSet(name))
+              subtitleContent.append(NLS.bind(Messages.NewsBrowserLabelProvider_BY_AUTHOR, StringUtils.htmlEscape(name)));
+            else if (email != null)
+              link(subtitleContent, email, NLS.bind(Messages.NewsBrowserLabelProvider_BY_AUTHOR, StringUtils.htmlEscape(email)), "author"); //$NON-NLS-1$
+            else
+              subtitleContent.append(Messages.NewsBrowserLabelProvider_UNKNOWN);
+          }
+        }
+
+        /* Subtitle: Feed */
+        String feedLinkAsText = news.getFeedLinkAsText();
+        String feedName = fMapFeedLinkToName.get(feedLinkAsText);
+        if (feedName == null) {
+          IBookMark bm = CoreUtils.getBookMark(news.getFeedReference());
+          if (bm != null) {
+            feedName = StringUtils.htmlEscape(bm.getName());
+            fMapFeedLinkToName.put(feedLinkAsText, feedName);
+          }
+        }
+
+        if (StringUtils.isSet(feedName)) {
+          subtitleContent.append(" | "); //$NON-NLS-1$
+          subtitleContent.append(feedName);
+        }
+
+        link(builder, link, subtitleContent.toString(), "subtitle", Dynamic.SUBTITLE_LINK.getId(news), "80, 80, 80"); //$NON-NLS-1$ //$NON-NLS-2$
       }
 
       /* Otherwise treat normally */
