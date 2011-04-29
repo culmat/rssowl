@@ -755,7 +755,7 @@ public class DBManager {
     File defragmentedDatabase = backupService.getTempBackupFile();
 
     /* User might have cancelled the operation */
-    if (monitor.isCanceled()) {
+    if (!useLargeBlockSize && monitor.isCanceled()) {
       Activator.safeLogInfo("Cancelled: Database Defragmentation"); //$NON-NLS-1$
       return;
     }
@@ -765,7 +765,7 @@ public class DBManager {
     copyDatabase(database, defragmentedDatabase, useLargeBlockSize, monitor);
 
     /* User might have cancelled the operation */
-    if (monitor.isCanceled()) {
+    if (!useLargeBlockSize && monitor.isCanceled()) {
       Activator.safeLogInfo("Cancelled: Database Defragmentation"); //$NON-NLS-1$
       defragmentedDatabase.delete();
       return;
@@ -776,7 +776,7 @@ public class DBManager {
     backupService.backup(true, monitor);
 
     /* User might have cancelled the operation */
-    if (monitor.isCanceled()) {
+    if (!useLargeBlockSize && monitor.isCanceled()) {
       Activator.safeLogInfo("Cancelled: Database Defragmentation"); //$NON-NLS-1$
       defragmentedDatabase.delete();
       return;
@@ -821,7 +821,7 @@ public class DBManager {
     ObjectContainer destinationDb = Db4o.openFile(destinationDbConfiguration, destination.getAbsolutePath());
 
     /* User might have cancelled the operation */
-    if (isCanceled(monitor, sourceDb, destinationDb))
+    if (isCanceled(monitor, useLargeBlockSize, sourceDb, destinationDb))
       return;
 
     /* Labels (keep in memory to avoid duplicate copies when cascading feed) */
@@ -831,7 +831,7 @@ public class DBManager {
     if (!allLabels.isEmpty()) {
       int chunk = available / allLabels.size();
       for (Label label : allLabels) {
-        if (isCanceled(monitor, sourceDb, destinationDb))
+        if (isCanceled(monitor, useLargeBlockSize, sourceDb, destinationDb))
           return;
 
         labels.add(label);
@@ -844,7 +844,7 @@ public class DBManager {
       monitor.worked(available);
 
     /* User might have cancelled the operation */
-    if (isCanceled(monitor, sourceDb, destinationDb))
+    if (isCanceled(monitor, useLargeBlockSize, sourceDb, destinationDb))
       return;
 
     /* Folders */
@@ -853,7 +853,7 @@ public class DBManager {
     if (!allFolders.isEmpty()) {
       int chunk = available / allFolders.size();
       for (Folder type : allFolders) {
-        if (isCanceled(monitor, sourceDb, destinationDb))
+        if (isCanceled(monitor, useLargeBlockSize, sourceDb, destinationDb))
           return;
 
         sourceDb.activate(type, Integer.MAX_VALUE);
@@ -867,7 +867,7 @@ public class DBManager {
       monitor.worked(available);
 
     /* User might have cancelled the operation */
-    if (isCanceled(monitor, sourceDb, destinationDb))
+    if (isCanceled(monitor, useLargeBlockSize, sourceDb, destinationDb))
       return;
 
     /*
@@ -880,13 +880,13 @@ public class DBManager {
     if (!allBins.isEmpty()) {
       int chunk = available / allBins.size();
       for (NewsBin newsBin : allBins) {
-        if (isCanceled(monitor, sourceDb, destinationDb))
+        if (isCanceled(monitor, useLargeBlockSize, sourceDb, destinationDb))
           return;
 
         destinationDb.activate(newsBin, Integer.MAX_VALUE);
         List<NewsReference> staleNewsRefs = new ArrayList<NewsReference>(0);
         for (NewsReference newsRef : newsBin.getNewsRefs()) {
-          if (isCanceled(monitor, sourceDb, destinationDb))
+          if (isCanceled(monitor, useLargeBlockSize, sourceDb, destinationDb))
             return;
 
           Query query = sourceDb.query();
@@ -904,7 +904,7 @@ public class DBManager {
         }
 
         if (!staleNewsRefs.isEmpty()) {
-          if (isCanceled(monitor, sourceDb, destinationDb))
+          if (isCanceled(monitor, useLargeBlockSize, sourceDb, destinationDb))
             return;
 
           newsBin.removeNewsRefs(staleNewsRefs);
@@ -918,7 +918,7 @@ public class DBManager {
       monitor.worked(available);
 
     /* User might have cancelled the operation */
-    if (isCanceled(monitor, sourceDb, destinationDb))
+    if (isCanceled(monitor, useLargeBlockSize, sourceDb, destinationDb))
       return;
 
     /* Feeds */
@@ -932,7 +932,7 @@ public class DBManager {
 
       int i = 1;
       for (Feed feed : allFeeds) {
-        if (isCanceled(monitor, sourceDb, destinationDb))
+        if (isCanceled(monitor, useLargeBlockSize, sourceDb, destinationDb))
           return;
 
         /* Introduce own label as feed copying can be very time consuming */
@@ -961,13 +961,13 @@ public class DBManager {
     monitor.subTask(Messages.DBManager_IMPROVING_APP_PERFORMANCE);
 
     /* User might have cancelled the operation */
-    if (isCanceled(monitor, sourceDb, destinationDb))
+    if (isCanceled(monitor, useLargeBlockSize, sourceDb, destinationDb))
       return;
 
     destinationDb.ext().set(newsCounter, Integer.MAX_VALUE);
 
     /* User might have cancelled the operation */
-    if (isCanceled(monitor, sourceDb, destinationDb))
+    if (isCanceled(monitor, useLargeBlockSize, sourceDb, destinationDb))
       return;
 
     /* Description */
@@ -978,7 +978,7 @@ public class DBManager {
       int chunk = Math.max(1, available / allDescriptions.size());
 
       for (Description description : allDescriptions) {
-        if (isCanceled(monitor, sourceDb, destinationDb))
+        if (isCanceled(monitor, useLargeBlockSize, sourceDb, destinationDb))
           return;
 
         sourceDb.activate(description, Integer.MAX_VALUE);
@@ -1000,7 +1000,7 @@ public class DBManager {
       monitor.worked(available);
 
     /* User might have cancelled the operation */
-    if (isCanceled(monitor, sourceDb, destinationDb))
+    if (isCanceled(monitor, useLargeBlockSize, sourceDb, destinationDb))
       return;
 
     /* Preferences */
@@ -1010,7 +1010,7 @@ public class DBManager {
       int chunk = available / allPreferences.size();
 
       for (Preference pref : allPreferences) {
-        if (isCanceled(monitor, sourceDb, destinationDb))
+        if (isCanceled(monitor, useLargeBlockSize, sourceDb, destinationDb))
           return;
 
         sourceDb.activate(pref, Integer.MAX_VALUE);
@@ -1024,7 +1024,7 @@ public class DBManager {
       monitor.worked(available);
 
     /* User might have cancelled the operation */
-    if (isCanceled(monitor, sourceDb, destinationDb))
+    if (isCanceled(monitor, useLargeBlockSize, sourceDb, destinationDb))
       return;
 
     /* Filter */
@@ -1034,7 +1034,7 @@ public class DBManager {
       int chunk = available / allFilters.size();
 
       for (ISearchFilter filter : allFilters) {
-        if (isCanceled(monitor, sourceDb, destinationDb))
+        if (isCanceled(monitor, useLargeBlockSize, sourceDb, destinationDb))
           return;
 
         sourceDb.activate(filter, Integer.MAX_VALUE);
@@ -1047,7 +1047,7 @@ public class DBManager {
       monitor.worked(available);
 
     /* User might have cancelled the operation */
-    if (isCanceled(monitor, sourceDb, destinationDb))
+    if (isCanceled(monitor, useLargeBlockSize, sourceDb, destinationDb))
       return;
 
     /* Counter */
@@ -1059,7 +1059,7 @@ public class DBManager {
     monitor.worked(DEFRAG_SUB_WORK_COUNTERS);
 
     /* User might have cancelled the operation */
-    if (isCanceled(monitor, sourceDb, destinationDb))
+    if (isCanceled(monitor, useLargeBlockSize, sourceDb, destinationDb))
       return;
 
     /* Entity Id By Event Type */
@@ -1070,7 +1070,7 @@ public class DBManager {
     monitor.worked(DEFRAG_SUB_WORK_EVENTS);
 
     /* User might have cancelled the operation */
-    if (isCanceled(monitor, sourceDb, destinationDb))
+    if (isCanceled(monitor, useLargeBlockSize, sourceDb, destinationDb))
       return;
 
     /* Conditional Get */
@@ -1079,7 +1079,7 @@ public class DBManager {
     if (!allConditionalGets.isEmpty()) {
       int chunk = available / allConditionalGets.size();
       for (ConditionalGet conditionalGet : allConditionalGets) {
-        if (isCanceled(monitor, sourceDb, destinationDb))
+        if (isCanceled(monitor, useLargeBlockSize, sourceDb, destinationDb))
           return;
 
         sourceDb.activate(conditionalGet, Integer.MAX_VALUE);
@@ -1091,7 +1091,7 @@ public class DBManager {
       monitor.worked(available);
 
     /* User might have cancelled the operation */
-    if (isCanceled(monitor, sourceDb, destinationDb))
+    if (isCanceled(monitor, useLargeBlockSize, sourceDb, destinationDb))
       return;
 
     sourceDb.close();
@@ -1123,7 +1123,10 @@ public class DBManager {
     monitor.worked(DEFRAG_SUB_WORK_FINISH);
   }
 
-  private static boolean isCanceled(IProgressMonitor monitor, ObjectContainer source, ObjectContainer dest) {
+  private static boolean isCanceled(IProgressMonitor monitor, boolean useLargeBlockSize, ObjectContainer source, ObjectContainer dest) {
+    if (useLargeBlockSize)
+      return false; //Must not allow cancellation when migrating from small DB to 2 GB DB
+
     if (monitor.isCanceled()) {
       source.close();
       dest.close();
