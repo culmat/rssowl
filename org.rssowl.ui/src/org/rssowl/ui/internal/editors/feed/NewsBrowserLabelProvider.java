@@ -559,7 +559,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   /* Common CSS for Headlines Layout */
   private void writeCommonHeadlinesCSS(Writer writer) throws IOException {
 
-    /* Title (Collapsed) */
+    /* Title (Collapsed - Initially) */
     writer.append("div.title {  ").append(fNormalFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     writer.append("div.title a { color: black; text-decoration: none; }\n"); //$NON-NLS-1$
     writer.append("div.title a.unread { font-weight: bold; text-decoration: none; }\n"); //$NON-NLS-1$
@@ -572,6 +572,13 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.append("div.titleExpanded a.unread { font-weight: bold; text-decoration: none; }\n"); //$NON-NLS-1$
     writer.append("div.titleExpanded a:hover { ").append(fLinkFGColorCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     writer.append("div.titleExpanded a:visited { ").append(fLinkFGColorCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+
+    /* Title (Collapsed - By user) */
+    writer.append("div.titleCollapsed { ").append(fNormalFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("div.titleCollapsed a { color: rgb(80, 80, 80); text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.append("div.titleCollapsed a.unread { color: rgb(80, 80, 80); font-weight: bold; text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.append("div.titleCollapsed a:hover { color: rgb(80, 80, 80); text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.append("div.titleCollapsed a:visited { color: rgb(80, 80, 80); text-decoration: none; }\n"); //$NON-NLS-1$
 
     /* Subtitle */
     writer.append("a.subtitle { font-style: italic; text-decoration: none; padding-left: 10px; color: rgb(80, 80, 80); ").append(fVerySmallFontCSS).append(" }"); //$NON-NLS-1$ //$NON-NLS-2$
