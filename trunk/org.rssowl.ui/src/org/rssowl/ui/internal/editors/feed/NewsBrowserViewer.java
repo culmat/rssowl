@@ -902,7 +902,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     if (visible)
       js.append(getElementById(Dynamic.TITLE.getId(news))).append(".className='titleExpanded'; "); //$NON-NLS-1$
     else
-      js.append(getElementById(Dynamic.TITLE.getId(news))).append(".className='title'; "); //$NON-NLS-1$
+      js.append(getElementById(Dynamic.TITLE.getId(news))).append(".className='titleCollapsed'; "); //$NON-NLS-1$
 
     /* Update News Content as needed */
     if (visible) {
