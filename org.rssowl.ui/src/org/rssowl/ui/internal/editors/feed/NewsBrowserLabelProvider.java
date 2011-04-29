@@ -807,54 +807,26 @@ public class NewsBrowserLabelProvider extends LabelProvider {
         StringBuilder subtitleContent = new StringBuilder();
 
         /* Subtitle: Date */
-        {
-          Date newsDate = DateUtils.getRecentDate(news);
-          if (DateUtils.isAfterIncludingToday(newsDate, fTodayInMillies))
-            subtitleContent.append(fTimeFormat.format(newsDate));
-          else
-            subtitleContent.append(fDateFormat.format(newsDate));
-        }
+        fillDate(news, subtitleContent);
 
         /* Subtitle: Author */
-        {
-          IPerson author = news.getAuthor();
-          if (author != null) {
-            subtitleContent.append(" | "); //$NON-NLS-1$
-
-            String name = author.getName();
-            String email = (author.getEmail() != null) ? author.getEmail().toASCIIString() : null;
-            if (email != null && !email.contains("mail:")) //$NON-NLS-1$
-              email = "mailto:" + email; //$NON-NLS-1$
-
-            /* Use name as email if valid */
-            if (email == null && name.contains("@") && !name.contains(" ")) //$NON-NLS-1$ //$NON-NLS-2$
-              email = name;
-
-            if (StringUtils.isSet(name) && email != null)
-              link(subtitleContent, email, NLS.bind(Messages.NewsBrowserLabelProvider_BY_AUTHOR, StringUtils.htmlEscape(name)), "author"); //$NON-NLS-1$
-            else if (StringUtils.isSet(name))
-              subtitleContent.append(NLS.bind(Messages.NewsBrowserLabelProvider_BY_AUTHOR, StringUtils.htmlEscape(name)));
-            else if (email != null)
-              link(subtitleContent, email, NLS.bind(Messages.NewsBrowserLabelProvider_BY_AUTHOR, StringUtils.htmlEscape(email)), "author"); //$NON-NLS-1$
-            else
-              subtitleContent.append(Messages.NewsBrowserLabelProvider_UNKNOWN);
-          }
+        IPerson author = news.getAuthor();
+        if (author != null) {
+          subtitleContent.append(" | "); //$NON-NLS-1$
+          fillAuthor(subtitleContent, author);
         }
 
         /* Subtitle: Feed */
-        String feedLinkAsText = news.getFeedLinkAsText();
-        String feedName = fMapFeedLinkToName.get(feedLinkAsText);
-        if (feedName == null) {
-          IBookMark bm = CoreUtils.getBookMark(news.getFeedReference());
-          if (bm != null) {
-            feedName = StringUtils.htmlEscape(bm.getName());
-            fMapFeedLinkToName.put(feedLinkAsText, feedName);
-          }
-        }
-
+        String feedName = getFeedName(news);
         if (StringUtils.isSet(feedName)) {
           subtitleContent.append(" | "); //$NON-NLS-1$
           subtitleContent.append(feedName);
+        }
+
+        /* Subtitle: Labels */
+        if (!labels.isEmpty()) {
+          subtitleContent.append(" | "); //$NON-NLS-1$
+          fillLabels(subtitleContent, labels);
         }
 
         link(builder, link, subtitleContent.toString(), "subtitle", Dynamic.SUBTITLE_LINK.getId(news), "80, 80, 80"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -943,13 +915,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
     /* Date */
     builder.append("<td class=\"subline\">"); //$NON-NLS-1$
-
-    Date newsDate = DateUtils.getRecentDate(news);
-    if (DateUtils.isAfterIncludingToday(newsDate, fTodayInMillies))
-      builder.append(fTimeFormat.format(newsDate));
-    else
-      builder.append(fDateFormat.format(newsDate));
-
+    fillDate(news, builder);
     builder.append("</td>"); //$NON-NLS-1$
 
     /* Author */
@@ -960,42 +926,13 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       builder.append("</td>"); //$NON-NLS-1$
 
       builder.append("<td class=\"subline\">"); //$NON-NLS-1$
-      String name = author.getName();
-      String email = (author.getEmail() != null) ? author.getEmail().toASCIIString() : null;
-      if (email != null && !email.contains("mail:")) //$NON-NLS-1$
-        email = "mailto:" + email; //$NON-NLS-1$
-
-      /* Use name as email if valid */
-      if (email == null && name.contains("@") && !name.contains(" ")) //$NON-NLS-1$ //$NON-NLS-2$
-        email = name;
-
-      if (StringUtils.isSet(name) && email != null)
-        link(builder, email, NLS.bind(Messages.NewsBrowserLabelProvider_BY_AUTHOR, StringUtils.htmlEscape(name)), "author"); //$NON-NLS-1$
-      else if (StringUtils.isSet(name))
-        builder.append(NLS.bind(Messages.NewsBrowserLabelProvider_BY_AUTHOR, StringUtils.htmlEscape(name)));
-      else if (email != null)
-        link(builder, email, NLS.bind(Messages.NewsBrowserLabelProvider_BY_AUTHOR, StringUtils.htmlEscape(email)), "author"); //$NON-NLS-1$
-      else
-        builder.append(Messages.NewsBrowserLabelProvider_UNKNOWN);
-
+      fillAuthor(builder, author);
       builder.append("</td>"); //$NON-NLS-1$
     }
 
     /* Feed Information */
     if (showFeedInformation()) {
-
-      /* Retrieve Name */
-      String feedLinkAsText = news.getFeedLinkAsText();
-      String feedName = fMapFeedLinkToName.get(feedLinkAsText);
-      if (feedName == null) {
-        IBookMark bm = CoreUtils.getBookMark(news.getFeedReference());
-        if (bm != null) {
-          feedName = StringUtils.htmlEscape(bm.getName());
-          fMapFeedLinkToName.put(feedLinkAsText, feedName);
-        }
-      }
-
-      /* Show Name if Provided */
+      String feedName = getFeedName(news);
       if (StringUtils.isSet(feedName)) {
         builder.append("<td class=\"sublineseparator\">"); //$NON-NLS-1$
         builder.append("|"); //$NON-NLS-1$
@@ -1043,20 +980,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
     /* Labels */
     builder.append("<td id=\"").append(Dynamic.LABELS.getId(news)).append("\" class=\"subline\">"); //$NON-NLS-1$ //$NON-NLS-2$
-
-    if (!labels.isEmpty())
-      builder.append(Messages.NewsBrowserLabelProvider_LABELS).append(" "); //$NON-NLS-1$
-
-    /* Append Labels to Header */
-    int c = 0;
-    for (ILabel label : labels) {
-      c++;
-      if (c < labels.size())
-        span(builder, StringUtils.htmlEscape(label.getName()) + ", ", null, label.getColor()); //$NON-NLS-1$
-      else
-        span(builder, StringUtils.htmlEscape(label.getName()), null, label.getColor());
-    }
-
+    fillLabels(builder, labels);
     builder.append("</td>"); //$NON-NLS-1$
 
     /* Close: NewsItem/Header/Actions */
@@ -1210,6 +1134,62 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
     /* Highlight Support (if search is active) */
     return highlightSearchTermsIfNecessary(builder.toString());
+  }
+
+  private void fillDate(INews news, StringBuilder builder) {
+    Date newsDate = DateUtils.getRecentDate(news);
+    if (DateUtils.isAfterIncludingToday(newsDate, fTodayInMillies))
+      builder.append(fTimeFormat.format(newsDate));
+    else
+      builder.append(fDateFormat.format(newsDate));
+  }
+
+  private void fillAuthor(StringBuilder builder, IPerson author) {
+    String name = author.getName();
+    String email = (author.getEmail() != null) ? author.getEmail().toASCIIString() : null;
+    if (email != null && !email.contains("mail:")) //$NON-NLS-1$
+      email = "mailto:" + email; //$NON-NLS-1$
+
+    /* Use name as email if valid */
+    if (email == null && name.contains("@") && !name.contains(" ")) //$NON-NLS-1$ //$NON-NLS-2$
+      email = name;
+
+    if (StringUtils.isSet(name) && email != null)
+      link(builder, email, NLS.bind(Messages.NewsBrowserLabelProvider_BY_AUTHOR, StringUtils.htmlEscape(name)), "author"); //$NON-NLS-1$
+    else if (StringUtils.isSet(name))
+      builder.append(NLS.bind(Messages.NewsBrowserLabelProvider_BY_AUTHOR, StringUtils.htmlEscape(name)));
+    else if (email != null)
+      link(builder, email, NLS.bind(Messages.NewsBrowserLabelProvider_BY_AUTHOR, StringUtils.htmlEscape(email)), "author"); //$NON-NLS-1$
+    else
+      builder.append(Messages.NewsBrowserLabelProvider_UNKNOWN);
+  }
+
+  private String getFeedName(INews news) {
+    String feedLinkAsText = news.getFeedLinkAsText();
+    String feedName = fMapFeedLinkToName.get(feedLinkAsText);
+    if (feedName == null) {
+      IBookMark bm = CoreUtils.getBookMark(news.getFeedReference());
+      if (bm != null) {
+        feedName = StringUtils.htmlEscape(bm.getName());
+        fMapFeedLinkToName.put(feedLinkAsText, feedName);
+      }
+    }
+
+    return feedName;
+  }
+
+  private void fillLabels(StringBuilder builder, Set<ILabel> labels) {
+    if (!labels.isEmpty())
+      builder.append(Messages.NewsBrowserLabelProvider_LABELS).append(" "); //$NON-NLS-1$
+
+    int c = 0;
+    for (ILabel label : labels) {
+      c++;
+      if (c < labels.size())
+        span(builder, StringUtils.htmlEscape(label.getName()) + ", ", null, label.getColor()); //$NON-NLS-1$
+      else
+        span(builder, StringUtils.htmlEscape(label.getName()), null, label.getColor());
+    }
   }
 
   private void div(StringBuilder builder, String cssClass) {
