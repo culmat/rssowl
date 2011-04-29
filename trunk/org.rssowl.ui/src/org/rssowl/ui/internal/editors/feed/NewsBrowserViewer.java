@@ -627,6 +627,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
         /* Remove Focus from Link */
         blur(Dynamic.TOGGLE_STICKY_LINK.getId(news));
+        blur(Dynamic.TINY_TOGGLE_STICKY_LINK.getId(news), true);
 
         /* Toggle Sticky State */
         Set<INews> singleNewsSet = Collections.singleton(news);
@@ -868,6 +869,12 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     else
       js.append(getElementById(Dynamic.TITLE_LINK.getId(news)).append(".href='").append(link).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$
 
+    /* Update Toggle Sticky Link Visibility */
+    if (visible)
+      js.append(getElementById(Dynamic.TINY_TOGGLE_STICKY_LINK.getId(news))).append(".style.display='none'; "); //$NON-NLS-1$
+    else
+      js.append(getElementById(Dynamic.TINY_TOGGLE_STICKY_LINK.getId(news))).append(".style.display='inline'; "); //$NON-NLS-1$
+
     /* Update News Div Visibility */
     Set<Dynamic> elements = EnumSet.of(Dynamic.SUBLINE, Dynamic.DELETE, Dynamic.CONTENT, Dynamic.FOOTER);
     for (Dynamic element : elements) {
@@ -1040,8 +1047,17 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   }
 
   private void blur(String elementId) {
+    blur(elementId, false);
+  }
+
+  private void blur(String elementId, boolean guardNull) {
     StringBuilder js = new StringBuilder();
-    js.append(getElementById(elementId).append(".blur();")); //$NON-NLS-1$
+    if (guardNull) {
+      js.append("if (").append(getElementById(elementId)).append(" != null) {"); //$NON-NLS-1$ //$NON-NLS-2$
+      js.append(getElementById(elementId).append(".blur();")); //$NON-NLS-1$
+      js.append("}"); //$NON-NLS-1$
+    } else
+      js.append(getElementById(elementId).append(".blur();")); //$NON-NLS-1$
     fBrowser.execute(js.toString());
   }
 

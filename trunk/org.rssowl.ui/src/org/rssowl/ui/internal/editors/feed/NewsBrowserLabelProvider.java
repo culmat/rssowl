@@ -114,6 +114,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     DELETE("delete"), //$NON-NLS-1$
     TOGGLE_READ_LINK("toggleRead"), //$NON-NLS-1$
     TOGGLE_READ_IMG("toggleReadImg"), //$NON-NLS-1$
+    TINY_TOGGLE_STICKY_LINK("tinyToggleStickyLink"), //$NON-NLS-1$
     TOGGLE_STICKY_LINK("toggleStickyLink"), //$NON-NLS-1$
     TOGGLE_STICKY_IMG("toggleStickyImg"), //$NON-NLS-1$
     TOGGLE_GROUP_LINK("toggleGroupLink"), //$NON-NLS-1$
@@ -785,9 +786,15 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
       String cssClass = isUnread ? "unread" : "read"; //$NON-NLS-1$ //$NON-NLS-2$
 
-      /* Let click on Title expand news */
+      /* Collapsed Title Bar */
       if (fHeadlinesOnly) {
-        String link = HANDLER_PROTOCOL + EXPAND_NEWS_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
+
+        /* Make Sticky */
+        String link = HANDLER_PROTOCOL + TOGGLE_STICKY_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
+        imageLink(builder, link, Messages.NewsBrowserLabelProvider_STICKY, Messages.NewsBrowserLabelProvider_STICKY, "/icons/obj16/news_pin_light_tiny.gif", "news_pin_light_tiny.gif", Dynamic.TINY_TOGGLE_STICKY_LINK.getId(news), null); //$NON-NLS-1$//$NON-NLS-2$
+
+        /* Expand News when clicking on Title */
+        link = HANDLER_PROTOCOL + EXPAND_NEWS_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
         link(builder, link, newsTitle, cssClass, Dynamic.TITLE_LINK.getId(news), color);
       }
 
