@@ -558,7 +558,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   private void writeCommonHeadlinesCSS(Writer writer) throws IOException {
 
     /* Title (Collapsed) */
-    writer.append("div.title {  ").append(fBiggerFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("div.title {  ").append(fNormalFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     writer.append("div.title a { color: black; text-decoration: none; }\n"); //$NON-NLS-1$
     writer.append("div.title a.unread { font-weight: bold; text-decoration: none; }\n"); //$NON-NLS-1$
     writer.append("div.title a:hover { color: black; text-decoration: none; }\n"); //$NON-NLS-1$
