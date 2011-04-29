@@ -1124,10 +1124,13 @@ public class DBManager {
   }
 
   private static boolean isCanceled(IProgressMonitor monitor, boolean useLargeBlockSize, ObjectContainer source, ObjectContainer dest) {
-    if (useLargeBlockSize)
-      return false; //Must not allow cancellation when migrating from small DB to 2 GB DB
-
     if (monitor.isCanceled()) {
+      if (useLargeBlockSize) { //Must not allow cancellation when migrating from small DB to 2 GB DB
+        monitor.setTaskName(Messages.DBManager_WAIT_TASK_COMPLETION);
+        return false;
+      }
+
+      /* Otherwise close Object Containers */
       source.close();
       dest.close();
       return true;
