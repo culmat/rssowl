@@ -1169,11 +1169,21 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     String line;
     try {
       while ((line = reader.readLine()) != null) {
+
+        /* Escape single and double quotes */
         line = StringUtils.replaceAll(line, "\"", "\\\""); //$NON-NLS-1$ //$NON-NLS-2$
         line = StringUtils.replaceAll(line, "'", "\\'"); //$NON-NLS-1$ //$NON-NLS-2$
-        if (isIE) //IE: Escape newlines using backslash in JS
+
+        /* XULRunner: Need to escape % with its ASCII HEX counterpart as XUL decodes it */
+        if (CBrowser.isMozillaRunningOnWindows())
+          line = StringUtils.replaceAll(line, "%", "%25"); //$NON-NLS-1$ //$NON-NLS-2$
+
+        /* IE: Escape newlines using backslash in JS */
+        if (isIE)
           result.append(line.trim()).append("\\").append(fNl); //$NON-NLS-1$
-        else //Others: Normalize newlines to whitespaces
+
+        /* Others: Normalize newlines to whitespaces */
+        else
           result.append(line.trim()).append(" "); //$NON-NLS-1$
       }
     } catch (IOException e) {
