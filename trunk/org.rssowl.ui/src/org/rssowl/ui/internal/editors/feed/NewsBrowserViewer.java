@@ -875,6 +875,12 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     else
       js.append(getElementById(Dynamic.TINY_TOGGLE_STICKY_LINK.getId(news))).append(".style.display='inline'; "); //$NON-NLS-1$
 
+    /* Update Subtitle if present */
+    if (visible)
+      js.append(getElementById(Dynamic.SUBTITLE_LINK.getId(news))).append(".style.display='none'; "); //$NON-NLS-1$
+    else
+      js.append(getElementById(Dynamic.SUBTITLE_LINK.getId(news))).append(".style.display='inline'; "); //$NON-NLS-1$
+
     /* Update News Div Visibility */
     Set<Dynamic> elements = EnumSet.of(Dynamic.SUBLINE, Dynamic.DELETE, Dynamic.CONTENT, Dynamic.FOOTER);
     for (Dynamic element : elements) {
