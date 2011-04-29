@@ -824,10 +824,12 @@ public class NewsBrowserLabelProvider extends LabelProvider {
         }
 
         /* Subtitle: Feed */
-        String feedName = getFeedName(news);
-        if (StringUtils.isSet(feedName)) {
-          subtitleContent.append(" | "); //$NON-NLS-1$
-          subtitleContent.append(feedName);
+        if (showFeedInformation()) {
+          String feedName = getFeedName(news);
+          if (StringUtils.isSet(feedName)) {
+            subtitleContent.append(" | "); //$NON-NLS-1$
+            subtitleContent.append(feedName);
+          }
         }
 
         /* Subtitle: Labels */
