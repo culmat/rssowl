@@ -1791,72 +1791,84 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   }
 
   private boolean internalUpdate(Set<NewsEvent> newsEvents) {
-    StringBuilder js = new StringBuilder();
+    boolean toggleJS = fBrowser.shouldDisableScript();
+    try {
+      if (toggleJS)
+        fBrowser.setScriptDisabled(false);
 
-    /* Update for each Event */
-    for (NewsEvent newsEvent : newsEvents) {
-      INews news = newsEvent.getEntity();
+      /* Update for each Event */
+      for (NewsEvent newsEvent : newsEvents) {
+        INews news = newsEvent.getEntity();
+        StringBuilder js = new StringBuilder();
 
-      /* State (Bold/Plain Title, Mark Read Tooltip) */
-      if (CoreUtils.isStateChange(newsEvent)) {
-        String markRead = Messages.NewsBrowserViewer_MARK_READ;
-        String markUnread = Messages.NewsBrowserViewer_MARK_UNREAD;
+        /* State (Bold/Plain Title, Mark Read Tooltip) */
+        if (CoreUtils.isStateChange(newsEvent)) {
+          String markRead = Messages.NewsBrowserViewer_MARK_READ;
+          String markUnread = Messages.NewsBrowserViewer_MARK_UNREAD;
 
-        boolean isRead = (INews.State.READ == news.getState());
-        js.append(getElementById(Dynamic.NEWS.getId(news)).append(isRead ? ".className='newsitemRead'; " : ".className='newsitemUnread'; ")); //$NON-NLS-1$ //$NON-NLS-2$
-        js.append(getElementById(Dynamic.TITLE_LINK.getId(news)).append(isRead ? ".className='read'; " : ".className='unread'; ")); //$NON-NLS-1$ //$NON-NLS-2$
-        js.append(getElementById(Dynamic.TOGGLE_READ_LINK.getId(news)).append(isRead ? ".title='" + markUnread + "'; " : ".title='" + markRead + "'; ")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-        js.append(getElementById(Dynamic.TOGGLE_READ_IMG.getId(news)).append(isRead ? ".alt='" + markUnread + "'; " : ".alt='" + markRead + "'; ")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-      }
+          boolean isRead = (INews.State.READ == news.getState());
+          js.append(getElementById(Dynamic.NEWS.getId(news)).append(isRead ? ".className='newsitemRead'; " : ".className='newsitemUnread'; ")); //$NON-NLS-1$ //$NON-NLS-2$
+          js.append(getElementById(Dynamic.TITLE_LINK.getId(news)).append(isRead ? ".className='read'; " : ".className='unread'; ")); //$NON-NLS-1$ //$NON-NLS-2$
+          js.append(getElementById(Dynamic.TOGGLE_READ_LINK.getId(news)).append(isRead ? ".title='" + markUnread + "'; " : ".title='" + markRead + "'; ")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+          js.append(getElementById(Dynamic.TOGGLE_READ_IMG.getId(news)).append(isRead ? ".alt='" + markUnread + "'; " : ".alt='" + markRead + "'; ")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+        }
 
-      /* Sticky (Title Background, Footer Background, Mark Sticky Image) */
-      if (CoreUtils.isStickyStateChange(newsEvent)) {
-        boolean isSticky = news.isFlagged();
-        js.append(getElementById(Dynamic.HEADER.getId(news)).append(isSticky ? ".className='headerSticky'; " : ".className='header'; ")); //$NON-NLS-1$ //$NON-NLS-2$
-        js.append(getElementById(Dynamic.FOOTER.getId(news)).append(isSticky ? ".className='footerSticky'; " : ".className='footer'; ")); //$NON-NLS-1$ //$NON-NLS-2$
+        /* Sticky (Title Background, Footer Background, Mark Sticky Image) */
+        if (CoreUtils.isStickyStateChange(newsEvent)) {
+          boolean isSticky = news.isFlagged();
+          js.append(getElementById(Dynamic.HEADER.getId(news)).append(isSticky ? ".className='headerSticky'; " : ".className='header'; ")); //$NON-NLS-1$ //$NON-NLS-2$
+          js.append(getElementById(Dynamic.FOOTER.getId(news)).append(isSticky ? ".className='footerSticky'; " : ".className='footer'; ")); //$NON-NLS-1$ //$NON-NLS-2$
 
-        String stickyImgUri;
-        if (fBrowser.isIE())
-          stickyImgUri = isSticky ? OwlUI.getImageUri("/icons/obj16/news_pinned_light.gif", "news_pinned_light.gif") : OwlUI.getImageUri("/icons/obj16/news_pin_light.gif", "news_pin_light.gif"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-        else
-          stickyImgUri = isSticky ? ApplicationServer.getDefault().toResourceUrl("/icons/obj16/news_pinned_light.gif") : ApplicationServer.getDefault().toResourceUrl("/icons/obj16/news_pin_light.gif"); //$NON-NLS-1$ //$NON-NLS-2$
+          String stickyImgUri;
+          if (fBrowser.isIE())
+            stickyImgUri = isSticky ? OwlUI.getImageUri("/icons/obj16/news_pinned_light.gif", "news_pinned_light.gif") : OwlUI.getImageUri("/icons/obj16/news_pin_light.gif", "news_pin_light.gif"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+          else
+            stickyImgUri = isSticky ? ApplicationServer.getDefault().toResourceUrl("/icons/obj16/news_pinned_light.gif") : ApplicationServer.getDefault().toResourceUrl("/icons/obj16/news_pin_light.gif"); //$NON-NLS-1$ //$NON-NLS-2$
 
-        js.append(getElementById(Dynamic.TOGGLE_STICKY_IMG.getId(news)).append(".src='").append(stickyImgUri).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$
-      }
+          js.append(getElementById(Dynamic.TOGGLE_STICKY_IMG.getId(news)).append(".src='").append(stickyImgUri).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$
+        }
 
-      /* Label (Title Foreground, Label List) */
-      if (CoreUtils.isLabelChange(newsEvent)) {
-        Set<ILabel> labels = CoreUtils.getSortedLabels(news);
-        String defaultColor = CoreUtils.getLink(news) != null ? "#009" : "rgb(0,0,0)"; //$NON-NLS-1$ //$NON-NLS-2$
-        String color = (labels.isEmpty()) ? defaultColor : "rgb(" + OwlUI.toString(OwlUI.getRGB(labels.iterator().next())) + ")"; //$NON-NLS-1$ //$NON-NLS-2$
-        if ("rgb(0,0,0)".equals(color)) //Don't let black override link color //$NON-NLS-1$
-          color = defaultColor;
-        js.append(getElementById(Dynamic.TITLE_LINK.getId(news)).append(".style.color='").append(color).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$
+        /* Label (Title Foreground, Label List) */
+        if (CoreUtils.isLabelChange(newsEvent)) {
+          Set<ILabel> labels = CoreUtils.getSortedLabels(news);
+          String defaultColor = CoreUtils.getLink(news) != null ? "#009" : "rgb(0,0,0)"; //$NON-NLS-1$ //$NON-NLS-2$
+          String color = (labels.isEmpty()) ? defaultColor : "rgb(" + OwlUI.toString(OwlUI.getRGB(labels.iterator().next())) + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+          if ("rgb(0,0,0)".equals(color)) //Don't let black override link color //$NON-NLS-1$
+            color = defaultColor;
+          js.append(getElementById(Dynamic.TITLE_LINK.getId(news)).append(".style.color='").append(color).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$
 
-        if (labels.isEmpty()) {
-          js.append(getElementById(Dynamic.LABELS_SEPARATOR.getId(news)).append(".style.display='none'; ")); //$NON-NLS-1$
-          js.append(getElementById(Dynamic.LABELS.getId(news)).append(".innerHTML=''; ")); //$NON-NLS-1$
-        } else {
-          js.append(getElementById(Dynamic.LABELS_SEPARATOR.getId(news)).append(".style.display='inline'; ")); //$NON-NLS-1$
+          if (labels.isEmpty()) {
+            js.append(getElementById(Dynamic.LABELS_SEPARATOR.getId(news)).append(".style.display='none'; ")); //$NON-NLS-1$
+            js.append(getElementById(Dynamic.LABELS.getId(news)).append(".innerHTML=''; ")); //$NON-NLS-1$
+          } else {
+            js.append(getElementById(Dynamic.LABELS_SEPARATOR.getId(news)).append(".style.display='inline'; ")); //$NON-NLS-1$
 
-          StringBuilder labelsHtml = new StringBuilder(Messages.NewsBrowserViewer_LABELS);
-          labelsHtml.append(" "); //$NON-NLS-1$
-          int c = 0;
-          for (ILabel label : labels) {
-            c++;
-            if (c < labels.size())
-              span(labelsHtml, StringUtils.htmlEscape(label.getName()) + ", ", label.getColor()); //$NON-NLS-1$
-            else
-              span(labelsHtml, StringUtils.htmlEscape(label.getName()), label.getColor());
+            StringBuilder labelsHtml = new StringBuilder(Messages.NewsBrowserViewer_LABELS);
+            labelsHtml.append(" "); //$NON-NLS-1$
+            int c = 0;
+            for (ILabel label : labels) {
+              c++;
+              if (c < labels.size())
+                span(labelsHtml, StringUtils.htmlEscape(label.getName()) + ", ", label.getColor()); //$NON-NLS-1$
+              else
+                span(labelsHtml, StringUtils.htmlEscape(label.getName()), label.getColor());
+            }
+
+            js.append(getElementById(Dynamic.LABELS.getId(news)).append(".innerHTML='").append(labelsHtml.toString()).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$
           }
+        }
 
-          js.append(getElementById(Dynamic.LABELS.getId(news)).append(".innerHTML='").append(labelsHtml.toString()).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$
+        /* Execute */
+        if (js.length() > 0) {
+          boolean res = fBrowser.getControl().execute(js.toString());
+          if (!res)
+            return false;
         }
       }
+    } finally {
+      if (toggleJS)
+        fBrowser.setScriptDisabled(true);
     }
-
-    if (js.length() > 0)
-      return fBrowser.execute(js.toString());
 
     return true;
   }
