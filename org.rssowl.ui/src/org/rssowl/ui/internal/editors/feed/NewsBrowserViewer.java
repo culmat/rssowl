@@ -157,6 +157,9 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   static final String TRANSFORM_HANDLER_ID = "org.rssowl.ui.TransformNews"; //$NON-NLS-1$
   static final String RELATED_NEWS_MENU_HANDLER_ID = "org.rssowl.ui.RelatedNewsMenu"; //$NON-NLS-1$
 
+  /* Unique identifier of the <body> element */
+  private static final String BODY_ELEMENT_ID = "owlbody"; //$NON-NLS-1$
+
   private Object fInput;
   private CBrowser fBrowser;
   private IWorkbenchPartSite fSite;
@@ -1870,6 +1873,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   private boolean internalRemove(Object[] elements) {
     StringBuilder js = new StringBuilder();
 
+    boolean varDefined = false;
     Set<Long> groupsToUpdate = new HashSet<Long>();
     for (Object element : elements) {
       if (element instanceof INews) {
@@ -1893,15 +1897,21 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
           }
         }
 
-        /* Set News Hidden */
-        js.append("var node = ").append(getElementById(Dynamic.NEWS.getId(news))).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
+        /* Remove News from DOM */
+        if (!varDefined) {
+          js.append("var "); //$NON-NLS-1$
+          varDefined = true;
+        }
+
+        js.append("node = ").append(getElementById(Dynamic.NEWS.getId(news))).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
         js.append("if (node != null) { "); //$NON-NLS-1$
-        js.append("node.style.display='none'; "); //$NON-NLS-1$
+        js.append(getElementById(BODY_ELEMENT_ID)).append(".removeChild(node); "); //$NON-NLS-1$
         js.append("} "); //$NON-NLS-1$
 
         /* Hide Separator if using headlines layout */
-        js.append("if (").append(getElementById(Dynamic.HEADLINE_SEPARATOR.getId(news))).append(" != null) {"); //$NON-NLS-1$ //$NON-NLS-2$
-        js.append(getElementById(Dynamic.HEADLINE_SEPARATOR.getId(news))).append(".style.display='none'; "); //$NON-NLS-1$
+        js.append("node = ").append(getElementById(Dynamic.HEADLINE_SEPARATOR.getId(news))).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
+        js.append("if (node != null) { "); //$NON-NLS-1$
+        js.append(getElementById(BODY_ELEMENT_ID)).append(".removeChild(node); "); //$NON-NLS-1$
         js.append("}"); //$NON-NLS-1$
       }
     }
@@ -1910,11 +1920,11 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     IBaseLabelProvider labelProvider = getLabelProvider();
     for (Long groupId : groupsToUpdate) {
 
-      /* Group is empty now: Hide it */
+      /* Group is empty now: Remove it from DOM */
       if (!fMapEntityGroupToNews.containsKey(groupId)) {
         js.append("node = ").append(getElementById(Dynamic.GROUP.getId(groupId))).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
         js.append("if (node != null) { "); //$NON-NLS-1$
-        js.append("node.style.display='none'; "); //$NON-NLS-1$
+        js.append(getElementById(BODY_ELEMENT_ID)).append(".removeChild(node); "); //$NON-NLS-1$
         js.append("} "); //$NON-NLS-1$
       }
 
