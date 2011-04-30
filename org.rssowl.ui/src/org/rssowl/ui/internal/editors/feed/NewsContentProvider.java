@@ -35,6 +35,7 @@ import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.ISearchMark;
@@ -60,12 +61,14 @@ import org.rssowl.ui.internal.EntityGroupItem;
 import org.rssowl.ui.internal.FolderNewsMark;
 import org.rssowl.ui.internal.FolderNewsMark.FolderNewsMarkReference;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.editors.feed.NewsFilter.Type;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.UIBackgroundJob;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -268,7 +271,15 @@ public class NewsContentProvider implements ITreeContentProvider {
 
     /* Special-case marks that can retrieve newsRefs cheaply */
     if (input.isGetNewsRefsEfficient()) {
-      for (NewsReference newsRef : input.getNewsRefs(INews.State.getVisible())) {
+      Set<State> states;
+      if (fFilter.getType() == Type.SHOW_NEW)
+        states = EnumSet.of(INews.State.NEW);
+      else if (fFilter.getType() == Type.SHOW_UNREAD)
+        states = EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED);
+      else
+        states = INews.State.getVisible();
+
+      for (NewsReference newsRef : input.getNewsRefs(states)) {
 
         /* Avoid to resolve an already shown News */
         if (onlyAdd && hasCachedNews(newsRef))
