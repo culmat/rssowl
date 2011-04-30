@@ -802,26 +802,33 @@ public class FilterBar {
   }
 
   void doFilter(final NewsFilter.Type type, boolean refresh, boolean saveSettings) {
-    boolean noChange = fFeedView.getFilter().getType() == type;
+    Type oldType = fFeedView.getFilter().getType();
+    boolean noChange = (oldType == type);
 
+    /* Remember last filter type */
     if (type != Type.SHOW_ALL)
       fLastFilterType = type;
     else if (fFeedView.getFilter().getType() != Type.SHOW_ALL)
-      fLastFilterType = fFeedView.getFilter().getType();
-
-    fFeedView.getFilter().setType(type);
-    fFilterGroupingToolBarManager.find(FILTER_ACTION).update();
+      fLastFilterType = oldType;
 
     /* No need to refresh or save settings if nothing changed */
     if (noChange)
       return;
 
+    /* Apply Type */
+    fFeedView.getFilter().setType(type);
+    fFilterGroupingToolBarManager.find(FILTER_ACTION).update();
+
     /* Refresh if set */
     if (refresh) {
-      NewsTableControl newsTable = fFeedView.getNewsTableControl();
-      boolean isNewsTableVisible = fFeedView.isTableViewerVisible();
+
+      /* Filter has changed - ask Feedview to revalidate caches if necessary */
+      if (needsCacheRevalidation(oldType, type))
+        fFeedView.revalidateCaches();
 
       /* Only Refresh Table as Browser shows single News */
+      NewsTableControl newsTable = fFeedView.getNewsTableControl();
+      boolean isNewsTableVisible = fFeedView.isTableViewerVisible();
       if (newsTable != null && isNewsTableVisible)
         fFeedView.refreshTableViewer(true, false);
 
@@ -836,6 +843,19 @@ public class FilterBar {
     /* Update Settings */
     if (saveSettings)
       saveIntegerValue(DefaultPreferences.BM_NEWS_FILTERING, type.ordinal());
+  }
+
+  private boolean needsCacheRevalidation(Type oldType, Type newType) {
+    if (oldType == newType)
+      return false;
+
+    if (oldType == Type.SHOW_NEW)
+      return true;
+
+    if (oldType == Type.SHOW_UNREAD && newType != Type.SHOW_NEW)
+      return true;
+
+    return false;
   }
 
   private void doSearch(final NewsFilter.SearchTarget target) {

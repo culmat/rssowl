@@ -2090,6 +2090,20 @@ public class FeedView extends EditorPart implements IReusableEditor {
     setInput(fInput.getMark(), false);
   }
 
+  /*
+   * This method is currently only being used when the news filter was changed and
+   * the input is of type news bin or search mark. In this case, the cache is clever
+   * enough to not resolve all news, but only the ones necessary from the used filter.
+   *
+   * However, if the filter changes, the feed view needs to ensure the cache is up to
+   * date in case more elements are now visible. Thus, the cache is refreshed, but
+   * only for added news that have not been there previously.
+   */
+  void revalidateCaches() {
+    if (fInput.getMark().isGetNewsRefsEfficient())
+      fContentProvider.refreshCache(fInput.getMark(), true);
+  }
+
   /**
    * Navigate to the next/previous read or unread News respecting the News-Items
    * that are displayed in the NewsTableControl.
