@@ -821,32 +821,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
         /* Subtitle */
         StringBuilder subtitleContent = new StringBuilder();
-
-        /* Subtitle: Date */
-        fillDate(news, subtitleContent);
-
-        /* Subtitle: Author */
-        IPerson author = news.getAuthor();
-        if (author != null) {
-          subtitleContent.append(" | "); //$NON-NLS-1$
-          fillAuthor(subtitleContent, author);
-        }
-
-        /* Subtitle: Feed */
-        if (showFeedInformation()) {
-          String feedName = getFeedName(news);
-          if (StringUtils.isSet(feedName)) {
-            subtitleContent.append(" | "); //$NON-NLS-1$
-            subtitleContent.append(feedName);
-          }
-        }
-
-        /* Subtitle: Labels */
-        if (!labels.isEmpty()) {
-          subtitleContent.append(" | "); //$NON-NLS-1$
-          fillLabels(subtitleContent, labels);
-        }
-
+        fillSubtitle(subtitleContent, news, labels);
         link(builder, link, subtitleContent.toString(), "subtitle", Dynamic.SUBTITLE_LINK.getId(news), "80, 80, 80"); //$NON-NLS-1$ //$NON-NLS-2$
       }
 
@@ -1152,6 +1127,34 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
     /* Highlight Support (if search is active) */
     return highlightSearchTermsIfNecessary(builder.toString());
+  }
+
+  void fillSubtitle(StringBuilder subtitleContent, INews news, Set<ILabel> labels) {
+
+    /* Subtitle: Date */
+    fillDate(news, subtitleContent);
+
+    /* Subtitle: Author */
+    IPerson author = news.getAuthor();
+    if (author != null) {
+      subtitleContent.append(" | "); //$NON-NLS-1$
+      fillAuthor(subtitleContent, author);
+    }
+
+    /* Subtitle: Feed */
+    if (showFeedInformation()) {
+      String feedName = getFeedName(news);
+      if (StringUtils.isSet(feedName)) {
+        subtitleContent.append(" | "); //$NON-NLS-1$
+        subtitleContent.append(feedName);
+      }
+    }
+
+    /* Subtitle: Labels */
+    if (!labels.isEmpty()) {
+      subtitleContent.append(" | "); //$NON-NLS-1$
+      fillLabels(subtitleContent, labels);
+    }
   }
 
   private void fillDate(INews news, StringBuilder builder) {

@@ -878,8 +878,15 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     /* Update Subtitle if present */
     if (visible)
       js.append(getElementById(Dynamic.SUBTITLE_LINK.getId(news))).append(".style.display='none'; "); //$NON-NLS-1$
-    else
+    else {
+      StringBuilder subtitleContent = new StringBuilder();
+      IBaseLabelProvider lp = getLabelProvider();
+      if (lp instanceof NewsBrowserLabelProvider)
+        ((NewsBrowserLabelProvider) lp).fillSubtitle(subtitleContent, news, CoreUtils.getSortedLabels(news));
+      if (subtitleContent.length() > 0)
+        js.append(getElementById(Dynamic.SUBTITLE_LINK.getId(news))).append(".innerHTML='").append(escapeForInnerHtml(subtitleContent.toString())).append("'; "); //$NON-NLS-1$ //$NON-NLS-2$
       js.append(getElementById(Dynamic.SUBTITLE_LINK.getId(news))).append(".style.display='inline'; "); //$NON-NLS-1$
+    }
 
     /* Update News Div Visibility */
     Set<Dynamic> elements = EnumSet.of(Dynamic.SUBLINE, Dynamic.DELETE, Dynamic.CONTENT, Dynamic.FOOTER);
