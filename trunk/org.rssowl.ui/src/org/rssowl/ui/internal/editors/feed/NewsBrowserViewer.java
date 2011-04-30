@@ -1891,6 +1891,11 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
         js.append("if (node != null) { "); //$NON-NLS-1$
         js.append("node.style.display='none'; "); //$NON-NLS-1$
         js.append("} "); //$NON-NLS-1$
+
+        /* Hide Separator if using headlines layout */
+        js.append("if (").append(getElementById(Dynamic.HEADLINE_SEPARATOR.getId(news))).append(" != null) {"); //$NON-NLS-1$ //$NON-NLS-2$
+        js.append(getElementById(Dynamic.HEADLINE_SEPARATOR.getId(news))).append(".style.display='none'; "); //$NON-NLS-1$
+        js.append("}"); //$NON-NLS-1$
       }
     }
 
