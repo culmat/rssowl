@@ -108,6 +108,8 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   /* Dynamic HTML in Content */
   enum Dynamic {
     NEWS("newsitem"), //$NON-NLS-1$
+    GROUP("group"), //$NON-NLS-1$
+    GROUP_NOTE("groupNote"), //$NON-NLS-1$
     TITLE("title"), //$NON-NLS-1$
     TITLE_LINK("titleLink"), //$NON-NLS-1$
     SUBTITLE_LINK("subtitleLink"), //$NON-NLS-1$
@@ -492,7 +494,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.append("div.group a { color: #678; ").append(fBiggestFontCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     writer.append("div.group a:hover { color: #678; ").append(fBiggestFontCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     writer.append("div.group a:visited { color: #678; ").append(fBiggestFontCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
-    writer.append("span.groupNote { ").append(fNormalFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("span.groupNote { margin-left: 5px; ").append(fNormalFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* Content */
     writer.append("div.content { \n"); //$NON-NLS-1$
@@ -696,9 +698,9 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
     /* DIV: Group */
     if (groupColor == null)
-      div(builder, "group"); //$NON-NLS-1$
+      div(builder, "group", Dynamic.GROUP.getId(group)); //$NON-NLS-1$
     else
-      div(builder, "group", "border-bottom-color: rgb(" + groupColor + ");", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      div(builder, "group", "border-bottom-color: rgb(" + groupColor + ");", Dynamic.GROUP.getId(group)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
     /* Let the group name be a link to invoke actions on all news inside and provide a toggle */
     if (withInternalLinks) {
@@ -718,27 +720,34 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     }
 
     /* Group Note (number of articles and filtered elements if any) */
-    int sizeHint = group.getSizeHint();
-    int sizeDiff = group.getEntities().size() - sizeHint;
+    int actualSize = group.getSizeHint();
+    int totalSize = group.getEntities().size();
+    String groupNote = getGroupNote(actualSize, totalSize);
+    span(builder, groupNote, "groupNote", Dynamic.GROUP_NOTE.getId(group), groupColor); //$NON-NLS-1$
+
+    /* Close: Group */
+    close(builder, "div"); //$NON-NLS-1$
+
+    return builder.toString();
+  }
+
+  String getGroupNote(int actualSize, int totalSize) {
+    int sizeDiff = totalSize - actualSize;
+
     String groupNote;
-    if (sizeHint == 1) {
+    if (actualSize == 1) {
       if (sizeDiff == 0)
         groupNote = Messages.NewsBrowserLabelProvider_ONE_ARTICLE;
       else
         groupNote = NLS.bind(Messages.NewsBrowserLabelProvider_ONE_ARTICLE_N_FILTERED, sizeDiff);
     } else {
       if (sizeDiff == 0)
-        groupNote = NLS.bind(Messages.NewsBrowserLabelProvider_N_ARTICLES, sizeHint);
+        groupNote = NLS.bind(Messages.NewsBrowserLabelProvider_N_ARTICLES, actualSize);
       else
-        groupNote = NLS.bind(Messages.NewsBrowserLabelProvider_N_ARTICLES_M_FILTERED, sizeHint, sizeDiff);
+        groupNote = NLS.bind(Messages.NewsBrowserLabelProvider_N_ARTICLES_M_FILTERED, actualSize, sizeDiff);
     }
 
-    span(builder, groupNote, "groupNote", null, groupColor); //$NON-NLS-1$
-
-    /* Close: Group */
-    close(builder, "div"); //$NON-NLS-1$
-
-    return builder.toString();
+    return groupNote;
   }
 
   private StringBuilder getBuilder(INews news, String description) {

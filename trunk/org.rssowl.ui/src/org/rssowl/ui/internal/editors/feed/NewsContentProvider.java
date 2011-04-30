@@ -763,21 +763,17 @@ public class NewsContentProvider implements ITreeContentProvider {
       fCachedNews.removeAll(deletedNews);
     }
 
-    /* Return early if refresh is required anyways */
-    if (fGrouping.needsRefresh(events, false))
+    /* Only refresh if grouping requires this from table viewer */
+    if (isGroupingEnabled() && fFeedView.isTableViewerVisible() && fGrouping.needsRefresh(events, false))
       return true;
 
-    /* Grouping Disabled */
-    if (!isGroupingEnabled()) {
+    /* Otherwise: Remove from Table-Viewer */
+    if (fFeedView.isTableViewerVisible())
+      fTableViewer.remove(deletedNews.toArray());
 
-      /* Remove from Table-Viewer */
-      if (fFeedView.isTableViewerVisible())
-        fTableViewer.remove(deletedNews.toArray());
-
-      /* Remove from Browser-Viewer */
-      if (fFeedView.isBrowserViewerVisible() && contains(fBrowserViewer.getInput(), deletedNews))
-        fBrowserViewer.remove(deletedNews.toArray());
-    }
+    /* And: Remove from Browser-Viewer */
+    if (fFeedView.isBrowserViewerVisible() && contains(fBrowserViewer.getInput(), deletedNews))
+      fBrowserViewer.remove(deletedNews.toArray());
 
     return false;
   }
