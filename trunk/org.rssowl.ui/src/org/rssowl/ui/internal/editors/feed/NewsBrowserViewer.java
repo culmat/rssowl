@@ -849,6 +849,10 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   }
 
   private void setNewsExpanded(INews news, boolean expanded) {
+    setNewsExpanded(news, expanded, true);
+  }
+
+  private void setNewsExpanded(INews news, boolean expanded, boolean scrollIntoView) {
 
     /* Return early if visibility already matches state */
     if (expanded == fViewModel.isExpanded(news))
@@ -946,7 +950,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     }
 
     /* Scroll expanded news into view as necessary */
-    if (expanded)
+    if (scrollIntoView && expanded)
       scrollIfNecessary(news, js);
 
     /* Collapse other visible news if present */
@@ -997,6 +1001,10 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   }
 
   private void setGroupExpanded(long groupId, List<Long> newsIds, boolean expanded) {
+    setGroupExpanded(groupId, newsIds, expanded, true);
+  }
+
+  private void setGroupExpanded(long groupId, List<Long> newsIds, boolean expanded, boolean scrollIntoView) {
 
     /* Image */
     StringBuilder js = new StringBuilder();
@@ -1042,7 +1050,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     }
 
     /* Scroll expanded group into view as necessary */
-    if (expanded && !newsIds.isEmpty()) {
+    if (scrollIntoView && expanded && !newsIds.isEmpty()) {
       if (fBrowser.isIE()) {
         js.append("var scrollPosY = document.body.scrollTop; "); //$NON-NLS-1$
         js.append("var windowHeight = document.body.clientHeight; "); //$NON-NLS-1$
@@ -1608,16 +1616,19 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       /* Group */
       Long groupId = fViewModel.findGroup(targetNews);
       if (groupId != -1 && !fViewModel.isGroupExpanded(groupId))
-        setGroupExpanded(groupId, fViewModel.getNewsIds(groupId), true);
+        setGroupExpanded(groupId, fViewModel.getNewsIds(groupId), true, false);
 
       /* News */
-      setNewsExpanded(DynamicDAO.load(INews.class, targetNews), true);
+      setNewsExpanded(DynamicDAO.load(INews.class, targetNews), true, false);
+      StringBuilder js = new StringBuilder();
+      js.append(getElementById(Dynamic.NEWS.getId(targetNews))).append(".scrollIntoView(true); "); //$NON-NLS-1$
+      fBrowser.execute(js.toString());
     }
 
     /* If navigation did not find a suitable target, call the outer navigation function */
     else {
       StringBuilder js = new StringBuilder();
-      js.append("  window.location.href = \"").append(ILinkHandler.HANDLER_PROTOCOL + getNavigationActionId(next, unread)).append("\"; "); //$NON-NLS-1$ //$NON-NLS-2$
+      js.append("window.location.href = \"").append(ILinkHandler.HANDLER_PROTOCOL + getNavigationActionId(next, unread)).append("\"; "); //$NON-NLS-1$ //$NON-NLS-2$
       fBrowser.execute(js.toString());
     }
   }
