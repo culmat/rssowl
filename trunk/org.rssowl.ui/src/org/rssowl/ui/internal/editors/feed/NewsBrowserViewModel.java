@@ -28,24 +28,28 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.ui.internal.EntityGroup;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The news view model is a representation of the visible news in the
  * {@link NewsBrowserViewer}. This includes groups (if enabled), sorting and
  * other UI related state.
- *
+ * <p>
+ * The model is safe to be used from multiple threads.
+ * </p>
+ * 
  * @author bpasero
  */
 class NewsBrowserViewModel {
   private final List<Item> fItemList = new ArrayList<NewsBrowserViewModel.Item>();
-  private final Map<Long, Item> fItemMap = new ConcurrentHashMap<Long, NewsBrowserViewModel.Item>();
-  private final Map<Long, List<Long>> fEntityGroupToNewsMap = new ConcurrentHashMap<Long, List<Long>>();
+  private final Map<Long, Item> fItemMap = new HashMap<Long, NewsBrowserViewModel.Item>();
+  private final Map<Long, List<Long>> fEntityGroupToNewsMap = new HashMap<Long, List<Long>>();
   private final Set<Long> fExpandedNews = new HashSet<Long>();
+  private final Object fLock = new Object();
 
   /* Base Class of all Items in the Model */
   static class Item {
@@ -95,78 +99,91 @@ class NewsBrowserViewModel {
   }
 
   void setInput(Object[] elements) {
+    synchronized (fLock) {
 
-    /* Clear Caches */
-    clear();
+      /* Clear Caches */
+      fItemList.clear();
+      fItemMap.clear();
+      fEntityGroupToNewsMap.clear();
+      fExpandedNews.clear();
 
-    /* Build the Model based on the Elements */
-    List<Long> currentGroupEntryList = null;
-    for (Object element : elements) {
-      Item entry = null;
+      /* Build the Model based on the Elements */
+      List<Long> currentGroupEntryList = null;
+      for (Object element : elements) {
+        Item entry = null;
 
-      /* Entity Group */
-      if (element instanceof EntityGroup) {
-        EntityGroup group = (EntityGroup) element;
-        entry = new Group(group.getId());
+        /* Entity Group */
+        if (element instanceof EntityGroup) {
+          EntityGroup group = (EntityGroup) element;
+          entry = new Group(group.getId());
 
-        currentGroupEntryList = new ArrayList<Long>();
-        fEntityGroupToNewsMap.put(group.getId(), currentGroupEntryList);
-      }
+          currentGroupEntryList = new ArrayList<Long>();
+          fEntityGroupToNewsMap.put(group.getId(), currentGroupEntryList);
+        }
 
-      /* News Item */
-      else if (element instanceof INews) {
-        INews news = (INews) element;
-        entry = new Item(news.getId());
+        /* News Item */
+        else if (element instanceof INews) {
+          INews news = (INews) element;
+          entry = new Item(news.getId());
 
-        if (currentGroupEntryList != null)
-          currentGroupEntryList.add(news.getId());
-      }
+          if (currentGroupEntryList != null)
+            currentGroupEntryList.add(news.getId());
+        }
 
-      /* Add Entry into Collections */
-      if (entry != null) {
-        fItemList.add(entry);
-        fItemMap.put(entry.getId(), entry);
+        /* Add Entry into Collections */
+        if (entry != null) {
+          fItemList.add(entry);
+          fItemMap.put(entry.getId(), entry);
+        }
       }
     }
   }
 
-  private void clear() {
-    fItemList.clear();
-    fItemMap.clear();
-    fEntityGroupToNewsMap.clear();
-    fExpandedNews.clear();
-  }
-
-  Set<java.util.Map.Entry<Long, List<Long>>> getGroups() {
-    return fEntityGroupToNewsMap.entrySet();
+  Map<Long, List<Long>> getGroups() {
+    synchronized (fLock) {
+      return new HashMap<Long, List<Long>>(fEntityGroupToNewsMap);
+    }
   }
 
   boolean hasGroup(long groupId) {
-    return fEntityGroupToNewsMap.containsKey(groupId);
+    synchronized (fLock) {
+      return fEntityGroupToNewsMap.containsKey(groupId);
+    }
   }
 
   int getGroupSize(long groupId) {
-    List<Long> entries = fEntityGroupToNewsMap.get(groupId);
-    return entries != null ? entries.size() : 0;
+    synchronized (fLock) {
+      List<Long> entries = fEntityGroupToNewsMap.get(groupId);
+      return entries != null ? entries.size() : 0;
+    }
   }
 
   List<Long> getNewsIds(long groupId) {
-    return fEntityGroupToNewsMap.get(groupId);
+    synchronized (fLock) {
+      List<Long> newsIds = fEntityGroupToNewsMap.get(groupId);
+      return newsIds != null ? new ArrayList<Long>(newsIds) : null;
+    }
   }
 
   boolean isExpanded(INews news) {
-    return fExpandedNews.contains(news.getId());
+    synchronized (fLock) {
+      return fExpandedNews.contains(news.getId());
+    }
   }
 
   ArrayList<Long> getExpandedNews() {
-    return new ArrayList<Long>(fExpandedNews);
+    synchronized (fLock) {
+      return new ArrayList<Long>(fExpandedNews);
+    }
   }
 
   void setExpanded(INews news, boolean expanded) {
-    if (expanded)
-      fExpandedNews.add(news.getId());
-    else
-      fExpandedNews.remove(news.getId());
+    synchronized (fLock) {
+      if (expanded)
+        fExpandedNews.add(news.getId());
+      else
+        fExpandedNews.remove(news.getId());
+    }
   }
 
   /**
@@ -175,40 +192,42 @@ class NewsBrowserViewModel {
    * has been removed or -1 if none.
    */
   Long removeNews(INews news) {
+    synchronized (fLock) {
 
-    /* Remove from generic Item Collections */
-    Item item = fItemMap.get(news.getId());
-    if (item != null) {
-      fItemList.remove(item);
-      fItemMap.remove(item.getId());
-    }
-
-    /* Remove from Collection of expanded Elements */
-    fExpandedNews.remove(news.getId());
-
-    /* Remove from Group Mapping */
-    Set<java.util.Map.Entry<Long, List<Long>>> entries = fEntityGroupToNewsMap.entrySet();
-    for (java.util.Map.Entry<Long, List<Long>> entry : entries) {
-      Long groupId = entry.getKey();
-      List<Long> newsInGroup = entry.getValue();
-      if (newsInGroup.contains(news.getId())) {
-        newsInGroup.remove(news.getId());
-
-        /* In case the group is now empty, remove it as well */
-        if (newsInGroup.isEmpty()) {
-          fEntityGroupToNewsMap.remove(groupId);
-
-          Item group = fItemMap.get(groupId);
-          if (group != null) {
-            fItemList.remove(group);
-            fItemMap.remove(group.getId());
-          }
-        }
-
-        return groupId; //News can only be part of one group
+      /* Remove from generic Item Collections */
+      Item item = fItemMap.get(news.getId());
+      if (item != null) {
+        fItemList.remove(item);
+        fItemMap.remove(item.getId());
       }
-    }
 
-    return -1L;
+      /* Remove from Collection of expanded Elements */
+      fExpandedNews.remove(news.getId());
+
+      /* Remove from Group Mapping */
+      Set<java.util.Map.Entry<Long, List<Long>>> entries = fEntityGroupToNewsMap.entrySet();
+      for (java.util.Map.Entry<Long, List<Long>> entry : entries) {
+        Long groupId = entry.getKey();
+        List<Long> newsInGroup = entry.getValue();
+        if (newsInGroup.contains(news.getId())) {
+          newsInGroup.remove(news.getId());
+
+          /* In case the group is now empty, remove it as well */
+          if (newsInGroup.isEmpty()) {
+            fEntityGroupToNewsMap.remove(groupId);
+
+            Item group = fItemMap.get(groupId);
+            if (group != null) {
+              fItemList.remove(group);
+              fItemMap.remove(group.getId());
+            }
+          }
+
+          return groupId; //News can only be part of one group
+        }
+      }
+
+      return -1L;
+    }
   }
 }

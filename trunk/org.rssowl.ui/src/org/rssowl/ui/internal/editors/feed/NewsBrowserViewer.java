@@ -364,7 +364,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
           manager.add(new Action(Messages.NewsBrowserViewer_COLLAPSE_GROUPS, icon) {
             @Override
             public void run() {
-              Set<Entry<Long, List<Long>>> groups = fViewModel.getGroups();
+              Set<Entry<Long, List<Long>>> groups = fViewModel.getGroups().entrySet();
               for (Entry<Long, List<Long>> group : groups) {
                 Long groupId = group.getKey();
                 List<Long> newsIds = group.getValue();
