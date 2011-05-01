@@ -29,6 +29,7 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.ui.internal.EntityGroup;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -45,7 +46,7 @@ import java.util.Set;
  *
  * @author bpasero
  */
-class NewsBrowserViewModel {
+public class NewsBrowserViewModel {
   private final List<Item> fItemList = new ArrayList<NewsBrowserViewModel.Item>();
   private final Map<Long, Item> fItemMap = new HashMap<Long, NewsBrowserViewModel.Item>();
   private final Map<Long, List<Long>> fEntityGroupToNewsMap = new HashMap<Long, List<Long>>();
@@ -54,14 +55,14 @@ class NewsBrowserViewModel {
   private final Object fLock = new Object();
 
   /* Base Class of all Items in the Model */
-  static class Item {
+  public static class Item {
     private final long fId;
 
-    Item(long id) {
+    public Item(long id) {
       fId = id;
     }
 
-    long getId() {
+    public long getId() {
       return fId;
     }
 
@@ -94,13 +95,18 @@ class NewsBrowserViewModel {
   }
 
   /* Special Item that contains other Items in the View */
-  static class Group extends Item {
+  public static class Group extends Item {
     public Group(long id) {
       super(id);
     }
   }
 
-  void setInput(Object[] elements) {
+  /**
+   * Updates this view model with the contents of the provided elements.
+   *
+   * @param elements the elements to create the view model from.
+   */
+  public void setInput(Object[] elements) {
     synchronized (fLock) {
 
       /* Clear Caches */
@@ -111,76 +117,109 @@ class NewsBrowserViewModel {
       fCollapsedGroups.clear();
 
       /* Build the Model based on the Elements */
-      List<Long> currentGroupEntryList = null;
-      for (Object element : elements) {
-        Item entry = null;
+      if (elements != null) {
+        List<Long> currentGroupEntryList = null;
+        for (Object element : elements) {
+          Item entry = null;
 
-        /* Entity Group */
-        if (element instanceof EntityGroup) {
-          EntityGroup group = (EntityGroup) element;
-          entry = new Group(group.getId());
+          /* Entity Group */
+          if (element instanceof EntityGroup) {
+            EntityGroup group = (EntityGroup) element;
+            entry = new Group(group.getId());
 
-          currentGroupEntryList = new ArrayList<Long>();
-          fEntityGroupToNewsMap.put(group.getId(), currentGroupEntryList);
-        }
+            currentGroupEntryList = new ArrayList<Long>();
+            fEntityGroupToNewsMap.put(group.getId(), currentGroupEntryList);
+          }
 
-        /* News Item */
-        else if (element instanceof INews) {
-          INews news = (INews) element;
-          entry = new Item(news.getId());
+          /* News Item */
+          else if (element instanceof INews) {
+            INews news = (INews) element;
+            entry = new Item(news.getId());
 
-          if (currentGroupEntryList != null)
-            currentGroupEntryList.add(news.getId());
-        }
+            if (currentGroupEntryList != null)
+              currentGroupEntryList.add(news.getId());
+          }
 
-        /* Add Entry into Collections */
-        if (entry != null) {
-          fItemList.add(entry);
-          fItemMap.put(entry.getId(), entry);
+          /* Add Entry into Collections */
+          if (entry != null) {
+            fItemList.add(entry);
+            fItemMap.put(entry.getId(), entry);
+          }
         }
       }
     }
   }
 
-  Map<Long, List<Long>> getGroups() {
+  /**
+   * @return the {@link Map} of groups if grouping is enabled.
+   */
+  public Map<Long, List<Long>> getGroups() {
     synchronized (fLock) {
       return new HashMap<Long, List<Long>>(fEntityGroupToNewsMap);
     }
   }
 
-  boolean hasGroup(long groupId) {
+  /**
+   * @param groupId the group identifier to look for
+   * @return <code>true</code> if a group with the given identifier exists and
+   * <code>false</code> otherwise.
+   */
+  public boolean hasGroup(long groupId) {
     synchronized (fLock) {
       return fEntityGroupToNewsMap.containsKey(groupId);
     }
   }
 
-  int getGroupSize(long groupId) {
+  /**
+   * @param groupId the group identifier to use
+   * @return the number of elements inside the group with the given identifier
+   * or 0 if none.
+   */
+  public int getGroupSize(long groupId) {
     synchronized (fLock) {
       List<Long> entries = fEntityGroupToNewsMap.get(groupId);
       return entries != null ? entries.size() : 0;
     }
   }
 
-  List<Long> getNewsIds(long groupId) {
+  /**
+   * @param groupId the group identifier to use
+   * @return the list of news ids being held by the given group.
+   */
+  @SuppressWarnings("unchecked")
+  public List<Long> getNewsIds(long groupId) {
     synchronized (fLock) {
       List<Long> newsIds = fEntityGroupToNewsMap.get(groupId);
-      return newsIds != null ? new ArrayList<Long>(newsIds) : null;
+      return newsIds != null ? new ArrayList<Long>(newsIds) : Collections.EMPTY_LIST;
     }
   }
 
-  boolean isExpanded(INews news) {
+  /**
+   * @param news
+   * @return <code>true</code> if the news is expanded and <code>false</code>
+   * otherwise.
+   */
+  public boolean isExpanded(INews news) {
     synchronized (fLock) {
       return fExpandedNews.contains(news.getId());
     }
   }
 
-  boolean isGroupExpanded(long groupId) {
+  /**
+   * @param groupId
+   * @return <code>true</code> if the group is expanded and <code>false</code>
+   * otherwise.
+   */
+  public boolean isGroupExpanded(long groupId) {
     synchronized (fLock) {
       return !fCollapsedGroups.contains(groupId);
     }
   }
 
-  Long getExpandedNews() {
+  /**
+   * @return the identifier of the currently expanded news or -1 if none.
+   */
+  public Long getExpandedNews() {
     synchronized (fLock) {
       if (!fExpandedNews.isEmpty())
         return fExpandedNews.iterator().next();
@@ -189,7 +228,12 @@ class NewsBrowserViewModel {
     }
   }
 
-  void setExpanded(INews news, boolean expanded) {
+  /**
+   * @param news the news to expand or collapse
+   * @param expanded <code>true</code> if expanded and <code>false</code> if
+   * collapsed
+   */
+  public void setExpanded(INews news, boolean expanded) {
     synchronized (fLock) {
       if (expanded)
         fExpandedNews.add(news.getId());
@@ -198,7 +242,12 @@ class NewsBrowserViewModel {
     }
   }
 
-  void setGroupExpanded(Long groupId, boolean expanded) {
+  /**
+   * @param groupId the group to expand or collapse
+   * @param expanded <code>true</code> if expanded and <code>false</code> if
+   * collapsed
+   */
+  public void setGroupExpanded(Long groupId, boolean expanded) {
     synchronized (fLock) {
       if (expanded)
         fCollapsedGroups.remove(groupId);
@@ -207,7 +256,11 @@ class NewsBrowserViewModel {
     }
   }
 
-  Long findGroup(Long newsId) {
+  /**
+   * @param newsId the identifier of the news to find the group for
+   * @return the identifier of the group for the given news or -1 if none
+   */
+  public Long findGroup(Long newsId) {
     synchronized (fLock) {
       Set<java.util.Map.Entry<Long, List<Long>>> entries = fEntityGroupToNewsMap.entrySet();
       for (java.util.Map.Entry<Long, List<Long>> entry : entries) {
@@ -225,7 +278,7 @@ class NewsBrowserViewModel {
    * @return the identifier of a group that needs an update now that the news
    * has been removed or -1 if none.
    */
-  Long removeNews(INews news) {
+  public Long removeNews(INews news) {
     synchronized (fLock) {
 
       /* Remove from generic Item Collections */
@@ -266,7 +319,12 @@ class NewsBrowserViewModel {
     }
   }
 
-  Long nextNews(boolean unread, Long offset) {
+  /**
+   * @param unread if the next news should be unread or not
+   * @param offset the offset to start navigating from
+   * @return the identifier of the next news or -1 if none
+   */
+  public Long nextNews(boolean unread, Long offset) {
     synchronized (fLock) {
 
       /* Get the next news using provided one as starting location or from beginning if no location provided */
@@ -287,7 +345,12 @@ class NewsBrowserViewModel {
     return -1L;
   }
 
-  Long previousNews(boolean unread, Long offset) {
+  /**
+   * @param unread if the previous news should be unread or not
+   * @param offset the offset to start navigating from
+   * @return the identifier of the previous news or -1 if none
+   */
+  public Long previousNews(boolean unread, Long offset) {
     synchronized (fLock) {
 
       /* Get the next news using provided one as starting location or from end if no location provided */
