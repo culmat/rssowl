@@ -704,7 +704,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     else if (queryProvided && (EXPAND_GROUP_HANDLER_ID.equals(id) || COLLAPSE_GROUP_HANDLER_ID.equals(id))) {
       long groupId = getId(query);
       List<Long> newsIds = fViewModel.getNewsIds(groupId);
-      if (newsIds != null)
+      if (!newsIds.isEmpty())
         setGroupExpanded(groupId, newsIds, EXPAND_GROUP_HANDLER_ID.equals(id));
     }
 
@@ -1233,7 +1233,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
     /* Try to resolve the news from the mapping table */
     List<Long> newsIds = fViewModel.getNewsIds(id);
-    if (newsIds != null) {
+    if (!newsIds.isEmpty()) {
       List<INews> news = new ArrayList<INews>(newsIds.size());
       for (Long newsId : newsIds) {
         try {
@@ -1615,8 +1615,11 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
       /* Group */
       Long groupId = fViewModel.findGroup(targetNews);
-      if (groupId != -1 && !fViewModel.isGroupExpanded(groupId))
-        setGroupExpanded(groupId, fViewModel.getNewsIds(groupId), true, false);
+      if (groupId != -1 && !fViewModel.isGroupExpanded(groupId)) {
+        List<Long> newsIds = fViewModel.getNewsIds(groupId);
+        if (!newsIds.isEmpty())
+          setGroupExpanded(groupId, newsIds, true, false);
+      }
 
       /* News */
       setNewsExpanded(DynamicDAO.load(INews.class, targetNews), true, false);

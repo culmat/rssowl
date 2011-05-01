@@ -35,6 +35,7 @@ import org.rssowl.core.tests.ui.EntityPropertyPageTests;
 import org.rssowl.core.tests.ui.FolderMarkGroupFilterTest;
 import org.rssowl.core.tests.ui.MiscUITests;
 import org.rssowl.core.tests.ui.ModelUtilsTest;
+import org.rssowl.core.tests.ui.NewsBrowserViewModelTests;
 import org.rssowl.core.tests.ui.NewsGroupFilterTest;
 import org.rssowl.core.tests.ui.UndoTest;
 
@@ -56,5 +57,6 @@ import org.rssowl.core.tests.ui.UndoTest;
   ImportExportOPMLTest.class,
   FileImportTest.class,
   DownloadServiceTests.class,
+  NewsBrowserViewModelTests.class,
   UndoTest.class })
 public class UITests {}
