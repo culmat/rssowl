@@ -630,7 +630,8 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
         /* Remove Focus from Link */
         blur(Dynamic.TOGGLE_STICKY_LINK.getId(news));
-        blur(Dynamic.TINY_TOGGLE_STICKY_LINK.getId(news), true);
+        if (isHeadlinesLayout())
+          blur(Dynamic.TINY_TOGGLE_STICKY_LINK.getId(news), true);
 
         /* Toggle Sticky State */
         Set<INews> singleNewsSet = Collections.singleton(news);
@@ -1035,12 +1036,14 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
         js.append(getElementById(Dynamic.NEWS.getId(id))).append(".style.display='none'; "); //$NON-NLS-1$
 
       /* Separator if using headlines layout */
-      js.append("if (").append(getElementById(Dynamic.HEADLINE_SEPARATOR.getId(id))).append(" != null) {"); //$NON-NLS-1$ //$NON-NLS-2$
-      if (visible)
-        js.append(getElementById(Dynamic.HEADLINE_SEPARATOR.getId(id))).append(".style.display='block'; "); //$NON-NLS-1$
-      else
-        js.append(getElementById(Dynamic.HEADLINE_SEPARATOR.getId(id))).append(".style.display='none'; "); //$NON-NLS-1$
-      js.append("}"); //$NON-NLS-1$
+      if (isHeadlinesLayout()) {
+        js.append("if (").append(getElementById(Dynamic.HEADLINE_SEPARATOR.getId(id))).append(" != null) {"); //$NON-NLS-1$ //$NON-NLS-2$
+        if (visible)
+          js.append(getElementById(Dynamic.HEADLINE_SEPARATOR.getId(id))).append(".style.display='block'; "); //$NON-NLS-1$
+        else
+          js.append(getElementById(Dynamic.HEADLINE_SEPARATOR.getId(id))).append(".style.display='none'; "); //$NON-NLS-1$
+        js.append("}"); //$NON-NLS-1$
+      }
     }
 
     /* Scroll expanded group into view as necessary */
@@ -1521,7 +1524,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       js.append("var scrollPosY = document.body.scrollTop; "); //$NON-NLS-1$
     else
       js.append("var scrollPosY = window.pageYOffset; "); //$NON-NLS-1$
-    js.append("var body = document.getElementById(\"owlbody\"); "); //$NON-NLS-1$
+    js.append("var body = ").append(getElementById(BODY_ELEMENT_ID)).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
     js.append("var divs = body.childNodes; "); //$NON-NLS-1$
 
     /* Next News (need to fake Y position by some pixels to avoid the same news being selected over and over) */
@@ -1921,10 +1924,12 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
         js.append("} "); //$NON-NLS-1$
 
         /* Hide Separator if using headlines layout */
-        js.append("node = ").append(getElementById(Dynamic.HEADLINE_SEPARATOR.getId(news))).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
-        js.append("if (node != null) { "); //$NON-NLS-1$
-        js.append(getElementById(BODY_ELEMENT_ID)).append(".removeChild(node); "); //$NON-NLS-1$
-        js.append("}"); //$NON-NLS-1$
+        if (isHeadlinesLayout()) {
+          js.append("node = ").append(getElementById(Dynamic.HEADLINE_SEPARATOR.getId(news))).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
+          js.append("if (node != null) { "); //$NON-NLS-1$
+          js.append(getElementById(BODY_ELEMENT_ID)).append(".removeChild(node); "); //$NON-NLS-1$
+          js.append("}"); //$NON-NLS-1$
+        }
       }
     }
 
@@ -2002,6 +2007,14 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     IContentProvider cp = getContentProvider();
     if (cp instanceof NewsContentProvider)
       return ((NewsContentProvider) cp).isGroupingByState();
+
+    return false;
+  }
+
+  private boolean isHeadlinesLayout() {
+    IBaseLabelProvider lp = getLabelProvider();
+    if (lp instanceof NewsBrowserLabelProvider)
+      return ((NewsBrowserLabelProvider) lp).isHeadlinesOnly();
 
     return false;
   }
