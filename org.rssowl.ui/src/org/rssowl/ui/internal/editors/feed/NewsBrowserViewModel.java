@@ -274,6 +274,22 @@ public class NewsBrowserViewModel {
   }
 
   /**
+   * @return <code>true</code> if the first item showing in the browser is
+   * unread and <code>false</code>otherwise. Will always return false if
+   * grouping is enabled as the first item then will be a group.
+   */
+  public boolean isFirstItemUnread() {
+    synchronized (fLock) {
+      if (!fItemList.isEmpty()) {
+        Item item = fItemList.get(0);
+        return isUnread(item);
+      }
+    }
+
+    return false;
+  }
+
+  /**
    * @param news the news to remove from the view model.
    * @return the identifier of a group that needs an update now that the news
    * has been removed or -1 if none.
@@ -374,6 +390,9 @@ public class NewsBrowserViewModel {
   }
 
   private boolean isUnread(Item item) {
+    if (item instanceof Group)
+      return false;
+
     INews news = DynamicDAO.load(INews.class, item.getId());
     if (news == null)
       return false;

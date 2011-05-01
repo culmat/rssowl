@@ -69,6 +69,7 @@ public class NewsBrowserViewModelTests {
     model.setInput(null);
 
     assertEquals(-1L, model.findGroup(5L).longValue());
+    assertFalse(model.isFirstItemUnread());
     assertEquals(-1L, model.getExpandedNews().longValue());
     assertTrue(model.getGroups().isEmpty());
     assertEquals(0, model.getGroupSize(5L));
@@ -101,6 +102,7 @@ public class NewsBrowserViewModelTests {
 
     assertEquals(-1L, model.findGroup(5L).longValue());
     assertEquals(-1L, model.getExpandedNews().longValue());
+    assertFalse(model.isFirstItemUnread());
     assertTrue(model.getGroups().isEmpty());
     assertEquals(0, model.getGroupSize(5L));
     assertTrue(model.getNewsIds(5L).isEmpty());
@@ -137,6 +139,8 @@ public class NewsBrowserViewModelTests {
     Object[] elements = new Object[] { news1, news2, news3, feed };
     NewsBrowserViewModel model = new NewsBrowserViewModel();
     model.setInput(elements);
+
+    assertTrue(model.isFirstItemUnread());
 
     assertEquals(-1L, model.findGroup(5L).longValue());
     assertEquals(-1L, model.getExpandedNews().longValue());
@@ -194,6 +198,8 @@ public class NewsBrowserViewModelTests {
     Object[] elements = new Object[] { group1, news1, news2, group2, news3, feed };
     NewsBrowserViewModel model = new NewsBrowserViewModel();
     model.setInput(elements);
+
+    assertFalse(model.isFirstItemUnread());
 
     assertEquals(-1L, model.findGroup(5L).longValue());
     assertEquals(100L, model.findGroup(1L).longValue());

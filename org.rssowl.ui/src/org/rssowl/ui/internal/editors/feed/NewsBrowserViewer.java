@@ -1514,10 +1514,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     }
   }
 
-  /*
-   * Executes JavaScript in the Browser to navigate between News.
-   */
-  void navigate(boolean next, boolean unread) {
+  void navigate(boolean next, boolean unread, boolean onInputSet) {
 
     /* Navigate in Headlines Layout based on expanded element */
     if (isHeadlinesLayout())
@@ -1525,10 +1522,16 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
     /* Navigate in Newspaper Layout based on scroll position */
     else
-      navigateInNewspaper(next, unread);
+      navigateInNewspaper(next, unread, onInputSet);
   }
 
-  private void navigateInNewspaper(boolean next, boolean unread) {
+  private void navigateInNewspaper(boolean next, boolean unread, boolean onInputSet) {
+
+    /* Check if the first news is already unread and in this case avoid navigation */
+    if (unread && onInputSet && fViewModel.isFirstItemUnread())
+      return;
+
+    /* Otherwise need to navigate to a specific unread news */
     StringBuffer js = new StringBuffer();
     if (fBrowser.isIE())
       js.append("var scrollPosY = document.body.scrollTop; "); //$NON-NLS-1$
