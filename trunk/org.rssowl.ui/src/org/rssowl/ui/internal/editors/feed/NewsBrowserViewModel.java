@@ -25,6 +25,7 @@
 package org.rssowl.ui.internal.editors.feed;
 
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.ui.internal.EntityGroup;
 
 import java.util.ArrayList;
@@ -41,7 +42,7 @@ import java.util.Set;
  * <p>
  * The model is safe to be used from multiple threads.
  * </p>
- * 
+ *
  * @author bpasero
  */
 class NewsBrowserViewModel {
@@ -49,6 +50,7 @@ class NewsBrowserViewModel {
   private final Map<Long, Item> fItemMap = new HashMap<Long, NewsBrowserViewModel.Item>();
   private final Map<Long, List<Long>> fEntityGroupToNewsMap = new HashMap<Long, List<Long>>();
   private final Set<Long> fExpandedNews = new HashSet<Long>();
+  private final Set<Long> fCollapsedGroups = new HashSet<Long>();
   private final Object fLock = new Object();
 
   /* Base Class of all Items in the Model */
@@ -106,6 +108,7 @@ class NewsBrowserViewModel {
       fItemMap.clear();
       fEntityGroupToNewsMap.clear();
       fExpandedNews.clear();
+      fCollapsedGroups.clear();
 
       /* Build the Model based on the Elements */
       List<Long> currentGroupEntryList = null;
@@ -171,9 +174,18 @@ class NewsBrowserViewModel {
     }
   }
 
-  ArrayList<Long> getExpandedNews() {
+  boolean isGroupExpanded(long groupId) {
     synchronized (fLock) {
-      return new ArrayList<Long>(fExpandedNews);
+      return !fCollapsedGroups.contains(groupId);
+    }
+  }
+
+  Long getExpandedNews() {
+    synchronized (fLock) {
+      if (!fExpandedNews.isEmpty())
+        return fExpandedNews.iterator().next();
+
+      return -1L;
     }
   }
 
@@ -184,6 +196,28 @@ class NewsBrowserViewModel {
       else
         fExpandedNews.remove(news.getId());
     }
+  }
+
+  void setGroupExpanded(Long groupId, boolean expanded) {
+    synchronized (fLock) {
+      if (expanded)
+        fCollapsedGroups.remove(groupId);
+      else
+        fCollapsedGroups.add(groupId);
+    }
+  }
+
+  Long findGroup(Long newsId) {
+    synchronized (fLock) {
+      Set<java.util.Map.Entry<Long, List<Long>>> entries = fEntityGroupToNewsMap.entrySet();
+      for (java.util.Map.Entry<Long, List<Long>> entry : entries) {
+        List<Long> newsInGroup = entry.getValue();
+        if (newsInGroup.contains(newsId))
+          return entry.getKey();
+      }
+    }
+
+    return -1L;
   }
 
   /**
@@ -220,6 +254,7 @@ class NewsBrowserViewModel {
             if (group != null) {
               fItemList.remove(group);
               fItemMap.remove(group.getId());
+              fCollapsedGroups.remove(group.getId());
             }
           }
 
@@ -229,5 +264,62 @@ class NewsBrowserViewModel {
 
       return -1L;
     }
+  }
+
+  Long nextNews(boolean unread, Long offset) {
+    synchronized (fLock) {
+
+      /* Get the next news using provided one as starting location or from beginning if no location provided */
+      int nextIndex = (offset != -1) ? fItemList.indexOf(new Item(offset)) + 1 : 0;
+
+      /* More Elements available */
+      for (int i = nextIndex; i < fItemList.size(); i++) {
+        Item nextItem = fItemList.get(i);
+        if (nextItem instanceof Group)
+          continue; //We only want to navigate to News Items
+
+        /* Return Item if it matches the criteria */
+        if (!unread || isUnread(nextItem))
+          return nextItem.getId();
+      }
+    }
+
+    return -1L;
+  }
+
+  Long previousNews(boolean unread, Long offset) {
+    synchronized (fLock) {
+
+      /* Get the next news using provided one as starting location or from end if no location provided */
+      int previousIndex = (offset != -1) ? fItemList.indexOf(new Item(offset)) - 1 : fItemList.size() - 1;
+
+      /* More Elements available */
+      for (int i = previousIndex; i >= 0 && i < fItemList.size(); i--) {
+        Item previousItem = fItemList.get(i);
+        if (previousItem instanceof Group)
+          continue; //We only want to navigate to News Items
+
+        /* Return Item if it matches the criteria */
+        if (!unread || isUnread(previousItem))
+          return previousItem.getId();
+      }
+    }
+
+    return -1L;
+  }
+
+  private boolean isUnread(Item item) {
+    INews news = DynamicDAO.load(INews.class, item.getId());
+    if (news == null)
+      return false;
+
+    switch (news.getState()) {
+      case NEW:
+      case UNREAD:
+      case UPDATED:
+        return true;
+    }
+
+    return false;
   }
 }

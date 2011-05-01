@@ -942,17 +942,13 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     if (visible)
       scrollIfNecessary(news, js);
 
-    /* Collapse other visible news */
+    /* Collapse other visible news if present */
     if (visible) {
-      List<INews> newsToCollapse = new ArrayList<INews>(1);
-      for (Long id : fViewModel.getExpandedNews()) {
-        INews item = DynamicDAO.load(INews.class, id);
+      Long expandedNewsId = fViewModel.getExpandedNews();
+      if (expandedNewsId != -1) {
+        INews item = DynamicDAO.load(INews.class, expandedNewsId);
         if (item != null)
-          newsToCollapse.add(item);
-      }
-
-      for (INews iNews : newsToCollapse) {
-        setVisibility(iNews, false);
+          setVisibility(item, false);
       }
     }
 
@@ -1058,6 +1054,9 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
     /* Execute */
     fBrowser.execute(js.toString());
+
+    /* Update View Model */
+    fViewModel.setGroupExpanded(groupId, visible);
   }
 
   private void blur(String elementId) {
@@ -1283,7 +1282,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   /**
    * A special way of refreshing this viewer with additional options to control
    * the behavior.
-   *
+   * 
    * @param restoreInput if set to <code>true</code> will restore the initial
    * input that was set to the browser in case the user navigated to a different
    * URL.
@@ -1399,7 +1398,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
   /**
    * Adds the given filter to this viewer.
-   *
+   * 
    * @param filter a viewer filter
    */
   public void addFilter(ViewerFilter filter) {
@@ -1415,7 +1414,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
    * Removes the given filter from this viewer, and triggers refiltering and
    * resorting of the elements if required. Has no effect if the identical
    * filter is not registered.
-   *
+   * 
    * @param filter a viewer filter
    */
   public void removeFilter(ViewerFilter filter) {
@@ -1505,7 +1504,16 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
    */
   void navigate(boolean next, boolean unread) {
 
-    /* Create JavaScript to Execute */
+    /* Navigate in Headlines Layout based on expanded element */
+    if (isHeadlinesLayout())
+      navigateInHeadlines(next, unread);
+
+    /* Navigate in Newspaper Layout based on scroll position */
+    else
+      navigateInNewspaper(next, unread);
+  }
+
+  private void navigateInNewspaper(boolean next, boolean unread) {
     StringBuffer js = new StringBuffer();
     if (fBrowser.isIE())
       js.append("var scrollPosY = document.body.scrollTop; "); //$NON-NLS-1$
@@ -1549,29 +1557,62 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     }
 
     /* See if the Scroll Position Changed at all and handle */
-    String actionId;
-    if (next) {
-      if (unread)
-        actionId = NewsBrowserViewer.NEXT_UNREAD_NEWS_HANDLER_ID;
-      else
-        actionId = NewsBrowserViewer.NEXT_NEWS_HANDLER_ID;
-    } else {
-      if (unread)
-        actionId = NewsBrowserViewer.PREVIOUS_UNREAD_NEWS_HANDLER_ID;
-      else
-        actionId = NewsBrowserViewer.PREVIOUS_NEWS_HANDLER_ID;
-    }
-
     if (fBrowser.isIE())
       js.append("var newScrollPosY = document.body.scrollTop; "); //$NON-NLS-1$
     else
       js.append("var newScrollPosY = window.pageYOffset; "); //$NON-NLS-1$
 
     js.append("if (scrollPosY == newScrollPosY) { "); //$NON-NLS-1$
-    js.append("  window.location.href = \"").append(ILinkHandler.HANDLER_PROTOCOL + actionId).append("\"; "); //$NON-NLS-1$ //$NON-NLS-2$
+    js.append("  window.location.href = \"").append(ILinkHandler.HANDLER_PROTOCOL + getNavigationActionId(next, unread)).append("\"; "); //$NON-NLS-1$ //$NON-NLS-2$
     js.append("} "); //$NON-NLS-1$
 
     fBrowser.execute(js.toString());
+  }
+
+  private String getNavigationActionId(boolean next, boolean unread) {
+    if (next) {
+      if (unread)
+        return NewsBrowserViewer.NEXT_UNREAD_NEWS_HANDLER_ID;
+
+      return NewsBrowserViewer.NEXT_NEWS_HANDLER_ID;
+    }
+
+    if (unread)
+      return NewsBrowserViewer.PREVIOUS_UNREAD_NEWS_HANDLER_ID;
+
+    return NewsBrowserViewer.PREVIOUS_NEWS_HANDLER_ID;
+  }
+
+  private void navigateInHeadlines(boolean next, boolean unread) {
+    Long targetNews = -1L;
+    Long offset = fViewModel.getExpandedNews();
+
+    /* Navigate to Next News */
+    if (next)
+      targetNews = fViewModel.nextNews(unread, offset);
+
+    /* Navigate to Previous News */
+    else
+      targetNews = fViewModel.previousNews(unread, offset);
+
+    /* Expand target and the parent group if necessary */
+    if (targetNews != -1) {
+
+      /* Group */
+      Long groupId = fViewModel.findGroup(targetNews);
+      if (groupId != -1 && !fViewModel.isGroupExpanded(groupId))
+        setVisibility(groupId, fViewModel.getNewsIds(groupId), true);
+
+      /* News */
+      setVisibility(DynamicDAO.load(INews.class, targetNews), true);
+    }
+
+    /* If navigation did not find a suitable target, call the outer navigation function */
+    else {
+      StringBuilder js = new StringBuilder();
+      js.append("  window.location.href = \"").append(ILinkHandler.HANDLER_PROTOCOL + getNavigationActionId(next, unread)).append("\"; "); //$NON-NLS-1$ //$NON-NLS-2$
+      fBrowser.execute(js.toString());
+    }
   }
 
   /**
@@ -1621,7 +1662,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
   /**
    * Asks the NewsViewModel to update based on the given input.
-   *
+   * 
    * @param input the list of elements that becomes visible in the browser
    * viewer.
    */
