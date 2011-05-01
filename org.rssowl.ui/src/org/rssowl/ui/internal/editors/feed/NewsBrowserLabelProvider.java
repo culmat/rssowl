@@ -287,6 +287,10 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     fHeadlinesOnly = headlinesOnly;
   }
 
+  boolean isHeadlinesOnly() {
+    return fHeadlinesOnly;
+  }
+
   /*
    * @see org.eclipse.jface.viewers.BaseLabelProvider#dispose()
    */
