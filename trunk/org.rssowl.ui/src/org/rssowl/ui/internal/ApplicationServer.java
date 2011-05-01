@@ -648,8 +648,8 @@ public class ApplicationServer {
     NewsBrowserLabelProvider labelProvider = (NewsBrowserLabelProvider) viewer.getLabelProvider();
     Object[] children = new Object[0];
     if (viewer instanceof NewsBrowserViewer) {
-      ((NewsBrowserViewer) viewer).clearCaches();
       children = ((NewsBrowserViewer) viewer).getFlattendChildren(elements);
+      ((NewsBrowserViewer) viewer).updateViewModel(children);
     }
 
     /* Write HTML to the Receiver */
