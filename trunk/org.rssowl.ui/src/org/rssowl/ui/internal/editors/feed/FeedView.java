@@ -2113,8 +2113,8 @@ public class FeedView extends EditorPart implements IReusableEditor {
    * @param respectSelection If <code>TRUE</code>, respect the current selected
    * Item from the Tree as starting-node for the navigation, or
    * <code>FALSE</code> otherwise.
-   * @param delay if <code>true</code> delay the navigation if the browser is
-   * maximized and <code>false</code> if not.
+   * @param onInputSet if <code>true</code> this method is called directly after
+   * an input was set, <code>false</code> otherwise.
    * @param next If <code>TRUE</code>, move to the next item, or previous if
    * <code>FALSE</code>.
    * @param unread If <code>TRUE</code>, only move to unread items, or ignore if
@@ -2122,7 +2122,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
    * @return Returns <code>TRUE</code> in case navigation found a valid item, or
    * <code>FALSE</code> otherwise.
    */
-  public boolean navigate(boolean respectSelection, boolean delay, final boolean next, final boolean unread) {
+  public boolean navigate(boolean respectSelection, final boolean onInputSet, final boolean next, final boolean unread) {
 
     /* Check for unread counter */
     if (unread && fInput.getMark().getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)) == 0)
@@ -2132,17 +2132,17 @@ public class FeedView extends EditorPart implements IReusableEditor {
     if (!isTableViewerVisible()) {
 
       /* Delay navigation because input was just set and browser needs a little to render */
-      if (delay) {
+      if (onInputSet) {
         JobRunner.runInUIThread(300, fNewsBrowserControl.getViewer().getControl(), new Runnable() {
           public void run() {
-            fNewsBrowserControl.getViewer().navigate(next, unread);
+            fNewsBrowserControl.getViewer().navigate(next, unread, onInputSet);
           }
         });
       }
 
       /* Directly Navigate */
       else
-        fNewsBrowserControl.getViewer().navigate(next, unread);
+        fNewsBrowserControl.getViewer().navigate(next, unread, onInputSet);
 
       return true;
     }
