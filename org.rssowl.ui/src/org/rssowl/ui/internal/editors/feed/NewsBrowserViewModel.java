@@ -328,7 +328,8 @@ public class NewsBrowserViewModel {
     synchronized (fLock) {
 
       /* Get the next news using provided one as starting location or from beginning if no location provided */
-      int nextIndex = (offset != -1) ? fItemList.indexOf(new Item(offset)) + 1 : 0;
+      Item item = new Item(offset);
+      int nextIndex = (offset != -1 && fItemList.contains(item)) ? fItemList.indexOf(item) + 1 : 0;
 
       /* More Elements available */
       for (int i = nextIndex; i < fItemList.size(); i++) {
@@ -354,7 +355,8 @@ public class NewsBrowserViewModel {
     synchronized (fLock) {
 
       /* Get the next news using provided one as starting location or from end if no location provided */
-      int previousIndex = (offset != -1) ? fItemList.indexOf(new Item(offset)) - 1 : fItemList.size() - 1;
+      Item item = new Item(offset);
+      int previousIndex = (offset != -1 && fItemList.contains(item)) ? fItemList.indexOf(item) - 1 : fItemList.size() - 1;
 
       /* More Elements available */
       for (int i = previousIndex; i >= 0 && i < fItemList.size(); i--) {
