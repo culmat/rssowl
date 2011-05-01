@@ -226,7 +226,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
   NewsFilter.Type fInitialFilterType;
   NewsGrouping.Type fInitialGroupType;
   NewsFilter.SearchTarget fInitialSearchTarget;
-  Layout fInitialLayout;
+  Layout fLayout;
   private int fInitialWeights[];
   private int fCacheWeights[];
 
@@ -799,7 +799,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
       fInitialGroupType = NewsGrouping.Type.values()[fPreferences.getInteger(DefaultPreferences.FV_GROUP_TYPE)];
 
     /* Other Settings */
-    fInitialLayout = OwlUI.getLayout(preferences);
+    fLayout = OwlUI.getLayout(preferences);
     fInitialWeights = fPreferences.getIntegers(DefaultPreferences.FV_SASHFORM_WEIGHTS);
     fInitialSearchTarget = NewsFilter.SearchTarget.values()[fPreferences.getInteger(DefaultPreferences.FV_SEARCH_TARGET)];
   }
@@ -1319,8 +1319,10 @@ public class FeedView extends EditorPart implements IReusableEditor {
     if (perform != null) {
 
       /* Select first News */
-      if (perform.getType() == PerformAfterInputSet.Kind.SELECT_FIRST_NEWS)
-        navigate(false, false, true, false);
+      if (perform.getType() == PerformAfterInputSet.Kind.SELECT_FIRST_NEWS) {
+        if (fLayout != Layout.NEWSPAPER) //Newspaper will always show a full news on top, so ignore here
+          navigate(false, true, true, false);
+      }
 
       /* Select first unread News */
       else if (perform.getType() == PerformAfterInputSet.Kind.SELECT_UNREAD_NEWS)
@@ -1513,7 +1515,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
     Layout layout = OwlUI.getLayout(preferences);
 
     /* Return early if layout already up to date */
-    if (fInitialLayout == layout)
+    if (fLayout == layout)
       return;
 
     /* Notify Controls */
@@ -1540,7 +1542,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
     /* Newspaper / Headlines Layout */
     else if (layout == Layout.NEWSPAPER || layout == Layout.HEADLINES) {
       maximizeBrowser(updateInput);
-      if (updateInput && (fInitialLayout == Layout.NEWSPAPER || fInitialLayout == Layout.HEADLINES))
+      if (updateInput && (fLayout == Layout.NEWSPAPER || fLayout == Layout.HEADLINES))
         refreshBrowserViewer(); //A change between Newspaper and Headlines needs a refresh due to the different CSS
     }
 
@@ -1555,7 +1557,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
     fBrowserViewerControlContainer.layout();
 
     /* Remember Layout */
-    fInitialLayout = layout;
+    fLayout = layout;
   }
 
   private void maximizeTable(boolean updateInput) {
@@ -1657,7 +1659,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
   public void updateToolbarVisibility() {
     fFilterBar.updateVisibility();
     fBrowserBar.updateVisibility();
-    updateSeparators(fInitialLayout);
+    updateSeparators(fLayout);
     fRootComposite.layout(true, true);
   }
 
@@ -1963,7 +1965,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
     /* Separate Filter from Table */
     boolean showSeparator = false;
-    if (!Application.IS_MAC || fInitialLayout != Layout.CLASSIC)
+    if (!Application.IS_MAC || fLayout != Layout.CLASSIC)
       showSeparator = fFilterBar.isVisible();
     fHorizontalFilterTableSep = new Label(fRootComposite, SWT.SEPARATOR | SWT.HORIZONTAL);
     fHorizontalFilterTableSep.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
@@ -1971,7 +1973,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
     fHorizontalFilterTableSep.setVisible(showSeparator);
 
     /* SashForm dividing Feed and News View */
-    boolean useClassicLayout = (fInitialLayout != Layout.VERTICAL);
+    boolean useClassicLayout = (fLayout != Layout.VERTICAL);
     fSashForm = new SashForm(fRootComposite, (useClassicLayout ? SWT.VERTICAL : SWT.HORIZONTAL) | SWT.SMOOTH);
     fSashForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
@@ -2007,12 +2009,12 @@ public class FeedView extends EditorPart implements IReusableEditor {
       /* Separate from Browser-Viewer (Vertically) */
       fVerticalTableBrowserSep = new Label(fNewsTableControlContainer, SWT.SEPARATOR | SWT.VERTICAL);
       fVerticalTableBrowserSep.setLayoutData(new GridData(SWT.BEGINNING, SWT.FILL, false, false));
-      ((GridData) fVerticalTableBrowserSep.getLayoutData()).exclude = (fInitialLayout != Layout.VERTICAL);
+      ((GridData) fVerticalTableBrowserSep.getLayoutData()).exclude = (fLayout != Layout.VERTICAL);
 
       /* Separate from Browser-Viewer (Horizontally) */
       fHorizontalTableBrowserSep = new Label(fNewsTableControlContainer, SWT.SEPARATOR | SWT.HORIZONTAL);
       fHorizontalTableBrowserSep.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
-      ((GridData) fHorizontalTableBrowserSep.getLayoutData()).exclude = (fInitialLayout != Layout.CLASSIC);
+      ((GridData) fHorizontalTableBrowserSep.getLayoutData()).exclude = (fLayout != Layout.CLASSIC);
     }
 
     /* Browser-Viewer to display news */
@@ -2025,7 +2027,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
       /* Separate to Browser (Vertically) */
       fVerticalBrowserSep = new Label(fBrowserViewerControlContainer, SWT.SEPARATOR | SWT.VERTICAL);
       fVerticalBrowserSep.setLayoutData(new GridData(SWT.BEGINNING, SWT.FILL, false, false, 1, 3));
-      ((GridData) fVerticalBrowserSep.getLayoutData()).exclude = (fInitialLayout != Layout.VERTICAL);
+      ((GridData) fVerticalBrowserSep.getLayoutData()).exclude = (fLayout != Layout.VERTICAL);
 
       /* Browser Bar for Navigation */
       fBrowserBar = new BrowserBar(this, fBrowserViewerControlContainer);
@@ -2034,19 +2036,19 @@ public class FeedView extends EditorPart implements IReusableEditor {
       fHorizontalBrowserSep = new Label(fBrowserViewerControlContainer, SWT.SEPARATOR | SWT.HORIZONTAL);
 
       /* Horizontal Layout */
-      if (fInitialLayout == Layout.CLASSIC) {
+      if (fLayout == Layout.CLASSIC) {
         fHorizontalBrowserSep.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
         ((GridData) fHorizontalBrowserSep.getLayoutData()).exclude = false;
       }
 
       /* Verical Layout */
-      else if (fInitialLayout == Layout.VERTICAL) {
+      else if (fLayout == Layout.VERTICAL) {
         fHorizontalBrowserSep.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 1, 1));
         ((GridData) fHorizontalBrowserSep.getLayoutData()).exclude = !fBrowserBar.isVisible();
       }
 
       /* Browser Maximized */
-      else if (fInitialLayout == Layout.NEWSPAPER || fInitialLayout == Layout.HEADLINES) {
+      else if (fLayout == Layout.NEWSPAPER || fLayout == Layout.HEADLINES) {
         fHorizontalBrowserSep.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
         ((GridData) fHorizontalBrowserSep.getLayoutData()).exclude = !fBrowserBar.isVisible();
       }
@@ -2074,9 +2076,9 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
     /* SashForm weights */
     fSashForm.setWeights(fInitialWeights);
-    if (fInitialLayout == Layout.NEWSPAPER || fInitialLayout == Layout.HEADLINES)
+    if (fLayout == Layout.NEWSPAPER || fLayout == Layout.HEADLINES)
       fSashForm.setMaximizedControl(fBrowserViewerControlContainer);
-    else if (fInitialLayout == Layout.LIST)
+    else if (fLayout == Layout.LIST)
       fSashForm.setMaximizedControl(fNewsTableControlContainer);
 
     /* Create the shared Content-Provider */
@@ -2141,6 +2143,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
       /* Directly Navigate */
       else
         fNewsBrowserControl.getViewer().navigate(next, unread);
+
       return true;
     }
 
