@@ -784,7 +784,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
         public void run() {
           NavigationActionFactory factory = new NavigationActionFactory();
           try {
-            factory.setInitializationData(null, null, NavigationActionFactory.NavigationActionType.NEXT_FEED.getId());
+            factory.setInitializationData(null, null, NavigationActionFactory.NavigationActionType.NEXT_FEED_NEXT_NEWS.getId());
             IWorkbenchWindowActionDelegate action = (IWorkbenchWindowActionDelegate) factory.create();
             action.run(null);
           } catch (CoreException e) {
@@ -800,7 +800,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
         public void run() {
           NavigationActionFactory factory = new NavigationActionFactory();
           try {
-            factory.setInitializationData(null, null, NavigationActionFactory.NavigationActionType.NEXT_UNREAD_FEED.getId());
+            factory.setInitializationData(null, null, NavigationActionFactory.NavigationActionType.NEXT_UNREAD_FEED_NEXT_UNREAD_NEWS.getId());
             IWorkbenchWindowActionDelegate action = (IWorkbenchWindowActionDelegate) factory.create();
             action.run(null);
           } catch (CoreException e) {
@@ -816,7 +816,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
         public void run() {
           NavigationActionFactory factory = new NavigationActionFactory();
           try {
-            factory.setInitializationData(null, null, NavigationActionFactory.NavigationActionType.PREVIOUS_FEED.getId());
+            factory.setInitializationData(null, null, NavigationActionFactory.NavigationActionType.PREVIOUS_FEED_PREVIOUS_NEWS.getId());
             IWorkbenchWindowActionDelegate action = (IWorkbenchWindowActionDelegate) factory.create();
             action.run(null);
           } catch (CoreException e) {
@@ -832,7 +832,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
         public void run() {
           NavigationActionFactory factory = new NavigationActionFactory();
           try {
-            factory.setInitializationData(null, null, NavigationActionFactory.NavigationActionType.PREVIOUS_UNREAD_FEED.getId());
+            factory.setInitializationData(null, null, NavigationActionFactory.NavigationActionType.PREVIOUS_UNREAD_FEED_PREVIOUS_UNREAD_NEWS.getId());
             IWorkbenchWindowActionDelegate action = (IWorkbenchWindowActionDelegate) factory.create();
             action.run(null);
           } catch (CoreException e) {
