@@ -25,6 +25,7 @@
 package org.rssowl.ui.internal.editors.feed;
 
 import org.eclipse.ui.IEditorSite;
+import org.rssowl.core.persist.pref.IPreferenceScope;
 
 /**
  * A more specialized form of an editor site providing direct access to the
@@ -50,4 +51,11 @@ public interface IFeedViewSite {
    * <code>false</code> otherwise.
    */
   boolean isBrowserViewerVisible();
+
+  /**
+   * @return the {@link IPreferenceScope} to access the preferences of the input
+   * that is currently displayed in the editor. Never <code>null</code>. Will
+   * fallback to global preferences in any case.
+   */
+  IPreferenceScope getInputPreferences();
 }

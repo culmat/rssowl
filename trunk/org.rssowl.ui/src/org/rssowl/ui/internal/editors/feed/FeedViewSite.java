@@ -25,6 +25,9 @@
 package org.rssowl.ui.internal.editors.feed;
 
 import org.eclipse.ui.IEditorSite;
+import org.rssowl.core.Owl;
+import org.rssowl.core.persist.INewsMark;
+import org.rssowl.core.persist.pref.IPreferenceScope;
 
 /**
  * Implementation of {@link IFeedViewSite} that knows about the {@link FeedView}
@@ -58,5 +61,19 @@ public class FeedViewSite implements IFeedViewSite {
    */
   public boolean isBrowserViewerVisible() {
     return fFeedView.isBrowserViewerVisible();
+  }
+
+  /*
+   * @see org.rssowl.ui.internal.editors.feed.IFeedViewSite#getInputPreferences()
+   */
+  public IPreferenceScope getInputPreferences() {
+    FeedViewInput input = (FeedViewInput) fFeedView.getEditorInput();
+    if (input != null) {
+      INewsMark mark = input.getMark();
+      if (mark != null)
+        return Owl.getPreferenceService().getEntityScope(mark);
+    }
+
+    return Owl.getPreferenceService().getGlobalScope();
   }
 }
