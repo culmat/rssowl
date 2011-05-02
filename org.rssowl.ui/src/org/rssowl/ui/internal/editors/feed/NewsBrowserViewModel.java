@@ -290,6 +290,16 @@ public class NewsBrowserViewModel {
   }
 
   /**
+   * @return <code>true</code> if the browser viewer is displaying items and
+   * <code>false</code> otherwise.
+   */
+  public boolean hasItems() {
+    synchronized (fLock) {
+      return !fItemList.isEmpty();
+    }
+  }
+
+  /**
    * @param news the news to remove from the view model.
    * @return the identifier of a group that needs an update now that the news
    * has been removed or -1 if none.
