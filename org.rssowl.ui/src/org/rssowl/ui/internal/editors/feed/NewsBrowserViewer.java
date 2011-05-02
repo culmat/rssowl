@@ -48,13 +48,13 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.SameShellProvider;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IWorkbenchActionConstants;
-import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.rssowl.core.Owl;
 import org.rssowl.core.connection.ConnectionException;
@@ -160,7 +160,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
   private Object fInput;
   private CBrowser fBrowser;
-  private IWorkbenchPartSite fSite;
+  private IFeedViewSite fSite;
   private boolean fIsEmbedded;
   private Menu fNewsContextMenu;
   private Menu fAttachmentsContextMenu;
@@ -171,6 +171,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   private ApplicationServer fServer;
   private String fId;
   private boolean fBlockRefresh;
+  private boolean fMarkReadOnExpand = true;
   private IModelFactory fFactory;
   private IPreferenceScope fPreferences = Owl.getPreferenceService().getGlobalScope();
   private INewsDAO fNewsDao = DynamicDAO.getDAO(INewsDAO.class);
@@ -187,19 +188,20 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   private final NewsBrowserViewModel fViewModel = new NewsBrowserViewModel();
 
   /**
-   * @param parent
-   * @param style
+   * @param parent the parent {@link Composite} to host this viewer.
+   * @param style the style of the {@link Browser} in this viewer.
    */
   public NewsBrowserViewer(Composite parent, int style) {
     this(parent, style, null);
   }
 
   /**
-   * @param parent
-   * @param style
-   * @param site
+   * @param parent the parent {@link Composite} to host this viewer.
+   * @param style the style of the {@link Browser} in this viewer.
+   * @param site the {@link IFeedViewSite} if this viewer is being used from a
+   * {@link FeedView} or <code>null</code> otherwise.
    */
-  public NewsBrowserViewer(Composite parent, int style, IWorkbenchPartSite site) {
+  public NewsBrowserViewer(Composite parent, int style, IFeedViewSite site) {
     fBrowser = new CBrowser(parent, style);
     fSite = site;
     fIsEmbedded = (fSite != null);
@@ -388,7 +390,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
     /* Register with Part Site if possible */
     if (fSite != null)
-      fSite.registerContextMenu(manager, this);
+      fSite.getEditorSite().registerContextMenu(manager, this);
   }
 
   private void hookAttachmentsContextMenu() {
@@ -971,7 +973,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     });
 
     /* Update State if not already marked as read */
-    if (expanded && news.getState() != INews.State.READ && !isGroupingByState()) { //Ignore if grouping by state to avoid refresh
+    if (fMarkReadOnExpand && expanded && news.getState() != INews.State.READ && !isGroupingByState()) { //Ignore if grouping by state to avoid refresh
       Set<INews> singleNewsSet = Collections.singleton(news);
       boolean affectEquivalentNews = OwlUI.markReadDuplicates();
       UndoStack.getInstance().addOperation(new NewsStateOperation(singleNewsSet, INews.State.READ, affectEquivalentNews));
@@ -1370,6 +1372,10 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
     /* Remember Input */
     fInput = input;
+
+    /* Update Settings based on Input */
+    if (fSite != null)
+      fMarkReadOnExpand = fSite.getInputPreferences().getBoolean(DefaultPreferences.MARK_READ_STATE);
 
     /* Stop any other Website if required */
     String url = fBrowser.getControl().getUrl();

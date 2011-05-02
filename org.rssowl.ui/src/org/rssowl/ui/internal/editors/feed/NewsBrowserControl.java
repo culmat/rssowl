@@ -131,7 +131,7 @@ public class NewsBrowserControl implements IFeedViewPart {
     setInfoBarVisible(false, false);
 
     /* Browser Viewer for News */
-    fViewer = new NewsBrowserViewer(container, SWT.NONE, fFeedViewSite.getEditorSite()) {
+    fViewer = new NewsBrowserViewer(container, SWT.NONE, fFeedViewSite) {
       @Override
       protected void onRefresh() {
         setInfoBarVisible(false);
