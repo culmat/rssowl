@@ -1696,16 +1696,17 @@ public class BookMarkExplorer extends ViewPart {
    * Navigate to the next/previous read or unread Feed respecting the Marks that
    * are displayed in the Tree-Viewer.
    *
-   * @param newsScoped If <code>TRUE</code>, the navigation looks for News and
-   * for Feeds if <code>FALSE</code>.
    * @param next If <code>TRUE</code>, move to the next item, or previous if
    * <code>FALSE</code>.
    * @param unread If <code>TRUE</code>, only move to unread items, or ignore if
    * <code>FALSE</code>.
+   * @param performOnFeedView If <code>TRUE</code>, this navigation should also invoke a follow
+   * up navigation in the opened feed view if a valid target is found and <code>false</code>
+   * otherwise.
    * @return Returns <code>TRUE</code> in case navigation found a valid item, or
    * <code>FALSE</code> otherwise.
    */
-  public boolean navigate(boolean newsScoped, boolean next, boolean unread) {
+  public boolean navigate(boolean next, boolean unread, boolean performOnFeedView) {
     Tree explorerTree = fViewer.getTree();
 
     /* Nothing to Navigate to */
@@ -1729,14 +1730,14 @@ public class BookMarkExplorer extends ViewPart {
 
     /* Perform navigation if Node was found */
     if (targetNode != null) {
-      performNavigation(targetNode, newsScoped, unread);
+      performNavigation(targetNode, performOnFeedView, unread);
       return true;
     }
 
     return false;
   }
 
-  private void performNavigation(ITreeNode targetNode, boolean newsScoped, boolean unread) {
+  private void performNavigation(ITreeNode targetNode, boolean performOnFeedView, boolean unread) {
     INewsMark mark = (INewsMark) targetNode.getData();
 
     /* Set Selection to Mark */
@@ -1745,9 +1746,9 @@ public class BookMarkExplorer extends ViewPart {
 
     /* Open in FeedView */
     PerformAfterInputSet perform = null;
-    if (newsScoped && unread)
+    if (performOnFeedView && unread)
       perform = PerformAfterInputSet.SELECT_UNREAD_NEWS;
-    else if (newsScoped)
+    else if (performOnFeedView)
       perform = PerformAfterInputSet.SELECT_FIRST_NEWS;
 
     OwlUI.openInFeedView(fViewSite.getPage(), selection, true, false, perform);

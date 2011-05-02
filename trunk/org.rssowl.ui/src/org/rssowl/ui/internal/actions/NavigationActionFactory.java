@@ -182,7 +182,7 @@ public class NavigationActionFactory implements IExecutableExtensionFactory, IEx
         return false;
 
       /* Navigate on Explorer */
-      bookmarkExplorer.navigate(fType.isNewsScoped(), fType.isNext(), fType.isUnread());
+      bookmarkExplorer.navigate(fType.isNext(), fType.isUnread(), fType.performOnFeedView());
 
       return true; //Avoid navigation on Model if Explorer is Opened
     }
@@ -286,7 +286,13 @@ public class NavigationActionFactory implements IExecutableExtensionFactory, IEx
     NEXT_TAB("nextTab", "org.rssowl.ui.NextTab", Messages.NavigationActionFactory_NEXT_TAB, false, false, false), //$NON-NLS-1$ //$NON-NLS-2$
 
     /** Action: Go to previous Tab */
-    PREVIOUS_TAB("previousTab", "org.rssowl.ui.PreviousTab", Messages.NavigationActionFactory_PREVIOUS_TAB, false, false, false); //$NON-NLS-1$ //$NON-NLS-2$
+    PREVIOUS_TAB("previousTab", "org.rssowl.ui.PreviousTab", Messages.NavigationActionFactory_PREVIOUS_TAB, false, false, false), //$NON-NLS-1$ //$NON-NLS-2$
+
+    /** Special Combined Actions only executed from Browser Viewer */
+    NEXT_FEED_NEXT_NEWS("nextFeedNextNews", null, null, false, true, false, true), //$NON-NLS-1$
+    NEXT_UNREAD_FEED_NEXT_UNREAD_NEWS("nextUnreadFeedNextUnreadNews", null, null, false, true, true, true), //$NON-NLS-1$
+    PREVIOUS_FEED_PREVIOUS_NEWS("previousFeedPreviousNews", null, null, false, false, false, true), //$NON-NLS-1$
+    PREVIOUS_UNREAD_FEED_PREVIOUS_UNREAD_NEWS("previousUnreadFeedPreviousUnreadNews", null, null, false, false, true, true); //$NON-NLS-1$
 
     String fId;
     String fCommandId;
@@ -294,14 +300,20 @@ public class NavigationActionFactory implements IExecutableExtensionFactory, IEx
     boolean fIsNewsScoped;
     boolean fIsNext;
     boolean fIsUnread;
+    boolean fPerformOnFeedView;
 
     NavigationActionType(String id, String commandId, String name, boolean isNewsScoped, boolean isNext, boolean isUnread) {
+      this(id, commandId, name, isNewsScoped, isNext, isUnread, isNewsScoped);
+    }
+
+    NavigationActionType(String id, String commandId, String name, boolean isNewsScoped, boolean isNext, boolean isUnread, boolean performOnFeedView) {
       fId = id;
       fCommandId = commandId;
       fName = name;
       fIsNewsScoped = isNewsScoped;
       fIsNext = isNext;
       fIsUnread = isUnread;
+      fPerformOnFeedView = performOnFeedView;
     }
 
     /**
@@ -325,16 +337,36 @@ public class NavigationActionFactory implements IExecutableExtensionFactory, IEx
       return fName;
     }
 
+    /**
+     * @return <code>true</code> if the navigation is around news and
+     * <code>false</code> in the case of feeds.
+     */
     boolean isNewsScoped() {
       return fIsNewsScoped;
     }
 
+    /**
+     * @return <code>true</code> if navigation should only consider unread items
+     * and <code>false</code> otherwise.
+     */
     boolean isUnread() {
       return fIsUnread;
     }
 
+    /**
+     * @return <code>true</code> if the navigation goes to the next item and
+     * <code>false</code> otherwise.
+     */
     boolean isNext() {
       return fIsNext;
+    }
+
+    /**
+     * @return <code>true</code> if the navigational action should be performed
+     * on the feedview and <code>false</code> otherwise.
+     */
+    public boolean performOnFeedView() {
+      return fPerformOnFeedView;
     }
   };
 
@@ -357,6 +389,12 @@ public class NavigationActionFactory implements IExecutableExtensionFactory, IEx
     if (NavigationActionType.NEXT_UNREAD_FEED.getId().equals(fId))
       return new NavigationAction(NavigationActionType.NEXT_UNREAD_FEED);
 
+    if (NavigationActionType.NEXT_FEED_NEXT_NEWS.getId().equals(fId))
+      return new NavigationAction(NavigationActionType.NEXT_FEED_NEXT_NEWS);
+
+    if (NavigationActionType.NEXT_UNREAD_FEED_NEXT_UNREAD_NEWS.getId().equals(fId))
+      return new NavigationAction(NavigationActionType.NEXT_UNREAD_FEED_NEXT_UNREAD_NEWS);
+
     if (NavigationActionType.PREVIOUS_NEWS.getId().equals(fId))
       return new NavigationAction(NavigationActionType.PREVIOUS_NEWS);
 
@@ -368,6 +406,12 @@ public class NavigationActionFactory implements IExecutableExtensionFactory, IEx
 
     if (NavigationActionType.PREVIOUS_UNREAD_FEED.getId().equals(fId))
       return new NavigationAction(NavigationActionType.PREVIOUS_UNREAD_FEED);
+
+    if (NavigationActionType.PREVIOUS_FEED_PREVIOUS_NEWS.getId().equals(fId))
+      return new NavigationAction(NavigationActionType.PREVIOUS_FEED_PREVIOUS_NEWS);
+
+    if (NavigationActionType.PREVIOUS_UNREAD_FEED_PREVIOUS_UNREAD_NEWS.getId().equals(fId))
+      return new NavigationAction(NavigationActionType.PREVIOUS_UNREAD_FEED_PREVIOUS_UNREAD_NEWS);
 
     if (NavigationActionType.NEXT_TAB.getId().equals(fId))
       return new NavigationAction(NavigationActionType.NEXT_TAB);
