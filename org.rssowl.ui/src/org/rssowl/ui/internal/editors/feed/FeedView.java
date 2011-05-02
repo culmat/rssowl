@@ -2102,8 +2102,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
    * only for added news that have not been there previously.
    */
   void revalidateCaches() {
-    if (fInput.getMark().isGetNewsRefsEfficient())
-      fContentProvider.refreshCache(fInput.getMark(), true);
+    fContentProvider.refreshCache(fInput.getMark(), true);
   }
 
   /**
