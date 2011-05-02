@@ -1512,11 +1512,22 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     else if (firstElement instanceof NewsReference)
       newsToShow = (NewsReference) firstElement;
 
-    /* Scroll the News into View if present */
+    /* Scroll the News into View if present and expand as necessary */
     if (newsToShow != null) {
-      StringBuffer js = new StringBuffer();
-      js.append(getElementById(Dynamic.NEWS.getId(newsToShow))).append(".scrollIntoView(true);"); //$NON-NLS-1$
-      fBrowser.execute(js.toString());
+
+      /* Headlines Layout */
+      if (isHeadlinesLayout()) {
+        INews news = newsToShow.resolve();
+        if (news != null)
+          setNewsExpanded(news, true);
+      }
+
+      /* Newspaper Layout */
+      else {
+        StringBuffer js = new StringBuffer();
+        js.append(getElementById(Dynamic.NEWS.getId(newsToShow))).append(".scrollIntoView(true);"); //$NON-NLS-1$
+        fBrowser.execute(js.toString());
+      }
     }
   }
 
