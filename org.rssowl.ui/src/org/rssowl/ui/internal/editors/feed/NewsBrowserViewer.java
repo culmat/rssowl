@@ -1159,6 +1159,17 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
   private void showTransformation(INews news, String result) {
 
+    /* Transformer script surrounds content with a DIV, display it inline to avoid extra whitespace */
+    int index = result.indexOf("<div"); //$NON-NLS-1$
+    if (index != -1 && index < 10) { //Ensure the DIV is really at the beginning
+      index += "<div".length(); //$NON-NLS-1$
+      StringBuilder inlineResult = new StringBuilder();
+      inlineResult.append(result.substring(0, index));
+      inlineResult.append(" style=\"display: inline;\" "); //$NON-NLS-1$
+      inlineResult.append(result.substring(index));
+      result = inlineResult.toString();
+    }
+
     /* Support stripping media tags if set and highlight search terms if any */
     IBaseLabelProvider labelProvider = getLabelProvider();
     if (labelProvider instanceof NewsBrowserLabelProvider) {
