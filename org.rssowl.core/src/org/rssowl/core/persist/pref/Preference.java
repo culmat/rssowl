@@ -358,6 +358,9 @@ public enum Preference {
   /** Global: Archive Bin Marker */
   ARCHIVE_BIN_MARKER("org.rssowl.pref.ArchiveBinMarker", IPreferenceType.BOOLEAN), //$NON-NLS-1$
 
+  /** Global: Number of Elements in Browser before starting to Page */
+  NEWS_BROWSER_PAGE_SIZE("org.rssowl.pref.NewsBrowserPageSize", IPreferenceType.INTEGER), //$NON-NLS-1$
+
   /******************************
    * Eclipse Preferences Follow *
    ******************************/
