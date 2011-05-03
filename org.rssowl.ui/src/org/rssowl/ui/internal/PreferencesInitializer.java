@@ -109,6 +109,7 @@ public class PreferencesInitializer implements IPreferencesInitializer {
     defaultScope.putBoolean(Preference.BM_LOAD_TITLE_FROM_FEED.id(), true);
     defaultScope.putBoolean(Preference.UPDATE_ON_STARTUP.id(), true);
     defaultScope.putString(Preference.BM_TRANSFORMER_ID.id(), "org.rssowl.ui.InstapaperTransformer"); //$NON-NLS-1$
+    defaultScope.putInteger(Preference.NEWS_BROWSER_PAGE_SIZE.id(), 50);
 
     defaultScope.putIntegers(Preference.SEARCH_DIALOG_NEWS_COLUMNS.id(), new int[] {
       NewsColumn.RELEVANCE.ordinal(),
