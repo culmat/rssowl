@@ -55,7 +55,7 @@ public class NewsBrowserViewModel {
   private final Object fLock = new Object();
 
   /* Base Class of all Items in the Model */
-  public static class Item {
+  private static class Item {
     private final long fId;
 
     public Item(long id) {
@@ -95,7 +95,7 @@ public class NewsBrowserViewModel {
   }
 
   /* Special Item that contains other Items in the View */
-  public static class Group extends Item {
+  private static class Group extends Item {
     public Group(long id) {
       super(id);
     }
