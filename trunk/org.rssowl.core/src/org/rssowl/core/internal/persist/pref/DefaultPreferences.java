@@ -361,6 +361,9 @@ public class DefaultPreferences {
   /** Global: Marker for the Archive Bin */
   public static final String ARCHIVE_BIN_MARKER = Preference.ARCHIVE_BIN_MARKER.id();
 
+  /** Global: Number of Elements in Browser before starting to Page */
+  public static final String NEWS_BROWSER_PAGE_SIZE = Preference.NEWS_BROWSER_PAGE_SIZE.id();
+
   /**
    * Eclipse Preferences Follow
    */
