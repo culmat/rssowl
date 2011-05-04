@@ -26,6 +26,7 @@ package org.rssowl.ui.internal.editors.feed;
 
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.util.Triple;
 import org.rssowl.ui.internal.EntityGroup;
 
 import java.util.ArrayList;
@@ -52,6 +53,8 @@ public class NewsBrowserViewModel {
   private final Map<Long, List<Long>> fEntityGroupToNewsMap = new HashMap<Long, List<Long>>();
   private final Set<Long> fExpandedNews = new HashSet<Long>();
   private final Set<Long> fCollapsedGroups = new HashSet<Long>();
+  private final Set<Long> fHiddenNews = new HashSet<Long>();
+  private final Set<Long> fHiddenGroups = new HashSet<Long>();
   private final Object fLock = new Object();
 
   /* Base Class of all Items in the Model */
@@ -107,6 +110,17 @@ public class NewsBrowserViewModel {
    * @param elements the elements to create the view model from.
    */
   public void setInput(Object[] elements) {
+    setInput(elements, 0);
+  }
+
+  /**
+   * Updates this view model with the contents of the provided elements.
+   *
+   * @param elements the elements to create the view model from.
+   * @param pageSize the number of elements per page or <code>0</code> in case
+   * paging is disabled.
+   */
+  public void setInput(Object[] elements, int pageSize) {
     synchronized (fLock) {
 
       /* Clear Caches */
@@ -115,9 +129,14 @@ public class NewsBrowserViewModel {
       fEntityGroupToNewsMap.clear();
       fExpandedNews.clear();
       fCollapsedGroups.clear();
+      fHiddenNews.clear();
+      fHiddenGroups.clear();
 
       /* Build the Model based on the Elements */
-      if (elements != null) {
+      if (elements != null && elements.length > 0) {
+
+        /* Build Model */
+        int newsCounter = 0;
         List<Long> currentGroupEntryList = null;
         for (Object element : elements) {
           Item entry = null;
@@ -129,15 +148,26 @@ public class NewsBrowserViewModel {
 
             currentGroupEntryList = new ArrayList<Long>();
             fEntityGroupToNewsMap.put(group.getId(), currentGroupEntryList);
+
+            /*
+             * We use ">=" here to check if the group is visible or not to avoid the case
+             * of a group being made visible that contains no visible news at all.
+             */
+            if (pageSize != 0 && newsCounter >= pageSize)
+              setGroupVisible(group.getId(), false);
           }
 
           /* News Item */
           else if (element instanceof INews) {
+            newsCounter++;
             INews news = (INews) element;
             entry = new Item(news.getId());
 
             if (currentGroupEntryList != null)
               currentGroupEntryList.add(news.getId());
+
+            if (pageSize != 0 && newsCounter > pageSize)
+              setNewsVisible(news, false);
           }
 
           /* Add Entry into Collections */
@@ -195,13 +225,33 @@ public class NewsBrowserViewModel {
   }
 
   /**
-   * @param news
+   * @param news the news item to check for expanded state
    * @return <code>true</code> if the news is expanded and <code>false</code>
    * otherwise.
    */
-  public boolean isExpanded(INews news) {
+  public boolean isNewsExpanded(INews news) {
     synchronized (fLock) {
       return fExpandedNews.contains(news.getId());
+    }
+  }
+
+  /**
+   * @param news the news item to check for being visible or not
+   * @return <code>true</code> if the news is visible and <code>false</code>
+   * otherwise.
+   */
+  public boolean isNewsVisible(INews news) {
+    return isNewsVisible(news.getId());
+  }
+
+  /**
+   * @param newsId the news item to check for being visible or not
+   * @return <code>true</code> if the news is visible and <code>false</code>
+   * otherwise.
+   */
+  public boolean isNewsVisible(long newsId) {
+    synchronized (fLock) {
+      return !fHiddenNews.contains(newsId);
     }
   }
 
@@ -213,6 +263,17 @@ public class NewsBrowserViewModel {
   public boolean isGroupExpanded(long groupId) {
     synchronized (fLock) {
       return !fCollapsedGroups.contains(groupId);
+    }
+  }
+
+  /**
+   * @param groupId
+   * @return <code>true</code> if the group is visible and <code>false</code>
+   * otherwise.
+   */
+  public boolean isGroupVisible(long groupId) {
+    synchronized (fLock) {
+      return !fHiddenGroups.contains(groupId);
     }
   }
 
@@ -233,12 +294,40 @@ public class NewsBrowserViewModel {
    * @param expanded <code>true</code> if expanded and <code>false</code> if
    * collapsed
    */
-  public void setExpanded(INews news, boolean expanded) {
+  public void setNewsExpanded(INews news, boolean expanded) {
     synchronized (fLock) {
       if (expanded)
         fExpandedNews.add(news.getId());
       else
         fExpandedNews.remove(news.getId());
+    }
+  }
+
+  /**
+   * @param news the news to hide or show
+   * @param visible <code>true</code> if visible and <code>false</code> if
+   * hidden
+   */
+  public void setNewsVisible(INews news, boolean visible) {
+    synchronized (fLock) {
+      if (visible)
+        fHiddenNews.remove(news.getId());
+      else
+        fHiddenNews.add(news.getId());
+    }
+  }
+
+  /**
+   * @param groupId the group to hide or show
+   * @param visible <code>true</code> if visible and <code>false</code> if
+   * hidden
+   */
+  public void setGroupVisible(Long groupId, boolean visible) {
+    synchronized (fLock) {
+      if (visible)
+        fHiddenGroups.remove(groupId);
+      else
+        fHiddenGroups.add(groupId);
     }
   }
 
@@ -300,6 +389,24 @@ public class NewsBrowserViewModel {
   }
 
   /**
+   * @return the number of news in the model (both visible and hidden).
+   */
+  public int getNewsCount() {
+    synchronized (fLock) {
+      return fItemList.size() - fEntityGroupToNewsMap.keySet().size();
+    }
+  }
+
+  /**
+   * @return the number of visible news displayed.
+   */
+  public int getVisibleNewsCount() {
+    synchronized (fLock) {
+      return fItemList.size() - fEntityGroupToNewsMap.keySet().size() - fHiddenNews.size();
+    }
+  }
+
+  /**
    * @param news the news to remove from the view model.
    * @return the identifier of a group that needs an update now that the news
    * has been removed or -1 if none.
@@ -312,6 +419,7 @@ public class NewsBrowserViewModel {
       if (item != null) {
         fItemList.remove(item);
         fItemMap.remove(item.getId());
+        fHiddenNews.remove(item.getId());
       }
 
       /* Remove from Collection of expanded Elements */
@@ -334,6 +442,7 @@ public class NewsBrowserViewModel {
               fItemList.remove(group);
               fItemMap.remove(group.getId());
               fCollapsedGroups.remove(group.getId());
+              fHiddenGroups.remove(group.getId());
             }
           }
 
@@ -415,5 +524,66 @@ public class NewsBrowserViewModel {
     }
 
     return false;
+  }
+
+  /**
+   * Retrieves the identifiers of the elements for the next page.
+   *
+   * @param pageSize the number of elements per page.
+   * @return a {@link Triple} of lists. The first contains the identifiers of
+   * groups revealed and the second the list of news identifiers. Finally
+   * indicates if more pages are available or not.
+   */
+  public Triple<List<Long> /* Groups */, List<Long> /* News Items */, Boolean /* Has More Pages */> getNextPage(int pageSize) {
+    List<Long> groups = new ArrayList<Long>(1);
+    List<Long> news = new ArrayList<Long>(pageSize);
+    Boolean hasMorePages = false;
+
+    synchronized (fLock) {
+
+      /* Find Index of First Hidden Item */
+      int indexOfFirstHiddenItem = -1;
+      for (int i = 0; i < fItemList.size(); i++) {
+        Item item = fItemList.get(i);
+        if (isVisible(item))
+          continue;
+
+        indexOfFirstHiddenItem = i;
+        break;
+      }
+
+      /* Find the next page of items */
+      if (indexOfFirstHiddenItem != -1) {
+        int newsCounter = 0;
+        for (int i = indexOfFirstHiddenItem; i < fItemList.size(); i++) {
+          Item item = fItemList.get(i);
+
+          /* Group */
+          if (item instanceof Group) {
+            groups.add(item.getId());
+          }
+
+          /* News */
+          else {
+            newsCounter++;
+            news.add(item.getId());
+          }
+
+          if (newsCounter == pageSize) {
+            hasMorePages = (i + 1 < fItemList.size());
+            break; //Reached the next page, so stop looping
+          }
+        }
+      }
+    }
+
+    return Triple.create(groups, news, hasMorePages);
+  }
+
+  private boolean isVisible(Item item) {
+    if (item instanceof Group)
+      return isGroupVisible(item.getId());
+
+    return isNewsVisible(item.getId());
   }
 }

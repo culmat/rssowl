@@ -59,6 +59,7 @@ public class Messages extends NLS {
   public static String NewsBrowserLabelProvider_COMMENTS;
   public static String NewsBrowserLabelProvider_DELETE;
   public static String NewsBrowserLabelProvider_DISPLAY_FULL_CONTENT;
+  public static String NewsBrowserLabelProvider_DISPLAY_MORE_ARTICLES;
   public static String NewsBrowserLabelProvider_FULL_CONTENT;
   public static String NewsBrowserLabelProvider_LABEL;
   public static String NewsBrowserLabelProvider_LABELS;

@@ -34,6 +34,7 @@ import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.EXPAND_NEWS_
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.GROUP_MENU_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.LABELS_MENU_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.NEWS_MENU_HANDLER_ID;
+import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.NEXT_PAGE_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.RELATED_NEWS_MENU_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.SHARE_NEWS_MENU_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.TOGGLE_READ_HANDLER_ID;
@@ -71,6 +72,7 @@ import org.rssowl.ui.internal.ApplicationServer;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.FolderNewsMark.FolderNewsMarkReference;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.PageLatch;
 import org.rssowl.ui.internal.util.CBrowser;
 
 import java.io.IOException;
@@ -137,12 +139,18 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     FULL_CONTENT_LINK_TEXT("fullContentLinkText"), //$NON-NLS-1$
     LABELS("labels"), //$NON-NLS-1$
     LABELS_SEPARATOR("labelsSeparator"), //$NON-NLS-1$
-    HEADLINE_SEPARATOR("headlineSeparator"); //$NON-NLS-1$
+    HEADLINE_SEPARATOR("headlineSeparator"), //$NON-NLS-1$
+    PAGE_LATCH("pageLatch"), //$NON-NLS-1$
+    PAGE_LATCH_LINK("pageLatchLink"); //$NON-NLS-1$
 
     private String fId;
 
     Dynamic(String id) {
       fId = id;
+    }
+
+    String getId() {
+      return fId;
     }
 
     String getId(long id) {
@@ -386,6 +394,10 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     else if (element instanceof INews)
       return getLabel((INews) element, withInternalLinks, withManagedLinks, index);
 
+    /* Return HTML for Page Latch */
+    else if (element instanceof PageLatch)
+      return getLabel((PageLatch) element);
+
     return ""; //$NON-NLS-1$
   }
 
@@ -560,6 +572,13 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.write("span.quote_lvl2 { color: #007777; }\n"); //$NON-NLS-1$
     writer.write("span.quote_lvl3 { color: #3377ff; }\n"); //$NON-NLS-1$
     writer.write("span.quote_lvl4 { color: #669966; }\n"); //$NON-NLS-1$
+
+    /* Page Latch */
+    writer.append("div.pageLatch { text-align: right; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("a.pageLatch { color: rgb(80,80,80); text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.append("a.pageLatch:hover { color: rgb(80,80,80); text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.append("a.pageLatch:active { color: rgb(80,80,80); text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.append("a.pageLatch:visited { color: rgb(80,80,80); text-decoration: none; }\n"); //$NON-NLS-1$
   }
 
   /* Common CSS for Headlines Layout */
@@ -693,6 +712,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   }
 
   private String getLabel(EntityGroup group, boolean withInternalLinks) {
+    boolean isVisible = isVisible(group);
     StringBuilder builder = new StringBuilder();
 
     String groupName = StringUtils.htmlEscape(group.getName());
@@ -701,10 +721,16 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       groupColor = OwlUI.toString(group.getColorHint());
 
     /* DIV: Group */
-    if (groupColor == null)
+    StringBuilder extraCSS = new StringBuilder();
+    if (!isVisible)
+      extraCSS.append("display: none; "); //$NON-NLS-1$
+    if (groupColor != null)
+      extraCSS.append("border-bottom-color: rgb(" + groupColor + ");"); //$NON-NLS-1$ //$NON-NLS-2$
+
+    if (extraCSS.length() == 0)
       div(builder, "group", Dynamic.GROUP.getId(group)); //$NON-NLS-1$
     else
-      div(builder, "group", "border-bottom-color: rgb(" + groupColor + ");", Dynamic.GROUP.getId(group)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      div(builder, "group", extraCSS.toString(), Dynamic.GROUP.getId(group)); //$NON-NLS-1$
 
     /* Let the group name be a link to invoke actions on all news inside and provide a toggle */
     if (withInternalLinks) {
@@ -767,8 +793,10 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   }
 
   private String getLabel(INews news, boolean withInternalLinks, boolean withManagedLinks, int index) {
-    String description = null; //Fetch description lazily if only headlines shown
-    if (!fHeadlinesOnly)
+    boolean isVisible = isVisible(news);
+
+    String description = null; //Fetch description lazily if only headlines shown or news hidden
+    if (!fHeadlinesOnly && isVisible)
       description = stripMediaTagsIfNecessary(news.getDescription());
 
     StringBuilder builder = getBuilder(news, description);
@@ -793,8 +821,14 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     }
 
     /* DIV: NewsItem */
+    StringBuilder extraCSS = new StringBuilder();
+    if (!isVisible)
+      extraCSS.append("display: none; "); //$NON-NLS-1$
     if (index != 0 && fIsNewsListBGColorDefined && index % 2 != 0)
-      div(builder, isUnread ? "newsitemUnread" : "newsitemRead", fNewsListBGColorCSS, Dynamic.NEWS.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
+      extraCSS.append(fNewsListBGColorCSS);
+
+    if (extraCSS.length() != 0)
+      div(builder, isUnread ? "newsitemUnread" : "newsitemRead", extraCSS.toString(), Dynamic.NEWS.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
     else
       div(builder, isUnread ? "newsitemUnread" : "newsitemRead", Dynamic.NEWS.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -992,17 +1026,19 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     {
 
       /* DIV: NewsItem/Content */
-      String extraCSS = ""; //$NON-NLS-1$
-      if (index != 0 && fIsNewsListBGColorDefined && index % 2 != 0)
-        extraCSS = fNewsListBGColorCSS;
-
+      extraCSS = new StringBuilder();
       if (fHeadlinesOnly) //Hidden initially in headlines mode
-        extraCSS += " display: none;"; //$NON-NLS-1$
+        extraCSS.append("display: none; "); //$NON-NLS-1$
+      if (index != 0 && fIsNewsListBGColorDefined && index % 2 != 0)
+        extraCSS.append(fNewsListBGColorCSS);
 
-      div(builder, "content", extraCSS, Dynamic.CONTENT.getId(news)); //$NON-NLS-1$
+      if (extraCSS.length() > 0)
+        div(builder, "content", extraCSS.toString(), Dynamic.CONTENT.getId(news)); //$NON-NLS-1$
+      else
+        div(builder, "content", Dynamic.CONTENT.getId(news)); //$NON-NLS-1$
 
       /* Content is provided and should be displayed */
-      if (!fHeadlinesOnly) {
+      if (!fHeadlinesOnly && isVisible) {
         if (StringUtils.isSet(description) && description != null && !description.equals(news.getTitle()))
           builder.append(description);
 
@@ -1125,12 +1161,68 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
     /* Headlines Separator */
     if (fHeadlinesOnly) {
-      div(builder, "headlinesSeparator", Dynamic.HEADLINE_SEPARATOR.getId(news)); //$NON-NLS-1$
+      if (isVisible)
+        div(builder, "headlinesSeparator", Dynamic.HEADLINE_SEPARATOR.getId(news)); //$NON-NLS-1$
+      else
+        div(builder, "headlinesSeparator", "display: none;", Dynamic.HEADLINE_SEPARATOR.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
+
       close(builder, "div"); //$NON-NLS-1$
     }
 
     /* Highlight Support (if search is active) */
     return highlightSearchTermsIfNecessary(builder.toString());
+  }
+
+  private boolean isVisible(EntityGroup group) {
+    if (fViewer != null)
+      return fViewer.getViewModel().isGroupVisible(group.getId());
+
+    return true;
+  }
+
+  private boolean isVisible(INews news) {
+    if (fViewer != null)
+      return fViewer.getViewModel().isNewsVisible(news);
+
+    return true;
+  }
+
+  private int getTotalNewsCount() {
+    if (fViewer != null)
+      return fViewer.getViewModel().getNewsCount();
+
+    return 0;
+  }
+
+  private int getVisibleNewsCount() {
+    if (fViewer != null)
+      return fViewer.getViewModel().getVisibleNewsCount();
+
+    return 0;
+  }
+
+  /**
+   * @param latch the page latch in case more entries are shown than allowed per
+   * page.
+   */
+  private String getLabel(PageLatch latch) {
+    StringBuilder builder = new StringBuilder();
+
+    /* Open: Page Latch */
+    div(builder, "pageLatch", Dynamic.PAGE_LATCH.getId()); //$NON-NLS-1$
+
+    /* Page Latch Link to navigate to next page */
+    String link = HANDLER_PROTOCOL + NEXT_PAGE_HANDLER_ID;
+    link(builder, link, getLatchName(), "pageLatch", Dynamic.PAGE_LATCH_LINK.getId(), null); //$NON-NLS-1$
+
+    /* Close: Page Latch */
+    close(builder, "div"); //$NON-NLS-1$
+
+    return builder.toString();
+  }
+
+  String getLatchName() {
+    return NLS.bind(Messages.NewsBrowserLabelProvider_DISPLAY_MORE_ARTICLES, getVisibleNewsCount(), getTotalNewsCount());
   }
 
   void fillSubtitle(StringBuilder subtitleContent, INews news, Set<ILabel> labels) {
