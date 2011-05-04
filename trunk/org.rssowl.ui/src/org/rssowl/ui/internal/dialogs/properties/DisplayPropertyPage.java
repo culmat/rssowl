@@ -52,6 +52,7 @@ import org.rssowl.ui.dialogs.properties.IPropertyDialogSite;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.LinkTransformer;
 import org.rssowl.ui.internal.OwlUI.Layout;
+import org.rssowl.ui.internal.OwlUI.PageSize;
 import org.rssowl.ui.internal.editors.feed.NewsFilter;
 import org.rssowl.ui.internal.editors.feed.NewsGrouping;
 import org.rssowl.ui.internal.util.EditorUtils;
@@ -72,6 +73,7 @@ public class DisplayPropertyPage implements IEntityPropertyPage {
   private Combo fFilterCombo;
   private Combo fGroupCombo;
   private Combo fLayoutCombo;
+  private Combo fPageSizeCombo;
   private Button fLoadImagesForNewsCheck;
   private Button fDisplayContentsOfNewsRadio;
   private Button fOpenLinkOfNewsRadio;
@@ -84,6 +86,7 @@ public class DisplayPropertyPage implements IEntityPropertyPage {
   private int fPrefSelectedFilter;
   private int fPrefSelectedGroup;
   private int fPrefSelectedLayout;
+  private int fPrefSelectedPageSize;
   private boolean fPrefOpenSiteForNews;
   private boolean fPrefOpenSiteForEmptyNews;
   private boolean fPrefUseLinkTransformer;
@@ -122,6 +125,7 @@ public class DisplayPropertyPage implements IEntityPropertyPage {
     fPrefLinkTransformerId = firstScope.getString(DefaultPreferences.BM_TRANSFORMER_ID);
     fPrefLoadImagesForNews = firstScope.getBoolean(DefaultPreferences.BM_LOAD_IMAGES);
     fPrefSelectedLayout = firstScope.getInteger(DefaultPreferences.FV_LAYOUT);
+    fPrefSelectedPageSize = firstScope.getInteger(DefaultPreferences.NEWS_BROWSER_PAGE_SIZE);
 
     /* For any other scope not sharing the initial values, use the default */
     for (int i = 1; i < fEntityPreferences.size(); i++) {
@@ -150,6 +154,9 @@ public class DisplayPropertyPage implements IEntityPropertyPage {
 
       if (otherScope.getInteger(DefaultPreferences.FV_LAYOUT) != fPrefSelectedLayout)
         fPrefSelectedLayout = defaultScope.getInteger(DefaultPreferences.FV_LAYOUT);
+
+      if (otherScope.getInteger(DefaultPreferences.NEWS_BROWSER_PAGE_SIZE) != fPrefSelectedPageSize)
+        fPrefSelectedPageSize = defaultScope.getInteger(DefaultPreferences.NEWS_BROWSER_PAGE_SIZE);
     }
   }
 
@@ -168,8 +175,12 @@ public class DisplayPropertyPage implements IEntityPropertyPage {
     Label layoutLabel = new Label(topContainer, SWT.None);
     layoutLabel.setText(Messages.DisplayPropertyPage_LAYOUT);
 
-    fLayoutCombo = new Combo(topContainer, SWT.BORDER | SWT.READ_ONLY);
-    fLayoutCombo.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false));
+    Composite layoutContainer = new Composite(topContainer, SWT.None);
+    layoutContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false));
+    layoutContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0, 0, 5, false));
+
+    fLayoutCombo = new Combo(layoutContainer, SWT.BORDER | SWT.READ_ONLY);
+    fLayoutCombo.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     for (Layout layout : Layout.values()) {
       fLayoutCombo.add(layout.getName());
@@ -184,6 +195,17 @@ public class DisplayPropertyPage implements IEntityPropertyPage {
         updateDisplayButtons();
       }
     });
+
+    /* Layout Page Size */
+    fPageSizeCombo = new Combo(layoutContainer, SWT.BORDER | SWT.READ_ONLY);
+    fPageSizeCombo.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false));
+
+    for (PageSize pageSize : PageSize.values()) {
+      fPageSizeCombo.add(pageSize.getName());
+    }
+
+    fPageSizeCombo.select(PageSize.from(fPrefSelectedPageSize).ordinal());
+    fPageSizeCombo.setVisibleItemCount(fPageSizeCombo.getItemCount());
 
     /* Filter Settings */
     Label filterLabel = new Label(topContainer, SWT.None);
@@ -297,12 +319,16 @@ public class DisplayPropertyPage implements IEntityPropertyPage {
 
     fLinkTransformerViewer.setSelection(new StructuredSelection(selectedTransformer));
 
-    updateDisplayButtons();
+    updateDisplayButtons(false);
 
     return container;
   }
 
   private void updateDisplayButtons() {
+    updateDisplayButtons(true);
+  }
+
+  private void updateDisplayButtons(boolean layout) {
     boolean isNewspaperLayout = (fLayoutCombo.getSelectionIndex() == Layout.NEWSPAPER.ordinal() || fLayoutCombo.getSelectionIndex() == Layout.HEADLINES.ordinal());
     boolean isListLayout = (fLayoutCombo.getSelectionIndex() == Layout.LIST.ordinal());
 
@@ -319,6 +345,15 @@ public class DisplayPropertyPage implements IEntityPropertyPage {
     fOpenSiteForEmptyNewsCheck.setEnabled(!isListLayout && !isNewspaperLayout && fOpenLinkOfNewsRadio.getSelection());
     fUseTransformerCheck.setEnabled(!isListLayout && !isNewspaperLayout && fOpenLinkOfNewsRadio.getSelection());
     fLinkTransformerViewer.getCombo().setEnabled(!isListLayout && !isNewspaperLayout && fOpenLinkOfNewsRadio.getSelection() && fUseTransformerCheck.getSelection());
+
+    /* Update Layout */
+    GridData data = (GridData) fLayoutCombo.getLayoutData();
+    data.horizontalSpan = isNewspaperLayout ? 1 : 2;
+    data = (GridData) fPageSizeCombo.getLayoutData();
+    data.exclude = !isNewspaperLayout;
+
+    if (layout)
+      fPageSizeCombo.getParent().getParent().layout(true, true);
   }
 
   /*
@@ -398,6 +433,14 @@ public class DisplayPropertyPage implements IEntityPropertyPage {
     iVal = fLayoutCombo.getSelectionIndex();
     if (fPrefSelectedLayout != iVal) {
       scope.putInteger(DefaultPreferences.FV_LAYOUT, iVal);
+      changed = true;
+    }
+
+    /* Page Size */
+    iVal = fPageSizeCombo.getSelectionIndex();
+    PageSize size = PageSize.values()[iVal];
+    if (fPrefSelectedPageSize != size.getPageSize()) {
+      scope.putInteger(DefaultPreferences.NEWS_BROWSER_PAGE_SIZE, size.getPageSize());
       changed = true;
     }
 
