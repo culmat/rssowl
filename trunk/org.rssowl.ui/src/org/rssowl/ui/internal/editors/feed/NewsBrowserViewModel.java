@@ -408,6 +408,30 @@ public class NewsBrowserViewModel {
   }
 
   /**
+   * Returns the first news that is hidden and optionally unread or
+   * <code>-1</code> if none.
+   *
+   * @param onlyUnread if set to <code>true</code>, only unread news will be
+   * considered.
+   * @return the identifier of the first hidden news or <code>-1</code> if none.
+   */
+  public long getFirstHiddenNews(boolean onlyUnread) {
+    synchronized (fLock) {
+      for (int i = 0; i < fItemList.size(); i++) {
+        Item item = fItemList.get(i);
+
+        if (item instanceof Group || isNewsVisible(item.getId()))
+          continue;
+
+        if (!onlyUnread || isUnread(item))
+          return item.getId();
+      }
+    }
+
+    return -1;
+  }
+
+  /**
    * @param news the news to remove from the view model.
    * @return the identifier of a group that needs an update now that the news
    * has been removed or -1 if none.

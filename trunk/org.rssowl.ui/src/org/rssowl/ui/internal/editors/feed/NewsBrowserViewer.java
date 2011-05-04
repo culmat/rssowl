@@ -785,66 +785,22 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
     /* Go to Next News */
     else if (NEXT_NEWS_HANDLER_ID.equals(id)) {
-      delayInUI(new Runnable() {
-        public void run() {
-          NavigationActionFactory factory = new NavigationActionFactory();
-          try {
-            factory.setInitializationData(null, null, NavigationActionFactory.NavigationActionType.NEXT_FEED_NEXT_NEWS.getId());
-            IWorkbenchWindowActionDelegate action = (IWorkbenchWindowActionDelegate) factory.create();
-            action.run(null);
-          } catch (CoreException e) {
-            /* Ignore */
-          }
-        }
-      });
+      handleNavigateAction(id);
     }
 
     /* Go to Next Unread News */
     else if (NEXT_UNREAD_NEWS_HANDLER_ID.equals(id)) {
-      delayInUI(new Runnable() {
-        public void run() {
-          NavigationActionFactory factory = new NavigationActionFactory();
-          try {
-            factory.setInitializationData(null, null, NavigationActionFactory.NavigationActionType.NEXT_UNREAD_FEED_NEXT_UNREAD_NEWS.getId());
-            IWorkbenchWindowActionDelegate action = (IWorkbenchWindowActionDelegate) factory.create();
-            action.run(null);
-          } catch (CoreException e) {
-            /* Ignore */
-          }
-        }
-      });
+      handleNavigateAction(id);
     }
 
     /* Go to Previous News */
     else if (PREVIOUS_NEWS_HANDLER_ID.equals(id)) {
-      delayInUI(new Runnable() {
-        public void run() {
-          NavigationActionFactory factory = new NavigationActionFactory();
-          try {
-            factory.setInitializationData(null, null, NavigationActionFactory.NavigationActionType.PREVIOUS_FEED_PREVIOUS_NEWS.getId());
-            IWorkbenchWindowActionDelegate action = (IWorkbenchWindowActionDelegate) factory.create();
-            action.run(null);
-          } catch (CoreException e) {
-            /* Ignore */
-          }
-        }
-      });
+      handleNavigateAction(id);
     }
 
     /* Go to Previous Unread News */
     else if (PREVIOUS_UNREAD_NEWS_HANDLER_ID.equals(id)) {
-      delayInUI(new Runnable() {
-        public void run() {
-          NavigationActionFactory factory = new NavigationActionFactory();
-          try {
-            factory.setInitializationData(null, null, NavigationActionFactory.NavigationActionType.PREVIOUS_UNREAD_FEED_PREVIOUS_UNREAD_NEWS.getId());
-            IWorkbenchWindowActionDelegate action = (IWorkbenchWindowActionDelegate) factory.create();
-            action.run(null);
-          } catch (CoreException e) {
-            /* Ignore */
-          }
-        }
-      });
+      handleNavigateAction(id);
     }
 
     /* Transform News */
@@ -858,6 +814,51 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     else if (NEXT_PAGE_HANDLER_ID.equals(id)) {
       revealNextPage();
     }
+  }
+
+  private void handleNavigateAction(final String id) {
+
+    /* Special Case Navigation in Newspaper mode when some news are hidden from the page */
+    if (!isHeadlinesLayout() && fPageSize != 0 && (NEXT_NEWS_HANDLER_ID.equals(id) || NEXT_UNREAD_NEWS_HANDLER_ID.equals(id))) {
+      boolean onlyUnread = NEXT_UNREAD_NEWS_HANDLER_ID.equals(id);
+      int totalNewsCount = fViewModel.getNewsCount();
+      int visibleNewsCount = fViewModel.getVisibleNewsCount();
+
+      /* There are hidden News beyond the Page Latch */
+      if (totalNewsCount != 0 && totalNewsCount > visibleNewsCount) {
+        long firstHiddenNewsId = fViewModel.getFirstHiddenNews(onlyUnread);
+        if (firstHiddenNewsId != -1) {
+          showSelection(new StructuredSelection(new NewsReference(firstHiddenNewsId)));
+          return;
+        }
+      }
+    }
+
+    /* Forward the navigation action to the outer scope */
+    delayInUI(new Runnable() {
+      public void run() {
+        NavigationActionFactory factory = new NavigationActionFactory();
+        try {
+          NavigationActionFactory.NavigationActionType type = null;
+          if (NEXT_NEWS_HANDLER_ID.equals(id))
+            type = NavigationActionFactory.NavigationActionType.NEXT_FEED_NEXT_NEWS;
+          else if (NEXT_UNREAD_NEWS_HANDLER_ID.equals(id))
+            type = NavigationActionFactory.NavigationActionType.NEXT_UNREAD_FEED_NEXT_UNREAD_NEWS;
+          else if (PREVIOUS_NEWS_HANDLER_ID.equals(id))
+            type = NavigationActionFactory.NavigationActionType.PREVIOUS_FEED_PREVIOUS_NEWS;
+          else if (PREVIOUS_UNREAD_NEWS_HANDLER_ID.equals(id))
+            type = NavigationActionFactory.NavigationActionType.PREVIOUS_UNREAD_FEED_PREVIOUS_UNREAD_NEWS;
+
+          if (type != null) {
+            factory.setInitializationData(null, null, type.getId());
+            IWorkbenchWindowActionDelegate action = (IWorkbenchWindowActionDelegate) factory.create();
+            action.run(null);
+          }
+        } catch (CoreException e) {
+          /* Ignore */
+        }
+      }
+    });
   }
 
   private void setNewsExpanded(INews news, boolean expanded) {
