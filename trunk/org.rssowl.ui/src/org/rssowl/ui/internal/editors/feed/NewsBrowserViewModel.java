@@ -26,6 +26,7 @@ package org.rssowl.ui.internal.editors.feed;
 
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.Triple;
 import org.rssowl.ui.internal.EntityGroup;
 
@@ -531,13 +532,11 @@ public class NewsBrowserViewModel {
    *
    * @param pageSize the number of elements per page.
    * @return a {@link Triple} of lists. The first contains the identifiers of
-   * groups revealed and the second the list of news identifiers. Finally
-   * indicates if more pages are available or not.
+   * groups revealed and the second the list of news identifiers.
    */
-  public Triple<List<Long> /* Groups */, List<Long> /* News Items */, Boolean /* Has More Pages */> getNextPage(int pageSize) {
+  public Pair<List<Long> /* Groups */, List<Long> /* News Items */> getNextPage(int pageSize) {
     List<Long> groups = new ArrayList<Long>(1);
     List<Long> news = new ArrayList<Long>(pageSize);
-    Boolean hasMorePages = false;
 
     synchronized (fLock) {
       int indexOfFirstHiddenItem = indexOfFirstHiddenItem(-1);
@@ -557,15 +556,13 @@ public class NewsBrowserViewModel {
             news.add(item.getId());
           }
 
-          if (newsCounter == pageSize) {
-            hasMorePages = (i + 1 < fItemList.size());
+          if (pageSize != 0 && newsCounter == pageSize)
             break; //Reached the next page, so stop looping
-          }
         }
       }
     }
 
-    return Triple.create(groups, news, hasMorePages);
+    return Pair.create(groups, news);
   }
 
   /**
@@ -574,14 +571,12 @@ public class NewsBrowserViewModel {
    *
    * @param newsId the identifier of the news item that is being revealed.
    * @param pageSize the number of elements per page.
-   * @return a {@link Triple} of lists. The first contains the identifiers of
-   * groups revealed and the second the list of news identifiers. Finally
-   * indicates if more pages are available or not.
+   * @return a {@link Pair} of lists. The first contains the identifiers of
+   * groups revealed and the second the list of news identifiers.
    */
-  public Triple<List<Long> /* Groups */, List<Long> /* News Items */, Boolean /* Has More Pages */> reveal(long newsId, int pageSize) {
+  public Pair<List<Long> /* Groups */, List<Long> /* News Items */> reveal(long newsId, int pageSize) {
     List<Long> groups = new ArrayList<Long>(1);
     List<Long> news = new ArrayList<Long>();
-    Boolean hasMorePages = false;
 
     synchronized (fLock) {
       int indexOfNewsItem = indexOfNews(newsId);
@@ -599,11 +594,9 @@ public class NewsBrowserViewModel {
             news.add(item.getId());
         }
       }
-
-      hasMorePages = (indexOfNewsItem != -1) && (getNewsCount() - indexOfNewsItem > pageSize);
     }
 
-    return Triple.create(groups, news, hasMorePages);
+    return Pair.create(groups, news);
   }
 
   private int indexOfNews(long newsId) {
