@@ -898,7 +898,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       StringBuilder subtitleContent = new StringBuilder();
       IBaseLabelProvider lp = getLabelProvider();
       if (lp instanceof NewsBrowserLabelProvider)
-        ((NewsBrowserLabelProvider) lp).fillSubtitle(subtitleContent, news, CoreUtils.getSortedLabels(news));
+        ((NewsBrowserLabelProvider) lp).fillSubtitle(subtitleContent, news, CoreUtils.getSortedLabels(news), false);
       if (subtitleContent.length() > 0)
         js.append(getElementById(Dynamic.SUBTITLE_LINK.getId(news))).append(".innerHTML='").append(escapeForInnerHtml(subtitleContent.toString())).append("'; "); //$NON-NLS-1$ //$NON-NLS-2$
       js.append(getElementById(Dynamic.SUBTITLE_LINK.getId(news))).append(".style.display='inline'; "); //$NON-NLS-1$
