@@ -26,7 +26,6 @@ package org.rssowl.ui.internal.editors.feed;
 
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.dao.DynamicDAO;
-import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.Triple;
 import org.rssowl.ui.internal.EntityGroup;
 
@@ -573,18 +572,20 @@ public class NewsBrowserViewModel {
    * Retrieves the identifiers of all hidden elements up to and including the
    * provided news item.
    *
-   * @param newsitem the news item that is being revealed.
-   * @return a {@link Pair} of lists. The first contains the identifiers of
-   * groups revealed and the second the list of news identifiers in case not
-   * visible.
+   * @param newsId the identifier of the news item that is being revealed.
+   * @param pageSize the number of elements per page.
+   * @return a {@link Triple} of lists. The first contains the identifiers of
+   * groups revealed and the second the list of news identifiers. Finally
+   * indicates if more pages are available or not.
    */
-  public Pair<List<Long>, List<Long>> reveal(INews newsitem) {
+  public Triple<List<Long> /* Groups */, List<Long> /* News Items */, Boolean /* Has More Pages */> reveal(long newsId, int pageSize) {
     List<Long> groups = new ArrayList<Long>(1);
     List<Long> news = new ArrayList<Long>();
+    Boolean hasMorePages = false;
 
     synchronized (fLock) {
-      int indexOfNewsItem = indexOf(newsitem);
-      int indexOfFirstHiddenItem = indexOfFirstHiddenItem(newsitem.getId());
+      int indexOfNewsItem = indexOfNews(newsId);
+      int indexOfFirstHiddenItem = indexOfFirstHiddenItem(newsId);
       if (indexOfFirstHiddenItem != -1 && indexOfNewsItem != -1) {
         for (int i = indexOfFirstHiddenItem; i < fItemList.size() && i <= indexOfNewsItem; i++) {
           Item item = fItemList.get(i);
@@ -598,16 +599,18 @@ public class NewsBrowserViewModel {
             news.add(item.getId());
         }
       }
+
+      hasMorePages = (indexOfNewsItem != -1) && (getNewsCount() - indexOfNewsItem > pageSize);
     }
 
-    return Pair.create(groups, news);
+    return Triple.create(groups, news, hasMorePages);
   }
 
-  private int indexOf(INews news) {
+  private int indexOfNews(long newsId) {
     synchronized (fLock) {
       for (int i = 0; i < fItemList.size(); i++) {
         Item item = fItemList.get(i);
-        if (!(item instanceof Group) && item.getId() == news.getId())
+        if (!(item instanceof Group) && item.getId() == newsId)
           return i;
       }
     }
