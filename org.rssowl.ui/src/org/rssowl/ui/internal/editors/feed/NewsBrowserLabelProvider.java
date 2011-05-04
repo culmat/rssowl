@@ -192,6 +192,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   private boolean fShowFooter;
   private boolean fHeadlinesOnly;
   private boolean fForceNoGrouping;
+  private boolean fForceNoPaging;
   private final long fTodayInMillies;
   private final Map<String, String> fMapFeedLinkToName = new HashMap<String, String>();
 
@@ -793,7 +794,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   }
 
   private String getLabel(INews news, boolean withInternalLinks, boolean withManagedLinks, int index) {
-    boolean isVisible = isVisible(news);
+    boolean isVisible = isVisible(news) || fForceNoPaging;
 
     String description = null; //Fetch description lazily if only headlines shown or news hidden
     if (!fHeadlinesOnly && isVisible)
@@ -1434,6 +1435,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     fHeadlinesOnly = false;
     fForceShowFeedInformation = true;
     fForceNoGrouping = true;
+    fForceNoPaging = true;
     try {
       return internalRender(elements, base, withManagedLinks);
     } finally {
@@ -1442,6 +1444,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       fHeadlinesOnly = headlinesOnly;
       fForceShowFeedInformation = showFeedInformation;
       fForceNoGrouping = false;
+      fForceNoPaging = false;
     }
   }
 
