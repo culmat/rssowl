@@ -195,8 +195,11 @@ public class Messages extends NLS {
   public static String DefaultStatusHandler_ERROR_DISK_WRITE;
   public static String EntityGroup_GROUP;
   public static String OwlUI_ACCESSIBLE_NAME;
+  public static String OwlUI_ALL_ARTICLES;
   public static String OwlUI_CLASSIC_LAYOUT;
   public static String OwlUI_CONTENT_ASSIST;
+  public static String OwlUI_F_ARTICLES;
+  public static String OwlUI_H_ARTICLES;
   public static String OwlUI_HEADLINES_LAYOUT;
   public static String OwlUI_HOUR;
   public static String OwlUI_HOUR_MINUTE;
@@ -214,6 +217,8 @@ public class Messages extends NLS {
   public static String OwlUI_SECOND;
   public static String OwlUI_SECONDS;
   public static String OwlUI_SIZE_FORMAT;
+  public static String OwlUI_T_ARTICLES;
+  public static String OwlUI_TF_ARTICLES;
   public static String OwlUI_TITLE;
   public static String OwlUI_UPDATED;
   public static String OwlUI_VERTICAL_LAYOUT;
