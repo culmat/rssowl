@@ -1129,7 +1129,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
     /* Indicate Progress */
     StringBuilder js = new StringBuilder();
-    js.append(getElementById(Dynamic.FULL_CONTENT_LINK_TEXT.getId(news)).append(".innerHTML='").append(Messages.NewsBrowserViewer_LOADING).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$
+    js.append(getElementById(Dynamic.FULL_CONTENT_LINK_TEXT.getId(news)).append(".innerHTML='").append(escapeForInnerHtml(Messages.NewsBrowserViewer_LOADING)).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$
     js.append(getElementById(Dynamic.FULL_CONTENT_LINK.getId(news)).append(".blur(); ")); //$NON-NLS-1$
     fBrowser.execute(js.toString());
 
@@ -1208,12 +1208,9 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       result = ((NewsBrowserLabelProvider) labelProvider).highlightSearchTermsIfNecessary(result);
     }
 
-    /* Make the result suitable to be used in JavaScript */
-    result = escapeForInnerHtml(result);
-
     final StringBuilder js = new StringBuilder();
-    js.append(getElementById(Dynamic.CONTENT.getId(news)).append(".innerHTML='").append(result).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$
-    js.append(getElementById(Dynamic.FULL_CONTENT_LINK_TEXT.getId(news)).append(".innerHTML='").append(Messages.NewsBrowserViewer_FULL_CONTENT).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$
+    js.append(getElementById(Dynamic.CONTENT.getId(news)).append(".innerHTML='").append(escapeForInnerHtml(result)).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$
+    js.append(getElementById(Dynamic.FULL_CONTENT_LINK_TEXT.getId(news)).append(".innerHTML='").append(escapeForInnerHtml(Messages.NewsBrowserViewer_FULL_CONTENT)).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$
     scrollIfNecessary(news, js);
 
     /* Block external navigation while setting innerHTML */
@@ -1326,15 +1323,8 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     if (firstNews != null && scrollIntoView)
       js.append(getElementById(Dynamic.NEWS.getId(firstNews))).append(".scrollIntoView(true); "); //$NON-NLS-1$
 
-    /* Update Latch */
-    if (fPageSize != 0) {
-      if (fViewModel.getVisibleNewsCount() == fViewModel.getNewsCount())
-        js.append(getElementById(Dynamic.PAGE_LATCH.getId())).append(".style.display='none'; "); //$NON-NLS-1$
-      else if (getLabelProvider() instanceof NewsBrowserLabelProvider) {
-        String updatedLatchName = ((NewsBrowserLabelProvider) getLabelProvider()).getLatchName();
-        js.append(getElementById(Dynamic.PAGE_LATCH_LINK.getId())).append(".innerHTML='").append(updatedLatchName).append("'; "); //$NON-NLS-1$ //$NON-NLS-2$
-      }
-    }
+    /* Update Latch if necessary */
+    updateLatchIfNecessary(js);
 
     /* Block external navigation while setting innerHTML */
     fBrowser.blockExternalNavigationWhile(new Runnable() {
@@ -1342,6 +1332,28 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
         fBrowser.execute(js.toString());
       }
     });
+  }
+
+  private void updateLatchIfNecessary(StringBuilder js) {
+    if (fPageSize == 0)
+      return; //Return if pagination turned off
+
+    /* Latch no longer required - hide */
+    if (fViewModel.getVisibleNewsCount() == fViewModel.getNewsCount()) {
+      js.append("var latch = ").append(getElementById(Dynamic.PAGE_LATCH.getId())).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
+      js.append("if (latch != null) {"); //$NON-NLS-1$
+      js.append("  latch.style.display='none'; "); //$NON-NLS-1$
+      js.append("}"); //$NON-NLS-1$
+    }
+
+    /* Otherwise update Latch Label */
+    else if (getLabelProvider() instanceof NewsBrowserLabelProvider) {
+      String updatedLatchName = ((NewsBrowserLabelProvider) getLabelProvider()).getLatchName();
+      js.append("var latch = ").append(getElementById(Dynamic.PAGE_LATCH_LINK.getId())).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
+      js.append("if (latch != null) {"); //$NON-NLS-1$
+      js.append("  latch.innerHTML='").append(escapeForInnerHtml(updatedLatchName)).append("'; "); //$NON-NLS-1$ //$NON-NLS-2$
+      js.append("}"); //$NON-NLS-1$
+    }
   }
 
   private void delayInUI(Runnable runnable) {
@@ -2075,7 +2087,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
                 span(labelsHtml, StringUtils.htmlEscape(label.getName()), label.getColor());
             }
 
-            js.append(getElementById(Dynamic.LABELS.getId(news)).append(".innerHTML='").append(labelsHtml.toString()).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$
+            js.append(getElementById(Dynamic.LABELS.getId(news)).append(".innerHTML='").append(escapeForInnerHtml(labelsHtml.toString())).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$
           }
         }
 
@@ -2158,10 +2170,13 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
         js.append("node = ").append(getElementById(Dynamic.GROUP_NOTE.getId(groupId))).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
         js.append("if (node != null) { "); //$NON-NLS-1$
-        js.append("node.innerHTML = '").append(groupNote).append("'; "); //$NON-NLS-1$ //$NON-NLS-2$
+        js.append("  node.innerHTML = '").append(escapeForInnerHtml(groupNote)).append("'; "); //$NON-NLS-1$ //$NON-NLS-2$
         js.append("} "); //$NON-NLS-1$
       }
     }
+
+    /* Update Latch as necessary */
+    updateLatchIfNecessary(js);
 
     return fBrowser.execute(js.toString());
   }
