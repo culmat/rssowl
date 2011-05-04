@@ -2132,7 +2132,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
       /* Delay navigation because input was just set and browser needs a little to render */
       if (onInputSet) {
-        JobRunner.runInUIThread(300, fNewsBrowserControl.getViewer().getControl(), new Runnable() {
+        JobRunner.runInUIThread(100, fNewsBrowserControl.getViewer().getControl(), new Runnable() {
           public void run() {
             fNewsBrowserControl.getViewer().navigate(next, unread, onInputSet);
           }
