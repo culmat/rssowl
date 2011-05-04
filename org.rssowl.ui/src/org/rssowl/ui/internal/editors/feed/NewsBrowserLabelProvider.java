@@ -860,7 +860,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
         /* Subtitle */
         StringBuilder subtitleContent = new StringBuilder();
-        fillSubtitle(subtitleContent, news, labels);
+        fillSubtitle(subtitleContent, news, labels, false);
         link(builder, link, subtitleContent.toString(), "subtitle", Dynamic.SUBTITLE_LINK.getId(news), "80, 80, 80"); //$NON-NLS-1$ //$NON-NLS-2$
       }
 
@@ -958,7 +958,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       builder.append("</td>"); //$NON-NLS-1$
 
       builder.append("<td class=\"subline\">"); //$NON-NLS-1$
-      fillAuthor(builder, author);
+      fillAuthor(builder, author, true);
       builder.append("</td>"); //$NON-NLS-1$
     }
 
@@ -1226,7 +1226,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     return NLS.bind(Messages.NewsBrowserLabelProvider_DISPLAY_MORE_ARTICLES, getVisibleNewsCount(), getTotalNewsCount());
   }
 
-  void fillSubtitle(StringBuilder subtitleContent, INews news, Set<ILabel> labels) {
+  void fillSubtitle(StringBuilder subtitleContent, INews news, Set<ILabel> labels, boolean withLinks) {
 
     /* Subtitle: Date */
     fillDate(news, subtitleContent);
@@ -1235,7 +1235,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     IPerson author = news.getAuthor();
     if (author != null) {
       subtitleContent.append(" | "); //$NON-NLS-1$
-      fillAuthor(subtitleContent, author);
+      fillAuthor(subtitleContent, author, withLinks);
     }
 
     /* Subtitle: Feed */
@@ -1262,7 +1262,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       builder.append(fDateFormat.format(newsDate));
   }
 
-  private void fillAuthor(StringBuilder builder, IPerson author) {
+  private void fillAuthor(StringBuilder builder, IPerson author, boolean withLinks) {
     String name = author.getName();
     String email = (author.getEmail() != null) ? author.getEmail().toASCIIString() : null;
     if (email != null && !email.contains("mail:")) //$NON-NLS-1$
@@ -1272,12 +1272,14 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     if (email == null && name.contains("@") && !name.contains(" ")) //$NON-NLS-1$ //$NON-NLS-2$
       email = name;
 
-    if (StringUtils.isSet(name) && email != null)
+    if (withLinks && StringUtils.isSet(name) && email != null)
       link(builder, email, NLS.bind(Messages.NewsBrowserLabelProvider_BY_AUTHOR, StringUtils.htmlEscape(name)), "author"); //$NON-NLS-1$
     else if (StringUtils.isSet(name))
       builder.append(NLS.bind(Messages.NewsBrowserLabelProvider_BY_AUTHOR, StringUtils.htmlEscape(name)));
-    else if (email != null)
+    else if (withLinks && email != null)
       link(builder, email, NLS.bind(Messages.NewsBrowserLabelProvider_BY_AUTHOR, StringUtils.htmlEscape(email)), "author"); //$NON-NLS-1$
+    else if (email != null)
+      builder.append(StringUtils.htmlEscape(email));
     else
       builder.append(Messages.NewsBrowserLabelProvider_UNKNOWN);
   }
