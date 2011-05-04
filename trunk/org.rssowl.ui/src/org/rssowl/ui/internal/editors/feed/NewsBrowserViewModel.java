@@ -26,6 +26,7 @@ package org.rssowl.ui.internal.editors.feed;
 
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.Triple;
 import org.rssowl.ui.internal.EntityGroup;
 
@@ -280,7 +281,7 @@ public class NewsBrowserViewModel {
   /**
    * @return the identifier of the currently expanded news or -1 if none.
    */
-  public Long getExpandedNews() {
+  public long getExpandedNews() {
     synchronized (fLock) {
       if (!fExpandedNews.isEmpty())
         return fExpandedNews.iterator().next();
@@ -322,7 +323,7 @@ public class NewsBrowserViewModel {
    * @param visible <code>true</code> if visible and <code>false</code> if
    * hidden
    */
-  public void setGroupVisible(Long groupId, boolean visible) {
+  public void setGroupVisible(long groupId, boolean visible) {
     synchronized (fLock) {
       if (visible)
         fHiddenGroups.remove(groupId);
@@ -336,7 +337,7 @@ public class NewsBrowserViewModel {
    * @param expanded <code>true</code> if expanded and <code>false</code> if
    * collapsed
    */
-  public void setGroupExpanded(Long groupId, boolean expanded) {
+  public void setGroupExpanded(long groupId, boolean expanded) {
     synchronized (fLock) {
       if (expanded)
         fCollapsedGroups.remove(groupId);
@@ -349,7 +350,7 @@ public class NewsBrowserViewModel {
    * @param newsId the identifier of the news to find the group for
    * @return the identifier of the group for the given news or -1 if none
    */
-  public Long findGroup(Long newsId) {
+  public long findGroup(long newsId) {
     synchronized (fLock) {
       Set<java.util.Map.Entry<Long, List<Long>>> entries = fEntityGroupToNewsMap.entrySet();
       for (java.util.Map.Entry<Long, List<Long>> entry : entries) {
@@ -411,7 +412,7 @@ public class NewsBrowserViewModel {
    * @return the identifier of a group that needs an update now that the news
    * has been removed or -1 if none.
    */
-  public Long removeNews(INews news) {
+  public long removeNews(INews news) {
     synchronized (fLock) {
 
       /* Remove from generic Item Collections */
@@ -459,7 +460,7 @@ public class NewsBrowserViewModel {
    * @param offset the offset to start navigating from
    * @return the identifier of the next news or -1 if none
    */
-  public Long nextNews(boolean unread, Long offset) {
+  public long nextNews(boolean unread, long offset) {
     synchronized (fLock) {
 
       /* Get the next news using provided one as starting location or from beginning if no location provided */
@@ -486,7 +487,7 @@ public class NewsBrowserViewModel {
    * @param offset the offset to start navigating from
    * @return the identifier of the previous news or -1 if none
    */
-  public Long previousNews(boolean unread, Long offset) {
+  public long previousNews(boolean unread, long offset) {
     synchronized (fLock) {
 
       /* Get the next news using provided one as starting location or from end if no location provided */
@@ -540,19 +541,7 @@ public class NewsBrowserViewModel {
     Boolean hasMorePages = false;
 
     synchronized (fLock) {
-
-      /* Find Index of First Hidden Item */
-      int indexOfFirstHiddenItem = -1;
-      for (int i = 0; i < fItemList.size(); i++) {
-        Item item = fItemList.get(i);
-        if (isVisible(item))
-          continue;
-
-        indexOfFirstHiddenItem = i;
-        break;
-      }
-
-      /* Find the next page of items */
+      int indexOfFirstHiddenItem = indexOfFirstHiddenItem(-1);
       if (indexOfFirstHiddenItem != -1) {
         int newsCounter = 0;
         for (int i = indexOfFirstHiddenItem; i < fItemList.size(); i++) {
@@ -578,6 +567,67 @@ public class NewsBrowserViewModel {
     }
 
     return Triple.create(groups, news, hasMorePages);
+  }
+
+  /**
+   * Retrieves the identifiers of all hidden elements up to and including the
+   * provided news item.
+   *
+   * @param newsitem the news item that is being revealed.
+   * @return a {@link Pair} of lists. The first contains the identifiers of
+   * groups revealed and the second the list of news identifiers in case not
+   * visible.
+   */
+  public Pair<List<Long>, List<Long>> reveal(INews newsitem) {
+    List<Long> groups = new ArrayList<Long>(1);
+    List<Long> news = new ArrayList<Long>();
+
+    synchronized (fLock) {
+      int indexOfNewsItem = indexOf(newsitem);
+      int indexOfFirstHiddenItem = indexOfFirstHiddenItem(newsitem.getId());
+      if (indexOfFirstHiddenItem != -1 && indexOfNewsItem != -1) {
+        for (int i = indexOfFirstHiddenItem; i < fItemList.size() && i <= indexOfNewsItem; i++) {
+          Item item = fItemList.get(i);
+
+          /* Group */
+          if (item instanceof Group)
+            groups.add(item.getId());
+
+          /* News */
+          else
+            news.add(item.getId());
+        }
+      }
+    }
+
+    return Pair.create(groups, news);
+  }
+
+  private int indexOf(INews news) {
+    synchronized (fLock) {
+      for (int i = 0; i < fItemList.size(); i++) {
+        Item item = fItemList.get(i);
+        if (!(item instanceof Group) && item.getId() == news.getId())
+          return i;
+      }
+    }
+
+    return -1;
+  }
+
+  private int indexOfFirstHiddenItem(long toId) {
+    synchronized (fLock) {
+      for (int i = 0; i < fItemList.size(); i++) {
+        Item item = fItemList.get(i);
+
+        if (!isVisible(item))
+          return i; //Hidden Item found
+
+        if (toId != -1 && toId == item.getId())
+          break; //Limit reached
+      }
+    }
+    return -1;
   }
 
   private boolean isVisible(Item item) {
