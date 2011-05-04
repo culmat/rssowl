@@ -75,7 +75,7 @@ public class NewsBrowserViewModelTests {
     assertEquals(0, model.getGroupSize(5L));
     assertTrue(model.getNewsIds(5L).isEmpty());
     assertFalse(model.hasGroup(5L));
-    assertFalse(model.isExpanded(fFactory.createNews(5L, fFactory.createFeed(null, URI.create("rssowl.org")), new Date())));
+    assertFalse(model.isNewsExpanded(fFactory.createNews(5L, fFactory.createFeed(null, URI.create("rssowl.org")), new Date())));
     assertTrue(model.isGroupExpanded(5L));
     assertEquals(-1L, model.nextNews(false, -1L).longValue());
     assertEquals(-1L, model.previousNews(false, -1L).longValue());
@@ -87,7 +87,7 @@ public class NewsBrowserViewModelTests {
     assertEquals(-1L, model.previousNews(true, 5L).longValue());
     assertEquals(-1L, model.removeNews(fFactory.createNews(5L, fFactory.createFeed(null, URI.create("rssowl.org")), new Date())).longValue());
 
-    model.setExpanded(fFactory.createNews(5L, fFactory.createFeed(null, URI.create("rssowl.org")), new Date()), false);
+    model.setNewsExpanded(fFactory.createNews(5L, fFactory.createFeed(null, URI.create("rssowl.org")), new Date()), false);
     model.setGroupExpanded(5L, false);
   }
 
@@ -107,7 +107,7 @@ public class NewsBrowserViewModelTests {
     assertEquals(0, model.getGroupSize(5L));
     assertTrue(model.getNewsIds(5L).isEmpty());
     assertFalse(model.hasGroup(5L));
-    assertFalse(model.isExpanded(fFactory.createNews(5L, fFactory.createFeed(null, URI.create("rssowl.org")), new Date())));
+    assertFalse(model.isNewsExpanded(fFactory.createNews(5L, fFactory.createFeed(null, URI.create("rssowl.org")), new Date())));
     assertTrue(model.isGroupExpanded(5L));
     assertEquals(-1L, model.nextNews(false, -1L).longValue());
     assertEquals(-1L, model.previousNews(false, -1L).longValue());
@@ -119,7 +119,7 @@ public class NewsBrowserViewModelTests {
     assertEquals(-1L, model.previousNews(true, 5L).longValue());
     assertEquals(-1L, model.removeNews(fFactory.createNews(5L, fFactory.createFeed(null, URI.create("rssowl.org")), new Date())).longValue());
 
-    model.setExpanded(fFactory.createNews(5L, fFactory.createFeed(null, URI.create("rssowl.org")), new Date()), false);
+    model.setNewsExpanded(fFactory.createNews(5L, fFactory.createFeed(null, URI.create("rssowl.org")), new Date()), false);
     model.setGroupExpanded(5L, false);
   }
 
@@ -144,14 +144,14 @@ public class NewsBrowserViewModelTests {
 
     assertEquals(-1L, model.findGroup(5L).longValue());
     assertEquals(-1L, model.getExpandedNews().longValue());
-    model.setExpanded(news3, true);
+    model.setNewsExpanded(news3, true);
     assertEquals(3L, model.getExpandedNews().longValue());
     assertTrue(model.getGroups().isEmpty());
     assertEquals(0, model.getGroupSize(5L));
     assertTrue(model.getNewsIds(5L).isEmpty());
     assertFalse(model.hasGroup(5L));
-    assertFalse(model.isExpanded(news2));
-    assertTrue(model.isExpanded(news3));
+    assertFalse(model.isNewsExpanded(news2));
+    assertTrue(model.isNewsExpanded(news3));
     assertTrue(model.isGroupExpanded(5L));
 
     assertEquals(1L, model.nextNews(false, -1L).longValue());
@@ -207,7 +207,7 @@ public class NewsBrowserViewModelTests {
     assertEquals(101L, model.findGroup(3L).longValue());
 
     assertEquals(-1L, model.getExpandedNews().longValue());
-    model.setExpanded(news3, true);
+    model.setNewsExpanded(news3, true);
     assertEquals(3L, model.getExpandedNews().longValue());
 
     assertEquals(2, model.getGroups().size());
@@ -229,8 +229,8 @@ public class NewsBrowserViewModelTests {
     assertTrue(model.hasGroup(100L));
     assertTrue(model.hasGroup(101L));
 
-    assertFalse(model.isExpanded(news2));
-    assertTrue(model.isExpanded(news3));
+    assertFalse(model.isNewsExpanded(news2));
+    assertTrue(model.isNewsExpanded(news3));
 
     assertTrue(model.isGroupExpanded(5L));
     model.setGroupExpanded(100L, false);
@@ -261,9 +261,9 @@ public class NewsBrowserViewModelTests {
     assertEquals(101L, model.removeNews(news3).longValue());
     assertFalse(model.hasGroup(101L));
 
-    assertFalse(model.isExpanded(news1));
-    assertFalse(model.isExpanded(news2));
-    assertFalse(model.isExpanded(news3));
+    assertFalse(model.isNewsExpanded(news1));
+    assertFalse(model.isNewsExpanded(news2));
+    assertFalse(model.isNewsExpanded(news3));
 
     assertEquals(0, model.getGroups().size());
     assertEquals(0, model.getGroupSize(100L));
