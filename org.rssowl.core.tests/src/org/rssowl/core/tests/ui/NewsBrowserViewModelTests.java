@@ -35,7 +35,7 @@ import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.dao.DynamicDAO;
-import org.rssowl.core.util.Triple;
+import org.rssowl.core.util.Pair;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.editors.feed.NewsBrowserViewModel;
 
@@ -90,20 +90,17 @@ public class NewsBrowserViewModelTests {
     assertEquals(0, model.getNewsCount());
     assertEquals(0, model.getVisibleNewsCount());
 
-    Triple<List<Long>, List<Long>, Boolean> nextPage = model.getNextPage(0);
+    Pair<List<Long>, List<Long>> nextPage = model.getNextPage(0);
     assertTrue(nextPage.getFirst().isEmpty());
     assertTrue(nextPage.getSecond().isEmpty());
-    assertFalse(nextPage.getThird());
 
     nextPage = model.getNextPage(5);
     assertTrue(nextPage.getFirst().isEmpty());
     assertTrue(nextPage.getSecond().isEmpty());
-    assertFalse(nextPage.getThird());
 
-    Triple<List<Long>, List<Long>, Boolean> revealed = model.reveal(5L, 0);
+    Pair<List<Long>, List<Long>> revealed = model.reveal(5L, 0);
     assertTrue(revealed.getFirst().isEmpty());
     assertTrue(revealed.getSecond().isEmpty());
-    assertFalse(revealed.getThird());
 
     model.setNewsExpanded(fFactory.createNews(5L, fFactory.createFeed(null, URI.create("rssowl.org")), new Date()), false);
     model.setGroupExpanded(5L, false);
@@ -140,20 +137,17 @@ public class NewsBrowserViewModelTests {
     assertEquals(0, model.getNewsCount());
     assertEquals(0, model.getVisibleNewsCount());
 
-    Triple<List<Long>, List<Long>, Boolean> nextPage = model.getNextPage(0);
+    Pair<List<Long>, List<Long>> nextPage = model.getNextPage(0);
     assertTrue(nextPage.getFirst().isEmpty());
     assertTrue(nextPage.getSecond().isEmpty());
-    assertFalse(nextPage.getThird());
 
     nextPage = model.getNextPage(5);
     assertTrue(nextPage.getFirst().isEmpty());
     assertTrue(nextPage.getSecond().isEmpty());
-    assertFalse(nextPage.getThird());
 
-    Triple<List<Long>, List<Long>, Boolean> revealed = model.reveal(5L, 0);
+    Pair<List<Long>, List<Long>> revealed = model.reveal(5L, 0);
     assertTrue(revealed.getFirst().isEmpty());
     assertTrue(revealed.getSecond().isEmpty());
-    assertFalse(revealed.getThird());
 
     model.setNewsExpanded(fFactory.createNews(5L, fFactory.createFeed(null, URI.create("rssowl.org")), new Date()), false);
     model.setGroupExpanded(5L, false);
@@ -190,20 +184,17 @@ public class NewsBrowserViewModelTests {
     assertEquals(0, model.getNewsCount());
     assertEquals(0, model.getVisibleNewsCount());
 
-    Triple<List<Long>, List<Long>, Boolean> nextPage = model.getNextPage(0);
+    Pair<List<Long>, List<Long>> nextPage = model.getNextPage(0);
     assertTrue(nextPage.getFirst().isEmpty());
     assertTrue(nextPage.getSecond().isEmpty());
-    assertFalse(nextPage.getThird());
 
     nextPage = model.getNextPage(5);
     assertTrue(nextPage.getFirst().isEmpty());
     assertTrue(nextPage.getSecond().isEmpty());
-    assertFalse(nextPage.getThird());
 
-    Triple<List<Long>, List<Long>, Boolean> revealed = model.reveal(5L, 0);
+    Pair<List<Long>, List<Long>> revealed = model.reveal(5L, 0);
     assertTrue(revealed.getFirst().isEmpty());
     assertTrue(revealed.getSecond().isEmpty());
-    assertFalse(revealed.getThird());
 
     model.setNewsExpanded(fFactory.createNews(5L, fFactory.createFeed(null, URI.create("rssowl.org")), new Date()), false);
     model.setGroupExpanded(5L, false);
@@ -281,17 +272,15 @@ public class NewsBrowserViewModelTests {
     assertEquals(2, model.getNewsCount());
     assertEquals(2, model.getVisibleNewsCount());
 
-    Triple<List<Long>, List<Long>, Boolean> nextPage = model.getNextPage(0);
+    Pair<List<Long>, List<Long>> nextPage = model.getNextPage(0);
     assertTrue(nextPage.getFirst().isEmpty());
     assertTrue(nextPage.getSecond().isEmpty());
-    assertFalse(nextPage.getThird());
 
     nextPage = model.getNextPage(5);
     assertTrue(nextPage.getFirst().isEmpty());
     assertTrue(nextPage.getSecond().isEmpty());
-    assertFalse(nextPage.getThird());
 
-    Triple<List<Long>, List<Long>, Boolean> revealed = model.reveal(5L, 5);
+    Pair<List<Long>, List<Long>> revealed = model.reveal(5L, 5);
     assertTrue(revealed.getFirst().isEmpty());
     assertTrue(revealed.getSecond().isEmpty());
 
@@ -367,11 +356,10 @@ public class NewsBrowserViewModelTests {
     assertEquals(3L, model.previousNews(true, 5L));
     assertEquals(3L, model.previousNews(false, 5L));
 
-    Triple<List<Long>, List<Long>, Boolean> nextPage = model.getNextPage(2);
+    Pair<List<Long>, List<Long>> nextPage = model.getNextPage(2);
     assertTrue(nextPage.getFirst().isEmpty());
     assertEquals(1, nextPage.getSecond().size());
     assertEquals(news3.getId(), nextPage.getSecond().get(0));
-    assertFalse(nextPage.getThird());
 
     assertEquals(-1L, model.removeNews(news2));
     assertEquals(3L, model.nextNews(false, 1L));
@@ -397,14 +385,12 @@ public class NewsBrowserViewModelTests {
     nextPage = model.getNextPage(0);
     assertTrue(nextPage.getFirst().isEmpty());
     assertTrue(nextPage.getSecond().isEmpty());
-    assertFalse(nextPage.getThird());
 
     nextPage = model.getNextPage(5);
     assertTrue(nextPage.getFirst().isEmpty());
     assertTrue(nextPage.getSecond().isEmpty());
-    assertFalse(nextPage.getThird());
 
-    Triple<List<Long>, List<Long>, Boolean> revealed = model.reveal(5L, 2);
+    Pair<List<Long>, List<Long>> revealed = model.reveal(5L, 2);
     assertTrue(revealed.getFirst().isEmpty());
     assertTrue(revealed.getSecond().isEmpty());
 
@@ -501,17 +487,15 @@ public class NewsBrowserViewModelTests {
     assertEquals(2, model.getNewsCount());
     assertEquals(2, model.getVisibleNewsCount());
 
-    Triple<List<Long>, List<Long>, Boolean> nextPage = model.getNextPage(0);
+    Pair<List<Long>, List<Long>> nextPage = model.getNextPage(0);
     assertTrue(nextPage.getFirst().isEmpty());
     assertTrue(nextPage.getSecond().isEmpty());
-    assertFalse(nextPage.getThird());
 
     nextPage = model.getNextPage(5);
     assertTrue(nextPage.getFirst().isEmpty());
     assertTrue(nextPage.getSecond().isEmpty());
-    assertFalse(nextPage.getThird());
 
-    Triple<List<Long>, List<Long>, Boolean> revealed = model.reveal(5L, 5);
+    Pair<List<Long>, List<Long>> revealed = model.reveal(5L, 5);
     assertTrue(revealed.getFirst().isEmpty());
     assertTrue(revealed.getSecond().isEmpty());
 
@@ -628,20 +612,17 @@ public class NewsBrowserViewModelTests {
 
     assertTrue(model.getNewsIds(100L).isEmpty());
 
-    Triple<List<Long>, List<Long>, Boolean> nextPage = model.getNextPage(0);
+    Pair<List<Long>, List<Long>> nextPage = model.getNextPage(0);
     assertTrue(nextPage.getFirst().isEmpty());
     assertTrue(nextPage.getSecond().isEmpty());
-    assertFalse(nextPage.getThird());
 
     nextPage = model.getNextPage(5);
     assertTrue(nextPage.getFirst().isEmpty());
     assertTrue(nextPage.getSecond().isEmpty());
-    assertFalse(nextPage.getThird());
 
-    Triple<List<Long>, List<Long>, Boolean> revealed = model.reveal(5L, 0);
+    Pair<List<Long>, List<Long>> revealed = model.reveal(5L, 0);
     assertTrue(revealed.getFirst().isEmpty());
     assertTrue(revealed.getSecond().isEmpty());
-    assertFalse(revealed.getThird());
   }
 
   /**
@@ -736,20 +717,17 @@ public class NewsBrowserViewModelTests {
 
     assertTrue(model.getNewsIds(100L).isEmpty());
 
-    Triple<List<Long>, List<Long>, Boolean> nextPage = model.getNextPage(0);
+    Pair<List<Long>, List<Long>> nextPage = model.getNextPage(0);
     assertTrue(nextPage.getFirst().isEmpty());
     assertTrue(nextPage.getSecond().isEmpty());
-    assertFalse(nextPage.getThird());
 
     nextPage = model.getNextPage(5);
     assertTrue(nextPage.getFirst().isEmpty());
     assertTrue(nextPage.getSecond().isEmpty());
-    assertFalse(nextPage.getThird());
 
-    Triple<List<Long>, List<Long>, Boolean> revealed = model.reveal(5L, 0);
+    Pair<List<Long>, List<Long>> revealed = model.reveal(5L, 0);
     assertTrue(revealed.getFirst().isEmpty());
     assertTrue(revealed.getSecond().isEmpty());
-    assertFalse(revealed.getThird());
   }
 
   /**
@@ -827,12 +805,11 @@ public class NewsBrowserViewModelTests {
     assertEquals(3L, model.previousNews(true, 5L));
     assertEquals(3L, model.previousNews(false, 5L));
 
-    Triple<List<Long>, List<Long>, Boolean> nextPage = model.getNextPage(2);
+    Pair<List<Long>, List<Long>> nextPage = model.getNextPage(2);
     assertEquals(1, nextPage.getFirst().size());
     assertEquals(group2.getId(), nextPage.getFirst().get(0).longValue());
     assertEquals(1, nextPage.getSecond().size());
     assertEquals(news3.getId(), nextPage.getSecond().get(0));
-    assertFalse(nextPage.getThird());
 
     model.setGroupVisible(group2.getId(), true);
     model.setNewsVisible(news3, true);
@@ -840,17 +817,15 @@ public class NewsBrowserViewModelTests {
     nextPage = model.getNextPage(2);
     assertTrue(nextPage.getFirst().isEmpty());
     assertTrue(nextPage.getSecond().isEmpty());
-    assertFalse(nextPage.getThird());
 
     model.setGroupVisible(group2.getId(), false);
     model.setNewsVisible(news3, false);
 
-    Triple<List<Long>, List<Long>, Boolean> revealed = model.reveal(news3.getId(), 2);
+    Pair<List<Long>, List<Long>> revealed = model.reveal(news3.getId(), 2);
     assertEquals(1, revealed.getFirst().size());
     assertEquals(group2.getId(), revealed.getFirst().get(0).longValue());
     assertEquals(1, revealed.getSecond().size());
     assertEquals(news3.getId(), revealed.getSecond().get(0));
-    assertFalse(revealed.getThird());
   }
 
   /**
@@ -871,10 +846,9 @@ public class NewsBrowserViewModelTests {
     NewsBrowserViewModel model = new NewsBrowserViewModel();
     model.setInput(elements, 2);
 
-    Triple<List<Long>, List<Long>, Boolean> revealed = model.reveal(news1.getId(), 2);
+    Pair<List<Long>, List<Long>> revealed = model.reveal(news1.getId(), 2);
     assertTrue(revealed.getFirst().isEmpty());
     assertTrue(revealed.getSecond().isEmpty());
-    assertTrue(revealed.getThird());
 
     revealed = model.reveal(news4.getId(), 2);
     assertTrue(revealed.getFirst().isEmpty());
@@ -882,7 +856,6 @@ public class NewsBrowserViewModelTests {
     assertEquals(2, revealed.getSecond().size());
     assertEquals(news3.getId(), revealed.getSecond().get(0));
     assertEquals(news4.getId(), revealed.getSecond().get(1));
-    assertFalse(revealed.getThird());
   }
 
   /**
@@ -906,10 +879,9 @@ public class NewsBrowserViewModelTests {
     NewsBrowserViewModel model = new NewsBrowserViewModel();
     model.setInput(elements, 2);
 
-    Triple<List<Long>, List<Long>, Boolean> revealed = model.reveal(news1.getId(), 2);
+    Pair<List<Long>, List<Long>> revealed = model.reveal(news1.getId(), 2);
     assertTrue(revealed.getFirst().isEmpty());
     assertTrue(revealed.getSecond().isEmpty());
-    assertTrue(revealed.getThird());
 
     revealed = model.reveal(news4.getId(), 2);
     assertFalse(revealed.getFirst().isEmpty());
@@ -919,6 +891,5 @@ public class NewsBrowserViewModelTests {
     assertEquals(2, revealed.getSecond().size());
     assertEquals(news3.getId(), revealed.getSecond().get(0));
     assertEquals(news4.getId(), revealed.getSecond().get(1));
-    assertFalse(revealed.getThird());
   }
 }

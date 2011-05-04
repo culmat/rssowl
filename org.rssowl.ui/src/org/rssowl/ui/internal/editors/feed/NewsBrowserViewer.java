@@ -78,8 +78,8 @@ import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.CoreUtils;
+import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.StringUtils;
-import org.rssowl.core.util.Triple;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.ApplicationActionBarAdvisor;
@@ -1259,16 +1259,15 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   private void revealNextPage() {
 
     /* Get next page from View Model */
-    Triple<List<Long>, List<Long>, Boolean> nextPage = fViewModel.getNextPage(fPageSize);
+    Pair<List<Long>, List<Long>> nextPage = fViewModel.getNextPage(fPageSize);
     List<Long> revealedGroups = nextPage.getFirst();
     List<Long> revealedNews = nextPage.getSecond();
-    Boolean hasMorePages = nextPage.getThird();
 
-    revealItems(revealedGroups, revealedNews, hasMorePages, true);
+    revealItems(revealedGroups, revealedNews, true);
   }
 
   @SuppressWarnings("unchecked")
-  private void revealItems(List<Long> revealedGroups, List<Long> revealedNews, Boolean hasMorePages, boolean scrollIntoView) {
+  private void revealItems(List<Long> revealedGroups, List<Long> revealedNews, boolean scrollIntoView) {
 
     /* Return early if no more news to reveal */
     if (revealedNews.isEmpty())
@@ -1277,7 +1276,8 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     final StringBuilder js = new StringBuilder();
 
     /* Blur Links */
-    js.append(getElementById(Dynamic.PAGE_LATCH_LINK.getId()).append(".blur(); ")); //$NON-NLS-1$
+    if (scrollIntoView) //Action was invoked from latch
+      js.append(getElementById(Dynamic.PAGE_LATCH_LINK.getId()).append(".blur(); ")); //$NON-NLS-1$
 
     /* Check if the first revealed news belongs to a group that is already showing but collapsed */
     long group = fViewModel.findGroup(revealedNews.get(0));
@@ -1327,11 +1327,13 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       js.append(getElementById(Dynamic.NEWS.getId(firstNews))).append(".scrollIntoView(true); "); //$NON-NLS-1$
 
     /* Update Latch */
-    if (!hasMorePages)
-      js.append(getElementById(Dynamic.PAGE_LATCH.getId())).append(".style.display='none'; "); //$NON-NLS-1$
-    else if (getLabelProvider() instanceof NewsBrowserLabelProvider) {
-      String updatedLatchName = ((NewsBrowserLabelProvider) getLabelProvider()).getLatchName();
-      js.append(getElementById(Dynamic.PAGE_LATCH_LINK.getId())).append(".innerHTML='").append(updatedLatchName).append("'; "); //$NON-NLS-1$ //$NON-NLS-2$
+    if (fPageSize != 0) {
+      if (fViewModel.getVisibleNewsCount() == fViewModel.getNewsCount())
+        js.append(getElementById(Dynamic.PAGE_LATCH.getId())).append(".style.display='none'; "); //$NON-NLS-1$
+      else if (getLabelProvider() instanceof NewsBrowserLabelProvider) {
+        String updatedLatchName = ((NewsBrowserLabelProvider) getLabelProvider()).getLatchName();
+        js.append(getElementById(Dynamic.PAGE_LATCH_LINK.getId())).append(".innerHTML='").append(updatedLatchName).append("'; "); //$NON-NLS-1$ //$NON-NLS-2$
+      }
     }
 
     /* Block external navigation while setting innerHTML */
@@ -1648,8 +1650,8 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     if (newsToShow != null) {
 
       /* First determine if there are hidden elements that need to be expanded */
-      Triple<List<Long>, List<Long>, Boolean> itemsToReveal = fViewModel.reveal(newsToShow.getId(), fPageSize);
-      revealItems(itemsToReveal.getFirst(), itemsToReveal.getSecond(), itemsToReveal.getThird(), false);
+      Pair<List<Long>, List<Long>> itemsToReveal = fViewModel.reveal(newsToShow.getId(), fPageSize);
+      revealItems(itemsToReveal.getFirst(), itemsToReveal.getSecond(), false);
 
       /* Headlines Layout */
       if (isHeadlinesLayout()) {
@@ -1742,20 +1744,6 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     fBrowser.execute(js.toString());
   }
 
-  private String getNavigationActionId(boolean next, boolean unread) {
-    if (next) {
-      if (unread)
-        return NewsBrowserViewer.NEXT_UNREAD_NEWS_HANDLER_ID;
-
-      return NewsBrowserViewer.NEXT_NEWS_HANDLER_ID;
-    }
-
-    if (unread)
-      return NewsBrowserViewer.PREVIOUS_UNREAD_NEWS_HANDLER_ID;
-
-    return NewsBrowserViewer.PREVIOUS_NEWS_HANDLER_ID;
-  }
-
   private void navigateInHeadlines(boolean next, boolean unread) {
     long targetNews = -1L;
     long offset = fViewModel.getExpandedNews();
@@ -1770,6 +1758,10 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
     /* Expand target and the parent group if necessary */
     if (targetNews != -1) {
+
+      /* First determine if there are hidden elements that need to be expanded */
+      Pair<List<Long>, List<Long>> itemsToReveal = fViewModel.reveal(targetNews, fPageSize);
+      revealItems(itemsToReveal.getFirst(), itemsToReveal.getSecond(), false);
 
       /* Group */
       long groupId = fViewModel.findGroup(targetNews);
@@ -1792,6 +1784,20 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       js.append("window.location.href = \"").append(ILinkHandler.HANDLER_PROTOCOL + getNavigationActionId(next, unread)).append("\"; "); //$NON-NLS-1$ //$NON-NLS-2$
       fBrowser.execute(js.toString());
     }
+  }
+
+  private String getNavigationActionId(boolean next, boolean unread) {
+    if (next) {
+      if (unread)
+        return NewsBrowserViewer.NEXT_UNREAD_NEWS_HANDLER_ID;
+
+      return NewsBrowserViewer.NEXT_NEWS_HANDLER_ID;
+    }
+
+    if (unread)
+      return NewsBrowserViewer.PREVIOUS_UNREAD_NEWS_HANDLER_ID;
+
+    return NewsBrowserViewer.PREVIOUS_NEWS_HANDLER_ID;
   }
 
   /**
