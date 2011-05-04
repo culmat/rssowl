@@ -919,7 +919,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     /* Update Headlines Separator if present and parent group (if any) is not collapsed */
     boolean showHeadlinesSeparator = !expanded;
     if (isGroupingEnabled()) {
-      Long groupId = fViewModel.findGroup(news.getId());
+      long groupId = fViewModel.findGroup(news.getId());
       if (!fViewModel.isGroupExpanded(groupId))
         showHeadlinesSeparator = false;
     }
@@ -949,7 +949,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
     /* Collapse other visible news if present */
     if (expanded) {
-      Long expandedNewsId = fViewModel.getExpandedNews();
+      long expandedNewsId = fViewModel.getExpandedNews();
       if (expandedNewsId != -1) {
         INews item = DynamicDAO.load(INews.class, expandedNewsId);
         if (item != null)
@@ -1274,7 +1274,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     js.append(getElementById(Dynamic.PAGE_LATCH_LINK.getId()).append(".blur(); ")); //$NON-NLS-1$
 
     /* Check if the first revealed news belongs to a group that is already showing but collapsed */
-    Long group = fViewModel.findGroup(revealedNews.get(0));
+    long group = fViewModel.findGroup(revealedNews.get(0));
     if (group != -1 && fViewModel.isGroupVisible(group) && !fViewModel.isGroupExpanded(group))
       setGroupExpanded(group, fViewModel.getNewsIds(group), true, false);
 
@@ -1747,8 +1747,8 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   }
 
   private void navigateInHeadlines(boolean next, boolean unread) {
-    Long targetNews = -1L;
-    Long offset = fViewModel.getExpandedNews();
+    long targetNews = -1L;
+    long offset = fViewModel.getExpandedNews();
 
     /* Navigate to Next News */
     if (next)
@@ -1762,7 +1762,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     if (targetNews != -1) {
 
       /* Group */
-      Long groupId = fViewModel.findGroup(targetNews);
+      long groupId = fViewModel.findGroup(targetNews);
       if (groupId != -1 && !fViewModel.isGroupExpanded(groupId)) {
         List<Long> newsIds = fViewModel.getNewsIds(groupId);
         if (!newsIds.isEmpty())
@@ -2097,7 +2097,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
         INews news = (INews) element;
 
         /* Remove from View Model */
-        Long groupToUpdate = fViewModel.removeNews(news);
+        long groupToUpdate = fViewModel.removeNews(news);
         if (groupToUpdate != -1)
           groupsToUpdate.add(groupToUpdate);
 
