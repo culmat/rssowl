@@ -917,7 +917,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     }
 
     /* Update Headlines Separator if present and parent group (if any) is not collapsed */
-    boolean showHeadlinesSeparator = expanded;
+    boolean showHeadlinesSeparator = !expanded;
     if (isGroupingEnabled()) {
       Long groupId = fViewModel.findGroup(news.getId());
       if (!fViewModel.isGroupExpanded(groupId))
@@ -1306,7 +1306,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
       /* Make News container visible */
       js.append(getElementById(Dynamic.NEWS.getId(news))).append(".style.display='block'; "); //$NON-NLS-1$
-      
+
       /* Show separator in case of headlines layout */
       if (isHeadlinesLayout())
         js.append(getElementById(Dynamic.HEADLINE_SEPARATOR.getId(news))).append(".style.display='block'; "); //$NON-NLS-1$
