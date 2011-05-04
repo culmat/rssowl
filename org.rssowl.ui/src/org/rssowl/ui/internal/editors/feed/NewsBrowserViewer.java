@@ -1264,6 +1264,12 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     List<Long> revealedNews = nextPage.getSecond();
     Boolean hasMorePages = nextPage.getThird();
 
+    revealItems(revealedGroups, revealedNews, hasMorePages, true);
+  }
+
+  @SuppressWarnings("unchecked")
+  private void revealItems(List<Long> revealedGroups, List<Long> revealedNews, Boolean hasMorePages, boolean scrollIntoView) {
+
     /* Return early if no more news to reveal */
     if (revealedNews.isEmpty())
       return;
@@ -1317,7 +1323,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     }
 
     /* Update Scroll Position */
-    if (firstNews != null)
+    if (firstNews != null && scrollIntoView)
       js.append(getElementById(Dynamic.NEWS.getId(firstNews))).append(".scrollIntoView(true); "); //$NON-NLS-1$
 
     /* Update Latch */
@@ -1640,6 +1646,10 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
     /* Scroll the News into View if present and expand as necessary */
     if (newsToShow != null) {
+
+      /* First determine if there are hidden elements that need to be expanded */
+      Triple<List<Long>, List<Long>, Boolean> itemsToReveal = fViewModel.reveal(newsToShow.getId(), fPageSize);
+      revealItems(itemsToReveal.getFirst(), itemsToReveal.getSecond(), itemsToReveal.getThird(), false);
 
       /* Headlines Layout */
       if (isHeadlinesLayout()) {
