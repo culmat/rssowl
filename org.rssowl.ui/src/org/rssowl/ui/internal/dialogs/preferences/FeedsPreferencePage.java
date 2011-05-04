@@ -64,6 +64,7 @@ import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.LinkTransformer;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.OwlUI.Layout;
+import org.rssowl.ui.internal.OwlUI.PageSize;
 import org.rssowl.ui.internal.editors.feed.NewsColumnViewModel;
 import org.rssowl.ui.internal.editors.feed.NewsFilter;
 import org.rssowl.ui.internal.editors.feed.NewsGrouping;
@@ -115,6 +116,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
   private Combo fFilterCombo;
   private Combo fGroupCombo;
   private Combo fLayoutCombo;
+  private Combo fPageSizeCombo;
   private Button fOpenSiteForEmptyNewsCheck;
   private Button fLoadImagesForNewsCheck;
   private Button fDisplayContentsOfNewsRadio;
@@ -357,8 +359,12 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     Label layoutLabel = new Label(topContainer, SWT.None);
     layoutLabel.setText(Messages.FeedsPreferencePage_LAYOUT);
 
-    fLayoutCombo = new Combo(topContainer, SWT.BORDER | SWT.READ_ONLY);
-    fLayoutCombo.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false));
+    Composite layoutContainer = new Composite(topContainer, SWT.None);
+    layoutContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false));
+    layoutContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0, 0, 5, false));
+
+    fLayoutCombo = new Combo(layoutContainer, SWT.BORDER | SWT.READ_ONLY);
+    fLayoutCombo.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     for (Layout layout : Layout.values()) {
       fLayoutCombo.add(layout.getName());
@@ -372,6 +378,17 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
         updateDisplayButtons();
       }
     });
+
+    /* Layout Page Size */
+    fPageSizeCombo = new Combo(layoutContainer, SWT.BORDER | SWT.READ_ONLY);
+    fPageSizeCombo.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false));
+
+    for (PageSize pageSize : PageSize.values()) {
+      fPageSizeCombo.add(pageSize.getName());
+    }
+
+    fPageSizeCombo.select(PageSize.from(fGlobalScope.getInteger(DefaultPreferences.NEWS_BROWSER_PAGE_SIZE)).ordinal());
+    fPageSizeCombo.setVisibleItemCount(fPageSizeCombo.getItemCount());
 
     /* Filter Settings */
     Label filterLabel = new Label(topContainer, SWT.None);
@@ -479,10 +496,14 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     fLinkTransformerViewer.setInput(Controller.getDefault().getLinkTransformers());
     fLinkTransformerViewer.setSelection(new StructuredSelection(Controller.getDefault().getLinkTransformer(fGlobalScope)));
 
-    updateDisplayButtons();
+    updateDisplayButtons(false);
   }
 
   private void updateDisplayButtons() {
+    updateDisplayButtons(true);
+  }
+
+  private void updateDisplayButtons(boolean layout) {
     boolean isNewspaperLayout = (fLayoutCombo.getSelectionIndex() == Layout.NEWSPAPER.ordinal() || fLayoutCombo.getSelectionIndex() == Layout.HEADLINES.ordinal());
     boolean isListLayout = (fLayoutCombo.getSelectionIndex() == Layout.LIST.ordinal());
 
@@ -499,6 +520,15 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     fOpenSiteForEmptyNewsCheck.setEnabled(!isListLayout && !isNewspaperLayout && fOpenLinkOfNewsRadio.getSelection());
     fUseTransformerCheck.setEnabled(!isListLayout && !isNewspaperLayout && fOpenLinkOfNewsRadio.getSelection());
     fLinkTransformerViewer.getCombo().setEnabled(!isListLayout && !isNewspaperLayout && fOpenLinkOfNewsRadio.getSelection() && fUseTransformerCheck.getSelection());
+
+    /* Update Layout */
+    GridData data = (GridData) fLayoutCombo.getLayoutData();
+    data.horizontalSpan = isNewspaperLayout ? 1 : 2;
+    data = (GridData) fPageSizeCombo.getLayoutData();
+    data.exclude = !isNewspaperLayout;
+
+    if (layout)
+      fPageSizeCombo.getParent().getParent().layout(true, true);
   }
 
   private void createColumnsGroup(TabFolder parent) {
@@ -673,6 +703,11 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
       layoutChange = true;
     }
 
+    iVal = fPageSizeCombo.getSelectionIndex();
+    PageSize size = PageSize.values()[iVal];
+    if (fGlobalScope.getInteger(DefaultPreferences.NEWS_BROWSER_PAGE_SIZE) != size.getPageSize())
+      fGlobalScope.putInteger(DefaultPreferences.NEWS_BROWSER_PAGE_SIZE, size.getPageSize());
+
     fGlobalScope.putBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_NEWS, fOpenLinkOfNewsRadio.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_EMPTY_NEWS, fOpenSiteForEmptyNewsCheck.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.BM_LOAD_IMAGES, fLoadImagesForNewsCheck.getSelection());
@@ -844,6 +879,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     fFilterCombo.select(ModelUtils.loadIntegerValueWithFallback(defaultScope, DefaultPreferences.BM_NEWS_FILTERING, defaultScope, DefaultPreferences.FV_FILTER_TYPE));
     fGroupCombo.select(ModelUtils.loadIntegerValueWithFallback(defaultScope, DefaultPreferences.BM_NEWS_GROUPING, defaultScope, DefaultPreferences.FV_GROUP_TYPE));
     fLayoutCombo.select(defaultScope.getInteger(DefaultPreferences.FV_LAYOUT));
+    fPageSizeCombo.select(PageSize.from(defaultScope.getInteger(DefaultPreferences.NEWS_BROWSER_PAGE_SIZE)).ordinal());
     fDisplayContentsOfNewsRadio.setSelection(!defaultScope.getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_NEWS));
     fOpenLinkOfNewsRadio.setSelection(defaultScope.getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_NEWS));
     fOpenSiteForEmptyNewsCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_EMPTY_NEWS));
