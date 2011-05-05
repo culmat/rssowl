@@ -576,7 +576,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.write("span.quote_lvl4 { color: #669966; }\n"); //$NON-NLS-1$
 
     /* Page Latch */
-    writer.append("div.pageLatch { padding: 5px; text-align: right; ").append(fNormalFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("div.pageLatch { padding: 5px; text-align: center; ").append(fNormalFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     writer.append("div.pageLatch a { ").append(fLinkFGColorCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     writer.append("div.pageLatch a:hover { ").append(fLinkFGColorCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     writer.append("div.pageLatch a:active { ").append(fLinkFGColorCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
