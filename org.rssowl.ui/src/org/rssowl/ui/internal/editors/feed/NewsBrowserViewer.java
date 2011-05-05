@@ -2084,7 +2084,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
         /* Execute */
         if (js.length() > 0) {
-          boolean res = fBrowser.getControl().execute(js.toString());
+          boolean res = fBrowser.execute(js.toString(), false);
           if (!res)
             return false;
         }

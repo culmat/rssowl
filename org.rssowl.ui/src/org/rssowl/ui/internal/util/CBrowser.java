@@ -64,6 +64,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Instances of <code>CBrowser</code> wrap around the Browser-Widget and enhance
@@ -115,6 +116,10 @@ public class CBrowser {
 
   /* Blacklist of common iframes that cause external window opening */
   private static final List<String> EXTERNAL_BLACKLIST = Arrays.asList("/plugins/like.php", "scribd.com/embeds", "youtube.com/embed/"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+  /* Count failing JS executions and log as appropiate */
+  private static final AtomicInteger fgFailingJSCounter = new AtomicInteger();
+  private static final int MAX_FAILING_JS_LOGS = 5;
 
   private Browser fBrowser;
   private boolean fAllowExternalNavigation;
@@ -448,17 +453,45 @@ public class CBrowser {
    * <code>false</code> otherwise.
    */
   public boolean execute(String js) {
+    return execute(js, true);
+  }
+
+  /**
+   * Executes JavaScript in this Browser instance.
+   *
+   * @param js the JavaScript to execute in the browser.
+   * @param handleJSEnablement if <code>true</code> make sure that JS becomes
+   * enabled if not and <code>false</code> otherwise
+   * @return <code>true</code> if the JavaScript was successfully executed and
+   * <code>false</code> otherwise.
+   */
+  public boolean execute(String js, boolean handleJSEnablement) {
     if (fBrowser.isDisposed())
       return false;
 
-    if (shouldDisableScript())
+    if (handleJSEnablement && shouldDisableScript())
       setScriptDisabled(false);
     try {
-      return fBrowser.execute(js);
+      return internalExecute(js);
     } finally {
-      if (shouldDisableScript())
+      if (handleJSEnablement && shouldDisableScript())
         setScriptDisabled(true);
     }
+  }
+
+  private boolean internalExecute(String js) {
+    boolean res = fBrowser.execute(js);
+    if (!res) {
+      if (fgFailingJSCounter.incrementAndGet() < MAX_FAILING_JS_LOGS) {
+        boolean isMozilla = isMozillaRunningOnWindows();
+        if (!isMozilla)
+          Activator.getDefault().logError("Failed to execute JavaScript: " + js, null); //$NON-NLS-1$
+        else
+          Activator.getDefault().logError("Failed to execute JavaScript (XULRunner): " + js, null); //$NON-NLS-1$
+      }
+    }
+
+    return res;
   }
 
   /* Special handling of opened websites on Windows (IE and Mozilla) */
