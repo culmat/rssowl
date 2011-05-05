@@ -31,6 +31,7 @@ public class Messages extends NLS {
   public static String Activator_ERROR_STARTUP;
   public static String ApplicationActionBarAdvisor_ABOUT_RSSOWL;
   public static String ApplicationActionBarAdvisor_AGGREGATE_NEWS;
+  public static String ApplicationActionBarAdvisor_ALL_ARTICLES;
   public static String ApplicationActionBarAdvisor_ASCENDING;
   public static String ApplicationActionBarAdvisor_ATTACHMENTS;
   public static String ApplicationActionBarAdvisor_BOOKMARKS;
@@ -50,6 +51,7 @@ public class Messages extends NLS {
   public static String ApplicationActionBarAdvisor_EXIT;
   public static String ApplicationActionBarAdvisor_EXPORT_LOGFILE;
   public static String ApplicationActionBarAdvisor_EXPORT_LOGFILE_DIALOG;
+  public static String ApplicationActionBarAdvisor_F_ARTICLES;
   public static String ApplicationActionBarAdvisor_FAQ;
   public static String ApplicationActionBarAdvisor_FEED_TOOLBAR;
   public static String ApplicationActionBarAdvisor_FILE;
@@ -59,6 +61,7 @@ public class Messages extends NLS {
   public static String ApplicationActionBarAdvisor_FULL_SCREEN;
   public static String ApplicationActionBarAdvisor_GO;
   public static String ApplicationActionBarAdvisor_GROUP_NEWS;
+  public static String ApplicationActionBarAdvisor_H_ARTICLES;
   public static String ApplicationActionBarAdvisor_HEADLINES_LAYOUT;
   public static String ApplicationActionBarAdvisor_HELP;
   public static String ApplicationActionBarAdvisor_HIDE_TOOLBAR;
@@ -78,6 +81,7 @@ public class Messages extends NLS {
   public static String ApplicationActionBarAdvisor_NEWSPAPER_LAYOUT;
   public static String ApplicationActionBarAdvisor_OPEN_FILE;
   public static String ApplicationActionBarAdvisor_ORGANIZE_LABELS;
+  public static String ApplicationActionBarAdvisor_PAGE_SIZE;
   public static String ApplicationActionBarAdvisor_PREFERENCES;
   public static String ApplicationActionBarAdvisor_REPORT_PROBLEMS;
   public static String ApplicationActionBarAdvisor_RESET;
@@ -93,8 +97,10 @@ public class Messages extends NLS {
   public static String ApplicationActionBarAdvisor_SOME_ELEMENTS_FILTERED;
   public static String ApplicationActionBarAdvisor_SORT_BY;
   public static String ApplicationActionBarAdvisor_STATUS;
+  public static String ApplicationActionBarAdvisor_T_ARTICLES;
   public static String ApplicationActionBarAdvisor_TABBED_BROWSING;
   public static String ApplicationActionBarAdvisor_TABS_MESSAGE;
+  public static String ApplicationActionBarAdvisor_TF_ARTICLES;
   public static String ApplicationActionBarAdvisor_TOOLBAR;
   public static String ApplicationActionBarAdvisor_TOOLBARS;
   public static String ApplicationActionBarAdvisor_TOOLS;
