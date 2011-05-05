@@ -141,7 +141,8 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     LABELS_SEPARATOR("labelsSeparator"), //$NON-NLS-1$
     HEADLINE_SEPARATOR("headlineSeparator"), //$NON-NLS-1$
     PAGE_LATCH("pageLatch"), //$NON-NLS-1$
-    PAGE_LATCH_LINK("pageLatchLink"); //$NON-NLS-1$
+    PAGE_LATCH_LINK("pageLatchLink"), //$NON-NLS-1$
+    PAGE_LATCH_TEXT("pageLatchText"); //$NON-NLS-1$
 
     private String fId;
 
@@ -575,11 +576,11 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.write("span.quote_lvl4 { color: #669966; }\n"); //$NON-NLS-1$
 
     /* Page Latch */
-    writer.append("div.pageLatch { text-align: right; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
-    writer.append("a.pageLatch { color: rgb(80,80,80); text-decoration: none; }\n"); //$NON-NLS-1$
-    writer.append("a.pageLatch:hover { color: rgb(80,80,80); text-decoration: none; }\n"); //$NON-NLS-1$
-    writer.append("a.pageLatch:active { color: rgb(80,80,80); text-decoration: none; }\n"); //$NON-NLS-1$
-    writer.append("a.pageLatch:visited { color: rgb(80,80,80); text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.append("div.pageLatch { padding: 5px; text-align: right; ").append(fNormalFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("div.pageLatch a { ").append(fLinkFGColorCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("div.pageLatch a:hover { ").append(fLinkFGColorCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("div.pageLatch a:active { ").append(fLinkFGColorCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("div.pageLatch a:visited { ").append(fLinkFGColorCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
   }
 
   /* Common CSS for Headlines Layout */
@@ -1214,7 +1215,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
     /* Page Latch Link to navigate to next page */
     String link = HANDLER_PROTOCOL + NEXT_PAGE_HANDLER_ID;
-    link(builder, link, getLatchName(), "pageLatch", Dynamic.PAGE_LATCH_LINK.getId(), null); //$NON-NLS-1$
+    imageLink(builder, link, getLatchName(), null, null, "/icons/obj16/mono_transform.gif", "mono_transform.gif", Dynamic.PAGE_LATCH_LINK.getId(), null, Dynamic.PAGE_LATCH_TEXT.getId()); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* Close: Page Latch */
     close(builder, "div"); //$NON-NLS-1$
