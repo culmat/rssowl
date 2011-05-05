@@ -89,6 +89,7 @@ import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.OwlUI.Layout;
+import org.rssowl.ui.internal.OwlUI.PageSize;
 import org.rssowl.ui.internal.actions.AggregateFolderAction;
 import org.rssowl.ui.internal.actions.ArchiveNewsAction;
 import org.rssowl.ui.internal.actions.AssignLabelsAction;
@@ -377,6 +378,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         final FeedView activeFeedView = OwlUI.getActiveFeedView();
         final IPreferenceScope entityPreferences = OwlUI.getActiveFeedViewPreferences();
         final Layout layout = OwlUI.getLayout(entityPreferences != null ? entityPreferences : globalPreferences);
+        final PageSize pageSize = OwlUI.getPageSize(entityPreferences != null ? entityPreferences : globalPreferences);
 
         manager.add(new GroupMarker(M_VIEW_START));
 
@@ -421,8 +423,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
           }
         });
 
-        layoutMenu.add(new Separator());
-
         layoutMenu.add(new Action(Messages.ApplicationActionBarAdvisor_NEWSPAPER_LAYOUT, IAction.AS_RADIO_BUTTON) {
           @Override
           public void run() {
@@ -448,6 +448,82 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
             return layout == Layout.HEADLINES;
           }
         });
+
+        /* Add the Page Size if using Newspaper or Headlines layout */
+        if (layout == Layout.NEWSPAPER || layout == Layout.HEADLINES) {
+          layoutMenu.add(new Separator());
+
+          MenuManager pageMenu = new MenuManager(Messages.ApplicationActionBarAdvisor_PAGE_SIZE);
+
+          pageMenu.add(new Action(Messages.ApplicationActionBarAdvisor_T_ARTICLES, IAction.AS_RADIO_BUTTON) {
+            @Override
+            public void run() {
+              if (super.isChecked()) //Need to use parent scope to get real selection state from UI and not Model
+                updatePageSizePreferences(globalPreferences, entityPreferences, PageSize.TEN);
+            }
+
+            @Override
+            public boolean isChecked() {
+              return pageSize == PageSize.TEN;
+            }
+          });
+
+          pageMenu.add(new Action(Messages.ApplicationActionBarAdvisor_TF_ARTICLES, IAction.AS_RADIO_BUTTON) {
+            @Override
+            public void run() {
+              if (super.isChecked()) //Need to use parent scope to get real selection state from UI and not Model
+                updatePageSizePreferences(globalPreferences, entityPreferences, PageSize.TWENTY_FIVE);
+            }
+
+            @Override
+            public boolean isChecked() {
+              return pageSize == PageSize.TWENTY_FIVE;
+            }
+          });
+
+          pageMenu.add(new Action(Messages.ApplicationActionBarAdvisor_F_ARTICLES, IAction.AS_RADIO_BUTTON) {
+            @Override
+            public void run() {
+              if (super.isChecked()) //Need to use parent scope to get real selection state from UI and not Model
+                updatePageSizePreferences(globalPreferences, entityPreferences, PageSize.FIFTY);
+            }
+
+            @Override
+            public boolean isChecked() {
+              return pageSize == PageSize.FIFTY;
+            }
+          });
+
+          pageMenu.add(new Action(Messages.ApplicationActionBarAdvisor_H_ARTICLES, IAction.AS_RADIO_BUTTON) {
+            @Override
+            public void run() {
+              if (super.isChecked()) //Need to use parent scope to get real selection state from UI and not Model
+                updatePageSizePreferences(globalPreferences, entityPreferences, PageSize.HUNDRED);
+            }
+
+            @Override
+            public boolean isChecked() {
+              return pageSize == PageSize.HUNDRED;
+            }
+          });
+
+          pageMenu.add(new Separator());
+
+          pageMenu.add(new Action(Messages.ApplicationActionBarAdvisor_ALL_ARTICLES, IAction.AS_RADIO_BUTTON) {
+            @Override
+            public void run() {
+              if (super.isChecked()) //Need to use parent scope to get real selection state from UI and not Model
+                updatePageSizePreferences(globalPreferences, entityPreferences, PageSize.NO_PAGING);
+            }
+
+            @Override
+            public boolean isChecked() {
+              return pageSize == PageSize.NO_PAGING;
+            }
+          });
+
+          layoutMenu.add(pageMenu);
+        }
 
         manager.add(layoutMenu);
 
@@ -923,6 +999,20 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         manager.add(new GroupMarker(M_VIEW_START));
       }
     });
+  }
+
+  private void updatePageSizePreferences(IPreferenceScope globalPreferences, IPreferenceScope entityPreferences, PageSize pageSize) {
+
+    /* Update Global */
+    globalPreferences.putInteger(DefaultPreferences.NEWS_BROWSER_PAGE_SIZE, pageSize.getPageSize());
+
+    /* Update Entity if it was configured explicitly */
+    if (entityPreferences != null) {
+      if (entityPreferences.hasKey(DefaultPreferences.NEWS_BROWSER_PAGE_SIZE)) {
+        entityPreferences.delete(DefaultPreferences.NEWS_BROWSER_PAGE_SIZE);
+        entityPreferences.flush();
+      }
+    }
   }
 
   private void updateLayoutPreferences(IPreferenceScope globalPreferences, IPreferenceScope entityPreferences, Layout layout) {

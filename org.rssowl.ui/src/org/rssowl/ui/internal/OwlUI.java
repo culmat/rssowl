@@ -2733,4 +2733,13 @@ public class OwlUI {
     Layout[] layouts = Layout.values();
     return layoutOrdinal < layouts.length ? layouts[layoutOrdinal] : Layout.CLASSIC;
   }
+
+  /**
+   * @param scope the preferences scope to look for the defined page size.
+   * @return the selected {@link PageSize} from the given preferences scope.
+   */
+  public static PageSize getPageSize(IPreferenceScope scope) {
+    int pageSize = scope.getInteger(DefaultPreferences.NEWS_BROWSER_PAGE_SIZE);
+    return PageSize.from(pageSize);
+  }
 }
