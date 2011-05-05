@@ -1340,7 +1340,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     /* Otherwise update Latch Label */
     else if (getLabelProvider() instanceof NewsBrowserLabelProvider) {
       String updatedLatchName = ((NewsBrowserLabelProvider) getLabelProvider()).getLatchName();
-      js.append("var latch = ").append(getElementById(Dynamic.PAGE_LATCH_LINK.getId())).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
+      js.append("var latch = ").append(getElementById(Dynamic.PAGE_LATCH_TEXT.getId())).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
       js.append("if (latch != null) {"); //$NON-NLS-1$
       js.append("  latch.innerHTML='").append(escapeForInnerHtml(updatedLatchName)).append("'; "); //$NON-NLS-1$ //$NON-NLS-2$
       js.append("}"); //$NON-NLS-1$
