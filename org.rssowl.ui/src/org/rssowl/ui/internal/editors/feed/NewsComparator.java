@@ -466,7 +466,7 @@ public class NewsComparator extends ViewerComparator implements Comparator<INews
 
   private int compareByString(String str1, String str2) {
     if (str1 != null && str2 != null)
-      return str1.compareTo(str2);
+      return str1.compareToIgnoreCase(str2);
     else if (str1 != null)
       return -1;
 
