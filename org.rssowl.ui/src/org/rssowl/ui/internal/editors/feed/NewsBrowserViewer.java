@@ -27,6 +27,8 @@ package org.rssowl.ui.internal.editors.feed;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.GroupMarker;
@@ -48,11 +50,14 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.SameShellProvider;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
@@ -78,6 +83,8 @@ import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.CoreUtils;
+import org.rssowl.core.util.ITask;
+import org.rssowl.core.util.ITask.Priority;
 import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
@@ -89,6 +96,7 @@ import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.EntityGroupItem;
 import org.rssowl.ui.internal.ILinkHandler;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.OwlUI.Layout;
 import org.rssowl.ui.internal.actions.ArchiveNewsAction;
 import org.rssowl.ui.internal.actions.AutomateFilterAction;
 import org.rssowl.ui.internal.actions.CreateFilterAction.PresetAction;
@@ -106,6 +114,7 @@ import org.rssowl.ui.internal.undo.StickyOperation;
 import org.rssowl.ui.internal.undo.UndoStack;
 import org.rssowl.ui.internal.util.CBrowser;
 import org.rssowl.ui.internal.util.JobRunner;
+import org.rssowl.ui.internal.util.JobTracker;
 import org.rssowl.ui.internal.util.ModelUtils;
 import org.rssowl.ui.internal.util.UIBackgroundJob;
 
@@ -156,6 +165,10 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   static final String TRANSFORM_HANDLER_ID = "org.rssowl.ui.TransformNews"; //$NON-NLS-1$
   static final String RELATED_NEWS_MENU_HANDLER_ID = "org.rssowl.ui.RelatedNewsMenu"; //$NON-NLS-1$
   static final String NEXT_PAGE_HANDLER_ID = "org.rssowl.ui.NextPage"; //$NON-NLS-1$
+  static final String SCROLL_NEXT_PAGE_HANDLER_ID = "org.rssowl.ui.ScrollNextPage"; //$NON-NLS-1$
+
+  /* Delay in millies before revealing the next page from user interaction */
+  private static final int AUTOMATIC_PAGE_REVEAL_DELAY = 500;
 
   /* Unique identifier of the <body> element */
   private static final String BODY_ELEMENT_ID = "owlbody"; //$NON-NLS-1$
@@ -178,6 +191,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   private IModelFactory fFactory;
   private IPreferenceScope fPreferences = Owl.getPreferenceService().getGlobalScope();
   private INewsDAO fNewsDao = DynamicDAO.getDAO(INewsDAO.class);
+  private final JobTracker fJobTracker = new JobTracker(AUTOMATIC_PAGE_REVEAL_DELAY, false, true, Priority.INTERACTIVE);
 
   /* This viewer's sorter. <code>null</code> means there is no sorter. */
   private ViewerComparator fSorter;
@@ -187,10 +201,55 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   private NewsFilter fNewsFilter;
 
   /* A model of what is displayed in the browser */
-  private final NewsBrowserViewModel fViewModel = new NewsBrowserViewModel();
+  private final NewsBrowserViewModel fViewModel;
 
   /* Special Element that denotes a Paging Latch */
   static final class PageLatch {}
+
+  /* Task to reveal the next page as necessary */
+  static final class RevealPageTask implements ITask {
+    private final NewsBrowserViewModel fViewModel;
+    private final CBrowser fCBrowser;
+
+    public RevealPageTask(NewsBrowserViewModel model, CBrowser browser) {
+      fViewModel = model;
+      fCBrowser = browser;
+    }
+
+    public IStatus run(IProgressMonitor monitor) {
+      if (fViewModel.hasHiddenNews()) {
+        StringBuilder js = new StringBuilder();
+        if (fCBrowser.isIE()) {
+          js.append("var scrollPosY = document.body.scrollTop; "); //$NON-NLS-1$
+          js.append("var windowHeight = document.body.clientHeight; "); //$NON-NLS-1$
+        } else {
+          js.append("var scrollPosY = window.pageYOffset; "); //$NON-NLS-1$
+          js.append("var windowHeight = window.innerHeight; "); //$NON-NLS-1$
+        }
+
+        js.append("if (scrollPosY > 0) {"); //$NON-NLS-1$
+        js.append("  var latchNode = document.getElementById('").append(Dynamic.PAGE_LATCH.getId()).append("'); "); //$NON-NLS-1$//$NON-NLS-2$
+        js.append("  if (latchNode != null) {"); //$NON-NLS-1$
+        js.append("    if ((scrollPosY + windowHeight) >= latchNode.offsetTop) {"); //$NON-NLS-1$
+        js.append("      window.location.href = '").append(ILinkHandler.HANDLER_PROTOCOL + SCROLL_NEXT_PAGE_HANDLER_ID).append("'; "); //$NON-NLS-1$ //$NON-NLS-2$
+        js.append("    }"); //$NON-NLS-1$
+        js.append("  }"); //$NON-NLS-1$
+        js.append("}"); //$NON-NLS-1$
+
+        fCBrowser.execute(js.toString());
+      }
+
+      return Status.OK_STATUS;
+    }
+
+    public String getName() {
+      return null;
+    }
+
+    public Priority getPriority() {
+      return Priority.INTERACTIVE;
+    }
+  }
 
   /**
    * @param parent the parent {@link Composite} to host this viewer.
@@ -208,6 +267,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
    */
   public NewsBrowserViewer(Composite parent, int style, IFeedViewSite site) {
     fBrowser = new CBrowser(parent, style);
+    fViewModel = new NewsBrowserViewModel();
     fSite = site;
     fIsEmbedded = (fSite != null);
     hookControl(fBrowser.getControl());
@@ -243,6 +303,24 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     fBrowser.addLinkHandler(TRANSFORM_HANDLER_ID, this);
     fBrowser.addLinkHandler(RELATED_NEWS_MENU_HANDLER_ID, this);
     fBrowser.addLinkHandler(NEXT_PAGE_HANDLER_ID, this);
+    fBrowser.addLinkHandler(SCROLL_NEXT_PAGE_HANDLER_ID, this);
+
+    /* Reveal paged (hidden) news dynamically as the user uses the browser */
+    Listener listener = new Listener() {
+      public void handleEvent(Event event) {
+        onMouseInteraction(event);
+      }
+    };
+    fBrowser.getControl().addListener(SWT.MouseWheel, listener);
+    fBrowser.getControl().addListener(SWT.MouseDown, listener);
+  }
+
+  private void onMouseInteraction(Event event) {
+    if (fPageSize == 0 || event.widget.isDisposed() || fJobTracker.isRunning())
+      return;
+
+    /* Tell the tracker to reveal the next page if possible */
+    fJobTracker.run(new RevealPageTask(fViewModel, fBrowser));
   }
 
   private void hookNewsContextMenu() {
@@ -812,7 +890,12 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
     /* Reveal Next Page */
     else if (NEXT_PAGE_HANDLER_ID.equals(id)) {
-      revealNextPage();
+      revealNextPage(true);
+    }
+
+    /* Scroll Reveal Next Page */
+    else if (SCROLL_NEXT_PAGE_HANDLER_ID.equals(id)) {
+      revealNextPage(false);
     }
   }
 
@@ -1244,14 +1327,14 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   }
 
   @SuppressWarnings("unchecked")
-  private void revealNextPage() {
+  private void revealNextPage(boolean scrollIntoView) {
 
     /* Get next page from View Model */
     Pair<List<Long>, List<Long>> nextPage = fViewModel.getNextPage(fPageSize);
     List<Long> revealedGroups = nextPage.getFirst();
     List<Long> revealedNews = nextPage.getSecond();
 
-    revealItems(revealedGroups, revealedNews, true);
+    revealItems(revealedGroups, revealedNews, scrollIntoView);
   }
 
   @SuppressWarnings("unchecked")
@@ -1511,7 +1594,13 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     if (fSite != null) {
       IPreferenceScope inputPreferences = fSite.getInputPreferences();
       fMarkReadOnExpand = inputPreferences.getBoolean(DefaultPreferences.MARK_READ_STATE);
-      fPageSize = inputPreferences.getInteger(DefaultPreferences.NEWS_BROWSER_PAGE_SIZE);
+
+      /* Update Page Size (only relevant to Newspaper and Headlines layout) */
+      Layout layout = OwlUI.getLayout(inputPreferences);
+      if (layout == Layout.NEWSPAPER || layout == Layout.HEADLINES)
+        fPageSize = inputPreferences.getInteger(DefaultPreferences.NEWS_BROWSER_PAGE_SIZE);
+      else
+        fPageSize = 0;
     }
 
     /* Stop any other Website if required */
@@ -1665,7 +1754,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
       /* Newspaper Layout */
       else {
-        StringBuffer js = new StringBuffer();
+        StringBuilder js = new StringBuilder();
         js.append(getElementById(Dynamic.NEWS.getId(newsToShow))).append(".scrollIntoView(true);"); //$NON-NLS-1$
         fBrowser.execute(js.toString());
       }
@@ -1690,7 +1779,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       return;
 
     /* Otherwise need to navigate to a specific unread news */
-    StringBuffer js = new StringBuffer();
+    StringBuilder js = new StringBuilder();
     if (fBrowser.isIE())
       js.append("var scrollPosY = document.body.scrollTop; "); //$NON-NLS-1$
     else
