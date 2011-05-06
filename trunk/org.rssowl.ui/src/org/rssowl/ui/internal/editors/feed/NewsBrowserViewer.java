@@ -236,7 +236,8 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
         js.append("  }"); //$NON-NLS-1$
         js.append("}"); //$NON-NLS-1$
 
-        fCBrowser.execute(js.toString());
+        if (!monitor.isCanceled())
+          fCBrowser.execute(js.toString());
       }
 
       return Status.OK_STATUS;
