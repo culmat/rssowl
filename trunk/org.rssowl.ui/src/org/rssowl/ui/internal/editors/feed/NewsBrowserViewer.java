@@ -1653,7 +1653,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     if (newsToShow != null) {
 
       /* First determine if there are hidden elements that need to be expanded */
-      Pair<List<Long>, List<Long>> itemsToReveal = fViewModel.reveal(newsToShow.getId(), fPageSize);
+      Pair<List<Long>, List<Long>> itemsToReveal = fViewModel.revealPage(newsToShow.getId(), fPageSize);
       revealItems(itemsToReveal.getFirst(), itemsToReveal.getSecond(), false);
 
       /* Headlines Layout */
@@ -1763,7 +1763,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     if (targetNews != -1) {
 
       /* First determine if there are hidden elements that need to be expanded */
-      Pair<List<Long>, List<Long>> itemsToReveal = fViewModel.reveal(targetNews, fPageSize);
+      Pair<List<Long>, List<Long>> itemsToReveal = fViewModel.revealPage(targetNews, fPageSize);
       revealItems(itemsToReveal.getFirst(), itemsToReveal.getSecond(), false);
 
       /* Group */

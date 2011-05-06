@@ -45,7 +45,7 @@ import java.util.Set;
  * <p>
  * The model is safe to be used from multiple threads.
  * </p>
- *
+ * 
  * @author bpasero
  */
 public class NewsBrowserViewModel {
@@ -107,7 +107,7 @@ public class NewsBrowserViewModel {
 
   /**
    * Updates this view model with the contents of the provided elements.
-   *
+   * 
    * @param elements the elements to create the view model from.
    */
   public void setInput(Object[] elements) {
@@ -116,7 +116,7 @@ public class NewsBrowserViewModel {
 
   /**
    * Updates this view model with the contents of the provided elements.
-   *
+   * 
    * @param elements the elements to create the view model from.
    * @param pageSize the number of elements per page or <code>0</code> in case
    * paging is disabled.
@@ -410,13 +410,16 @@ public class NewsBrowserViewModel {
   /**
    * Returns the first news that is hidden and optionally unread or
    * <code>-1</code> if none.
-   *
+   * 
    * @param onlyUnread if set to <code>true</code>, only unread news will be
    * considered.
    * @return the identifier of the first hidden news or <code>-1</code> if none.
    */
   public long getFirstHiddenNews(boolean onlyUnread) {
     synchronized (fLock) {
+      if (fHiddenNews.isEmpty())
+        return -1;
+
       for (int i = 0; i < fItemList.size(); i++) {
         Item item = fItemList.get(i);
 
@@ -553,7 +556,7 @@ public class NewsBrowserViewModel {
 
   /**
    * Retrieves the identifiers of the elements for the next page.
-   *
+   * 
    * @param pageSize the number of elements per page.
    * @return a {@link Triple} of lists. The first contains the identifiers of
    * groups revealed and the second the list of news identifiers.
@@ -562,26 +565,29 @@ public class NewsBrowserViewModel {
     List<Long> groups = new ArrayList<Long>(1);
     List<Long> news = new ArrayList<Long>(pageSize);
 
-    synchronized (fLock) {
-      int indexOfFirstHiddenItem = indexOfFirstHiddenItem(-1);
-      if (indexOfFirstHiddenItem != -1) {
-        int newsCounter = 0;
-        for (int i = indexOfFirstHiddenItem; i < fItemList.size(); i++) {
-          Item item = fItemList.get(i);
+    /* Get the next page if paging is enabled */
+    if (pageSize != 0) {
+      synchronized (fLock) {
+        int indexOfFirstHiddenItem = indexOfFirstHiddenItem(-1);
+        if (indexOfFirstHiddenItem != -1) {
+          int newsCounter = 0;
+          for (int i = indexOfFirstHiddenItem; i < fItemList.size(); i++) {
+            Item item = fItemList.get(i);
 
-          /* Group */
-          if (item instanceof Group) {
-            groups.add(item.getId());
+            /* Group */
+            if (item instanceof Group) {
+              groups.add(item.getId());
+            }
+
+            /* News */
+            else {
+              newsCounter++;
+              news.add(item.getId());
+            }
+
+            if (pageSize != 0 && newsCounter == pageSize)
+              break; //Reached the next page, so stop looping
           }
-
-          /* News */
-          else {
-            newsCounter++;
-            news.add(item.getId());
-          }
-
-          if (pageSize != 0 && newsCounter == pageSize)
-            break; //Reached the next page, so stop looping
         }
       }
     }
@@ -590,32 +596,42 @@ public class NewsBrowserViewModel {
   }
 
   /**
-   * Retrieves the identifiers of all hidden elements up to and including the
-   * provided news item.
-   *
+   * Will return lists of groups (if any) and news that are hidden up to the
+   * provided news and including the entire page the news is in. This allows to
+   * reveal the actual page the provided news is in if hidden.
+   * 
    * @param newsId the identifier of the news item that is being revealed.
    * @param pageSize the number of elements per page.
    * @return a {@link Pair} of lists. The first contains the identifiers of
    * groups revealed and the second the list of news identifiers.
    */
-  public Pair<List<Long> /* Groups */, List<Long> /* News Items */> reveal(long newsId, int pageSize) {
+  public Pair<List<Long> /* Groups */, List<Long> /* News Items */> revealPage(long newsId, int pageSize) {
     List<Long> groups = new ArrayList<Long>(1);
     List<Long> news = new ArrayList<Long>();
 
-    synchronized (fLock) {
-      int indexOfNewsItem = indexOfNews(newsId);
-      int indexOfFirstHiddenItem = indexOfFirstHiddenItem(newsId);
-      if (indexOfFirstHiddenItem != -1 && indexOfNewsItem != -1) {
-        for (int i = indexOfFirstHiddenItem; i < fItemList.size() && i <= indexOfNewsItem; i++) {
-          Item item = fItemList.get(i);
+    /* Find all pages until target news is found */
+    if (pageSize != 0) {
+      synchronized (fLock) {
+        int indexOfFirstHiddenItem = indexOfFirstHiddenItem(newsId);
+        if (indexOfFirstHiddenItem != -1) {
+          int newsCounter = 0;
+          for (int i = indexOfFirstHiddenItem; i < fItemList.size(); i++) {
+            Item item = fItemList.get(i);
 
-          /* Group */
-          if (item instanceof Group)
-            groups.add(item.getId());
+            /* Group */
+            if (item instanceof Group) {
+              groups.add(item.getId());
+            }
 
-          /* News */
-          else
-            news.add(item.getId());
+            /* News */
+            else {
+              newsCounter++;
+              news.add(item.getId());
+            }
+
+            if (news.contains(newsId) && newsCounter % pageSize == 0)
+              break; //Reached the page that contains the target news, so stop
+          }
         }
       }
     }
@@ -623,20 +639,11 @@ public class NewsBrowserViewModel {
     return Pair.create(groups, news);
   }
 
-  private int indexOfNews(long newsId) {
-    synchronized (fLock) {
-      for (int i = 0; i < fItemList.size(); i++) {
-        Item item = fItemList.get(i);
-        if (!(item instanceof Group) && item.getId() == newsId)
-          return i;
-      }
-    }
-
-    return -1;
-  }
-
   private int indexOfFirstHiddenItem(long toId) {
     synchronized (fLock) {
+      if (fHiddenNews.isEmpty() && fHiddenGroups.isEmpty())
+        return -1;
+
       for (int i = 0; i < fItemList.size(); i++) {
         Item item = fItemList.get(i);
 
@@ -647,6 +654,7 @@ public class NewsBrowserViewModel {
           break; //Limit reached
       }
     }
+
     return -1;
   }
 

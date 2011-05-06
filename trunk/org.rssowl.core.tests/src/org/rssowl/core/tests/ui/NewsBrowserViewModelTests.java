@@ -98,7 +98,7 @@ public class NewsBrowserViewModelTests {
     assertTrue(nextPage.getFirst().isEmpty());
     assertTrue(nextPage.getSecond().isEmpty());
 
-    Pair<List<Long>, List<Long>> revealed = model.reveal(5L, 0);
+    Pair<List<Long>, List<Long>> revealed = model.revealPage(5L, 0);
     assertTrue(revealed.getFirst().isEmpty());
     assertTrue(revealed.getSecond().isEmpty());
 
@@ -145,7 +145,7 @@ public class NewsBrowserViewModelTests {
     assertTrue(nextPage.getFirst().isEmpty());
     assertTrue(nextPage.getSecond().isEmpty());
 
-    Pair<List<Long>, List<Long>> revealed = model.reveal(5L, 0);
+    Pair<List<Long>, List<Long>> revealed = model.revealPage(5L, 0);
     assertTrue(revealed.getFirst().isEmpty());
     assertTrue(revealed.getSecond().isEmpty());
 
@@ -192,7 +192,7 @@ public class NewsBrowserViewModelTests {
     assertTrue(nextPage.getFirst().isEmpty());
     assertTrue(nextPage.getSecond().isEmpty());
 
-    Pair<List<Long>, List<Long>> revealed = model.reveal(5L, 0);
+    Pair<List<Long>, List<Long>> revealed = model.revealPage(5L, 0);
     assertTrue(revealed.getFirst().isEmpty());
     assertTrue(revealed.getSecond().isEmpty());
 
@@ -280,26 +280,27 @@ public class NewsBrowserViewModelTests {
     assertTrue(nextPage.getFirst().isEmpty());
     assertTrue(nextPage.getSecond().isEmpty());
 
-    Pair<List<Long>, List<Long>> revealed = model.reveal(5L, 5);
+    Pair<List<Long>, List<Long>> revealed = model.revealPage(5L, 5);
     assertTrue(revealed.getFirst().isEmpty());
     assertTrue(revealed.getSecond().isEmpty());
 
     model.setNewsVisible(news1, false);
     model.setNewsVisible(news3, true);
 
-    revealed = model.reveal(news1.getId(), 5);
+    revealed = model.revealPage(news1.getId(), 5);
     assertTrue(revealed.getFirst().isEmpty());
-    assertEquals(1, revealed.getSecond().size());
+    assertEquals(2, revealed.getSecond().size());
     assertEquals(news1.getId(), revealed.getSecond().get(0));
+    assertEquals(news3.getId(), revealed.getSecond().get(1));
 
-    revealed = model.reveal(news3.getId(), 5);
+    revealed = model.revealPage(news3.getId(), 5);
     assertTrue(revealed.getFirst().isEmpty());
     assertEquals(news1.getId(), revealed.getSecond().get(0));
 
     model.setNewsVisible(news1, false);
     model.setNewsVisible(news3, false);
 
-    revealed = model.reveal(news3.getId(), 5);
+    revealed = model.revealPage(news3.getId(), 5);
     assertEquals(2, revealed.getSecond().size());
     assertEquals(news1.getId(), revealed.getSecond().get(0));
     assertEquals(news3.getId(), revealed.getSecond().get(1));
@@ -390,26 +391,27 @@ public class NewsBrowserViewModelTests {
     assertTrue(nextPage.getFirst().isEmpty());
     assertTrue(nextPage.getSecond().isEmpty());
 
-    Pair<List<Long>, List<Long>> revealed = model.reveal(5L, 2);
+    Pair<List<Long>, List<Long>> revealed = model.revealPage(5L, 2);
     assertTrue(revealed.getFirst().isEmpty());
     assertTrue(revealed.getSecond().isEmpty());
 
     model.setNewsVisible(news1, false);
     model.setNewsVisible(news3, true);
 
-    revealed = model.reveal(news1.getId(), 2);
+    revealed = model.revealPage(news1.getId(), 2);
     assertTrue(revealed.getFirst().isEmpty());
-    assertEquals(1, revealed.getSecond().size());
+    assertEquals(2, revealed.getSecond().size());
     assertEquals(news1.getId(), revealed.getSecond().get(0));
+    assertEquals(news3.getId(), revealed.getSecond().get(1));
 
-    revealed = model.reveal(news3.getId(), 2);
+    revealed = model.revealPage(news3.getId(), 2);
     assertTrue(revealed.getFirst().isEmpty());
     assertEquals(news1.getId(), revealed.getSecond().get(0));
 
     model.setNewsVisible(news1, false);
     model.setNewsVisible(news3, false);
 
-    revealed = model.reveal(news3.getId(), 2);
+    revealed = model.revealPage(news3.getId(), 2);
     assertEquals(2, revealed.getSecond().size());
     assertEquals(news1.getId(), revealed.getSecond().get(0));
     assertEquals(news3.getId(), revealed.getSecond().get(1));
@@ -495,26 +497,27 @@ public class NewsBrowserViewModelTests {
     assertTrue(nextPage.getFirst().isEmpty());
     assertTrue(nextPage.getSecond().isEmpty());
 
-    Pair<List<Long>, List<Long>> revealed = model.reveal(5L, 5);
+    Pair<List<Long>, List<Long>> revealed = model.revealPage(5L, 5);
     assertTrue(revealed.getFirst().isEmpty());
     assertTrue(revealed.getSecond().isEmpty());
 
     model.setNewsVisible(news1, false);
     model.setNewsVisible(news3, true);
 
-    revealed = model.reveal(news1.getId(), 5);
+    revealed = model.revealPage(news1.getId(), 5);
     assertTrue(revealed.getFirst().isEmpty());
-    assertEquals(1, revealed.getSecond().size());
+    assertEquals(2, revealed.getSecond().size());
     assertEquals(news1.getId(), revealed.getSecond().get(0));
+    assertEquals(news3.getId(), revealed.getSecond().get(1));
 
-    revealed = model.reveal(news3.getId(), 5);
+    revealed = model.revealPage(news3.getId(), 5);
     assertTrue(revealed.getFirst().isEmpty());
     assertEquals(news1.getId(), revealed.getSecond().get(0));
 
     model.setNewsVisible(news1, false);
     model.setNewsVisible(news3, false);
 
-    revealed = model.reveal(news3.getId(), 5);
+    revealed = model.revealPage(news3.getId(), 5);
     assertEquals(2, revealed.getSecond().size());
     assertEquals(news1.getId(), revealed.getSecond().get(0));
     assertEquals(news3.getId(), revealed.getSecond().get(1));
@@ -620,7 +623,7 @@ public class NewsBrowserViewModelTests {
     assertTrue(nextPage.getFirst().isEmpty());
     assertTrue(nextPage.getSecond().isEmpty());
 
-    Pair<List<Long>, List<Long>> revealed = model.reveal(5L, 0);
+    Pair<List<Long>, List<Long>> revealed = model.revealPage(5L, 0);
     assertTrue(revealed.getFirst().isEmpty());
     assertTrue(revealed.getSecond().isEmpty());
   }
@@ -725,7 +728,7 @@ public class NewsBrowserViewModelTests {
     assertTrue(nextPage.getFirst().isEmpty());
     assertTrue(nextPage.getSecond().isEmpty());
 
-    Pair<List<Long>, List<Long>> revealed = model.reveal(5L, 0);
+    Pair<List<Long>, List<Long>> revealed = model.revealPage(5L, 0);
     assertTrue(revealed.getFirst().isEmpty());
     assertTrue(revealed.getSecond().isEmpty());
   }
@@ -821,7 +824,7 @@ public class NewsBrowserViewModelTests {
     model.setGroupVisible(group2.getId(), false);
     model.setNewsVisible(news3, false);
 
-    Pair<List<Long>, List<Long>> revealed = model.reveal(news3.getId(), 2);
+    Pair<List<Long>, List<Long>> revealed = model.revealPage(news3.getId(), 2);
     assertEquals(1, revealed.getFirst().size());
     assertEquals(group2.getId(), revealed.getFirst().get(0).longValue());
     assertEquals(1, revealed.getSecond().size());
@@ -846,11 +849,11 @@ public class NewsBrowserViewModelTests {
     NewsBrowserViewModel model = new NewsBrowserViewModel();
     model.setInput(elements, 2);
 
-    Pair<List<Long>, List<Long>> revealed = model.reveal(news1.getId(), 2);
+    Pair<List<Long>, List<Long>> revealed = model.revealPage(news1.getId(), 2);
     assertTrue(revealed.getFirst().isEmpty());
     assertTrue(revealed.getSecond().isEmpty());
 
-    revealed = model.reveal(news4.getId(), 2);
+    revealed = model.revealPage(news4.getId(), 2);
     assertTrue(revealed.getFirst().isEmpty());
     assertFalse(revealed.getSecond().isEmpty());
     assertEquals(2, revealed.getSecond().size());
@@ -879,11 +882,11 @@ public class NewsBrowserViewModelTests {
     NewsBrowserViewModel model = new NewsBrowserViewModel();
     model.setInput(elements, 2);
 
-    Pair<List<Long>, List<Long>> revealed = model.reveal(news1.getId(), 2);
+    Pair<List<Long>, List<Long>> revealed = model.revealPage(news1.getId(), 2);
     assertTrue(revealed.getFirst().isEmpty());
     assertTrue(revealed.getSecond().isEmpty());
 
-    revealed = model.reveal(news4.getId(), 2);
+    revealed = model.revealPage(news4.getId(), 2);
     assertFalse(revealed.getFirst().isEmpty());
     assertEquals(1, revealed.getFirst().size());
     assertEquals(group2.getId(), revealed.getFirst().get(0).longValue());
