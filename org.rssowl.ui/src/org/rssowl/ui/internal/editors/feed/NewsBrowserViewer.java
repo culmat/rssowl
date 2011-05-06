@@ -218,26 +218,29 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
     public IStatus run(IProgressMonitor monitor) {
       if (fViewModel.hasHiddenNews()) {
-        StringBuilder js = new StringBuilder();
-        if (fCBrowser.isIE()) {
-          js.append("var scrollPosY = document.body.scrollTop; "); //$NON-NLS-1$
-          js.append("var windowHeight = document.body.clientHeight; "); //$NON-NLS-1$
-        } else {
-          js.append("var scrollPosY = window.pageYOffset; "); //$NON-NLS-1$
-          js.append("var windowHeight = window.innerHeight; "); //$NON-NLS-1$
+        long lastVisibleNewsId = fViewModel.getLastVisibleNews();
+        if (lastVisibleNewsId != -1) {
+          StringBuilder js = new StringBuilder();
+          if (fCBrowser.isIE()) {
+            js.append("var scrollPosY = document.body.scrollTop; "); //$NON-NLS-1$
+            js.append("var windowHeight = document.body.clientHeight; "); //$NON-NLS-1$
+          } else {
+            js.append("var scrollPosY = window.pageYOffset; "); //$NON-NLS-1$
+            js.append("var windowHeight = window.innerHeight; "); //$NON-NLS-1$
+          }
+
+          js.append("if (scrollPosY > 0) {"); //$NON-NLS-1$
+          js.append("  var node = document.getElementById('").append(Dynamic.NEWS.getId(lastVisibleNewsId)).append("'); "); //$NON-NLS-1$//$NON-NLS-2$
+          js.append("  if (node != null) {"); //$NON-NLS-1$
+          js.append("    if ((scrollPosY + windowHeight) >= node.offsetTop) {"); //$NON-NLS-1$
+          js.append("      window.location.href = '").append(ILinkHandler.HANDLER_PROTOCOL + SCROLL_NEXT_PAGE_HANDLER_ID).append("'; "); //$NON-NLS-1$ //$NON-NLS-2$
+          js.append("    }"); //$NON-NLS-1$
+          js.append("  }"); //$NON-NLS-1$
+          js.append("}"); //$NON-NLS-1$
+
+          if (!monitor.isCanceled())
+            fCBrowser.execute(js.toString());
         }
-
-        js.append("if (scrollPosY > 0) {"); //$NON-NLS-1$
-        js.append("  var latchNode = document.getElementById('").append(Dynamic.PAGE_LATCH.getId()).append("'); "); //$NON-NLS-1$//$NON-NLS-2$
-        js.append("  if (latchNode != null) {"); //$NON-NLS-1$
-        js.append("    if ((scrollPosY + windowHeight) >= latchNode.offsetTop) {"); //$NON-NLS-1$
-        js.append("      window.location.href = '").append(ILinkHandler.HANDLER_PROTOCOL + SCROLL_NEXT_PAGE_HANDLER_ID).append("'; "); //$NON-NLS-1$ //$NON-NLS-2$
-        js.append("    }"); //$NON-NLS-1$
-        js.append("  }"); //$NON-NLS-1$
-        js.append("}"); //$NON-NLS-1$
-
-        if (!monitor.isCanceled())
-          fCBrowser.execute(js.toString());
       }
 
       return Status.OK_STATUS;
@@ -1526,7 +1529,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   /**
    * A special way of refreshing this viewer with additional options to control
    * the behavior.
-   * 
+   *
    * @param restoreInput if set to <code>true</code> will restore the initial
    * input that was set to the browser in case the user navigated to a different
    * URL.
@@ -1655,7 +1658,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
   /**
    * Adds the given filter to this viewer.
-   * 
+   *
    * @param filter a viewer filter
    */
   public void addFilter(ViewerFilter filter) {
@@ -1671,7 +1674,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
    * Removes the given filter from this viewer, and triggers refiltering and
    * resorting of the elements if required. Has no effect if the identical
    * filter is not registered.
-   * 
+   *
    * @param filter a viewer filter
    */
   public void removeFilter(ViewerFilter filter) {
@@ -1950,7 +1953,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
   /**
    * Asks the NewsViewModel to update based on the given input.
-   * 
+   *
    * @param input the list of elements that becomes visible in the browser
    * viewer.
    */
