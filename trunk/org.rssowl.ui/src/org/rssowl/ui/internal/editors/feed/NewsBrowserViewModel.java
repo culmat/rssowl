@@ -436,6 +436,30 @@ public class NewsBrowserViewModel {
   }
 
   /**
+   * Returns the last news that is visible or <code>-1</code> if none.
+   *
+   * @return the identifier of the last hidden news or <code>-1</code> if none.
+   */
+  public long getLastVisibleNews() {
+    Item lastVisibleNews = null;
+    synchronized (fLock) {
+      for (int i = 0; i < fItemList.size(); i++) {
+        Item item = fItemList.get(i);
+
+        if (item instanceof Group)
+          continue;
+
+        if (isNewsVisible(item.getId()))
+          lastVisibleNews = item;
+        else
+          break;
+      }
+    }
+
+    return lastVisibleNews != null ? lastVisibleNews.getId() : -1;
+  }
+
+  /**
    * @param news the news to remove from the view model.
    * @return the identifier of a group that needs an update now that the news
    * has been removed or -1 if none.
