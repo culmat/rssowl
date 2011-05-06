@@ -51,10 +51,10 @@ public class JobTracker {
    *
    * @param delay The delay in milliseconds after which new Tasks should be
    * scheduled.
-   * @param showProgress if <code>TRUE</code>, progress is shown in the
-   * Progress View.
-   * @param priority The Priority of the <code>ITask</code>s that are to be
-   * run by this tracker.
+   * @param showProgress if <code>TRUE</code>, progress is shown in the Progress
+   * View.
+   * @param priority The Priority of the <code>ITask</code>s that are to be run
+   * by this tracker.
    */
   public JobTracker(int delay, boolean showProgress, ITask.Priority priority) {
     this(delay, showProgress, false, priority);
@@ -66,12 +66,12 @@ public class JobTracker {
    *
    * @param delay The delay in milliseconds after which new Tasks should be
    * scheduled.
-   * @param showProgress if <code>TRUE</code>, progress is shown in the
-   * Progress View.
+   * @param showProgress if <code>TRUE</code>, progress is shown in the Progress
+   * View.
    * @param runInUIThread if <code>TRUE</code>, this Job will run in the
    * UI-Thread by creating a <code>UIJob</code>.
-   * @param priority The Priority of the <code>ITask</code>s that are to be
-   * run by this tracker.
+   * @param priority The Priority of the <code>ITask</code>s that are to be run
+   * by this tracker.
    */
   public JobTracker(int delay, boolean showProgress, boolean runInUIThread, ITask.Priority priority) {
     fDelay = delay;
@@ -178,5 +178,13 @@ public class JobTracker {
     /* Cancel */
     Job.getJobManager().cancel(this);
     fRunning = false;
+  }
+
+  /**
+   * @return <code>true</code> if the JobTracker has a {@link ITask} pending to
+   * run and <code>false</code> otherwise.
+   */
+  public boolean isRunning() {
+    return fRunning;
   }
 }
