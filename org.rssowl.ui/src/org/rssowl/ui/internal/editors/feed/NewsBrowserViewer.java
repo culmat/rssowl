@@ -896,7 +896,16 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
     /* Scroll Reveal Next Page */
     else if (SCROLL_NEXT_PAGE_HANDLER_ID.equals(id)) {
-      revealNextPage(false);
+      Runnable runnable = new Runnable() {
+        public void run() {
+          revealNextPage(false);
+        }
+      };
+
+      if (CBrowser.isMozillaRunningOnWindows()) //Bug in XULRunner, otherwise won't work
+        JobRunner.runInUIThread(0, true, fBrowser.getControl(), runnable);
+      else
+        runnable.run();
     }
   }
 
@@ -1517,7 +1526,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   /**
    * A special way of refreshing this viewer with additional options to control
    * the behavior.
-   *
+   * 
    * @param restoreInput if set to <code>true</code> will restore the initial
    * input that was set to the browser in case the user navigated to a different
    * URL.
@@ -1646,7 +1655,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
   /**
    * Adds the given filter to this viewer.
-   *
+   * 
    * @param filter a viewer filter
    */
   public void addFilter(ViewerFilter filter) {
@@ -1662,7 +1671,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
    * Removes the given filter from this viewer, and triggers refiltering and
    * resorting of the elements if required. Has no effect if the identical
    * filter is not registered.
-   *
+   * 
    * @param filter a viewer filter
    */
   public void removeFilter(ViewerFilter filter) {
@@ -1941,7 +1950,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
   /**
    * Asks the NewsViewModel to update based on the given input.
-   *
+   * 
    * @param input the list of elements that becomes visible in the browser
    * viewer.
    */
