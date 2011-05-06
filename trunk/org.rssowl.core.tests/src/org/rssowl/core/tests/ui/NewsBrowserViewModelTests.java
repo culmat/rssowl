@@ -67,7 +67,7 @@ public class NewsBrowserViewModelTests {
   @Test
   public void testNullModel() throws Exception {
     NewsBrowserViewModel model = new NewsBrowserViewModel();
-    model.setInput(null);
+    model.setInput(null, 0);
 
     assertEquals(-1L, model.findGroup(5L));
     assertFalse(model.isFirstItemUnread());
@@ -113,7 +113,7 @@ public class NewsBrowserViewModelTests {
   public void testEmptyModel() throws Exception {
     Object[] elements = new Object[0];
     NewsBrowserViewModel model = new NewsBrowserViewModel();
-    model.setInput(elements);
+    model.setInput(elements, 0);
 
     assertEquals(-1L, model.findGroup(5L));
     assertEquals(-1L, model.getExpandedNews());
@@ -215,7 +215,7 @@ public class NewsBrowserViewModelTests {
 
     Object[] elements = new Object[] { news1, news2, news3, feed };
     NewsBrowserViewModel model = new NewsBrowserViewModel();
-    model.setInput(elements);
+    model.setInput(elements, 0);
 
     assertTrue(model.isFirstItemUnread());
 
@@ -541,7 +541,7 @@ public class NewsBrowserViewModelTests {
 
     Object[] elements = new Object[] { group1, news1, news2, group2, news3, feed };
     NewsBrowserViewModel model = new NewsBrowserViewModel();
-    model.setInput(elements);
+    model.setInput(elements, 0);
 
     assertFalse(model.isFirstItemUnread());
 
