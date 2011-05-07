@@ -1718,6 +1718,12 @@ public class OwlUI {
     /* Open Editors for the given Selection */
     for (int i = 0; i < list.size() && openedEditors < maxOpenEditors; i++) {
       Object object = list.get(i);
+
+      /* Convert folder to news mark in case folder selected */
+      if (object instanceof IFolder)
+        object = new FolderNewsMark((IFolder) object);
+
+      /* Only news marks supported at this point */
       if (object instanceof INewsMark) {
         INewsMark mark = ((INewsMark) object);
         FeedViewInput input = new FeedViewInput(mark, perform);
