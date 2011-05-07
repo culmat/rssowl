@@ -1381,34 +1381,38 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     }
 
     /* Reveal News and insert content */
-    INews firstNews = null;
+    Long firstNewsId = null;
     for (Long newsId : revealedNews) {
-      INews news = DynamicDAO.load(INews.class, newsId);
-      if (news == null || fViewModel.isNewsVisible(news))
+      if (fViewModel.isNewsVisible(newsId))
         continue; //Skip if already visible
 
       /* Remember the first news made visible to scroll to */
-      if (firstNews == null)
-        firstNews = news;
+      if (firstNewsId == null)
+        firstNewsId = newsId;
 
       /* Update View Model */
-      fViewModel.setNewsVisible(news, true);
+      fViewModel.setNewsVisible(newsId, true);
 
       /* Make News container visible */
-      js.append(getElementById(Dynamic.NEWS.getId(news))).append(".style.display='block'; "); //$NON-NLS-1$
+      js.append(getElementById(Dynamic.NEWS.getId(newsId))).append(".style.display='block'; "); //$NON-NLS-1$
 
       /* Show separator in case of headlines layout */
       if (isHeadlinesLayout())
-        js.append(getElementById(Dynamic.HEADLINE_SEPARATOR.getId(news))).append(".style.display='block'; "); //$NON-NLS-1$
+        js.append(getElementById(Dynamic.HEADLINE_SEPARATOR.getId(newsId))).append(".style.display='block'; "); //$NON-NLS-1$
 
       /* Fill full news content in newspaper layout */
-      else
+      else {
+        INews news = DynamicDAO.load(INews.class, newsId);
+        if (news == null)
+          continue;
+
         fillNewsContent(news, js, CoreUtils.getLink(news));
+      }
     }
 
     /* Update Scroll Position */
-    if (firstNews != null && scrollIntoView)
-      js.append(getElementById(Dynamic.NEWS.getId(firstNews))).append(".scrollIntoView(true); "); //$NON-NLS-1$
+    if (firstNewsId != null && scrollIntoView)
+      js.append(getElementById(Dynamic.NEWS.getId(firstNewsId))).append(".scrollIntoView(true); "); //$NON-NLS-1$
 
     /* Update Latch if necessary */
     updateLatchIfNecessary(js);
