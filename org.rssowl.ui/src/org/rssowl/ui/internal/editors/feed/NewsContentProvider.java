@@ -81,7 +81,7 @@ import java.util.Set;
 public class NewsContentProvider implements ITreeContentProvider {
 
   /* The maximum number of items returned from a FolderNewsMark */
-  private static final int MAX_FOLDER_ELEMENTS = 500;
+  static final int MAX_FOLDER_ELEMENTS = 500;
 
   private final NewsBrowserViewer fBrowserViewer;
   private final NewsTableViewer fTableViewer;
@@ -253,6 +253,11 @@ public class NewsContentProvider implements ITreeContentProvider {
 
   /* Returns the news that have been added since the last refresh */
   synchronized Pair</* Added News (only for saved searches) */List<INews>, /* Was Empty */Boolean> refreshCache(INewsMark input, boolean onlyAdd) throws PersistenceException {
+    return refreshCache(input, onlyAdd, null);
+  }
+
+  /* Returns the news that have been added since the last refresh */
+  synchronized Pair</* Added News (only for saved searches) */List<INews>, /* Was Empty */Boolean> refreshCache(INewsMark input, boolean onlyAdd, NewsComparator comparer) throws PersistenceException {
     List<INews> resolvedNews = Collections.emptyList();
     boolean wasEmpty = fCachedNews.isEmpty();
 
@@ -302,7 +307,7 @@ public class NewsContentProvider implements ITreeContentProvider {
 
       /* Special treat folders and limit them by size */
       if (input instanceof FolderNewsMark)
-        resolvedNews = limitFolder(resolvedNews, fFilter.getType() == Type.SHOW_NEW || fFilter.getType() == Type.SHOW_UNREAD);
+        resolvedNews = limitFolder(resolvedNews, fFilter.getType() == Type.SHOW_NEW || fFilter.getType() == Type.SHOW_UNREAD, comparer != null ? comparer : fFeedView.getComparator());
     }
 
     /* Handle Bookmark */
@@ -347,7 +352,7 @@ public class NewsContentProvider implements ITreeContentProvider {
       ((FolderNewsMark) fInput).remove(deletedNews);
   }
 
-  private List<INews> limitFolder(List<INews> resolvedNews, boolean alreadyFiltered) {
+  private List<INews> limitFolder(List<INews> resolvedNews, boolean alreadyFiltered, NewsComparator comparer) {
     if (resolvedNews.size() <= MAX_FOLDER_ELEMENTS)
       return resolvedNews;
 
@@ -355,7 +360,7 @@ public class NewsContentProvider implements ITreeContentProvider {
     Object[] elements = resolvedNews.toArray();
     if (!alreadyFiltered)
       elements = fFilter.filter(null, (Object) null, elements);
-    fFeedView.getSorter().sort(null, elements);
+    comparer.sort(null, elements);
 
     List<INews> limitedResult = new ArrayList<INews>(Math.min(elements.length, MAX_FOLDER_ELEMENTS));
     for (int i = 0; i < elements.length && i < MAX_FOLDER_ELEMENTS; i++) {

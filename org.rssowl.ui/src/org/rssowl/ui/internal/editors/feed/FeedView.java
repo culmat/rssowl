@@ -148,7 +148,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * The FeedView is an instance of <code>EditorPart</code> capable of displaying
  * News in a Table-Viewer and Browser-Viewer. It offers controls to Filter and
  * Group them.
- *
+ * 
  * @author bpasero
  */
 public class FeedView extends EditorPart implements IReusableEditor {
@@ -973,7 +973,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
   /**
    * Sets the given <code>IStructuredSelection</code> to the News-Table showing
    * in the FeedView. Will ignore the selection, if the Table is minimized.
-   *
+   * 
    * @param selection The Selection to show in the News-Table.
    */
   public void setSelection(final IStructuredSelection selection) {
@@ -1092,7 +1092,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
    * TODO Find a better solution once its possible to add listeners to
    * {@link IPreferenceScope} and then listen to changes of display-properties.
    * </p>
-   *
+   * 
    * @param refresh If TRUE, refresh the Viewer, FALSE otherwise.
    */
   public void updateFilterAndGrouping(boolean refresh) {
@@ -1118,9 +1118,33 @@ public class FeedView extends EditorPart implements IReusableEditor {
     if (fInput == null)
       return;
 
+    /* Folder News Mark might require cache refresh if sorting has changed and limit reached */
+    if (fInput.getMark() instanceof FolderNewsMark && fInput.getMark().getNewsCount(INews.State.getVisible()) > NewsContentProvider.MAX_FOLDER_ELEMENTS) {
+      FolderNewsMark folderMark = (FolderNewsMark) fInput.getMark();
+      IPreferenceScope preferences = Owl.getPreferenceService().getEntityScope(folderMark.getFolder());
+      NewsComparator comparator = getComparator();
+
+      NewsColumn oldSortBy = comparator.getSortBy();
+      boolean oldIsAscending = comparator.isAscending();
+
+      NewsColumn newSortBy = NewsColumn.values()[preferences.getInteger(DefaultPreferences.BM_NEWS_SORT_COLUMN)];
+      boolean newIsAscending = preferences.getBoolean(DefaultPreferences.BM_NEWS_SORT_ASCENDING);
+
+      /* Sorting changed and cache is at limit, so refresh cache */
+      if (oldSortBy != newSortBy || oldIsAscending != newIsAscending) {
+        NewsComparator comparer = new NewsComparator();
+        comparer.setSortBy(newSortBy);
+        comparer.setAscending(newIsAscending);
+
+        fContentProvider.refreshCache(folderMark, false, comparer);
+      }
+    }
+
+    /* Update Columns and Sorting in Table Viewer */
     if (isTableViewerVisible())
       fNewsTableControl.updateColumns(fInput.getMark());
 
+    /* Update Sorting in Browser Viewer */
     if (isBrowserViewerVisible())
       fNewsBrowserControl.updateSorting(fInput.getMark(), true);
   }
@@ -1128,7 +1152,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
   /**
    * Notifies this editor about a UI-Event just occured. In dependance of the
    * event, the Editor might want to update the state on the displayed News.
-   *
+   * 
    * @param event The UI-Event that just occured as described in the
    * <code>UIEvent</code> enumeration.
    */
@@ -1705,7 +1729,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
   /**
    * Refreshes all parts of this editor.
-   *
+   * 
    * @param delayRedraw If <code>TRUE</code> delay redraw until operation is
    * done.
    * @param updateLabels If <code>TRUE</code> update all Labels.
@@ -1717,7 +1741,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
   /**
    * A special key was pressed from the Quicksearch Input-Field. Handle it.
-   *
+   * 
    * @param traversal The Traversal that occured from the quicksearch.
    * @param clear If <code>true</code> indicates that the quicksearch was
    * cleared.
@@ -1899,7 +1923,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
   /**
    * Check wether the News-Table-Part of this Editor is visible or not
    * (minmized).
-   *
+   * 
    * @return TRUE if the News-Table-Part is visible, FALSE otherwise.
    */
   boolean isTableViewerVisible() {
@@ -1908,7 +1932,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
   /**
    * Check wether the Browser-Part of this Editor is visible or not (minmized).
-   *
+   * 
    * @return TRUE if the Browser-Table-Part is visible, FALSE otherwise.
    */
   boolean isBrowserViewerVisible() {
@@ -1917,7 +1941,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
   /**
    * Get the shared ViewerFilter used to filter News.
-   *
+   * 
    * @return the shared ViewerFilter used to filter News.
    */
   NewsFilter getFilter() {
@@ -1926,19 +1950,19 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
   /**
    * Get the ViewerComparator that is used for sorting news.
-   *
+   * 
    * @return the {@link ViewerComparator} for sorting news.
    */
-  ViewerComparator getSorter() {
+  NewsComparator getComparator() {
     if (isTableViewerVisible())
-      return fNewsTableControl.getViewer().getComparator();
+      return (NewsComparator) fNewsTableControl.getViewer().getComparator();
 
-    return fNewsBrowserControl.getViewer().getComparator();
+    return (NewsComparator) fNewsBrowserControl.getViewer().getComparator();
   }
 
   /**
    * Get the shared Viewer-Grouper used to group News.
-   *
+   * 
    * @return the shared Viewer-Grouper used to group News.
    */
   NewsGrouping getGrouper() {
@@ -2123,7 +2147,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
   /**
    * Navigate to the next/previous read or unread News respecting the News-Items
    * that are displayed in the NewsTableControl.
-   *
+   * 
    * @param respectSelection If <code>TRUE</code>, respect the current selected
    * Item from the Tree as starting-node for the navigation, or
    * <code>FALSE</code> otherwise.
@@ -2238,7 +2262,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
   /**
    * Returns the <code>Composite</code> that is the Parent Control of this
    * Editor Part.
-   *
+   * 
    * @return The <code>Composite</code> that is the Parent Control of this
    * Editor Part.
    */
