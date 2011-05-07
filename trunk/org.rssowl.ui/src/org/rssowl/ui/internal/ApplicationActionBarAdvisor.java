@@ -528,7 +528,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         manager.add(layoutMenu);
 
         /* Columns */
-        final boolean isColumnsEnabled = (layout != Layout.NEWSPAPER);
+        final boolean isColumnsEnabled = (layout != Layout.NEWSPAPER && layout != Layout.HEADLINES);
         MenuManager columnsMenu = new MenuManager(Messages.ApplicationActionBarAdvisor_COLUMNS);
         final NewsColumnViewModel model = NewsColumnViewModel.loadFrom(entityPreferences != null ? entityPreferences : globalPreferences);
         NewsColumn[] columns = NewsColumn.values();
