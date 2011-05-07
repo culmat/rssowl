@@ -1167,7 +1167,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
      * navigating between feeds. Also, the input could have been deleted and the
      * editor closed. Thereby do not react.
      */
-    if (news == null || !fInput.exists())
+    if (news.isEmpty() || !fInput.exists())
       return;
 
     final boolean markReadOnFeedChange = inputPreferences.getBoolean(DefaultPreferences.MARK_READ_ON_CHANGE);
