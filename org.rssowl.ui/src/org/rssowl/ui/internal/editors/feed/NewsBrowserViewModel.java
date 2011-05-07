@@ -50,7 +50,8 @@ import java.util.Set;
  */
 public class NewsBrowserViewModel {
   private final List<Item> fItemList = new ArrayList<NewsBrowserViewModel.Item>();
-  private final Map<Long, Item> fItemMap = new HashMap<Long, NewsBrowserViewModel.Item>();
+  private final Map<Long, Item> fNewsMap = new HashMap<Long, NewsBrowserViewModel.Item>();
+  private final Map<Long, Group> fGroupMap = new HashMap<Long, NewsBrowserViewModel.Group>();
   private final Map<Long, List<Long>> fEntityGroupToNewsMap = new HashMap<Long, List<Long>>();
   private final Set<Long> fExpandedNews = new HashSet<Long>();
   private final Set<Long> fCollapsedGroups = new HashSet<Long>();
@@ -117,7 +118,8 @@ public class NewsBrowserViewModel {
 
       /* Clear Caches */
       fItemList.clear();
-      fItemMap.clear();
+      fNewsMap.clear();
+      fGroupMap.clear();
       fEntityGroupToNewsMap.clear();
       fExpandedNews.clear();
       fCollapsedGroups.clear();
@@ -137,6 +139,7 @@ public class NewsBrowserViewModel {
           if (element instanceof EntityGroup) {
             EntityGroup group = (EntityGroup) element;
             entry = new Group(group.getId());
+            fGroupMap.put(entry.getId(), (Group) entry);
 
             currentGroupEntryList = new ArrayList<Long>();
             fEntityGroupToNewsMap.put(group.getId(), currentGroupEntryList);
@@ -154,6 +157,7 @@ public class NewsBrowserViewModel {
             newsCounter++;
             INews news = (INews) element;
             entry = new Item(news.getId());
+            fNewsMap.put(entry.getId(), entry);
 
             if (currentGroupEntryList != null)
               currentGroupEntryList.add(news.getId());
@@ -162,11 +166,9 @@ public class NewsBrowserViewModel {
               setNewsVisible(news, false);
           }
 
-          /* Add Entry into Collections */
-          if (entry != null) {
+          /* Add Entry into Collection */
+          if (entry != null)
             fItemList.add(entry);
-            fItemMap.put(entry.getId(), entry);
-          }
         }
       }
     }
@@ -477,11 +479,11 @@ public class NewsBrowserViewModel {
     synchronized (fLock) {
 
       /* Remove from generic Item Collections */
-      Item item = fItemMap.get(news.getId());
+      fHiddenNews.remove(news.getId());
+      Item item = fNewsMap.get(news.getId());
       if (item != null) {
         fItemList.remove(item);
-        fItemMap.remove(item.getId());
-        fHiddenNews.remove(item.getId());
+        fNewsMap.remove(item.getId());
       }
 
       /* Remove from Collection of expanded Elements */
@@ -498,13 +500,13 @@ public class NewsBrowserViewModel {
           /* In case the group is now empty, remove it as well */
           if (newsInGroup.isEmpty()) {
             fEntityGroupToNewsMap.remove(groupId);
+            fCollapsedGroups.remove(groupId);
+            fHiddenGroups.remove(groupId);
 
-            Item group = fItemMap.get(groupId);
+            Group group = fGroupMap.get(groupId);
             if (group != null) {
               fItemList.remove(group);
-              fItemMap.remove(group.getId());
-              fCollapsedGroups.remove(group.getId());
-              fHiddenGroups.remove(group.getId());
+              fGroupMap.remove(group.getId());
             }
           }
 
