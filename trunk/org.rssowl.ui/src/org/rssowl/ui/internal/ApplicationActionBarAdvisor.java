@@ -90,7 +90,6 @@ import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.OwlUI.Layout;
 import org.rssowl.ui.internal.OwlUI.PageSize;
-import org.rssowl.ui.internal.actions.AggregateFolderAction;
 import org.rssowl.ui.internal.actions.ArchiveNewsAction;
 import org.rssowl.ui.internal.actions.AssignLabelsAction;
 import org.rssowl.ui.internal.actions.AutomateFilterAction;
@@ -2150,20 +2149,24 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         folderMenu.addMenuListener(new IMenuListener() {
           public void menuAboutToShow(IMenuManager manager) {
 
-            /* Open All in New Tabs */
-            if (preferences.getBoolean(DefaultPreferences.ALWAYS_REUSE_FEEDVIEW) && OwlUI.isTabbedBrowsingEnabled())
-              folderMenu.add(new OpenInNewTabAction(OwlUI.getPage(window), folder));
-
-            /* Aggregate News of Folder */
-            folderMenu.add(new Action(Messages.ApplicationActionBarAdvisor_AGGREGATE_NEWS) {
+            /* Open Folder */
+            folderMenu.add(new Action(Messages.ApplicationActionBarAdvisor_OPEN_FOLDER) {
               @Override
               public void run() {
-                AggregateFolderAction action = new AggregateFolderAction();
-                action.selectionChanged(null, new StructuredSelection(folder));
-                action.setActivePart(null, OwlUI.getActivePart(window));
-                action.run(null);
+                OwlUI.openInFeedView(window.getActivePage(), new StructuredSelection(child));
               }
             });
+
+            /* Offer Actions to force open a new Tab */
+            if (preferences.getBoolean(DefaultPreferences.ALWAYS_REUSE_FEEDVIEW) && OwlUI.isTabbedBrowsingEnabled()) {
+
+              /* Open Folder in New Tab */
+              folderMenu.add(new OpenInNewTabAction(OwlUI.getPage(window), new StructuredSelection(child)));
+
+              /* Open All in New Tabs */
+              folderMenu.add(new OpenInNewTabAction(OwlUI.getPage(window), folder));
+            }
+
             folderMenu.add(new Separator());
 
             /* Show other entries */

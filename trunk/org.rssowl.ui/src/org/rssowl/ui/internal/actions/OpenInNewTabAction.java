@@ -40,7 +40,7 @@ import java.util.EnumSet;
  * @author bpasero
  */
 public class OpenInNewTabAction extends Action {
-  private ISelectionProvider fSelectionProvider;
+  private IStructuredSelection fSelection;
   private IWorkbenchPage fPage;
   private IFolder fFolder;
 
@@ -49,10 +49,17 @@ public class OpenInNewTabAction extends Action {
    * @param selectionProvider
    */
   public OpenInNewTabAction(IWorkbenchPage page, ISelectionProvider selectionProvider) {
-    fPage = page;
-    fSelectionProvider = selectionProvider;
+    this(page, (IStructuredSelection) selectionProvider.getSelection());
+  }
 
-    IStructuredSelection selection = (IStructuredSelection) fSelectionProvider.getSelection();
+  /**
+   * @param page
+   * @param selection
+   */
+  public OpenInNewTabAction(IWorkbenchPage page, IStructuredSelection selection) {
+    fPage = page;
+    fSelection = selection;
+
     if (selection.size() == 1)
       setText(Messages.OpenInNewTabAction_OPEN_IN_NEW_TAB);
     else
@@ -77,8 +84,8 @@ public class OpenInNewTabAction extends Action {
 
     /* Find Elements to Open */
     final IStructuredSelection selection;
-    if (fSelectionProvider != null)
-      selection = (IStructuredSelection) fSelectionProvider.getSelection();
+    if (fSelection != null)
+      selection = fSelection;
     else
       selection = new StructuredSelection(fFolder.getMarks());
 

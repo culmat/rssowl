@@ -62,11 +62,8 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.MouseAdapter;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -78,7 +75,6 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IActionDelegate;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -128,7 +124,6 @@ import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.ShareProvider;
 import org.rssowl.ui.internal.StatusLineUpdater;
-import org.rssowl.ui.internal.actions.AggregateFolderAction;
 import org.rssowl.ui.internal.actions.DeleteTypesAction;
 import org.rssowl.ui.internal.actions.EntityPropertyDialogAction;
 import org.rssowl.ui.internal.actions.FindAction;
@@ -167,7 +162,7 @@ import java.util.Set;
  * fViewer.setLabelProvider(new DecoratingLabelProvider(new BookMarkLabelProvider(), decorator);
  * </code>
  * </p>
- *
+ * 
  * @author bpasero
  */
 public class BookMarkExplorer extends ViewPart {
@@ -234,7 +229,7 @@ public class BookMarkExplorer extends ViewPart {
   /**
    * Returns the preferences key for the selected bookmark set for the given
    * workbench window.
-   *
+   * 
    * @param window the active workbench window.
    * @return the preferences key for the selected bookmark set for the given
    * workbench window.
@@ -372,15 +367,6 @@ public class BookMarkExplorer extends ViewPart {
       }
     });
 
-    /* Aggregate Folder on Mouse Middle Click */
-    fViewer.getTree().addMouseListener(new MouseAdapter() {
-      @Override
-      public void mouseUp(MouseEvent e) {
-        if (e.button == 2)
-          onMouseMiddleClick(fViewer.getTree().getItem(new Point(e.x, e.y)));
-      }
-    });
-
     /* Custom Owner Drawn for Groups */
     if (!OwlUI.isHighContrast()) {
       fViewer.getControl().addListener(SWT.EraseItem, new Listener() {
@@ -438,15 +424,6 @@ public class BookMarkExplorer extends ViewPart {
       boolean expandedState = !fViewer.getExpandedState(firstElem);
       fViewer.setExpandedState(firstElem, expandedState);
       onTreeEvent(firstElem, expandedState);
-    }
-  }
-
-  private void onMouseMiddleClick(TreeItem item) {
-    if (item != null && item.getData() instanceof IFolder) {
-      AggregateFolderAction action = new AggregateFolderAction();
-      action.setActivePart(null, this);
-      action.selectionChanged(null, new StructuredSelection(item.getData()));
-      action.run(null);
     }
   }
 
@@ -1269,25 +1246,23 @@ public class BookMarkExplorer extends ViewPart {
         manager.add(new GroupMarker(IWorkbenchActionConstants.NEW_EXT));
 
         final IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
-        boolean newsMarkSelected = (getNewsMark(selection) != null);
         IFolder selectedFolder = getFolder(selection);
         IPreferenceScope globalPreferences = Owl.getPreferenceService().getGlobalScope();
         IPreferenceScope eclipsePreferences = Owl.getPreferenceService().getEclipseScope();
 
         /* Open */
         manager.add(new Separator(OwlUI.M_OPEN));
-        if (newsMarkSelected && !eclipsePreferences.getBoolean(DefaultPreferences.ECLIPSE_SINGLE_CLICK_OPEN))
+        if (!eclipsePreferences.getBoolean(DefaultPreferences.ECLIPSE_SINGLE_CLICK_OPEN))
           manager.add(new OpenAction(fViewSite.getPage(), fViewer));
 
         /* Tab related Actions */
         if (globalPreferences.getBoolean(DefaultPreferences.ALWAYS_REUSE_FEEDVIEW) && OwlUI.isTabbedBrowsingEnabled()) {
 
-          /* Open Feed in new Tab */
-          if (newsMarkSelected)
-            manager.add(new OpenInNewTabAction(fViewSite.getPage(), fViewer));
+          /* Open in new Tab */
+          manager.add(new OpenInNewTabAction(fViewSite.getPage(), fViewer));
 
           /* Open Feeds of Folder in Tabs */
-          else if (selectedFolder != null)
+          if (selectedFolder != null)
             manager.add(new OpenInNewTabAction(fViewSite.getPage(), selectedFolder));
         }
 
@@ -1381,16 +1356,6 @@ public class BookMarkExplorer extends ViewPart {
     for (Object object : list) {
       if (object instanceof IBookMark)
         return (IBookMark) object;
-    }
-
-    return null;
-  }
-
-  private INewsMark getNewsMark(IStructuredSelection selection) {
-    List<?> list = selection.toList();
-    for (Object object : list) {
-      if (object instanceof INewsMark)
-        return (INewsMark) object;
     }
 
     return null;
@@ -1695,14 +1660,14 @@ public class BookMarkExplorer extends ViewPart {
   /**
    * Navigate to the next/previous read or unread Feed respecting the Marks that
    * are displayed in the Tree-Viewer.
-   *
+   * 
    * @param next If <code>TRUE</code>, move to the next item, or previous if
    * <code>FALSE</code>.
    * @param unread If <code>TRUE</code>, only move to unread items, or ignore if
    * <code>FALSE</code>.
-   * @param performOnFeedView If <code>TRUE</code>, this navigation should also invoke a follow
-   * up navigation in the opened feed view if a valid target is found and <code>false</code>
-   * otherwise.
+   * @param performOnFeedView If <code>TRUE</code>, this navigation should also
+   * invoke a follow up navigation in the opened feed view if a valid target is
+   * found and <code>false</code> otherwise.
    * @return Returns <code>TRUE</code> in case navigation found a valid item, or
    * <code>FALSE</code> otherwise.
    */
@@ -2012,7 +1977,7 @@ public class BookMarkExplorer extends ViewPart {
   /**
    * Allows to disable saving settings on dispose. Useful if settings have been
    * imported and the application is to restart.
-   *
+   * 
    * @param saveStateOnDispose <code>true</code> to save settings on dispose and
    * <code>false</code> to block this.
    */
