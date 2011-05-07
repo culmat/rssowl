@@ -69,8 +69,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -88,7 +90,7 @@ public class NewsContentProvider implements ITreeContentProvider {
   private boolean fDisposed;
 
   /* Cache displayed News */
-  private Set<INews> fCachedNews;
+  private Map<Long, INews> fCachedNews;
 
   /**
    * @param tableViewer
@@ -133,7 +135,7 @@ public class NewsContentProvider implements ITreeContentProvider {
       /* This is a FeedReference */
       else if (object instanceof FeedLinkReference) {
         synchronized (NewsContentProvider.this) {
-          Collection<INews> news = fCachedNews;
+          Collection<INews> news = fCachedNews.values();
           if (news != null) {
             if (fGrouping.getType() == NewsGrouping.Type.NO_GROUPING)
               elements.addAll(news);
@@ -148,7 +150,7 @@ public class NewsContentProvider implements ITreeContentProvider {
         Class<? extends IEntity> entityClass = ((ModelReference) object).getEntityClass();
         if (IMark.class.isAssignableFrom(entityClass) || IFolder.class.isAssignableFrom(entityClass)) { //Suppoer FolderNewsMark too
           synchronized (NewsContentProvider.this) {
-            Collection<INews> news = fCachedNews;
+            Collection<INews> news = fCachedNews.values();
             if (news != null) {
               if (fGrouping.getType() == NewsGrouping.Type.NO_GROUPING)
                 elements.addAll(news);
@@ -245,8 +247,8 @@ public class NewsContentProvider implements ITreeContentProvider {
   }
 
   /* Returns the news that have been added since the last refresh */
-  synchronized Pair</* Added News */List<INews>, /* Was Empty */Boolean> refreshCache(INewsMark input, boolean onlyAdd) throws PersistenceException {
-    List<INews> addedNews = Collections.emptyList();
+  synchronized Pair</* Added News (only for saved searches) */List<INews>, /* Was Empty */Boolean> refreshCache(INewsMark input, boolean onlyAdd) throws PersistenceException {
+    List<INews> resolvedNews = Collections.emptyList();
     boolean wasEmpty = (fCachedNews == null || fCachedNews.isEmpty());
 
     /* Update Input */
@@ -258,19 +260,22 @@ public class NewsContentProvider implements ITreeContentProvider {
 
     /* Clear old Data if required */
     if (fCachedNews == null)
-      fCachedNews = new HashSet<INews>();
+      fCachedNews = new HashMap<Long, INews>();
     else if (!onlyAdd)
       fCachedNews.clear();
 
     /* Check if ContentProvider was already disposed */
     if (fDisposed)
-      return Pair.create(addedNews, wasEmpty);
+      return Pair.create(resolvedNews, wasEmpty);
 
     /* Obtain the News */
-    addedNews = new ArrayList<INews>();
+    resolvedNews = new ArrayList<INews>();
 
-    /* Special-case marks that can retrieve newsRefs cheaply */
-    if (input.isGetNewsRefsEfficient()) {
+    /* Handle Folder, Newsbin and Saved Search */
+    boolean isSearch = (input instanceof ISearchMark);
+    if (isSearch || input instanceof INewsBin || input instanceof FolderNewsMark) {
+
+      /* Folder, Bin and Search can resolve news by state efficiently */
       Set<State> states;
       if (fFilter.getType() == Type.SHOW_NEW)
         states = EnumSet.of(INews.State.NEW);
@@ -279,26 +284,30 @@ public class NewsContentProvider implements ITreeContentProvider {
       else
         states = INews.State.getVisible();
 
-      for (NewsReference newsRef : input.getNewsRefs(states)) {
+      List<NewsReference> newsReferences = input.getNewsRefs(states);
+      for (NewsReference newsRef : newsReferences) {
 
         /* Avoid to resolve an already shown News */
-        if (onlyAdd && hasCachedNews(newsRef))
+        if (onlyAdd && isSearch && hasCachedNews(newsRef))
           continue;
 
         /* Resolve and Add News */
-        INews resolvedNews = newsRef.resolve();
-        if (resolvedNews != null)
-          addedNews.add(resolvedNews);
+        INews resolvedNewsItem = newsRef.resolve();
+        if (resolvedNewsItem != null)
+          resolvedNews.add(resolvedNewsItem);
       }
     }
 
+    /* Handle Bookmark */
     else
-      addedNews.addAll(input.getNews(INews.State.getVisible()));
+      resolvedNews.addAll(input.getNews(INews.State.getVisible()));
 
     /* Add into Cache */
-    fCachedNews.addAll(addedNews);
+    for (INews news : resolvedNews) {
+      fCachedNews.put(news.getId(), news);
+    }
 
-    return Pair.create(addedNews, wasEmpty);
+    return Pair.create(resolvedNews, wasEmpty);
   }
 
   synchronized INewsMark getInput() {
@@ -309,7 +318,7 @@ public class NewsContentProvider implements ITreeContentProvider {
     if (fCachedNews == null)
       return null;
 
-    return new ArrayList<INews>(fCachedNews);
+    return new ArrayList<INews>(fCachedNews.values());
   }
 
   synchronized boolean hasCachedNews() {
@@ -320,33 +329,21 @@ public class NewsContentProvider implements ITreeContentProvider {
     if (fCachedNews == null)
       return false;
 
-    for (INews news : fCachedNews) {
-      if (ref.references(news))
-        return true;
-    }
-
-    return false;
+    return fCachedNews.containsKey(ref.getId());
   }
 
   private synchronized boolean hasCachedNews(INews news) {
     if (fCachedNews == null)
       return false;
 
-    for (INews cachedNews : fCachedNews) {
-      if (cachedNews.equals(news))
-        return true;
-    }
-
-    return false;
+    return fCachedNews.containsKey(news.getId());
   }
 
   private synchronized INews obtainFromCache(NewsReference ref) {
-    for (INews cachedNews : fCachedNews) {
-      if (ref.references(cachedNews))
-        return cachedNews;
-    }
+    if (fCachedNews == null)
+      return null;
 
-    return null;
+    return fCachedNews.get(ref.getId());
   }
 
   private void registerListeners() {
@@ -646,7 +643,9 @@ public class NewsContentProvider implements ITreeContentProvider {
     boolean wasEmpty = false;
     synchronized (NewsContentProvider.this) {
       wasEmpty = fCachedNews.isEmpty();
-      fCachedNews.addAll(addedNews);
+      for (INews news : addedNews) {
+        fCachedNews.put(news.getId(), news);
+      }
     }
 
     /* Return early if a refresh is required anyways */
@@ -771,7 +770,9 @@ public class NewsContentProvider implements ITreeContentProvider {
 
     /* Remove from Cache */
     synchronized (NewsContentProvider.this) {
-      fCachedNews.removeAll(deletedNews);
+      for (INews news : deletedNews) {
+        fCachedNews.remove(news.getId());
+      }
     }
 
     /* Only refresh if grouping requires this from table viewer */
