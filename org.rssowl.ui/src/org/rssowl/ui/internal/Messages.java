@@ -30,7 +30,6 @@ public class Messages extends NLS {
   private static final String BUNDLE_NAME = "org.rssowl.ui.internal.messages"; //$NON-NLS-1$
   public static String Activator_ERROR_STARTUP;
   public static String ApplicationActionBarAdvisor_ABOUT_RSSOWL;
-  public static String ApplicationActionBarAdvisor_AGGREGATE_NEWS;
   public static String ApplicationActionBarAdvisor_ALL_ARTICLES;
   public static String ApplicationActionBarAdvisor_ASCENDING;
   public static String ApplicationActionBarAdvisor_ATTACHMENTS;
@@ -80,6 +79,7 @@ public class Messages extends NLS {
   public static String ApplicationActionBarAdvisor_NEWS;
   public static String ApplicationActionBarAdvisor_NEWSPAPER_LAYOUT;
   public static String ApplicationActionBarAdvisor_OPEN_FILE;
+  public static String ApplicationActionBarAdvisor_OPEN_FOLDER;
   public static String ApplicationActionBarAdvisor_ORGANIZE_LABELS;
   public static String ApplicationActionBarAdvisor_PAGE_SIZE;
   public static String ApplicationActionBarAdvisor_PREFERENCES;
