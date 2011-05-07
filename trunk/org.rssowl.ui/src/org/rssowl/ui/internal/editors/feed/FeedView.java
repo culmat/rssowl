@@ -1300,20 +1300,17 @@ public class FeedView extends EditorPart implements IReusableEditor {
             new ReloadTypesAction(new StructuredSelection(bookMarksToReload.toArray()), getEditorSite().getShell()).run();
         }
 
+        /* Mark the Bookmark as visited */
+        if (mark instanceof IBookMark)
+          DynamicDAO.getDAO(IBookMarkDAO.class).visited((IBookMark) mark);
+
         /* Mark the Searchmark as visited */
-        if (mark instanceof ISearchMark) {
+        else if (mark instanceof ISearchMark)
           DynamicDAO.getDAO(ISearchMarkDAO.class).visited((ISearchMark) mark);
-        }
 
         /* Mark the newsbin as visited */
-        else if (mark instanceof INewsBin) {
+        else if (mark instanceof INewsBin)
           DynamicDAO.getDAO(INewsBinDAO.class).visited((INewsBin) mark);
-        }
-
-        /* Mark the Bookmark as visited */
-        else if (!(mark instanceof FolderNewsMark)) {
-          DynamicDAO.getDAO(IBookMarkDAO.class).visited((IBookMark) mark);
-        }
       }
     });
   }
