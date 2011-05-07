@@ -847,22 +847,22 @@ public class FilterBar {
 
   private boolean needsCacheRevalidation(Type oldType, Type newType) {
     if (oldType == newType)
-      return false;
+      return false; //No filter change
 
     INewsMark mark = ((FeedViewInput) fFeedView.getEditorInput()).getMark();
     if (mark instanceof IBookMark)
       return false; //Only revalidate for Folders, Searches and Bins
 
-    if (mark instanceof FolderNewsMark)
-      return true; //Since Folders are limited, always revalidate when the filter changes
-
     if (oldType == Type.SHOW_NEW)
-      return true;
+      return true; //New is most strict filter, so revalidate cache
 
     if (oldType == Type.SHOW_UNREAD && newType != Type.SHOW_NEW)
-      return true;
+      return true; //Other filters than Unread (except for New) can have more elements
 
-    return false;
+    if (mark instanceof FolderNewsMark && mark.getNewsCount(INews.State.getVisible()) > NewsContentProvider.MAX_FOLDER_ELEMENTS)
+      return true; //Since Folders are limited, always revalidate when the filter changes and count larger limit
+
+    return false; //No revalidation needed
   }
 
   private void doSearch(final NewsFilter.SearchTarget target) {
