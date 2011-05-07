@@ -40,6 +40,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.custom.SashForm;
@@ -1919,6 +1920,18 @@ public class FeedView extends EditorPart implements IReusableEditor {
    */
   NewsFilter getFilter() {
     return fNewsFilter;
+  }
+
+  /**
+   * Get the ViewerComparator that is used for sorting news.
+   *
+   * @return the {@link ViewerComparator} for sorting news.
+   */
+  ViewerComparator getSorter() {
+    if (isTableViewerVisible())
+      return fNewsTableControl.getViewer().getComparator();
+
+    return fNewsBrowserControl.getViewer().getComparator();
   }
 
   /**

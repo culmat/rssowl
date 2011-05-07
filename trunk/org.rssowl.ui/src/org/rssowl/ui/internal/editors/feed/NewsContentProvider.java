@@ -79,6 +79,10 @@ import java.util.Set;
  * @author bpasero
  */
 public class NewsContentProvider implements ITreeContentProvider {
+
+  /* The maximum number of items returned from a FolderNewsMark */
+  private static final int MAX_FOLDER_ELEMENTS = 500;
+
   private final NewsBrowserViewer fBrowserViewer;
   private final NewsTableViewer fTableViewer;
   private final NewsGrouping fGrouping;
@@ -296,6 +300,10 @@ public class NewsContentProvider implements ITreeContentProvider {
         if (resolvedNewsItem != null)
           resolvedNews.add(resolvedNewsItem);
       }
+
+      /* Special treat folders and limit them by size */
+      if (input instanceof FolderNewsMark)
+        resolvedNews = limitFolder(resolvedNews, fFilter.getType() == Type.SHOW_NEW || fFilter.getType() == Type.SHOW_UNREAD);
     }
 
     /* Handle Bookmark */
@@ -308,6 +316,24 @@ public class NewsContentProvider implements ITreeContentProvider {
     }
 
     return Pair.create(resolvedNews, wasEmpty);
+  }
+
+  private List<INews> limitFolder(List<INews> resolvedNews, boolean alreadyFiltered) {
+    if (resolvedNews.size() <= MAX_FOLDER_ELEMENTS)
+      return resolvedNews;
+
+    /* Filter and Sort the Elements, then limit by size */
+    Object[] elements = resolvedNews.toArray();
+    if (!alreadyFiltered)
+      elements = fFilter.filter(null, (Object) null, elements);
+    fFeedView.getSorter().sort(null, elements);
+
+    List<INews> limitedResult = new ArrayList<INews>(Math.min(elements.length, MAX_FOLDER_ELEMENTS));
+    for (int i = 0; i < elements.length && i < MAX_FOLDER_ELEMENTS; i++) {
+      limitedResult.add((INews) elements[i]);
+    }
+
+    return limitedResult;
   }
 
   synchronized INewsMark getInput() {
