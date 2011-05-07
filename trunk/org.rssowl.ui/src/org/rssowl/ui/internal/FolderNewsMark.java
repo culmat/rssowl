@@ -131,26 +131,37 @@ public class FolderNewsMark extends Mark implements INewsMark {
     }
   }
 
-  private void resolveIfNecessary() {
+  /**
+   * Resolves all news of this news mark that match the given state.
+   *
+   * @param states the {@link org.rssowl.core.persist.INews.State} of news that
+   * should be resolved in this news mark.
+   */
+  public void resolve(Set<INews.State> states) {
     if (!fIsResolved.get())
-      internalResolve();
+      internalResolve(states);
   }
 
-  private void internalResolve() {
+  private void resolveIfNecessary() {
+    if (!fIsResolved.get())
+      internalResolve(INews.State.getVisible());
+  }
+
+  private void internalResolve(Set<State> states) {
     if (!fIsResolved.get()) {
       synchronized (this) {
         if (!fIsResolved.getAndSet(true))
-          fillNews(fFolder);
+          fillNews(fFolder, states);
       }
     }
   }
 
-  private void fillNews(IFolder folder) {
+  private void fillNews(IFolder folder, Set<State> states) {
     List<IFolderChild> children = folder.getChildren();
     for (IFolderChild child : children) {
       if (child instanceof INewsMark) {
         INewsMark newsmark = (INewsMark) child;
-        List<INews> news = newsmark.getNews(INews.State.getVisible());
+        List<INews> news = newsmark.getNews(states);
         for (INews newsitem : news) {
           if (newsitem != null && newsitem.getId() != null)
             fNewsContainer.addNews(newsitem);
@@ -159,7 +170,7 @@ public class FolderNewsMark extends Mark implements INewsMark {
 
       /* Recursively treat Folders */
       if (child instanceof IFolder)
-        fillNews((IFolder) child);
+        fillNews((IFolder) child, states);
     }
   }
 
