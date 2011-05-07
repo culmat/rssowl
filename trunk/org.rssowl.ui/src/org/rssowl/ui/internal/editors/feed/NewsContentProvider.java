@@ -292,10 +292,6 @@ public class NewsContentProvider implements ITreeContentProvider {
       else
         states = INews.State.getVisible();
 
-      /* Use special resolve method in folder news mark given the states */
-      if (input instanceof FolderNewsMark)
-        ((FolderNewsMark) input).resolve(states);
-
       /* Resolve and Add News */
       List<NewsReference> newsReferences = input.getNewsRefs(states);
       for (NewsReference newsRef : newsReferences) {
