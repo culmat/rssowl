@@ -985,8 +985,13 @@ public class FeedView extends EditorPart implements IReusableEditor {
       for (Object element : elements) {
 
         /* Resolve the actual News */
-        if (element instanceof NewsReference)
-          element = ((NewsReference) element).resolve();
+        if (element instanceof NewsReference) {
+          INews news = fContentProvider.obtainFromCache(((NewsReference) element).getId());
+          if (news != null)
+            element = news;
+          else
+            element = ((NewsReference) element).resolve();
+        }
 
         /* This Element is filtered */
         if (!fNewsFilter.select(fNewsTableControl.getViewer(), null, element)) {

@@ -295,8 +295,17 @@ public class NewsBrowserControl implements IFeedViewPart {
       return getInput((INews) obj);
 
     /* NewsReference: Resolve and special handle */
-    else if (obj instanceof NewsReference)
-      return getInput(((NewsReference) obj).resolve());
+    else if (obj instanceof NewsReference) {
+      INews resolvedNews = null;
+
+      if (fViewer.getContentProvider() instanceof NewsContentProvider)
+        resolvedNews = ((NewsContentProvider) fViewer.getContentProvider()).obtainFromCache(((NewsReference) obj).getId());
+
+      if (resolvedNews == null)
+        resolvedNews = ((NewsReference) obj).resolve();
+
+      return getInput(resolvedNews);
+    }
 
     return Pair.create(obj, false);
   }
