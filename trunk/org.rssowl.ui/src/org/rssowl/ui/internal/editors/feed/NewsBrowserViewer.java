@@ -1842,7 +1842,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
     if (unread || fViewModel.hasItems()) { //Workaround for a Bug that would cause endless navigation if viewer contains no news otherwise
       js.append("if (scrollPosY == newScrollPosY) { "); //$NON-NLS-1$
-      js.append("  window.location.href = \"").append(ILinkHandler.HANDLER_PROTOCOL + getNavigationActionId(next, unread)).append("\"; "); //$NON-NLS-1$ //$NON-NLS-2$
+      js.append("  window.location.href = '").append(ILinkHandler.HANDLER_PROTOCOL + getNavigationActionId(next, unread)).append("'; "); //$NON-NLS-1$ //$NON-NLS-2$
       js.append("} "); //$NON-NLS-1$
     }
 
@@ -1886,7 +1886,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     /* If navigation did not find a suitable target, call the outer navigation function */
     else if (unread || fViewModel.hasItems()) { //Workaround for a Bug that would cause endless navigation if viewer contains no news otherwise
       StringBuilder js = new StringBuilder();
-      js.append("window.location.href = \"").append(ILinkHandler.HANDLER_PROTOCOL + getNavigationActionId(next, unread)).append("\"; "); //$NON-NLS-1$ //$NON-NLS-2$
+      js.append("window.location.href = '").append(ILinkHandler.HANDLER_PROTOCOL + getNavigationActionId(next, unread)).append("'; "); //$NON-NLS-1$ //$NON-NLS-2$
       fBrowser.execute(js.toString());
     }
   }
