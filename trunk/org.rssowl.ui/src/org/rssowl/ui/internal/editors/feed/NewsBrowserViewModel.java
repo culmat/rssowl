@@ -619,7 +619,7 @@ public class NewsBrowserViewModel {
               news.add(item.getId());
             }
 
-            if (pageSize != 0 && newsCounter == pageSize)
+            if (newsCounter == pageSize)
               break; //Reached the next page, so stop looping
           }
         }
