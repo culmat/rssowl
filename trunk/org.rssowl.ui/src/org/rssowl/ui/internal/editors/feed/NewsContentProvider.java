@@ -366,10 +366,14 @@ public class NewsContentProvider implements ITreeContentProvider {
   }
 
   private synchronized INews obtainFromCache(NewsReference ref) {
+    return obtainFromCache(ref.getId());
+  }
+
+  synchronized INews obtainFromCache(long newsId) {
     if (fCachedNews == null)
       return null;
 
-    return fCachedNews.get(ref.getId());
+    return fCachedNews.get(newsId);
   }
 
   private void registerListeners() {

@@ -58,6 +58,15 @@ public class NewsBrowserViewModel {
   private final Set<Long> fHiddenNews = new HashSet<Long>();
   private final Set<Long> fHiddenGroups = new HashSet<Long>();
   private final Object fLock = new Object();
+  private final NewsBrowserViewer fViewer;
+
+  public NewsBrowserViewModel() {
+    this(null);
+  }
+
+  public NewsBrowserViewModel(NewsBrowserViewer viewer) {
+    fViewer = viewer;
+  }
 
   /* Base Class of all Items in the Model */
   private static class Item {
@@ -576,7 +585,12 @@ public class NewsBrowserViewModel {
     if (item instanceof Group)
       return false;
 
-    INews news = DynamicDAO.load(INews.class, item.getId());
+    INews news;
+    if (fViewer != null)
+      news = fViewer.resolve(item.getId());
+    else
+      news = DynamicDAO.load(INews.class, item.getId());
+
     if (news == null)
       return false;
 

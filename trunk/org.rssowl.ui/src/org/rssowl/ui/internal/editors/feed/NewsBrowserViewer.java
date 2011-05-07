@@ -271,7 +271,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
    */
   public NewsBrowserViewer(Composite parent, int style, IFeedViewSite site) {
     fBrowser = new CBrowser(parent, style);
-    fViewModel = new NewsBrowserViewModel();
+    fViewModel = new NewsBrowserViewModel(this);
     fSite = site;
     fIsEmbedded = (fSite != null);
     hookControl(fBrowser.getControl());
@@ -1044,7 +1044,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     if (expanded) {
       long expandedNewsId = fViewModel.getExpandedNews();
       if (expandedNewsId != -1) {
-        INews item = DynamicDAO.load(INews.class, expandedNewsId);
+        INews item = resolve(expandedNewsId);
         if (item != null)
           setNewsExpanded(item, false);
       }
@@ -1402,7 +1402,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
       /* Fill full news content in newspaper layout */
       else {
-        INews news = DynamicDAO.load(INews.class, newsId);
+        INews news = resolve(newsId);
         if (news == null)
           continue;
 
@@ -1458,7 +1458,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   private INews getNews(String query) {
     try {
       long id = getId(query);
-      return fNewsDao.load(id);
+      return resolve(id);
     } catch (NullPointerException e) {
       return null;
     }
@@ -1473,7 +1473,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       List<INews> news = new ArrayList<INews>(newsIds.size());
       for (Long newsId : newsIds) {
         try {
-          INews item = fNewsDao.load(newsId);
+          INews item = resolve(newsId);
           if (item != null)
             news.add(item);
         } catch (NullPointerException e) {
@@ -1764,7 +1764,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
       /* Headlines Layout */
       if (isHeadlinesLayout()) {
-        INews news = newsToShow.resolve();
+        INews news = resolve(newsToShow.getId());
         if (news != null)
           setNewsExpanded(news, true);
       }
@@ -1881,7 +1881,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       }
 
       /* News */
-      setNewsExpanded(DynamicDAO.load(INews.class, targetNews), true, false);
+      setNewsExpanded(resolve(targetNews), true, false);
       StringBuilder js = new StringBuilder();
       js.append(getElementById(Dynamic.NEWS.getId(targetNews))).append(".scrollIntoView(true); "); //$NON-NLS-1$
       fBrowser.execute(js.toString());
@@ -2359,5 +2359,19 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       return ((NewsBrowserLabelProvider) lp).isHeadlinesOnly();
 
     return false;
+  }
+
+  INews resolve(long newsId) {
+    INews news = null;
+
+    /* First Ask ContentProvider Cache */
+    if (getContentProvider() instanceof NewsContentProvider)
+      news = ((NewsContentProvider) getContentProvider()).obtainFromCache(newsId);
+
+    /* Then fallback to resolve from DB */
+    if (news == null)
+      return fNewsDao.load(newsId);
+
+    return news;
   }
 }
