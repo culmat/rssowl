@@ -2160,7 +2160,11 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
         if (CoreUtils.isStickyStateChange(newsEvent)) {
           boolean isSticky = news.isFlagged();
           js.append(getElementById(Dynamic.HEADER.getId(news)).append(isSticky ? ".className='headerSticky'; " : ".className='header'; ")); //$NON-NLS-1$ //$NON-NLS-2$
-          js.append(getElementById(Dynamic.FOOTER.getId(news)).append(isSticky ? ".className='footerSticky'; " : ".className='footer'; ")); //$NON-NLS-1$ //$NON-NLS-2$
+
+          js.append("var footer = ").append(getElementById(Dynamic.FOOTER.getId(news))).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
+          js.append("if (footer != null) {"); //$NON-NLS-1$
+          js.append("footer").append(isSticky ? ".className='footerSticky'; " : ".className='footer'; "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+          js.append("}"); //$NON-NLS-1$
 
           String stickyImgUri;
           if (fBrowser.isIE())
