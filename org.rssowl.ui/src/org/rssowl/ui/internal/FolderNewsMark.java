@@ -30,9 +30,9 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.INewsMark;
-import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.ModelReference;
 import org.rssowl.core.persist.reference.NewsReference;
@@ -44,6 +44,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * An internal subclass of {@link Mark} that implements {@link INewsMark} to
@@ -52,16 +53,18 @@ import java.util.Set;
  * in the feedview and is never persisted to the DB.
  * <p>
  * TODO This class is not very good in terms of performance because it has to
- * load all news of the folder on the fly to produce the news container. When then
- * opened from the feedview, these news get resolved again and thereby twice.
+ * load all news of the folder on the fly to produce the news container. When
+ * then opened from the feedview, these news get resolved again and thereby
+ * twice.
  * </p>
  *
  * @author bpasero
  */
 @SuppressWarnings("restriction")
 public class FolderNewsMark extends Mark implements INewsMark {
-  private NewsContainer fNewsContainer;
+  private final NewsContainer fNewsContainer;
   private final IFolder fFolder;
+  private final AtomicBoolean fIsResolved = new AtomicBoolean(false);
 
   /**
    * Internal implementation of the <code>ModelReference</code> for the internal
@@ -91,7 +94,20 @@ public class FolderNewsMark extends Mark implements INewsMark {
     super(folder.getId(), folder.getParent(), folder.getName());
     fFolder = folder;
     fNewsContainer = new NewsContainer(Collections.<INews.State, Boolean> emptyMap());
-    fillNews(folder);
+  }
+
+  private void resolveIfNecessary() {
+    if (!fIsResolved.get())
+      internalResolve();
+  }
+
+  private void internalResolve() {
+    if (!fIsResolved.get()) {
+      synchronized (this) {
+        if (!fIsResolved.getAndSet(true))
+          fillNews(fFolder);
+      }
+    }
   }
 
   private void fillNews(IFolder folder) {
@@ -169,6 +185,9 @@ public class FolderNewsMark extends Mark implements INewsMark {
    */
   public boolean isRelatedTo(INews news) {
 
+    /* Resolve Lazily if necessary */
+    resolveIfNecessary();
+
     /* Might be contained */
     if (containsNews(news))
       return true;
@@ -208,6 +227,10 @@ public class FolderNewsMark extends Mark implements INewsMark {
    * @see org.rssowl.core.persist.INewsMark#containsNews(org.rssowl.core.persist.INews)
    */
   public synchronized boolean containsNews(INews news) {
+
+    /* Resolve Lazily if necessary */
+    resolveIfNecessary();
+
     return fNewsContainer.containsNews(news);
   }
 
@@ -215,6 +238,10 @@ public class FolderNewsMark extends Mark implements INewsMark {
    * @see org.rssowl.core.persist.INewsMark#getNews()
    */
   public synchronized List<INews> getNews() {
+
+    /* Resolve Lazily if necessary */
+    resolveIfNecessary();
+
     return getNews(EnumSet.allOf(INews.State.class));
   }
 
@@ -222,10 +249,15 @@ public class FolderNewsMark extends Mark implements INewsMark {
    * @see org.rssowl.core.persist.INewsMark#getNews(java.util.Set)
    */
   public List<INews> getNews(Set<State> states) {
+
+    /* Resolve Lazily if necessary */
+    resolveIfNecessary();
+
     List<NewsReference> newsRefs;
     synchronized (this) {
       newsRefs = fNewsContainer.getNews(states);
     }
+
     return getNews(newsRefs);
   }
 
@@ -233,6 +265,10 @@ public class FolderNewsMark extends Mark implements INewsMark {
    * @see org.rssowl.core.persist.INewsMark#getNewsCount(java.util.Set)
    */
   public synchronized int getNewsCount(Set<State> states) {
+
+    /* Resolve Lazily if necessary */
+    resolveIfNecessary();
+
     return fNewsContainer.getNewsCount(states);
   }
 
@@ -240,6 +276,10 @@ public class FolderNewsMark extends Mark implements INewsMark {
    * @see org.rssowl.core.persist.INewsMark#getNewsRefs()
    */
   public synchronized List<NewsReference> getNewsRefs() {
+
+    /* Resolve Lazily if necessary */
+    resolveIfNecessary();
+
     return fNewsContainer.getNews();
   }
 
@@ -247,6 +287,10 @@ public class FolderNewsMark extends Mark implements INewsMark {
    * @see org.rssowl.core.persist.INewsMark#getNewsRefs(java.util.Set)
    */
   public synchronized List<NewsReference> getNewsRefs(Set<State> states) {
+
+    /* Resolve Lazily if necessary */
+    resolveIfNecessary();
+
     return fNewsContainer.getNews(states);
   }
 
@@ -254,7 +298,7 @@ public class FolderNewsMark extends Mark implements INewsMark {
    * @see org.rssowl.core.persist.INewsMark#isGetNewsRefsEfficient()
    */
   public boolean isGetNewsRefsEfficient() {
-    return false;
+    return true;
   }
 
   /*
