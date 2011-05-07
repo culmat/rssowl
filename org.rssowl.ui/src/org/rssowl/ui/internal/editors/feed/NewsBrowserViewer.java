@@ -1916,6 +1916,13 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     internalSetInput(fInput, true, false);
   }
 
+  /**
+   * @return the {@link ViewerComparator} used for sorting news.
+   */
+  ViewerComparator getComparator() {
+    return fSorter;
+  }
+
   private Object[] getSortedChildren(Object parent) {
     Object[] result = getFilteredChildren(parent);
     if (fSorter != null) {
@@ -1996,6 +2003,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
           input = new Object[] { input };
 
         /* For each Group retrieve Children (sorted and filtered) */
+        int newsCount = 0;
         Object groups[] = (Object[]) input;
         for (Object group : groups) {
 
@@ -2016,6 +2024,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
               /* Add childs of group to the list */
               flatList.addAll(Arrays.asList(sortedChilds));
+              newsCount += sortedChilds.length;
             }
           }
 
@@ -2026,7 +2035,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
           }
         }
 
-        return fillPagingIfNecessary(flatList.toArray());
+        return fillPagingIfNecessary(flatList.toArray(), newsCount);
       }
 
       /* Grouping is not enabled, just return sorted Children */
@@ -2042,7 +2051,11 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   }
 
   private Object[] fillPagingIfNecessary(Object[] elements) {
-    if (fPageSize == 0 || elements.length <= fPageSize)
+    return fillPagingIfNecessary(elements, elements.length);
+  }
+
+  private Object[] fillPagingIfNecessary(Object[] elements, int newsCount) {
+    if (fPageSize == 0 || newsCount <= fPageSize)
       return elements;
 
     Object[] elementsWithPaging = new Object[elements.length + 1];
