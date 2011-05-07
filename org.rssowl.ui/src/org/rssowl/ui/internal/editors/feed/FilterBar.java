@@ -849,8 +849,12 @@ public class FilterBar {
     if (oldType == newType)
       return false;
 
-    if (((FeedViewInput) fFeedView.getEditorInput()).getMark() instanceof IBookMark)
+    INewsMark mark = ((FeedViewInput) fFeedView.getEditorInput()).getMark();
+    if (mark instanceof IBookMark)
       return false; //Only revalidate for Folders, Searches and Bins
+
+    if (mark instanceof FolderNewsMark)
+      return true; //Since Folders are limited, always revalidate when the filter changes
 
     if (oldType == Type.SHOW_NEW)
       return true;
