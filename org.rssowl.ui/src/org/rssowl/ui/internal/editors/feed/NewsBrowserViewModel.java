@@ -301,11 +301,20 @@ public class NewsBrowserViewModel {
    * hidden
    */
   public void setNewsVisible(INews news, boolean visible) {
+    setNewsVisible(news.getId(), visible);
+  }
+
+  /**
+   * @param newsId the news to hide or show
+   * @param visible <code>true</code> if visible and <code>false</code> if
+   * hidden
+   */
+  public void setNewsVisible(long newsId, boolean visible) {
     synchronized (fLock) {
       if (visible)
-        fHiddenNews.remove(news.getId());
+        fHiddenNews.remove(newsId);
       else
-        fHiddenNews.add(news.getId());
+        fHiddenNews.add(newsId);
     }
   }
 
