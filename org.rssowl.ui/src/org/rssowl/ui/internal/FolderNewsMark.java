@@ -88,12 +88,47 @@ public class FolderNewsMark extends Mark implements INewsMark {
   }
 
   /**
-   * @param folder
+   * @param folder the {@link IFolder} that makes the contents of this
+   * {@link INewsMark}.
    */
   public FolderNewsMark(IFolder folder) {
     super(folder.getId(), folder.getParent(), folder.getName());
     fFolder = folder;
     fNewsContainer = new NewsContainer(Collections.<INews.State, Boolean> emptyMap());
+  }
+
+  /**
+   * @param news the {@link List} of {@link INews} to add into this
+   * {@link INewsMark}.
+   */
+  public void add(List<INews> news) {
+
+    /* Resolve Lazily if necessary */
+    resolveIfNecessary();
+
+    synchronized (this) {
+      for (INews item : news) {
+        if (item != null && item.getId() != null)
+          fNewsContainer.addNews(item);
+      }
+    }
+  }
+
+  /**
+   * @param news the {@link List} of {@link INews} to remove from this
+   * {@link INewsMark}.
+   */
+  public void remove(List<INews> news) {
+
+    /* Resolve Lazily if necessary */
+    resolveIfNecessary();
+
+    synchronized (this) {
+      for (INews item : news) {
+        if (item != null && item.getId() != null)
+          fNewsContainer.removeNews(item);
+      }
+    }
   }
 
   private void resolveIfNecessary() {

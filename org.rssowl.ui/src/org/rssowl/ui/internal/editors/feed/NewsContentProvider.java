@@ -94,7 +94,7 @@ public class NewsContentProvider implements ITreeContentProvider {
   private boolean fDisposed;
 
   /* Cache displayed News */
-  private Map<Long, INews> fCachedNews;
+  private final Map<Long, INews> fCachedNews;
 
   /**
    * @param tableViewer
@@ -107,6 +107,7 @@ public class NewsContentProvider implements ITreeContentProvider {
     fFeedView = feedView;
     fGrouping = feedView.getGrouper();
     fFilter = feedView.getFilter();
+    fCachedNews = new HashMap<Long, INews>();
   }
 
   /*
@@ -253,7 +254,7 @@ public class NewsContentProvider implements ITreeContentProvider {
   /* Returns the news that have been added since the last refresh */
   synchronized Pair</* Added News (only for saved searches) */List<INews>, /* Was Empty */Boolean> refreshCache(INewsMark input, boolean onlyAdd) throws PersistenceException {
     List<INews> resolvedNews = Collections.emptyList();
-    boolean wasEmpty = (fCachedNews == null || fCachedNews.isEmpty());
+    boolean wasEmpty = fCachedNews.isEmpty();
 
     /* Update Input */
     fInput = input;
@@ -263,9 +264,7 @@ public class NewsContentProvider implements ITreeContentProvider {
       registerListeners();
 
     /* Clear old Data if required */
-    if (fCachedNews == null)
-      fCachedNews = new HashMap<Long, INews>();
-    else if (!onlyAdd)
+    if (!onlyAdd)
       fCachedNews.clear();
 
     /* Check if ContentProvider was already disposed */
@@ -318,6 +317,36 @@ public class NewsContentProvider implements ITreeContentProvider {
     return Pair.create(resolvedNews, wasEmpty);
   }
 
+  private synchronized boolean addToCache(List<INews> addedNews) {
+    boolean wasEmpty = fCachedNews.isEmpty();
+
+    for (INews news : addedNews) {
+      fCachedNews.put(news.getId(), news);
+    }
+
+    /*
+     * Since the folder news mark is bound to the lifecycle of the feedview,
+     * make sure that the contents are updated properly from here.
+     */
+    if (fInput instanceof FolderNewsMark)
+      ((FolderNewsMark) fInput).add(addedNews);
+
+    return wasEmpty;
+  }
+
+  private synchronized void removeFromCache(List<INews> deletedNews) {
+    for (INews news : deletedNews) {
+      fCachedNews.remove(news.getId());
+    }
+
+    /*
+     * Since the folder news mark is bound to the lifecycle of the feedview,
+     * make sure that the contents are updated properly from here.
+     */
+    if (fInput instanceof FolderNewsMark)
+      ((FolderNewsMark) fInput).remove(deletedNews);
+  }
+
   private List<INews> limitFolder(List<INews> resolvedNews, boolean alreadyFiltered) {
     if (resolvedNews.size() <= MAX_FOLDER_ELEMENTS)
       return resolvedNews;
@@ -341,27 +370,18 @@ public class NewsContentProvider implements ITreeContentProvider {
   }
 
   synchronized Collection<INews> getCachedNewsCopy() {
-    if (fCachedNews == null)
-      return null;
-
     return new ArrayList<INews>(fCachedNews.values());
   }
 
   synchronized boolean hasCachedNews() {
-    return fCachedNews != null && !fCachedNews.isEmpty();
+    return !fCachedNews.isEmpty();
   }
 
   private synchronized boolean hasCachedNews(NewsReference ref) {
-    if (fCachedNews == null)
-      return false;
-
     return fCachedNews.containsKey(ref.getId());
   }
 
   private synchronized boolean hasCachedNews(INews news) {
-    if (fCachedNews == null)
-      return false;
-
     return fCachedNews.containsKey(news.getId());
   }
 
@@ -370,9 +390,6 @@ public class NewsContentProvider implements ITreeContentProvider {
   }
 
   synchronized INews obtainFromCache(long newsId) {
-    if (fCachedNews == null)
-      return null;
-
     return fCachedNews.get(newsId);
   }
 
@@ -670,13 +687,7 @@ public class NewsContentProvider implements ITreeContentProvider {
     }
 
     /* Add to Cache */
-    boolean wasEmpty = false;
-    synchronized (NewsContentProvider.this) {
-      wasEmpty = fCachedNews.isEmpty();
-      for (INews news : addedNews) {
-        fCachedNews.put(news.getId(), news);
-      }
-    }
+    boolean wasEmpty = addToCache(addedNews);
 
     /* Return early if a refresh is required anyways */
     if (fGrouping.needsRefresh(events, false)) {
@@ -799,11 +810,7 @@ public class NewsContentProvider implements ITreeContentProvider {
     }
 
     /* Remove from Cache */
-    synchronized (NewsContentProvider.this) {
-      for (INews news : deletedNews) {
-        fCachedNews.remove(news.getId());
-      }
-    }
+    removeFromCache(deletedNews);
 
     /* Only refresh if grouping requires this from table viewer */
     if (isGroupingEnabled() && fFeedView.isTableViewerVisible() && fGrouping.needsRefresh(events, false))
