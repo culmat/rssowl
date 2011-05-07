@@ -28,6 +28,7 @@ import org.eclipse.ui.IEditorSite;
 import org.rssowl.core.Owl;
 import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.ui.internal.FolderNewsMark;
 
 /**
  * Implementation of {@link IFeedViewSite} that knows about the {@link FeedView}
@@ -70,8 +71,12 @@ public class FeedViewSite implements IFeedViewSite {
     FeedViewInput input = (FeedViewInput) fFeedView.getEditorInput();
     if (input != null) {
       INewsMark mark = input.getMark();
-      if (mark != null)
+      if (mark != null) {
+        if (mark instanceof FolderNewsMark)
+          return Owl.getPreferenceService().getEntityScope(((FolderNewsMark) mark).getFolder());
+
         return Owl.getPreferenceService().getEntityScope(mark);
+      }
     }
 
     return Owl.getPreferenceService().getGlobalScope();
