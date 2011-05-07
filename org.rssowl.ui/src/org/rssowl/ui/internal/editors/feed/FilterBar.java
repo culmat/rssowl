@@ -61,6 +61,7 @@ import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.ISearchCondition;
@@ -90,6 +91,7 @@ import org.rssowl.ui.internal.util.ModelUtils;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * The FilterBar is the central control to filter News that are showing in the
@@ -411,6 +413,8 @@ public class FilterBar {
                   setHighlight(false);
                   highlightChanged = false;
                 }
+                if (needsCacheRevalidationFromSearch())
+                  fFeedView.revalidateCaches(false);
                 fFeedView.refresh(true, false);
               }
             });
@@ -428,6 +432,8 @@ public class FilterBar {
                   if (setHighlight(true))
                     highlightChanged = true;
                   fFeedView.getFilter().setPattern(fSearchInput.getText());
+                  if (needsCacheRevalidationFromSearch())
+                    fFeedView.revalidateCaches(false);
                   fFeedView.refresh(true, false);
                   updateBrowserSelection();
                 }
@@ -823,8 +829,8 @@ public class FilterBar {
     if (refresh) {
 
       /* Filter has changed - ask Feedview to revalidate caches if necessary */
-      if (needsCacheRevalidation(oldType, type))
-        fFeedView.revalidateCaches();
+      if (needsCacheRevalidationFromFilter(oldType, type))
+        fFeedView.revalidateCaches(true);
 
       /* Only Refresh Table as Browser shows single News */
       NewsTableControl newsTable = fFeedView.getNewsTableControl();
@@ -845,7 +851,7 @@ public class FilterBar {
       saveIntegerValue(DefaultPreferences.BM_NEWS_FILTERING, type.ordinal());
   }
 
-  private boolean needsCacheRevalidation(Type oldType, Type newType) {
+  private boolean needsCacheRevalidationFromFilter(Type oldType, Type newType) {
     if (oldType == newType)
       return false; //No filter change
 
@@ -865,12 +871,31 @@ public class FilterBar {
     return false; //No revalidation needed
   }
 
+  private boolean needsCacheRevalidationFromSearch() {
+    INewsMark mark = ((FeedViewInput) fFeedView.getEditorInput()).getMark();
+    if (mark instanceof FolderNewsMark) {
+      Set<State> states;
+      if (fFeedView.getFilter().getType() == Type.SHOW_NEW)
+        states = EnumSet.of(INews.State.NEW);
+      else if (fFeedView.getFilter().getType() == Type.SHOW_UNREAD)
+        states = EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED);
+      else
+        states = INews.State.getVisible();
+
+      return mark.getNewsCount(states) > NewsContentProvider.MAX_FOLDER_ELEMENTS;
+    }
+
+    return false;
+  }
+
   private void doSearch(final NewsFilter.SearchTarget target) {
     fFeedView.getFilter().setSearchTarget(target);
     fSearchInput.setMessage(fFeedView.getFilter().getSearchTarget().getName());
     fSearchInput.setFocus();
 
     if (fSearchInput.getText().length() > 0) {
+      if (needsCacheRevalidationFromSearch())
+        fFeedView.revalidateCaches(false);
       fFeedView.refresh(true, false);
       updateBrowserSelection();
     }
