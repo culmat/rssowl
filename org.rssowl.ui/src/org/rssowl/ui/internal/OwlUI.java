@@ -1557,11 +1557,11 @@ public class OwlUI {
    * Update the current active window title based on the given array of
    * {@link IMark}.
    *
-   * @param shownInput the input that is currently visible in RSSOwl.
+   * @param input the input that is currently visible in RSSOwl.
    */
-  public static void updateWindowTitle(IMark[] shownInput) {
-    if (shownInput != null && shownInput.length > 0)
-      updateWindowTitle(shownInput[0].getName());
+  public static void updateWindowTitle(IMark input) {
+    if (input != null)
+      updateWindowTitle(input.getName());
   }
 
   /**
