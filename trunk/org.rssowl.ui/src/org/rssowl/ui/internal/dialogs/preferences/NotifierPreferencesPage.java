@@ -95,6 +95,7 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
   private Button fAutoCloseNotifierCheck;
   private Button fShowExcerptCheck;
   private Button fCloseNotifierOnOpen;
+  private Button fFadeNotifierCheck;
   private LocalResourceManager fResources = new LocalResourceManager(JFaceResources.getResources());
 
   /** Leave for reflection */
@@ -450,6 +451,11 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
       fNotificationOnlyFromTray.setText(Messages.NotifierPreferencesPage_SHOW_WHEN_MINIMIZED);
       fNotificationOnlyFromTray.setSelection(fGlobalScope.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP_ONLY_WHEN_MINIMIZED));
 
+      /* Animate Notifier */
+      fFadeNotifierCheck = new Button(group, SWT.CHECK);
+      fFadeNotifierCheck.setText(Messages.NotifierPreferencesPage_ANIMATE_NOTIFIER);
+      fFadeNotifierCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.FADE_NOTIFIER));
+
       /* Close Notifier when opening Item */
       fCloseNotifierOnOpen = new Button(group, SWT.CHECK);
       fCloseNotifierOnOpen.setText(Messages.NotifierPreferencesPage_CLOSE_NOTIFIER_ON_OPEN);
@@ -528,6 +534,7 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
   public boolean performOk() {
     fGlobalScope.putBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP, fShowNotificationPopup.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP_ONLY_WHEN_MINIMIZED, fNotificationOnlyFromTray.getSelection());
+    fGlobalScope.putBoolean(DefaultPreferences.FADE_NOTIFIER, fFadeNotifierCheck.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.SHOW_EXCERPT_IN_NOTIFIER, fShowExcerptCheck.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.CLOSE_NOTIFIER_ON_OPEN, fCloseNotifierOnOpen.getSelection());
 
@@ -614,8 +621,8 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
     IPreferenceScope defaultScope = Owl.getPreferenceService().getDefaultScope();
 
     fShowNotificationPopup.setSelection(defaultScope.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP));
-
     fNotificationOnlyFromTray.setSelection(defaultScope.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP_ONLY_WHEN_MINIMIZED));
+    fFadeNotifierCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.FADE_NOTIFIER));
     fShowExcerptCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.SHOW_EXCERPT_IN_NOTIFIER));
     fCloseNotifierOnOpen.setSelection(defaultScope.getBoolean(DefaultPreferences.CLOSE_NOTIFIER_ON_OPEN));
 

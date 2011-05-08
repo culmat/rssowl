@@ -56,9 +56,9 @@ public class ShowNotifierNewsAction implements INewsAction {
     /* Run Filter */
     NotificationService notificationService = Controller.getDefault().getNotificationService();
     if (data != null && data instanceof String)
-      notificationService.show(news, OwlUI.getRGB((String) data), Mode.INCOMING_AUTOMATIC);
+      notificationService.show(news, OwlUI.getRGB((String) data), Mode.INCOMING_AUTOMATIC, true);
     else
-      notificationService.show(news, null, Mode.INCOMING_AUTOMATIC);
+      notificationService.show(news, null, Mode.INCOMING_AUTOMATIC, true);
 
     /* Nothing to Save */
     return Collections.emptyList();
