@@ -1578,7 +1578,9 @@ public class OwlUI {
       else
         title = appTitle;
 
-      window.getShell().setText(title);
+      String shellText = window.getShell().getText();
+      if (shellText == null || !shellText.equals(title))
+        window.getShell().setText(title);
     }
   }
 
