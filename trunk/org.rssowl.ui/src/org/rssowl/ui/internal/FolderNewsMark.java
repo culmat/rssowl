@@ -33,6 +33,7 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.INewsMark;
+import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.ModelReference;
@@ -260,6 +261,19 @@ public class FolderNewsMark extends Mark implements INewsMark {
   }
 
   /**
+   * @param searchMark the search to find out if its contained in this folder.
+   * @return <code>true</code> if the given Search is contained in the
+   * {@link IFolder} of this news mark and <code>false</code> otherwise.
+   */
+  public boolean isRelatedTo(ISearchMark searchMark) {
+
+    /* Resolve Lazily if necessary */
+    resolveIfNecessary();
+
+    return isRelatedTo(fFolder, searchMark);
+  }
+
+  /**
    * @param news the news to find out if this mark is related to.
    * @return <code>true</code> if the given News belongs to any
    * {@link IBookMark} or {@link INewsBin} of the given {@link IFolder}.
@@ -295,6 +309,23 @@ public class FolderNewsMark extends Mark implements INewsMark {
         if (bin.getId() == news.getParentId())
           return true;
       }
+    }
+
+    return false;
+  }
+
+  private boolean isRelatedTo(IFolder folder, ISearchMark searchMark) {
+    List<IFolderChild> children = folder.getChildren();
+
+    for (IFolderChild child : children) {
+
+      /* Check contained in Folder */
+      if (child instanceof IFolder && isRelatedTo((IFolder) child, searchMark))
+        return true;
+
+      /* Check identical to Child */
+      else if (child.equals(searchMark))
+        return true;
     }
 
     return false;

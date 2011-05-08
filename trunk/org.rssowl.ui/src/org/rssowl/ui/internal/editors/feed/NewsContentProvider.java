@@ -422,8 +422,8 @@ public class NewsContentProvider implements ITreeContentProvider {
         for (SearchMarkEvent event : events) {
           ISearchMark searchMark = event.getEntity();
 
-          if (fInput.equals(searchMark)) {
-            JobRunner.runInUIThread(fFeedView.getEditorControl(), new Runnable() {
+          if (fInput.equals(searchMark) || (fInput instanceof FolderNewsMark && ((FolderNewsMark) fInput).isRelatedTo(searchMark))) {
+            JobRunner.runInUIThread(fFeedView.getEditorControl(), new Runnable() { //Must run in UI Thread to find out if Feedview is visible or not
               public void run() {
                 final boolean onlyHandleAddedNews = fFeedView.isVisible();
 

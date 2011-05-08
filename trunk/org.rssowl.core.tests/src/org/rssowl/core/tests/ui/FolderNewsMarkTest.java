@@ -256,6 +256,10 @@ public class FolderNewsMarkTest {
       assertTrue(mark.isRelatedTo(copiedNews2));
       assertTrue(mark.isRelatedTo(copiedNews3));
     }
+
+    {
+      assertTrue(mark.isRelatedTo(search));
+    }
   }
 
   /**
