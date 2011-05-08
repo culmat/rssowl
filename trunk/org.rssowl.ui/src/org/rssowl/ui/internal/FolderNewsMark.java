@@ -35,6 +35,7 @@ import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.event.NewsEvent;
+import org.rssowl.core.persist.event.SearchMarkEvent;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.ModelReference;
 import org.rssowl.core.persist.reference.NewsReference;
@@ -61,7 +62,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * then opened from the feedview, these news get resolved again and thereby
  * twice.
  * </p>
- *
+ * 
  * @author bpasero
  */
 @SuppressWarnings("restriction")
@@ -73,7 +74,7 @@ public class FolderNewsMark extends Mark implements INewsMark {
   /**
    * Internal implementation of the <code>ModelReference</code> for the internal
    * Type <code>FolderNewsMark</code>.
-   *
+   * 
    * @author bpasero
    */
   public static final class FolderNewsMarkReference extends ModelReference {
@@ -120,6 +121,27 @@ public class FolderNewsMark extends Mark implements INewsMark {
   private void add(INews item) {
     if (item != null && item.getId() != null && !fNewsContainer.containsNews(item))
       fNewsContainer.addNews(item);
+  }
+
+  /**
+   * @param events the {@link Set} of {@link SearchMarkEvent} that provide
+   * details about the changes. For each event, find the news and add them if
+   * not yet contained.
+   */
+  public void resultsChanged(Collection<SearchMarkEvent> events) {
+
+    /* Resolve Lazily if necessary */
+    resolveIfNecessary();
+
+    synchronized (this) {
+      for (SearchMarkEvent event : events) {
+        ISearchMark search = event.getEntity();
+        List<INews> news = search.getNews(INews.State.getVisible());
+        for (INews item : news) {
+          add(item);
+        }
+      }
+    }
   }
 
   /**
@@ -170,7 +192,7 @@ public class FolderNewsMark extends Mark implements INewsMark {
 
   /**
    * Resolves all news of this news mark that match the given state.
-   *
+   * 
    * @param states the {@link org.rssowl.core.persist.INews.State} of news that
    * should be resolved in this news mark.
    */
