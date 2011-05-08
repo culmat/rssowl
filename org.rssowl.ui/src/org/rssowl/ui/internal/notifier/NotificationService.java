@@ -122,6 +122,17 @@ public class NotificationService {
    * @param mode the {@link Mode} of the notification
    */
   public void show(List<INews> news, RGB color, Mode mode) {
+    show(news, color, mode, false);
+  }
+
+  /**
+   * @param news the list of {@link INews} to show in the notifier.
+   * @param color the color to use for the news or <code>null</code> if none.
+   * @param mode the {@link Mode} of the notification
+   * @param direct if <code>true</code> directly show the news in the notifier
+   * without going through the delayed buffer, <code>false</code> otherwise.
+   */
+  public void show(List<INews> news, RGB color, Mode mode, boolean direct) {
 
     /* Create Notification Items */
     Set<NotificationItem> items = new TreeSet<NotificationItem>();
@@ -129,7 +140,7 @@ public class NotificationService {
       items.add(new NewsNotificationItem(newsitem, color));
 
     /* Add into Buffer for automatic */
-    if (!isPopupVisible() && mode == Mode.INCOMING_AUTOMATIC)
+    if (!direct && !isPopupVisible() && mode == Mode.INCOMING_AUTOMATIC)
       fBatchedBuffer.addAll(items);
 
     /* Show Directly otherwise */
