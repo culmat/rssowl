@@ -36,6 +36,7 @@ public class Messages extends NLS {
   public static String MoveCopyNewsActionPresentation_TO_NEWS_BINS;
   public static String NewsActionList_ADD_ACTION;
   public static String NewsActionList_DELETE_ACTION;
+  public static String OpenNewsAction_OPEN_BROWSER_QUEUE;
   public static String PlaySoundActionPresentation_SELECT_SOUND;
   public static String PlaySoundActionPresentation_SELECT_SOUND_TO_PLAY;
   public static String PlaySoundActionPresentation_SOUND_LINK;
