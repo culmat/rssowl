@@ -117,8 +117,10 @@ public class FolderNewsMark extends Mark implements INewsMark {
   }
 
   /**
-   * @param events the {@link Set} of {@link NewsEvent} to update from in this
-   * {@link INewsMark}.
+   * @param events the {@link Set} of {@link NewsEvent} that provide details
+   * about the changes. For each event, find the news to update from its old
+   * news state. This is necessary because the {@link NewsContainer} stores news
+   * by state id.
    */
   public void update(Set<NewsEvent> events) {
 
@@ -127,10 +129,10 @@ public class FolderNewsMark extends Mark implements INewsMark {
 
     synchronized (this) {
       for (NewsEvent event : events) {
-        if (CoreUtils.isStateChange(event)) { //Only update for state change since NewsContainer uses states
+        if (event.getOldNews() != null && CoreUtils.isStateChange(event)) { //Only update for state change since NewsContainer uses states
           INews item = event.getEntity();
           if (item != null && item.getId() != null) {
-            if (fNewsContainer.removeNews(item))
+            if (fNewsContainer.removeNews(event.getOldNews())) //Use old news to pick up old state
               fNewsContainer.addNews(item);
           }
         }
@@ -139,18 +141,23 @@ public class FolderNewsMark extends Mark implements INewsMark {
   }
 
   /**
-   * @param news the {@link List} of {@link INews} to remove from this
-   * {@link INewsMark}.
+   * @param events the {@link Set} of {@link NewsEvent} that provide details
+   * about the changes. For each event, find the news to delete from its old
+   * news state. This is necessary because the {@link NewsContainer} stores news
+   * by state id.
    */
-  public void remove(List<INews> news) {
+  public void remove(Set<NewsEvent> events) {
 
     /* Resolve Lazily if necessary */
     resolveIfNecessary();
 
     synchronized (this) {
-      for (INews item : news) {
-        if (item != null && item.getId() != null)
-          fNewsContainer.removeNews(item);
+      for (NewsEvent event : events) {
+        if (event.getOldNews() != null) {
+          INews item = event.getOldNews(); //Need to use old news to pick up old state
+          if (item != null && item.getId() != null)
+            fNewsContainer.removeNews(item);
+        }
       }
     }
   }

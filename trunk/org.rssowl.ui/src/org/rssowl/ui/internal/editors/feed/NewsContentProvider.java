@@ -350,7 +350,7 @@ public class NewsContentProvider implements ITreeContentProvider {
       ((FolderNewsMark) fInput).update(events);
   }
 
-  private synchronized void removeFromCache(List<INews> deletedNews) {
+  private synchronized void removeFromCache(List<INews> deletedNews, Set<NewsEvent> events) {
     for (INews news : deletedNews) {
       fCachedNews.remove(news.getId());
     }
@@ -360,7 +360,7 @@ public class NewsContentProvider implements ITreeContentProvider {
      * make sure that the contents are updated properly from here.
      */
     if (fInput instanceof FolderNewsMark)
-      ((FolderNewsMark) fInput).remove(deletedNews);
+      ((FolderNewsMark) fInput).remove(events);
   }
 
   private List<INews> limitFolder(List<INews> resolvedNews, boolean alreadyFiltered, NewsComparator comparer) {
@@ -829,7 +829,7 @@ public class NewsContentProvider implements ITreeContentProvider {
     }
 
     /* Remove from Cache */
-    removeFromCache(deletedNews);
+    removeFromCache(deletedNews, events);
 
     /* Only refresh if grouping requires this from table viewer */
     if (isGroupingEnabled() && fFeedView.isTableViewerVisible() && fGrouping.needsRefresh(events, false))
