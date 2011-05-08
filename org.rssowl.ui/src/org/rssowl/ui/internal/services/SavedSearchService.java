@@ -220,7 +220,7 @@ public class SavedSearchService {
 
     /* Notify Listeners */
     if (!events.isEmpty() && !Controller.getDefault().isShuttingDown())
-      DynamicDAO.getDAO(ISearchMarkDAO.class).fireResultsChanged(events);
+      DynamicDAO.getDAO(ISearchMarkDAO.class).fireNewsChanged(events);
   }
 
   /** Stops this service and unregisters any listeners added. */

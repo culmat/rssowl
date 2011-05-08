@@ -416,7 +416,7 @@ public class BookMarkContentProvider implements ITreeContentProvider {
       }
 
       /* SearchMark result changed */
-      public void resultsChanged(final Set<SearchMarkEvent> events) {
+      public void newsChanged(final Set<SearchMarkEvent> events) {
         JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
           public void run() {
 

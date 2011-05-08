@@ -191,9 +191,9 @@ public class NotificationService {
   private SearchMarkListener registerSearchMarkListener() {
     SearchMarkListener listener = new SearchMarkAdapter() {
       @Override
-      public void resultsChanged(Set<SearchMarkEvent> events) {
+      public void newsChanged(Set<SearchMarkEvent> events) {
         if (!Controller.getDefault().isShuttingDown())
-          onResultsChanged(events);
+          onNewsChanged(events);
       }
     };
 
@@ -201,7 +201,7 @@ public class NotificationService {
     return listener;
   }
 
-  private void onResultsChanged(Set<SearchMarkEvent> events) {
+  private void onNewsChanged(Set<SearchMarkEvent> events) {
 
     /* Return if Notification is disabled */
     if (!fGlobalPreferences.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP))

@@ -737,7 +737,7 @@ public class ApplicationLayerTest extends LargeBlockSizeTest {
           assertEquals(newMarkParent, event.getEntity().getParent());
         }
 
-        public void resultsChanged(Set<SearchMarkEvent> events) {
+        public void newsChanged(Set<SearchMarkEvent> events) {
           fail("Unexpected event");
         }
       };

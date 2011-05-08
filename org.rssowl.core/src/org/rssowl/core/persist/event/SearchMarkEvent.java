@@ -39,7 +39,7 @@ import org.rssowl.core.persist.event.runnable.SearchMarkEventRunnable;
  */
 public final class SearchMarkEvent extends MarkEvent {
 
-  /* Only for resultsChanged(): TRUE if *new* news where added */
+  /* Only for newsChanged(): TRUE if *new* news where added */
   private final boolean fAddedNewNews;
 
   /**
@@ -81,7 +81,7 @@ public final class SearchMarkEvent extends MarkEvent {
   }
 
   /**
-   * @return TRUE if *new* news where added from a resultsChanged() event.
+   * @return TRUE if *new* news where added from a newsChanged() event.
    */
   public boolean isAddedNewNews() {
     return fAddedNewNews;

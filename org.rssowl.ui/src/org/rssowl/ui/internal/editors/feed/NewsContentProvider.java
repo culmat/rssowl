@@ -344,14 +344,14 @@ public class NewsContentProvider implements ITreeContentProvider {
     return wasEmpty;
   }
 
-  private synchronized Pair<List<INews>, Boolean> resultsChangedInCache(Collection<SearchMarkEvent> events, boolean onlyHandleAddedNews) {
+  private synchronized Pair<List<INews>, Boolean> newsChangedInCache(Collection<SearchMarkEvent> events, boolean onlyHandleAddedNews) {
 
     /*
      * Since the folder news mark is bound to the lifecycle of the feedview,
      * make sure that the contents are updated properly from here.
      */
     if (fInput instanceof FolderNewsMark)
-      ((FolderNewsMark) fInput).resultsChanged(events);
+      ((FolderNewsMark) fInput).newsChanged(events);
 
     /* Refresh Cache */
     Pair<List<INews>, Boolean> result = refreshCache(fInput, onlyHandleAddedNews);
@@ -435,7 +435,7 @@ public class NewsContentProvider implements ITreeContentProvider {
     /* Saved Search Listener */
     fSearchMarkListener = new SearchMarkAdapter() {
       @Override
-      public void resultsChanged(Set<SearchMarkEvent> events) {
+      public void newsChanged(Set<SearchMarkEvent> events) {
         final List<SearchMarkEvent> eventsRelatedToInput = new ArrayList<SearchMarkEvent>(1);
 
         /* Find those events that are related to the current input */
@@ -462,7 +462,7 @@ public class NewsContentProvider implements ITreeContentProvider {
                 @Override
                 protected void runInBackground(IProgressMonitor monitor) {
                   if (!Controller.getDefault().isShuttingDown()) {
-                    Pair<List<INews>, Boolean> result = resultsChangedInCache(eventsRelatedToInput, onlyHandleAddedNews);
+                    Pair<List<INews>, Boolean> result = newsChangedInCache(eventsRelatedToInput, onlyHandleAddedNews);
                     fAddedNews = result.getFirst();
                     fWasEmpty = result.getSecond();
                   }

@@ -31,17 +31,19 @@ import java.util.Set;
 /**
  * A Listener being notified whenever the type <code>ISearchMark</code> was
  * added, updated or deleted in the persistance layer. In addition, a method is
- * provided to notify about results changed.
+ * provided to notify about news inside the search being changed.
  *
  * @author bpasero
  */
 public interface SearchMarkListener extends EntityListener<SearchMarkEvent, ISearchMark> {
 
   /**
-   * Called when the results of a <code>ISearchMark</code> have changed.
+   * Called when the news of a <code>ISearchMark</code> have changed. This can
+   * either be the number of news that have changed or the state of any news has
+   * changed.
    *
    * @param events A Set of SearchMarkEvents identifying the searchmarks that
    * provide new results.
    */
-  void resultsChanged(Set<SearchMarkEvent> events);
+  void newsChanged(Set<SearchMarkEvent> events);
 }

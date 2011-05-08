@@ -149,7 +149,7 @@ public class FolderNewsMark extends Mark implements INewsMark {
    * details about the changes. For each event, find the news and add them if
    * not yet contained.
    */
-  public void resultsChanged(Collection<SearchMarkEvent> events) {
+  public void newsChanged(Collection<SearchMarkEvent> events) {
 
     /* Resolve Lazily if necessary */
     resolveIfNecessary();
