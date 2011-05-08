@@ -45,7 +45,6 @@ import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.NewsListener;
 import org.rssowl.core.persist.event.SearchMarkAdapter;
 import org.rssowl.core.persist.event.SearchMarkEvent;
-import org.rssowl.core.persist.event.runnable.EventType;
 import org.rssowl.core.persist.reference.BookMarkReference;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.ModelReference;
@@ -95,6 +94,11 @@ public class NewsContentProvider implements ITreeContentProvider {
 
   /* Cache displayed News */
   private final Map<Long, INews> fCachedNews;
+
+  /* Enumeration of possible news event types */
+  private static enum NewsEventType {
+    PERSISTED, UPDATED, REMOVED, RESTORED
+  }
 
   /**
    * @param tableViewer
@@ -482,7 +486,7 @@ public class NewsContentProvider implements ITreeContentProvider {
 
             /* Filter News which are from a different Feed than displayed */
             for (NewsEvent event : events) {
-              if (event.getEntity().isVisible() && isInputRelatedTo(event.getEntity(), EventType.PERSIST)) {
+              if (event.getEntity().isVisible() && isInputRelatedTo(event.getEntity(), NewsEventType.PERSISTED)) {
                 if (addedNews == null)
                   addedNews = new HashSet<NewsEvent>();
 
@@ -525,15 +529,16 @@ public class NewsContentProvider implements ITreeContentProvider {
 
             /* Filter News which are from a different Feed than displayed */
             for (NewsEvent event : events) {
+              INews news = event.getEntity();
+              INews.State oldState = event.getOldNews() != null ? event.getOldNews().getState() : null;
+              boolean isRestored = news.isVisible() && (oldState == INews.State.HIDDEN || oldState == INews.State.DELETED);
 
               /* Return on Shutdown */
               if (Controller.getDefault().isShuttingDown())
                 return;
 
               /* Check if input relates to news events */
-              if (isInputRelatedTo(event.getEntity(), EventType.UPDATE)) {
-                INews news = event.getEntity();
-                INews.State oldState = event.getOldNews().getState();
+              if (isInputRelatedTo(event.getEntity(), isRestored ? NewsEventType.RESTORED : NewsEventType.UPDATED)) {
 
                 /* News got Deleted */
                 if (!news.isVisible()) {
@@ -544,7 +549,7 @@ public class NewsContentProvider implements ITreeContentProvider {
                 }
 
                 /* News got Restored */
-                else if (news.isVisible() && (oldState == INews.State.HIDDEN || oldState == INews.State.DELETED)) {
+                else if (isRestored) {
                   if (restoredNews == null)
                     restoredNews = new HashSet<NewsEvent>();
 
@@ -582,14 +587,14 @@ public class NewsContentProvider implements ITreeContentProvider {
             if (updateSelectionFromDelete) {
               fTableViewer.updateSelectionAfterDelete(new Runnable() {
                 public void run() {
-                  refreshViewers(events, EventType.REMOVE);
+                  refreshViewers(events, NewsEventType.REMOVED);
                 }
               });
             }
 
             /* Normal refresh w/o deletion */
             else if (refresh)
-              refreshViewers(events, EventType.UPDATE);
+              refreshViewers(events, NewsEventType.UPDATED);
           }
         });
       }
@@ -604,7 +609,7 @@ public class NewsContentProvider implements ITreeContentProvider {
             /* Filter News which are from a different Feed than displayed */
             for (NewsEvent event : events) {
               INews news = event.getEntity();
-              if ((news.isVisible() || news.getParentId() != 0) && isInputRelatedTo(news, EventType.REMOVE)) {
+              if ((news.isVisible() || news.getParentId() != 0) && isInputRelatedTo(news, NewsEventType.REMOVED)) {
                 if (deletedNews == null)
                   deletedNews = new HashSet<NewsEvent>();
 
@@ -636,7 +641,7 @@ public class NewsContentProvider implements ITreeContentProvider {
     DynamicDAO.addEntityListener(INews.class, fNewsListener);
   }
 
-  private void refreshViewers(final Set<NewsEvent> events, EventType type) {
+  private void refreshViewers(final Set<NewsEvent> events, NewsEventType type) {
 
     /* Return on Shutdown */
     if (Controller.getDefault().isShuttingDown())
@@ -657,7 +662,7 @@ public class NewsContentProvider implements ITreeContentProvider {
       if (fFeedView.isBrowserViewerVisible() && contains(fBrowserViewer.getInput(), items)) {
 
         /* Update */
-        if (type == EventType.UPDATE) {
+        if (type == NewsEventType.UPDATED) {
           Set<NewsEvent> newsToUpdate = events;
 
           /*
@@ -674,7 +679,7 @@ public class NewsContentProvider implements ITreeContentProvider {
         }
 
         /* Remove */
-        else if (type == EventType.REMOVE)
+        else if (type == NewsEventType.REMOVED)
           fBrowserViewer.remove(items.toArray());
       }
 
@@ -851,17 +856,27 @@ public class NewsContentProvider implements ITreeContentProvider {
     DynamicDAO.removeEntityListener(ISearchMark.class, fSearchMarkListener);
   }
 
-  private boolean isInputRelatedTo(INews news, EventType type) {
+  private boolean isInputRelatedTo(INews news, NewsEventType type) {
 
     /* Check if BookMark references the News' Feed and is not a copy */
     if (fInput instanceof IBookMark) {
+
+      /* Return early if news is from bin */
+      if (news.getParentId() != 0)
+        return false;
+
+      /* Perform fast HashMap lookup first */
+      if (hasCachedNews(news))
+        return true;
+
+      /* Otherwise compare by feed link */
       IBookMark bookmark = (IBookMark) fInput;
-      if (news.getParentId() == 0 && bookmark.getFeedLinkReference().equals(news.getFeedReference()))
+      if (bookmark.getFeedLinkReference().equals(news.getFeedReference()))
         return true;
     }
 
     /* Check if Saved Search contains the given News */
-    else if (type != EventType.PERSIST && fInput instanceof ISearchMark) {
+    else if (type != NewsEventType.PERSISTED && fInput instanceof ISearchMark) {
 
       /*
        * Workaround a race condition in a safe way: When a News gets updated or deleted from a
@@ -882,7 +897,7 @@ public class NewsContentProvider implements ITreeContentProvider {
     else if (fInput instanceof FolderNewsMark) {
 
       /* News Added: Check if its part of the Folder */
-      if (type == EventType.PERSIST)
+      if (type == NewsEventType.PERSISTED || type == NewsEventType.RESTORED)
         return ((FolderNewsMark) fInput).isRelatedTo(news);
 
       /* Update/Remove: Check if news is part of cache */
