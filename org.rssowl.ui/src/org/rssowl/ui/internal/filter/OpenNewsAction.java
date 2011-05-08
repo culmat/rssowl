@@ -37,6 +37,7 @@ import org.rssowl.core.util.JobQueue;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.TaskAdapter;
 import org.rssowl.ui.internal.Controller;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.OpenInBrowserAction;
 import org.rssowl.ui.internal.util.JobRunner;
 
@@ -77,9 +78,10 @@ public class OpenNewsAction implements INewsAction {
         }
       });
 
-      if (!monitor.isCanceled() && !Controller.getDefault().isShuttingDown()) {
+      /* Delay opening in external browser to avoid Program spam */
+      if (OwlUI.useExternalBrowser() && !monitor.isCanceled() && !Controller.getDefault().isShuttingDown()) {
         try {
-          Thread.sleep(OPEN_BROWSER_DELAY); //Avoid massive browser spam by using a fixed delay
+          Thread.sleep(OPEN_BROWSER_DELAY);
         } catch (InterruptedException e) {
         }
       }
