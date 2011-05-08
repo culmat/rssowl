@@ -491,7 +491,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
       public void partBroughtToTop(IWorkbenchPartReference partRef) {
         if (FeedView.this.equals(partRef.getPart(false))) {
           setGlobalActions();
-          OwlUI.updateWindowTitle(fInput != null ? new IMark[] { fInput.getMark() } : null);
+          OwlUI.updateWindowTitle(fInput != null ? fInput.getMark() : null);
 
           /* Notify last visible feedview about change */
           if (fgLastVisibleFeedView != null && fgLastVisibleFeedView != FeedView.this && !fgLastVisibleFeedView.fIsDisposed) {
@@ -522,24 +522,24 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
       public void partActivated(IWorkbenchPartReference partRef) {
         if (FeedView.this.equals(partRef.getPart(false)))
-          OwlUI.updateWindowTitle(fInput != null ? new IMark[] { fInput.getMark() } : null);
+          OwlUI.updateWindowTitle(fInput != null ? fInput.getMark() : null);
       }
 
       public void partInputChanged(IWorkbenchPartReference partRef) {
         if (FeedView.this.equals(partRef.getPart(false)))
-          OwlUI.updateWindowTitle(fInput != null ? new IMark[] { fInput.getMark() } : null);
+          OwlUI.updateWindowTitle(fInput != null ? fInput.getMark() : null);
       }
 
       public void partOpened(IWorkbenchPartReference partRef) {
         if (FeedView.this.equals(partRef.getPart(false)) && isVisible()) {
           fOpenTime = System.currentTimeMillis();
-          OwlUI.updateWindowTitle(fInput != null ? new IMark[] { fInput.getMark() } : null);
+          OwlUI.updateWindowTitle(fInput != null ? fInput.getMark() : null);
         }
       }
 
       public void partVisible(IWorkbenchPartReference partRef) {
         if (FeedView.this.equals(partRef.getPart(false)))
-          OwlUI.updateWindowTitle(fInput != null ? new IMark[] { fInput.getMark() } : null);
+          OwlUI.updateWindowTitle(fInput != null ? fInput.getMark() : null);
       }
     };
 
@@ -721,7 +721,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
           if (folder.equals(folderNewsMark.getFolder())) {
             setPartName(folder.getName());
             if (activeFeedView == FeedView.this)
-              OwlUI.updateWindowTitle(new IMark[] { fInput.getMark() });
+              OwlUI.updateWindowTitle(fInput.getMark());
 
             break;
           }
@@ -758,7 +758,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
           if (mark.getId().equals(fInput.getMark().getId())) {
             setPartName(mark.getName());
             if (activeFeedView == FeedView.this)
-              OwlUI.updateWindowTitle(new IMark[] { fInput.getMark() });
+              OwlUI.updateWindowTitle(fInput.getMark());
 
             break;
           }
