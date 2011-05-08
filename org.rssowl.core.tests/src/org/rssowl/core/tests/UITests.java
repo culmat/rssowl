@@ -33,6 +33,7 @@ import org.rssowl.core.tests.ui.CleanUpTests;
 import org.rssowl.core.tests.ui.DownloadServiceTests;
 import org.rssowl.core.tests.ui.EntityPropertyPageTests;
 import org.rssowl.core.tests.ui.FolderMarkGroupFilterTest;
+import org.rssowl.core.tests.ui.FolderNewsMarkTest;
 import org.rssowl.core.tests.ui.MiscUITests;
 import org.rssowl.core.tests.ui.ModelUtilsTest;
 import org.rssowl.core.tests.ui.NewsBrowserViewModelTests;
@@ -53,6 +54,7 @@ import org.rssowl.core.tests.ui.UndoTest;
   FolderMarkGroupFilterTest.class,
   NewsGroupFilterTest.class,
   MiscUITests.class,
+  FolderNewsMarkTest.class,
   CleanUpTests.class,
   ImportExportOPMLTest.class,
   FileImportTest.class,
