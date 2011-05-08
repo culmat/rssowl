@@ -1707,13 +1707,21 @@
             id="org.rssowl.ui.ShowNotifierNewsAction"
             name="%newsAction.name"
             forcable="false"
-            sortKey="51">
+            sortKey="52">
       </newsAction>
       <newsAction
             class="org.rssowl.ui.internal.filter.PlaySoundAction"
             id="org.rssowl.ui.PlaySoundAction"
             name="%newsAction.name.0"
             forcable="false"
+            sortKey="51">
+      </newsAction>
+      <newsAction
+            class="org.rssowl.ui.internal.filter.OpenNewsAction"
+            description="%newsAction.description.1"
+            forcable="false"
+            id="org.rssowl.ui.OpenNewsAction"
+            name="%newsAction.name.2"
             sortKey="50">
       </newsAction>
       <newsAction
