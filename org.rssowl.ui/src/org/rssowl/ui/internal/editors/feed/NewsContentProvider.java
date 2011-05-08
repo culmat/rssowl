@@ -345,7 +345,7 @@ public class NewsContentProvider implements ITreeContentProvider {
     return wasEmpty;
   }
 
-  private synchronized Pair<List<INews>, Boolean> resultsChangedInCache(Set<SearchMarkEvent> events, boolean onlyHandleAddedNews) {
+  private synchronized Pair<List<INews>, Boolean> resultsChangedInCache(Collection<SearchMarkEvent> events, boolean onlyHandleAddedNews) {
 
     /*
      * Since the folder news mark is bound to the lifecycle of the feedview,
@@ -436,57 +436,66 @@ public class NewsContentProvider implements ITreeContentProvider {
     /* Saved Search Listener */
     fSearchMarkListener = new SearchMarkAdapter() {
       @Override
-      public void resultsChanged(final Set<SearchMarkEvent> events) {
+      public void resultsChanged(Set<SearchMarkEvent> events) {
+        final List<SearchMarkEvent> eventsRelatedToInput = new ArrayList<SearchMarkEvent>(1);
+
+        /* Find those events that are related to the current input */
         for (SearchMarkEvent event : events) {
           ISearchMark searchMark = event.getEntity();
-          final boolean isContainedInFolderNewsMark = (fInput instanceof FolderNewsMark && ((FolderNewsMark) fInput).isRelatedTo(searchMark));
-
-          if (fInput.equals(searchMark) || isContainedInFolderNewsMark) {
-            JobRunner.runInUIThread(fFeedView.getEditorControl(), new Runnable() { //Must run in UI Thread to find out if Feedview is visible or not
-                  public void run() {
-                    final boolean onlyHandleAddedNews = fFeedView.isVisible();
-
-                    JobRunner.runUIUpdater(new UIBackgroundJob(fFeedView.getEditorControl()) {
-                      private List<INews> fAddedNews;
-                      private boolean fWasEmpty;
-
-                      @Override
-                      protected void runInBackground(IProgressMonitor monitor) {
-                        if (!Controller.getDefault().isShuttingDown()) {
-                          Pair<List<INews>, Boolean> result = resultsChangedInCache(events, onlyHandleAddedNews);
-                          fAddedNews = result.getFirst();
-                          fWasEmpty = result.getSecond();
-                        }
-                      }
-
-                      @Override
-                      protected void runInUI(IProgressMonitor monitor) {
-                        if (Controller.getDefault().isShuttingDown())
-                          return;
-
-                        /* Check if we need to Refresh at all */
-                        if (onlyHandleAddedNews && (fAddedNews == null || fAddedNews.size() == 0))
-                          return;
-
-                        /* Refresh only Table Viewer if not using Newspaper Mode in Browser */
-                        if (!browserShowsCollection())
-                          fFeedView.refreshTableViewer(true, true); //TODO Seems some JFace caching problem here (redraw=true)
-
-                        /* Browser shows Newspaper Mode: Only refresh under certain circumstances */
-                        else {
-                          if (canDoBrowserRefresh(fWasEmpty))
-                            fFeedView.refreshBrowserViewer();
-                          else
-                            fFeedView.getNewsBrowserControl().setInfoBarVisible(true);
-                        }
-                      }
-                    });
-                  }
-                });
-
-            /* Done */
-            return;
+          if (fInput.equals(searchMark)) {
+            eventsRelatedToInput.add(event);
+            break; //Can only be one search mark per feed view
+          } else if (fInput instanceof FolderNewsMark && ((FolderNewsMark) fInput).isRelatedTo(searchMark)) {
+            eventsRelatedToInput.add(event);
           }
+        }
+
+        /* Properly update given searches are related to input */
+        if (!eventsRelatedToInput.isEmpty()) {
+          JobRunner.runInUIThread(fFeedView.getEditorControl(), new Runnable() {
+            public void run() {
+              final boolean onlyHandleAddedNews = fFeedView.isVisible();
+
+              JobRunner.runUIUpdater(new UIBackgroundJob(fFeedView.getEditorControl()) {
+                private List<INews> fAddedNews;
+                private boolean fWasEmpty;
+
+                @Override
+                protected void runInBackground(IProgressMonitor monitor) {
+                  if (!Controller.getDefault().isShuttingDown()) {
+                    Pair<List<INews>, Boolean> result = resultsChangedInCache(eventsRelatedToInput, onlyHandleAddedNews);
+                    fAddedNews = result.getFirst();
+                    fWasEmpty = result.getSecond();
+                  }
+                }
+
+                @Override
+                protected void runInUI(IProgressMonitor monitor) {
+                  if (Controller.getDefault().isShuttingDown())
+                    return;
+
+                  /* Check if we need to Refresh at all */
+                  if (onlyHandleAddedNews && (fAddedNews == null || fAddedNews.size() == 0))
+                    return;
+
+                  /* Refresh only Table Viewer if not using Newspaper Mode in Browser */
+                  if (!browserShowsCollection())
+                    fFeedView.refreshTableViewer(true, true); //TODO Seems some JFace caching problem here (redraw=true)
+
+                  /* Browser shows Newspaper Mode: Only refresh under certain circumstances */
+                  else {
+                    if (canDoBrowserRefresh(fWasEmpty))
+                      fFeedView.refreshBrowserViewer();
+                    else
+                      fFeedView.getNewsBrowserControl().setInfoBarVisible(true);
+                  }
+                }
+              });
+            }
+          });
+
+          /* Done */
+          return;
         }
       }
     };
