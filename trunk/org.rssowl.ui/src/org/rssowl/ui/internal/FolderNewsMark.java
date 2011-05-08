@@ -33,10 +33,12 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.INewsMark;
+import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.ModelReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.PersistenceException;
+import org.rssowl.core.util.CoreUtils;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -110,6 +112,28 @@ public class FolderNewsMark extends Mark implements INewsMark {
       for (INews item : news) {
         if (item != null && item.getId() != null)
           fNewsContainer.addNews(item);
+      }
+    }
+  }
+
+  /**
+   * @param events the {@link Set} of {@link NewsEvent} to update from in this
+   * {@link INewsMark}.
+   */
+  public void update(Set<NewsEvent> events) {
+
+    /* Resolve Lazily if necessary */
+    resolveIfNecessary();
+
+    synchronized (this) {
+      for (NewsEvent event : events) {
+        if (CoreUtils.isStateChange(event)) { //Only update for state change since NewsContainer uses states
+          INews item = event.getEntity();
+          if (item != null && item.getId() != null) {
+            if (fNewsContainer.removeNews(item))
+              fNewsContainer.addNews(item);
+          }
+        }
       }
     }
   }
