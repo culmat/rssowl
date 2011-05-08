@@ -65,9 +65,7 @@ public class NewsBin extends Mark implements INewsBin {
   }
 
   /**
-   * Should be used for testing only.
-   *
-   * @return internal NewsContainer.
+   * @return the {@link NewsContainer} being used in this news bin.
    */
   public synchronized NewsContainer internalGetNewsContainer() {
     return fNewsContainer;

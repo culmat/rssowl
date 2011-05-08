@@ -158,7 +158,7 @@ public class FolderNewsMarkTest {
     waitForIndexer();
 
     FolderNewsMark mark = new FolderNewsMark(childFolder);
-    mark.resolve(INews.State.getVisible());
+    mark.resolve();
 
     {
       List<INews> news = mark.getNews();
@@ -275,7 +275,7 @@ public class FolderNewsMarkTest {
     DynamicDAO.save(folder);
 
     FolderNewsMark mark = new FolderNewsMark(childFolder);
-    mark.resolve(INews.State.getVisible());
+    mark.resolve();
 
     IFeed feed = fFactory.createFeed(null, new URI("feed"));
     INews news1 = fFactory.createNews(null, feed, new Date());
@@ -478,7 +478,7 @@ public class FolderNewsMarkTest {
     waitForIndexer();
 
     FolderNewsMark mark = new FolderNewsMark(childFolder);
-    mark.resolve(INews.State.getVisible());
+    mark.resolve();
 
     List<NewsEvent> events = new ArrayList<NewsEvent>();
     News oldNews = new News((News) news1, -1);
@@ -637,7 +637,7 @@ public class FolderNewsMarkTest {
     waitForIndexer();
 
     FolderNewsMark mark = new FolderNewsMark(childFolder);
-    mark.resolve(INews.State.getVisible());
+    mark.resolve();
 
     List<NewsEvent> events = new ArrayList<NewsEvent>();
 
@@ -815,7 +815,7 @@ public class FolderNewsMarkTest {
     waitForIndexer();
 
     FolderNewsMark mark = new FolderNewsMark(childFolder);
-    mark.resolve(INews.State.getVisible());
+    mark.resolve();
 
     {
       List<INews> news = mark.getNews(EnumSet.of(INews.State.NEW));
