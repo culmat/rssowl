@@ -225,7 +225,7 @@ public class FolderNewsMark extends Mark implements INewsMark {
   }
 
   /**
-   * @param news
+   * @param news the news to find out if this mark is related to.
    * @return <code>true</code> if the given News belongs to any
    * {@link IBookMark} or {@link INewsBin} of the given {@link IFolder}.
    */
@@ -233,10 +233,6 @@ public class FolderNewsMark extends Mark implements INewsMark {
 
     /* Resolve Lazily if necessary */
     resolveIfNecessary();
-
-    /* Might be contained */
-    if (containsNews(news))
-      return true;
 
     FeedLinkReference feedRef = news.getFeedReference();
     return isRelatedTo(fFolder, news, feedRef);

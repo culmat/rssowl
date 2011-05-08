@@ -302,7 +302,7 @@ public class NewsContentProvider implements ITreeContentProvider {
 
         /* Resolve and Add News */
         INews resolvedNewsItem = newsRef.resolve();
-        if (resolvedNewsItem != null)
+        if (resolvedNewsItem != null && resolvedNewsItem.isVisible())
           resolvedNews.add(resolvedNewsItem);
       }
 
@@ -868,12 +868,11 @@ public class NewsContentProvider implements ITreeContentProvider {
     /* In Memory Folder News Mark (aggregated news) */
     else if (fInput instanceof FolderNewsMark) {
 
-      /* News Added/Updated: Check if its part of the Folder */
-      if (type == EventType.PERSIST || type == EventType.UPDATE) {
+      /* News Added: Check if its part of the Folder */
+      if (type == EventType.PERSIST)
         return ((FolderNewsMark) fInput).isRelatedTo(news);
-      }
 
-      /* Remove: Check if news was cached */
+      /* Update/Remove: Check if news is part of cache */
       return hasCachedNews(news);
     }
 
