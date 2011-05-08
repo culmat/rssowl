@@ -354,7 +354,7 @@ public class NotificationService {
           return;
 
         /* Show News in Popup */
-        synchronized (this) {
+        synchronized (NotificationService.this) {
 
           /* Popup not yet visible, create new */
           if (fgNotificationPopup == null) {
