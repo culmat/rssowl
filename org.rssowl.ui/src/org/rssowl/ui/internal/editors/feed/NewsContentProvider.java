@@ -340,6 +340,16 @@ public class NewsContentProvider implements ITreeContentProvider {
     return wasEmpty;
   }
 
+  private synchronized void updateCache(Set<NewsEvent> events) {
+
+    /*
+     * Since the folder news mark is bound to the lifecycle of the feedview,
+     * make sure that the contents are updated properly from here.
+     */
+    if (fInput instanceof FolderNewsMark)
+      ((FolderNewsMark) fInput).update(events);
+  }
+
   private synchronized void removeFromCache(List<INews> deletedNews) {
     for (INews news : deletedNews) {
       fCachedNews.remove(news.getId());
@@ -767,6 +777,9 @@ public class NewsContentProvider implements ITreeContentProvider {
     for (NewsEvent event : events) {
       updatedNews.add(event.getEntity());
     }
+
+    /* Update in Cache */
+    updateCache(events);
 
     /* Return early if refresh is required anyways for Grouper */
     if (fGrouping.needsRefresh(events, true))
