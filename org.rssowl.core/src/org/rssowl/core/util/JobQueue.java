@@ -42,6 +42,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -70,7 +71,6 @@ public class JobQueue {
   private final boolean fShowProgress;
   private boolean fIsUnknownProgress;
   private final ListenerList fListeners = new ListenerList();
-  private boolean fIsSealed;
 
   /* These fields are accessed from N Jobs concurrently */
   private volatile boolean fProgressJobScheduled;
@@ -80,6 +80,7 @@ public class JobQueue {
   private final AtomicInteger fProgressShown = new AtomicInteger(0); // Number of Progress Shown
   private final AtomicInteger fProgressBuf = new AtomicInteger(0); // Buffer for the Progress Monitor
   private final AtomicInteger fScheduledJobs = new AtomicInteger(0); // Count number of running Jobs
+  private final AtomicBoolean fIsSealed = new AtomicBoolean(false);
   private final BlockingQueue<ITask> fOpenTasksQueue;
 
   /**
@@ -190,7 +191,7 @@ public class JobQueue {
    * Seals this queue so that no task can be added anymore.
    */
   public void seal() {
-    fIsSealed= true;
+    fIsSealed.set(true);
   }
 
   /**
@@ -238,7 +239,7 @@ public class JobQueue {
       return true;
 
     /* Return if Queue is Sealed */
-    if (fIsSealed)
+    if (fIsSealed.get())
       return false;
 
     /* Add into List of open tasks */
