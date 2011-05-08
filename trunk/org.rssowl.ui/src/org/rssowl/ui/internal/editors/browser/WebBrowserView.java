@@ -708,7 +708,8 @@ public class WebBrowserView extends EditorPart implements IReusableEditor {
         else
           setPartName(event.title);
 
-        OwlUI.updateWindowTitle(getPartName());
+        if (fEditorSite.getPage().isPartVisible(fEditorSite.getPart()))
+          OwlUI.updateWindowTitle(getPartName());
       }
     });
 
