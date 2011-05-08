@@ -284,8 +284,7 @@ public class NewsContentProvider implements ITreeContentProvider {
     resolvedNews = new ArrayList<INews>();
 
     /* Handle Folder, Newsbin and Saved Search */
-    boolean isSearch = (input instanceof ISearchMark);
-    if (isSearch || input instanceof INewsBin || input instanceof FolderNewsMark) {
+    if (input.isGetNewsRefsEfficient()) {
 
       /* Folder, Bin and Search can resolve news by state efficiently */
       Set<State> states;
@@ -301,7 +300,7 @@ public class NewsContentProvider implements ITreeContentProvider {
       for (NewsReference newsRef : newsReferences) {
 
         /* Avoid to resolve an already shown News */
-        if (onlyAdd && isSearch && hasCachedNews(newsRef))
+        if (onlyAdd && hasCachedNews(newsRef)) //If onlyAdd is false, caches have been cleared
           continue;
 
         /* Resolve and Add News */
