@@ -41,6 +41,7 @@ import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.CoreUtils;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
@@ -103,17 +104,21 @@ public class FolderNewsMark extends Mark implements INewsMark {
    * @param news the {@link List} of {@link INews} to add into this
    * {@link INewsMark}.
    */
-  public void add(List<INews> news) {
+  public void add(Collection<INews> news) {
 
     /* Resolve Lazily if necessary */
     resolveIfNecessary();
 
     synchronized (this) {
       for (INews item : news) {
-        if (item != null && item.getId() != null)
-          fNewsContainer.addNews(item);
+        add(item);
       }
     }
+  }
+
+  private void add(INews item) {
+    if (item != null && item.getId() != null && !fNewsContainer.containsNews(item))
+      fNewsContainer.addNews(item);
   }
 
   /**
@@ -122,7 +127,7 @@ public class FolderNewsMark extends Mark implements INewsMark {
    * news state. This is necessary because the {@link NewsContainer} stores news
    * by state id.
    */
-  public void update(Set<NewsEvent> events) {
+  public void update(Collection<NewsEvent> events) {
 
     /* Resolve Lazily if necessary */
     resolveIfNecessary();
@@ -146,7 +151,7 @@ public class FolderNewsMark extends Mark implements INewsMark {
    * news state. This is necessary because the {@link NewsContainer} stores news
    * by state id.
    */
-  public void remove(Set<NewsEvent> events) {
+  public void remove(Collection<NewsEvent> events) {
 
     /* Resolve Lazily if necessary */
     resolveIfNecessary();
@@ -193,9 +198,8 @@ public class FolderNewsMark extends Mark implements INewsMark {
       if (child instanceof INewsMark) {
         INewsMark newsmark = (INewsMark) child;
         List<INews> news = newsmark.getNews(states);
-        for (INews newsitem : news) {
-          if (newsitem != null && newsitem.getId() != null)
-            fNewsContainer.addNews(newsitem);
+        for (INews item : news) {
+          add(item);
         }
       }
 

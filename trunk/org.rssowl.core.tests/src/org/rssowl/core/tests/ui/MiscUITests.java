@@ -52,7 +52,6 @@ import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.ApplicationServer;
 import org.rssowl.ui.internal.Controller;
-import org.rssowl.ui.internal.FolderNewsMark;
 import org.rssowl.ui.internal.LinkTransformer;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.ShareProvider;
@@ -66,7 +65,6 @@ import org.rssowl.ui.internal.editors.feed.NewsComparator;
 
 import java.net.URI;
 import java.util.Date;
-import java.util.EnumSet;
 import java.util.List;
 
 /**
@@ -112,40 +110,6 @@ public class MiscUITests {
     DynamicDAO.delete(bookmark);
 
     assertEquals(null, OwlUI.getFavicon(bookmark));
-  }
-
-  /**
-   * @throws Exception
-   */
-  @Test
-  public void testFolderNewsMark() throws Exception {
-    IFolder folder = Owl.getModelFactory().createFolder(null, null, "Root");
-    IFolder childFolder = Owl.getModelFactory().createFolder(null, folder, "Child");
-    childFolder.setProperty("foo", "bar");
-
-    IFeed feed = Owl.getModelFactory().createFeed(null, new URI("feed"));
-    INews news = Owl.getModelFactory().createNews(null, feed, new Date());
-    news.setState(INews.State.NEW);
-    news = Owl.getModelFactory().createNews(null, feed, new Date());
-    news.setState(INews.State.READ);
-    DynamicDAO.save(feed);
-
-    Owl.getModelFactory().createBookMark(null, childFolder, new FeedLinkReference(feed.getLink()), "Mark");
-    folder = DynamicDAO.save(folder);
-
-    FolderNewsMark mark = new FolderNewsMark(childFolder);
-    assertEquals(childFolder.getId(), mark.getId());
-    assertEquals(childFolder, mark.getFolder());
-    assertEquals("bar", mark.getProperty("foo"));
-    assertTrue(Long.valueOf(mark.toReference().getId()).equals(childFolder.getId()));
-
-    assertEquals(2, mark.getNews().size());
-    assertEquals(2, mark.getNews(EnumSet.of(INews.State.NEW, INews.State.READ)).size());
-    assertEquals(1, mark.getNews(EnumSet.of(INews.State.NEW)).size());
-    assertEquals(1, mark.getNews(EnumSet.of(INews.State.READ)).size());
-    assertEquals(2, mark.getNewsCount(EnumSet.of(INews.State.NEW, INews.State.READ)));
-    assertEquals(1, mark.getNewsCount(EnumSet.of(INews.State.NEW)));
-    assertEquals(1, mark.getNewsCount(EnumSet.of(INews.State.READ)));
   }
 
   /**
