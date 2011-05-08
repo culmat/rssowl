@@ -43,6 +43,7 @@ import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.event.NewsEvent;
+import org.rssowl.core.persist.event.SearchMarkEvent;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.ui.internal.Controller;
@@ -54,6 +55,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Tests for the {@link FolderNewsMark}.
@@ -759,6 +761,87 @@ public class FolderNewsMarkTest {
       assertTrue(mark.isRelatedTo(copiedNews1));
       assertTrue(mark.isRelatedTo(copiedNews2));
       assertTrue(mark.isRelatedTo(copiedNews3));
+    }
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testComplexFolderNewsMarkResultsChange() throws Exception {
+    IFolder folder = fFactory.createFolder(null, null, "Root");
+    IFolder childFolder = fFactory.createFolder(null, folder, "Child");
+
+    IFeed feed = fFactory.createFeed(null, new URI("feed"));
+    INews news1 = fFactory.createNews(null, feed, new Date());
+    news1.setState(INews.State.NEW);
+    INews news2 = fFactory.createNews(null, feed, new Date());
+    news2.setState(INews.State.UNREAD);
+    INews news3 = fFactory.createNews(null, feed, new Date());
+    news3.setState(INews.State.READ);
+    DynamicDAO.save(feed);
+
+    fFactory.createBookMark(null, childFolder, new FeedLinkReference(feed.getLink()), "Mark");
+
+    IFeed otherFeed = fFactory.createFeed(null, new URI("otherfeed"));
+    INews otherNews1 = fFactory.createNews(null, otherFeed, new Date());
+    otherNews1.setState(INews.State.NEW);
+    INews othernews2 = fFactory.createNews(null, otherFeed, new Date());
+    othernews2.setState(INews.State.UNREAD);
+    INews othernews3 = fFactory.createNews(null, otherFeed, new Date());
+    othernews3.setState(INews.State.READ);
+    DynamicDAO.save(otherFeed);
+
+    fFactory.createBookMark(null, folder, new FeedLinkReference(otherFeed.getLink()), "Other Mark");
+
+    INewsBin bin = fFactory.createNewsBin(null, childFolder, "bin");
+    DynamicDAO.save(bin);
+    INews copiedNews1 = fFactory.createNews(news1, bin);
+    INews copiedNews2 = fFactory.createNews(news2, bin);
+    INews copiedNews3 = fFactory.createNews(news3, bin);
+    DynamicDAO.save(copiedNews1);
+    DynamicDAO.save(copiedNews2);
+    DynamicDAO.save(copiedNews3);
+
+    ISearchField stateField = fFactory.createSearchField(INews.STATE, INews.class.getName());
+    ISearchCondition condition = fFactory.createSearchCondition(stateField, SearchSpecifier.IS, EnumSet.of(INews.State.NEW));
+    ISearchMark search = fFactory.createSearchMark(null, childFolder, "search");
+    search.addSearchCondition(condition);
+
+    folder = DynamicDAO.save(folder);
+
+    waitForIndexer();
+    Controller.getDefault().getSavedSearchService().forceQuickUpdate();
+    waitForIndexer();
+
+    FolderNewsMark mark = new FolderNewsMark(childFolder);
+    mark.resolve(INews.State.getVisible());
+
+    {
+      List<INews> news = mark.getNews(EnumSet.of(INews.State.NEW));
+      assertEquals(3, news.size());
+      assertTrue(news.contains(news1));
+      assertTrue(news.contains(copiedNews1));
+      assertTrue(news.contains(otherNews1));
+    }
+
+    othernews2.setState(INews.State.NEW);
+    DynamicDAO.save(othernews2);
+    waitForIndexer();
+    Controller.getDefault().getSavedSearchService().forceQuickUpdate();
+    waitForIndexer();
+
+    SearchMarkEvent event = new SearchMarkEvent(search, null, true);
+    Set<SearchMarkEvent> events = Collections.singleton(event);
+    mark.resultsChanged(events);
+
+    {
+      List<INews> news = mark.getNews(EnumSet.of(INews.State.NEW));
+      assertEquals(4, news.size());
+      assertTrue(news.contains(news1));
+      assertTrue(news.contains(copiedNews1));
+      assertTrue(news.contains(othernews2));
+      assertTrue(news.contains(otherNews1));
     }
   }
 
