@@ -39,13 +39,14 @@ import java.util.Set;
 public interface ISearchMarkDAO extends IEntityDAO<ISearchMark, SearchMarkListener, SearchMarkEvent> {
 
   /**
-   * Notify <code>SearchMarkListener</code> that the results of a Set of
-   * SearchMarks have changed.
+   * Notify <code>SearchMarkListener</code> that the news of a Set of
+   * SearchMarks have changed. This can either be the number of news that have
+   * changed, or the news state inside the results having changed.
    *
    * @param events The Set of SearchMarkEvents identifying the searchmarks of
    * this event.
    */
-  void fireResultsChanged(Set<SearchMarkEvent> events);
+  void fireNewsChanged(Set<SearchMarkEvent> events);
 
   /**
    * Loads the {@code ISearchMark} that contains {@code searchCondition}.

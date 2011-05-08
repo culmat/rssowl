@@ -71,13 +71,11 @@ public final class SearchMarkDAOImpl extends AbstractEntityDAO<ISearchMark, Sear
   }
 
   /*
-   * @see
-   * org.rssowl.core.persist.dao.ISearchMarkDAO#fireResultsChanged(java.util
-   * .Set)
+   * @see org.rssowl.core.persist.dao.ISearchMarkDAO#fireNewsChanged(java.util.Set)
    */
-  public void fireResultsChanged(Set<SearchMarkEvent> events) {
+  public void fireNewsChanged(Set<SearchMarkEvent> events) {
     for (SearchMarkListener listener : fEntityListeners) {
-      listener.resultsChanged(events);
+      listener.newsChanged(events);
     }
   }
 

@@ -833,7 +833,7 @@ public class FolderNewsMarkTest {
 
     SearchMarkEvent event = new SearchMarkEvent(search, null, true);
     Set<SearchMarkEvent> events = Collections.singleton(event);
-    mark.resultsChanged(events);
+    mark.newsChanged(events);
 
     {
       List<INews> news = mark.getNews(EnumSet.of(INews.State.NEW));

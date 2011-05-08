@@ -88,19 +88,17 @@ public class CachingSearchMarkDAO extends CachingDAO<SearchMarkDAOImpl, ISearchM
       /* No action needed */
       }
 
-      public void resultsChanged(Set<SearchMarkEvent> events) {
+      public void newsChanged(Set<SearchMarkEvent> events) {
       /* No action needed */
       }
     };
   }
 
   /*
-   * @see
-   * org.rssowl.core.persist.dao.ISearchMarkDAO#fireResultsChanged(java.util
-   * .Set)
+   * @see org.rssowl.core.persist.dao.ISearchMarkDAO#fireNewsChanged(java.util.Set)
    */
-  public void fireResultsChanged(Set<SearchMarkEvent> events) {
-    getDAO().fireResultsChanged(events);
+  public void fireNewsChanged(Set<SearchMarkEvent> events) {
+    getDAO().fireNewsChanged(events);
   }
 
   /*

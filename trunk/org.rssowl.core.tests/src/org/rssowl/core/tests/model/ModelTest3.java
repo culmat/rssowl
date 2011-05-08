@@ -1083,7 +1083,7 @@ public class ModelTest3 extends LargeBlockSizeTest {
           }
         }
 
-        public void resultsChanged(Set<SearchMarkEvent> events) {
+        public void newsChanged(Set<SearchMarkEvent> events) {
           fail("Unexpected event");
         }
       };
