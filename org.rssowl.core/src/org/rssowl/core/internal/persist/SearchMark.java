@@ -80,6 +80,13 @@ public class SearchMark extends Mark implements ISearchMark {
     fNewsContainer = createNewsContainer();
   }
 
+  /**
+   * @return the {@link NewsContainer} being used in this search.
+   */
+  public synchronized NewsContainer internalGetNewsContainer() {
+    return fNewsContainer;
+  }
+
   /*
    * @see org.rssowl.core.persist.ISearchMark#setResult(java.util.List)
    */

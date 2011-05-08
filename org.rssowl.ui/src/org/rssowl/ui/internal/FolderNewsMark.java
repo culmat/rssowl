@@ -24,8 +24,11 @@
 
 package org.rssowl.ui.internal;
 
+import org.rssowl.core.internal.persist.LongArrayList;
 import org.rssowl.core.internal.persist.Mark;
+import org.rssowl.core.internal.persist.NewsBin;
 import org.rssowl.core.internal.persist.NewsContainer;
+import org.rssowl.core.internal.persist.SearchMark;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
@@ -62,7 +65,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * then opened from the feedview, these news get resolved again and thereby
  * twice.
  * </p>
- * 
+ *
  * @author bpasero
  */
 @SuppressWarnings("restriction")
@@ -74,7 +77,7 @@ public class FolderNewsMark extends Mark implements INewsMark {
   /**
    * Internal implementation of the <code>ModelReference</code> for the internal
    * Type <code>FolderNewsMark</code>.
-   * 
+   *
    * @author bpasero
    */
   public static final class FolderNewsMarkReference extends ModelReference {
@@ -123,6 +126,24 @@ public class FolderNewsMark extends Mark implements INewsMark {
       fNewsContainer.addNews(item);
   }
 
+  private void addAll(NewsContainer container) {
+    synchronized (this) {
+      LongArrayList[] folderMarkNewsContainer = fNewsContainer.internalGetNewsIds();
+      LongArrayList[] containerIds = container.internalGetNewsIds();
+      for (int i = 0; i < containerIds.length && i < folderMarkNewsContainer.length; i++) {
+        LongArrayList newsIdsForState = containerIds[i];
+        for (int j = 0; j < newsIdsForState.size(); j++) {
+          long element = newsIdsForState.get(j);
+          if (element <= 0)
+            continue; //Avoid adding 0 values that can be present if the list was not compacted
+
+          if (!folderMarkNewsContainer[i].contains(element))
+            folderMarkNewsContainer[i].add(element);
+        }
+      }
+    }
+  }
+
   /**
    * @param events the {@link Set} of {@link SearchMarkEvent} that provide
    * details about the changes. For each event, find the news and add them if
@@ -136,10 +157,8 @@ public class FolderNewsMark extends Mark implements INewsMark {
     synchronized (this) {
       for (SearchMarkEvent event : events) {
         ISearchMark search = event.getEntity();
-        List<INews> news = search.getNews(INews.State.getVisible());
-        for (INews item : news) {
-          add(item);
-        }
+        NewsContainer container = ((SearchMark) search).internalGetNewsContainer();
+        addAll(container);
       }
     }
   }
@@ -191,44 +210,56 @@ public class FolderNewsMark extends Mark implements INewsMark {
   }
 
   /**
-   * Resolves all news of this news mark that match the given state.
-   * 
-   * @param states the {@link org.rssowl.core.persist.INews.State} of news that
-   * should be resolved in this news mark.
+   * Resolves all news of this news mark.
    */
-  public void resolve(Set<INews.State> states) {
+  public void resolve() {
     if (!fIsResolved.get())
-      internalResolve(states);
+      internalResolve();
   }
 
   private void resolveIfNecessary() {
     if (!fIsResolved.get())
-      internalResolve(INews.State.getVisible());
+      internalResolve();
   }
 
-  private void internalResolve(Set<State> states) {
+  private void internalResolve() {
     if (!fIsResolved.get()) {
       synchronized (this) {
         if (!fIsResolved.getAndSet(true))
-          fillNews(fFolder, states);
+          fillNews(fFolder);
       }
     }
   }
 
-  private void fillNews(IFolder folder, Set<State> states) {
+  private void fillNews(IFolder folder) {
     List<IFolderChild> children = folder.getChildren();
     for (IFolderChild child : children) {
       if (child instanceof INewsMark) {
         INewsMark newsmark = (INewsMark) child;
-        List<INews> news = newsmark.getNews(states);
-        for (INews item : news) {
-          add(item);
+
+        /* Resolve News from Bookmark */
+        if (newsmark instanceof IBookMark) {
+          List<INews> news = newsmark.getNews(INews.State.getVisible());
+          for (INews item : news) {
+            add(item);
+          }
+        }
+
+        /* Directly access Newscontainer of News Bin and Searches */
+        else {
+          NewsContainer container;
+          if (newsmark instanceof SearchMark)
+            container = ((SearchMark) newsmark).internalGetNewsContainer();
+          else
+            container = ((NewsBin) newsmark).internalGetNewsContainer();
+
+          addAll(container);
         }
       }
 
       /* Recursively treat Folders */
       if (child instanceof IFolder)
-        fillNews((IFolder) child, states);
+        fillNews((IFolder) child);
     }
   }
 
