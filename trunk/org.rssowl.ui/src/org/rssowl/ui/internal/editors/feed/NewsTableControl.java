@@ -1005,7 +1005,12 @@ public class NewsTableControl implements IFeedViewPart {
           manager.add(new Action(Messages.NewsTableControl_COLLAPSE_GROUPS, icon) {
             @Override
             public void run() {
-              fViewer.collapseAll();
+              fViewer.getControl().setRedraw(false);
+              try {
+                fViewer.collapseAll();
+              } finally {
+                fViewer.getControl().setRedraw(true);
+              }
             };
           });
         }
