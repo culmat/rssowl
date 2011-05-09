@@ -67,6 +67,8 @@ import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IReusableEditor;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.dialogs.PreferencesUtil;
@@ -708,7 +710,9 @@ public class WebBrowserView extends EditorPart implements IReusableEditor {
         else
           setPartName(event.title);
 
-        if (fEditorSite.getPage().isPartVisible(fEditorSite.getPart()))
+        IWorkbenchPage page = fEditorSite.getPage();
+        IWorkbenchPart part = fEditorSite.getPart();
+        if (page != null && part != null && page.isPartVisible(part))
           OwlUI.updateWindowTitle(getPartName());
       }
     });

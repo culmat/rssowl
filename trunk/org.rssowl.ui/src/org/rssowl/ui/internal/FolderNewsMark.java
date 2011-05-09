@@ -178,7 +178,7 @@ public class FolderNewsMark extends Mark implements INewsMark {
       for (NewsEvent event : events) {
         if (event.getOldNews() != null && CoreUtils.isStateChange(event)) { //Only update for state change since NewsContainer uses states
           INews item = event.getEntity();
-          if (item != null && item.getId() != null) {
+          if (item != null && item.getId() != null && event.getOldNews().getId() != null) {
             if (fNewsContainer.removeNews(event.getOldNews())) //Use old news to pick up old state
               fNewsContainer.addNews(item);
           }
@@ -234,6 +234,9 @@ public class FolderNewsMark extends Mark implements INewsMark {
   private void fillNews(IFolder folder) {
     List<IFolderChild> children = folder.getChildren();
     for (IFolderChild child : children) {
+      if (Controller.getDefault().isShuttingDown())
+        return; //Break resolving when RSSOwl shuts down
+
       if (child instanceof INewsMark) {
         INewsMark newsmark = (INewsMark) child;
 

@@ -77,6 +77,7 @@ import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.ISearchCondition;
@@ -122,6 +123,7 @@ import org.rssowl.ui.internal.actions.DeleteTypesAction;
 import org.rssowl.ui.internal.actions.FindAction;
 import org.rssowl.ui.internal.actions.ReloadTypesAction;
 import org.rssowl.ui.internal.actions.RetargetActions;
+import org.rssowl.ui.internal.editors.feed.NewsFilter.Type;
 import org.rssowl.ui.internal.undo.NewsStateOperation;
 import org.rssowl.ui.internal.undo.UndoStack;
 import org.rssowl.ui.internal.util.CBrowser;
@@ -1119,24 +1121,34 @@ public class FeedView extends EditorPart implements IReusableEditor {
       return;
 
     /* Folder News Mark might require cache refresh if sorting has changed and limit reached */
-    if (fInput.getMark() instanceof FolderNewsMark && fInput.getMark().getNewsCount(INews.State.getVisible()) > NewsContentProvider.MAX_FOLDER_ELEMENTS) {
-      FolderNewsMark folderMark = (FolderNewsMark) fInput.getMark();
-      IPreferenceScope preferences = Owl.getPreferenceService().getEntityScope(folderMark.getFolder());
-      NewsComparator comparator = getComparator();
+    if (fInput.getMark() instanceof FolderNewsMark) {
+      Set<State> states;
+      if (fNewsFilter.getType() == Type.SHOW_NEW)
+        states = EnumSet.of(INews.State.NEW);
+      else if (fNewsFilter.getType() == Type.SHOW_UNREAD)
+        states = EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED);
+      else
+        states = INews.State.getVisible();
 
-      NewsColumn oldSortBy = comparator.getSortBy();
-      boolean oldIsAscending = comparator.isAscending();
+      if (fInput.getMark().getNewsCount(states) > NewsContentProvider.MAX_FOLDER_ELEMENTS) {
+        FolderNewsMark folderMark = (FolderNewsMark) fInput.getMark();
+        IPreferenceScope preferences = Owl.getPreferenceService().getEntityScope(folderMark.getFolder());
+        NewsComparator comparator = getComparator();
 
-      NewsColumn newSortBy = NewsColumn.values()[preferences.getInteger(DefaultPreferences.BM_NEWS_SORT_COLUMN)];
-      boolean newIsAscending = preferences.getBoolean(DefaultPreferences.BM_NEWS_SORT_ASCENDING);
+        NewsColumn oldSortBy = comparator.getSortBy();
+        boolean oldIsAscending = comparator.isAscending();
 
-      /* Sorting changed and cache is at limit, so refresh cache */
-      if (oldSortBy != newSortBy || oldIsAscending != newIsAscending) {
-        NewsComparator comparer = new NewsComparator();
-        comparer.setSortBy(newSortBy);
-        comparer.setAscending(newIsAscending);
+        NewsColumn newSortBy = NewsColumn.values()[preferences.getInteger(DefaultPreferences.BM_NEWS_SORT_COLUMN)];
+        boolean newIsAscending = preferences.getBoolean(DefaultPreferences.BM_NEWS_SORT_ASCENDING);
 
-        fContentProvider.refreshCache(folderMark, false, comparer);
+        /* Sorting changed and cache is at limit, so refresh cache */
+        if (oldSortBy != newSortBy || oldIsAscending != newIsAscending) {
+          NewsComparator comparer = new NewsComparator();
+          comparer.setSortBy(newSortBy);
+          comparer.setAscending(newIsAscending);
+
+          fContentProvider.refreshCache(folderMark, false, comparer);
+        }
       }
     }
 
