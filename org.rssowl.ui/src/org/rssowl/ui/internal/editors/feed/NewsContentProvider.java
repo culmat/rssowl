@@ -229,7 +229,7 @@ public class NewsContentProvider implements ITreeContentProvider {
    */
   public synchronized void dispose() {
     fDisposed.set(true);
-    unregisterListeners();    
+    unregisterListeners();
     fCachedNews.clear();
   }
 
@@ -279,7 +279,7 @@ public class NewsContentProvider implements ITreeContentProvider {
       fCachedNews.clear();
 
     /* Check if ContentProvider was already disposed or RSSOwl shutting down */
-    if (fDisposed.get() || Controller.getDefault().isShuttingDown() || (monitor != null && monitor.isCanceled()))
+    if (canceled(monitor))
       return Pair.create(resolvedNews, wasEmpty);
 
     /* Obtain the News */
@@ -288,9 +288,9 @@ public class NewsContentProvider implements ITreeContentProvider {
     /* Resolve Folder News Mark now if not yet done */
     if (input instanceof FolderNewsMark)
       ((FolderNewsMark) input).resolve(monitor);
-    
+
     /* Check if ContentProvider was already disposed or RSSOwl shutting down */
-    if (fDisposed.get() || Controller.getDefault().isShuttingDown() || (monitor != null && monitor.isCanceled()))
+    if (canceled(monitor))
       return Pair.create(resolvedNews, wasEmpty);
 
     /* Handle Folder, Newsbin and Saved Search */
@@ -308,9 +308,9 @@ public class NewsContentProvider implements ITreeContentProvider {
       /* Resolve and Add News */
       List<NewsReference> newsReferences = input.getNewsRefs(states);
       for (NewsReference newsRef : newsReferences) {
-        
+
         /* Check if ContentProvider was already disposed or RSSOwl shutting down */
-        if (fDisposed.get() || Controller.getDefault().isShuttingDown() || (monitor != null && monitor.isCanceled()))
+        if (canceled(monitor))
           return Pair.create(resolvedNews, wasEmpty);
 
         /* Avoid to resolve an already shown News */
@@ -333,7 +333,7 @@ public class NewsContentProvider implements ITreeContentProvider {
       resolvedNews.addAll(input.getNews(INews.State.getVisible()));
 
     /* Check if ContentProvider was already disposed or RSSOwl shutting down */
-    if (fDisposed.get() || Controller.getDefault().isShuttingDown() || (monitor != null && monitor.isCanceled()))
+    if (canceled(monitor))
       return Pair.create(resolvedNews, wasEmpty);
 
     /* Add into Cache */
@@ -348,7 +348,7 @@ public class NewsContentProvider implements ITreeContentProvider {
     boolean wasEmpty = fCachedNews.isEmpty();
 
     /* Check if ContentProvider was already disposed or RSSOwl shutting down */
-    if (fDisposed.get() || Controller.getDefault().isShuttingDown())
+    if (canceled())
       return wasEmpty;
 
     /* Add to Cache */
@@ -369,7 +369,7 @@ public class NewsContentProvider implements ITreeContentProvider {
   private synchronized Pair<List<INews>, Boolean> newsChangedInCache(IProgressMonitor monitor, Collection<SearchMarkEvent> events, boolean onlyHandleAddedNews) {
 
     /* Check if ContentProvider was already disposed or RSSOwl shutting down */
-    if (fDisposed.get() || Controller.getDefault().isShuttingDown()) {
+    if (canceled(monitor)) {
       List<INews> emptyList = Collections.emptyList();
       return Pair.create(emptyList, false);
     }
@@ -390,7 +390,7 @@ public class NewsContentProvider implements ITreeContentProvider {
   private synchronized void updateCache(Set<NewsEvent> events) {
 
     /* Check if ContentProvider was already disposed or RSSOwl shutting down */
-    if (fDisposed.get() || Controller.getDefault().isShuttingDown())
+    if (canceled())
       return;
 
     /*
@@ -404,7 +404,7 @@ public class NewsContentProvider implements ITreeContentProvider {
   private synchronized void removeFromCache(List<INews> deletedNews, Set<NewsEvent> events) {
 
     /* Check if ContentProvider was already disposed or RSSOwl shutting down */
-    if (fDisposed.get() || Controller.getDefault().isShuttingDown())
+    if (canceled())
       return;
 
     /* Remove from Cache */
@@ -473,9 +473,9 @@ public class NewsContentProvider implements ITreeContentProvider {
       @Override
       public void newsChanged(Set<SearchMarkEvent> events) {
         final List<SearchMarkEvent> eventsRelatedToInput = new ArrayList<SearchMarkEvent>(1);
-        
+
         /* Check if ContentProvider was already disposed or RSSOwl shutting down */
-        if (fDisposed.get() || Controller.getDefault().isShuttingDown())
+        if (canceled())
           return;
 
         /* Find those events that are related to the current input */
@@ -490,7 +490,7 @@ public class NewsContentProvider implements ITreeContentProvider {
         }
 
         /* Check if ContentProvider was already disposed or RSSOwl shutting down */
-        if (fDisposed.get() || Controller.getDefault().isShuttingDown())
+        if (canceled())
           return;
 
         /* Properly update given searches are related to input */
@@ -505,16 +505,17 @@ public class NewsContentProvider implements ITreeContentProvider {
 
                 @Override
                 protected void runInBackground(IProgressMonitor monitor) {
-                  if (!fDisposed.get() && !Controller.getDefault().isShuttingDown()) {
-                    Pair<List<INews>, Boolean> result = newsChangedInCache(monitor, eventsRelatedToInput, onlyHandleAddedNews);
-                    fAddedNews = result.getFirst();
-                    fWasEmpty = result.getSecond();
-                  }
+                  if (canceled(monitor))
+                    return;
+
+                  Pair<List<INews>, Boolean> result = newsChangedInCache(monitor, eventsRelatedToInput, onlyHandleAddedNews);
+                  fAddedNews = result.getFirst();
+                  fWasEmpty = result.getSecond();
                 }
 
                 @Override
                 protected void runInUI(IProgressMonitor monitor) {
-                  if (fDisposed.get() || Controller.getDefault().isShuttingDown())
+                  if (canceled(monitor))
                     return;
 
                   /* Check if we need to Refresh at all */
@@ -554,9 +555,9 @@ public class NewsContentProvider implements ITreeContentProvider {
         JobRunner.runInUIThread(fFeedView.getEditorControl(), new Runnable() {
           public void run() {
             Set<NewsEvent> addedNews = null;
-            
+
             /* Check if ContentProvider was already disposed or RSSOwl shutting down */
-            if (fDisposed.get() || Controller.getDefault().isShuttingDown())
+            if (canceled())
               return;
 
             /* Filter News which are from a different Feed than displayed */
@@ -569,7 +570,7 @@ public class NewsContentProvider implements ITreeContentProvider {
               }
 
               /* Return on Shutdown or disposal */
-              if (fDisposed.get() || Controller.getDefault().isShuttingDown())
+              if (canceled())
                 return;
             }
 
@@ -597,9 +598,9 @@ public class NewsContentProvider implements ITreeContentProvider {
             Set<NewsEvent> restoredNews = null;
             Set<NewsEvent> updatedNews = null;
             Set<NewsEvent> deletedNews = null;
-            
+
             /* Check if ContentProvider was already disposed or RSSOwl shutting down */
-            if (fDisposed.get() || Controller.getDefault().isShuttingDown())
+            if (canceled())
               return;
 
             /* Filter News which are from a different Feed than displayed */
@@ -609,7 +610,7 @@ public class NewsContentProvider implements ITreeContentProvider {
               boolean isRestored = news.isVisible() && (oldState == INews.State.HIDDEN || oldState == INews.State.DELETED);
 
               /* Return on Shutdown or disposal */
-              if (fDisposed.get() || Controller.getDefault().isShuttingDown())
+              if (canceled())
                 return;
 
               /* Check if input relates to news events */
@@ -642,7 +643,7 @@ public class NewsContentProvider implements ITreeContentProvider {
             }
 
             /* Return on Shutdown or disposal */
-            if (fDisposed.get() || Controller.getDefault().isShuttingDown())
+            if (canceled())
               return;
 
             boolean refresh = false;
@@ -661,9 +662,9 @@ public class NewsContentProvider implements ITreeContentProvider {
               refresh = handleDeletedNews(deletedNews);
               updateSelectionFromDelete = refresh;
             }
-            
+
             /* Check if ContentProvider was already disposed or RSSOwl shutting down */
-            if (fDisposed.get() || Controller.getDefault().isShuttingDown())
+            if (canceled())
               return;
 
             /* Refresh and update selection due to deletion */
@@ -688,9 +689,9 @@ public class NewsContentProvider implements ITreeContentProvider {
         JobRunner.runInUIThread(fFeedView.getEditorControl(), new Runnable() {
           public void run() {
             Set<NewsEvent> deletedNews = null;
-            
+
             /* Check if ContentProvider was already disposed or RSSOwl shutting down */
-            if (fDisposed.get() || Controller.getDefault().isShuttingDown())
+            if (canceled())
               return;
 
             /* Filter News which are from a different Feed than displayed */
@@ -704,7 +705,7 @@ public class NewsContentProvider implements ITreeContentProvider {
               }
 
               /* Return on Shutdown or disposal */
-              if (fDisposed.get() || Controller.getDefault().isShuttingDown())
+              if (canceled())
                 return;
             }
 
@@ -714,11 +715,11 @@ public class NewsContentProvider implements ITreeContentProvider {
 
             /* Handle Deleted News */
             boolean refresh = handleDeletedNews(deletedNews);
-            
+
             /* Check if ContentProvider was already disposed or RSSOwl shutting down */
-            if (fDisposed.get() || Controller.getDefault().isShuttingDown())
+            if (canceled())
               return;
-            
+
             /* Handle Refresh */
             if (refresh) {
               if (!browserShowsCollection())
@@ -737,7 +738,7 @@ public class NewsContentProvider implements ITreeContentProvider {
   private void refreshViewers(final Set<NewsEvent> events, NewsEventType type) {
 
     /* Return on Shutdown or disposal */
-    if (fDisposed.get() || Controller.getDefault().isShuttingDown())
+    if (canceled())
       return;
 
     /*
@@ -775,9 +776,9 @@ public class NewsContentProvider implements ITreeContentProvider {
         else if (type == NewsEventType.REMOVED)
           fBrowserViewer.remove(items.toArray());
       }
-      
+
       /* Check if ContentProvider was already disposed or RSSOwl shutting down */
-      if (fDisposed.get() || Controller.getDefault().isShuttingDown())
+      if (canceled())
         return;
 
       /* Refresh Table Viewer */
@@ -816,7 +817,7 @@ public class NewsContentProvider implements ITreeContentProvider {
     }
 
     /* Return on Shutdown or disposal */
-    if (fDisposed.get() || Controller.getDefault().isShuttingDown())
+    if (canceled())
       return false;
 
     /* Add to Viewers */
@@ -829,7 +830,7 @@ public class NewsContentProvider implements ITreeContentProvider {
   private void addToViewers(List<INews> addedNews, Set<NewsEvent> events, boolean wasEmpty) {
 
     /* Return on Shutdown or disposal */
-    if (fDisposed.get() || Controller.getDefault().isShuttingDown())
+    if (canceled())
       return;
 
     /* Add to Table-Viewer if Visible (keep top item and selection stable) */
@@ -892,7 +893,7 @@ public class NewsContentProvider implements ITreeContentProvider {
     updateCache(events);
 
     /* Return on Shutdown or disposal */
-    if (fDisposed.get() || Controller.getDefault().isShuttingDown())
+    if (canceled())
       return false;
 
     /* Return early if refresh is required anyways for Grouper */
@@ -946,7 +947,7 @@ public class NewsContentProvider implements ITreeContentProvider {
     removeFromCache(deletedNews, events);
 
     /* Return on Shutdown or disposal */
-    if (fDisposed.get() || Controller.getDefault().isShuttingDown())
+    if (canceled())
       return false;
 
     /* Only refresh if grouping requires this from table viewer */
@@ -1062,5 +1063,13 @@ public class NewsContentProvider implements ITreeContentProvider {
     }
 
     return null;
+  }
+
+  private boolean canceled() {
+    return canceled(null);
+  }
+
+  private boolean canceled(IProgressMonitor monitor) {
+    return fDisposed.get() || Controller.getDefault().isShuttingDown() || (monitor != null && monitor.isCanceled());
   }
 }
