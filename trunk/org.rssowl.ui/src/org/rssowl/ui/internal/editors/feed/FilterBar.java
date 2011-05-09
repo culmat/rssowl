@@ -414,7 +414,7 @@ public class FilterBar {
                   highlightChanged = false;
                 }
                 if (needsCacheRevalidationFromSearch())
-                  fFeedView.revalidateCaches(false);
+                  fFeedView.revalidateCaches();
                 fFeedView.refresh(true, false);
               }
             });
@@ -433,7 +433,7 @@ public class FilterBar {
                     highlightChanged = true;
                   fFeedView.getFilter().setPattern(fSearchInput.getText());
                   if (needsCacheRevalidationFromSearch())
-                    fFeedView.revalidateCaches(false);
+                    fFeedView.revalidateCaches();
                   fFeedView.refresh(true, false);
                   updateBrowserSelection();
                 }
@@ -830,7 +830,7 @@ public class FilterBar {
 
       /* Filter has changed - ask Feedview to revalidate caches if necessary */
       if (needsCacheRevalidationFromFilter(oldType, type))
-        fFeedView.revalidateCaches(true);
+        fFeedView.revalidateCaches();
 
       /* Only Refresh Table as Browser shows single News */
       NewsTableControl newsTable = fFeedView.getNewsTableControl();
@@ -895,7 +895,7 @@ public class FilterBar {
 
     if (fSearchInput.getText().length() > 0) {
       if (needsCacheRevalidationFromSearch())
-        fFeedView.revalidateCaches(false);
+        fFeedView.revalidateCaches();
       fFeedView.refresh(true, false);
       updateBrowserSelection();
     }

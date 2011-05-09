@@ -2155,8 +2155,8 @@ public class FeedView extends EditorPart implements IReusableEditor {
    * date in case more elements are now visible. Thus, the cache is refreshed, but
    * only for added news that have not been there previously.
    */
-  void revalidateCaches(boolean onlyAdd) {
-    fContentProvider.refreshCache(null, fInput.getMark(), onlyAdd);
+  void revalidateCaches() {
+    fContentProvider.refreshCache(null, fInput.getMark(), false);
   }
 
   /**
