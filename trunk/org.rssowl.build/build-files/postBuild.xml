@@ -17,6 +17,8 @@
     		<fileset dir="${UpdateSiteStagingLocation}" includes="**"/>
     	</copy>
     	<delete dir="${UpdateSiteStagingLocation}/../.." includes="tmpUpdateSite/**" includeemptydirs="true"/>
+    	<delete dir="${UpdateSiteFinalLocation}/plugins"/>
+    	<delete dir="${UpdateSiteFinalLocation}/features"/>
     </target>
 	
 	<target name="deleteSiteXml" unless="isNightlyBuild">
