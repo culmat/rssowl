@@ -24,6 +24,7 @@
 
 package org.rssowl.ui.internal;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.rssowl.core.internal.persist.LongArrayList;
 import org.rssowl.core.internal.persist.Mark;
 import org.rssowl.core.internal.persist.NewsBin;
@@ -211,31 +212,32 @@ public class FolderNewsMark extends Mark implements INewsMark {
 
   /**
    * Resolves all news of this news mark.
+   * @param monitor a monitor to track cancellation.
    */
-  public void resolve() {
+  public void resolve(IProgressMonitor monitor) {
     if (!fIsResolved.get())
-      internalResolve();
+      internalResolve(monitor);
   }
 
   private void resolveIfNecessary() {
     if (!fIsResolved.get())
-      internalResolve();
+      internalResolve(null);
   }
 
-  private void internalResolve() {
+  private void internalResolve(IProgressMonitor monitor) {
     if (!fIsResolved.get()) {
       synchronized (this) {
         if (!fIsResolved.getAndSet(true))
-          fillNews(fFolder);
+          fillNews(fFolder, monitor);
       }
     }
   }
 
-  private void fillNews(IFolder folder) {
+  private void fillNews(IFolder folder, IProgressMonitor monitor) {
     List<IFolderChild> children = folder.getChildren();
     for (IFolderChild child : children) {
-      if (Controller.getDefault().isShuttingDown())
-        return; //Break resolving when RSSOwl shuts down
+      if (Controller.getDefault().isShuttingDown() || (monitor != null && monitor.isCanceled()))
+        return; //Break resolving when RSSOwl shuts down or job cancelled
 
       if (child instanceof INewsMark) {
         INewsMark newsmark = (INewsMark) child;
@@ -262,7 +264,7 @@ public class FolderNewsMark extends Mark implements INewsMark {
 
       /* Recursively treat Folders */
       if (child instanceof IFolder)
-        fillNews((IFolder) child);
+        fillNews((IFolder) child, monitor);
     }
   }
 
