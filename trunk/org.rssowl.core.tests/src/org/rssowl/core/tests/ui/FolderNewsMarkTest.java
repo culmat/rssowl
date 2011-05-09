@@ -251,17 +251,21 @@ public class FolderNewsMarkTest {
     }
 
     {
-      assertTrue(mark.isRelatedTo(news1));
-      assertTrue(mark.isRelatedTo(news2));
-      assertTrue(mark.isRelatedTo(news3));
-      assertTrue(mark.isRelatedTo(copiedNews1));
-      assertTrue(mark.isRelatedTo(copiedNews2));
-      assertTrue(mark.isRelatedTo(copiedNews3));
+      assertTrue(mark.isRelatedTo(getEvent(news1), false));
+      assertTrue(mark.isRelatedTo(getEvent(news2), false));
+      assertTrue(mark.isRelatedTo(getEvent(news3), false));
+      assertTrue(mark.isRelatedTo(getEvent(copiedNews1), false));
+      assertTrue(mark.isRelatedTo(getEvent(copiedNews2), false));
+      assertTrue(mark.isRelatedTo(getEvent(copiedNews3), false));
     }
 
     {
       assertTrue(mark.isRelatedTo(search));
     }
+  }
+
+  private NewsEvent getEvent(INews news) {
+    return new NewsEvent(news, news, true);
   }
 
   /**
@@ -418,12 +422,12 @@ public class FolderNewsMarkTest {
     }
 
     {
-      assertTrue(mark.isRelatedTo(news1));
-      assertTrue(mark.isRelatedTo(news2));
-      assertTrue(mark.isRelatedTo(news3));
-      assertTrue(mark.isRelatedTo(copiedNews1));
-      assertTrue(mark.isRelatedTo(copiedNews2));
-      assertTrue(mark.isRelatedTo(copiedNews3));
+      assertTrue(mark.isRelatedTo(getEvent(news1), false));
+      assertTrue(mark.isRelatedTo(getEvent(news2), false));
+      assertTrue(mark.isRelatedTo(getEvent(news3), false));
+      assertTrue(mark.isRelatedTo(getEvent(copiedNews1), false));
+      assertTrue(mark.isRelatedTo(getEvent(copiedNews2), false));
+      assertTrue(mark.isRelatedTo(getEvent(copiedNews3), false));
     }
   }
 
@@ -576,12 +580,12 @@ public class FolderNewsMarkTest {
     }
 
     {
-      assertTrue(mark.isRelatedTo(news1));
-      assertTrue(mark.isRelatedTo(news2));
-      assertTrue(mark.isRelatedTo(news3));
-      assertTrue(mark.isRelatedTo(copiedNews1));
-      assertTrue(mark.isRelatedTo(copiedNews2));
-      assertTrue(mark.isRelatedTo(copiedNews3));
+      assertTrue(mark.isRelatedTo(getEvent(news1), false));
+      assertTrue(mark.isRelatedTo(getEvent(news2), false));
+      assertTrue(mark.isRelatedTo(getEvent(news3), false));
+      assertTrue(mark.isRelatedTo(getEvent(copiedNews1), false));
+      assertTrue(mark.isRelatedTo(getEvent(copiedNews2), false));
+      assertTrue(mark.isRelatedTo(getEvent(copiedNews3), false));
     }
   }
 
@@ -755,12 +759,12 @@ public class FolderNewsMarkTest {
     }
 
     {
-      assertTrue(mark.isRelatedTo(news1));
-      assertTrue(mark.isRelatedTo(news2));
-      assertTrue(mark.isRelatedTo(news3));
-      assertTrue(mark.isRelatedTo(copiedNews1));
-      assertTrue(mark.isRelatedTo(copiedNews2));
-      assertTrue(mark.isRelatedTo(copiedNews3));
+      assertTrue(mark.isRelatedTo(getEvent(news1), false));
+      assertTrue(mark.isRelatedTo(getEvent(news2), false));
+      assertTrue(mark.isRelatedTo(getEvent(news3), false));
+      assertTrue(mark.isRelatedTo(getEvent(copiedNews1), false));
+      assertTrue(mark.isRelatedTo(getEvent(copiedNews2), false));
+      assertTrue(mark.isRelatedTo(getEvent(copiedNews3), false));
     }
   }
 

@@ -562,7 +562,7 @@ public class NewsContentProvider implements ITreeContentProvider {
 
             /* Filter News which are from a different Feed than displayed */
             for (NewsEvent event : events) {
-              if (event.getEntity().isVisible() && isInputRelatedTo(event.getEntity(), NewsEventType.PERSISTED)) {
+              if (event.getEntity().isVisible() && isInputRelatedTo(event, NewsEventType.PERSISTED)) {
                 if (addedNews == null)
                   addedNews = new HashSet<NewsEvent>();
 
@@ -614,7 +614,7 @@ public class NewsContentProvider implements ITreeContentProvider {
                 return;
 
               /* Check if input relates to news events */
-              if (isInputRelatedTo(event.getEntity(), isRestored ? NewsEventType.RESTORED : NewsEventType.UPDATED)) {
+              if (isInputRelatedTo(event, isRestored ? NewsEventType.RESTORED : NewsEventType.UPDATED)) {
 
                 /* News got Deleted */
                 if (!news.isVisible()) {
@@ -697,7 +697,7 @@ public class NewsContentProvider implements ITreeContentProvider {
             /* Filter News which are from a different Feed than displayed */
             for (NewsEvent event : events) {
               INews news = event.getEntity();
-              if ((news.isVisible() || news.getParentId() != 0) && isInputRelatedTo(news, NewsEventType.REMOVED)) {
+              if ((news.isVisible() || news.getParentId() != 0) && isInputRelatedTo(event, NewsEventType.REMOVED)) {
                 if (deletedNews == null)
                   deletedNews = new HashSet<NewsEvent>();
 
@@ -970,7 +970,8 @@ public class NewsContentProvider implements ITreeContentProvider {
     DynamicDAO.removeEntityListener(ISearchMark.class, fSearchMarkListener);
   }
 
-  private boolean isInputRelatedTo(INews news, NewsEventType type) {
+  private boolean isInputRelatedTo(NewsEvent event, NewsEventType type) {
+    INews news = event.getEntity();
 
     /* Check if BookMark references the News' Feed and is not a copy */
     if (fInput instanceof IBookMark) {
@@ -1010,12 +1011,12 @@ public class NewsContentProvider implements ITreeContentProvider {
     /* In Memory Folder News Mark (aggregated news) */
     else if (fInput instanceof FolderNewsMark) {
 
-      /* News Added: Check if its part of the Folder */
-      if (type == NewsEventType.PERSISTED || type == NewsEventType.RESTORED)
-        return ((FolderNewsMark) fInput).isRelatedTo(news);
+      /* Perform fast HashMap lookup first */
+      if (hasCachedNews(news))
+        return true;
 
-      /* Update/Remove: Check if news is part of cache */
-      return hasCachedNews(news);
+      /* Ask FolderNewsMark directly */
+      return ((FolderNewsMark) fInput).isRelatedTo(event, type == NewsEventType.PERSISTED || type == NewsEventType.RESTORED);
     }
 
     return false;
