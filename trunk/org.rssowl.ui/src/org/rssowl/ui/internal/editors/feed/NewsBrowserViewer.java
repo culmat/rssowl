@@ -97,6 +97,7 @@ import org.rssowl.ui.internal.EntityGroupItem;
 import org.rssowl.ui.internal.ILinkHandler;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.OwlUI.Layout;
+import org.rssowl.ui.internal.OwlUI.PageSize;
 import org.rssowl.ui.internal.actions.ArchiveNewsAction;
 import org.rssowl.ui.internal.actions.AutomateFilterAction;
 import org.rssowl.ui.internal.actions.CreateFilterAction.PresetAction;
@@ -1596,6 +1597,13 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
    */
   public void setInput(Object input, boolean blockExternalNavigation) {
     internalSetInput(input, false, blockExternalNavigation);
+  }
+
+  /**
+   * @param size the {@link PageSize} to use for this browser viewer.
+   */
+  void setPageSize(PageSize size) {
+    fPageSize = size.getPageSize();
   }
 
   private void internalSetInput(Object input, boolean force, boolean blockExternalNavigation) {
