@@ -66,7 +66,7 @@ public class NewsBrowserViewModelTests {
    */
   @Test
   public void testNullModel() throws Exception {
-    NewsBrowserViewModel model = new NewsBrowserViewModel();
+    NewsBrowserViewModel model = new NewsBrowserViewModel(null);
     model.setInput(null, 0);
 
     assertEquals(-1L, model.findGroup(5L));
@@ -114,7 +114,7 @@ public class NewsBrowserViewModelTests {
   @Test
   public void testEmptyModel() throws Exception {
     Object[] elements = new Object[0];
-    NewsBrowserViewModel model = new NewsBrowserViewModel();
+    NewsBrowserViewModel model = new NewsBrowserViewModel(null);
     model.setInput(elements, 0);
 
     assertEquals(-1L, model.findGroup(5L));
@@ -163,7 +163,7 @@ public class NewsBrowserViewModelTests {
   @Test
   public void testEmptyModelWithPageSize() throws Exception {
     Object[] elements = new Object[0];
-    NewsBrowserViewModel model = new NewsBrowserViewModel();
+    NewsBrowserViewModel model = new NewsBrowserViewModel(null);
     model.setInput(elements, 5);
 
     assertEquals(-1L, model.findGroup(5L));
@@ -221,7 +221,7 @@ public class NewsBrowserViewModelTests {
     DynamicDAO.save(feed);
 
     Object[] elements = new Object[] { news1, news2, news3, feed };
-    NewsBrowserViewModel model = new NewsBrowserViewModel();
+    NewsBrowserViewModel model = new NewsBrowserViewModel(null);
     model.setInput(elements, 0);
 
     assertTrue(model.isFirstItemUnread());
@@ -330,7 +330,7 @@ public class NewsBrowserViewModelTests {
     DynamicDAO.save(feed);
 
     Object[] elements = new Object[] { news1, news2, news3, feed };
-    NewsBrowserViewModel model = new NewsBrowserViewModel();
+    NewsBrowserViewModel model = new NewsBrowserViewModel(null);
     model.setInput(elements, 2);
 
     assertTrue(model.isFirstItemUnread());
@@ -448,7 +448,7 @@ public class NewsBrowserViewModelTests {
     DynamicDAO.save(feed);
 
     Object[] elements = new Object[] { news1, news2, news3, feed };
-    NewsBrowserViewModel model = new NewsBrowserViewModel();
+    NewsBrowserViewModel model = new NewsBrowserViewModel(null);
     model.setInput(elements, 5);
 
     assertTrue(model.isFirstItemUnread());
@@ -557,7 +557,7 @@ public class NewsBrowserViewModelTests {
     EntityGroup group2 = new EntityGroup(101, "foo");
 
     Object[] elements = new Object[] { group1, news1, news2, group2, news3, feed };
-    NewsBrowserViewModel model = new NewsBrowserViewModel();
+    NewsBrowserViewModel model = new NewsBrowserViewModel(null);
     model.setInput(elements, 0);
 
     assertFalse(model.isFirstItemUnread());
@@ -662,7 +662,7 @@ public class NewsBrowserViewModelTests {
     EntityGroup group2 = new EntityGroup(101, "foo");
 
     Object[] elements = new Object[] { group1, news1, news2, group2, news3, feed };
-    NewsBrowserViewModel model = new NewsBrowserViewModel();
+    NewsBrowserViewModel model = new NewsBrowserViewModel(null);
     model.setInput(elements, 5);
 
     assertFalse(model.isFirstItemUnread());
@@ -767,7 +767,7 @@ public class NewsBrowserViewModelTests {
     EntityGroup group2 = new EntityGroup(101, "foo");
 
     Object[] elements = new Object[] { group1, news1, news2, group2, news3, feed };
-    NewsBrowserViewModel model = new NewsBrowserViewModel();
+    NewsBrowserViewModel model = new NewsBrowserViewModel(null);
     model.setInput(elements, 2);
 
     assertFalse(model.isFirstItemUnread());
@@ -863,7 +863,7 @@ public class NewsBrowserViewModelTests {
     DynamicDAO.save(feed);
 
     Object[] elements = new Object[] { news1, news2, news3, news4, news5 };
-    NewsBrowserViewModel model = new NewsBrowserViewModel();
+    NewsBrowserViewModel model = new NewsBrowserViewModel(null);
     model.setInput(elements, 2);
 
     Pair<List<Long>, List<Long>> revealed = model.revealPage(news1.getId(), 2);
@@ -896,7 +896,7 @@ public class NewsBrowserViewModelTests {
     EntityGroup group2 = new EntityGroup(101, "foo");
 
     Object[] elements = new Object[] { group1, news1, news2, news3, group2, news4, news5 };
-    NewsBrowserViewModel model = new NewsBrowserViewModel();
+    NewsBrowserViewModel model = new NewsBrowserViewModel(null);
     model.setInput(elements, 2);
 
     Pair<List<Long>, List<Long>> revealed = model.revealPage(news1.getId(), 2);

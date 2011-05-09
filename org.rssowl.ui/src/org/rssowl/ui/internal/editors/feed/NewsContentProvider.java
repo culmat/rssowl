@@ -276,8 +276,8 @@ public class NewsContentProvider implements ITreeContentProvider {
     if (!onlyAdd)
       fCachedNews.clear();
 
-    /* Check if ContentProvider was already disposed */
-    if (fDisposed)
+    /* Check if ContentProvider was already disposed or RSSOwl shutting down */
+    if (fDisposed || Controller.getDefault().isShuttingDown())
       return Pair.create(resolvedNews, wasEmpty);
 
     /* Obtain the News */

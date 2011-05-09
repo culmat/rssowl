@@ -60,10 +60,6 @@ public class NewsBrowserViewModel {
   private final Object fLock = new Object();
   private final NewsBrowserViewer fViewer;
 
-  public NewsBrowserViewModel() {
-    this(null);
-  }
-
   public NewsBrowserViewModel(NewsBrowserViewer viewer) {
     fViewer = viewer;
   }
