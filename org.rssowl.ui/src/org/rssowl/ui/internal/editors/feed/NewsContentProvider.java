@@ -256,12 +256,12 @@ public class NewsContentProvider implements ITreeContentProvider {
   }
 
   /* Returns the news that have been added since the last refresh */
-  synchronized Pair</* Added News (only for saved searches) */List<INews>, /* Was Empty */Boolean> refreshCache(INewsMark input, boolean onlyAdd) throws PersistenceException {
-    return refreshCache(input, onlyAdd, null);
+  synchronized Pair</* Added News (only for saved searches) */List<INews>, /* Was Empty */Boolean> refreshCache(IProgressMonitor monitor, INewsMark input, boolean onlyAdd) throws PersistenceException {
+    return refreshCache(monitor, input, onlyAdd, null);
   }
 
   /* Returns the news that have been added since the last refresh */
-  synchronized Pair</* Added News (only for saved searches) */List<INews>, /* Was Empty */Boolean> refreshCache(INewsMark input, boolean onlyAdd, NewsComparator comparer) throws PersistenceException {
+  synchronized Pair</* Added News (only for saved searches) */List<INews>, /* Was Empty */Boolean> refreshCache(IProgressMonitor monitor, INewsMark input, boolean onlyAdd, NewsComparator comparer) throws PersistenceException {
     List<INews> resolvedNews = Collections.emptyList();
     boolean wasEmpty = fCachedNews.isEmpty();
 
@@ -277,11 +277,15 @@ public class NewsContentProvider implements ITreeContentProvider {
       fCachedNews.clear();
 
     /* Check if ContentProvider was already disposed or RSSOwl shutting down */
-    if (fDisposed || Controller.getDefault().isShuttingDown())
+    if (fDisposed || Controller.getDefault().isShuttingDown() || (monitor != null && monitor.isCanceled()))
       return Pair.create(resolvedNews, wasEmpty);
 
     /* Obtain the News */
     resolvedNews = new ArrayList<INews>();
+
+    /* Resolve Folder News Mark now if not yet done */
+    if (input instanceof FolderNewsMark)
+      ((FolderNewsMark) input).resolve(monitor);
 
     /* Handle Folder, Newsbin and Saved Search */
     if (input.isGetNewsRefsEfficient()) {
@@ -344,7 +348,7 @@ public class NewsContentProvider implements ITreeContentProvider {
     return wasEmpty;
   }
 
-  private synchronized Pair<List<INews>, Boolean> newsChangedInCache(Collection<SearchMarkEvent> events, boolean onlyHandleAddedNews) {
+  private synchronized Pair<List<INews>, Boolean> newsChangedInCache(IProgressMonitor monitor, Collection<SearchMarkEvent> events, boolean onlyHandleAddedNews) {
 
     /*
      * Since the folder news mark is bound to the lifecycle of the feedview,
@@ -354,7 +358,7 @@ public class NewsContentProvider implements ITreeContentProvider {
       ((FolderNewsMark) fInput).newsChanged(events);
 
     /* Refresh Cache */
-    Pair<List<INews>, Boolean> result = refreshCache(fInput, onlyHandleAddedNews);
+    Pair<List<INews>, Boolean> result = refreshCache(monitor, fInput, onlyHandleAddedNews);
 
     return result;
   }
@@ -462,7 +466,7 @@ public class NewsContentProvider implements ITreeContentProvider {
                 @Override
                 protected void runInBackground(IProgressMonitor monitor) {
                   if (!Controller.getDefault().isShuttingDown()) {
-                    Pair<List<INews>, Boolean> result = newsChangedInCache(eventsRelatedToInput, onlyHandleAddedNews);
+                    Pair<List<INews>, Boolean> result = newsChangedInCache(monitor, eventsRelatedToInput, onlyHandleAddedNews);
                     fAddedNews = result.getFirst();
                     fWasEmpty = result.getSecond();
                   }
