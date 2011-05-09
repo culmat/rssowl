@@ -212,6 +212,7 @@ public class FolderNewsMark extends Mark implements INewsMark {
 
   /**
    * Resolves all news of this news mark.
+   *
    * @param monitor a monitor to track cancellation.
    */
   public void resolve(IProgressMonitor monitor) {
@@ -332,15 +333,26 @@ public class FolderNewsMark extends Mark implements INewsMark {
   }
 
   /**
-   * @param news the news to find out if this mark is related to.
+   * @param event the event to check if its related to this folder news mark.
+   * @param gotAdded <code>true</code> if the given news has been added and
+   * <code>false</code> otherwise (update, remove).
    * @return <code>true</code> if the given News belongs to any
    * {@link IBookMark} or {@link INewsBin} of the given {@link IFolder}.
    */
-  public boolean isRelatedTo(INews news) {
+  public boolean isRelatedTo(NewsEvent event, boolean gotAdded) {
+    INews news = event.getEntity();
 
     /* Resolve Lazily if necessary */
     resolveIfNecessary();
 
+    /* Check using Newscontainer */
+    if (!gotAdded) {
+      INews oldNews = event.getOldNews(); //Have to use the old news since the state could have changed
+      if (oldNews != null && oldNews.getId() != null && fNewsContainer.containsNews(oldNews))
+        return true;
+    }
+
+    /* Check by Feedlink */
     FeedLinkReference feedRef = news.getFeedReference();
     return isRelatedTo(fFolder, news, feedRef);
   }
