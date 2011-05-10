@@ -25,55 +25,58 @@
 package org.rssowl.ui.internal;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.LongArrayList;
 import org.rssowl.core.internal.persist.Mark;
-import org.rssowl.core.internal.persist.NewsBin;
-import org.rssowl.core.internal.persist.NewsContainer;
 import org.rssowl.core.internal.persist.SearchMark;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
+import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.INewsMark;
+import org.rssowl.core.persist.ISearchCondition;
+import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.ISearchMark;
-import org.rssowl.core.persist.event.NewsEvent;
-import org.rssowl.core.persist.event.SearchMarkEvent;
+import org.rssowl.core.persist.SearchSpecifier;
+import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.ModelReference;
 import org.rssowl.core.persist.reference.NewsReference;
+import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.persist.service.PersistenceException;
-import org.rssowl.core.util.CoreUtils;
+import org.rssowl.core.util.SearchHit;
+import org.rssowl.ui.internal.editors.feed.NewsFilter;
+import org.rssowl.ui.internal.editors.feed.NewsFilter.Type;
+import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.io.Serializable;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * An internal subclass of {@link Mark} that implements {@link INewsMark} to
  * provide the news of all bookmarks, bins and saved searches inside a folder.
  * The {@link FolderNewsMark} is created dynamically whenever a folder is opened
  * in the feedview and is never persisted to the DB.
- * <p>
- * TODO This class is not very good in terms of performance because it has to
- * load all news of the folder on the fly to produce the news container. When
- * then opened from the feedview, these news get resolved again and thereby
- * twice.
- * </p>
  *
  * @author bpasero
  */
 @SuppressWarnings("restriction")
 public class FolderNewsMark extends Mark implements INewsMark {
-  private final NewsContainer fNewsContainer;
+  private final Set<Long> fNewsContainer;
   private final IFolder fFolder;
-  private final AtomicBoolean fIsResolved = new AtomicBoolean(false);
+  private final INewsDAO fNewsDao;
+  private final IModelFactory fFactory;
+  private final IModelSearch fSearch;
 
   /**
    * Internal implementation of the <code>ModelReference</code> for the internal
@@ -103,170 +106,142 @@ public class FolderNewsMark extends Mark implements INewsMark {
   public FolderNewsMark(IFolder folder) {
     super(folder.getId(), folder.getParent(), folder.getName());
     fFolder = folder;
-    fNewsContainer = new NewsContainer(Collections.<INews.State, Boolean> emptyMap());
+    fNewsContainer = new HashSet<Long>();
+    fNewsDao = DynamicDAO.getDAO(INewsDAO.class);
+    fFactory = Owl.getModelFactory();
+    fSearch = Owl.getPersistenceService().getModelSearch();
   }
 
   /**
-   * @param news the {@link List} of {@link INews} to add into this
-   * {@link INewsMark}.
+   * @param news the {@link List} of {@link INews} to add into this news mark.
    */
-  public void add(Collection<INews> news) {
+  public void add(List<INews> news) {
+    for (INews item : news) {
+      if (item != null && item.getId() != null)
+        add(item.getId());
+    }
+  }
 
-    /* Resolve Lazily if necessary */
-    resolveIfNecessary();
-
+  private boolean add(long newsId) {
     synchronized (this) {
-      for (INews item : news) {
-        add(item);
+      return fNewsContainer.add(newsId);
+    }
+  }
+
+  private void addAll(long[] elements) {
+    synchronized (this) {
+      for (long element : elements) {
+        if (element > 0)
+          fNewsContainer.add(element);
       }
     }
   }
 
-  private void add(INews item) {
-    if (item != null && item.getId() != null && !fNewsContainer.containsNews(item))
-      fNewsContainer.addNews(item);
-  }
-
-  private void addAll(NewsContainer container) {
+  private void addAll(List<SearchHit<NewsReference>> results) {
     synchronized (this) {
-      LongArrayList[] folderMarkNewsContainer = fNewsContainer.internalGetNewsIds();
-      LongArrayList[] containerIds = container.internalGetNewsIds();
-      for (int i = 0; i < containerIds.length && i < folderMarkNewsContainer.length; i++) {
-        LongArrayList newsIdsForState = containerIds[i];
-        for (int j = 0; j < newsIdsForState.size(); j++) {
-          long element = newsIdsForState.get(j);
-          if (element <= 0)
-            continue; //Avoid adding 0 values that can be present if the list was not compacted
-
-          if (!folderMarkNewsContainer[i].contains(element))
-            folderMarkNewsContainer[i].add(element);
-        }
+      for (SearchHit<NewsReference> result : results) {
+        fNewsContainer.add(result.getResult().getId());
       }
     }
   }
 
   /**
-   * @param events the {@link Set} of {@link SearchMarkEvent} that provide
-   * details about the changes. For each event, find the news and add them if
-   * not yet contained.
+   * @param news the {@link List} of {@link INews} to remove from this news
+   * mark.
    */
-  public void newsChanged(Collection<SearchMarkEvent> events) {
-
-    /* Resolve Lazily if necessary */
-    resolveIfNecessary();
-
-    synchronized (this) {
-      for (SearchMarkEvent event : events) {
-        ISearchMark search = event.getEntity();
-        NewsContainer container = ((SearchMark) search).internalGetNewsContainer();
-        addAll(container);
+  public void remove(List<INews> news) {
+    for (INews item : news) {
+      if (item != null && item.getId() != null) {
+        synchronized (this) {
+          fNewsContainer.remove(item.getId());
+        }
       }
     }
+  }
+
+  /*
+   * @see org.rssowl.core.persist.INewsMark#getNewsRefs()
+   */
+  public List<NewsReference> getNewsRefs() {
+    List<NewsReference> news = new ArrayList<NewsReference>(fNewsContainer.size());
+    synchronized (this) {
+      for (Long id : fNewsContainer) {
+        news.add(new NewsReference(id));
+      }
+    }
+
+    return news;
+  }
+
+  /*
+   * @see org.rssowl.core.persist.INewsMark#getNewsRefs(java.util.Set)
+   */
+  public List<NewsReference> getNewsRefs(Set<State> states) {
+    return getNewsRefs();
+  }
+
+  /*
+   * @see org.rssowl.core.persist.INewsMark#getNewsCount(java.util.Set)
+   */
+  public int getNewsCount(Set<State> states) {
+    synchronized (this) {
+      return fNewsContainer.size();
+    }
+  }
+
+  /*
+   * @see org.rssowl.core.persist.INewsMark#containsNews(org.rssowl.core.persist.INews)
+   */
+  public boolean containsNews(INews news) {
+    return news.getId() != null && containsNews(news.getId());
   }
 
   /**
-   * @param events the {@link Set} of {@link NewsEvent} that provide details
-   * about the changes. For each event, find the news to update from its old
-   * news state. This is necessary because the {@link NewsContainer} stores news
-   * by state id.
+   * @param newsId the identifier of the news.
+   * @return <code>true</code> if this news mark contains the news and
+   * <code>false</code> otherwise.
    */
-  public void update(Collection<NewsEvent> events) {
-
-    /* Resolve Lazily if necessary */
-    resolveIfNecessary();
-
+  public boolean containsNews(long newsId) {
     synchronized (this) {
-      for (NewsEvent event : events) {
-        if (event.getOldNews() != null && CoreUtils.isStateChange(event)) { //Only update for state change since NewsContainer uses states
-          INews item = event.getEntity();
-          if (item != null && item.getId() != null && event.getOldNews().getId() != null) {
-            if (fNewsContainer.removeNews(event.getOldNews())) //Use old news to pick up old state
-              fNewsContainer.addNews(item);
-          }
-        }
-      }
+      return fNewsContainer.contains(newsId);
     }
   }
 
-  /**
-   * @param events the {@link Set} of {@link NewsEvent} that provide details
-   * about the changes. For each event, find the news to delete from its old
-   * news state. This is necessary because the {@link NewsContainer} stores news
-   * by state id.
+  /*
+   * @see org.rssowl.core.persist.INewsMark#getNews()
    */
-  public void remove(Collection<NewsEvent> events) {
-
-    /* Resolve Lazily if necessary */
-    resolveIfNecessary();
-
+  public List<INews> getNews() {
+    List<INews> news = new ArrayList<INews>(fNewsContainer.size());
     synchronized (this) {
-      for (NewsEvent event : events) {
-        if (event.getOldNews() != null) {
-          INews item = event.getOldNews(); //Need to use old news to pick up old state
-          if (item != null && item.getId() != null)
-            fNewsContainer.removeNews(item);
-        }
+      for (Long id : fNewsContainer) {
+        INews item = fNewsDao.load(id);
+        if (item != null)
+          news.add(item);
       }
     }
+
+    return news;
   }
 
-  /**
-   * Resolves all news of this news mark.
-   *
-   * @param monitor a monitor to track cancellation.
+  /*
+   * @see org.rssowl.core.persist.INewsMark#getNews(java.util.Set)
    */
-  public void resolve(IProgressMonitor monitor) {
-    if (!fIsResolved.get())
-      internalResolve(monitor);
+  public List<INews> getNews(Set<State> states) {
+    return getNews();
   }
 
-  private void resolveIfNecessary() {
-    if (!fIsResolved.get())
-      internalResolve(null);
+  /*
+   * @see org.rssowl.core.persist.INewsMark#isGetNewsRefsEfficient()
+   */
+  public boolean isGetNewsRefsEfficient() {
+    return true;
   }
 
-  private void internalResolve(IProgressMonitor monitor) {
-    if (!fIsResolved.get()) {
-      synchronized (this) {
-        if (!fIsResolved.getAndSet(true))
-          fillNews(fFolder, monitor);
-      }
-    }
-  }
-
-  private void fillNews(IFolder folder, IProgressMonitor monitor) {
-    List<IFolderChild> children = folder.getChildren();
-    for (IFolderChild child : children) {
-      if (Controller.getDefault().isShuttingDown() || (monitor != null && monitor.isCanceled()))
-        return; //Break resolving when RSSOwl shuts down or job cancelled
-
-      if (child instanceof INewsMark) {
-        INewsMark newsmark = (INewsMark) child;
-
-        /* Resolve News from Bookmark */
-        if (newsmark instanceof IBookMark) {
-          List<INews> news = newsmark.getNews(INews.State.getVisible());
-          for (INews item : news) {
-            add(item);
-          }
-        }
-
-        /* Directly access Newscontainer of News Bin and Searches */
-        else {
-          NewsContainer container;
-          if (newsmark instanceof SearchMark)
-            container = ((SearchMark) newsmark).internalGetNewsContainer();
-          else
-            container = ((NewsBin) newsmark).internalGetNewsContainer();
-
-          addAll(container);
-        }
-      }
-
-      /* Recursively treat Folders */
-      if (child instanceof IFolder)
-        fillNews((IFolder) child, monitor);
-    }
+  /*
+   * @see org.rssowl.core.persist.IEntity#toReference()
+   */
+  public ModelReference toReference() {
+    return new FolderNewsMarkReference(getId());
   }
 
   /**
@@ -325,41 +300,44 @@ public class FolderNewsMark extends Mark implements INewsMark {
    * {@link IFolder} of this news mark and <code>false</code> otherwise.
    */
   public boolean isRelatedTo(ISearchMark searchMark) {
-
-    /* Resolve Lazily if necessary */
-    resolveIfNecessary();
-
     return isRelatedTo(fFolder, searchMark);
   }
 
-  /**
-   * @param event the event to check if its related to this folder news mark.
-   * @param gotAdded <code>true</code> if the given news has been added and
-   * <code>false</code> otherwise (update, remove).
-   * @return <code>true</code> if the given News belongs to any
-   * {@link IBookMark} or {@link INewsBin} of the given {@link IFolder}.
-   */
-  public boolean isRelatedTo(NewsEvent event, boolean gotAdded) {
-    INews news = event.getEntity();
+  private boolean isRelatedTo(IFolder folder, ISearchMark searchMark) {
+    List<IFolderChild> children = folder.getChildren();
 
-    /* Resolve Lazily if necessary */
-    resolveIfNecessary();
+    for (IFolderChild child : children) {
 
-    /* Check using Newscontainer */
-    if (!gotAdded) {
-      INews oldNews = event.getOldNews(); //Have to use the old news since the state could have changed
-      if (oldNews != null && oldNews.getId() != null && fNewsContainer.containsNews(oldNews))
+      /* Check contained in Folder */
+      if (child instanceof IFolder && isRelatedTo((IFolder) child, searchMark))
+        return true;
+
+      /* Check identical to Child */
+      else if (child.equals(searchMark))
         return true;
     }
 
-    /* Check by Feedlink */
+    return false;
+  }
+
+  /**
+   * @param news the news to check if its related to this news mark.
+   * @return <code>true</code> if the given News belongs to any
+   * {@link IBookMark} or {@link INewsBin} of the given {@link IFolder}.
+   */
+  public boolean isRelatedTo(INews news) {
+
+    /* Check News Container first */
+    if (containsNews(news))
+      return true;
+
+    /* Then check by Feedlink for new news yet unknown to the news mark */
     FeedLinkReference feedRef = news.getFeedReference();
     return isRelatedTo(fFolder, news, feedRef);
   }
 
   private boolean isRelatedTo(IFolder folder, INews news, FeedLinkReference ref) {
     List<IFolderChild> children = folder.getChildren();
-
     for (IFolderChild child : children) {
 
       /* Check contained in Folder */
@@ -384,105 +362,115 @@ public class FolderNewsMark extends Mark implements INewsMark {
     return false;
   }
 
-  private boolean isRelatedTo(IFolder folder, ISearchMark searchMark) {
-    List<IFolderChild> children = folder.getChildren();
-
-    for (IFolderChild child : children) {
-
-      /* Check contained in Folder */
-      if (child instanceof IFolder && isRelatedTo((IFolder) child, searchMark))
-        return true;
-
-      /* Check identical to Child */
-      else if (child.equals(searchMark))
-        return true;
-    }
-
-    return false;
-  }
-
-  /*
-   * @see org.rssowl.core.persist.INewsMark#containsNews(org.rssowl.core.persist.INews)
+  /**
+   * @param type the filter type to scope the resulting news properly.
+   * @param monitor a monitor to react to cancellation.
    */
-  public synchronized boolean containsNews(INews news) {
+  public void resolve(NewsFilter.Type type, IProgressMonitor monitor) {
 
-    /* Resolve Lazily if necessary */
-    resolveIfNecessary();
-
-    return fNewsContainer.containsNews(news);
-  }
-
-  /*
-   * @see org.rssowl.core.persist.INewsMark#getNews()
-   */
-  public synchronized List<INews> getNews() {
-
-    /* Resolve Lazily if necessary */
-    resolveIfNecessary();
-
-    return getNews(EnumSet.allOf(INews.State.class));
-  }
-
-  /*
-   * @see org.rssowl.core.persist.INewsMark#getNews(java.util.Set)
-   */
-  public List<INews> getNews(Set<State> states) {
-
-    /* Resolve Lazily if necessary */
-    resolveIfNecessary();
-
-    List<NewsReference> newsRefs;
+    /* Clear caches */
     synchronized (this) {
-      newsRefs = fNewsContainer.getNews(states);
+      fNewsContainer.clear();
     }
 
-    return getNews(newsRefs);
+    /* Return eary on cancellation */
+    if (Controller.getDefault().isShuttingDown() || (monitor != null && monitor.isCanceled()))
+      return;
+
+    /* Retrieve filter condition */
+    ISearchCondition filterCondition = getCondition(type);
+
+    /* Resolve Bookmarks and Newsbins using Location search */
+    {
+      List<ISearchCondition> conditions = new ArrayList<ISearchCondition>(2);
+      ISearchField field = fFactory.createSearchField(INews.LOCATION, INews.class.getName());
+      ISearchCondition locationCondition = fFactory.createSearchCondition(field, SearchSpecifier.IS, ModelUtils.toPrimitive(Collections.singleton((IFolderChild) fFolder)));
+      conditions.add(locationCondition);
+      if (filterCondition != null)
+        conditions.add(filterCondition);
+
+      List<SearchHit<NewsReference>> results = fSearch.searchNews(conditions, conditions.size() == 2);
+      addAll(results);
+
+      /* Return eary on cancellation */
+      if (Controller.getDefault().isShuttingDown() || (monitor != null && monitor.isCanceled()))
+        return;
+    }
+
+    /* Resolve Searches (TODO Performance: Currently does not consider other filters than NEW and UNREAD if search uses OR conditions) */
+    {
+      Set<ISearchMark> searches = new HashSet<ISearchMark>();
+      findSearches(fFolder, searches);
+      for (ISearchMark search : searches) {
+
+        /* Inject the filter condition into the search if it is not an OR query */
+        if (search.matchAllConditions() && (type == Type.SHOW_RECENT || type == Type.SHOW_LAST_5_DAYS || type == Type.SHOW_STICKY)) {
+          List<ISearchCondition> conditions = search.getSearchConditions();
+          conditions.add(filterCondition);
+
+          List<SearchHit<NewsReference>> results = fSearch.searchNews(conditions, true);
+          addAll(results);
+        }
+
+        /* Otherwise pick up the results from the search directly */
+        else {
+          LongArrayList[] newsIds = ((SearchMark) search).internalGetNewsContainer().internalGetNewsIds();
+          for (int i = 0; i < newsIds.length && i < INews.State.HIDDEN.ordinal(); i++) {
+
+            /* Only consider ids based on state filter if set */
+            if (type == Type.SHOW_NEW && i > INews.State.NEW.ordinal())
+              break;
+            else if (type == Type.SHOW_UNREAD && i > INews.State.UPDATED.ordinal())
+              break;
+
+            long[] news = newsIds[i].getElements();
+            addAll(news);
+          }
+        }
+
+        /* Return eary on cancellation */
+        if (Controller.getDefault().isShuttingDown() || (monitor != null && monitor.isCanceled()))
+          return;
+      }
+    }
   }
 
-  /*
-   * @see org.rssowl.core.persist.INewsMark#getNewsCount(java.util.Set)
-   */
-  public synchronized int getNewsCount(Set<State> states) {
+  private ISearchCondition getCondition(NewsFilter.Type type) {
+    switch (type) {
+      case SHOW_ALL:
+        return null;
 
-    /* Resolve Lazily if necessary */
-    resolveIfNecessary();
+      case SHOW_NEW:
+        ISearchField field = fFactory.createSearchField(INews.STATE, INews.class.getName());
+        return fFactory.createSearchCondition(field, SearchSpecifier.IS, EnumSet.of(INews.State.NEW));
 
-    return fNewsContainer.getNewsCount(states);
+      case SHOW_UNREAD:
+        field = fFactory.createSearchField(INews.STATE, INews.class.getName());
+        return fFactory.createSearchCondition(field, SearchSpecifier.IS, EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED));
+
+      case SHOW_STICKY:
+        field = fFactory.createSearchField(INews.IS_FLAGGED, INews.class.getName());
+        return fFactory.createSearchCondition(field, SearchSpecifier.IS, true);
+
+      case SHOW_LAST_5_DAYS:
+        field = fFactory.createSearchField(INews.AGE_IN_DAYS, INews.class.getName());
+        return fFactory.createSearchCondition(field, SearchSpecifier.IS_LESS_THAN, 5);
+
+      case SHOW_RECENT:
+        field = fFactory.createSearchField(INews.AGE_IN_DAYS, INews.class.getName());
+        return fFactory.createSearchCondition(field, SearchSpecifier.IS_LESS_THAN, 1);
+    }
+
+    return null;
   }
 
-  /*
-   * @see org.rssowl.core.persist.INewsMark#getNewsRefs()
-   */
-  public synchronized List<NewsReference> getNewsRefs() {
-
-    /* Resolve Lazily if necessary */
-    resolveIfNecessary();
-
-    return fNewsContainer.getNews();
-  }
-
-  /*
-   * @see org.rssowl.core.persist.INewsMark#getNewsRefs(java.util.Set)
-   */
-  public synchronized List<NewsReference> getNewsRefs(Set<State> states) {
-
-    /* Resolve Lazily if necessary */
-    resolveIfNecessary();
-
-    return fNewsContainer.getNews(states);
-  }
-
-  /*
-   * @see org.rssowl.core.persist.INewsMark#isGetNewsRefsEfficient()
-   */
-  public boolean isGetNewsRefsEfficient() {
-    return true;
-  }
-
-  /*
-   * @see org.rssowl.core.persist.IEntity#toReference()
-   */
-  public ModelReference toReference() {
-    return new FolderNewsMarkReference(getId());
+  private void findSearches(IFolder folder, Set<ISearchMark> searches) {
+    List<IFolderChild> children = folder.getChildren();
+    for (IFolderChild child : children) {
+      if (child instanceof IFolder)
+        findSearches((IFolder) child, searches);
+      else if (child instanceof ISearchMark)
+        searches.add((ISearchMark) child);
+    }
   }
 }

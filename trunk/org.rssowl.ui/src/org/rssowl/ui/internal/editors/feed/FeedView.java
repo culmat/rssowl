@@ -615,7 +615,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
                 @Override
                 protected void runInBackground(IProgressMonitor monitor) {
                   if (!Controller.getDefault().isShuttingDown())
-                    fContentProvider.refreshCache(monitor, fInput.getMark(), false);
+                    fContentProvider.refreshCache(monitor, fInput.getMark());
                 }
 
                 @Override
@@ -1150,7 +1150,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
           comparer.setSortBy(newSortBy);
           comparer.setAscending(newIsAscending);
 
-          fContentProvider.refreshCache(null, folderMark, false, comparer);
+          fContentProvider.refreshCache(null, folderMark, comparer);
         }
       }
     }
@@ -1411,7 +1411,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
       protected void runInBackground(IProgressMonitor monitor) {
         fBgMonitor = monitor;
         if (!monitor.isCanceled())
-          fContentProvider.refreshCache(monitor, mark, false);
+          fContentProvider.refreshCache(monitor, mark);
       }
 
       @Override
@@ -2156,7 +2156,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
    * only for added news that have not been there previously.
    */
   void revalidateCaches() {
-    fContentProvider.refreshCache(null, fInput.getMark(), false);
+    fContentProvider.refreshCache(null, fInput.getMark());
   }
 
   /**
