@@ -361,6 +361,15 @@ public class NewsContentProvider implements ITreeContentProvider {
     return wasEmpty;
   }
 
+  private synchronized boolean updateCache(List<INews> updatedNews) {
+    for (INews news : updatedNews) {
+      if (news.getId() != null && fCachedNews.containsKey(news.getId()))
+        return true;
+    }
+
+    return false;
+  }
+
   private synchronized Pair<List<INews>, Boolean> newsChangedFromSearch(IProgressMonitor monitor, List<SearchMarkEvent> eventsRelatedToInput, boolean onlyHandleAddedNews) {
 
     /* Check if ContentProvider was already disposed or RSSOwl shutting down */
@@ -462,15 +471,17 @@ public class NewsContentProvider implements ITreeContentProvider {
     return Pair.create(addedNews, wasEmpty);
   }
 
-  private synchronized void removeFromCache(List<INews> deletedNews) {
+  private synchronized boolean removeFromCache(List<INews> deletedNews) {
+    boolean changed = false;
 
     /* Check if ContentProvider was already disposed or RSSOwl shutting down */
     if (canceled())
-      return;
+      return changed;
 
     /* Remove from Cache */
     for (INews news : deletedNews) {
-      fCachedNews.remove(news.getId());
+      if (fCachedNews.remove(news.getId()) != null)
+        changed = true;
     }
 
     /*
@@ -479,6 +490,8 @@ public class NewsContentProvider implements ITreeContentProvider {
      */
     if (fInput instanceof FolderNewsMark)
       ((FolderNewsMark) fInput).remove(deletedNews);
+
+    return changed;
   }
 
   private List<INews> limitFolder(List<INews> resolvedNews, NewsComparator comparer) {
@@ -949,6 +962,13 @@ public class NewsContentProvider implements ITreeContentProvider {
       updatedNews.add(event.getEntity());
     }
 
+    /* Update Cache */
+    boolean changed = updateCache(updatedNews);
+
+    /* Return if news was not part of cache at all (e.g. limited Folder News Mark) */
+    if (!changed)
+      return false;
+
     /* Return on Shutdown or disposal */
     if (canceled())
       return false;
@@ -1001,7 +1021,11 @@ public class NewsContentProvider implements ITreeContentProvider {
     }
 
     /* Remove from Cache */
-    removeFromCache(deletedNews);
+    boolean changed = removeFromCache(deletedNews);
+
+    /* Return if news was not part of cache at all (e.g. limited Folder News Mark) */
+    if (!changed)
+      return false;
 
     /* Return on Shutdown or disposal */
     if (canceled())
