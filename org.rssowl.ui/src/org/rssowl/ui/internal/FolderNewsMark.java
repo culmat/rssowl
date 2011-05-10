@@ -55,6 +55,7 @@ import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -115,7 +116,7 @@ public class FolderNewsMark extends Mark implements INewsMark {
   /**
    * @param news the {@link List} of {@link INews} to add into this news mark.
    */
-  public void add(List<INews> news) {
+  public void add(Collection<INews> news) {
     for (INews item : news) {
       if (item != null && item.getId() != null)
         add(item.getId());
@@ -149,7 +150,7 @@ public class FolderNewsMark extends Mark implements INewsMark {
    * @param news the {@link List} of {@link INews} to remove from this news
    * mark.
    */
-  public void remove(List<INews> news) {
+  public void remove(Collection<INews> news) {
     for (INews item : news) {
       if (item != null && item.getId() != null) {
         synchronized (this) {

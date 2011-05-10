@@ -43,19 +43,19 @@ import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.event.NewsEvent;
-import org.rssowl.core.persist.event.SearchMarkEvent;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.FolderNewsMark;
+import org.rssowl.ui.internal.editors.feed.NewsFilter;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Tests for the {@link FolderNewsMark}.
@@ -158,7 +158,7 @@ public class FolderNewsMarkTest {
     waitForIndexer();
 
     FolderNewsMark mark = new FolderNewsMark(childFolder);
-    mark.resolve(null);
+    mark.resolve(NewsFilter.Type.SHOW_ALL, null);
 
     {
       List<INews> news = mark.getNews();
@@ -251,21 +251,17 @@ public class FolderNewsMarkTest {
     }
 
     {
-      assertTrue(mark.isRelatedTo(getEvent(news1), false));
-      assertTrue(mark.isRelatedTo(getEvent(news2), false));
-      assertTrue(mark.isRelatedTo(getEvent(news3), false));
-      assertTrue(mark.isRelatedTo(getEvent(copiedNews1), false));
-      assertTrue(mark.isRelatedTo(getEvent(copiedNews2), false));
-      assertTrue(mark.isRelatedTo(getEvent(copiedNews3), false));
+      assertTrue(mark.isRelatedTo(news1));
+      assertTrue(mark.isRelatedTo(news2));
+      assertTrue(mark.isRelatedTo(news3));
+      assertTrue(mark.isRelatedTo(copiedNews1));
+      assertTrue(mark.isRelatedTo(copiedNews2));
+      assertTrue(mark.isRelatedTo(copiedNews3));
     }
 
     {
       assertTrue(mark.isRelatedTo(search));
     }
-  }
-
-  private NewsEvent getEvent(INews news) {
-    return new NewsEvent(news, news, true);
   }
 
   /**
@@ -279,7 +275,7 @@ public class FolderNewsMarkTest {
     DynamicDAO.save(folder);
 
     FolderNewsMark mark = new FolderNewsMark(childFolder);
-    mark.resolve(null);
+    mark.resolve(NewsFilter.Type.SHOW_ALL, null);
 
     IFeed feed = fFactory.createFeed(null, new URI("feed"));
     INews news1 = fFactory.createNews(null, feed, new Date());
@@ -422,12 +418,12 @@ public class FolderNewsMarkTest {
     }
 
     {
-      assertTrue(mark.isRelatedTo(getEvent(news1), false));
-      assertTrue(mark.isRelatedTo(getEvent(news2), false));
-      assertTrue(mark.isRelatedTo(getEvent(news3), false));
-      assertTrue(mark.isRelatedTo(getEvent(copiedNews1), false));
-      assertTrue(mark.isRelatedTo(getEvent(copiedNews2), false));
-      assertTrue(mark.isRelatedTo(getEvent(copiedNews3), false));
+      assertTrue(mark.isRelatedTo(news1));
+      assertTrue(mark.isRelatedTo(news2));
+      assertTrue(mark.isRelatedTo(news3));
+      assertTrue(mark.isRelatedTo(copiedNews1));
+      assertTrue(mark.isRelatedTo(copiedNews2));
+      assertTrue(mark.isRelatedTo(copiedNews3));
     }
   }
 
@@ -482,7 +478,7 @@ public class FolderNewsMarkTest {
     waitForIndexer();
 
     FolderNewsMark mark = new FolderNewsMark(childFolder);
-    mark.resolve(null);
+    mark.resolve(NewsFilter.Type.SHOW_ALL, null);
 
     List<NewsEvent> events = new ArrayList<NewsEvent>();
     News oldNews = new News((News) news1, -1);
@@ -501,7 +497,7 @@ public class FolderNewsMarkTest {
     events.add(event2);
     events.add(event3);
 
-    mark.remove(events);
+    mark.remove(Arrays.asList(news1, copiedNews1, otherNews1));
 
     {
       List<INews> news = mark.getNews();
@@ -580,12 +576,12 @@ public class FolderNewsMarkTest {
     }
 
     {
-      assertTrue(mark.isRelatedTo(getEvent(news1), false));
-      assertTrue(mark.isRelatedTo(getEvent(news2), false));
-      assertTrue(mark.isRelatedTo(getEvent(news3), false));
-      assertTrue(mark.isRelatedTo(getEvent(copiedNews1), false));
-      assertTrue(mark.isRelatedTo(getEvent(copiedNews2), false));
-      assertTrue(mark.isRelatedTo(getEvent(copiedNews3), false));
+      assertTrue(mark.isRelatedTo(news1));
+      assertTrue(mark.isRelatedTo(news2));
+      assertTrue(mark.isRelatedTo(news3));
+      assertTrue(mark.isRelatedTo(copiedNews1));
+      assertTrue(mark.isRelatedTo(copiedNews2));
+      assertTrue(mark.isRelatedTo(copiedNews3));
     }
   }
 
@@ -641,7 +637,7 @@ public class FolderNewsMarkTest {
     waitForIndexer();
 
     FolderNewsMark mark = new FolderNewsMark(childFolder);
-    mark.resolve(null);
+    mark.resolve(NewsFilter.Type.SHOW_ALL, null);
 
     List<NewsEvent> events = new ArrayList<NewsEvent>();
 
@@ -663,8 +659,6 @@ public class FolderNewsMarkTest {
     events.add(event1);
     events.add(event2);
     events.add(event3);
-
-    mark.update(events);
 
     {
       List<INews> news = mark.getNews();
@@ -759,12 +753,12 @@ public class FolderNewsMarkTest {
     }
 
     {
-      assertTrue(mark.isRelatedTo(getEvent(news1), false));
-      assertTrue(mark.isRelatedTo(getEvent(news2), false));
-      assertTrue(mark.isRelatedTo(getEvent(news3), false));
-      assertTrue(mark.isRelatedTo(getEvent(copiedNews1), false));
-      assertTrue(mark.isRelatedTo(getEvent(copiedNews2), false));
-      assertTrue(mark.isRelatedTo(getEvent(copiedNews3), false));
+      assertTrue(mark.isRelatedTo(news1));
+      assertTrue(mark.isRelatedTo(news2));
+      assertTrue(mark.isRelatedTo(news3));
+      assertTrue(mark.isRelatedTo(copiedNews1));
+      assertTrue(mark.isRelatedTo(copiedNews2));
+      assertTrue(mark.isRelatedTo(copiedNews3));
     }
   }
 
@@ -819,7 +813,7 @@ public class FolderNewsMarkTest {
     waitForIndexer();
 
     FolderNewsMark mark = new FolderNewsMark(childFolder);
-    mark.resolve(null);
+    mark.resolve(NewsFilter.Type.SHOW_ALL, null);
 
     {
       List<INews> news = mark.getNews(EnumSet.of(INews.State.NEW));
@@ -834,10 +828,6 @@ public class FolderNewsMarkTest {
     waitForIndexer();
     Controller.getDefault().getSavedSearchService().forceQuickUpdate();
     waitForIndexer();
-
-    SearchMarkEvent event = new SearchMarkEvent(search, null, true);
-    Set<SearchMarkEvent> events = Collections.singleton(event);
-    mark.newsChanged(events);
 
     {
       List<INews> news = mark.getNews(EnumSet.of(INews.State.NEW));
