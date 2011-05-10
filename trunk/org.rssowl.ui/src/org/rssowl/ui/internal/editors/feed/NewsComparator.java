@@ -40,6 +40,7 @@ import org.rssowl.core.util.DateUtils;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.editors.feed.NewsGrouping.Group;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -96,7 +97,7 @@ public class NewsComparator extends ViewerComparator implements Comparator<INews
    * @return <code>true</code> if the sorter requires a refresh and
    * <code>false</code> otherwise
    */
-  public boolean needsRefresh(Set<NewsEvent> events) {
+  public boolean needsRefresh(Collection<NewsEvent> events) {
     if (fSortBy != null) {
       switch (fSortBy) {
         case AUTHOR:

@@ -227,7 +227,7 @@ public class NewsGrouping {
     fType = type;
   }
 
-  boolean needsRefresh(Set<NewsEvent> events, boolean isUpdate) {
+  boolean needsRefresh(Collection<NewsEvent> events, boolean isUpdate) {
 
     /* In case the Grouping is not active at all */
     if (fType == Type.NO_GROUPING)
