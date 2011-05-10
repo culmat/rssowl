@@ -117,15 +117,11 @@ public class FolderNewsMark extends Mark implements INewsMark {
    * @param news the {@link List} of {@link INews} to add into this news mark.
    */
   public void add(Collection<INews> news) {
-    for (INews item : news) {
-      if (item != null && item.getId() != null)
-        add(item.getId());
-    }
-  }
-
-  private boolean add(long newsId) {
     synchronized (this) {
-      return fNewsContainer.add(newsId);
+      for (INews item : news) {
+        if (item != null && item.getId() != null)
+          fNewsContainer.add(item.getId());
+      }
     }
   }
 
@@ -151,9 +147,9 @@ public class FolderNewsMark extends Mark implements INewsMark {
    * mark.
    */
   public void remove(Collection<INews> news) {
-    for (INews item : news) {
-      if (item != null && item.getId() != null) {
-        synchronized (this) {
+    synchronized (this) {
+      for (INews item : news) {
+        if (item != null && item.getId() != null) {
           fNewsContainer.remove(item.getId());
         }
       }
@@ -164,14 +160,14 @@ public class FolderNewsMark extends Mark implements INewsMark {
    * @see org.rssowl.core.persist.INewsMark#getNewsRefs()
    */
   public List<NewsReference> getNewsRefs() {
-    List<NewsReference> news = new ArrayList<NewsReference>(fNewsContainer.size());
     synchronized (this) {
+      List<NewsReference> news = new ArrayList<NewsReference>(fNewsContainer.size());
       for (Long id : fNewsContainer) {
         news.add(new NewsReference(id));
       }
-    }
 
-    return news;
+      return news;
+    }
   }
 
   /*
@@ -212,16 +208,16 @@ public class FolderNewsMark extends Mark implements INewsMark {
    * @see org.rssowl.core.persist.INewsMark#getNews()
    */
   public List<INews> getNews() {
-    List<INews> news = new ArrayList<INews>(fNewsContainer.size());
     synchronized (this) {
+      List<INews> news = new ArrayList<INews>(fNewsContainer.size());
       for (Long id : fNewsContainer) {
         INews item = fNewsDao.load(id);
         if (item != null)
           news.add(item);
       }
-    }
 
-    return news;
+      return news;
+    }
   }
 
   /*
@@ -416,16 +412,17 @@ public class FolderNewsMark extends Mark implements INewsMark {
         /* Otherwise pick up the results from the search directly */
         else {
           LongArrayList[] newsIds = ((SearchMark) search).internalGetNewsContainer().internalGetNewsIds();
-          for (int i = 0; i < newsIds.length && i < INews.State.HIDDEN.ordinal(); i++) {
+          for (int i = 0; i < newsIds.length; i++) {
 
-            /* Only consider ids based on state filter if set */
-            if (type == Type.SHOW_NEW && i > INews.State.NEW.ordinal())
-              break;
-            else if (type == Type.SHOW_UNREAD && i > INews.State.UPDATED.ordinal())
-              break;
+            /* Ignore hidden/deleted and states that are filtered */
+            if (i == INews.State.HIDDEN.ordinal() || i == INews.State.DELETED.ordinal())
+              continue;
+            else if (type == Type.SHOW_NEW && i != INews.State.NEW.ordinal())
+              continue;
+            else if (type == Type.SHOW_UNREAD && i == INews.State.READ.ordinal())
+              continue;
 
-            long[] news = newsIds[i].getElements();
-            addAll(news);
+            addAll(newsIds[i].getElements());
           }
         }
 
