@@ -267,7 +267,13 @@ public class NewsContentProvider implements ITreeContentProvider {
     refreshCache(monitor, input, null);
   }
 
+  @SuppressWarnings("unchecked")
   synchronized void refreshCache(IProgressMonitor monitor, INewsMark input, NewsComparator comparer) throws PersistenceException {
+
+    /* If input is identical, keep the cache during this method to speed up lookup of already resolved items */
+    Map<Long, INews> cacheCopy = null;
+    if (input.isGetNewsRefsEfficient() && fInput != null && fInput.equals(input))
+      cacheCopy = new HashMap(fCachedNews);
 
     /* Update Input */
     fInput = input;
@@ -314,8 +320,17 @@ public class NewsContentProvider implements ITreeContentProvider {
         if (canceled(monitor))
           return;
 
-        /* Resolve and Add News */
-        INews resolvedNewsItem = newsRef.resolve();
+        INews resolvedNewsItem = null;
+
+        /* Ask the local cache first */
+        if (cacheCopy != null)
+          resolvedNewsItem = cacheCopy.get(newsRef.getId());
+
+        /* Otherwise resolve from DB */
+        if (resolvedNewsItem == null)
+          resolvedNewsItem = fNewsDao.load(newsRef.getId());
+
+        /* Add if visible */
         if (resolvedNewsItem != null && resolvedNewsItem.isVisible())
           resolvedNews.add(resolvedNewsItem);
       }
