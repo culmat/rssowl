@@ -85,7 +85,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class NewsContentProvider implements ITreeContentProvider {
 
   /* The maximum number of items returned from a FolderNewsMark */
-  static final int MAX_FOLDER_ELEMENTS = 5;
+  static final int MAX_FOLDER_ELEMENTS = 500;
 
   private final NewsBrowserViewer fBrowserViewer;
   private final NewsTableViewer fTableViewer;
