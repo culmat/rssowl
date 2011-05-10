@@ -69,6 +69,13 @@ public class LongArrayList {
   }
 
   /**
+   * @return the underlying array with all elements of this list.
+   */
+  public final long[] getElements() {
+    return fElements;
+  }
+
+  /**
    * @param element the long value to find the index for
    * @return the index of the long value or -1 if none.
    */
