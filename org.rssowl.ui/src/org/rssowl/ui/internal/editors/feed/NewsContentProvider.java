@@ -376,13 +376,48 @@ public class NewsContentProvider implements ITreeContentProvider {
     return wasEmpty;
   }
 
-  private synchronized boolean updateCache(List<INews> updatedNews) {
-    for (INews news : updatedNews) {
-      if (news.getId() != null && fCachedNews.containsKey(news.getId()))
-        return true;
+  private synchronized Pair<List<NewsEvent>, List<INews>> updateCache(Set<NewsEvent> events, List<INews> updatedNews) {
+    List<NewsEvent> visibleEvents = new ArrayList<NewsEvent>(events.size());
+    List<INews> visibleNews = new ArrayList<INews>(updatedNews.size());
+
+    /* Check if ContentProvider was already disposed or RSSOwl shutting down */
+    if (canceled())
+      return Pair.create(visibleEvents, visibleNews);
+
+    for (NewsEvent event : events) {
+      if (event.getEntity().getId() != null && fCachedNews.containsKey(event.getEntity().getId())) {
+        visibleEvents.add(event);
+        visibleNews.add(event.getEntity());
+      }
     }
 
-    return false;
+    return Pair.create(visibleEvents, visibleNews);
+  }
+
+  private synchronized Pair<List<NewsEvent>, List<INews>> removeFromCache(Set<NewsEvent> events, List<INews> deletedNews) {
+    List<NewsEvent> visibleEvents = new ArrayList<NewsEvent>(events.size());
+    List<INews> visibleNews = new ArrayList<INews>(deletedNews.size());
+
+    /* Check if ContentProvider was already disposed or RSSOwl shutting down */
+    if (canceled())
+      return Pair.create(visibleEvents, visibleNews);
+
+    /* Remove from Cache and keep track of contained items */
+    for (NewsEvent event : events) {
+      if (event.getEntity().getId() != null && fCachedNews.remove(event.getEntity().getId()) != null) {
+        visibleEvents.add(event);
+        visibleNews.add(event.getEntity());
+      }
+    }
+
+    /*
+     * Since the folder news mark is bound to the lifecycle of the feedview,
+     * make sure that the contents are updated properly from here.
+     */
+    if (fInput instanceof FolderNewsMark)
+      ((FolderNewsMark) fInput).remove(deletedNews);
+
+    return Pair.create(visibleEvents, visibleNews);
   }
 
   private synchronized Pair<List<INews>, Boolean> newsChangedFromSearch(IProgressMonitor monitor, List<SearchMarkEvent> eventsRelatedToInput, boolean onlyHandleAddedNews) {
@@ -503,29 +538,6 @@ public class NewsContentProvider implements ITreeContentProvider {
     }
 
     return set;
-  }
-
-  private synchronized boolean removeFromCache(List<INews> deletedNews) {
-    boolean changed = false;
-
-    /* Check if ContentProvider was already disposed or RSSOwl shutting down */
-    if (canceled())
-      return changed;
-
-    /* Remove from Cache */
-    for (INews news : deletedNews) {
-      if (fCachedNews.remove(news.getId()) != null)
-        changed = true;
-    }
-
-    /*
-     * Since the folder news mark is bound to the lifecycle of the feedview,
-     * make sure that the contents are updated properly from here.
-     */
-    if (fInput instanceof FolderNewsMark)
-      ((FolderNewsMark) fInput).remove(deletedNews);
-
-    return changed;
   }
 
   private List<INews> limitFolder(List<INews> resolvedNews, NewsComparator comparer) {
@@ -997,10 +1009,12 @@ public class NewsContentProvider implements ITreeContentProvider {
     }
 
     /* Update Cache */
-    boolean changed = updateCache(updatedNews);
+    Pair<List<NewsEvent>, List<INews>> result = updateCache(events, updatedNews);
+    final List<NewsEvent> visibleEvents = result.getFirst();
+    List<INews> visibleNews = result.getSecond();
 
     /* Return if news was not part of cache at all (e.g. limited Folder News Mark) */
-    if (!changed)
+    if (visibleNews.isEmpty())
       return false;
 
     /* Return on Shutdown or disposal */
@@ -1008,34 +1022,34 @@ public class NewsContentProvider implements ITreeContentProvider {
       return false;
 
     /* Return early if refresh is required anyways for Grouper */
-    if (fGrouping.needsRefresh(events, true))
+    if (fGrouping.needsRefresh(visibleEvents, true))
       return true;
 
     /* Return early if refresh is required anyways for Filter */
-    if (fFilter.needsRefresh(events))
+    if (fFilter.needsRefresh(visibleEvents))
       return true;
 
     /* Return early if refresh is required anyways for Sorter */
     if (fFeedView.isTableViewerVisible()) { //Only makes sense if Browser not maximized
       ViewerComparator sorter = fTableViewer.getComparator();
-      if (sorter instanceof NewsComparator && ((NewsComparator) sorter).needsRefresh(events))
+      if (sorter instanceof NewsComparator && ((NewsComparator) sorter).needsRefresh(visibleEvents))
         return true;
     }
 
     /* Update in Table-Viewer */
     if (fFeedView.isTableViewerVisible())
-      fTableViewer.update(updatedNews.toArray(), null);
+      fTableViewer.update(visibleNews.toArray(), null);
 
     /* Update in Browser-Viewer */
-    if (fFeedView.isBrowserViewerVisible() && contains(fBrowserViewer.getInput(), updatedNews)) {
-      Set<NewsEvent> newsToUpdate = events;
+    if (fFeedView.isBrowserViewerVisible() && contains(fBrowserViewer.getInput(), visibleNews)) {
+      Collection<NewsEvent> newsToUpdate = visibleEvents;
 
       /*
        * Optimization: If more than a single news is to update, check
        * if the Browser only shows a single news to avoid a full refresh.
        */
-      if (events.size() > 1) {
-        NewsEvent event = findShowingEventFromBrowser(events);
+      if (visibleEvents.size() > 1) {
+        NewsEvent event = findShowingEventFromBrowser(visibleEvents);
         if (event != null)
           newsToUpdate = Collections.singleton(event);
       }
@@ -1055,10 +1069,12 @@ public class NewsContentProvider implements ITreeContentProvider {
     }
 
     /* Remove from Cache */
-    boolean changed = removeFromCache(deletedNews);
+    Pair<List<NewsEvent>, List<INews>> result = removeFromCache(events, deletedNews);
+    List<NewsEvent> visibleEvents = result.getFirst();
+    List<INews> visibleNews = result.getSecond();
 
     /* Return if news was not part of cache at all (e.g. limited Folder News Mark) */
-    if (!changed)
+    if (visibleNews.isEmpty())
       return false;
 
     /* Return on Shutdown or disposal */
@@ -1066,16 +1082,16 @@ public class NewsContentProvider implements ITreeContentProvider {
       return false;
 
     /* Only refresh if grouping requires this from table viewer */
-    if (isGroupingEnabled() && fFeedView.isTableViewerVisible() && fGrouping.needsRefresh(events, false))
+    if (isGroupingEnabled() && fFeedView.isTableViewerVisible() && fGrouping.needsRefresh(visibleEvents, false))
       return true;
 
     /* Otherwise: Remove from Table-Viewer */
     if (fFeedView.isTableViewerVisible())
-      fTableViewer.remove(deletedNews.toArray());
+      fTableViewer.remove(visibleNews.toArray());
 
     /* And: Remove from Browser-Viewer */
-    if (fFeedView.isBrowserViewerVisible() && contains(fBrowserViewer.getInput(), deletedNews))
-      fBrowserViewer.remove(deletedNews.toArray());
+    if (fFeedView.isBrowserViewerVisible() && contains(fBrowserViewer.getInput(), visibleNews))
+      fBrowserViewer.remove(visibleNews.toArray());
 
     return false;
   }
@@ -1168,7 +1184,7 @@ public class NewsContentProvider implements ITreeContentProvider {
     return false;
   }
 
-  private NewsEvent findShowingEventFromBrowser(Set<NewsEvent> events) {
+  private NewsEvent findShowingEventFromBrowser(Collection<NewsEvent> events) {
     Object input = fBrowserViewer.getInput();
     if (input instanceof INews) {
       INews news = (INews) input;
