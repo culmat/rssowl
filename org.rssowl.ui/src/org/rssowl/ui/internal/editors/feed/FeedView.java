@@ -1036,14 +1036,19 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
     /* Quickly cancel any caching Job and dispose content provider since input changed */
     if (fCreated) {
+
+      /* Keep the news for passing into notifyUIEvent() */
+      Collection<INews> cachedNewsCopy = fContentProvider.getCachedNewsCopy();
+
+      /* Cancel and Dispose */
       Job.getJobManager().cancel(fCacheJobIdentifier);
       fContentProvider.dispose();
-    }
 
-    /* Handle Old being hidden now */
-    if (fInput != null) {
-      notifyUIEvent(UIEvent.FEED_CHANGE);
-      rememberSelection(fInput.getMark(), fNewsTableControl.getLastSelection());
+      /* Handle Old being hidden now */
+      if (fInput != null) {
+        notifyUIEvent(UIEvent.FEED_CHANGE, cachedNewsCopy);
+        rememberSelection(fInput.getMark(), fNewsTableControl.getLastSelection());
+      }
     }
 
     /* Set New */
@@ -1172,6 +1177,10 @@ public class FeedView extends EditorPart implements IReusableEditor {
    * <code>UIEvent</code> enumeration.
    */
   public void notifyUIEvent(final UIEvent event) {
+    notifyUIEvent(event, null);
+  }
+
+  private void notifyUIEvent(final UIEvent event, Collection<INews> visibleNews) {
     final IMark inputMark = fInput.getMark();
     final IStructuredSelection lastSelection = fNewsTableControl.getLastSelection();
 
@@ -1196,8 +1205,8 @@ public class FeedView extends EditorPart implements IReusableEditor {
         return; // Ignore other events than CLOSE that might get issued
     }
 
-    /* Operate on a Copy of the Content Providers News */
-    final Collection<INews> news = fContentProvider.getCachedNewsCopy();
+    /* Operate on a Copy of the Content Providers News (either passed in or obtain) */
+    final Collection<INews> news = (visibleNews != null) ? visibleNews : fContentProvider.getCachedNewsCopy();
     IPreferenceScope inputPreferences = Owl.getPreferenceService().getEntityScope(inputMark);
 
     /*
