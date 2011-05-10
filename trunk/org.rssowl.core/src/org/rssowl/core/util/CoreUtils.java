@@ -610,7 +610,7 @@ public class CoreUtils {
    * @return <code>TRUE</code> in case the <code>INews.State.NEW</code> changed
    * its value for any of the given Events, <code>FALSE</code> otherwise.
    */
-  public static boolean isNewStateChange(Set<? extends ModelEvent> events) {
+  public static boolean isNewStateChange(Collection<? extends ModelEvent> events) {
     for (ModelEvent event : events) {
       if (event instanceof NewsEvent) {
         NewsEvent newsEvent = (NewsEvent) event;
@@ -631,7 +631,7 @@ public class CoreUtils {
    * changed its value for any of the given Events, <code>FALSE</code>
    * otherwise.
    */
-  public static boolean isStickyStateChange(Set<? extends ModelEvent> events) {
+  public static boolean isStickyStateChange(Collection<? extends ModelEvent> events) {
     return isStickyStateChange(events, false);
   }
 
@@ -656,7 +656,7 @@ public class CoreUtils {
    * changed its value for any of the given Events, <code>FALSE</code>
    * otherwise. Respects the onlyHasBecomeSticky parameter.
    */
-  public static boolean isStickyStateChange(Set<? extends ModelEvent> events, boolean onlyHasBecomeSticky) {
+  public static boolean isStickyStateChange(Collection<? extends ModelEvent> events, boolean onlyHasBecomeSticky) {
     for (ModelEvent event : events) {
       if (event instanceof NewsEvent) {
         NewsEvent newsEvent = (NewsEvent) event;
@@ -685,7 +685,7 @@ public class CoreUtils {
    * @return <code>TRUE</code> in case any state changed from NEW, UPDATED or
    * UNREAD to a different one, <code>FALSE</code> otherwise.
    */
-  public static boolean isReadStateChange(Set<? extends ModelEvent> events) {
+  public static boolean isReadStateChange(Collection<? extends ModelEvent> events) {
     return isReadStateChange(events, false);
   }
 
@@ -697,7 +697,7 @@ public class CoreUtils {
    * UNREAD to a different one, <code>FALSE</code> otherwise. Respects the
    * onlyHasBecomeUnread parameter.
    */
-  public static boolean isReadStateChange(Set<? extends ModelEvent> events, boolean onlyHasBecomeUnread) {
+  public static boolean isReadStateChange(Collection<? extends ModelEvent> events, boolean onlyHasBecomeUnread) {
     for (ModelEvent event : events) {
       if (event instanceof NewsEvent) {
         NewsEvent newsEvent = (NewsEvent) event;
@@ -727,7 +727,7 @@ public class CoreUtils {
    * unread-state (NEW, UPDATED, UNREAD) changed its value for any of the given
    * Events, <code>FALSE</code> otherwise.
    */
-  public static boolean isNewOrReadStateChange(Set<? extends ModelEvent> events) {
+  public static boolean isNewOrReadStateChange(Collection<? extends ModelEvent> events) {
     for (ModelEvent event : events) {
       if (event instanceof NewsEvent) {
         NewsEvent newsEvent = (NewsEvent) event;
@@ -762,7 +762,7 @@ public class CoreUtils {
    * @return <code>TRUE</code> in case any State changed for ther given Events,
    * <code>FALSE</code> otherwise.
    */
-  public static boolean isStateChange(Set<NewsEvent> events) {
+  public static boolean isStateChange(Collection<NewsEvent> events) {
     for (NewsEvent event : events) {
       INews.State oldState = event.getOldNews() != null ? event.getOldNews().getState() : null;
       if (oldState != event.getEntity().getState())
@@ -790,7 +790,7 @@ public class CoreUtils {
    * @return <code>TRUE</code> in case any of the News got deleted and
    * <code>FALSE</code> otherwise.
    */
-  public static boolean gotDeleted(Set<NewsEvent> events) {
+  public static boolean gotDeleted(Collection<NewsEvent> events) {
     for (NewsEvent event : events) {
       boolean isVisible = event.getEntity().isVisible();
       boolean wasVisible = event.getOldNews() != null ? event.getOldNews().isVisible() : false;
@@ -824,7 +824,7 @@ public class CoreUtils {
    * @return <code>TRUE</code> in case any of the events tell about a change in
    * the most recent Date of the News, <code>FALSE</code> otherwise.
    */
-  public static boolean isDateChange(Set<NewsEvent> events) {
+  public static boolean isDateChange(Collection<NewsEvent> events) {
     for (NewsEvent event : events) {
       Date oldDate = event.getOldNews() != null ? DateUtils.getRecentDate(event.getOldNews()) : null;
       Date newDate = DateUtils.getRecentDate(event.getEntity());
@@ -841,7 +841,7 @@ public class CoreUtils {
    * @return <code>TRUE</code> in case any of the events tell about a change in
    * the Publish-Date of the News, <code>FALSE</code> otherwise.
    */
-  public static boolean isPublishedDateChange(Set<NewsEvent> events) {
+  public static boolean isPublishedDateChange(Collection<NewsEvent> events) {
     for (NewsEvent event : events) {
       Date oldDate = event.getOldNews() != null ? event.getOldNews().getPublishDate() : null;
       Date newDate = event.getEntity().getPublishDate();
@@ -860,7 +860,7 @@ public class CoreUtils {
    * @return <code>TRUE</code> in case any of the events tell about a change in
    * the Modified-Date of the News, <code>FALSE</code> otherwise.
    */
-  public static boolean isModifiedDateChange(Set<NewsEvent> events) {
+  public static boolean isModifiedDateChange(Collection<NewsEvent> events) {
     for (NewsEvent event : events) {
       Date oldDate = event.getOldNews() != null ? event.getOldNews().getModifiedDate() : null;
       Date newDate = event.getEntity().getModifiedDate();
@@ -879,7 +879,7 @@ public class CoreUtils {
    * @return <code>TRUE</code> in case any of the events tell about a change in
    * the Location of the News, <code>FALSE</code> otherwise.
    */
-  public static boolean isLocationChange(Set<NewsEvent> events) {
+  public static boolean isLocationChange(Collection<NewsEvent> events) {
     for (NewsEvent event : events) {
       long oldLocation = event.getOldNews() != null ? event.getOldNews().getParentId() : 0;
       long newLocation = event.getEntity().getParentId();
@@ -895,7 +895,7 @@ public class CoreUtils {
    * @return <code>TRUE</code> in case any of the events tell about a change in
    * the Author of the News, <code>FALSE</code> otherwise.
    */
-  public static boolean isAuthorChange(Set<NewsEvent> events) {
+  public static boolean isAuthorChange(Collection<NewsEvent> events) {
     for (NewsEvent event : events) {
       IPerson oldAuthor = event.getOldNews() != null ? event.getOldNews().getAuthor() : null;
       IPerson newAuthor = event.getEntity().getAuthor();
@@ -914,7 +914,7 @@ public class CoreUtils {
    * @return <code>TRUE</code> in case any of the events tell about a change in
    * the Category of the News, <code>FALSE</code> otherwise.
    */
-  public static boolean isCategoryChange(Set<NewsEvent> events) {
+  public static boolean isCategoryChange(Collection<NewsEvent> events) {
     for (NewsEvent event : events) {
       List<ICategory> oldCategories = event.getOldNews() != null ? event.getOldNews().getCategories() : null;
       List<ICategory> newCategories = event.getEntity().getCategories();
@@ -931,7 +931,7 @@ public class CoreUtils {
    * @return <code>TRUE</code> in case any of the events tell about a change in
    * the Label of the News, <code>FALSE</code> otherwise.
    */
-  public static boolean isLabelChange(Set<NewsEvent> events) {
+  public static boolean isLabelChange(Collection<NewsEvent> events) {
     for (NewsEvent event : events) {
       Set<ILabel> oldLabels = event.getOldNews() != null ? event.getOldNews().getLabels() : null;
       Set<ILabel> newLabels = event.getEntity().getLabels();
@@ -960,7 +960,7 @@ public class CoreUtils {
    * @return <code>TRUE</code> in case any of the events tell about a change in
    * the Title of the News, <code>FALSE</code> otherwise.
    */
-  public static boolean isTitleChange(Set<NewsEvent> events) {
+  public static boolean isTitleChange(Collection<NewsEvent> events) {
     for (NewsEvent event : events) {
       String oldTopic = event.getOldNews() != null ? getHeadline(event.getOldNews(), true) : null;
       String newTopic = getHeadline(event.getEntity(), true);
@@ -1254,7 +1254,7 @@ public class CoreUtils {
    * @return <code>true</code> if any of the events has the given state and
    * <code>false</code> otherwise.
    */
-  public static boolean containsState(Set<NewsEvent> events, INews.State state) {
+  public static boolean containsState(Collection<NewsEvent> events, INews.State state) {
     for (NewsEvent event : events) {
       INews entity = event.getEntity();
       if (entity != null && entity.getState() == state)
@@ -1882,7 +1882,7 @@ public class CoreUtils {
    * @param filters the Set of {@link ISearchFilter} to filter by scope.
    * @param feedLink the scope to use as filter.
    */
-  public static void removeFiltersByScope(Set<ISearchFilter> filters, String feedLink) {
+  public static void removeFiltersByScope(Collection<ISearchFilter> filters, String feedLink) {
     List<ISearchFilter> filtersToRemove = new ArrayList<ISearchFilter>();
     FilterLoop: for (ISearchFilter filter : filters) {
       List<IFolderChild> scope = getLocationScope(filter);
