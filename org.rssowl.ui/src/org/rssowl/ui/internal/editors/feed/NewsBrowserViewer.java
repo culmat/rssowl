@@ -2102,7 +2102,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   /**
    * @param news
    */
-  public void update(Set<NewsEvent> news) {
+  public void update(Collection<NewsEvent> news) {
 
     /*
      * The update-event could have been sent out a lot faster than the Browser
@@ -2141,7 +2141,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       refresh();
   }
 
-  private boolean internalUpdate(Set<NewsEvent> newsEvents) {
+  private boolean internalUpdate(Collection<NewsEvent> newsEvents) {
     boolean toggleJS = fBrowser.shouldDisableScript();
     try {
       if (toggleJS)
