@@ -450,16 +450,18 @@ public class NewsContentProvider implements ITreeContentProvider {
         }
       }
 
-      /* Run the filter over the result */
+      /* Add added news into folder news mark */
+      folderNewsMark.add(addedNews);
+    }
+
+    /* Optimization: Only consider those news that pass the filter when news are added (or in general for Folder News Mark) */
+    if ((fInput instanceof FolderNewsMark || onlyHandleAddedNews) && shouldFilter()) {
       Object[] elements = addedNews.toArray();
       elements = fFilter.filter(null, (Object) null, elements);
       addedNews = new ArrayList<INews>(elements.length);
       for (Object object : elements) {
         addedNews.add((INews) object);
       }
-
-      /* Add added news into folder news mark */
-      folderNewsMark.add(addedNews);
     }
 
     /* Add to Cache */
@@ -468,6 +470,14 @@ public class NewsContentProvider implements ITreeContentProvider {
     }
 
     return Pair.create(addedNews, wasEmpty);
+  }
+
+  private boolean shouldFilter() {
+    Type type = fFilter.getType();
+    if (type == Type.SHOW_STICKY || type == Type.SHOW_LAST_5_DAYS || type == Type.SHOW_RECENT)
+      return true;
+
+    return fFilter.isPatternSet();
   }
 
   private Set<Long> extractNewsIds(List<SearchMarkEvent> events) {
