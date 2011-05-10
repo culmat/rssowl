@@ -30,6 +30,8 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
+import org.rssowl.core.internal.persist.LongArrayList;
+import org.rssowl.core.internal.persist.SearchMark;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
@@ -40,6 +42,7 @@ import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.event.NewsAdapter;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.NewsListener;
@@ -78,6 +81,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * @author bpasero
  */
+@SuppressWarnings("restriction")
 public class NewsContentProvider implements ITreeContentProvider {
 
   /* The maximum number of items returned from a FolderNewsMark */
@@ -92,6 +96,7 @@ public class NewsContentProvider implements ITreeContentProvider {
   private INewsMark fInput;
   private final FeedView fFeedView;
   private final AtomicBoolean fDisposed = new AtomicBoolean(false);
+  private final INewsDAO fNewsDao;
 
   /* Cache displayed News */
   private final Map<Long, INews> fCachedNews;
@@ -113,6 +118,7 @@ public class NewsContentProvider implements ITreeContentProvider {
     fGrouping = feedView.getGrouper();
     fFilter = feedView.getFilter();
     fCachedNews = new HashMap<Long, INews>();
+    fNewsDao = DynamicDAO.getDAO(INewsDAO.class);
   }
 
   /*
@@ -257,15 +263,11 @@ public class NewsContentProvider implements ITreeContentProvider {
     return fGrouping.getType() == NewsGrouping.Type.GROUP_BY_STATE;
   }
 
-  /* Returns the news that have been added since the last refresh */
-  synchronized Pair</* Added News (only for saved searches) */List<INews>, /* Was Empty */Boolean> refreshCache(IProgressMonitor monitor, INewsMark input, boolean onlyAdd) throws PersistenceException {
-    return refreshCache(monitor, input, onlyAdd, null);
+  synchronized void refreshCache(IProgressMonitor monitor, INewsMark input) throws PersistenceException {
+    refreshCache(monitor, input, null);
   }
 
-  /* Returns the news that have been added since the last refresh */
-  synchronized Pair</* Added News (only for saved searches) */List<INews>, /* Was Empty */Boolean> refreshCache(IProgressMonitor monitor, INewsMark input, boolean onlyAdd, NewsComparator comparer) throws PersistenceException {
-    List<INews> resolvedNews = Collections.emptyList();
-    boolean wasEmpty = fCachedNews.isEmpty();
+  synchronized void refreshCache(IProgressMonitor monitor, INewsMark input, NewsComparator comparer) throws PersistenceException {
 
     /* Update Input */
     fInput = input;
@@ -274,24 +276,23 @@ public class NewsContentProvider implements ITreeContentProvider {
     if (fNewsListener == null)
       registerListeners();
 
-    /* Clear old Data if required */
-    if (!onlyAdd)
-      fCachedNews.clear();
+    /* Clear old Data */
+    fCachedNews.clear();
 
     /* Check if ContentProvider was already disposed or RSSOwl shutting down */
     if (canceled(monitor))
-      return Pair.create(resolvedNews, wasEmpty);
+      return;
 
     /* Obtain the News */
-    resolvedNews = new ArrayList<INews>();
+    List<INews> resolvedNews = new ArrayList<INews>();
 
-    /* Resolve Folder News Mark now if not yet done */
+    /* Resolve Folder News Mark and pass in current filter */
     if (input instanceof FolderNewsMark)
-      ((FolderNewsMark) input).resolve(monitor);
+      ((FolderNewsMark) input).resolve(fFilter.getType(), monitor);
 
     /* Check if ContentProvider was already disposed or RSSOwl shutting down */
     if (canceled(monitor))
-      return Pair.create(resolvedNews, wasEmpty);
+      return;
 
     /* Handle Folder, Newsbin and Saved Search */
     if (input.isGetNewsRefsEfficient()) {
@@ -311,11 +312,7 @@ public class NewsContentProvider implements ITreeContentProvider {
 
         /* Check if ContentProvider was already disposed or RSSOwl shutting down */
         if (canceled(monitor))
-          return Pair.create(resolvedNews, wasEmpty);
-
-        /* Avoid to resolve an already shown News */
-        if (onlyAdd && hasCachedNews(newsRef)) //If onlyAdd is false, caches have been cleared
-          continue;
+          return;
 
         /* Resolve and Add News */
         INews resolvedNewsItem = newsRef.resolve();
@@ -325,7 +322,7 @@ public class NewsContentProvider implements ITreeContentProvider {
 
       /* Special treat folders and limit them by size */
       if (input instanceof FolderNewsMark)
-        resolvedNews = limitFolder(resolvedNews, fFilter.getType() == Type.SHOW_NEW || fFilter.getType() == Type.SHOW_UNREAD, comparer != null ? comparer : fFeedView.getComparator());
+        resolvedNews = limitFolder(resolvedNews, comparer != null ? comparer : fFeedView.getComparator());
     }
 
     /* Handle Bookmark */
@@ -334,14 +331,12 @@ public class NewsContentProvider implements ITreeContentProvider {
 
     /* Check if ContentProvider was already disposed or RSSOwl shutting down */
     if (canceled(monitor))
-      return Pair.create(resolvedNews, wasEmpty);
+      return;
 
     /* Add into Cache */
     for (INews news : resolvedNews) {
       fCachedNews.put(news.getId(), news);
     }
-
-    return Pair.create(resolvedNews, wasEmpty);
   }
 
   private synchronized boolean addToCache(List<INews> addedNews) {
@@ -366,7 +361,7 @@ public class NewsContentProvider implements ITreeContentProvider {
     return wasEmpty;
   }
 
-  private synchronized Pair<List<INews>, Boolean> newsChangedInCache(IProgressMonitor monitor, Collection<SearchMarkEvent> events, boolean onlyHandleAddedNews) {
+  private synchronized Pair<List<INews>, Boolean> newsChangedFromSearch(IProgressMonitor monitor, List<SearchMarkEvent> eventsRelatedToInput, boolean onlyHandleAddedNews) {
 
     /* Check if ContentProvider was already disposed or RSSOwl shutting down */
     if (canceled(monitor)) {
@@ -374,34 +369,100 @@ public class NewsContentProvider implements ITreeContentProvider {
       return Pair.create(emptyList, false);
     }
 
-    /*
-     * Since the folder news mark is bound to the lifecycle of the feedview,
-     * make sure that the contents are updated properly from here.
-     */
-    if (fInput instanceof FolderNewsMark)
-      ((FolderNewsMark) fInput).newsChanged(events);
+    boolean wasEmpty = fCachedNews.isEmpty();
+    List<INews> addedNews = new ArrayList<INews>();
 
-    /* Refresh Cache */
-    Pair<List<INews>, Boolean> result = refreshCache(monitor, fInput, onlyHandleAddedNews);
+    /* Update Saved Search from Events */
+    if (fInput instanceof ISearchMark) {
 
-    return result;
+      /* Update cache alltogether based on search results */
+      if (!onlyHandleAddedNews)
+        refreshCache(monitor, fInput);
+
+      /* Only show the added news */
+      else {
+        for (SearchMarkEvent event : eventsRelatedToInput) {
+          LongArrayList[] newsIds = ((SearchMark) event.getEntity()).internalGetNewsContainer().internalGetNewsIds();
+          if (newsIds.length != 0) {
+            for (int i = 0; i < newsIds.length && i < INews.State.HIDDEN.ordinal(); i++) {
+              long[] elements = newsIds[i].getElements();
+              for (long element : elements) {
+                if (element <= 0)
+                  continue;
+
+                /* Skipe already cached news */
+                if (hasCachedNews(element))
+                  continue;
+
+                /* Resolve News */
+                INews news = fNewsDao.load(element);
+                if (news != null)
+                  addedNews.add(news);
+
+                /* Check if ContentProvider was already disposed or RSSOwl shutting down */
+                if (canceled(monitor)) {
+                  List<INews> emptyList = Collections.emptyList();
+                  return Pair.create(emptyList, false);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    /* Update Folder News Mark from Events (we only add news, never remove) */
+    else if (fInput instanceof FolderNewsMark) {
+      FolderNewsMark folderNewsMark = (FolderNewsMark) fInput;
+      for (SearchMarkEvent event : eventsRelatedToInput) {
+        LongArrayList[] newsIds = ((SearchMark) event.getEntity()).internalGetNewsContainer().internalGetNewsIds();
+        if (newsIds.length != 0) {
+          for (int i = 0; i < newsIds.length && i < INews.State.HIDDEN.ordinal(); i++) {
+            long[] elements = newsIds[i].getElements();
+            for (long element : elements) {
+              if (element <= 0)
+                continue;
+
+              /* Skipe already cached news */
+              if (hasCachedNews(element) || folderNewsMark.containsNews(element))
+                continue;
+
+              /* Resolve News */
+              INews news = fNewsDao.load(element);
+              if (news != null)
+                addedNews.add(news);
+
+              /* Check if ContentProvider was already disposed or RSSOwl shutting down */
+              if (canceled(monitor)) {
+                List<INews> emptyList = Collections.emptyList();
+                return Pair.create(emptyList, false);
+              }
+            }
+          }
+        }
+      }
+
+      /* Run the filter over the result */
+      Object[] elements = addedNews.toArray();
+      elements = fFilter.filter(null, (Object) null, elements);
+      addedNews = new ArrayList<INews>(elements.length);
+      for (Object object : elements) {
+        addedNews.add((INews) object);
+      }
+
+      /* Add added news into folder news mark */
+      folderNewsMark.add(addedNews);
+    }
+
+    /* Add to Cache */
+    for (INews news : addedNews) {
+      fCachedNews.put(news.getId(), news);
+    }
+
+    return Pair.create(addedNews, wasEmpty);
   }
 
-  private synchronized void updateCache(Set<NewsEvent> events) {
-
-    /* Check if ContentProvider was already disposed or RSSOwl shutting down */
-    if (canceled())
-      return;
-
-    /*
-     * Since the folder news mark is bound to the lifecycle of the feedview,
-     * make sure that the contents are updated properly from here.
-     */
-    if (fInput instanceof FolderNewsMark)
-      ((FolderNewsMark) fInput).update(events);
-  }
-
-  private synchronized void removeFromCache(List<INews> deletedNews, Set<NewsEvent> events) {
+  private synchronized void removeFromCache(List<INews> deletedNews) {
 
     /* Check if ContentProvider was already disposed or RSSOwl shutting down */
     if (canceled())
@@ -417,17 +478,16 @@ public class NewsContentProvider implements ITreeContentProvider {
      * make sure that the contents are updated properly from here.
      */
     if (fInput instanceof FolderNewsMark)
-      ((FolderNewsMark) fInput).remove(events);
+      ((FolderNewsMark) fInput).remove(deletedNews);
   }
 
-  private List<INews> limitFolder(List<INews> resolvedNews, boolean alreadyFiltered, NewsComparator comparer) {
+  private List<INews> limitFolder(List<INews> resolvedNews, NewsComparator comparer) {
     if (resolvedNews.size() <= MAX_FOLDER_ELEMENTS)
       return resolvedNews;
 
     /* Filter and Sort the Elements, then limit by size */
     Object[] elements = resolvedNews.toArray();
-    if (!alreadyFiltered)
-      elements = fFilter.filter(null, (Object) null, elements);
+    elements = fFilter.filter(null, (Object) null, elements);
     comparer.sort(null, elements);
 
     List<INews> limitedResult = new ArrayList<INews>(Math.min(elements.length, MAX_FOLDER_ELEMENTS));
@@ -450,12 +510,12 @@ public class NewsContentProvider implements ITreeContentProvider {
     return !fCachedNews.isEmpty();
   }
 
-  private synchronized boolean hasCachedNews(NewsReference ref) {
-    return fCachedNews.containsKey(ref.getId());
+  private synchronized boolean hasCachedNews(INews news) {
+    return news.getId() != null && hasCachedNews(news.getId());
   }
 
-  private synchronized boolean hasCachedNews(INews news) {
-    return fCachedNews.containsKey(news.getId());
+  private synchronized boolean hasCachedNews(long newsId) {
+    return fCachedNews.containsKey(newsId);
   }
 
   private synchronized INews obtainFromCache(NewsReference ref) {
@@ -508,7 +568,7 @@ public class NewsContentProvider implements ITreeContentProvider {
                   if (canceled(monitor))
                     return;
 
-                  Pair<List<INews>, Boolean> result = newsChangedInCache(monitor, eventsRelatedToInput, onlyHandleAddedNews);
+                  Pair<List<INews>, Boolean> result = newsChangedFromSearch(monitor, eventsRelatedToInput, onlyHandleAddedNews);
                   fAddedNews = result.getFirst();
                   fWasEmpty = result.getSecond();
                 }
@@ -889,9 +949,6 @@ public class NewsContentProvider implements ITreeContentProvider {
       updatedNews.add(event.getEntity());
     }
 
-    /* Update in Cache */
-    updateCache(events);
-
     /* Return on Shutdown or disposal */
     if (canceled())
       return false;
@@ -944,7 +1001,7 @@ public class NewsContentProvider implements ITreeContentProvider {
     }
 
     /* Remove from Cache */
-    removeFromCache(deletedNews, events);
+    removeFromCache(deletedNews);
 
     /* Return on Shutdown or disposal */
     if (canceled())
@@ -1016,7 +1073,7 @@ public class NewsContentProvider implements ITreeContentProvider {
         return true;
 
       /* Ask FolderNewsMark directly */
-      return ((FolderNewsMark) fInput).isRelatedTo(event, type == NewsEventType.PERSISTED || type == NewsEventType.RESTORED);
+      return ((FolderNewsMark) fInput).isRelatedTo(news);
     }
 
     return false;
