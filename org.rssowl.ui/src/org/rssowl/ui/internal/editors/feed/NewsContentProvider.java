@@ -85,7 +85,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class NewsContentProvider implements ITreeContentProvider {
 
   /* The maximum number of items returned from a FolderNewsMark */
-  static final int MAX_FOLDER_ELEMENTS = 500;
+  static final int MAX_FOLDER_ELEMENTS = 5;
 
   private final NewsBrowserViewer fBrowserViewer;
   private final NewsTableViewer fTableViewer;
@@ -259,6 +259,10 @@ public class NewsContentProvider implements ITreeContentProvider {
     return fGrouping.getType() == NewsGrouping.Type.GROUP_BY_STICKY;
   }
 
+  boolean isGroupingByLabel() {
+    return fGrouping.getType() == NewsGrouping.Type.GROUP_BY_LABEL;
+  }
+
   boolean isGroupingByState() {
     return fGrouping.getType() == NewsGrouping.Type.GROUP_BY_STATE;
   }
@@ -337,7 +341,7 @@ public class NewsContentProvider implements ITreeContentProvider {
 
       /* Special treat folders and limit them by size */
       if (input instanceof FolderNewsMark)
-        resolvedNews = limitFolder(resolvedNews, comparer != null ? comparer : fFeedView.getComparator());
+        resolvedNews = limitFolderNewsMark(resolvedNews, comparer != null ? comparer : fFeedView.getComparator());
     }
 
     /* Handle Bookmark */
@@ -540,19 +544,57 @@ public class NewsContentProvider implements ITreeContentProvider {
     return set;
   }
 
-  private List<INews> limitFolder(List<INews> resolvedNews, NewsComparator comparer) {
+  private List<INews> limitFolderNewsMark(List<INews> resolvedNews, NewsComparator comparer) {
+
+    /* Return if no capping is required at all */
     if (resolvedNews.size() <= MAX_FOLDER_ELEMENTS)
       return resolvedNews;
 
-    /* Filter and Sort the Elements, then limit by size */
+    /* Filter Elements */
     Object[] elements = resolvedNews.toArray();
     elements = fFilter.filter(null, (Object) null, elements);
+
+    /* Return after filtering if elements count is now small enough */
+    if (elements.length <= MAX_FOLDER_ELEMENTS) {
+      List<INews> limitedResult = new ArrayList<INews>(elements.length);
+      for (Object object : elements) {
+        limitedResult.add((INews) object);
+      }
+
+      return limitedResult;
+    }
+
+    /* First add those news that are Labeled or Sticky if this group mode is active */
+    List<INews> priorityItems = Collections.emptyList();
+    if (isGroupingByLabel() || isGroupingByStickyness()) {
+      priorityItems = new ArrayList<INews>();
+      for (int i = 0; i < elements.length; i++) {
+        INews news = (INews) elements[i];
+        if (isGroupingByLabel() && !news.getLabels().isEmpty() || isGroupingByStickyness() && news.isFlagged())
+          priorityItems.add(news);
+      }
+    }
+
+    /* Check if Labeled/Sticky News already at limit size and return then */
+    if (priorityItems.size() >= MAX_FOLDER_ELEMENTS)
+      return priorityItems;
+
+    /* Need to sort now to pick the top N remaining elements */
     comparer.sort(null, elements);
 
+    /* Pick top N remaining Elements */
+    int limit = MAX_FOLDER_ELEMENTS - priorityItems.size();
     List<INews> limitedResult = new ArrayList<INews>(Math.min(elements.length, MAX_FOLDER_ELEMENTS));
-    for (int i = 0; i < elements.length && i < MAX_FOLDER_ELEMENTS; i++) {
-      limitedResult.add((INews) elements[i]);
+    for (int i = 0, c = 0; i < elements.length && c < limit; i++) {
+      INews news = (INews) elements[i];
+      if (!priorityItems.contains(news)) {
+        limitedResult.add(news);
+        c++;
+      }
     }
+
+    /* Fill in priority items if any */
+    limitedResult.addAll(priorityItems);
 
     return limitedResult;
   }
