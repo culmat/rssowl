@@ -2192,10 +2192,14 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
             color = defaultColor;
           js.append(getElementById(Dynamic.TITLE_LINK.getId(news)).append(".style.color='").append(color).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$
 
+          /* Remove Labels */
           if (labels.isEmpty()) {
             js.append(getElementById(Dynamic.LABELS_SEPARATOR.getId(news)).append(".style.display='none'; ")); //$NON-NLS-1$
             js.append(getElementById(Dynamic.LABELS.getId(news)).append(".innerHTML=''; ")); //$NON-NLS-1$
-          } else {
+          }
+
+          /* Show Labels */
+          else {
             js.append(getElementById(Dynamic.LABELS_SEPARATOR.getId(news)).append(".style.display='inline'; ")); //$NON-NLS-1$
 
             StringBuilder labelsHtml = new StringBuilder(Messages.NewsBrowserViewer_LABELS);
@@ -2210,6 +2214,16 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
             }
 
             js.append(getElementById(Dynamic.LABELS.getId(news)).append(".innerHTML='").append(escapeForInnerHtml(labelsHtml.toString())).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$
+          }
+
+          /* Make sure to also update collapsed subtitles if present */
+          if (isHeadlinesLayout() && !fViewModel.isNewsExpanded(news)) {
+            StringBuilder subtitleContent = new StringBuilder();
+            IBaseLabelProvider lp = getLabelProvider();
+            if (lp instanceof NewsBrowserLabelProvider)
+              ((NewsBrowserLabelProvider) lp).fillSubtitle(subtitleContent, news, labels, false);
+            if (subtitleContent.length() > 0)
+              js.append(getElementById(Dynamic.SUBTITLE_LINK.getId(news))).append(".innerHTML='").append(escapeForInnerHtml(subtitleContent.toString())).append("'; "); //$NON-NLS-1$ //$NON-NLS-2$
           }
         }
 
