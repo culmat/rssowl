@@ -89,7 +89,7 @@ public class ModelUtils {
    * Returns <code>null</code> if the list of {@link IFolderChild} did not
    * contain any folders or bookmarks.
    */
-  public static Long[][] toPrimitive(List<IFolderChild> entities) {
+  public static Long[][] toPrimitive(Collection<IFolderChild> entities) {
     List<Long> folderIds = null;
     List<Long> bookmarkIds = null;
     List<Long> newsbinIds = null;
