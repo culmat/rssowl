@@ -407,38 +407,22 @@ public class NewsContentProvider implements ITreeContentProvider {
 
       /* Only show the added news */
       else {
-        for (SearchMarkEvent event : eventsRelatedToInput) {
-          LongArrayList[] newsIds = ((SearchMark) event.getEntity()).internalGetNewsContainer().internalGetNewsIds();
-          for (int i = 0; i < newsIds.length; i++) {
+        Set<Long> newsIds = extractNewsIds(eventsRelatedToInput);
+        for (Long newsId : newsIds) {
 
-            /* Ignore hidden/deleted and states that are filtered */
-            if (i == INews.State.HIDDEN.ordinal() || i == INews.State.DELETED.ordinal())
-              continue;
-            else if (fFilter.getType() == Type.SHOW_NEW && i != INews.State.NEW.ordinal())
-              continue;
-            else if (fFilter.getType() == Type.SHOW_UNREAD && i == INews.State.READ.ordinal())
-              continue;
+          /* Skip already cached news */
+          if (hasCachedNews(newsId))
+            continue;
 
-            long[] elements = newsIds[i].getElements();
-            for (long element : elements) {
-              if (element <= 0)
-                continue;
+          /* Resolve News */
+          INews news = fNewsDao.load(newsId);
+          if (news != null)
+            addedNews.add(news);
 
-              /* Skip already cached news */
-              if (hasCachedNews(element))
-                continue;
-
-              /* Resolve News */
-              INews news = fNewsDao.load(element);
-              if (news != null)
-                addedNews.add(news);
-
-              /* Check if ContentProvider was already disposed or RSSOwl shutting down */
-              if (canceled(monitor)) {
-                List<INews> emptyList = Collections.emptyList();
-                return Pair.create(emptyList, false);
-              }
-            }
+          /* Check if ContentProvider was already disposed or RSSOwl shutting down */
+          if (canceled(monitor)) {
+            List<INews> emptyList = Collections.emptyList();
+            return Pair.create(emptyList, false);
           }
         }
       }
@@ -447,38 +431,22 @@ public class NewsContentProvider implements ITreeContentProvider {
     /* Update Folder News Mark from Events (we only add news, never remove) */
     else if (fInput instanceof FolderNewsMark) {
       FolderNewsMark folderNewsMark = (FolderNewsMark) fInput;
-      for (SearchMarkEvent event : eventsRelatedToInput) {
-        LongArrayList[] newsIds = ((SearchMark) event.getEntity()).internalGetNewsContainer().internalGetNewsIds();
-        for (int i = 0; i < newsIds.length; i++) {
+      Set<Long> newsIds = extractNewsIds(eventsRelatedToInput);
+      for (Long newsId : newsIds) {
 
-          /* Ignore hidden/deleted and states that are filtered */
-          if (i == INews.State.HIDDEN.ordinal() || i == INews.State.DELETED.ordinal())
-            continue;
-          else if (fFilter.getType() == Type.SHOW_NEW && i != INews.State.NEW.ordinal())
-            continue;
-          else if (fFilter.getType() == Type.SHOW_UNREAD && i == INews.State.READ.ordinal())
-            continue;
+        /* Skip already cached news */
+        if (hasCachedNews(newsId) || folderNewsMark.containsNews(newsId))
+          continue;
 
-          long[] elements = newsIds[i].getElements();
-          for (long element : elements) {
-            if (element <= 0)
-              continue;
+        /* Resolve News */
+        INews news = fNewsDao.load(newsId);
+        if (news != null)
+          addedNews.add(news);
 
-            /* Skip already cached news */
-            if (hasCachedNews(element) || folderNewsMark.containsNews(element))
-              continue;
-
-            /* Resolve News */
-            INews news = fNewsDao.load(element);
-            if (news != null)
-              addedNews.add(news);
-
-            /* Check if ContentProvider was already disposed or RSSOwl shutting down */
-            if (canceled(monitor)) {
-              List<INews> emptyList = Collections.emptyList();
-              return Pair.create(emptyList, false);
-            }
-          }
+        /* Check if ContentProvider was already disposed or RSSOwl shutting down */
+        if (canceled(monitor)) {
+          List<INews> emptyList = Collections.emptyList();
+          return Pair.create(emptyList, false);
         }
       }
 
@@ -500,6 +468,31 @@ public class NewsContentProvider implements ITreeContentProvider {
     }
 
     return Pair.create(addedNews, wasEmpty);
+  }
+
+  private Set<Long> extractNewsIds(List<SearchMarkEvent> events) {
+    Set<Long> set = new HashSet<Long>();
+    for (SearchMarkEvent event : events) {
+      LongArrayList[] newsIds = ((SearchMark) event.getEntity()).internalGetNewsContainer().internalGetNewsIds();
+      for (int i = 0; i < newsIds.length; i++) {
+
+        /* Ignore hidden/deleted and states that are filtered */
+        if (i == INews.State.HIDDEN.ordinal() || i == INews.State.DELETED.ordinal())
+          continue;
+        else if (fFilter.getType() == Type.SHOW_NEW && i != INews.State.NEW.ordinal())
+          continue;
+        else if (fFilter.getType() == Type.SHOW_UNREAD && i == INews.State.READ.ordinal())
+          continue;
+
+        long[] elements = newsIds[i].getElements();
+        for (long element : elements) {
+          if (element > 0)
+            set.add(element);
+        }
+      }
+    }
+
+    return set;
   }
 
   private synchronized boolean removeFromCache(List<INews> deletedNews) {
