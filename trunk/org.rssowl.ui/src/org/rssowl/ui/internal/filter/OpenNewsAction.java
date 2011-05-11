@@ -72,6 +72,7 @@ public class OpenNewsAction implements INewsAction {
         public void run() {
           if (!monitor.isCanceled() && !Controller.getDefault().isShuttingDown()) {
             OpenInBrowserAction openAction = new OpenInBrowserAction();
+            openAction.setForceOpenInBackground(true);
             openAction.selectionChanged(null, new StructuredSelection(fLink));
             openAction.run();
           }

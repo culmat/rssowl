@@ -61,7 +61,7 @@ public class BrowserUtils {
 
   /* This utility class constructor is hidden */
   private BrowserUtils() {
-  // Protect default constructor
+    // Protect default constructor
   }
 
   /**
@@ -72,6 +72,20 @@ public class BrowserUtils {
    * <code>null</code> if it could not be created.
    */
   public static WebBrowserView openLinkInternal(String href, WebBrowserContext context) {
+    return openLinkInternal(href, context, false);
+  }
+
+  /**
+   * @param href Any URL
+   * @param context the context from which this link is coming from or
+   * <code>null</code> if none.
+   * @param forceOpenInBackground if <code>true</code>, forces to open the
+   * browser in the background and <code>false</code> otherwise asking the
+   * global preferences.
+   * @return the {@link WebBrowserInput} created to show the link or
+   * <code>null</code> if it could not be created.
+   */
+  public static WebBrowserView openLinkInternal(String href, WebBrowserContext context, boolean forceOpenInBackground) {
     WebBrowserView view = null;
 
     try {
@@ -82,7 +96,7 @@ public class BrowserUtils {
       IWorkbenchPage page = OwlUI.getPage();
       if (page != null) {
         boolean multipleTabs = eclipsePreferences.getBoolean(DefaultPreferences.ECLIPSE_MULTIPLE_TABS);
-        boolean openInBackground = owlPreferences.getBoolean(DefaultPreferences.OPEN_BROWSER_IN_BACKGROUND);
+        boolean openInBackground = forceOpenInBackground || owlPreferences.getBoolean(DefaultPreferences.OPEN_BROWSER_IN_BACKGROUND);
         boolean reuseTab = owlPreferences.getBoolean(DefaultPreferences.ALWAYS_REUSE_BROWSER);
 
         /* Try to Reuse existing Browser first if set */
