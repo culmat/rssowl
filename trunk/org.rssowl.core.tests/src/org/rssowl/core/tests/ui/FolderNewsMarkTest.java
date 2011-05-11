@@ -98,13 +98,10 @@ public class FolderNewsMarkTest {
     assertEquals("bar", mark.getProperty("foo"));
     assertTrue(Long.valueOf(mark.toReference().getId()).equals(childFolder.getId()));
 
+    waitForIndexer();
+    mark.resolve(NewsFilter.Type.SHOW_ALL, null);
+
     assertEquals(2, mark.getNews().size());
-    assertEquals(2, mark.getNews(EnumSet.of(INews.State.NEW, INews.State.READ)).size());
-    assertEquals(1, mark.getNews(EnumSet.of(INews.State.NEW)).size());
-    assertEquals(1, mark.getNews(EnumSet.of(INews.State.READ)).size());
-    assertEquals(2, mark.getNewsCount(EnumSet.of(INews.State.NEW, INews.State.READ)));
-    assertEquals(1, mark.getNewsCount(EnumSet.of(INews.State.NEW)));
-    assertEquals(1, mark.getNewsCount(EnumSet.of(INews.State.READ)));
   }
 
   /**
@@ -199,8 +196,8 @@ public class FolderNewsMarkTest {
 
     {
       assertEquals(7, mark.getNewsCount(INews.State.getVisible()));
-      assertEquals(3, mark.getNewsCount(EnumSet.of(INews.State.NEW)));
-      assertEquals(5, mark.getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)));
+      assertEquals(7, mark.getNewsCount(EnumSet.of(INews.State.NEW)));
+      assertEquals(7, mark.getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)));
     }
 
     {
@@ -366,8 +363,8 @@ public class FolderNewsMarkTest {
 
     {
       assertEquals(7, mark.getNewsCount(INews.State.getVisible()));
-      assertEquals(3, mark.getNewsCount(EnumSet.of(INews.State.NEW)));
-      assertEquals(5, mark.getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)));
+      assertEquals(7, mark.getNewsCount(EnumSet.of(INews.State.NEW)));
+      assertEquals(7, mark.getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)));
     }
 
     {
@@ -519,20 +516,20 @@ public class FolderNewsMarkTest {
 
     {
       List<INews> news = mark.getNews(EnumSet.of(INews.State.NEW));
-      assertTrue(news.isEmpty());
+      assertEquals(4, news.size());
     }
 
     {
       List<INews> news = mark.getNews(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED));
-      assertEquals(2, news.size());
+      assertEquals(4, news.size());
       assertTrue(news.contains(news2));
       assertTrue(news.contains(copiedNews2));
     }
 
     {
       assertEquals(4, mark.getNewsCount(INews.State.getVisible()));
-      assertEquals(0, mark.getNewsCount(EnumSet.of(INews.State.NEW)));
-      assertEquals(2, mark.getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)));
+      assertEquals(4, mark.getNewsCount(EnumSet.of(INews.State.NEW)));
+      assertEquals(4, mark.getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)));
     }
 
     {
@@ -555,12 +552,12 @@ public class FolderNewsMarkTest {
 
     {
       List<NewsReference> news = mark.getNewsRefs(EnumSet.of(INews.State.NEW));
-      assertEquals(0, news.size());
+      assertEquals(4, news.size());
     }
 
     {
       List<NewsReference> news = mark.getNewsRefs(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED));
-      assertEquals(2, news.size());
+      assertEquals(4, news.size());
       assertTrue(news.contains(news2.toReference()));
       assertTrue(news.contains(copiedNews2.toReference()));
     }
@@ -686,13 +683,13 @@ public class FolderNewsMarkTest {
 
     {
       List<INews> news = mark.getNews(EnumSet.of(INews.State.NEW));
-      assertEquals(1, news.size());
+      assertEquals(7, news.size());
       assertTrue(news.contains(copiedNews1));
     }
 
     {
       List<INews> news = mark.getNews(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED));
-      assertEquals(4, news.size());
+      assertEquals(7, news.size());
       assertTrue(news.contains(news2));
       assertTrue(news.contains(copiedNews1));
       assertTrue(news.contains(copiedNews2));
@@ -701,8 +698,8 @@ public class FolderNewsMarkTest {
 
     {
       assertEquals(7, mark.getNewsCount(INews.State.getVisible()));
-      assertEquals(1, mark.getNewsCount(EnumSet.of(INews.State.NEW)));
-      assertEquals(4, mark.getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)));
+      assertEquals(7, mark.getNewsCount(EnumSet.of(INews.State.NEW)));
+      assertEquals(7, mark.getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)));
     }
 
     {
@@ -729,13 +726,13 @@ public class FolderNewsMarkTest {
 
     {
       List<NewsReference> news = mark.getNewsRefs(EnumSet.of(INews.State.NEW));
-      assertEquals(1, news.size());
+      assertEquals(7, news.size());
       assertTrue(news.contains(copiedNews1.toReference()));
     }
 
     {
       List<NewsReference> news = mark.getNewsRefs(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED));
-      assertEquals(4, news.size());
+      assertEquals(7, news.size());
       assertTrue(news.contains(news2.toReference()));
       assertTrue(news.contains(copiedNews1.toReference()));
       assertTrue(news.contains(copiedNews2.toReference()));
@@ -766,13 +763,14 @@ public class FolderNewsMarkTest {
    * @throws Exception
    */
   @Test
-  public void testComplexFolderNewsMarkResultsChange() throws Exception {
+  public void testFolderNewsMarkResolve_SimpleSM() throws Exception {
     IFolder folder = fFactory.createFolder(null, null, "Root");
     IFolder childFolder = fFactory.createFolder(null, folder, "Child");
 
     IFeed feed = fFactory.createFeed(null, new URI("feed"));
     INews news1 = fFactory.createNews(null, feed, new Date());
     news1.setState(INews.State.NEW);
+    news1.setFlagged(true);
     INews news2 = fFactory.createNews(null, feed, new Date());
     news2.setState(INews.State.UNREAD);
     INews news3 = fFactory.createNews(null, feed, new Date());
@@ -795,6 +793,7 @@ public class FolderNewsMarkTest {
     INewsBin bin = fFactory.createNewsBin(null, childFolder, "bin");
     DynamicDAO.save(bin);
     INews copiedNews1 = fFactory.createNews(news1, bin);
+    copiedNews1.setState(INews.State.READ);
     INews copiedNews2 = fFactory.createNews(news2, bin);
     INews copiedNews3 = fFactory.createNews(news3, bin);
     DynamicDAO.save(copiedNews1);
@@ -804,6 +803,7 @@ public class FolderNewsMarkTest {
     ISearchField stateField = fFactory.createSearchField(INews.STATE, INews.class.getName());
     ISearchCondition condition = fFactory.createSearchCondition(stateField, SearchSpecifier.IS, EnumSet.of(INews.State.NEW));
     ISearchMark search = fFactory.createSearchMark(null, childFolder, "search");
+    search.setMatchAllConditions(true);
     search.addSearchCondition(condition);
 
     folder = DynamicDAO.save(folder);
@@ -813,30 +813,198 @@ public class FolderNewsMarkTest {
     waitForIndexer();
 
     FolderNewsMark mark = new FolderNewsMark(childFolder);
+
+    /* All */
     mark.resolve(NewsFilter.Type.SHOW_ALL, null);
+    assertEquals(7, mark.getNewsCount(INews.State.getVisible()));
 
-    {
-      List<INews> news = mark.getNews(EnumSet.of(INews.State.NEW));
-      assertEquals(3, news.size());
-      assertTrue(news.contains(news1));
-      assertTrue(news.contains(copiedNews1));
-      assertTrue(news.contains(otherNews1));
-    }
+    /* New */
+    mark.resolve(NewsFilter.Type.SHOW_NEW, null);
+    assertEquals(2, mark.getNewsCount(INews.State.getVisible()));
 
-    othernews2.setState(INews.State.NEW);
-    DynamicDAO.save(othernews2);
+    /* Unread */
+    mark.resolve(NewsFilter.Type.SHOW_UNREAD, null);
+    assertEquals(4, mark.getNewsCount(INews.State.getVisible()));
+
+    /* Recent */
+    mark.resolve(NewsFilter.Type.SHOW_RECENT, null);
+    assertEquals(7, mark.getNewsCount(INews.State.getVisible()));
+
+    /* Last 5 Days */
+    mark.resolve(NewsFilter.Type.SHOW_LAST_5_DAYS, null);
+    assertEquals(7, mark.getNewsCount(INews.State.getVisible()));
+
+    /* Sticky */
+    mark.resolve(NewsFilter.Type.SHOW_STICKY, null);
+    assertEquals(2, mark.getNewsCount(INews.State.getVisible()));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testFolderNewsMarkResolve_Complex_AND_SM() throws Exception {
+    IFolder folder = fFactory.createFolder(null, null, "Root");
+    IFolder childFolder = fFactory.createFolder(null, folder, "Child");
+
+    IFeed feed = fFactory.createFeed(null, new URI("feed"));
+    INews news1 = fFactory.createNews(null, feed, new Date());
+    news1.setState(INews.State.NEW);
+    news1.setFlagged(true);
+    INews news2 = fFactory.createNews(null, feed, new Date());
+    news2.setState(INews.State.UNREAD);
+    INews news3 = fFactory.createNews(null, feed, new Date());
+    news3.setState(INews.State.READ);
+    DynamicDAO.save(feed);
+
+    fFactory.createBookMark(null, childFolder, new FeedLinkReference(feed.getLink()), "Mark");
+
+    IFeed otherFeed = fFactory.createFeed(null, new URI("otherfeed"));
+    INews otherNews1 = fFactory.createNews(null, otherFeed, new Date());
+    otherNews1.setState(INews.State.NEW);
+    INews othernews2 = fFactory.createNews(null, otherFeed, new Date());
+    othernews2.setState(INews.State.UNREAD);
+    INews othernews3 = fFactory.createNews(null, otherFeed, new Date());
+    othernews3.setState(INews.State.READ);
+    DynamicDAO.save(otherFeed);
+
+    fFactory.createBookMark(null, folder, new FeedLinkReference(otherFeed.getLink()), "Other Mark");
+
+    INewsBin bin = fFactory.createNewsBin(null, childFolder, "bin");
+    DynamicDAO.save(bin);
+    INews copiedNews1 = fFactory.createNews(news1, bin);
+    copiedNews1.setState(INews.State.READ);
+    INews copiedNews2 = fFactory.createNews(news2, bin);
+    INews copiedNews3 = fFactory.createNews(news3, bin);
+    DynamicDAO.save(copiedNews1);
+    DynamicDAO.save(copiedNews2);
+    DynamicDAO.save(copiedNews3);
+
+    ISearchField stateField = fFactory.createSearchField(INews.STATE, INews.class.getName());
+    ISearchCondition condition1 = fFactory.createSearchCondition(stateField, SearchSpecifier.IS, EnumSet.of(INews.State.NEW));
+
+    ISearchField ageField = fFactory.createSearchField(INews.AGE_IN_DAYS, INews.class.getName());
+    ISearchCondition condition2 = fFactory.createSearchCondition(ageField, SearchSpecifier.IS_LESS_THAN, 2);
+
+    ISearchField attachmentField = fFactory.createSearchField(INews.HAS_ATTACHMENTS, INews.class.getName());
+    ISearchCondition condition3 = fFactory.createSearchCondition(attachmentField, SearchSpecifier.IS, false);
+
+    ISearchMark search = fFactory.createSearchMark(null, childFolder, "search");
+    search.setMatchAllConditions(true);
+    search.addSearchCondition(condition1);
+    search.addSearchCondition(condition2);
+    search.addSearchCondition(condition3);
+
+    folder = DynamicDAO.save(folder);
+
     waitForIndexer();
     Controller.getDefault().getSavedSearchService().forceQuickUpdate();
     waitForIndexer();
 
-    {
-      List<INews> news = mark.getNews(EnumSet.of(INews.State.NEW));
-      assertEquals(4, news.size());
-      assertTrue(news.contains(news1));
-      assertTrue(news.contains(copiedNews1));
-      assertTrue(news.contains(othernews2));
-      assertTrue(news.contains(otherNews1));
-    }
+    FolderNewsMark mark = new FolderNewsMark(childFolder);
+
+    /* All */
+    mark.resolve(NewsFilter.Type.SHOW_ALL, null);
+    assertEquals(7, mark.getNewsCount(INews.State.getVisible()));
+
+    /* New */
+    mark.resolve(NewsFilter.Type.SHOW_NEW, null);
+    assertEquals(2, mark.getNewsCount(INews.State.getVisible()));
+
+    /* Unread */
+    mark.resolve(NewsFilter.Type.SHOW_UNREAD, null);
+    assertEquals(4, mark.getNewsCount(INews.State.getVisible()));
+
+    /* Recent */
+    mark.resolve(NewsFilter.Type.SHOW_RECENT, null);
+    assertEquals(7, mark.getNewsCount(INews.State.getVisible()));
+
+    /* Last 5 Days */
+    mark.resolve(NewsFilter.Type.SHOW_LAST_5_DAYS, null);
+    assertEquals(7, mark.getNewsCount(INews.State.getVisible()));
+
+    /* Sticky */
+    mark.resolve(NewsFilter.Type.SHOW_STICKY, null);
+    assertEquals(2, mark.getNewsCount(INews.State.getVisible()));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testFolderNewsMarkResolve_Complex_OR_SM() throws Exception {
+    IFolder folder = fFactory.createFolder(null, null, "Root");
+    IFolder childFolder = fFactory.createFolder(null, folder, "Child");
+
+    IFeed feed = fFactory.createFeed(null, new URI("feed"));
+    INews news1 = fFactory.createNews(null, feed, new Date());
+    news1.setState(INews.State.NEW);
+    news1.setFlagged(true);
+    INews news2 = fFactory.createNews(null, feed, new Date());
+    news2.setState(INews.State.UNREAD);
+    INews news3 = fFactory.createNews(null, feed, new Date());
+    news3.setState(INews.State.READ);
+    DynamicDAO.save(feed);
+
+    fFactory.createBookMark(null, childFolder, new FeedLinkReference(feed.getLink()), "Mark");
+
+    IFeed otherFeed = fFactory.createFeed(null, new URI("otherfeed"));
+    INews otherNews1 = fFactory.createNews(null, otherFeed, new Date());
+    otherNews1.setState(INews.State.NEW);
+    INews othernews2 = fFactory.createNews(null, otherFeed, new Date());
+    othernews2.setState(INews.State.UNREAD);
+    INews othernews3 = fFactory.createNews(null, otherFeed, new Date());
+    othernews3.setState(INews.State.READ);
+    DynamicDAO.save(otherFeed);
+
+    fFactory.createBookMark(null, folder, new FeedLinkReference(otherFeed.getLink()), "Other Mark");
+
+    INewsBin bin = fFactory.createNewsBin(null, childFolder, "bin");
+    DynamicDAO.save(bin);
+    INews copiedNews1 = fFactory.createNews(news1, bin);
+    copiedNews1.setState(INews.State.READ);
+    INews copiedNews2 = fFactory.createNews(news2, bin);
+    INews copiedNews3 = fFactory.createNews(news3, bin);
+    DynamicDAO.save(copiedNews1);
+    DynamicDAO.save(copiedNews2);
+    DynamicDAO.save(copiedNews3);
+
+    ISearchField stateField = fFactory.createSearchField(INews.STATE, INews.class.getName());
+    ISearchCondition condition1 = fFactory.createSearchCondition(stateField, SearchSpecifier.IS, EnumSet.of(INews.State.NEW));
+
+    ISearchField ageField = fFactory.createSearchField(INews.AGE_IN_DAYS, INews.class.getName());
+    ISearchCondition condition2 = fFactory.createSearchCondition(ageField, SearchSpecifier.IS_LESS_THAN, 2);
+
+    ISearchField attachmentField = fFactory.createSearchField(INews.HAS_ATTACHMENTS, INews.class.getName());
+    ISearchCondition condition3 = fFactory.createSearchCondition(attachmentField, SearchSpecifier.IS, false);
+
+    ISearchMark search = fFactory.createSearchMark(null, childFolder, "search");
+    search.setMatchAllConditions(false);
+    search.addSearchCondition(condition1);
+    search.addSearchCondition(condition2);
+    search.addSearchCondition(condition3);
+
+    folder = DynamicDAO.save(folder);
+
+    waitForIndexer();
+    Controller.getDefault().getSavedSearchService().forceQuickUpdate();
+    waitForIndexer();
+
+    FolderNewsMark mark = new FolderNewsMark(childFolder);
+
+    /* All */
+    mark.resolve(NewsFilter.Type.SHOW_ALL, null);
+    assertEquals(9, mark.getNewsCount(INews.State.getVisible()));
+
+    /* New */
+    mark.resolve(NewsFilter.Type.SHOW_NEW, null);
+    assertEquals(2, mark.getNewsCount(INews.State.getVisible()));
+
+    /* Unread */
+    mark.resolve(NewsFilter.Type.SHOW_UNREAD, null);
+    assertEquals(5, mark.getNewsCount(INews.State.getVisible()));
+
+    //TODO Add tests for other types as soon as FolderNewsMark adds support to inject condition into OR search
   }
 
   /**
