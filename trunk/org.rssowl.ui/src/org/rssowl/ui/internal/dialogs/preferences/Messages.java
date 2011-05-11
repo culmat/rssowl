@@ -30,6 +30,7 @@ public class Messages extends NLS {
   private static final String BUNDLE_NAME = "org.rssowl.ui.internal.dialogs.preferences.messages"; //$NON-NLS-1$
   public static String BrowserPreferencePage_BLOCK_POPUPS;
   public static String BrowserPreferencePage_BROWSE;
+  public static String BrowserPreferencePage_BROWSER_PARAMETER_SUPPORT;
   public static String BrowserPreferencePage_BROWSER_SELECTION;
   public static String BrowserPreferencePage_CONTENT;
   public static String BrowserPreferencePage_DISABLE_JS;
