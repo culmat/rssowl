@@ -59,6 +59,7 @@ public class OpenInBrowserAction extends Action implements IWorkbenchWindowActio
 
   private IStructuredSelection fSelection;
   private WebBrowserContext fContext;
+  private boolean fForceOpenInBackground;
 
   /** Default Constructor for Reflection */
   public OpenInBrowserAction() {
@@ -70,6 +71,15 @@ public class OpenInBrowserAction extends Action implements IWorkbenchWindowActio
    */
   public OpenInBrowserAction(IStructuredSelection selection) {
     this(selection, null);
+  }
+
+  /**
+   * @param forceOpenInBackground if <code>true</code>, forces to open the
+   * browser in the background and <code>false</code> otherwise asking the
+   * global preferences.
+   */
+  public void setForceOpenInBackground(boolean forceOpenInBackground) {
+    fForceOpenInBackground = forceOpenInBackground;
   }
 
   /**
@@ -150,9 +160,9 @@ public class OpenInBrowserAction extends Action implements IWorkbenchWindowActio
               ((EmbeddedWebBrowser) browser).setContext(WebBrowserContext.createFrom(title));
 
             try {
-              browser.openURL(link.toURL());
+              ((EmbeddedWebBrowser) browser).openURL(link.toURL(), fForceOpenInBackground);
             } catch (MalformedURLException e) { //see Bug 1441
-              ((EmbeddedWebBrowser) browser).openURL(link);
+              ((EmbeddedWebBrowser) browser).openURL(link, fForceOpenInBackground);
             }
           }
 

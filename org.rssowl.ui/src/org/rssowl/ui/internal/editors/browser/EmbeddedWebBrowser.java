@@ -69,6 +69,17 @@ public class EmbeddedWebBrowser implements IWebBrowser {
    * @see org.eclipse.ui.browser.IWebBrowser#openURL(java.net.URL)
    */
   public void openURL(URL url) {
+    openURL(url, false);
+  }
+
+  /**
+   * @param url the {@link URL} to open in either the external or internal
+   * browser.
+   * @param forceOpenInBackground if <code>true</code>, forces to open the
+   * browser in the background and <code>false</code> otherwise asking the
+   * global preferences.
+   */
+  public void openURL(URL url, boolean forceOpenInBackground) {
     Assert.isNotNull(url);
 
     /* Open externally */
@@ -77,13 +88,25 @@ public class EmbeddedWebBrowser implements IWebBrowser {
 
     /* Open internally */
     else
-      BrowserUtils.openLinkInternal(url.toExternalForm(), fContext);
+      BrowserUtils.openLinkInternal(url.toExternalForm(), fContext, forceOpenInBackground);
   }
 
-  /*
-   * @see org.eclipse.ui.browser.IWebBrowser#openURL(java.net.URL)
+  /**
+   * @param uri the {@link URI} to open in either the external or internal
+   * browser.
    */
   public void openURL(URI uri) {
+    openURL(uri, false);
+  }
+
+  /**
+   * @param uri the {@link URI} to open in either the external or internal
+   * browser.
+   * @param forceOpenInBackground if <code>true</code>, forces to open the
+   * browser in the background and <code>false</code> otherwise asking the
+   * global preferences.
+   */
+  public void openURL(URI uri, boolean forceOpenInBackground) {
     Assert.isNotNull(uri);
 
     /* Open externally */
@@ -92,7 +115,7 @@ public class EmbeddedWebBrowser implements IWebBrowser {
 
     /* Open internally */
     else
-      BrowserUtils.openLinkInternal(uri.toString(), fContext);
+      BrowserUtils.openLinkInternal(uri.toString(), fContext, forceOpenInBackground);
   }
 
   private void openExternal(URL url) {
