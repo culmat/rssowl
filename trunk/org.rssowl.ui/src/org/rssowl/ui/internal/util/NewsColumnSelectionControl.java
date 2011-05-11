@@ -54,6 +54,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.editors.feed.NewsColumn;
 import org.rssowl.ui.internal.editors.feed.NewsColumnViewModel;
 
@@ -183,7 +184,7 @@ public class NewsColumnSelectionControl extends Composite {
 
     addButton.addDisposeListener(new DisposeListener() {
       public void widgetDisposed(DisposeEvent e) {
-        menu.dispose();
+        OwlUI.safeDispose(menu);
       }
     });
 

@@ -362,7 +362,7 @@ public class SearchConditionList extends ScrolledComposite {
 
     buttonBar.addDisposeListener(new DisposeListener() {
       public void widgetDisposed(DisposeEvent e) {
-        conditionMenu.dispose();
+        OwlUI.safeDispose(conditionMenu);
       }
     });
 

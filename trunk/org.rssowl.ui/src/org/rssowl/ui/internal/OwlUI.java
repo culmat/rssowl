@@ -2750,4 +2750,17 @@ public class OwlUI {
     int pageSize = scope.getInteger(DefaultPreferences.NEWS_BROWSER_PAGE_SIZE);
     return PageSize.from(pageSize);
   }
+
+  /**
+   * Safely disposes the provided {@link Menu}.
+   *
+   * @param menu the {@link Menu} to dispose.
+   */
+  public static void safeDispose(Menu menu) {
+    try {
+      menu.dispose();
+    } catch (NegativeArraySizeException e) {
+      /* Bug in SWT that we can safely ignore */
+    }
+  }
 }

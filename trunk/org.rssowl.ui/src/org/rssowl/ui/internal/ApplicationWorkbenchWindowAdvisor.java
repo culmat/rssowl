@@ -723,7 +723,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     fActionBarAdvisor.fillTrayItem(trayMenuManager, shell, ApplicationWorkbenchWindowAdvisor.this);
 
     if (fTrayMenu != null)
-      fTrayMenu.dispose();
+      OwlUI.safeDispose(fTrayMenu);
 
     fTrayMenu = trayMenuManager.createContextMenu(shell);
     fTrayMenu.setVisible(true);
