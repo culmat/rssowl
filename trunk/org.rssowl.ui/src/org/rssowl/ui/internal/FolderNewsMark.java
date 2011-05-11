@@ -400,8 +400,8 @@ public class FolderNewsMark extends Mark implements INewsMark {
       findSearches(fFolder, searches);
       for (ISearchMark search : searches) {
 
-        /* Inject the filter condition into the search if it is not an OR query */
-        if (search.matchAllConditions() && (type == Type.SHOW_RECENT || type == Type.SHOW_LAST_5_DAYS || type == Type.SHOW_STICKY)) {
+        /* Inject the filter condition into the search if it is not an OR query or only 1 condition specified */
+        if ((type == Type.SHOW_RECENT || type == Type.SHOW_LAST_5_DAYS || type == Type.SHOW_STICKY) && canInjectCondition(search)) {
           List<ISearchCondition> conditions = search.getSearchConditions();
           conditions.add(filterCondition);
 
@@ -431,6 +431,22 @@ public class FolderNewsMark extends Mark implements INewsMark {
           return;
       }
     }
+  }
+
+  private boolean canInjectCondition(ISearchMark search) {
+    List<ISearchCondition> conditions = search.getSearchConditions();
+
+    /* Can always inject if configured to match all conditions or conditions equals 1 */
+    if (search.matchAllConditions() || conditions.size() <= 1)
+      return true;
+
+    /* Can also inject if one of the two conditions is the Location-Scope condition */
+    if (conditions.size() == 2) {
+      if (conditions.get(0).getSpecifier() == SearchSpecifier.SCOPE || conditions.get(1).getSpecifier() == SearchSpecifier.SCOPE)
+        return true;
+    }
+
+    return false;
   }
 
   private ISearchCondition getCondition(NewsFilter.Type type) {
