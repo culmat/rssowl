@@ -25,6 +25,8 @@
 package org.rssowl.ui.internal.dialogs.preferences;
 
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.fieldassist.ControlDecoration;
+import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
@@ -181,6 +183,11 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
       OwlUI.makeAccessible(fCustomBrowserInput, fUseCustomExternalBrowser);
       fCustomBrowserInput.setEnabled(fUseCustomExternalBrowser.getSelection());
       fCustomBrowserInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+
+      ControlDecoration controlDeco = new ControlDecoration(fCustomBrowserInput, SWT.LEFT | SWT.TOP);
+      controlDeco.setImage(FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION).getImage());
+      controlDeco.setDescriptionText(Messages.BrowserPreferencePage_BROWSER_PARAMETER_SUPPORT);
+      controlDeco.setShowOnlyOnFocus(true);
 
       String customBrowserValue = fGlobalScope.getString(DefaultPreferences.CUSTOM_BROWSER_PATH);
       if (customBrowserValue != null)
