@@ -184,14 +184,14 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   private Menu fShareNewsContextMenu;
   private Menu fFindRelatedContextMenu;
   private IStructuredSelection fCurrentSelection = StructuredSelection.EMPTY;
-  private ApplicationServer fServer;
-  private String fId;
+  private final ApplicationServer fServer;
+  private final String fId;
   private boolean fBlockRefresh;
   private boolean fMarkReadOnExpand = true;
   private int fPageSize;
-  private IModelFactory fFactory;
-  private IPreferenceScope fPreferences = Owl.getPreferenceService().getGlobalScope();
-  private INewsDAO fNewsDao = DynamicDAO.getDAO(INewsDAO.class);
+  private final IModelFactory fFactory;
+  private final IPreferenceScope fPreferences = Owl.getPreferenceService().getGlobalScope();
+  private final INewsDAO fNewsDao = DynamicDAO.getDAO(INewsDAO.class);
   private final JobTracker fJobTracker = new JobTracker(AUTOMATIC_PAGE_REVEAL_DELAY, false, true, Priority.INTERACTIVE);
 
   /* This viewer's sorter. <code>null</code> means there is no sorter. */
@@ -1574,10 +1574,11 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   protected void handleDispose(DisposeEvent event) {
     fServer.unregister(fId);
     fCurrentSelection = null;
-    fNewsContextMenu.dispose();
-    fAttachmentsContextMenu.dispose();
-    fLabelsContextMenu.dispose();
-    fShareNewsContextMenu.dispose();
+    OwlUI.safeDispose(fNewsContextMenu);
+    OwlUI.safeDispose(fAttachmentsContextMenu);
+    OwlUI.safeDispose(fLabelsContextMenu);
+    OwlUI.safeDispose(fShareNewsContextMenu);
+    OwlUI.safeDispose(fFindRelatedContextMenu);
     super.handleDispose(event);
   }
 

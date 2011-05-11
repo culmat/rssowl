@@ -64,7 +64,7 @@ public class NewTypeDropdownAction implements IWorkbenchWindowPulldownDelegate, 
    */
   public Menu getMenu(Control parent) {
     if (fMenu != null)
-      fMenu.dispose();
+      OwlUI.safeDispose(fMenu);
 
     fMenu = new Menu(parent);
 
@@ -135,7 +135,7 @@ public class NewTypeDropdownAction implements IWorkbenchWindowPulldownDelegate, 
   public void dispose() {
     fResources.dispose();
     if (fMenu != null)
-      fMenu.dispose();
+      OwlUI.safeDispose(fMenu);
   }
 
   /*

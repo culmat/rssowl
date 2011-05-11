@@ -42,7 +42,7 @@ public abstract class ContextMenuCreator implements IMenuCreator {
    */
   public Menu getMenu(Control parent) {
     if (fMenu != null)
-      fMenu.dispose();
+      OwlUI.safeDispose(fMenu);
 
     fMenu = createMenu(parent);
 
@@ -60,7 +60,7 @@ public abstract class ContextMenuCreator implements IMenuCreator {
    */
   public void dispose() {
     if (fMenu != null)
-      fMenu.dispose();
+      OwlUI.safeDispose(fMenu);
   }
 
   /*

@@ -177,7 +177,7 @@ public class CustomizeToolbarDialog extends Dialog {
    */
   @Override
   public boolean close() {
-    fAddMenu.dispose();
+    OwlUI.safeDispose(fAddMenu);
     fResources.dispose();
     if (!fOkPressed) {
       fPreferences.putIntegers(DefaultPreferences.TOOLBAR_ITEMS, fInitialToolBarItems);

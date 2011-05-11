@@ -823,7 +823,7 @@ public class NewsTableControl implements IFeedViewPart {
       ApplicationActionBarAdvisor.fillAttachmentsMenu(contextMenu, new StructuredSelection(data), fFeedViewSite.getEditorSite(), true);
 
       if (fAttachmentsMenu != null)
-        fAttachmentsMenu.dispose();
+        OwlUI.safeDispose(fAttachmentsMenu);
 
       fAttachmentsMenu = contextMenu.createContextMenu(fViewer.getControl());
 
@@ -1077,7 +1077,7 @@ public class NewsTableControl implements IFeedViewPart {
    */
   public void dispose() {
     if (fAttachmentsMenu != null)
-      fAttachmentsMenu.dispose();
+      OwlUI.safeDispose(fAttachmentsMenu);
     fNewsStateTracker.cancel();
     fInstantMarkUnreadTracker.cancel();
     fResources.dispose();

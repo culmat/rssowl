@@ -653,7 +653,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
   public boolean close() {
     fgOpenDialogCount--;
     if (fAttachmentsMenu != null)
-      fAttachmentsMenu.dispose();
+      OwlUI.safeDispose(fAttachmentsMenu);
 
     /* Store Column Model */
     if (!fResultViewer.getTable().isDisposed()) {
@@ -1797,7 +1797,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
         ApplicationActionBarAdvisor.fillAttachmentsMenu(contextMenu, new StructuredSelection(((ScoredNews) data).getNews()), this, true);
 
         if (fAttachmentsMenu != null)
-          fAttachmentsMenu.dispose();
+          OwlUI.safeDispose(fAttachmentsMenu);
 
         fAttachmentsMenu = contextMenu.createContextMenu(fResultViewer.getControl());
 

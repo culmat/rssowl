@@ -309,7 +309,7 @@ public class NewsActionList extends ScrolledComposite {
 
     buttonBar.addDisposeListener(new DisposeListener() {
       public void widgetDisposed(DisposeEvent e) {
-        actionMenu.dispose();
+        OwlUI.safeDispose(actionMenu);
       }
     });
 
