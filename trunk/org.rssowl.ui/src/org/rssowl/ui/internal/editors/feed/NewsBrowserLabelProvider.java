@@ -1270,7 +1270,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       email = "mailto:" + email; //$NON-NLS-1$
 
     /* Use name as email if valid */
-    if (email == null && name.contains("@") && !name.contains(" ")) //$NON-NLS-1$ //$NON-NLS-2$
+    if (email == null && name != null && name.contains("@") && !name.contains(" ")) //$NON-NLS-1$ //$NON-NLS-2$
       email = name;
 
     if (withLinks && StringUtils.isSet(name) && email != null)
