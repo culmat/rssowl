@@ -507,18 +507,24 @@ public class CoreUtilsTest {
           if (mode.get() == 0) {
             assertTrue(CoreUtils.isLabelChange(events.iterator().next()));
             assertTrue(CoreUtils.isLabelChange(events));
+            assertTrue(CoreUtils.isLabelChange(events, true));
+            assertTrue(CoreUtils.isLabelChange(events, false));
             counter.incrementAndGet();
           }
 
           else if (mode.get() == 1) {
             assertTrue(CoreUtils.isLabelChange(events.iterator().next()));
             assertTrue(CoreUtils.isLabelChange(events));
+            assertTrue(CoreUtils.isLabelChange(events, false));
+            assertFalse(CoreUtils.isLabelChange(events, true));
             counter.incrementAndGet();
           }
 
           else if (mode.get() == 2) {
             assertFalse(CoreUtils.isLabelChange(events.iterator().next()));
             assertFalse(CoreUtils.isLabelChange(events));
+            assertFalse(CoreUtils.isLabelChange(events, false));
+            assertFalse(CoreUtils.isLabelChange(events, true));
             counter.incrementAndGet();
           }
         }
