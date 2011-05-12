@@ -932,12 +932,28 @@ public class CoreUtils {
    * the Label of the News, <code>FALSE</code> otherwise.
    */
   public static boolean isLabelChange(Collection<NewsEvent> events) {
+    return isLabelChange(events, false);
+  }
+
+  /**
+   * @param events
+   * @param onlyHasBecomeLabeled if <code>true</code>, only return
+   * <code>true</code> if a news has become labeled.
+   * @return <code>TRUE</code> in case any of the events tell about a change in
+   * the Label of the News, <code>FALSE</code> otherwise.
+   */
+  public static boolean isLabelChange(Collection<NewsEvent> events, boolean onlyHasBecomeLabeled) {
     for (NewsEvent event : events) {
       Set<ILabel> oldLabels = event.getOldNews() != null ? event.getOldNews().getLabels() : null;
       Set<ILabel> newLabels = event.getEntity().getLabels();
 
-      if (!newLabels.equals(oldLabels))
-        return true;
+      if (!newLabels.equals(oldLabels)) {
+        if (!onlyHasBecomeLabeled)
+          return true;
+
+        if (oldLabels == null || oldLabels.isEmpty())
+          return true;
+      }
     }
 
     return false;
