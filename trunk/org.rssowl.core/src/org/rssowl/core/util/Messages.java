@@ -33,6 +33,7 @@ public class Messages extends NLS {
   public static String CoreUtils_CONNECTION_TIMEOUT;
   public static String CoreUtils_IN_N;
   public static String CoreUtils_INVALID_FEED;
+  public static String CoreUtils_LABEL_ASSIGNED;
   public static String CoreUtils_N_DAY;
   public static String CoreUtils_N_DAYS;
   public static String CoreUtils_N_HOUR;
