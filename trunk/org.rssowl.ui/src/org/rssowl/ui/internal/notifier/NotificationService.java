@@ -56,7 +56,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * The <code>NotificationService</code> listens on News being downloaded and
@@ -257,7 +256,7 @@ public class NotificationService {
       showItems(items, Mode.INCOMING_AUTOMATIC);
   }
 
-  private void onNewsAdded(Set<NewsEvent> events) {
+  private void onNewsAdded(final Set<NewsEvent> events) {
 
     /* Return if Notification is disabled */
     if (!fGlobalPreferences.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP))
@@ -266,6 +265,48 @@ public class NotificationService {
     /* Return if events are not containing any NEW News */
     if (!CoreUtils.containsState(events, INews.State.NEW))
       return;
+
+    /* Use a runnable for this piece of code as it might be executed from an async call or not */
+    final Runnable runnable = new Runnable() {
+      public void run() {
+        Set<NewsEvent> eventsToShow = events;
+
+        /* Filter Events if user decided to show Notifier only for selected Elements */
+        if (fGlobalPreferences.getBoolean(DefaultPreferences.LIMIT_NOTIFIER_TO_SELECTION)) {
+          List<FeedLinkReference> enabledFeeds = new ArrayList<FeedLinkReference>();
+
+          /* TODO This can be slow, try to optimize performance! */
+          Collection<IBookMark> bookMarks = DynamicDAO.loadAll(IBookMark.class);
+          for (IBookMark bookMark : bookMarks) {
+            IPreferenceScope prefs = Owl.getPreferenceService().getEntityScope(bookMark);
+            if (prefs.getBoolean(DefaultPreferences.ENABLE_NOTIFIER))
+              enabledFeeds.add(bookMark.getFeedLinkReference());
+          }
+
+          eventsToShow = filterEvents(eventsToShow, enabledFeeds);
+        }
+
+        /* Create Items */
+        Set<NotificationItem> items = new TreeSet<NotificationItem>();
+        for (NewsEvent event : eventsToShow) {
+          INews news = event.getEntity();
+          if (news.getState().equals(INews.State.NEW)) //Only show NEW news in Notifier
+            items.add(new NewsNotificationItem(news));
+        }
+
+        /* Return if nothing to show */
+        if (items.isEmpty())
+          return;
+
+        /* Add into Buffer */
+        if (!isPopupVisible())
+          fBatchedBuffer.addAll(items);
+
+        /* Show Directly */
+        else
+          showItems(items, Mode.INCOMING_AUTOMATIC);
+      }
+    };
 
     /*
      * Optimization and Workaround for a Bug: It is quite useless to send notification items
@@ -277,59 +318,26 @@ public class NotificationService {
      * is minimized or not.
      */
     if (fGlobalPreferences.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP_ONLY_WHEN_MINIMIZED)) {
-      final AtomicBoolean sendNewsToBuffer = new AtomicBoolean(true);
       Shell primaryShell = OwlUI.getPrimaryShell();
       if (primaryShell != null) {
-        JobRunner.runSyncedInUIThread(primaryShell, new Runnable() {
+        JobRunner.runInUIThread(primaryShell, new Runnable() { //MUST NOT RUN SYNCED IN UI THREAD FROM EVENT - DEADLOCK ALERT !!!
           public void run() {
             if (Controller.getDefault().isShuttingDown())
               return;
 
             ApplicationWorkbenchWindowAdvisor advisor = ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor;
             if (advisor != null && !advisor.isMinimizedToTray() && !advisor.isMinimized())
-              sendNewsToBuffer.set(false);
+              return;
+
+            JobRunner.runInBackgroundThread(runnable);
           }
         });
       }
-
-      if (!sendNewsToBuffer.get())
-        return;
     }
 
-    /* Filter Events if user decided to show Notifier only for selected Elements */
-    if (fGlobalPreferences.getBoolean(DefaultPreferences.LIMIT_NOTIFIER_TO_SELECTION)) {
-      List<FeedLinkReference> enabledFeeds = new ArrayList<FeedLinkReference>();
-
-      /* TODO This can be slow, try to optimize performance! */
-      Collection<IBookMark> bookMarks = DynamicDAO.loadAll(IBookMark.class);
-      for (IBookMark bookMark : bookMarks) {
-        IPreferenceScope prefs = Owl.getPreferenceService().getEntityScope(bookMark);
-        if (prefs.getBoolean(DefaultPreferences.ENABLE_NOTIFIER))
-          enabledFeeds.add(bookMark.getFeedLinkReference());
-      }
-
-      events = filterEvents(events, enabledFeeds);
-    }
-
-    /* Create Items */
-    Set<NotificationItem> items = new TreeSet<NotificationItem>();
-    for (NewsEvent event : events) {
-      INews news = event.getEntity();
-      if (news.getState().equals(INews.State.NEW)) //Only show NEW news in Notifier
-        items.add(new NewsNotificationItem(news));
-    }
-
-    /* Return if nothing to show */
-    if (items.isEmpty())
-      return;
-
-    /* Add into Buffer */
-    if (!isPopupVisible())
-      fBatchedBuffer.addAll(items);
-
-    /* Show Directly */
+    /* Directly Execute */
     else
-      showItems(items, Mode.INCOMING_AUTOMATIC);
+      runnable.run();
   }
 
   private Set<NewsEvent> filterEvents(Set<NewsEvent> events, List<FeedLinkReference> enabledFeeds) {
