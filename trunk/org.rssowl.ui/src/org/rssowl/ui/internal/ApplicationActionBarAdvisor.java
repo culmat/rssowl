@@ -638,7 +638,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
           selectedFilterIndex = ModelUtils.loadIntegerValueWithFallback(globalPreferences, DefaultPreferences.BM_NEWS_FILTERING, globalPreferences, DefaultPreferences.FV_FILTER_TYPE);
 
         final NewsFilter.Type selectedFilter = NewsFilter.Type.values()[selectedFilterIndex];
-        NewsFilter.Type[] filters = new NewsFilter.Type[] { NewsFilter.Type.SHOW_ALL, NewsFilter.Type.SHOW_NEW, NewsFilter.Type.SHOW_UNREAD, NewsFilter.Type.SHOW_STICKY, NewsFilter.Type.SHOW_RECENT, NewsFilter.Type.SHOW_LAST_5_DAYS };
+        NewsFilter.Type[] filters = new NewsFilter.Type[] { NewsFilter.Type.SHOW_ALL, NewsFilter.Type.SHOW_NEW, NewsFilter.Type.SHOW_UNREAD, NewsFilter.Type.SHOW_STICKY, NewsFilter.Type.SHOW_LABELED, NewsFilter.Type.SHOW_RECENT, NewsFilter.Type.SHOW_LAST_5_DAYS };
         for (final NewsFilter.Type filter : filters) {
           filterMenu.add(new Action(filter.getName(), IAction.AS_RADIO_BUTTON) {
             @Override
@@ -654,7 +654,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
           });
 
           /* Add Separators to improve readability of filter options */
-          if (filter == NewsFilter.Type.SHOW_ALL || filter == NewsFilter.Type.SHOW_STICKY)
+          if (filter == NewsFilter.Type.SHOW_ALL || filter == NewsFilter.Type.SHOW_UNREAD || filter == NewsFilter.Type.SHOW_LABELED)
             filterMenu.add(new Separator());
         }
 

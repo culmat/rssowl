@@ -82,7 +82,10 @@ public class NewsFilter extends ViewerFilter {
     SHOW_STICKY(Messages.NewsFilter_SHOW_STICKY, Messages.NewsFilter_STICKY_NEWS),
 
     /** Show Recent News */
-    SHOW_LAST_5_DAYS(Messages.NewsFilter_SHOW_LAST_DAYS, Messages.NewsFilter_LAST_DAYS);
+    SHOW_LAST_5_DAYS(Messages.NewsFilter_SHOW_LAST_DAYS, Messages.NewsFilter_LAST_DAYS),
+
+    /** Show Labeled News */
+    SHOW_LABELED(Messages.NewsFilter_SHOW_LABELED_NEWS, Messages.NewsFilter_LABELED_NEWS);
 
     String fName;
     String fDisplayName;
@@ -272,6 +275,11 @@ public class NewsFilter extends ViewerFilter {
         /* Show Sticky News */
         case SHOW_STICKY:
           isMatch = news.isFlagged();
+          break;
+
+        /* Show Labeled News */
+        case SHOW_LABELED:
+          isMatch = !news.getLabels().isEmpty();
           break;
 
         /* Show Recent News (max 24h old) */
@@ -477,9 +485,12 @@ public class NewsFilter extends ViewerFilter {
   public boolean needsRefresh(Collection<NewsEvent> events) {
 
     /* Check if any News has become Sticky */
-    if (fType == Type.SHOW_STICKY) {
+    if (fType == Type.SHOW_STICKY)
       return CoreUtils.isStickyStateChange(events, true);
-    }
+
+    /* Check if any News has become Labeled */
+    else if (fType == Type.SHOW_LABELED)
+      return CoreUtils.isLabelChange(events, true);
 
     return false;
   }

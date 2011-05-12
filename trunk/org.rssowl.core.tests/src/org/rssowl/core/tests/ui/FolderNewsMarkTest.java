@@ -34,6 +34,7 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.News;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
@@ -771,6 +772,9 @@ public class FolderNewsMarkTest {
     INews news1 = fFactory.createNews(null, feed, new Date());
     news1.setState(INews.State.NEW);
     news1.setFlagged(true);
+    ILabel label = fFactory.createLabel(null, "Foo");
+    DynamicDAO.save(label);
+    news1.addLabel(label);
     INews news2 = fFactory.createNews(null, feed, new Date());
     news2.setState(INews.State.UNREAD);
     INews news3 = fFactory.createNews(null, feed, new Date());
@@ -837,6 +841,10 @@ public class FolderNewsMarkTest {
     /* Sticky */
     mark.resolve(NewsFilter.Type.SHOW_STICKY, null);
     assertEquals(2, mark.getNewsCount(INews.State.getVisible()));
+
+    /* Labeled */
+    mark.resolve(NewsFilter.Type.SHOW_LABELED, null);
+    assertEquals(2, mark.getNewsCount(INews.State.getVisible()));
   }
 
   /**
@@ -851,6 +859,9 @@ public class FolderNewsMarkTest {
     INews news1 = fFactory.createNews(null, feed, new Date());
     news1.setState(INews.State.NEW);
     news1.setFlagged(true);
+    ILabel label = fFactory.createLabel(null, "Foo");
+    DynamicDAO.save(label);
+    news1.addLabel(label);
     INews news2 = fFactory.createNews(null, feed, new Date());
     news2.setState(INews.State.UNREAD);
     INews news3 = fFactory.createNews(null, feed, new Date());
@@ -925,6 +936,10 @@ public class FolderNewsMarkTest {
 
     /* Sticky */
     mark.resolve(NewsFilter.Type.SHOW_STICKY, null);
+    assertEquals(2, mark.getNewsCount(INews.State.getVisible()));
+
+    /* Sticky */
+    mark.resolve(NewsFilter.Type.SHOW_LABELED, null);
     assertEquals(2, mark.getNewsCount(INews.State.getVisible()));
   }
 

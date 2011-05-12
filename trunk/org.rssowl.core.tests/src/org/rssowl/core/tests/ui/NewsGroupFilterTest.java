@@ -538,6 +538,17 @@ public class NewsGroupFilterTest {
       assertEquals(true, result.containsAll(Arrays.asList(new IEntity[] { news1, news2 })));
     }
 
+    /* Filter: Show Labeled */
+    {
+      news1.addLabel(fFactory.createLabel(null, "Foo"));
+      news2.addLabel(fFactory.createLabel(null, "Bar"));
+
+      fFiltering.setType(NewsFilter.Type.SHOW_LABELED);
+      List<?> result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
+      assertEquals(2, result.size());
+      assertEquals(true, result.containsAll(Arrays.asList(new IEntity[] { news1, news2 })));
+    }
+
     /* Filter: Show Recent */
     {
       fFiltering.setType(NewsFilter.Type.SHOW_RECENT);
