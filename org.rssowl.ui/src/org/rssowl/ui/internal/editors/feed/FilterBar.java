@@ -642,6 +642,9 @@ public class FilterBar {
           }
         });
 
+        /* Separator */
+        new MenuItem(menu, SWT.SEPARATOR);
+
         /* Filter: Sticky */
         final MenuItem showSticky = new MenuItem(menu, SWT.RADIO);
         showSticky.setText(NewsFilter.Type.SHOW_STICKY.getName());
@@ -651,6 +654,18 @@ public class FilterBar {
           public void widgetSelected(SelectionEvent e) {
             if (showSticky.getSelection() && filter.getType() != NewsFilter.Type.SHOW_STICKY)
               onFilter(NewsFilter.Type.SHOW_STICKY);
+          }
+        });
+
+        /* Filter: Labeled */
+        final MenuItem showLabeled = new MenuItem(menu, SWT.RADIO);
+        showLabeled.setText(NewsFilter.Type.SHOW_LABELED.getName());
+        showLabeled.setSelection(NewsFilter.Type.SHOW_LABELED == filter.getType());
+        showLabeled.addSelectionListener(new SelectionAdapter() {
+          @Override
+          public void widgetSelected(SelectionEvent e) {
+            if (showLabeled.getSelection() && filter.getType() != NewsFilter.Type.SHOW_LABELED)
+              onFilter(NewsFilter.Type.SHOW_LABELED);
           }
         });
 
@@ -742,6 +757,11 @@ public class FilterBar {
       case SHOW_STICKY:
         field = factory.createSearchField(INews.IS_FLAGGED, INews.class.getName());
         conditions.add(factory.createSearchCondition(field, SearchSpecifier.IS, true));
+        break;
+
+      case SHOW_LABELED:
+        field = factory.createSearchField(INews.LABEL, INews.class.getName());
+        conditions.add(factory.createSearchCondition(field, SearchSpecifier.IS, "*")); //$NON-NLS-1$
         break;
 
       case SHOW_UNREAD:

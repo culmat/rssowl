@@ -401,7 +401,7 @@ public class FolderNewsMark extends Mark implements INewsMark {
       for (ISearchMark search : searches) {
 
         /* Inject the filter condition into the search if it is not an OR query or only 1 condition specified */
-        if ((type == Type.SHOW_RECENT || type == Type.SHOW_LAST_5_DAYS || type == Type.SHOW_STICKY) && canInjectCondition(search)) {
+        if ((type == Type.SHOW_RECENT || type == Type.SHOW_LAST_5_DAYS || type == Type.SHOW_STICKY || type == Type.SHOW_LABELED) && canInjectCondition(search)) {
           List<ISearchCondition> conditions = search.getSearchConditions();
           conditions.add(filterCondition);
 
@@ -465,6 +465,10 @@ public class FolderNewsMark extends Mark implements INewsMark {
       case SHOW_STICKY:
         field = fFactory.createSearchField(INews.IS_FLAGGED, INews.class.getName());
         return fFactory.createSearchCondition(field, SearchSpecifier.IS, true);
+
+      case SHOW_LABELED:
+        field = fFactory.createSearchField(INews.LABEL, INews.class.getName());
+        return fFactory.createSearchCondition(field, SearchSpecifier.IS, "*"); //$NON-NLS-1$
 
       case SHOW_LAST_5_DAYS:
         field = fFactory.createSearchField(INews.AGE_IN_DAYS, INews.class.getName());

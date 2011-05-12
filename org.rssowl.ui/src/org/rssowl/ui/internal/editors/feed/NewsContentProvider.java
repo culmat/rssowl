@@ -513,7 +513,7 @@ public class NewsContentProvider implements ITreeContentProvider {
 
   private boolean shouldFilter() {
     Type type = fFilter.getType();
-    if (type == Type.SHOW_STICKY || type == Type.SHOW_LAST_5_DAYS || type == Type.SHOW_RECENT)
+    if (type == Type.SHOW_STICKY || type == Type.SHOW_LABELED || type == Type.SHOW_LAST_5_DAYS || type == Type.SHOW_RECENT)
       return true;
 
     return fFilter.isPatternSet();
