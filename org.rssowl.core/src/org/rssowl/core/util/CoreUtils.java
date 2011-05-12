@@ -632,6 +632,27 @@ public class CoreUtils {
 
   /**
    * @param events
+   * @return <code>true</code> in case any of the news provided by the events
+   * field have changed to NEW, UNREAD or UPDATED from the READ state.
+   */
+  public static boolean changedFromReadToUnread(Collection<? extends ModelEvent> events) {
+    for (ModelEvent event : events) {
+      if (event instanceof NewsEvent) {
+        NewsEvent newsEvent = (NewsEvent) event;
+        boolean oldStateRead = INews.State.READ.equals(newsEvent.getOldNews() != null ? newsEvent.getOldNews().getState() : null);
+        State currentState = newsEvent.getEntity().getState();
+        boolean currentStateNewUnreadUpdated = INews.State.NEW.equals(currentState) || INews.State.UNREAD.equals(currentState) || INews.State.UPDATED.equals(currentState);
+
+        if (oldStateRead && currentStateNewUnreadUpdated)
+          return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * @param events
    * @return <code>TRUE</code> in case the Sticky-State of the given News
    * changed its value for any of the given Events, <code>FALSE</code>
    * otherwise.
