@@ -492,6 +492,10 @@ public class NewsFilter extends ViewerFilter {
     else if (fType == Type.SHOW_LABELED)
       return CoreUtils.isLabelChange(events, true);
 
+    /* Check if any News has become Unread */
+    else if (fType == Type.SHOW_UNREAD)
+      return CoreUtils.changedFromReadToUnread(events);
+
     return false;
   }
 }

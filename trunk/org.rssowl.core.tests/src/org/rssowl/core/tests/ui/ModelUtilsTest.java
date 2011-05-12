@@ -312,6 +312,85 @@ public class ModelUtilsTest {
    * @throws Exception
    */
   @Test
+  public void testHasBecomeUnread() throws Exception {
+    IFeed feed = fFactory.createFeed(Long.valueOf(0L), new URI("http://www.rssowl.org"));
+
+    Set<ModelEvent> events = new HashSet<ModelEvent>();
+
+    INews newNews = fFactory.createNews(0L, feed, new Date());
+    newNews.setState(INews.State.NEW);
+
+    INews unreadNews = fFactory.createNews(1L, feed, new Date());
+    unreadNews.setState(INews.State.UNREAD);
+
+    INews readNews = fFactory.createNews(2L, feed, new Date());
+    readNews.setState(INews.State.READ);
+
+    INews hiddenNews = fFactory.createNews(3L, feed, new Date());
+    hiddenNews.setState(INews.State.HIDDEN);
+
+    INews deletedNews = fFactory.createNews(4L, feed, new Date());
+    deletedNews.setState(INews.State.DELETED);
+
+    INews readNews2 = fFactory.createNews(5L, feed, new Date());
+    readNews2.setState(INews.State.READ);
+
+    INews unreadNews2 = fFactory.createNews(6L, feed, new Date());
+    unreadNews2.setState(INews.State.UNREAD);
+
+    INews hiddenNews2 = fFactory.createNews(7L, feed, new Date());
+    hiddenNews2.setState(INews.State.HIDDEN);
+
+    NewsEvent event1 = new NewsEvent(newNews, newNews, true);
+    NewsEvent event2 = new NewsEvent(newNews, unreadNews, true);
+    NewsEvent event3 = new NewsEvent(newNews, readNews, true);
+    NewsEvent event4 = new NewsEvent(unreadNews, readNews2, true);
+    NewsEvent event5 = new NewsEvent(unreadNews, unreadNews2, true);
+    NewsEvent event6 = new NewsEvent(hiddenNews, hiddenNews, true);
+    NewsEvent event7 = new NewsEvent(newNews, hiddenNews2, true);
+    NewsEvent event8 = new NewsEvent(newNews, deletedNews, true);
+    NewsEvent event9 = new NewsEvent(readNews, newNews, true);
+    NewsEvent event10 = new NewsEvent(hiddenNews, unreadNews, true);
+    NewsEvent event11 = new NewsEvent(readNews, unreadNews, true);
+
+    events.add(event1);
+    assertEquals(false, CoreUtils.changedFromReadToUnread(events));
+    events.add(event4);
+    assertEquals(false, CoreUtils.changedFromReadToUnread(events));
+    events.add(event5);
+    assertEquals(false, CoreUtils.changedFromReadToUnread(events));
+    events.add(event6);
+    assertEquals(false, CoreUtils.changedFromReadToUnread(events));
+    events.add(event2);
+    assertEquals(false, CoreUtils.changedFromReadToUnread(events));
+    events.add(event3);
+    assertEquals(false, CoreUtils.changedFromReadToUnread(events));
+
+    events.clear();
+    events.add(event7);
+    assertEquals(false, CoreUtils.changedFromReadToUnread(events));
+
+    events.clear();
+    events.add(event8);
+    assertEquals(false, CoreUtils.changedFromReadToUnread(events));
+
+    events.clear();
+    events.add(event9);
+    assertEquals(true, CoreUtils.changedFromReadToUnread(events));
+
+    events.clear();
+    events.add(event10);
+    assertEquals(false, CoreUtils.changedFromReadToUnread(events));
+
+    events.clear();
+    events.add(event11);
+    assertEquals(true, CoreUtils.changedFromReadToUnread(events));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
   public void testIsReadStateChange() throws Exception {
     IFeed feed = fFactory.createFeed(Long.valueOf(0L), new URI("http://www.rssowl.org"));
 
