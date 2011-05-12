@@ -253,6 +253,11 @@ public class CoreUtils {
               fieldExpression.append(value == -1 ? NLS.bind(Messages.CoreUtils_N_MINUTE, Math.abs(value)) : NLS.bind(Messages.CoreUtils_N_MINUTES, Math.abs(value)));
           }
 
+          /* Specially Treat Label Condition with "*" */
+          else if (fieldId == INews.LABEL && condValue.equals("*") && (fieldCondition.getSpecifier() == SearchSpecifier.IS || fieldCondition.getSpecifier() == SearchSpecifier.IS_NOT)) { //$NON-NLS-1$
+            fieldExpression.append(Messages.CoreUtils_LABEL_ASSIGNED);
+          }
+
           /* Append Condition Value based on Type */
           else {
             switch (typeId) {
