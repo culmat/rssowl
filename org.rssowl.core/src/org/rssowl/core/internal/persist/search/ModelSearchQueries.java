@@ -69,6 +69,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
@@ -163,12 +164,7 @@ public class ModelSearchQueries {
 
     /* Add Condition Scope Query as necessary */
     if (scope != null) {
-      BooleanClause conditionClause = createBooleanClause(analyzer, scope, true);
-
-      BooleanQuery conditionScopeQuery = new BooleanQuery();
-      conditionScopeQuery.add(conditionClause);
-
-      bQuery.add(conditionScopeQuery, Occur.MUST);
+      addFieldClauses(Collections.singleton(scope), true, bQuery, analyzer);
       isScoped = true;
     }
 

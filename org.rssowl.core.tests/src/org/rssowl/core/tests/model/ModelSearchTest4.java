@@ -4260,6 +4260,7 @@ public class ModelSearchTest4 extends AbstractModelSearchTest {
     DynamicDAO.save(root);
     waitForIndexer();
 
+    ISearchField allField = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
     ISearchField locationField = fFactory.createSearchField(INews.LOCATION, fNewsEntityName);
     ISearchField titleField = fFactory.createSearchField(INews.TITLE, fNewsEntityName);
     ISearchField stateField = fFactory.createSearchField(INews.STATE, fNewsEntityName);
@@ -4277,6 +4278,14 @@ public class ModelSearchTest4 extends AbstractModelSearchTest {
     ISearchCondition condition1 = fFactory.createSearchCondition(titleField, SearchSpecifier.CONTAINS_ALL, "GNC-*");
     ISearchCondition condition2 = fFactory.createSearchCondition(stateField, SearchSpecifier.IS, EnumSet.of(INews.State.READ));
     List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition1, condition2), true);
+    assertSame(result, news1, news2);
+    result = fModelSearch.searchNews(list(condition1, condition2), stickyCondition, true);
+    assertSame(result, news1);
+
+    /* Scope Condition: Is Sticky (AND, All Fields) */
+    condition1 = fFactory.createSearchCondition(allField, SearchSpecifier.CONTAINS_ALL, "GNC-*");
+    condition2 = fFactory.createSearchCondition(stateField, SearchSpecifier.IS, EnumSet.of(INews.State.READ));
+    result = fModelSearch.searchNews(list(condition1, condition2), true);
     assertSame(result, news1, news2);
     result = fModelSearch.searchNews(list(condition1, condition2), stickyCondition, true);
     assertSame(result, news1);
@@ -4303,6 +4312,12 @@ public class ModelSearchTest4 extends AbstractModelSearchTest {
     result = fModelSearch.searchNews(list(condition1, condition2), stickyCondition, false);
     assertSame(result, news1, news3);
 
+    /* Scope Condition: Is Sticky (OR, All Fields) */
+    condition1 = fFactory.createSearchCondition(allField, SearchSpecifier.CONTAINS_ALL, "GNC-*");
+    condition2 = fFactory.createSearchCondition(stateField, SearchSpecifier.IS, EnumSet.of(INews.State.READ));
+    result = fModelSearch.searchNews(list(condition1, condition2), stickyCondition, false);
+    assertSame(result, news1, news3);
+
     /* Scope Condition: Is Labeled (OR) */
     condition1 = fFactory.createSearchCondition(titleField, SearchSpecifier.CONTAINS_ALL, "GNC-*");
     condition2 = fFactory.createSearchCondition(stateField, SearchSpecifier.IS, EnumSet.of(INews.State.READ));
@@ -4319,6 +4334,14 @@ public class ModelSearchTest4 extends AbstractModelSearchTest {
     ISearchCondition conditionMatch = fFactory.createSearchCondition(locationField, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Collections.singleton((IFolderChild) mark1)));
     ISearchCondition conditionNoMatch = fFactory.createSearchCondition(locationField, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Collections.singleton((IFolderChild) mark2)));
     condition1 = fFactory.createSearchCondition(titleField, SearchSpecifier.CONTAINS_ALL, "GNC-*");
+    condition2 = fFactory.createSearchCondition(stateField, SearchSpecifier.IS, EnumSet.of(INews.State.READ));
+    result = fModelSearch.searchNews(list(conditionMatch, condition1, condition2), stickyCondition, true);
+    assertSame(result, news1);
+    result = fModelSearch.searchNews(list(conditionNoMatch, condition1, condition2), stickyCondition, true);
+    assertTrue(result.isEmpty());
+
+    /* Scope Condition: Is Sticky (AND, with Location, all fields) */
+    condition1 = fFactory.createSearchCondition(allField, SearchSpecifier.CONTAINS_ALL, "GNC-*");
     condition2 = fFactory.createSearchCondition(stateField, SearchSpecifier.IS, EnumSet.of(INews.State.READ));
     result = fModelSearch.searchNews(list(conditionMatch, condition1, condition2), stickyCondition, true);
     assertSame(result, news1);
@@ -4343,6 +4366,14 @@ public class ModelSearchTest4 extends AbstractModelSearchTest {
 
     /* Scope Condition: Is Sticky (OR, with Location) */
     condition1 = fFactory.createSearchCondition(titleField, SearchSpecifier.CONTAINS_ALL, "GNC-*");
+    condition2 = fFactory.createSearchCondition(stateField, SearchSpecifier.IS, EnumSet.of(INews.State.READ));
+    result = fModelSearch.searchNews(list(conditionMatch, condition1, condition2), stickyCondition, false);
+    assertSame(result, news1, news3);
+    result = fModelSearch.searchNews(list(conditionNoMatch, condition1, condition2), stickyCondition, true);
+    assertTrue(result.isEmpty());
+
+    /* Scope Condition: Is Sticky (OR, with Location, all fields) */
+    condition1 = fFactory.createSearchCondition(allField, SearchSpecifier.CONTAINS_ALL, "GNC-*");
     condition2 = fFactory.createSearchCondition(stateField, SearchSpecifier.IS, EnumSet.of(INews.State.READ));
     result = fModelSearch.searchNews(list(conditionMatch, condition1, condition2), stickyCondition, false);
     assertSame(result, news1, news3);
