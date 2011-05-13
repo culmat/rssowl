@@ -885,8 +885,8 @@ public class FilterBar {
     if (oldType == Type.SHOW_UNREAD && newType != Type.SHOW_NEW)
       return true; //Other filters than Unread (except for New) can have more elements
 
-    if (mark instanceof FolderNewsMark && mark.getNewsCount(INews.State.getVisible()) > NewsContentProvider.MAX_FOLDER_ELEMENTS)
-      return true; //Since Folders are limited, always revalidate when the filter changes and count larger limit
+    if (mark instanceof FolderNewsMark || mark instanceof ISearchMark)
+      return true; //Folders and Searches are scoping by filter under specific conditions, thereby always revalidate
 
     return false; //No revalidation needed
   }

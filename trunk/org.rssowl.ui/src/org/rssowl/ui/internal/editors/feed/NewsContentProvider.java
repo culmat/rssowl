@@ -30,6 +30,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
+import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.LongArrayList;
 import org.rssowl.core.internal.persist.SearchMark;
 import org.rssowl.core.persist.IBookMark;
@@ -40,6 +41,7 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.INewsMark;
+import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
@@ -54,9 +56,11 @@ import org.rssowl.core.persist.reference.ModelReference;
 import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.reference.SearchMarkReference;
+import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.Pair;
+import org.rssowl.core.util.SearchHit;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.EntityGroupItem;
@@ -65,6 +69,7 @@ import org.rssowl.ui.internal.FolderNewsMark.FolderNewsMarkReference;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.editors.feed.NewsFilter.Type;
 import org.rssowl.ui.internal.util.JobRunner;
+import org.rssowl.ui.internal.util.ModelUtils;
 import org.rssowl.ui.internal.util.UIBackgroundJob;
 
 import java.util.ArrayList;
@@ -86,6 +91,9 @@ public class NewsContentProvider implements ITreeContentProvider {
 
   /* The maximum number of items returned from a FolderNewsMark */
   static final int MAX_FOLDER_ELEMENTS = 500;
+
+  /* The maximum number of items in a SearchMark before scoping the results as specified by the filter */
+  static final int SCOPE_SEARCH_LIMIT = 200;
 
   private final NewsBrowserViewer fBrowserViewer;
   private final NewsTableViewer fTableViewer;
@@ -297,8 +305,9 @@ public class NewsContentProvider implements ITreeContentProvider {
     List<INews> resolvedNews = new ArrayList<INews>();
 
     /* Resolve Folder News Mark and pass in current filter */
+    Type type = fFilter.getType();
     if (input instanceof FolderNewsMark)
-      ((FolderNewsMark) input).resolve(fFilter.getType(), monitor);
+      ((FolderNewsMark) input).resolve(type, monitor);
 
     /* Check if ContentProvider was already disposed or RSSOwl shutting down */
     if (canceled(monitor))
@@ -306,18 +315,7 @@ public class NewsContentProvider implements ITreeContentProvider {
 
     /* Handle Folder, Newsbin and Saved Search */
     if (input.isGetNewsRefsEfficient()) {
-
-      /* Folder, Bin and Search can resolve news by state efficiently */
-      Set<State> states;
-      if (fFilter.getType() == Type.SHOW_NEW)
-        states = EnumSet.of(INews.State.NEW);
-      else if (fFilter.getType() == Type.SHOW_UNREAD)
-        states = EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED);
-      else
-        states = INews.State.getVisible();
-
-      /* Resolve and Add News */
-      List<NewsReference> newsReferences = input.getNewsRefs(states);
+      List<NewsReference> newsReferences = getNewsRefsFromInput(input, type);
       for (NewsReference newsRef : newsReferences) {
 
         /* Check if ContentProvider was already disposed or RSSOwl shutting down */
@@ -356,6 +354,42 @@ public class NewsContentProvider implements ITreeContentProvider {
     for (INews news : resolvedNews) {
       fCachedNews.put(news.getId(), news);
     }
+  }
+
+  private List<NewsReference> getNewsRefsFromInput(INewsMark input, NewsFilter.Type filter) {
+
+    /*
+     * Optimization: If input is a saved search with many results and the news filter is set to any condition that
+     * is not scoped by news state, we can actually inject the filter condition into the search to produce less results.
+     */
+    if (input instanceof ISearchMark) {
+      boolean nonStateBasedFilter = (filter == Type.SHOW_STICKY || filter == Type.SHOW_LABELED || filter == Type.SHOW_LAST_5_DAYS || filter == Type.SHOW_RECENT);
+      if (nonStateBasedFilter && input.getNewsCount(INews.State.getVisible()) > SCOPE_SEARCH_LIMIT) {
+        ISearchMark searchMark = (ISearchMark) input;
+        IModelSearch search = Owl.getPersistenceService().getModelSearch();
+
+        ISearchCondition filterCondition = ModelUtils.getConditionForFilter(filter);
+        List<SearchHit<NewsReference>> result = search.searchNews(searchMark.getSearchConditions(), filterCondition, searchMark.matchAllConditions());
+        List<NewsReference> newsRefs = new ArrayList<NewsReference>(result.size());
+        for (SearchHit<NewsReference> item : result) {
+          newsRefs.add(item.getResult());
+        }
+
+        return newsRefs;
+      }
+    }
+
+    /* Determine set of states to pick up based on Filter Type */
+    Set<State> states;
+    if (filter == Type.SHOW_NEW)
+      states = EnumSet.of(INews.State.NEW);
+    else if (filter == Type.SHOW_UNREAD)
+      states = EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED);
+    else
+      states = INews.State.getVisible();
+
+    /* Return news refs by state */
+    return input.getNewsRefs(states);
   }
 
   private synchronized boolean addToCache(List<INews> addedNews) {
