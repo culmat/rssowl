@@ -36,6 +36,7 @@ import org.rssowl.core.persist.IFilterAction;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.ILabel;
+import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.ISearch;
@@ -55,6 +56,7 @@ import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.EntityGroupItem;
 import org.rssowl.ui.internal.FolderNewsMark;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.editors.feed.NewsFilter;
 import org.rssowl.ui.internal.editors.feed.NewsGrouping;
 
 import java.net.URI;
@@ -63,6 +65,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -490,5 +493,44 @@ public class ModelUtils {
     }
 
     return false;
+  }
+
+  /**
+   * @param type the {@link NewsFilter} type.
+   * @return a {@link ISearchCondition} matching the provided NewsFilter.Type or
+   * <code>null</code> if none.
+   */
+  public static ISearchCondition getConditionForFilter(NewsFilter.Type type) {
+    IModelFactory factory = Owl.getModelFactory();
+    switch (type) {
+      case SHOW_ALL:
+        return null;
+
+      case SHOW_NEW:
+        ISearchField field = factory.createSearchField(INews.STATE, INews.class.getName());
+        return factory.createSearchCondition(field, SearchSpecifier.IS, EnumSet.of(INews.State.NEW));
+
+      case SHOW_UNREAD:
+        field = factory.createSearchField(INews.STATE, INews.class.getName());
+        return factory.createSearchCondition(field, SearchSpecifier.IS, EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED));
+
+      case SHOW_STICKY:
+        field = factory.createSearchField(INews.IS_FLAGGED, INews.class.getName());
+        return factory.createSearchCondition(field, SearchSpecifier.IS, true);
+
+      case SHOW_LABELED:
+        field = factory.createSearchField(INews.LABEL, INews.class.getName());
+        return factory.createSearchCondition(field, SearchSpecifier.IS, "*"); //$NON-NLS-1$
+
+      case SHOW_LAST_5_DAYS:
+        field = factory.createSearchField(INews.AGE_IN_DAYS, INews.class.getName());
+        return factory.createSearchCondition(field, SearchSpecifier.IS_LESS_THAN, 5);
+
+      case SHOW_RECENT:
+        field = factory.createSearchField(INews.AGE_IN_DAYS, INews.class.getName());
+        return factory.createSearchCondition(field, SearchSpecifier.IS_LESS_THAN, 1);
+    }
+
+    return null;
   }
 }

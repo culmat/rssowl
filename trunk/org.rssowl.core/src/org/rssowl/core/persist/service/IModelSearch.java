@@ -67,6 +67,22 @@ public interface IModelSearch {
   List<SearchHit<NewsReference>> searchNews(Collection<ISearchCondition> conditions, boolean matchAllConditions) throws PersistenceException;
 
   /**
+   * Search for the type <code>INews</code> in the persistance layer.
+   *
+   * @param conditions A <code>List</code> of Search-Conditions specifying the
+   * search to perform.
+   * @param scope a specific {@link ISearchCondition} that scopes the results.
+   * As such, the scope condition is a must criteria for the results.
+   * @param matchAllConditions If <code>TRUE</code>, require all conditions to
+   * match, and if <code>FALSE</code>, News are considered a result when they
+   * match at least 1 condition.
+   * @return Returns the result of the search as <code>List</code>. In case no
+   * type is matching the search, an empty <code>List</code> is returned.
+   * @throws PersistenceException In case of an error while searching.
+   */
+  List<SearchHit<NewsReference>> searchNews(Collection<ISearchCondition> conditions, ISearchCondition scope, boolean matchAllConditions) throws PersistenceException;
+
+  /**
    * Releases all resources used by the implementor of this interface. The
    * difference between this method and <code>stopIndexer</code> is that, in
    * addition to stopping the indexer, this method also releases the resources
