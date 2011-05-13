@@ -36,13 +36,17 @@ import org.rssowl.core.internal.persist.SearchMark;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IMark;
+import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.ISearchCondition;
+import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.ISearchMark;
+import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.event.NewsAdapter;
@@ -73,6 +77,7 @@ import org.rssowl.ui.internal.util.ModelUtils;
 import org.rssowl.ui.internal.util.UIBackgroundJob;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -359,17 +364,31 @@ public class NewsContentProvider implements ITreeContentProvider {
   private List<NewsReference> getNewsRefsFromInput(INewsMark input, NewsFilter.Type filter) {
 
     /*
-     * Optimization: If input is a saved search with many results and the news filter is set to any condition that
-     * is not scoped by news state, we can actually inject the filter condition into the search to produce less results.
+     * Optimization: If input is a saved search or bin with many results and the news filter is set to any condition that
+     * is not scoped by news state, we get the results from a search to potentially get less results and so need less memory.
      */
-    if (input instanceof ISearchMark) {
+    if (input instanceof ISearchMark || input instanceof INewsBin) {
       boolean nonStateBasedFilter = (filter == Type.SHOW_STICKY || filter == Type.SHOW_LABELED || filter == Type.SHOW_LAST_5_DAYS || filter == Type.SHOW_RECENT);
       if (nonStateBasedFilter && input.getNewsCount(INews.State.getVisible()) > SCOPE_SEARCH_LIMIT) {
-        ISearchMark searchMark = (ISearchMark) input;
         IModelSearch search = Owl.getPersistenceService().getModelSearch();
-
         ISearchCondition filterCondition = ModelUtils.getConditionForFilter(filter);
-        List<SearchHit<NewsReference>> result = search.searchNews(searchMark.getSearchConditions(), filterCondition, searchMark.matchAllConditions());
+        List<SearchHit<NewsReference>> result = null;
+
+        /* Inject into Saved Search */
+        if (input instanceof ISearchMark) {
+          ISearchMark searchMark = (ISearchMark) input;
+          result = search.searchNews(searchMark.getSearchConditions(), filterCondition, searchMark.matchAllConditions());
+        }
+
+        /* Location search for News Bin */
+        else {
+          INewsBin newsBin = (INewsBin) input;
+          IModelFactory factory = Owl.getModelFactory();
+          ISearchField locationField = factory.createSearchField(INews.LOCATION, INews.class.getName());
+          ISearchCondition locationCondition = factory.createSearchCondition(locationField, SearchSpecifier.IS, ModelUtils.toPrimitive(Collections.singleton((IFolderChild) newsBin)));
+          result = search.searchNews(Arrays.asList(locationCondition, filterCondition), true);
+        }
+
         List<NewsReference> newsRefs = new ArrayList<NewsReference>(result.size());
         for (SearchHit<NewsReference> item : result) {
           newsRefs.add(item.getResult());
