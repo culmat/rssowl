@@ -65,6 +65,7 @@ import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.SearchHit;
+import org.rssowl.core.util.Triple;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.EntityGroupItem;
@@ -411,15 +412,43 @@ public class NewsContentProvider implements ITreeContentProvider {
     return input.getNewsRefs(states);
   }
 
-  private synchronized boolean addToCache(List<INews> addedNews) {
+  private synchronized Triple<Boolean /* Was Empty */, Collection<NewsEvent>, Collection<INews>> addToCache(Collection<NewsEvent> events, Collection<INews> addedNews) {
     boolean wasEmpty = fCachedNews.isEmpty();
+    Collection<NewsEvent> visibleEvents = new ArrayList<NewsEvent>();
+    Collection<INews> visibleNews = new ArrayList<INews>();
 
     /* Check if ContentProvider was already disposed or RSSOwl shutting down */
     if (canceled())
-      return wasEmpty;
+      return Triple.create(wasEmpty, visibleEvents, visibleNews);
+
+    /* Folders, Searches and Bins use the filter (if set) to determine elements to cache */
+    if (fInput.isGetNewsRefsEfficient() && fFilter.getType() != Type.SHOW_ALL) {
+
+      /* Quickly Map from News to Event */
+      Map<INews, NewsEvent> mapNewsToEvent = new HashMap<INews, NewsEvent>(events.size());
+      for (NewsEvent event : events) {
+        mapNewsToEvent.put(event.getEntity(), event);
+      }
+
+      /* Filter the Added News */
+      Object[] elements = addedNews.toArray();
+      elements = fFilter.filter(null, (Object) null, elements);
+
+      /* Store result in collections */
+      for (Object element : elements) {
+        visibleNews.add((INews) element);
+        visibleEvents.add(mapNewsToEvent.get(element));
+      }
+    }
+
+    /* Not relevant for bookmarks, just add all */
+    else {
+      visibleEvents = events;
+      visibleNews = addedNews;
+    }
 
     /* Add to Cache */
-    for (INews news : addedNews) {
+    for (INews news : visibleNews) {
       fCachedNews.put(news.getId(), news);
     }
 
@@ -428,9 +457,9 @@ public class NewsContentProvider implements ITreeContentProvider {
      * make sure that the contents are updated properly from here.
      */
     if (fInput instanceof FolderNewsMark)
-      ((FolderNewsMark) fInput).add(addedNews);
+      ((FolderNewsMark) fInput).add(visibleNews);
 
-    return wasEmpty;
+    return Triple.create(wasEmpty, visibleEvents, visibleNews);
   }
 
   private synchronized Pair<List<NewsEvent>, List<INews>> updateCache(Set<NewsEvent> events, List<INews> updatedNews) {
@@ -1032,13 +1061,16 @@ public class NewsContentProvider implements ITreeContentProvider {
     }
 
     /* Add to Cache */
-    boolean wasEmpty = addToCache(addedNews);
+    Triple<Boolean, Collection<NewsEvent>, Collection<INews>> result = addToCache(events, addedNews);
+    boolean wasEmpty = result.getFirst();
+    Collection<NewsEvent> visibleEvents = result.getSecond();
+    Collection<INews> visibleNews = result.getThird();
 
     /* Return early if a refresh is required anyways */
-    if (fGrouping.needsRefresh(events, false)) {
+    if (fGrouping.needsRefresh(visibleEvents, false)) {
 
       /* Avoid a refresh when user is reading a filled newspaper view at the moment */
-      if (!browserShowsCollection() || canDoBrowserRefresh(wasEmpty, events))
+      if (!browserShowsCollection() || canDoBrowserRefresh(wasEmpty, visibleEvents))
         return true;
     }
 
@@ -1047,16 +1079,20 @@ public class NewsContentProvider implements ITreeContentProvider {
       return false;
 
     /* Add to Viewers */
-    addToViewers(addedNews, events, wasEmpty);
+    addToViewers(visibleNews, visibleEvents, wasEmpty);
 
     return false;
   }
 
   /* Add a List of News to Table and Browser Viewers */
-  private void addToViewers(List<INews> addedNews, Set<NewsEvent> events, boolean wasEmpty) {
+  private void addToViewers(Collection<INews> addedNews, Collection<NewsEvent> events, boolean wasEmpty) {
 
     /* Return on Shutdown or disposal */
     if (canceled())
+      return;
+
+    /* Return early if nothing to do */
+    if (addedNews.isEmpty())
       return;
 
     /* Add to Table-Viewer if Visible (keep top item and selection stable) */
