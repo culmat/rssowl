@@ -770,6 +770,18 @@ public class NewsContentProvider implements ITreeContentProvider {
               INews.State oldState = event.getOldNews() != null ? event.getOldNews().getState() : null;
               boolean isRestored = news.isVisible() && (oldState == INews.State.HIDDEN || oldState == INews.State.DELETED);
 
+              /*
+               * Special case of news being restored: If the input is of type news bin, search or folder news mark and the filter is set to only
+               * show new or unread news, a news is treated as being restored if it changed from READ to NEW, UNREAD or UPDATED because the filter
+               * ensures to filter out READ events in case one of the two filters is enabled.
+               */
+              if (!isRestored && fInput.isGetNewsRefsEfficient() && !hasCachedNews(news)) {
+                if (fFilter.getType() == Type.SHOW_NEW)
+                  isRestored = news.getState() == INews.State.NEW && oldState != null && oldState != INews.State.NEW;
+                else if (fFilter.getType() == Type.SHOW_UNREAD)
+                  isRestored = news.isVisible() && news.getState() != INews.State.READ && oldState == INews.State.READ;
+              }
+
               /* Return on Shutdown or disposal */
               if (canceled())
                 return;
