@@ -158,7 +158,7 @@ public class ImportSourcePage extends WizardPage {
 
     if (source == Source.RESOURCE) {
       String resource = getImportResource();
-      if (!new File(resource).exists() && URIUtils.looksLikeLink(resource))
+      if (!new File(resource).exists() && URIUtils.looksLikeLink(resource, false))
         return true;
     }
 
@@ -306,7 +306,7 @@ public class ImportSourcePage extends WizardPage {
     data = (data != null) ? data.trim() : null;
     cb.dispose();
 
-    if (URIUtils.looksLikeLink(data))
+    if (URIUtils.looksLikeLink(data, false))
       return URIUtils.ensureProtocol(data);
 
     return null;

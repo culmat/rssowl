@@ -72,6 +72,12 @@ public class URIUtils {
   /** The FEED Identifier */
   public static final String FEED_IDENTIFIER = "feed:"; //$NON-NLS-1$
 
+  /** The NEWS Identifier */
+  public static final String NEWS_IDENTIFIER = "news:"; //$NON-NLS-1$
+
+  /** The NNTP Identifier */
+  public static final String NNTP_IDENTIFIER = "nntp:"; //$NON-NLS-1$
+
   /** Identifier for a Protocol */
   public static final String PROTOCOL_IDENTIFIER = "://"; //$NON-NLS-1$
 
@@ -187,6 +193,18 @@ public class URIUtils {
    * @return TRUE in case the String looks like a Link.
    */
   public static boolean looksLikeLink(String str) {
+    return looksLikeLink(str, true);
+  }
+
+  /**
+   * Return TRUE in case the given String looks like a Link.
+   *
+   * @param str The String to check
+   * @param allowNewsGroup <code>true</code> to allow links of the form
+   * "news://" and <code>false</code> otherwise.
+   * @return TRUE in case the String looks like a Link.
+   */
+  public static boolean looksLikeLink(String str, boolean allowNewsGroup) {
 
     /* Is empty or null? */
     if (!StringUtils.isSet(str))
@@ -194,6 +212,10 @@ public class URIUtils {
 
     /* Contains whitespaces ? */
     if (str.indexOf(' ') >= 0)
+      return false;
+
+    /* Check Protocol for Newsgroup if set */
+    if (!allowNewsGroup && (str.startsWith(NEWS_IDENTIFIER) || str.startsWith(NNTP_IDENTIFIER)))
       return false;
 
     /* RegEx Link check */

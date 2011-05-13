@@ -118,7 +118,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- *A {@link WizardPage} to select the elements to import.
+ * A {@link WizardPage} to select the elements to import.
  *
  * @author bpasero
  */
@@ -561,7 +561,7 @@ public class ImportElementsPage extends WizardPage {
             importFromLocalResource(sourceFile);
 
           /* Import from Supplied Online Resource */
-          else if (source == Source.RESOURCE && URIUtils.looksLikeLink(fCurrentSourceResource))
+          else if (source == Source.RESOURCE && URIUtils.looksLikeLink(fCurrentSourceResource, false))
             importFromOnlineResource(new URI(URIUtils.ensureProtocol(fCurrentSourceResource)));
 
           /* Import from Google */
