@@ -1122,7 +1122,7 @@ public class ModelSearchTest4 extends AbstractModelSearchTest {
     List<ISearchCondition> conditions = new ArrayList<ISearchCondition>();
     conditions.add(fFactory.createSearchCondition(field, SearchSpecifier.IS, ModelUtils.toPrimitive(Collections.singletonList(root))));
 
-    Query query = ModelSearchQueries.createQuery(conditions, false);
+    Query query = ModelSearchQueries.createQuery(conditions, null, false);
     assertNotNull(query);
 
     BooleanQuery.setMaxClauseCount(maxClauseCount);
@@ -4227,5 +4227,142 @@ public class ModelSearchTest4 extends AbstractModelSearchTest {
     condition2 = fFactory.createSearchCondition(stateField, SearchSpecifier.IS, EnumSet.of(INews.State.READ));
     result = fModelSearch.searchNews(list(condition1, condition2), false);
     assertSame(result, news1, news2, news4, news5);
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testSearchNewsWithScopeCondition() throws Exception {
+    IFolder root = fFactory.createFolder(null, null, "Root");
+    IFolder child = fFactory.createFolder(null, root, "Child");
+
+    IFeed feed = fFactory.createFeed(null, new URI("http://www.feed.com/feed.xml"));
+    IFeed feed2 = fFactory.createFeed(null, new URI("http://www.feed.com/feed2.xml"));
+    INews news1 = createNews(feed, "GNC-2012-12-13 #634 On the Mend", "http://www.news.com/news1.html", State.READ);
+    news1.setFlagged(true);
+    INews news2 = createNews(feed, "This GNC-2010-15-13 #634 On the Mend", "http://www.news.com/news2.html", State.READ);
+    news2.setReceiveDate(new Date(0));
+    ILabel label = DynamicDAO.save(fFactory.createLabel(null, "Foo"));
+    news2.addLabel(label);
+    INews news3 = createNews(feed, "GNC-2011-16-13 #634 On the Mend", "http://www.news.com/news3.html", State.UNREAD);
+    news3.setFlagged(true);
+    INews news4 = createNews(feed, "The OAL-Research #634 On the Mend", "http://www.news.com/news4.html", State.READ);
+    label = DynamicDAO.save(fFactory.createLabel(null, "Bar"));
+    news4.addLabel(label);
+    createNews(feed, "Anything Else", "http://www.news.com/news5.html", State.UPDATED); //Used to validate count of results
+
+    IBookMark mark1 = fFactory.createBookMark(null, child, new FeedLinkReference(feed.getLink()), "Bookmark");
+    IBookMark mark2 = fFactory.createBookMark(null, child, new FeedLinkReference(feed2.getLink()), "Bookmark 2");
+
+    DynamicDAO.save(feed);
+    DynamicDAO.save(feed2);
+    DynamicDAO.save(root);
+    waitForIndexer();
+
+    ISearchField locationField = fFactory.createSearchField(INews.LOCATION, fNewsEntityName);
+    ISearchField titleField = fFactory.createSearchField(INews.TITLE, fNewsEntityName);
+    ISearchField stateField = fFactory.createSearchField(INews.STATE, fNewsEntityName);
+
+    ISearchField stickyField = fFactory.createSearchField(INews.IS_FLAGGED, fNewsEntityName);
+    ISearchCondition stickyCondition = fFactory.createSearchCondition(stickyField, SearchSpecifier.IS, true);
+
+    ISearchField labelField = fFactory.createSearchField(INews.LABEL, fNewsEntityName);
+    ISearchCondition labelCondition = fFactory.createSearchCondition(labelField, SearchSpecifier.IS, "*");
+
+    ISearchField ageField = fFactory.createSearchField(INews.AGE_IN_DAYS, fNewsEntityName);
+    ISearchCondition ageCondition = fFactory.createSearchCondition(ageField, SearchSpecifier.IS_LESS_THAN, 5);
+
+    /* Scope Condition: Is Sticky (AND) */
+    ISearchCondition condition1 = fFactory.createSearchCondition(titleField, SearchSpecifier.CONTAINS_ALL, "GNC-*");
+    ISearchCondition condition2 = fFactory.createSearchCondition(stateField, SearchSpecifier.IS, EnumSet.of(INews.State.READ));
+    List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition1, condition2), true);
+    assertSame(result, news1, news2);
+    result = fModelSearch.searchNews(list(condition1, condition2), stickyCondition, true);
+    assertSame(result, news1);
+
+    /* Scope Condition: Is Labeled (AND) */
+    condition1 = fFactory.createSearchCondition(titleField, SearchSpecifier.CONTAINS_ALL, "GNC-*");
+    condition2 = fFactory.createSearchCondition(stateField, SearchSpecifier.IS, EnumSet.of(INews.State.READ));
+    result = fModelSearch.searchNews(list(condition1, condition2), true);
+    assertSame(result, news1, news2);
+    result = fModelSearch.searchNews(list(condition1, condition2), labelCondition, true);
+    assertSame(result, news2);
+
+    /* Scope Condition: Recent Age (AND) */
+    condition1 = fFactory.createSearchCondition(titleField, SearchSpecifier.CONTAINS_ALL, "GNC-*");
+    condition2 = fFactory.createSearchCondition(stateField, SearchSpecifier.IS, EnumSet.of(INews.State.READ));
+    result = fModelSearch.searchNews(list(condition1, condition2), true);
+    assertSame(result, news1, news2);
+    result = fModelSearch.searchNews(list(condition1, condition2), ageCondition, true);
+    assertSame(result, news1);
+
+    /* Scope Condition: Is Sticky (OR) */
+    condition1 = fFactory.createSearchCondition(titleField, SearchSpecifier.CONTAINS_ALL, "GNC-*");
+    condition2 = fFactory.createSearchCondition(stateField, SearchSpecifier.IS, EnumSet.of(INews.State.READ));
+    result = fModelSearch.searchNews(list(condition1, condition2), stickyCondition, false);
+    assertSame(result, news1, news3);
+
+    /* Scope Condition: Is Labeled (OR) */
+    condition1 = fFactory.createSearchCondition(titleField, SearchSpecifier.CONTAINS_ALL, "GNC-*");
+    condition2 = fFactory.createSearchCondition(stateField, SearchSpecifier.IS, EnumSet.of(INews.State.READ));
+    result = fModelSearch.searchNews(list(condition1, condition2), labelCondition, false);
+    assertSame(result, news2, news4);
+
+    /* Scope Condition: Recent Age (OR) */
+    condition1 = fFactory.createSearchCondition(titleField, SearchSpecifier.CONTAINS_ALL, "GNC-*");
+    condition2 = fFactory.createSearchCondition(stateField, SearchSpecifier.IS, EnumSet.of(INews.State.READ));
+    result = fModelSearch.searchNews(list(condition1, condition2), ageCondition, false);
+    assertSame(result, news1, news3, news4);
+
+    /* Scope Condition: Is Sticky (AND, with Location) */
+    ISearchCondition conditionMatch = fFactory.createSearchCondition(locationField, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Collections.singleton((IFolderChild) mark1)));
+    ISearchCondition conditionNoMatch = fFactory.createSearchCondition(locationField, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Collections.singleton((IFolderChild) mark2)));
+    condition1 = fFactory.createSearchCondition(titleField, SearchSpecifier.CONTAINS_ALL, "GNC-*");
+    condition2 = fFactory.createSearchCondition(stateField, SearchSpecifier.IS, EnumSet.of(INews.State.READ));
+    result = fModelSearch.searchNews(list(conditionMatch, condition1, condition2), stickyCondition, true);
+    assertSame(result, news1);
+    result = fModelSearch.searchNews(list(conditionNoMatch, condition1, condition2), stickyCondition, true);
+    assertTrue(result.isEmpty());
+
+    /* Scope Condition: Is Labeled (AND, with Location) */
+    condition1 = fFactory.createSearchCondition(titleField, SearchSpecifier.CONTAINS_ALL, "GNC-*");
+    condition2 = fFactory.createSearchCondition(stateField, SearchSpecifier.IS, EnumSet.of(INews.State.READ));
+    result = fModelSearch.searchNews(list(conditionMatch, condition1, condition2), labelCondition, true);
+    assertSame(result, news2);
+    result = fModelSearch.searchNews(list(conditionNoMatch, condition1, condition2), stickyCondition, true);
+    assertTrue(result.isEmpty());
+
+    /* Scope Condition: Recent Age (AND, with Location) */
+    condition1 = fFactory.createSearchCondition(titleField, SearchSpecifier.CONTAINS_ALL, "GNC-*");
+    condition2 = fFactory.createSearchCondition(stateField, SearchSpecifier.IS, EnumSet.of(INews.State.READ));
+    result = fModelSearch.searchNews(list(conditionMatch, condition1, condition2), ageCondition, true);
+    assertSame(result, news1);
+    result = fModelSearch.searchNews(list(conditionNoMatch, condition1, condition2), stickyCondition, true);
+    assertTrue(result.isEmpty());
+
+    /* Scope Condition: Is Sticky (OR, with Location) */
+    condition1 = fFactory.createSearchCondition(titleField, SearchSpecifier.CONTAINS_ALL, "GNC-*");
+    condition2 = fFactory.createSearchCondition(stateField, SearchSpecifier.IS, EnumSet.of(INews.State.READ));
+    result = fModelSearch.searchNews(list(conditionMatch, condition1, condition2), stickyCondition, false);
+    assertSame(result, news1, news3);
+    result = fModelSearch.searchNews(list(conditionNoMatch, condition1, condition2), stickyCondition, true);
+    assertTrue(result.isEmpty());
+
+    /* Scope Condition: Is Labeled (OR, with Location) */
+    condition1 = fFactory.createSearchCondition(titleField, SearchSpecifier.CONTAINS_ALL, "GNC-*");
+    condition2 = fFactory.createSearchCondition(stateField, SearchSpecifier.IS, EnumSet.of(INews.State.READ));
+    result = fModelSearch.searchNews(list(conditionMatch, condition1, condition2), labelCondition, false);
+    assertSame(result, news2, news4);
+    result = fModelSearch.searchNews(list(conditionNoMatch, condition1, condition2), stickyCondition, true);
+    assertTrue(result.isEmpty());
+
+    /* Scope Condition: Recent Age (OR, with Location) */
+    condition1 = fFactory.createSearchCondition(titleField, SearchSpecifier.CONTAINS_ALL, "GNC-*");
+    condition2 = fFactory.createSearchCondition(stateField, SearchSpecifier.IS, EnumSet.of(INews.State.READ));
+    result = fModelSearch.searchNews(list(conditionMatch, condition1, condition2), ageCondition, false);
+    assertSame(result, news1, news3, news4);
+    result = fModelSearch.searchNews(list(conditionNoMatch, condition1, condition2), stickyCondition, true);
+    assertTrue(result.isEmpty());
   }
 }

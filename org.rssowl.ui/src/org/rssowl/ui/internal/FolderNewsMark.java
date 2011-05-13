@@ -57,7 +57,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -375,7 +374,7 @@ public class FolderNewsMark extends Mark implements INewsMark {
       return;
 
     /* Retrieve filter condition */
-    ISearchCondition filterCondition = getCondition(type);
+    ISearchCondition filterCondition = ModelUtils.getConditionForFilter(type);
 
     /* Resolve Bookmarks and Newsbins using Location search */
     {
@@ -394,18 +393,16 @@ public class FolderNewsMark extends Mark implements INewsMark {
         return;
     }
 
-    /* Resolve Searches (TODO Performance: Currently does not consider other filters than NEW and UNREAD if search uses OR conditions) */
+    /* Resolve Searches */
     {
       Set<ISearchMark> searches = new HashSet<ISearchMark>();
       findSearches(fFolder, searches);
       for (ISearchMark search : searches) {
 
         /* Inject the filter condition into the search if it is not an OR query or only 1 condition specified */
-        if ((type == Type.SHOW_RECENT || type == Type.SHOW_LAST_5_DAYS || type == Type.SHOW_STICKY || type == Type.SHOW_LABELED) && canInjectCondition(search)) {
+        if ((type == Type.SHOW_RECENT || type == Type.SHOW_LAST_5_DAYS || type == Type.SHOW_STICKY || type == Type.SHOW_LABELED)) {
           List<ISearchCondition> conditions = search.getSearchConditions();
-          conditions.add(filterCondition);
-
-          List<SearchHit<NewsReference>> results = fSearch.searchNews(conditions, true);
+          List<SearchHit<NewsReference>> results = fSearch.searchNews(conditions, filterCondition, search.matchAllConditions());
           addAll(results);
         }
 
@@ -431,55 +428,6 @@ public class FolderNewsMark extends Mark implements INewsMark {
           return;
       }
     }
-  }
-
-  private boolean canInjectCondition(ISearchMark search) {
-    List<ISearchCondition> conditions = search.getSearchConditions();
-
-    /* Can always inject if configured to match all conditions or conditions equals 1 */
-    if (search.matchAllConditions() || conditions.size() <= 1)
-      return true;
-
-    /* Can also inject if one of the two conditions is the Location-Scope condition */
-    if (conditions.size() == 2) {
-      if (conditions.get(0).getSpecifier() == SearchSpecifier.SCOPE || conditions.get(1).getSpecifier() == SearchSpecifier.SCOPE)
-        return true;
-    }
-
-    return false;
-  }
-
-  private ISearchCondition getCondition(NewsFilter.Type type) {
-    switch (type) {
-      case SHOW_ALL:
-        return null;
-
-      case SHOW_NEW:
-        ISearchField field = fFactory.createSearchField(INews.STATE, INews.class.getName());
-        return fFactory.createSearchCondition(field, SearchSpecifier.IS, EnumSet.of(INews.State.NEW));
-
-      case SHOW_UNREAD:
-        field = fFactory.createSearchField(INews.STATE, INews.class.getName());
-        return fFactory.createSearchCondition(field, SearchSpecifier.IS, EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED));
-
-      case SHOW_STICKY:
-        field = fFactory.createSearchField(INews.IS_FLAGGED, INews.class.getName());
-        return fFactory.createSearchCondition(field, SearchSpecifier.IS, true);
-
-      case SHOW_LABELED:
-        field = fFactory.createSearchField(INews.LABEL, INews.class.getName());
-        return fFactory.createSearchCondition(field, SearchSpecifier.IS, "*"); //$NON-NLS-1$
-
-      case SHOW_LAST_5_DAYS:
-        field = fFactory.createSearchField(INews.AGE_IN_DAYS, INews.class.getName());
-        return fFactory.createSearchCondition(field, SearchSpecifier.IS_LESS_THAN, 5);
-
-      case SHOW_RECENT:
-        field = fFactory.createSearchField(INews.AGE_IN_DAYS, INews.class.getName());
-        return fFactory.createSearchCondition(field, SearchSpecifier.IS_LESS_THAN, 1);
-    }
-
-    return null;
   }
 
   private void findSearches(IFolder folder, Set<ISearchMark> searches) {

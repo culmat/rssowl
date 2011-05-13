@@ -75,7 +75,7 @@ import java.util.List;
 
 /**
  * Helper to build the queries to search for {@link INews}.
- * 
+ *
  * @author bpasero
  */
 public class ModelSearchQueries {
@@ -106,27 +106,29 @@ public class ModelSearchQueries {
 
   /**
    * Creates a Lucene {@link Query} from the given parameters.
-   * 
+   *
    * @param search the search for the query.
    * @return a {@link Query} from the given parameters.
    * @throws IOException in case of an error.
    */
   public static Query createQuery(ISearch search) throws IOException {
-    return createQuery(search.getSearchConditions(), search.matchAllConditions());
+    return createQuery(search.getSearchConditions(), null, search.matchAllConditions());
   }
 
   /**
    * Creates a Lucene {@link Query} from the given parameters.
-   * 
+   *
    * @param conditions the search conditions for the query.
+   * @param scope a specific {@link ISearchCondition} that scopes the results.
+   * As such, the scope condition is a must criteria for the results.
    * @param matchAllConditions <code>true</code> to match all conditions and
    * <code>false</code> otherwise.
    * @return a {@link Query} from the given parameters.
    * @throws IOException in case of an error.
    */
-  public static Query createQuery(Collection<ISearchCondition> conditions, boolean matchAllConditions) throws IOException {
+  public static Query createQuery(Collection<ISearchCondition> conditions, ISearchCondition scope, boolean matchAllConditions) throws IOException {
     try {
-      return internalCreateQuery(conditions, matchAllConditions);
+      return internalCreateQuery(conditions, scope, matchAllConditions);
     }
 
     /* Too Many Clauses - Increase Clauses Limit */
@@ -135,7 +137,7 @@ public class ModelSearchQueries {
       /* Disable Clauses Limit */
       if (BooleanQuery.getMaxClauseCount() != ModelSearchImpl.MAX_CLAUSE_COUNT) {
         BooleanQuery.setMaxClauseCount(ModelSearchImpl.MAX_CLAUSE_COUNT);
-        return internalCreateQuery(conditions, matchAllConditions);
+        return internalCreateQuery(conditions, scope, matchAllConditions);
       }
 
       /* Maximum reached */
@@ -143,19 +145,31 @@ public class ModelSearchQueries {
     }
   }
 
-  private static Query internalCreateQuery(Collection<ISearchCondition> conditions, boolean matchAllConditions) throws IOException {
-    BooleanQuery bQuery = new BooleanQuery();
-
-    /* Handle Scope Query separately */
+  private static Query internalCreateQuery(Collection<ISearchCondition> conditions, ISearchCondition scope, boolean matchAllConditions) throws IOException {
     boolean isScoped = false;
+    BooleanQuery bQuery = new BooleanQuery();
+    Analyzer analyzer = Indexer.createAnalyzer();
+
+    /* Handle Location Scope Query separately */
     for (ISearchCondition condition : conditions) {
-      if (isScopeCondition(condition)) {
-        BooleanQuery scopeClause = createLocationClause(condition);
-        if (!scopeClause.clauses().isEmpty()) {
-          bQuery.add(scopeClause, Occur.MUST);
+      if (isLocationScopeCondition(condition)) {
+        BooleanQuery locationScopeClause = createLocationClause(condition);
+        if (!locationScopeClause.clauses().isEmpty()) {
+          bQuery.add(locationScopeClause, Occur.MUST);
           isScoped = true;
         }
       }
+    }
+
+    /* Add Condition Scope Query as necessary */
+    if (scope != null) {
+      BooleanClause conditionClause = createBooleanClause(analyzer, scope, true);
+
+      BooleanQuery conditionScopeQuery = new BooleanQuery();
+      conditionScopeQuery.add(conditionClause);
+
+      bQuery.add(conditionScopeQuery, Occur.MUST);
+      isScoped = true;
     }
 
     /* If scoped, the fieldQuery is a MUST-Clause to the outer Query */
@@ -164,7 +178,7 @@ public class ModelSearchQueries {
       fieldQuery = new BooleanQuery();
 
     /* Add Conditions into the Boolean Query */
-    addFieldClauses(conditions, matchAllConditions, fieldQuery);
+    addFieldClauses(conditions, matchAllConditions, fieldQuery, analyzer);
 
     /* Only add if not empty if scoped */
     if (isScoped && !fieldQuery.clauses().isEmpty())
@@ -173,7 +187,7 @@ public class ModelSearchQueries {
     return bQuery;
   }
 
-  private static void addFieldClauses(Collection<ISearchCondition> conditions, boolean matchAllConditions, BooleanQuery bQuery) throws IOException {
+  private static void addFieldClauses(Collection<ISearchCondition> conditions, boolean matchAllConditions, BooleanQuery bQuery, Analyzer analyzer) throws IOException {
 
     /* Handle State-Field separately (group) */
     BooleanQuery statesQuery = null;
@@ -193,11 +207,10 @@ public class ModelSearchQueries {
 
     /* Create a Query for each condition */
     BooleanQuery fieldQuery = null;
-    Analyzer analyzer = Indexer.createAnalyzer();
     for (ISearchCondition condition : conditions) {
 
       /* State and Scope Queries already handled */
-      if (requiresStateGrouping(condition) || isScopeCondition(condition))
+      if (requiresStateGrouping(condition) || isLocationScopeCondition(condition))
         continue;
 
       /* Create and add new BooleanQuery for other Fields */
@@ -272,7 +285,7 @@ public class ModelSearchQueries {
     return condition.getField().getId() == INews.STATE;
   }
 
-  private static boolean isScopeCondition(ISearchCondition condition) {
+  private static boolean isLocationScopeCondition(ISearchCondition condition) {
     return condition.getSpecifier() == SearchSpecifier.SCOPE;
   }
 
@@ -403,7 +416,7 @@ public class ModelSearchQueries {
       try {
         switch (condition.getField().getSearchValueType().getId()) {
 
-          /* Boolean: Simple Term-Query */
+        /* Boolean: Simple Term-Query */
           case ISearchValueType.BOOLEAN:
             query = createTermQuery(condition);
             break;
@@ -585,13 +598,13 @@ public class ModelSearchQueries {
 
     switch (specifier) {
 
-      /* Create Wildcard-Query */
+    /* Create Wildcard-Query */
       case IS:
       case IS_NOT: {
         return createWildcardQuery(fieldname, value.toLowerCase());
       }
 
-        /* Let Query-Parser handle this */
+      /* Let Query-Parser handle this */
       case CONTAINS:
       case CONTAINS_ALL:
       case CONTAINS_NOT: {
@@ -607,19 +620,19 @@ public class ModelSearchQueries {
         return parser.parse(value);
       }
 
-        /* Wildcard-Query with trailing '*' */
+      /* Wildcard-Query with trailing '*' */
       case BEGINS_WITH: {
         value = value.toLowerCase() + "*"; //$NON-NLS-1$
         return createWildcardQuery(fieldname, value);
       }
 
-        /* Wildcard-Query with leading '*' */
+      /* Wildcard-Query with leading '*' */
       case ENDS_WITH: {
         value = "*" + value.toLowerCase(); //$NON-NLS-1$
         return createWildcardQuery(fieldname, value);
       }
 
-        /* Fuzzy Query */
+      /* Fuzzy Query */
       case SIMILIAR_TO: {
         BooleanQuery similarityQuery = new BooleanQuery();
 

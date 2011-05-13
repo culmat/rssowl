@@ -351,8 +351,17 @@ public class ModelSearchImpl implements IModelSearch {
    * boolean)
    */
   public List<SearchHit<NewsReference>> searchNews(Collection<ISearchCondition> conditions, boolean matchAllConditions) throws PersistenceException {
+    return searchNews(conditions, null, matchAllConditions);
+  }
+
+  /*
+   * @see
+   * org.rssowl.core.persist.service.IModelSearch#searchNews(java.util.Collection
+   * , org.rssowl.core.persist.ISearchCondition, boolean)
+   */
+  public List<SearchHit<NewsReference>> searchNews(Collection<ISearchCondition> conditions, ISearchCondition scope, boolean matchAllConditions) throws PersistenceException {
     try {
-      return doSearchNews(conditions, matchAllConditions);
+      return doSearchNews(conditions, scope, matchAllConditions);
     }
 
     /* Too Many Clauses - Increase Clauses Limit */
@@ -361,7 +370,7 @@ public class ModelSearchImpl implements IModelSearch {
       /* Disable Clauses Limit */
       if (BooleanQuery.getMaxClauseCount() != ModelSearchImpl.MAX_CLAUSE_COUNT) {
         BooleanQuery.setMaxClauseCount(MAX_CLAUSE_COUNT);
-        return doSearchNews(conditions, matchAllConditions);
+        return doSearchNews(conditions, scope, matchAllConditions);
       }
 
       /* Maximum reached */
@@ -369,11 +378,11 @@ public class ModelSearchImpl implements IModelSearch {
     }
   }
 
-  private List<SearchHit<NewsReference>> doSearchNews(Collection<ISearchCondition> conditions, boolean matchAllConditions) throws PersistenceException {
+  private List<SearchHit<NewsReference>> doSearchNews(Collection<ISearchCondition> conditions, ISearchCondition scope, boolean matchAllConditions) throws PersistenceException {
 
     /* Perform the search */
     try {
-      Query bQuery = ModelSearchQueries.createQuery(conditions, matchAllConditions);
+      Query bQuery = ModelSearchQueries.createQuery(conditions, scope, matchAllConditions);
 
       /* Make sure the searcher is in sync */
       final IndexSearcher currentSearcher = getCurrentSearcher();
