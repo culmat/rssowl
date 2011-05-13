@@ -879,14 +879,8 @@ public class FilterBar {
     if (mark instanceof IBookMark)
       return false; //Only revalidate for Folders, Searches and Bins
 
-    if (oldType == Type.SHOW_NEW)
-      return true; //New is most strict filter, so revalidate cache
-
-    if (oldType == Type.SHOW_UNREAD && newType != Type.SHOW_NEW)
-      return true; //Other filters than Unread (except for New) can have more elements
-
-    if (mark instanceof FolderNewsMark || mark instanceof ISearchMark)
-      return true; //Folders and Searches are scoping by filter under specific conditions, thereby always revalidate
+    if (mark.isGetNewsRefsEfficient())
+      return true; //Folders, Searches and Bins are scoping by filter under specific conditions, thereby always revalidate
 
     return false; //No revalidation needed
   }
