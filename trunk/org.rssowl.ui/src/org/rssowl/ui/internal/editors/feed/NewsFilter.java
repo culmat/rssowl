@@ -257,7 +257,7 @@ public class NewsFilter extends ViewerFilter {
 
       switch (fType) {
 
-        /* Show: All */
+      /* Show: All */
         case SHOW_ALL:
           isMatch = true;
           break;
@@ -406,6 +406,8 @@ public class NewsFilter extends ViewerFilter {
 
   private Map<Long, Long> cacheMatchingNews(String pattern) {
     List<ISearchCondition> conditions = new ArrayList<ISearchCondition>(2);
+    ISearchCondition locationCondition = null;
+    ISearchCondition textCondition = null;
 
     /* Explicitly return on empty String */
     if (!StringUtils.isSet(pattern))
@@ -418,7 +420,8 @@ public class NewsFilter extends ViewerFilter {
     /* Match on Location (not supported for search marks and folder news marks) */
     if (fNewsMark != null && !(fNewsMark instanceof ISearchMark) && !(fNewsMark instanceof FolderNewsMark)) {
       ISearchField field = fModelFactory.createSearchField(INews.LOCATION, INews.class.getName());
-      conditions.add(fModelFactory.createSearchCondition(field, SearchSpecifier.IS, ModelUtils.toPrimitive(Collections.singletonList((IFolderChild) fNewsMark))));
+      locationCondition = fModelFactory.createSearchCondition(field, SearchSpecifier.IS, ModelUtils.toPrimitive(Collections.singletonList((IFolderChild) fNewsMark)));
+      conditions.add(locationCondition);
     }
 
     /* Match on Pattern */
@@ -457,10 +460,18 @@ public class NewsFilter extends ViewerFilter {
         break;
     }
 
-    conditions.add(fModelFactory.createSearchCondition(field, specifier, pattern));
+    textCondition = fModelFactory.createSearchCondition(field, specifier, pattern);
+    conditions.add(textCondition);
 
     /* Perform Search */
-    List<SearchHit<NewsReference>> result = Owl.getPersistenceService().getModelSearch().searchNews(conditions, true);
+    List<SearchHit<NewsReference>> result;
+    if (fNewsMark != null && fNewsMark instanceof ISearchMark) { //Inject conditions into search conditions
+      ISearchMark searchMark = (ISearchMark) fNewsMark;
+      result = Owl.getPersistenceService().getModelSearch().searchNews(searchMark.getSearchConditions(), textCondition, searchMark.matchAllConditions());
+    } else { //Use the provided conditions as is
+      result = Owl.getPersistenceService().getModelSearch().searchNews(conditions, true);
+    }
+
     Map<Long, Long> resultMap = new HashMap<Long, Long>(result.size());
     for (SearchHit<NewsReference> hit : result) {
       resultMap.put(hit.getResult().getId(), hit.getResult().getId());
