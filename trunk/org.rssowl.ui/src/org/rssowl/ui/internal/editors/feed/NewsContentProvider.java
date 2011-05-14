@@ -84,6 +84,7 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -369,14 +370,8 @@ public class NewsContentProvider implements ITreeContentProvider {
     }
 
     /* Filter Elements as needed */
-    if (needToFilter && shouldFilter()) {
-      Object[] elements = resolvedNews.toArray();
-      elements = fFilter.filter(null, (Object) null, elements);
-      resolvedNews = new ArrayList<INews>(elements.length);
-      for (Object element : elements) {
-        resolvedNews.add((INews) element);
-      }
-    }
+    if (needToFilter && isFilteredByOtherThanState())
+      filterElements(resolvedNews);
 
     /* Check if ContentProvider was already disposed or RSSOwl shutting down */
     if (canceled(monitor))
@@ -446,7 +441,7 @@ public class NewsContentProvider implements ITreeContentProvider {
       return Triple.create(wasEmpty, visibleEvents, visibleNews);
 
     /* Use the filter (if set) to determine elements to cache */
-    if (fFilter.getType() != Type.SHOW_ALL) {
+    if (isFilteredByState() || isFilteredByOtherThanState()) {
 
       /* Quickly Map from News to Event */
       Map<INews, NewsEvent> mapNewsToEvent = new HashMap<INews, NewsEvent>(events.size());
@@ -455,14 +450,12 @@ public class NewsContentProvider implements ITreeContentProvider {
       }
 
       /* Filter the Added News */
-      Object[] elements = addedNews.toArray();
-      elements = fFilter.filter(null, (Object) null, elements);
+      visibleNews.addAll(addedNews);
+      filterElements(visibleNews);
 
-      /* Store result in collections */
-      for (Object element : elements) {
-        visibleNews.add((INews) element);
-        visibleEvents.add(mapNewsToEvent.get(element));
-      }
+      /* Also indicate related events for visible news */
+      for (INews news : visibleNews)
+        visibleEvents.add(mapNewsToEvent.get(news));
     }
 
     /* Not relevant for bookmarks, just add all */
@@ -605,14 +598,8 @@ public class NewsContentProvider implements ITreeContentProvider {
     }
 
     /* Optimization: Only consider those news that pass the filter when news are added (or in general for Folder News Mark) */
-    if (needToFilter && shouldFilter()) {
-      Object[] elements = addedNews.toArray();
-      elements = fFilter.filter(null, (Object) null, elements);
-      addedNews = new ArrayList<INews>(elements.length);
-      for (Object object : elements) {
-        addedNews.add((INews) object);
-      }
-    }
+    if (needToFilter && isFilteredByOtherThanState())
+      filterElements(addedNews);
 
     /* Add to Cache */
     for (INews news : addedNews) {
@@ -626,12 +613,20 @@ public class NewsContentProvider implements ITreeContentProvider {
     return Pair.create(addedNews, wasEmpty);
   }
 
-  private boolean shouldFilter() {
-    Type type = fFilter.getType();
-    if (type == Type.SHOW_STICKY || type == Type.SHOW_LABELED || type == Type.SHOW_LAST_5_DAYS || type == Type.SHOW_RECENT)
-      return true;
+  private boolean isFilteredByState() {
+    return fFilter.getType() == Type.SHOW_NEW || fFilter.getType() == Type.SHOW_UNREAD;
+  }
 
-    return fFilter.isPatternSet();
+  private boolean isFilteredByOtherThanState() {
+    return fFilter.getType() == Type.SHOW_STICKY || fFilter.getType() == Type.SHOW_LABELED || fFilter.getType() == Type.SHOW_RECENT || fFilter.getType() == Type.SHOW_LAST_5_DAYS;
+  }
+
+  private void filterElements(Collection<INews> elements) {
+    Iterator<INews> iterator = elements.iterator();
+    while (iterator.hasNext()) {
+      if (!fFilter.select(iterator.next(), true))
+        iterator.remove();
+    }
   }
 
   private Set<Long> extractNewsIds(List<SearchMarkEvent> events) {
@@ -666,26 +661,18 @@ public class NewsContentProvider implements ITreeContentProvider {
       return resolvedNews;
 
     /* Filter Elements if necessary */
-    Object[] elements = resolvedNews.toArray();
-    if (needToFilter)
-      elements = fFilter.filter(null, (Object) null, elements);
+    if (needToFilter && isFilteredByOtherThanState())
+      filterElements(resolvedNews);
 
     /* Return after filtering if elements count is now small enough */
-    if (elements.length <= MAX_FOLDER_ELEMENTS) {
-      List<INews> limitedResult = new ArrayList<INews>(elements.length);
-      for (Object object : elements) {
-        limitedResult.add((INews) object);
-      }
-
-      return limitedResult;
-    }
+    if (resolvedNews.size() <= MAX_FOLDER_ELEMENTS)
+      return resolvedNews;
 
     /* First add those news that are Labeled or Sticky if this group mode is active */
     List<INews> priorityItems = Collections.emptyList();
     if (isGroupingByLabel() || isGroupingByStickyness()) {
       priorityItems = new ArrayList<INews>();
-      for (int i = 0; i < elements.length; i++) {
-        INews news = (INews) elements[i];
+      for (INews news : resolvedNews) {
         if (isGroupingByLabel() && !news.getLabels().isEmpty() || isGroupingByStickyness() && news.isFlagged())
           priorityItems.add(news);
       }
@@ -696,6 +683,7 @@ public class NewsContentProvider implements ITreeContentProvider {
       return priorityItems;
 
     /* Need to sort now to pick the top N remaining elements */
+    Object[] elements = resolvedNews.toArray();
     comparer.sort(null, elements);
 
     /* Pick top N remaining Elements */
