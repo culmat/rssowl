@@ -1043,6 +1043,6 @@ public class FolderNewsMarkTest {
    * @throws InterruptedException
    */
   protected void waitForIndexer() throws InterruptedException {
-    Thread.sleep(500);
+    Thread.sleep(2000);
   }
 }
