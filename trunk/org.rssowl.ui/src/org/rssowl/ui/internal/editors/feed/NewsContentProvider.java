@@ -98,7 +98,7 @@ public class NewsContentProvider implements ITreeContentProvider {
   /* The maximum number of items returned from a FolderNewsMark */
   static final int MAX_FOLDER_ELEMENTS = 500;
 
-  /* The maximum number of items in a SearchMark before scoping the results as specified by the filter */
+  /* The maximum number of items in a NewsMark before scoping the results as specified by the filter */
   static final int SCOPE_SEARCH_LIMIT = 200;
 
   private final NewsBrowserViewer fBrowserViewer;
