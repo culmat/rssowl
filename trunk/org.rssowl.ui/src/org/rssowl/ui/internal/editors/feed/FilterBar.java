@@ -822,7 +822,7 @@ public class FilterBar {
 
   private void onFilter(NewsFilter.Type type) {
     doFilter(type, true, true);
-    EditorUtils.updateFilterAndGrouping();
+    EditorUtils.updateFilterAndGrouping(fFeedView);
   }
 
   void doFilter(final NewsFilter.Type type, boolean refresh, boolean saveSettings) {
@@ -1067,7 +1067,7 @@ public class FilterBar {
 
   private void onGrouping(NewsGrouping.Type type) {
     doGrouping(type, true, true);
-    EditorUtils.updateFilterAndGrouping();
+    EditorUtils.updateFilterAndGrouping(fFeedView);
   }
 
   void doGrouping(final NewsGrouping.Type type, boolean refresh, boolean saveSettings) {

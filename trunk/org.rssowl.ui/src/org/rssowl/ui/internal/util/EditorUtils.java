@@ -85,9 +85,21 @@ public class EditorUtils {
    * Update filter and grouping of all opened feed views.
    */
   public static void updateFilterAndGrouping() {
+    updateFilterAndGrouping(null);
+  }
+
+  /**
+   * Update filter and grouping of all opened feed views except for the provided
+   * one.
+   * 
+   * @param exception the instanceof {@link FeedView} to not update filter and
+   * grouping for.
+   */
+  public static void updateFilterAndGrouping(FeedView exception) {
     List<FeedView> feedViews = OwlUI.getFeedViews();
     for (FeedView feedView : feedViews) {
-      feedView.updateFilterAndGrouping(true);
+      if (!feedView.equals(exception))
+        feedView.updateFilterAndGrouping(true);
     }
   }
 
