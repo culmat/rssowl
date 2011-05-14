@@ -354,7 +354,7 @@ public class NewsContentProvider implements ITreeContentProvider {
 
       /* Special treat folders and limit them by size */
       if (input instanceof FolderNewsMark)
-        resolvedNews = limitFolderNewsMark(resolvedNews, needToFilter, comparer != null ? comparer : fFeedView.getComparator());
+        resolvedNews = limitFolderNewsMark(resolvedNews, comparer != null ? comparer : fFeedView.getComparator());
     }
 
     /* Handle Bookmark (check for news counts as optimization) */
@@ -371,7 +371,7 @@ public class NewsContentProvider implements ITreeContentProvider {
 
     /* Filter Elements as needed */
     if (needToFilter && isFilteredByOtherThanState())
-      filterElements(resolvedNews);
+      filterElements(resolvedNews, true);
 
     /* Check if ContentProvider was already disposed or RSSOwl shutting down */
     if (canceled(monitor))
@@ -451,7 +451,7 @@ public class NewsContentProvider implements ITreeContentProvider {
 
       /* Filter the Added News */
       visibleNews.addAll(addedNews);
-      filterElements(visibleNews);
+      filterElements(visibleNews, true);
 
       /* Also indicate related events for visible news */
       for (INews news : visibleNews)
@@ -599,7 +599,7 @@ public class NewsContentProvider implements ITreeContentProvider {
 
     /* Optimization: Only consider those news that pass the filter when news are added (or in general for Folder News Mark) */
     if (needToFilter && isFilteredByOtherThanState())
-      filterElements(addedNews);
+      filterElements(addedNews, true);
 
     /* Add to Cache */
     for (INews news : addedNews) {
@@ -621,10 +621,10 @@ public class NewsContentProvider implements ITreeContentProvider {
     return fFilter.getType() == Type.SHOW_STICKY || fFilter.getType() == Type.SHOW_LABELED || fFilter.getType() == Type.SHOW_RECENT || fFilter.getType() == Type.SHOW_LAST_5_DAYS;
   }
 
-  private void filterElements(Collection<INews> elements) {
+  private void filterElements(Collection<INews> elements, boolean ignoreTextPattern) {
     Iterator<INews> iterator = elements.iterator();
     while (iterator.hasNext()) {
-      if (!fFilter.select(iterator.next(), true))
+      if (!fFilter.select(iterator.next(), ignoreTextPattern))
         iterator.remove();
     }
   }
@@ -654,15 +654,15 @@ public class NewsContentProvider implements ITreeContentProvider {
     return set;
   }
 
-  private List<INews> limitFolderNewsMark(List<INews> resolvedNews, boolean needToFilter, NewsComparator comparer) {
+  private List<INews> limitFolderNewsMark(List<INews> resolvedNews, NewsComparator comparer) {
 
     /* Return if no capping is required at all */
     if (resolvedNews.size() <= MAX_FOLDER_ELEMENTS)
       return resolvedNews;
 
-    /* Filter Elements if necessary */
-    if (needToFilter && isFilteredByOtherThanState())
-      filterElements(resolvedNews);
+    /* Filter Elements by pattern if necessary */
+    if (fFilter.isPatternSet())
+      filterElements(resolvedNews, false);
 
     /* Return after filtering if elements count is now small enough */
     if (resolvedNews.size() <= MAX_FOLDER_ELEMENTS)
