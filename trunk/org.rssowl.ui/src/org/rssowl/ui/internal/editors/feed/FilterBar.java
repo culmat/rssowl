@@ -847,8 +847,13 @@ public class FilterBar {
     if (refresh) {
 
       /* Filter has changed - ask Feedview to revalidate caches */
-      if (oldType != type)
-        fFeedView.revalidateCaches();
+      if (oldType != type) {
+        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+          public void run() {
+            fFeedView.revalidateCaches();
+          }
+        });
+      }
 
       /* Only Refresh Table as Browser shows single News */
       NewsTableControl newsTable = fFeedView.getNewsTableControl();
