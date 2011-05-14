@@ -353,7 +353,7 @@ public class NewsContentProvider implements ITreeContentProvider {
 
       /* Special treat folders and limit them by size */
       if (input instanceof FolderNewsMark)
-        resolvedNews = limitFolderNewsMark(resolvedNews, comparer != null ? comparer : fFeedView.getComparator());
+        resolvedNews = limitFolderNewsMark(resolvedNews, needToFilter, comparer != null ? comparer : fFeedView.getComparator());
     }
 
     /* Handle Bookmark (check for news counts as optimization) */
@@ -618,7 +618,7 @@ public class NewsContentProvider implements ITreeContentProvider {
     for (INews news : addedNews) {
       fCachedNews.put(news.getId(), news);
     }
-    
+
     /* Add to Folder if necessary */
     if (fInput instanceof FolderNewsMark)
       ((FolderNewsMark) fInput).add(addedNews);
@@ -659,15 +659,16 @@ public class NewsContentProvider implements ITreeContentProvider {
     return set;
   }
 
-  private List<INews> limitFolderNewsMark(List<INews> resolvedNews, NewsComparator comparer) {
+  private List<INews> limitFolderNewsMark(List<INews> resolvedNews, boolean needToFilter, NewsComparator comparer) {
 
     /* Return if no capping is required at all */
     if (resolvedNews.size() <= MAX_FOLDER_ELEMENTS)
       return resolvedNews;
 
-    /* Filter Elements */
+    /* Filter Elements if necessary */
     Object[] elements = resolvedNews.toArray();
-    elements = fFilter.filter(null, (Object) null, elements);
+    if (needToFilter)
+      elements = fFilter.filter(null, (Object) null, elements);
 
     /* Return after filtering if elements count is now small enough */
     if (elements.length <= MAX_FOLDER_ELEMENTS) {
