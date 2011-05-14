@@ -142,6 +142,7 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -153,11 +154,14 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class FeedView extends EditorPart implements IReusableEditor {
 
-  /* Delay in ms to Mark *new* News to *unread* on Part-Deactivation */
+  /* Delay in millies to Mark *new* News to *unread* on Part-Deactivation */
   private static final int HANDLE_NEWS_SEEN_DELAY = 100;
 
   /* Millies before news seen are handled */
   private static final int HANDLE_NEWS_SEEN_BLOCK_DELAY = 800;
+
+  /* Delay in millies to safely operate on the browser content */
+  private static final int BROWSER_OPERATIONS_DELAY = 100;
 
   /* Millies before the next clean up is allowed to run again */
   private static final int CLEAN_UP_BLOCK_DELAY = 1000;
@@ -979,8 +983,8 @@ public class FeedView extends EditorPart implements IReusableEditor {
   public void setSelection(final IStructuredSelection selection) {
 
     /* Remove Filter if selection is hidden */
+    final AtomicBoolean unfilter = new AtomicBoolean(false);
     if (fNewsFilter.getType() != NewsFilter.Type.SHOW_ALL) {
-      boolean unfilter = false;
       List<?> elements = selection.toList();
       for (Object element : elements) {
 
@@ -995,13 +999,13 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
         /* This Element is filtered */
         if (!fNewsFilter.select(fNewsTableControl.getViewer(), null, element)) {
-          unfilter = true;
+          unfilter.set(true);
           break;
         }
       }
 
       /* Remove Filter if selection is hidden */
-      if (unfilter) {
+      if (unfilter.get()) {
         fNewsBrowserControl.getViewer().setBlockRefresh(true);
         try {
           fFilterBar.doFilter(NewsFilter.Type.SHOW_ALL, true, false);
@@ -1013,9 +1017,24 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
     /* Scroll News into View from Browser if maximized */
     if (!isTableViewerVisible()) {
-      JobRunner.runInUIThread(500, fNewsBrowserControl.getViewer().getControl(), new Runnable() {
+      JobRunner.runInUIThread(BROWSER_OPERATIONS_DELAY, fNewsBrowserControl.getViewer().getControl(), new Runnable() {
         public void run() { //Run delayed as the browser might still be busy loading the input
-          fNewsBrowserControl.getViewer().showSelection(selection);
+          Runnable runnable = new Runnable() {
+            public void run() {
+              fNewsBrowserControl.getViewer().showSelection(selection);
+            }
+          };
+
+          /* If Elements got revealed, make sure they show in the Browser viewer and then select the news item delayed */
+          if (unfilter.get()) {
+            fNewsBrowserControl.getViewer().refresh();
+            JobRunner.runInUIThread(BROWSER_OPERATIONS_DELAY, fNewsBrowserControl.getViewer().getControl(), runnable);
+          }
+
+          /* Otherwise directly select the news item */
+          else {
+            runnable.run();
+          }
         }
       });
     }
@@ -2183,7 +2202,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
       /* Delay navigation because input was just set and browser needs a little to render */
       if (onInputSet) {
-        JobRunner.runInUIThread(100, fNewsBrowserControl.getViewer().getControl(), new Runnable() {
+        JobRunner.runInUIThread(BROWSER_OPERATIONS_DELAY, fNewsBrowserControl.getViewer().getControl(), new Runnable() {
           public void run() {
             fNewsBrowserControl.getViewer().navigate(next, unread, onInputSet);
           }
