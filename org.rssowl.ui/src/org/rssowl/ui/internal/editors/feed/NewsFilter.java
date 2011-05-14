@@ -197,7 +197,7 @@ public class NewsFilter extends ViewerFilter {
    * @return true if the element matches the filter pattern
    */
   boolean isElementVisible(Viewer viewer, Object element) {
-    return isParentMatch(viewer, element) || isLeafMatch(viewer, element);
+    return isParentMatch(viewer, element) || isLeafMatch(viewer, element, false);
   }
 
   /**
@@ -235,18 +235,31 @@ public class NewsFilter extends ViewerFilter {
   }
 
   /**
+   * @param news the {@link INews} to check if matching the filter or not.
+   * @param ignorePattern if <code>true</code> ignore the text search pattern
+   * and <code>false</code> otherwise.
+   * @return <code>true</code> if the given {@link INews} should be selected by
+   * the filter and <code>false</code> otherwise.
+   */
+  boolean select(INews news, boolean ignorePattern) {
+    return isLeafMatch(null, news, ignorePattern);
+  }
+
+  /**
    * Check if the current (leaf) element is a match with the filter text. The
    * default behavior checks that the label of the element is a match.
    * Subclasses should override this method.
    *
    * @param viewer the viewer that contains the element
    * @param element the tree element to check
+   * @param ignorePattern if <code>true</code> ignore the text search pattern
+   * and <code>false</code> otherwise.
    * @return true if the given element's label matches the filter text
    */
-  private boolean isLeafMatch(Viewer viewer, Object element) {
+  private boolean isLeafMatch(Viewer viewer, Object element, boolean ignorePattern) {
 
     /* Filter not Active */
-    if (fCachedPatternMatchingNews == null && fType == Type.SHOW_ALL)
+    if ((ignorePattern || fCachedPatternMatchingNews == null) && fType == Type.SHOW_ALL)
       return true;
 
     /* Element is a News */
@@ -296,7 +309,7 @@ public class NewsFilter extends ViewerFilter {
       }
 
       /* Finally check the Pattern */
-      if (isMatch && fCachedPatternMatchingNews != null)
+      if (isMatch && !ignorePattern && fCachedPatternMatchingNews != null)
         isMatch = matchesPattern(news);
 
       return isMatch;
