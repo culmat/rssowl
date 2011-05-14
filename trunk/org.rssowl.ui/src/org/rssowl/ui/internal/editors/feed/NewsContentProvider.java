@@ -290,7 +290,7 @@ public class NewsContentProvider implements ITreeContentProvider {
 
     /* If input is identical, keep the cache during this method to speed up lookup of already resolved items */
     Map<Long, INews> cacheCopy = null;
-    if (input.isGetNewsRefsEfficient() && fInput != null && fInput.equals(input))
+    if (fInput != null && fInput.equals(input))
       cacheCopy = new HashMap(fCachedNews);
 
     /* Update Input */
@@ -310,18 +310,26 @@ public class NewsContentProvider implements ITreeContentProvider {
     /* Obtain the News */
     List<INews> resolvedNews = new ArrayList<INews>();
 
-    /* Resolve Folder News Mark and pass in current filter */
-    Type type = fFilter.getType();
-    if (input instanceof FolderNewsMark)
-      ((FolderNewsMark) input).resolve(type, monitor);
-
     /* Check if ContentProvider was already disposed or RSSOwl shutting down */
     if (canceled(monitor))
       return;
 
+    /* Determine Set of News States based on the filter */
+    Type filter = fFilter.getType();
+    Set<State> states;
+    if (filter == Type.SHOW_NEW)
+      states = EnumSet.of(INews.State.NEW);
+    else if (filter == Type.SHOW_UNREAD)
+      states = EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED);
+    else
+      states = INews.State.getVisible();
+
     /* Handle Folder, Newsbin and Saved Search */
+    boolean needToFilter = true;
     if (input.isGetNewsRefsEfficient()) {
-      List<NewsReference> newsReferences = getNewsRefsFromInput(input, type);
+      Pair<Boolean, List<NewsReference>> result = getNewsRefsFromInput(input, filter, states, monitor);
+      needToFilter = !result.getFirst();
+      List<NewsReference> newsReferences = result.getSecond();
       for (NewsReference newsRef : newsReferences) {
 
         /* Check if ContentProvider was already disposed or RSSOwl shutting down */
@@ -348,9 +356,27 @@ public class NewsContentProvider implements ITreeContentProvider {
         resolvedNews = limitFolderNewsMark(resolvedNews, comparer != null ? comparer : fFeedView.getComparator());
     }
 
-    /* Handle Bookmark */
-    else
-      resolvedNews.addAll(input.getNews(INews.State.getVisible()));
+    /* Handle Bookmark (check for news counts as optimization) */
+    else {
+      if (filter == Type.SHOW_NEW && input.getNewsCount(EnumSet.of(INews.State.NEW)) != 0)
+        resolvedNews.addAll(input.getNews(states));
+      else if (filter == Type.SHOW_UNREAD && input.getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)) != 0)
+        resolvedNews.addAll(input.getNews(states));
+      else if (filter == Type.SHOW_STICKY && ((IBookMark) fInput).getStickyNewsCount() != 0)
+        resolvedNews.addAll(input.getNews(states));
+      else
+        resolvedNews.addAll(input.getNews(states));
+    }
+
+    /* Filter Elements as needed */
+    if (needToFilter && shouldFilter()) {
+      Object[] elements = resolvedNews.toArray();
+      elements = fFilter.filter(null, (Object) null, elements);
+      resolvedNews = new ArrayList<INews>(elements.length);
+      for (Object element : elements) {
+        resolvedNews.add((INews) element);
+      }
+    }
 
     /* Check if ContentProvider was already disposed or RSSOwl shutting down */
     if (canceled(monitor))
@@ -362,7 +388,8 @@ public class NewsContentProvider implements ITreeContentProvider {
     }
   }
 
-  private List<NewsReference> getNewsRefsFromInput(INewsMark input, NewsFilter.Type filter) {
+  private Pair<Boolean /* Filtered */, List<NewsReference>> getNewsRefsFromInput(INewsMark input, NewsFilter.Type filter, Set<State> states, IProgressMonitor monitor) {
+    boolean filtered = false;
 
     /*
      * Optimization: If input is a saved search or bin with many results and the news filter is set to any condition that
@@ -395,21 +422,18 @@ public class NewsContentProvider implements ITreeContentProvider {
           newsRefs.add(item.getResult());
         }
 
-        return newsRefs;
+        return Pair.create(true, newsRefs);
       }
     }
 
-    /* Determine set of states to pick up based on Filter Type */
-    Set<State> states;
-    if (filter == Type.SHOW_NEW)
-      states = EnumSet.of(INews.State.NEW);
-    else if (filter == Type.SHOW_UNREAD)
-      states = EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED);
-    else
-      states = INews.State.getVisible();
+    /* Resolve Folder News Mark and pass in current filter */
+    else if (input instanceof FolderNewsMark) {
+      ((FolderNewsMark) input).resolve(filter, monitor);
+      filtered = true;
+    }
 
     /* Return news refs by state */
-    return input.getNewsRefs(states);
+    return Pair.create(filtered, input.getNewsRefs(states));
   }
 
   private synchronized Triple<Boolean /* Was Empty */, Collection<NewsEvent>, Collection<INews>> addToCache(Collection<NewsEvent> events, Collection<INews> addedNews) {
@@ -421,8 +445,8 @@ public class NewsContentProvider implements ITreeContentProvider {
     if (canceled())
       return Triple.create(wasEmpty, visibleEvents, visibleNews);
 
-    /* Folders, Searches and Bins use the filter (if set) to determine elements to cache */
-    if (fInput.isGetNewsRefsEfficient() && fFilter.getType() != Type.SHOW_ALL) {
+    /* Use the filter (if set) to determine elements to cache */
+    if (fFilter.getType() != Type.SHOW_ALL) {
 
       /* Quickly Map from News to Event */
       Map<INews, NewsEvent> mapNewsToEvent = new HashMap<INews, NewsEvent>(events.size());
@@ -514,6 +538,7 @@ public class NewsContentProvider implements ITreeContentProvider {
       return Pair.create(emptyList, false);
     }
 
+    boolean needToFilter = true;
     boolean wasEmpty = fCachedNews.isEmpty();
     List<INews> addedNews = new ArrayList<INews>();
 
@@ -524,6 +549,7 @@ public class NewsContentProvider implements ITreeContentProvider {
       if (!onlyHandleAddedNews) {
         refreshCache(monitor, fInput);
         addedNews.addAll(fCachedNews.values());
+        needToFilter = false;
       }
 
       /* Only show the added news */
@@ -570,13 +596,16 @@ public class NewsContentProvider implements ITreeContentProvider {
           return Pair.create(emptyList, false);
         }
       }
+    }
 
-      /* Add added news into folder news mark */
-      folderNewsMark.add(addedNews);
+    /* Check if ContentProvider was already disposed or RSSOwl shutting down */
+    if (canceled(monitor)) {
+      List<INews> emptyList = Collections.emptyList();
+      return Pair.create(emptyList, false);
     }
 
     /* Optimization: Only consider those news that pass the filter when news are added (or in general for Folder News Mark) */
-    if ((fInput instanceof FolderNewsMark || onlyHandleAddedNews) && shouldFilter()) {
+    if (needToFilter && shouldFilter()) {
       Object[] elements = addedNews.toArray();
       elements = fFilter.filter(null, (Object) null, elements);
       addedNews = new ArrayList<INews>(elements.length);
@@ -589,6 +618,10 @@ public class NewsContentProvider implements ITreeContentProvider {
     for (INews news : addedNews) {
       fCachedNews.put(news.getId(), news);
     }
+    
+    /* Add to Folder if necessary */
+    if (fInput instanceof FolderNewsMark)
+      ((FolderNewsMark) fInput).add(addedNews);
 
     return Pair.create(addedNews, wasEmpty);
   }
@@ -853,11 +886,11 @@ public class NewsContentProvider implements ITreeContentProvider {
               boolean isRestored = news.isVisible() && (oldState == INews.State.HIDDEN || oldState == INews.State.DELETED);
 
               /*
-               * Special case of news being restored: If the input is of type news bin, search or folder news mark and the filter is set to only
-               * show new or unread news, a news is treated as being restored if it changed from READ to NEW, UNREAD or UPDATED because the filter
-               * ensures to filter out READ events in case one of the two filters is enabled.
+               * Special case of news being restored: If the filter is set to only show new or unread news, a news is treated
+               * as being restored if it changed from READ to NEW, UNREAD or UPDATED because the filter ensures to filter out
+               * READ events in case one of the two filters is enabled.
                */
-              if (!isRestored && fInput.isGetNewsRefsEfficient() && !hasCachedNews(news)) {
+              if (!isRestored && !hasCachedNews(news)) {
                 if (fFilter.getType() == Type.SHOW_NEW)
                   isRestored = news.getState() == INews.State.NEW && oldState != null && oldState != INews.State.NEW;
                 else if (fFilter.getType() == Type.SHOW_UNREAD)
