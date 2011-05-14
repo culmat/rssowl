@@ -1087,7 +1087,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
       /* Load Filter Settings for this Mark if present */
       updateFilterAndGrouping(false);
 
-      /* Re-Create the ContentProvider to avoid concurrency problems with Cache */
+      /* Re-Create the ContentProvider to avoid being blocked on the old content provider still resolving something */
       fContentProvider = new NewsContentProvider(fNewsTableControl.getViewer(), fNewsBrowserControl.getViewer(), this);
       fNewsTableControl.getViewer().setContentProvider(fContentProvider);
       fNewsTableControl.onInputChanged(fInput);
