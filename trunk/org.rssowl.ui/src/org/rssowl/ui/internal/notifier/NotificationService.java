@@ -40,7 +40,6 @@ import org.rssowl.core.persist.event.SearchMarkAdapter;
 import org.rssowl.core.persist.event.SearchMarkEvent;
 import org.rssowl.core.persist.event.SearchMarkListener;
 import org.rssowl.core.persist.pref.IPreferenceScope;
-import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.BatchedBuffer;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.ui.internal.ApplicationWorkbenchAdvisor;
@@ -49,7 +48,6 @@ import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.JobRunner;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -273,14 +271,14 @@ public class NotificationService {
 
         /* Filter Events if user decided to show Notifier only for selected Elements */
         if (fGlobalPreferences.getBoolean(DefaultPreferences.LIMIT_NOTIFIER_TO_SELECTION)) {
-          List<FeedLinkReference> enabledFeeds = new ArrayList<FeedLinkReference>();
+          Set<String> enabledFeeds = new HashSet<String>();
 
           /* TODO This can be slow, try to optimize performance! */
           Collection<IBookMark> bookMarks = DynamicDAO.loadAll(IBookMark.class);
           for (IBookMark bookMark : bookMarks) {
             IPreferenceScope prefs = Owl.getPreferenceService().getEntityScope(bookMark);
             if (prefs.getBoolean(DefaultPreferences.ENABLE_NOTIFIER))
-              enabledFeeds.add(bookMark.getFeedLinkReference());
+              enabledFeeds.add(bookMark.getFeedLinkReference().getLinkAsText());
           }
 
           eventsToShow = filterEvents(eventsToShow, enabledFeeds);
@@ -321,17 +319,17 @@ public class NotificationService {
       Shell primaryShell = OwlUI.getPrimaryShell();
       if (primaryShell != null) {
         JobRunner.runInUIThread(primaryShell, new Runnable() { //MUST NOT RUN SYNCED IN UI THREAD FROM EVENT - DEADLOCK ALERT !!!
-          public void run() {
-            if (Controller.getDefault().isShuttingDown())
-              return;
+              public void run() {
+                if (Controller.getDefault().isShuttingDown())
+                  return;
 
-            ApplicationWorkbenchWindowAdvisor advisor = ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor;
-            if (advisor != null && !advisor.isMinimizedToTray() && !advisor.isMinimized())
-              return;
+                ApplicationWorkbenchWindowAdvisor advisor = ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor;
+                if (advisor != null && !advisor.isMinimizedToTray() && !advisor.isMinimized())
+                  return;
 
-            JobRunner.runInBackgroundThread(runnable);
-          }
-        });
+                JobRunner.runInBackgroundThread(runnable);
+              }
+            });
       }
     }
 
@@ -340,11 +338,11 @@ public class NotificationService {
       runnable.run();
   }
 
-  private Set<NewsEvent> filterEvents(Set<NewsEvent> events, List<FeedLinkReference> enabledFeeds) {
+  private Set<NewsEvent> filterEvents(Set<NewsEvent> events, Set<String> enabledFeeds) {
     Set<NewsEvent> filteredEvents = new HashSet<NewsEvent>();
 
     for (NewsEvent event : events) {
-      if (event.getEntity().isVisible() && enabledFeeds.contains(event.getEntity().getFeedReference()))
+      if (event.getEntity().isVisible() && enabledFeeds.contains(event.getEntity().getFeedLinkAsText()))
         filteredEvents.add(event);
     }
 
