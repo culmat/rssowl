@@ -61,7 +61,6 @@ import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
-import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.ISearchCondition;
@@ -91,7 +90,6 @@ import org.rssowl.ui.internal.util.ModelUtils;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * The FilterBar is the central control to filter News that are showing in the
@@ -848,8 +846,8 @@ public class FilterBar {
     /* Refresh if set */
     if (refresh) {
 
-      /* Filter has changed - ask Feedview to revalidate caches if necessary */
-      if (needsCacheRevalidationFromFilter(oldType, type))
+      /* Filter has changed - ask Feedview to revalidate caches */
+      if (oldType != type)
         fFeedView.revalidateCaches();
 
       /* Only Refresh Table as Browser shows single News */
@@ -871,35 +869,9 @@ public class FilterBar {
       saveIntegerValue(DefaultPreferences.BM_NEWS_FILTERING, type.ordinal());
   }
 
-  private boolean needsCacheRevalidationFromFilter(Type oldType, Type newType) {
-    if (oldType == newType)
-      return false; //No filter change
-
-    INewsMark mark = ((FeedViewInput) fFeedView.getEditorInput()).getMark();
-    if (mark instanceof IBookMark)
-      return false; //Only revalidate for Folders, Searches and Bins
-
-    if (mark.isGetNewsRefsEfficient())
-      return true; //Folders, Searches and Bins are scoping by filter under specific conditions, thereby always revalidate
-
-    return false; //No revalidation needed
-  }
-
   private boolean needsCacheRevalidationFromSearch() {
     INewsMark mark = ((FeedViewInput) fFeedView.getEditorInput()).getMark();
-    if (mark instanceof FolderNewsMark) {
-      Set<State> states;
-      if (fFeedView.getFilter().getType() == Type.SHOW_NEW)
-        states = EnumSet.of(INews.State.NEW);
-      else if (fFeedView.getFilter().getType() == Type.SHOW_UNREAD)
-        states = EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED);
-      else
-        states = INews.State.getVisible();
-
-      return mark.getNewsCount(states) > NewsContentProvider.MAX_FOLDER_ELEMENTS;
-    }
-
-    return false;
+    return (mark instanceof FolderNewsMark && mark.getNewsCount(INews.State.getVisible()) > NewsContentProvider.MAX_FOLDER_ELEMENTS);
   }
 
   private void doSearch(final NewsFilter.SearchTarget target) {
