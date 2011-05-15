@@ -359,13 +359,15 @@ public class NewsContentProvider implements ITreeContentProvider {
 
     /* Handle Bookmark (check for news counts as optimization) */
     else {
-      if (filter == Type.SHOW_NEW && input.getNewsCount(EnumSet.of(INews.State.NEW)) != 0)
-        resolvedNews.addAll(input.getNews(states));
-      else if (filter == Type.SHOW_UNREAD && input.getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)) != 0)
-        resolvedNews.addAll(input.getNews(states));
-      else if (filter == Type.SHOW_STICKY && ((IBookMark) fInput).getStickyNewsCount() != 0)
-        resolvedNews.addAll(input.getNews(states));
-      else
+      boolean resolveNews = true;
+      if (filter == Type.SHOW_NEW && input.getNewsCount(EnumSet.of(INews.State.NEW)) == 0)
+        resolveNews = false;
+      else if (filter == Type.SHOW_UNREAD && input.getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)) == 0)
+        resolveNews = false;
+      else if (filter == Type.SHOW_STICKY && ((IBookMark) fInput).getStickyNewsCount() == 0)
+        resolveNews = false;
+
+      if (resolveNews)
         resolvedNews.addAll(input.getNews(states));
     }
 
@@ -392,8 +394,7 @@ public class NewsContentProvider implements ITreeContentProvider {
      * is not scoped by news state, we get the results from a search to potentially get less results and so need less memory.
      */
     if (input instanceof ISearchMark || input instanceof INewsBin) {
-      boolean nonStateBasedFilter = (filter == Type.SHOW_STICKY || filter == Type.SHOW_LABELED || filter == Type.SHOW_LAST_5_DAYS || filter == Type.SHOW_RECENT);
-      if (nonStateBasedFilter && input.getNewsCount(INews.State.getVisible()) > SCOPE_SEARCH_LIMIT) {
+      if (isFilteredByOtherThanState() && input.getNewsCount(states) > SCOPE_SEARCH_LIMIT) {
         IModelSearch search = Owl.getPersistenceService().getModelSearch();
         ISearchCondition filterCondition = ModelUtils.getConditionForFilter(filter);
         List<SearchHit<NewsReference>> result = null;
@@ -569,7 +570,7 @@ public class NewsContentProvider implements ITreeContentProvider {
 
           /* Resolve News */
           INews news = fNewsDao.load(newsId);
-          if (news != null)
+          if (news != null && news.isVisible())
             addedNews.add(news);
 
           /* Check if ContentProvider was already disposed or RSSOwl shutting down */
@@ -593,7 +594,7 @@ public class NewsContentProvider implements ITreeContentProvider {
 
         /* Resolve News */
         INews news = fNewsDao.load(newsId);
-        if (news != null)
+        if (news != null && news.isVisible())
           addedNews.add(news);
 
         /* Check if ContentProvider was already disposed or RSSOwl shutting down */
