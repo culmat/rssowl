@@ -81,6 +81,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -98,6 +99,9 @@ public class NewsContentProvider implements ITreeContentProvider {
 
   /* The maximum number of items returned from a FolderNewsMark */
   static final int MAX_FOLDER_ELEMENTS = 500;
+
+  /* The maximum number of items that will get resolved from a FolderNewsMark */
+  static final int MAX_RESOLVED_FOLDER_ELEMENTS = 10000;
 
   /* The maximum number of items in a NewsMark before scoping the results as specified by the filter */
   static final int SCOPE_SEARCH_LIMIT = 200;
@@ -350,6 +354,10 @@ public class NewsContentProvider implements ITreeContentProvider {
         /* Add if visible */
         if (resolvedNewsItem != null && resolvedNewsItem.isVisible())
           resolvedNews.add(resolvedNewsItem);
+
+        /* Never resolve more than MAX_RESOLVED_FOLDER_ELEMENTS for a folder */
+        if (input instanceof FolderNewsMark && resolvedNews.size() > MAX_RESOLVED_FOLDER_ELEMENTS)
+          break;
       }
 
       /* Special treat folders and limit them by size */
@@ -427,22 +435,34 @@ public class NewsContentProvider implements ITreeContentProvider {
     else if (input instanceof FolderNewsMark) {
       ((FolderNewsMark) input).resolve(filter, monitor);
       filtered = true;
+      List<NewsReference> references = input.getNewsRefs(states);
 
       /* Optimization: If the folder has lots of elements and a text filter is set, limit result by this pattern */
       if (input.getNewsCount(states) > MAX_FOLDER_ELEMENTS && newsFilter.isPatternSet()) {
-        List<NewsReference> references = input.getNewsRefs(states);
         Iterator<NewsReference> iterator = references.iterator();
         while (iterator.hasNext()) {
           if (!newsFilter.isTextPatternMatch(iterator.next().getId()))
             iterator.remove();
         }
-
-        return Pair.create(filtered, references);
       }
+
+      /* Optimization: If the folder contains more than MAX_RESOLVED_FOLDER_ELEMENTS, put the most recent at the beginning */
+      if (references.size() > MAX_RESOLVED_FOLDER_ELEMENTS)
+        sortDescendingById(references);
+
+      return Pair.create(filtered, references);
     }
 
     /* Return news refs by state */
     return Pair.create(filtered, input.getNewsRefs(states));
+  }
+
+  private void sortDescendingById(List<NewsReference> references) {
+    Collections.sort(references, new Comparator<NewsReference>() {
+      public int compare(NewsReference o1, NewsReference o2) {
+        return o1.getId() > o2.getId() ? -1 : 1;
+      }
+    });
   }
 
   private synchronized Triple<Boolean /* Was Empty */, Collection<NewsEvent>, Collection<INews>> addToCache(Collection<NewsEvent> events, Collection<INews> addedNews) {
