@@ -40,7 +40,8 @@ import java.net.URI;
 public interface ICredentialsProvider {
 
   /**
-   * Get the Credentials to be used to authenticate on the given Feed.
+   * Get the Credentials to be used to authenticate on the given Feed. This
+   * includes stored credentials and in-memory credentials.
    *
    * @param link The Link to supply authentication Credentials for
    * @param realm The Realm to get credentials for or <code>null</code> if none.
@@ -50,6 +51,22 @@ public interface ICredentialsProvider {
    * Exception.
    */
   ICredentials getAuthCredentials(URI link, String realm) throws CredentialsException;
+
+  /**
+   * Get the Credentials to be used to authenticate on the given Feed from the
+   * persisted store excluding in-memory credentials.
+   *
+   * @param link The Link to supply authentication Credentials for
+   * @param realm The Realm to get credentials for or <code>null</code> if none.
+   * @param persistedOnly if <code>true</code> will return only those
+   * credentials that have been persisted and <code>false</code> to also include
+   * credentials that are stored in memory.
+   * @return Credentials to use or NULL in case none are to be used for the
+   * Feed.
+   * @throws CredentialsException Checked Exception to be used in case of any
+   * Exception.
+   */
+  ICredentials getPersistedAuthCredentials(URI link, String realm) throws CredentialsException;
 
   /**
    * Get the Proxy-Credentials to be used to connect on the given Feed using a
@@ -73,6 +90,30 @@ public interface ICredentialsProvider {
    * Exception.
    */
   void setAuthCredentials(ICredentials credentials, URI link, String realm) throws CredentialsException;
+
+  /**
+   * Set the Credentials to be used to authenticate on the given Feed in memory
+   * only. The credentials are lost after restart of the application.
+   *
+   * @param credentials The Credentials to use for the given Link
+   * @param link The Link to supply authentication Credentials for
+   * @param realm The Realm to set credentials for or <code>null</code> if none.
+   * @throws CredentialsException Checked Exception to be used in case of any
+   * Exception.
+   */
+  void setInMemoryAuthCredentials(ICredentials credentials, URI link, String realm) throws CredentialsException;
+
+  /**
+   * Find out if credentials are stored for the given link and relam.
+   *
+   * @param link The Link to supply authentication Credentials for
+   * @param realm The Realm to set credentials for or <code>null</code> if none.
+   * @return <code>true</code> if this provider has credentials stored for the
+   * given link and realm and <code>false</code> otherwise.
+   * @throws CredentialsException Checked Exception to be used in case of any
+   * Exception.
+   */
+  boolean hasPersistedAuthCredentials(URI link, String realm) throws CredentialsException;
 
   /**
    * Set the Proxy-Credentials to be used to connect on the given Feed using a

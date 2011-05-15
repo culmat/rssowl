@@ -40,6 +40,9 @@ public class DefaultPreferences {
   /** Global: Use OS Password to encrypt passwords to feeds */
   public static final String USE_OS_PASSWORD = Preference.USE_OS_PASSWORD.id();
 
+  /** Global: Remember Password */
+  public static final String REMEMBER_PASSWORD = Preference.REMEMBER_PASSWORD.id();
+
   /** Global: Mark all news as read on minimize */
   public static final String MARK_READ_ON_MINIMIZE = Preference.MARK_READ_ON_MINIMIZE.id();
 
