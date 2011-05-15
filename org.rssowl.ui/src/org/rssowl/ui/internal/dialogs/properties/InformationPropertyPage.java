@@ -42,6 +42,7 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.dialogs.properties.IEntityPropertyPage;
@@ -57,6 +58,7 @@ import org.rssowl.ui.internal.util.UIBackgroundJob;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.DateFormat;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -88,11 +90,36 @@ public class InformationPropertyPage implements IEntityPropertyPage {
     fContainer = new Composite(parent, SWT.NONE);
     fContainer.setLayout(LayoutUtils.createGridLayout(2, 10, 10));
 
+    INewsMark newsmark = (INewsMark) fEntities.get(0);
+
+    /* Bookmark Info */
+    if (newsmark instanceof IBookMark)
+      fillBookMarkInfo((IBookMark) fEntities.get(0));
+
+    /* Created */
+    if (newsmark.getCreationDate() != null) {
+      createLabel(fContainer, Messages.InformationPropertyPage_CREATED, true);
+      createLabel(fContainer, fDateFormat.format(newsmark.getCreationDate()), false);
+    }
+
+    /* Last Visited */
+    createLabel(fContainer, Messages.InformationPropertyPage_LAST_VISITED, true);
+    if (newsmark.getLastVisitDate() != null)
+      createLabel(fContainer, fDateFormat.format(newsmark.getLastVisitDate()), false);
+    else
+      createLabel(fContainer, Messages.InformationPropertyPage_NEVER, false);
+
+    /* News Count */
+    createLabel(fContainer, Messages.InformationPropertyPage_NEWS_COUNT, true);
+
+    return fContainer;
+  }
+
+  private void fillBookMarkInfo(final IBookMark bm) {
+    String message;
+
     /* Status */
     createLabel(fContainer, Messages.InformationPropertyPage_STATUS, true);
-
-    final IBookMark bm = (IBookMark) fEntities.get(0);
-    String message;
 
     /* Error Loading */
     if (bm.isErrorLoading()) {
@@ -151,31 +178,13 @@ public class InformationPropertyPage implements IEntityPropertyPage {
 
     fHomepageLink = new Link(fContainer, SWT.NONE);
     fHomepageLink.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-
-    /* Created */
-    if (bm.getCreationDate() != null) {
-      createLabel(fContainer, Messages.InformationPropertyPage_CREATED, true);
-      createLabel(fContainer, fDateFormat.format(bm.getCreationDate()), false);
-    }
-
-    /* Last Visited */
-    createLabel(fContainer, Messages.InformationPropertyPage_LAST_VISITED, true);
-    if (bm.getLastVisitDate() != null)
-      createLabel(fContainer, fDateFormat.format(bm.getLastVisitDate()), false);
-    else
-      createLabel(fContainer, Messages.InformationPropertyPage_NEVER, false);
-
-    /* News Count */
-    createLabel(fContainer, Messages.InformationPropertyPage_NEWS_COUNT, true);
-
-    return fContainer;
   }
 
   /*
    * @see org.rssowl.ui.dialogs.properties.IEntityPropertyPage#getImage()
    */
   public ImageDescriptor getImage() {
-    if (!fEntities.isEmpty() && ((IBookMark) fEntities.get(0)).isErrorLoading())
+    if (!fEntities.isEmpty() && fEntities.get(0) instanceof IBookMark && ((IBookMark) fEntities.get(0)).isErrorLoading())
       return OwlUI.getImageDescriptor("icons/ovr16/error.gif"); //$NON-NLS-1$
 
     return null;
@@ -219,48 +228,63 @@ public class InformationPropertyPage implements IEntityPropertyPage {
 
         @Override
         protected void runInBackground(IProgressMonitor monitor) {
-          IBookMark bm = (IBookMark) fEntities.get(0);
-          IFeed feed = bm.getFeedLinkReference().resolve();
-          if (feed != null) {
-            description = StringUtils.stripTags(feed.getDescription(), true);
-            homepage = feed.getHomepage();
+          INewsMark newsmark = (INewsMark) fEntities.get(0);
 
-            /* News Counts */
-            List<INews> news = feed.getVisibleNews();
-            totalCount = news.size();
-            for (INews newsitem : news) {
-              switch (newsitem.getState()) {
-                case NEW:
-                  newCount++;
-                  break;
-                case UNREAD:
-                  unreadCount++;
-                  break;
-                case UPDATED:
-                  updatedCount++;
-                  break;
+          /* Resolve Bookmark Values */
+          if (newsmark instanceof IBookMark) {
+            IFeed feed = ((IBookMark) newsmark).getFeedLinkReference().resolve();
+            if (feed != null) {
+              description = StringUtils.stripTags(feed.getDescription(), true);
+              homepage = feed.getHomepage();
+
+              /* News Counts */
+              List<INews> news = feed.getVisibleNews();
+              totalCount = news.size();
+              for (INews newsitem : news) {
+                switch (newsitem.getState()) {
+                  case NEW:
+                    newCount++;
+                    break;
+                  case UNREAD:
+                    unreadCount++;
+                    break;
+                  case UPDATED:
+                    updatedCount++;
+                    break;
+                }
               }
             }
+          }
+
+          /* Otherwise resolve news counts */
+          else {
+            totalCount = newsmark.getNewsCount(INews.State.getVisible());
+            newCount = newsmark.getNewsCount(EnumSet.of(INews.State.NEW));
+            unreadCount = newsmark.getNewsCount(EnumSet.of(INews.State.UNREAD));
+            updatedCount = newsmark.getNewsCount(EnumSet.of(INews.State.UPDATED));
           }
         }
 
         @Override
         protected void runInUI(IProgressMonitor monitor) {
 
-          /* Description */
-          fDescriptionLabel.setText(StringUtils.isSet(description) ? description : Messages.InformationPropertyPage_NONE);
+          /* Description (Bookmarks only) */
+          if (fEntities.get(0) instanceof IBookMark)
+            fDescriptionLabel.setText(StringUtils.isSet(description) ? description : Messages.InformationPropertyPage_NONE);
 
-          /* Homepage */
-          fHomepageLink.setText(homepage != null ? "<a>" + homepage.toString() + "</a>" : Messages.InformationPropertyPage_NONE); //$NON-NLS-1$ //$NON-NLS-2$
-          if (homepage != null) {
-            fHomepageLink.addSelectionListener(new SelectionAdapter() {
-              @Override
-              public void widgetSelected(SelectionEvent e) {
-                OpenInBrowserAction action = new OpenInBrowserAction();
-                action.selectionChanged(null, new StructuredSelection(homepage));
-                action.run();
-              }
-            });
+          /* Homepage (Bookmarks only) */
+          if (fEntities.get(0) instanceof IBookMark) {
+            fHomepageLink.setText(homepage != null ? "<a>" + homepage.toString() + "</a>" : Messages.InformationPropertyPage_NONE); //$NON-NLS-1$ //$NON-NLS-2$
+            if (homepage != null) {
+              fHomepageLink.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                  OpenInBrowserAction action = new OpenInBrowserAction();
+                  action.selectionChanged(null, new StructuredSelection(homepage));
+                  action.run();
+                }
+              });
+            }
           }
 
           /* News Count */
