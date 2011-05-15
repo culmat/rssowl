@@ -1008,12 +1008,29 @@ public class FeedView extends EditorPart implements IReusableEditor {
       if (unfilter.get()) {
         fNewsBrowserControl.getViewer().setBlockRefresh(true);
         try {
-          fFilterBar.doFilter(NewsFilter.Type.SHOW_ALL, true, false);
+
+          /* Provide code to be executed after unfiltering is done */
+          Runnable joinUIRunnable = new Runnable() {
+            public void run() {
+              fNewsBrowserControl.getViewer().setBlockRefresh(false);
+              internalShowSelection(selection, unfilter);
+            }
+          };
+
+          /* Remove Filter */
+          fFilterBar.doFilter(NewsFilter.Type.SHOW_ALL, true, false, joinUIRunnable);
         } finally {
           fNewsBrowserControl.getViewer().setBlockRefresh(false);
         }
       }
     }
+
+    /* Directly show selection as filtering was not undone */
+    if (!(unfilter.get()))
+      internalShowSelection(selection, unfilter);
+  }
+
+  private void internalShowSelection(final IStructuredSelection selection, final AtomicBoolean unfilter) {
 
     /* Scroll News into View from Browser if maximized */
     if (!isTableViewerVisible()) {
