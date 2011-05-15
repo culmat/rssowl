@@ -38,10 +38,8 @@ import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.SearchSpecifier;
-import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.PersistenceException;
-import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.SearchHit;
 import org.rssowl.core.util.StringUtils;
@@ -50,7 +48,6 @@ import org.rssowl.ui.internal.FolderNewsMark;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -501,27 +498,5 @@ public class NewsFilter extends ViewerFilter {
    */
   boolean isPatternSet() {
     return fCachedPatternMatchingNews != null;
-  }
-
-  /**
-   * @param events the {@link Set} of NewsEvents that occured.
-   * @return <code>true</code> if the filter requires a refresh and
-   * <code>false</code> otherwise
-   */
-  public boolean needsRefresh(Collection<NewsEvent> events) {
-
-    /* Check if any News has become Sticky */
-    if (fType == Type.SHOW_STICKY)
-      return CoreUtils.isStickyStateChange(events, true);
-
-    /* Check if any News has become Labeled */
-    else if (fType == Type.SHOW_LABELED)
-      return CoreUtils.isLabelChange(events, true);
-
-    /* Check if any News has become Unread */
-    else if (fType == Type.SHOW_UNREAD)
-      return CoreUtils.changedFromReadToUnread(events);
-
-    return false;
   }
 }

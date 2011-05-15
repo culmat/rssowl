@@ -1216,10 +1216,6 @@ public class NewsContentProvider implements ITreeContentProvider {
     if (fGrouping.needsRefresh(visibleEvents, true))
       return true;
 
-    /* Return early if refresh is required anyways for Filter */
-    if (fFilter.needsRefresh(visibleEvents))
-      return true;
-
     /* Return early if refresh is required anyways for Sorter */
     if (fFeedView.isTableViewerVisible()) { //Only makes sense if Browser not maximized
       ViewerComparator sorter = fTableViewer.getComparator();
