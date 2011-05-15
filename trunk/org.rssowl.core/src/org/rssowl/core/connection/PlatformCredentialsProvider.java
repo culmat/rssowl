@@ -148,8 +148,15 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
   private synchronized ICredentials internalGetAuthCredentials(URI link, String realm, boolean persistedOnly) throws CredentialsException {
 
     /* Check Cache first */
-    if (checkCacheProtected(link.toString(), realm))
+    if (isUnprotected(link, realm))
       return null;
+
+    /* Check In-Memory Store */
+    if (!persistedOnly) {
+      ICredentials inMemoryCredentials = fInMemoryStore.get(toCacheKey(link, realm));
+      if (inMemoryCredentials != null)
+        return inMemoryCredentials;
+    }
 
     /* Retrieve Credentials */
     ICredentials authorizationInfo = getAuthorizationInfo(link, realm);
@@ -158,15 +165,8 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
     if (authorizationInfo != null)
       return authorizationInfo;
 
-    /* Check In-Memory Store */
-    if (!persistedOnly) {
-      ICredentials inMemoryCredentials = fInMemoryStore.get(toCacheKey(link.toString(), realm));
-      if (inMemoryCredentials != null)
-        return inMemoryCredentials;
-    }
-
     /* Cache as unprotected */
-    addCacheProtected(link.toString(), realm);
+    addUnprotected(link, realm);
 
     /* Credentials not provided */
     return null;
@@ -330,7 +330,7 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
 
     /* Store Credentials in In-Memory Store */
     if (!persist) {
-      fInMemoryStore.put(toCacheKey(link.toString(), realm), credentials);
+      fInMemoryStore.put(toCacheKey(link, realm), credentials);
     }
 
     /* Store Credentials in secure Storage */
@@ -373,7 +373,7 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
     }
 
     /* Uncache */
-    removeCacheProtected(link.toString(), realm);
+    removeUnprotected(link, realm);
   }
 
   /*
@@ -402,13 +402,13 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
    * .net.URI, java.lang.String)
    */
   public synchronized void deleteAuthCredentials(URI link, String realm) throws CredentialsException {
-    
+
     /* Delete from In-Memory Store if present */
-    fInMemoryStore.remove(toCacheKey(link.toString(), realm));
+    fInMemoryStore.remove(toCacheKey(link, realm));
 
     /* Delete from Cache */
-    removeCacheProtected(link.toString(), realm);
-    
+    removeUnprotected(link, realm);
+
     /* Check if Bundle is Stopped */
     ISecurePreferences securePreferences = getSecurePreferences();
     if (securePreferences == null)
@@ -452,6 +452,9 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
    */
   public void clear() {
 
+    /* Clear In-Memory Store */
+    fInMemoryStore.clear();
+
     /* Clear cached info */
     InternalExchangeUtils.passwordProvidersReset();
 
@@ -475,24 +478,22 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
     }
   }
 
-  private boolean checkCacheProtected(String link, String realm) {
+  private boolean isUnprotected(URI link, String realm) {
     return fUnprotectedLinksCache.contains(toCacheKey(link, realm));
   }
 
-  private void addCacheProtected(String link, String realm) {
-    String cacheKey = toCacheKey(link, realm);
-    if (!fUnprotectedLinksCache.contains(cacheKey))
-      fUnprotectedLinksCache.add(cacheKey);
+  private void addUnprotected(URI link, String realm) {
+    fUnprotectedLinksCache.add(toCacheKey(link, realm));
   }
 
-  private void removeCacheProtected(String link, String realm) {
+  private void removeUnprotected(URI link, String realm) {
     fUnprotectedLinksCache.remove(toCacheKey(link, realm));
   }
 
-  private String toCacheKey(String link, String realm) {
+  private String toCacheKey(URI link, String realm) {
     if (realm == null)
       realm = REALM;
 
-    return link + realm;
+    return link.toString() + realm;
   }
 }
