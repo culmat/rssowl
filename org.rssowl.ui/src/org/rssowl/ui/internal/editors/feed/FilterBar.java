@@ -129,7 +129,7 @@ public class FilterBar {
   public FilterBar(FeedView feedView, Composite parent) {
     fFeedView = feedView;
     fParent = parent;
-    fQuickSearchTracker = new JobTracker(500, false, true, ITask.Priority.SHORT);
+    fQuickSearchTracker = new JobTracker(800, false, true, ITask.Priority.SHORT);
     fGlobalPreferences = Owl.getPreferenceService().getGlobalScope();
 
     createControl();
@@ -826,6 +826,10 @@ public class FilterBar {
   }
 
   void doFilter(final NewsFilter.Type type, boolean refresh, boolean saveSettings) {
+    doFilter(type, refresh, saveSettings, null);
+  }
+
+  void doFilter(final NewsFilter.Type type, boolean refresh, boolean saveSettings, final Runnable joinUIRunnable) {
     Type oldType = fFeedView.getFilter().getType();
     boolean noChange = (oldType == type);
 
@@ -845,28 +849,45 @@ public class FilterBar {
 
     /* Refresh if set */
     if (refresh) {
+      final Runnable uiRunnable = new Runnable() {
+        public void run() {
 
-      /* Filter has changed - ask Feedview to revalidate caches */
+          /* Only Refresh Table as Browser shows single News */
+          NewsTableControl newsTable = fFeedView.getNewsTableControl();
+          boolean isNewsTableVisible = fFeedView.isTableViewerVisible();
+          if (newsTable != null && isNewsTableVisible)
+            fFeedView.refreshTableViewer(true, false);
+
+          /* Refresh All */
+          else
+            fFeedView.refresh(true, false);
+
+          /* Update Selection */
+          updateBrowserSelection();
+
+          /* Execute passed in code if provided */
+          if (joinUIRunnable != null)
+            joinUIRunnable.run();
+        }
+      };
+
+      /* Filter has changed - ask Feedview to revalidate caches in Background Thread */
       if (oldType != type) {
-        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+        JobRunner.runInBackgroundWithBusyIndicator(new Runnable() {
           public void run() {
+
+            /* Potential Long-op running in Background */
             fFeedView.revalidateCaches();
+
+            /* Execute UI Code in UI Thread again */
+            JobRunner.runInUIThread(fParent, uiRunnable);
           }
         });
       }
 
-      /* Only Refresh Table as Browser shows single News */
-      NewsTableControl newsTable = fFeedView.getNewsTableControl();
-      boolean isNewsTableVisible = fFeedView.isTableViewerVisible();
-      if (newsTable != null && isNewsTableVisible)
-        fFeedView.refreshTableViewer(true, false);
-
-      /* Refresh All */
+      /* No Filter Change, directly run UI Code */
       else
-        fFeedView.refresh(true, false);
-
-      /* Update Selection */
-      updateBrowserSelection();
+        uiRunnable.run();
     }
 
     /* Update Settings */
