@@ -240,7 +240,7 @@ public class NewsBrowserViewModel {
    * otherwise.
    */
   public boolean isNewsVisible(INews news) {
-    return isNewsVisible(news.getId());
+    return news.getId() != null && isNewsVisible(news.getId());
   }
 
   /**
@@ -308,7 +308,8 @@ public class NewsBrowserViewModel {
    * hidden
    */
   public void setNewsVisible(INews news, boolean visible) {
-    setNewsVisible(news.getId(), visible);
+    if (news.getId() != null)
+      setNewsVisible(news.getId(), visible);
   }
 
   /**
