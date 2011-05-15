@@ -129,7 +129,7 @@ public class FilterBar {
   public FilterBar(FeedView feedView, Composite parent) {
     fFeedView = feedView;
     fParent = parent;
-    fQuickSearchTracker = new JobTracker(800, false, true, ITask.Priority.SHORT);
+    fQuickSearchTracker = new JobTracker(500, false, true, ITask.Priority.SHORT);
     fGlobalPreferences = Owl.getPreferenceService().getGlobalScope();
 
     createControl();
