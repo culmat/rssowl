@@ -33,6 +33,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -42,6 +43,8 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.connection.CredentialsException;
 import org.rssowl.core.connection.ICredentials;
 import org.rssowl.core.connection.ICredentialsProvider;
+import org.rssowl.core.internal.persist.pref.DefaultPreferences;
+import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
@@ -67,11 +70,13 @@ public class LoginDialog extends TitleAreaDialog {
   private final URI fLink;
   private Text fUsername;
   private Text fPassword;
+  private Button fRememberPassword;
   private final ICredentialsProvider fCredProvider;
   private final String fRealm;
   private String fHeader;
   private String fSubline;
   private ImageDescriptor fTitleImageDescriptor;
+  private final IPreferenceScope fPreferences;
 
   /**
    * @param parentShell
@@ -84,6 +89,7 @@ public class LoginDialog extends TitleAreaDialog {
     fRealm = realm;
     fResources = new LocalResourceManager(JFaceResources.getResources());
     fCredProvider = Owl.getConnectionService().getCredentialsProvider(link);
+    fPreferences = Owl.getPreferenceService().getGlobalScope();
   }
 
   /**
@@ -124,6 +130,10 @@ public class LoginDialog extends TitleAreaDialog {
 
     /* User pressed OK Button */
     if (buttonId == IDialogConstants.OK_ID) {
+      boolean rememberPassword = fRememberPassword.getSelection();
+      if (rememberPassword != fPreferences.getBoolean(DefaultPreferences.REMEMBER_PASSWORD))
+        fPreferences.putBoolean(DefaultPreferences.REMEMBER_PASSWORD, rememberPassword);
+
       final String username = fUsername.getText();
       final String password = fPassword.getText();
 
@@ -145,11 +155,18 @@ public class LoginDialog extends TitleAreaDialog {
         if (fCredProvider != null) {
 
           /* Store for URI */
-          fCredProvider.setAuthCredentials(credentials, fLink, null);
+          if (rememberPassword)
+            fCredProvider.setAuthCredentials(credentials, fLink, null);
+          else
+            fCredProvider.setInMemoryAuthCredentials(credentials, fLink, null);
 
           /* Also store for Realm */
-          if (fRealm != null)
-            fCredProvider.setAuthCredentials(credentials, URIUtils.normalizeUri(fLink, true), fRealm);
+          if (fRealm != null) {
+            if (rememberPassword)
+              fCredProvider.setAuthCredentials(credentials, URIUtils.normalizeUri(fLink, true), fRealm);
+            else
+              fCredProvider.setInMemoryAuthCredentials(credentials, URIUtils.normalizeUri(fLink, true), fRealm);
+          }
         }
       } catch (CredentialsException e) {
         Activator.getDefault().getLog().log(e.getStatus());
@@ -235,6 +252,16 @@ public class LoginDialog extends TitleAreaDialog {
     /* Password input field */
     fPassword = new Text(composite, SWT.SINGLE | SWT.BORDER | SWT.PASSWORD);
     fPassword.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+
+    /* Spacer */
+    new Label(composite, SWT.NONE);
+
+    /* Remember Password */
+    fRememberPassword = new Button(composite, SWT.CHECK);
+    fRememberPassword.setText(Messages.LoginDialog_REMEMBER_PASSWORD);
+    fRememberPassword.setSelection(fPreferences.getBoolean(DefaultPreferences.REMEMBER_PASSWORD));
+    fRememberPassword.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+    ((GridData) fRememberPassword.getLayoutData()).verticalIndent = 5;
 
     /* Separator */
     Label separator = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);

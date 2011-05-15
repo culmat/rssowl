@@ -86,6 +86,7 @@ public class PreferencesInitializer implements IPreferencesInitializer {
    */
   protected void initGlobalDefaults(IPreferenceScope defaultScope) {
     defaultScope.putBoolean(Preference.USE_OS_PASSWORD.id(), true);
+    defaultScope.putBoolean(Preference.REMEMBER_PASSWORD.id(), true);
     defaultScope.putBoolean(Preference.MARK_READ_ON_MINIMIZE.id(), false);
     defaultScope.putBoolean(Preference.MARK_READ_ON_CHANGE.id(), false);
     defaultScope.putBoolean(Preference.MARK_READ_ON_TAB_CLOSE.id(), false);

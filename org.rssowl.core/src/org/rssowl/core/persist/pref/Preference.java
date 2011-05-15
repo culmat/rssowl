@@ -37,6 +37,9 @@ public enum Preference {
   /** Global: Use OS Password to encrypt passwords to feeds */
   USE_OS_PASSWORD("org.rssowl.pref.UseOSPassword", IPreferenceType.BOOLEAN), //$NON-NLS-1$
 
+  /** Global: Remember Password */
+  REMEMBER_PASSWORD("org.rssowl.pref.RememberPassword", IPreferenceType.BOOLEAN), //$NON-NLS-1$
+
   /** Global: Mark all news as read on minimize */
   MARK_READ_ON_MINIMIZE("org.rssowl.pref.MarkNewsReadOnMinimize", IPreferenceType.BOOLEAN), //$NON-NLS-1$
 

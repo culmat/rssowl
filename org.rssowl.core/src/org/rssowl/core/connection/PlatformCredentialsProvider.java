@@ -90,6 +90,9 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
   /* A cache of non-protected Links (in the form Link + Realm) */
   private final Set<String> fUnprotectedLinksCache = Collections.synchronizedSet(new HashSet<String>());
 
+  /* The In-Memory credentials store if the user chooses to not store passwords permanently */
+  private final Map<String, ICredentials> fInMemoryStore = Collections.synchronizedMap(new HashMap<String, ICredentials>());
+
   /* Simple POJO Implementation of ICredentials */
   private static class Credentials implements ICredentials {
     private String fUsername;
@@ -117,10 +120,32 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
 
   /*
    * @see
+   * org.rssowl.core.connection.ICredentialsProvider#hasPersistedAuthCredentials
+   * (java.net.URI, java.lang.String)
+   */
+  public boolean hasPersistedAuthCredentials(URI link, String realm) throws CredentialsException {
+    return getAuthorizationInfo(link, realm) != null;
+  }
+
+  /*
+   * @see
+   * org.rssowl.core.connection.ICredentialsProvider#getPersistedAuthCredentials
+   * (java.net.URI, java.lang.String)
+   */
+  public ICredentials getPersistedAuthCredentials(URI link, String realm) throws CredentialsException {
+    return internalGetAuthCredentials(link, realm, true);
+  }
+
+  /*
+   * @see
    * org.rssowl.core.connection.ICredentialsProvider#getAuthCredentials(java
    * .net.URI, java.lang.String)
    */
   public synchronized ICredentials getAuthCredentials(URI link, String realm) throws CredentialsException {
+    return internalGetAuthCredentials(link, realm, false);
+  }
+
+  private synchronized ICredentials internalGetAuthCredentials(URI link, String realm, boolean persistedOnly) throws CredentialsException {
 
     /* Check Cache first */
     if (checkCacheProtected(link.toString(), realm))
@@ -132,6 +157,13 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
     /* Credentials Provided */
     if (authorizationInfo != null)
       return authorizationInfo;
+
+    /* Check In-Memory Store */
+    if (!persistedOnly) {
+      ICredentials inMemoryCredentials = fInMemoryStore.get(toCacheKey(link.toString(), realm));
+      if (inMemoryCredentials != null)
+        return inMemoryCredentials;
+    }
 
     /* Cache as unprotected */
     addCacheProtected(link.toString(), realm);
@@ -282,40 +314,62 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
    * rssowl.core.connection.ICredentials, java.net.URI, java.lang.String)
    */
   public void setAuthCredentials(ICredentials credentials, URI link, String realm) throws CredentialsException {
-    ISecurePreferences securePreferences = getSecurePreferences();
+    internalSetAuthCredentials(credentials, link, realm, true);
+  }
 
-    /* Check if Bundle is Stopped */
-    if (securePreferences == null)
-      return;
+  /*
+   * @see
+   * org.rssowl.core.connection.ICredentialsProvider#setInMemoryAuthCredentials
+   * (org.rssowl.core.connection.ICredentials, java.net.URI, java.lang.String)
+   */
+  public void setInMemoryAuthCredentials(ICredentials credentials, URI link, String realm) throws CredentialsException {
+    internalSetAuthCredentials(credentials, link, realm, false);
+  }
 
-    /* Store in Equinox Security Storage */
-    ISecurePreferences allFeedsPreferences = securePreferences.node(SECURE_FEED_NODE);
-    ISecurePreferences feedPreferences = allFeedsPreferences.node(EncodingUtils.encodeSlashes(link.toString()));
-    ISecurePreferences realmPreference = feedPreferences.node(EncodingUtils.encodeSlashes(realm != null ? realm : REALM));
+  private void internalSetAuthCredentials(ICredentials credentials, URI link, String realm, boolean persist) throws CredentialsException {
 
-    IPreferenceScope globalScope = Owl.getPreferenceService().getGlobalScope();
+    /* Store Credentials in In-Memory Store */
+    if (!persist) {
+      fInMemoryStore.put(toCacheKey(link.toString(), realm), credentials);
+    }
 
-    /* OS Password is only supported on Windows and Mac */
-    boolean useOSPassword = globalScope.getBoolean(DefaultPreferences.USE_OS_PASSWORD);
-    if (!Platform.OS_WIN32.equals(Platform.getOS()) && !Platform.OS_MACOSX.equals(Platform.getOS()))
-      useOSPassword = false;
+    /* Store Credentials in secure Storage */
+    else {
+      ISecurePreferences securePreferences = getSecurePreferences();
 
-    boolean encryptPW = useOSPassword || globalScope.getBoolean(DefaultPreferences.USE_MASTER_PASSWORD);
-    try {
-      if (credentials.getUsername() != null)
-        realmPreference.put(USERNAME, credentials.getUsername(), encryptPW);
+      /* Check if Bundle is Stopped */
+      if (securePreferences == null)
+        return;
 
-      if (credentials.getPassword() != null)
-        realmPreference.put(PASSWORD, credentials.getPassword(), encryptPW);
+      /* Store in Equinox Security Storage */
+      ISecurePreferences allFeedsPreferences = securePreferences.node(SECURE_FEED_NODE);
+      ISecurePreferences feedPreferences = allFeedsPreferences.node(EncodingUtils.encodeSlashes(link.toString()));
+      ISecurePreferences realmPreference = feedPreferences.node(EncodingUtils.encodeSlashes(realm != null ? realm : REALM));
 
-      if (credentials.getDomain() != null)
-        realmPreference.put(DOMAIN, credentials.getDomain(), encryptPW);
+      IPreferenceScope globalScope = Owl.getPreferenceService().getGlobalScope();
 
-      realmPreference.flush(); // Flush to disk early
-    } catch (StorageException e) {
-      throw new CredentialsException(Activator.getDefault().createErrorStatus(e.getMessage(), e));
-    } catch (IOException e) {
-      throw new CredentialsException(Activator.getDefault().createErrorStatus(e.getMessage(), e));
+      /* OS Password is only supported on Windows and Mac */
+      boolean useOSPassword = globalScope.getBoolean(DefaultPreferences.USE_OS_PASSWORD);
+      if (!Platform.OS_WIN32.equals(Platform.getOS()) && !Platform.OS_MACOSX.equals(Platform.getOS()))
+        useOSPassword = false;
+
+      boolean encryptPW = useOSPassword || globalScope.getBoolean(DefaultPreferences.USE_MASTER_PASSWORD);
+      try {
+        if (credentials.getUsername() != null)
+          realmPreference.put(USERNAME, credentials.getUsername(), encryptPW);
+
+        if (credentials.getPassword() != null)
+          realmPreference.put(PASSWORD, credentials.getPassword(), encryptPW);
+
+        if (credentials.getDomain() != null)
+          realmPreference.put(DOMAIN, credentials.getDomain(), encryptPW);
+
+        realmPreference.flush(); // Flush to disk early
+      } catch (StorageException e) {
+        throw new CredentialsException(Activator.getDefault().createErrorStatus(e.getMessage(), e));
+      } catch (IOException e) {
+        throw new CredentialsException(Activator.getDefault().createErrorStatus(e.getMessage(), e));
+      }
     }
 
     /* Uncache */
@@ -348,9 +402,15 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
    * .net.URI, java.lang.String)
    */
   public synchronized void deleteAuthCredentials(URI link, String realm) throws CredentialsException {
-    ISecurePreferences securePreferences = getSecurePreferences();
+    
+    /* Delete from In-Memory Store if present */
+    fInMemoryStore.remove(toCacheKey(link.toString(), realm));
 
+    /* Delete from Cache */
+    removeCacheProtected(link.toString(), realm);
+    
     /* Check if Bundle is Stopped */
+    ISecurePreferences securePreferences = getSecurePreferences();
     if (securePreferences == null)
       return;
 
@@ -371,9 +431,6 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
         }
       }
     }
-
-    /* Delete from Cache */
-    removeCacheProtected(link.toString(), realm);
   }
 
   /*

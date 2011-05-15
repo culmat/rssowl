@@ -586,7 +586,7 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
     if (StringUtils.isSet(link.getScheme())) {
       ICredentialsProvider credentialsProvider = fConService.getCredentialsProvider(link);
       if (credentialsProvider != null) {
-        ICredentials authCredentials = credentialsProvider.getAuthCredentials(link, realm);
+        ICredentials authCredentials = credentialsProvider.getPersistedAuthCredentials(link, realm);
         if (authCredentials != null)
           return new CredentialsModelData(authCredentials.getUsername(), authCredentials.getPassword(), link, realm);
       }

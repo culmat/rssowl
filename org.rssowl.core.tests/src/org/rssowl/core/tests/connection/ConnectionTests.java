@@ -35,6 +35,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
+import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
 import org.rssowl.core.connection.AuthenticationRequiredException;
@@ -76,6 +77,14 @@ import java.util.Map;
  * @author bpasero
  */
 public class ConnectionTests {
+
+  /**
+   * @throws Exception
+   */
+  @Before
+  public void setUp() throws Exception {
+    Owl.getPersistenceService().recreateSchema();
+  }
 
   /**
    * Test contribution of Credentials Provider.
@@ -157,6 +166,9 @@ public class ConnectionTests {
     IFeed feed2 = new Feed(feedUrl2);
     AuthenticationRequiredException e = null;
 
+    DynamicDAO.save(feed1);
+    DynamicDAO.save(feed2);
+
     try {
       Owl.getConnectionService().getHandler(feed1.getLink()).openStream(feed1.getLink(), null, null);
     } catch (AuthenticationRequiredException e1) {
@@ -207,6 +219,95 @@ public class ConnectionTests {
 
     Owl.getInterpreter().interpret(inS, feed2, null);
     assertEquals("RSS 2.0", feed2.getFormat());
+
+    DynamicDAO.delete(feed1);
+    DynamicDAO.delete(feed2);
+
+    assertNull(conManager.getAuthCredentials(feed1.getLink(), null));
+    assertNull(conManager.getAuthCredentials(feed2.getLink(), null));
+
+    conManager.getCredentialsProvider(feedUrl1).deleteAuthCredentials(URIUtils.normalizeUri(feedUrl2, true), "Other Directory");
+    conManager.getCredentialsProvider(feedUrl1).deleteAuthCredentials(URIUtils.normalizeUri(feedUrl2, true), "Restricted Directory");
+  }
+
+  /**
+   * Test a protected Feed.
+   *
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings("nls")
+  public void testProtectedFeedInMemory() throws Exception {
+    IConnectionService conManager = Owl.getConnectionService();
+    URI feedUrl1 = new URI("http://www.rssowl.org/rssowl2dg/tests/connection/authrequired/feed_rss.xml");
+    URI feedUrl2 = new URI("http://www.rssowl.org/rssowl2dg/tests/connection/authrequired/feed_rss_copy.xml");
+    ICredentialsProvider credProvider = conManager.getCredentialsProvider(feedUrl1);
+
+    IFeed feed1 = new Feed(feedUrl1);
+    IFeed feed2 = new Feed(feedUrl2);
+    AuthenticationRequiredException e = null;
+
+    DynamicDAO.save(feed1);
+    DynamicDAO.save(feed2);
+
+    try {
+      Owl.getConnectionService().getHandler(feed1.getLink()).openStream(feed1.getLink(), null, null);
+    } catch (AuthenticationRequiredException e1) {
+      e = e1;
+    }
+
+    assertNotNull(e);
+    e = null;
+
+    ICredentials credentials = new ICredentials() {
+      public String getDomain() {
+        return null;
+      }
+
+      public String getPassword() {
+        return "admin";
+      }
+
+      public String getUsername() {
+        return "bpasero";
+      }
+    };
+
+    credProvider.setInMemoryAuthCredentials(credentials, feedUrl1, null);
+
+    InputStream inS = Owl.getConnectionService().getHandler(feed1.getLink()).openStream(feed1.getLink(), null, null);
+    assertNotNull(inS);
+
+    Owl.getInterpreter().interpret(inS, feed1, null);
+    assertEquals("RSS 2.0", feed1.getFormat());
+
+    /* Test authentication by other realm is not working */
+    credProvider.setInMemoryAuthCredentials(credentials, URIUtils.normalizeUri(feedUrl2, true), "Other Directory");
+
+    try {
+      Owl.getConnectionService().getHandler(feed2.getLink()).openStream(feed2.getLink(), null, null);
+    } catch (AuthenticationRequiredException e1) {
+      e = e1;
+    }
+
+    assertNotNull(e);
+
+    /* Test authentication by realm is working */
+    credProvider.setInMemoryAuthCredentials(credentials, URIUtils.normalizeUri(feedUrl2, true), "Restricted Directory");
+
+    inS = Owl.getConnectionService().getHandler(feed2.getLink()).openStream(feed2.getLink(), null, null);
+    assertNotNull(inS);
+
+    Owl.getInterpreter().interpret(inS, feed2, null);
+    assertEquals("RSS 2.0", feed2.getFormat());
+
+    DynamicDAO.delete(feed1);
+    DynamicDAO.delete(feed2);
+
+    assertNull(conManager.getAuthCredentials(feed1.getLink(), null));
+    assertNull(conManager.getAuthCredentials(feed2.getLink(), null));
+    assertNull(conManager.getCredentialsProvider(feed1.getLink()).getPersistedAuthCredentials(feed1.getLink(), null));
+    assertNull(conManager.getCredentialsProvider(feed2.getLink()).getPersistedAuthCredentials(feed2.getLink(), null));
   }
 
   /**
@@ -349,7 +450,7 @@ public class ConnectionTests {
    * @throws Exception
    */
   @Test
-  public void testCredentialsDeleted() throws Exception {
+  public void testStoredCredentialsDeleted() throws Exception {
     IConnectionService conManager = Owl.getConnectionService();
     URI feedUrl = new URI("http://www.rssowl.org/rssowl2dg/tests/connection/authrequired/feed_rdf.xml");
     IFeed feed = new Feed(feedUrl);
@@ -377,6 +478,43 @@ public class ConnectionTests {
     DynamicDAO.delete(new FeedLinkReference(feedUrl).resolve());
 
     assertNull(conManager.getAuthCredentials(feedUrl, null));
+    assertNull(conManager.getCredentialsProvider(feedUrl).getPersistedAuthCredentials(feedUrl, null));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testInMemoryCredentialsDeleted() throws Exception {
+    IConnectionService conManager = Owl.getConnectionService();
+    URI feedUrl = new URI("http://www.rssowl.org/rssowl2dg/tests/connection/authrequired/feed_rdf.xml");
+    IFeed feed = new Feed(feedUrl);
+
+    DynamicDAO.save(feed);
+
+    ICredentials authCreds = new ICredentials() {
+      public String getDomain() {
+        return null;
+      }
+
+      public String getPassword() {
+        return null;
+      }
+
+      public String getUsername() {
+        return null;
+      }
+    };
+
+    conManager.getCredentialsProvider(feedUrl).setInMemoryAuthCredentials(authCreds, feedUrl, null);
+
+    assertNotNull(conManager.getAuthCredentials(feedUrl, null));
+    assertNull(conManager.getCredentialsProvider(feedUrl).getPersistedAuthCredentials(feedUrl, null));
+
+    DynamicDAO.delete(new FeedLinkReference(feedUrl).resolve());
+
+    assertNull(conManager.getAuthCredentials(feedUrl, null));
+    assertNull(conManager.getCredentialsProvider(feedUrl).getPersistedAuthCredentials(feedUrl, null));
   }
 
   /**

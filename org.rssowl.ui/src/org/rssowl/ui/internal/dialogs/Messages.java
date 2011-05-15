@@ -90,6 +90,7 @@ public class Messages extends NLS {
   public static String LoginDialog_FEED_REQUIRES_AUTH;
   public static String LoginDialog_LOGIN;
   public static String LoginDialog_PASSWORD;
+  public static String LoginDialog_REMEMBER_PASSWORD;
   public static String LoginDialog_USERNAME;
   public static String ManageSetsDialog_1_BIN;
   public static String ManageSetsDialog_1_BOOKMARK;
