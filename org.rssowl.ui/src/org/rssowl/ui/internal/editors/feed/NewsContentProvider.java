@@ -876,21 +876,8 @@ public class NewsContentProvider implements ITreeContentProvider {
 
             /* Filter News which are from a different Feed than displayed */
             for (NewsEvent event : events) {
+              boolean isRestored = gotRestored(event, fFilter.getType());
               INews news = event.getEntity();
-              INews.State oldState = event.getOldNews() != null ? event.getOldNews().getState() : null;
-              boolean isRestored = news.isVisible() && (oldState == INews.State.HIDDEN || oldState == INews.State.DELETED);
-
-              /*
-               * Special case of news being restored: If the filter is set to only show new or unread news, a news is treated
-               * as being restored if it changed from READ to NEW, UNREAD or UPDATED because the filter ensures to filter out
-               * READ events in case one of the two filters is enabled.
-               */
-              if (!isRestored && !hasCachedNews(news)) {
-                if (fFilter.getType() == Type.SHOW_NEW)
-                  isRestored = news.getState() == INews.State.NEW && oldState != null && oldState != INews.State.NEW;
-                else if (fFilter.getType() == Type.SHOW_UNREAD)
-                  isRestored = news.isVisible() && news.getState() != INews.State.READ && oldState == INews.State.READ;
-              }
 
               /* Return on Shutdown or disposal */
               if (canceled())
@@ -1016,6 +1003,39 @@ public class NewsContentProvider implements ITreeContentProvider {
     };
 
     DynamicDAO.addEntityListener(INews.class, fNewsListener);
+  }
+
+  private boolean gotRestored(NewsEvent event, NewsFilter.Type filter) {
+    INews news = event.getEntity();
+    INews old = event.getOldNews();
+
+    /* Quickly check common conditions under which the news can not be a restored one */
+    if (news == null || old == null || !news.isVisible() || hasCachedNews(news))
+      return false;
+
+    INews.State newState = news.getState();
+    INews.State oldState = old.getState();
+
+    /* Restored: Deletion was undone */
+    if (oldState == INews.State.HIDDEN || oldState == INews.State.DELETED)
+      return true;
+
+    /* Check if new state matches filter now */
+    switch (filter) {
+      case SHOW_NEW:
+        return newState == INews.State.NEW && oldState != INews.State.NEW;
+
+      case SHOW_UNREAD:
+        return newState != INews.State.READ && oldState == INews.State.READ;
+
+      case SHOW_STICKY:
+        return CoreUtils.isStickyStateChange(Collections.singleton(event), true);
+
+      case SHOW_LABELED:
+        return CoreUtils.isLabelChange(Collections.singleton(event), true);
+    }
+
+    return false;
   }
 
   private void refreshViewers(final Set<NewsEvent> events, NewsEventType type) {
