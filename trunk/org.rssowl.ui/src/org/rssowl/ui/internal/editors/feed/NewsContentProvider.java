@@ -328,7 +328,7 @@ public class NewsContentProvider implements ITreeContentProvider {
     /* Handle Folder, Newsbin and Saved Search */
     boolean needToFilter = true;
     if (input.isGetNewsRefsEfficient()) {
-      Pair<Boolean, List<NewsReference>> result = getNewsRefsFromInput(input, filter, states, monitor);
+      Pair<Boolean, List<NewsReference>> result = getNewsRefsFromInput(input, fFilter, states, monitor);
       needToFilter = !result.getFirst();
       List<NewsReference> newsReferences = result.getSecond();
       for (NewsReference newsRef : newsReferences) {
@@ -371,7 +371,7 @@ public class NewsContentProvider implements ITreeContentProvider {
 
     /* Filter Elements as needed */
     if (needToFilter && isFilteredByOtherThanState())
-      filterElements(resolvedNews, true);
+      filterElements(resolvedNews);
 
     /* Check if ContentProvider was already disposed or RSSOwl shutting down */
     if (canceled(monitor))
@@ -383,8 +383,9 @@ public class NewsContentProvider implements ITreeContentProvider {
     }
   }
 
-  private Pair<Boolean /* Filtered */, List<NewsReference>> getNewsRefsFromInput(INewsMark input, NewsFilter.Type filter, Set<State> states, IProgressMonitor monitor) {
+  private Pair<Boolean /* Filtered */, List<NewsReference>> getNewsRefsFromInput(INewsMark input, NewsFilter newsFilter, Set<State> states, IProgressMonitor monitor) {
     boolean filtered = false;
+    Type filter = newsFilter.getType();
 
     /*
      * Optimization: If input is a saved search or bin with many results and the news filter is set to any condition that
@@ -425,6 +426,18 @@ public class NewsContentProvider implements ITreeContentProvider {
     else if (input instanceof FolderNewsMark) {
       ((FolderNewsMark) input).resolve(filter, monitor);
       filtered = true;
+
+      /* Optimization: If the folder has lots of elements and a text filter is set, limit result by this pattern */
+      if (input.getNewsCount(states) > MAX_FOLDER_ELEMENTS && newsFilter.isPatternSet()) {
+        List<NewsReference> references = input.getNewsRefs(states);
+        Iterator<NewsReference> iterator = references.iterator();
+        while (iterator.hasNext()) {
+          if (!newsFilter.isTextPatternMatch(iterator.next().getId()))
+            iterator.remove();
+        }
+
+        return Pair.create(filtered, references);
+      }
     }
 
     /* Return news refs by state */
@@ -451,7 +464,7 @@ public class NewsContentProvider implements ITreeContentProvider {
 
       /* Filter the Added News */
       visibleNews.addAll(addedNews);
-      filterElements(visibleNews, true);
+      filterElements(visibleNews);
 
       /* Also indicate related events for visible news */
       for (INews news : visibleNews)
@@ -599,7 +612,7 @@ public class NewsContentProvider implements ITreeContentProvider {
 
     /* Optimization: Only consider those news that pass the filter when news are added (or in general for Folder News Mark) */
     if (needToFilter && isFilteredByOtherThanState())
-      filterElements(addedNews, true);
+      filterElements(addedNews);
 
     /* Add to Cache */
     for (INews news : addedNews) {
@@ -621,10 +634,10 @@ public class NewsContentProvider implements ITreeContentProvider {
     return fFilter.getType() == Type.SHOW_STICKY || fFilter.getType() == Type.SHOW_LABELED || fFilter.getType() == Type.SHOW_RECENT || fFilter.getType() == Type.SHOW_LAST_5_DAYS;
   }
 
-  private void filterElements(Collection<INews> elements, boolean ignoreTextPattern) {
+  private void filterElements(Collection<INews> elements) {
     Iterator<INews> iterator = elements.iterator();
     while (iterator.hasNext()) {
-      if (!fFilter.select(iterator.next(), ignoreTextPattern))
+      if (!fFilter.select(iterator.next(), true))
         iterator.remove();
     }
   }
@@ -657,14 +670,6 @@ public class NewsContentProvider implements ITreeContentProvider {
   private List<INews> limitFolderNewsMark(List<INews> resolvedNews, NewsComparator comparer) {
 
     /* Return if no capping is required at all */
-    if (resolvedNews.size() <= MAX_FOLDER_ELEMENTS)
-      return resolvedNews;
-
-    /* Filter Elements by pattern if necessary */
-    if (fFilter.isPatternSet())
-      filterElements(resolvedNews, false);
-
-    /* Return after filtering if elements count is now small enough */
     if (resolvedNews.size() <= MAX_FOLDER_ELEMENTS)
       return resolvedNews;
 
