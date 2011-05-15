@@ -1310,15 +1310,7 @@ public class NewsContentProvider implements ITreeContentProvider {
 
     /* Check if Saved Search contains the given News */
     else if (type != NewsEventType.PERSISTED && fInput instanceof ISearchMark) {
-
-      /*
-       * Workaround a race condition in a safe way: When a News gets updated or deleted from a
-       * Searchmark, the Indexer is the first to process this event. Since the SavedSearchService
-       * updates all Searchmarks instantly as a result of that, the Searchmark at this point could no
-       * longer contain the affected News and isInputRelated() would return false. The fix is
-       * to check the cache for the News instead of the potential modified Searchmark.
-       */
-      return hasCachedNews(news);
+      return hasCachedNews(news) || fInput.containsNews(news);
     }
 
     /* Update / Remove: Check if News points to this Bin */
