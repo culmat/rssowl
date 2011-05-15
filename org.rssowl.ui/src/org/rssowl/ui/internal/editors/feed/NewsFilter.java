@@ -53,9 +53,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -160,7 +159,7 @@ public class NewsFilter extends ViewerFilter {
 
   /* Misc. */
   private INewsMark fNewsMark;
-  private Map<Long, Long> fCachedPatternMatchingNews;
+  private Set<Long> fCachedPatternMatchingNews;
   private IModelFactory fModelFactory = Owl.getModelFactory();
   private String fPatternString;
 
@@ -246,6 +245,16 @@ public class NewsFilter extends ViewerFilter {
   }
 
   /**
+   * @param news the identifier of the {@link INews} to check if matching the
+   * text based filter or not.
+   * @return <code>true</code> if the given {@link INews} should be selected by
+   * the text based filter and <code>false</code> otherwise.
+   */
+  boolean isTextPatternMatch(Long newsId) {
+    return fCachedPatternMatchingNews == null || fCachedPatternMatchingNews.contains(newsId);
+  }
+
+  /**
    * Check if the current (leaf) element is a match with the filter text. The
    * default behavior checks that the label of the element is a match.
    * Subclasses should override this method.
@@ -310,19 +319,12 @@ public class NewsFilter extends ViewerFilter {
 
       /* Finally check the Pattern */
       if (isMatch && !ignorePattern && fCachedPatternMatchingNews != null)
-        isMatch = matchesPattern(news);
+        isMatch = isTextPatternMatch(news.getId());
 
       return isMatch;
     }
 
     return false;
-  }
-
-  private boolean matchesPattern(INews news) {
-    if (fCachedPatternMatchingNews == null)
-      return true;
-
-    return fCachedPatternMatchingNews.containsKey(news.getId());
   }
 
   /*
@@ -417,14 +419,14 @@ public class NewsFilter extends ViewerFilter {
     }
   }
 
-  private Map<Long, Long> cacheMatchingNews(String pattern) {
+  private Set<Long> cacheMatchingNews(String pattern) {
     List<ISearchCondition> conditions = new ArrayList<ISearchCondition>(2);
     ISearchCondition locationCondition = null;
     ISearchCondition textCondition = null;
 
     /* Explicitly return on empty String */
     if (!StringUtils.isSet(pattern))
-      return Collections.emptyMap();
+      return Collections.emptySet();
 
     /* Convert to Wildcard Query */
     if (!pattern.endsWith("*")) //$NON-NLS-1$
@@ -485,12 +487,12 @@ public class NewsFilter extends ViewerFilter {
       result = Owl.getPersistenceService().getModelSearch().searchNews(conditions, true);
     }
 
-    Map<Long, Long> resultMap = new HashMap<Long, Long>(result.size());
+    Set<Long> resultSet = new HashSet<Long>(result.size());
     for (SearchHit<NewsReference> hit : result) {
-      resultMap.put(hit.getResult().getId(), hit.getResult().getId());
+      resultSet.add(hit.getResult().getId());
     }
 
-    return resultMap;
+    return resultSet;
   }
 
   /**
