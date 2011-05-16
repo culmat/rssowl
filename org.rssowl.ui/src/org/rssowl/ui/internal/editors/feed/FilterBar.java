@@ -829,7 +829,7 @@ public class FilterBar {
     doFilter(type, refresh, saveSettings, null);
   }
 
-  void doFilter(final NewsFilter.Type type, boolean refresh, boolean saveSettings, final Runnable joinUIRunnable) {
+  void doFilter(final NewsFilter.Type type, boolean refresh, boolean saveSettings, final Runnable browserRefreshRunnable) {
     Type oldType = fFeedView.getFilter().getType();
     boolean noChange = (oldType == type);
 
@@ -851,23 +851,30 @@ public class FilterBar {
     if (refresh) {
       final Runnable uiRunnable = new Runnable() {
         public void run() {
+          if (browserRefreshRunnable != null) //If runnable is passed in, it will take care of refreshing
+            fFeedView.getNewsBrowserControl().getViewer().setBlockRefresh(true);
+          try {
 
-          /* Only Refresh Table as Browser shows single News */
-          NewsTableControl newsTable = fFeedView.getNewsTableControl();
-          boolean isNewsTableVisible = fFeedView.isTableViewerVisible();
-          if (newsTable != null && isNewsTableVisible)
-            fFeedView.refreshTableViewer(true, false);
+            /* Only Refresh Table as Browser shows single News */
+            NewsTableControl newsTable = fFeedView.getNewsTableControl();
+            boolean isNewsTableVisible = fFeedView.isTableViewerVisible();
+            if (newsTable != null && isNewsTableVisible)
+              fFeedView.refreshTableViewer(true, false);
 
-          /* Refresh All */
-          else
-            fFeedView.refresh(true, false);
+            /* Refresh All */
+            else
+              fFeedView.refresh(true, false);
 
-          /* Update Selection */
-          updateBrowserSelection();
+            /* Update Selection */
+            updateBrowserSelection();
 
-          /* Execute passed in code if provided */
-          if (joinUIRunnable != null)
-            joinUIRunnable.run();
+            /* Execute passed in code if provided */
+            if (browserRefreshRunnable != null)
+              browserRefreshRunnable.run();
+          } finally {
+            if (browserRefreshRunnable != null)
+              fFeedView.getNewsBrowserControl().getViewer().setBlockRefresh(false);
+          }
         }
       };
 
