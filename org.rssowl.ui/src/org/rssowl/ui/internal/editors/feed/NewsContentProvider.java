@@ -33,6 +33,7 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.LongArrayList;
 import org.rssowl.core.internal.persist.SearchMark;
+import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
@@ -54,6 +55,7 @@ import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.NewsListener;
 import org.rssowl.core.persist.event.SearchMarkAdapter;
 import org.rssowl.core.persist.event.SearchMarkEvent;
+import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.BookMarkReference;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.ModelReference;
@@ -106,6 +108,9 @@ public class NewsContentProvider implements ITreeContentProvider {
   /* The maximum number of items in a NewsMark before scoping the results as specified by the filter */
   static final int SCOPE_SEARCH_LIMIT = 200;
 
+  /* The maximum number of items in a Bookmark before scoping the results as specified by the filter */
+  static final int BOOKMARK_SCOPE_SEARCH_LIMIT = 1000;
+
   private final NewsBrowserViewer fBrowserViewer;
   private final NewsTableViewer fTableViewer;
   private final NewsGrouping fGrouping;
@@ -116,6 +121,8 @@ public class NewsContentProvider implements ITreeContentProvider {
   private final FeedView fFeedView;
   private final AtomicBoolean fDisposed = new AtomicBoolean(false);
   private final INewsDAO fNewsDao;
+  private final IModelFactory fFactory;
+  private final IModelSearch fSearch;
 
   /* Cache displayed News */
   private final Map<Long, INews> fCachedNews;
@@ -138,6 +145,8 @@ public class NewsContentProvider implements ITreeContentProvider {
     fFilter = feedView.getFilter();
     fCachedNews = new HashMap<Long, INews>();
     fNewsDao = DynamicDAO.getDAO(INewsDAO.class);
+    fFactory = Owl.getModelFactory();
+    fSearch = Owl.getPersistenceService().getModelSearch();
   }
 
   /*
@@ -331,7 +340,7 @@ public class NewsContentProvider implements ITreeContentProvider {
 
     /* Handle Folder, Newsbin and Saved Search */
     boolean needToFilter = true;
-    if (input.isGetNewsRefsEfficient()) {
+    if (input.isGetNewsRefsEfficient() || shouldResolveBookMarkWithSearch(input, filter)) {
       Pair<Boolean, List<NewsReference>> result = getNewsRefsFromInput(input, fFilter, states, monitor);
       needToFilter = !result.getFirst();
       List<NewsReference> newsReferences = result.getSecond();
@@ -365,18 +374,9 @@ public class NewsContentProvider implements ITreeContentProvider {
         resolvedNews = limitFolderNewsMark(resolvedNews, comparer != null ? comparer : fFeedView.getComparator());
     }
 
-    /* Handle Bookmark (check for news counts as optimization) */
-    else {
-      boolean resolveNews = true;
-      if (filter == Type.SHOW_NEW && input.getNewsCount(EnumSet.of(INews.State.NEW)) == 0)
-        resolveNews = false;
-      else if (filter == Type.SHOW_UNREAD && input.getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)) == 0)
-        resolveNews = false;
-      else if (filter == Type.SHOW_STICKY && ((IBookMark) fInput).getStickyNewsCount() == 0)
-        resolveNews = false;
-
-      if (resolveNews)
-        resolvedNews.addAll(input.getNews(states));
+    /* Resolve directly by state (check for news counts as optimization) */
+    else if (shouldResolve(input, filter)) {
+      resolvedNews.addAll(input.getNews(states));
     }
 
     /* Filter Elements as needed */
@@ -393,6 +393,54 @@ public class NewsContentProvider implements ITreeContentProvider {
     }
   }
 
+  private boolean shouldResolveBookMarkWithSearch(INewsMark input, NewsFilter.Type filter) {
+
+    /* Return if input is not a bookmark or not filtering at all */
+    if (!(input instanceof IBookMark) || filter == Type.SHOW_ALL)
+      return false;
+
+    /* Return if bookmark retention is setup, assuming that the number of elements is limited already */
+    if (hasRetentionLimit((IBookMark) input))
+      return false;
+
+    return true;
+  }
+
+  private boolean hasRetentionLimit(IBookMark bookmark) {
+    IPreferenceScope preferences = Owl.getPreferenceService().getEntityScope(bookmark);
+
+    /* High Retention: Read News Deleted */
+    if (preferences.getBoolean(DefaultPreferences.DEL_READ_NEWS_STATE))
+      return true;
+
+    /* Medium Retention: Aged News Deleted */
+    if (preferences.getBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE))
+      return true;
+
+    /* Low-High Retention: News Deleted by Count (Depends on actual count) */
+    if (preferences.getBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE) && preferences.getInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE) <= BOOKMARK_SCOPE_SEARCH_LIMIT)
+      return true;
+
+    return false;
+  }
+
+  private boolean shouldResolve(INewsMark input, NewsFilter.Type filter) {
+
+    /* Check for NEW News in Input */
+    if (filter == Type.SHOW_NEW && input.getNewsCount(EnumSet.of(INews.State.NEW)) == 0)
+      return false;
+
+    /* Check for UNREAD News in Input */
+    else if (filter == Type.SHOW_UNREAD && input.getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)) == 0)
+      return false;
+
+    /* Check for Sticky News in Bookmark */
+    else if (filter == Type.SHOW_STICKY && input instanceof IBookMark && ((IBookMark) input).getStickyNewsCount() == 0)
+      return false;
+
+    return true;
+  }
+
   private Pair<Boolean /* Filtered */, List<NewsReference>> getNewsRefsFromInput(INewsMark input, NewsFilter newsFilter, Set<State> states, IProgressMonitor monitor) {
     boolean filtered = false;
     Type filter = newsFilter.getType();
@@ -403,25 +451,24 @@ public class NewsContentProvider implements ITreeContentProvider {
      */
     if (input instanceof ISearchMark || input instanceof INewsBin) {
       if (isFilteredByOtherThanState() && input.getNewsCount(states) > SCOPE_SEARCH_LIMIT) {
-        IModelSearch search = Owl.getPersistenceService().getModelSearch();
         ISearchCondition filterCondition = ModelUtils.getConditionForFilter(filter);
         List<SearchHit<NewsReference>> result = null;
 
         /* Inject into Saved Search */
         if (input instanceof ISearchMark) {
           ISearchMark searchMark = (ISearchMark) input;
-          result = search.searchNews(searchMark.getSearchConditions(), filterCondition, searchMark.matchAllConditions());
+          result = fSearch.searchNews(searchMark.getSearchConditions(), filterCondition, searchMark.matchAllConditions());
         }
 
         /* Location search for News Bin */
         else {
           INewsBin newsBin = (INewsBin) input;
-          IModelFactory factory = Owl.getModelFactory();
-          ISearchField locationField = factory.createSearchField(INews.LOCATION, INews.class.getName());
-          ISearchCondition locationCondition = factory.createSearchCondition(locationField, SearchSpecifier.IS, ModelUtils.toPrimitive(Collections.singleton((IFolderChild) newsBin)));
-          result = search.searchNews(Arrays.asList(locationCondition, filterCondition), true);
+          ISearchField locationField = fFactory.createSearchField(INews.LOCATION, INews.class.getName());
+          ISearchCondition locationCondition = fFactory.createSearchCondition(locationField, SearchSpecifier.IS, ModelUtils.toPrimitive(Collections.singleton((IFolderChild) newsBin)));
+          result = fSearch.searchNews(Arrays.asList(locationCondition, filterCondition), true);
         }
 
+        /* Fill Newsreferences from Search Results */
         List<NewsReference> newsRefs = new ArrayList<NewsReference>(result.size());
         for (SearchHit<NewsReference> item : result) {
           newsRefs.add(item.getResult());
@@ -429,6 +476,28 @@ public class NewsContentProvider implements ITreeContentProvider {
 
         return Pair.create(true, newsRefs);
       }
+    }
+
+    /* Resolve items from bookmark through searching inside */
+    else if (input instanceof IBookMark) {
+      IBookMark bookmark = (IBookMark) input;
+
+      /* Return early if bookmark should not be resolved at all */
+      if (!shouldResolve(bookmark, filter))
+        return Pair.create(true, Collections.<NewsReference> emptyList());
+
+      ISearchCondition filterCondition = ModelUtils.getConditionForFilter(filter);
+      ISearchField locationField = fFactory.createSearchField(INews.LOCATION, INews.class.getName());
+      ISearchCondition locationCondition = fFactory.createSearchCondition(locationField, SearchSpecifier.IS, ModelUtils.toPrimitive(Collections.singleton((IFolderChild) bookmark)));
+      List<SearchHit<NewsReference>> result = fSearch.searchNews(Arrays.asList(locationCondition, filterCondition), true);
+
+      /* Fill Newsreferences from Search Results */
+      List<NewsReference> newsRefs = new ArrayList<NewsReference>(result.size());
+      for (SearchHit<NewsReference> item : result) {
+        newsRefs.add(item.getResult());
+      }
+
+      return Pair.create(true, newsRefs);
     }
 
     /* Resolve Folder News Mark and pass in current filter */
@@ -560,10 +629,8 @@ public class NewsContentProvider implements ITreeContentProvider {
   private synchronized Pair<List<INews>, Boolean> newsChangedFromSearch(IProgressMonitor monitor, List<SearchMarkEvent> eventsRelatedToInput, boolean onlyHandleAddedNews) {
 
     /* Check if ContentProvider was already disposed or RSSOwl shutting down */
-    if (canceled(monitor)) {
-      List<INews> emptyList = Collections.emptyList();
-      return Pair.create(emptyList, false);
-    }
+    if (canceled(monitor))
+      return Pair.create(Collections.<INews> emptyList(), false);
 
     boolean needToFilter = true;
     boolean wasEmpty = fCachedNews.isEmpty();
@@ -594,10 +661,8 @@ public class NewsContentProvider implements ITreeContentProvider {
             addedNews.add(news);
 
           /* Check if ContentProvider was already disposed or RSSOwl shutting down */
-          if (canceled(monitor)) {
-            List<INews> emptyList = Collections.emptyList();
-            return Pair.create(emptyList, false);
-          }
+          if (canceled(monitor))
+            return Pair.create(Collections.<INews> emptyList(), false);
         }
       }
     }
@@ -618,18 +683,14 @@ public class NewsContentProvider implements ITreeContentProvider {
           addedNews.add(news);
 
         /* Check if ContentProvider was already disposed or RSSOwl shutting down */
-        if (canceled(monitor)) {
-          List<INews> emptyList = Collections.emptyList();
-          return Pair.create(emptyList, false);
-        }
+        if (canceled(monitor))
+          return Pair.create(Collections.<INews> emptyList(), false);
       }
     }
 
     /* Check if ContentProvider was already disposed or RSSOwl shutting down */
-    if (canceled(monitor)) {
-      List<INews> emptyList = Collections.emptyList();
-      return Pair.create(emptyList, false);
-    }
+    if (canceled(monitor))
+      return Pair.create(Collections.<INews> emptyList(), false);
 
     /* Optimization: Only consider those news that pass the filter when news are added (or in general for Folder News Mark) */
     if (needToFilter && isFilteredByOtherThanState())
