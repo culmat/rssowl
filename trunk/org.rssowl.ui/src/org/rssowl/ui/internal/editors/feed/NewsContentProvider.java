@@ -106,7 +106,7 @@ public class NewsContentProvider implements ITreeContentProvider {
   static final int MAX_RESOLVED_FOLDER_ELEMENTS = 5000;
 
   /* The maximum number of items in a NewsMark before scoping the results as specified by the filter */
-  static final int SCOPE_SEARCH_LIMIT = 200;
+  static final int NEWSMARK_SCOPE_SEARCH_LIMIT = 200;
 
   /* The maximum number of items in a Bookmark before scoping the results as specified by the filter */
   static final int BOOKMARK_SCOPE_SEARCH_LIMIT = 1000;
@@ -450,7 +450,7 @@ public class NewsContentProvider implements ITreeContentProvider {
      * is not scoped by news state, we get the results from a search to potentially get less results and so need less memory.
      */
     if (input instanceof ISearchMark || input instanceof INewsBin) {
-      if (isFilteredByOtherThanState() && input.getNewsCount(states) > SCOPE_SEARCH_LIMIT) {
+      if (isFilteredByOtherThanState() && input.getNewsCount(states) > NEWSMARK_SCOPE_SEARCH_LIMIT) {
         ISearchCondition filterCondition = ModelUtils.getConditionForFilter(filter);
         List<SearchHit<NewsReference>> result = null;
 
