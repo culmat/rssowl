@@ -380,7 +380,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
 
         /* Store for plain URI too */
         ICredentialsProvider credProvider = Owl.getConnectionService().getCredentialsProvider(link);
-        if (credProvider.getPersistedAuthCredentials(normalizedUri, e.getRealm()) != null)
+        if (credProvider.hasPersistedAuthCredentials(normalizedUri, e.getRealm()))
           credProvider.setAuthCredentials(authCredentials, link, null);
         else
           credProvider.setInMemoryAuthCredentials(authCredentials, link, null);
