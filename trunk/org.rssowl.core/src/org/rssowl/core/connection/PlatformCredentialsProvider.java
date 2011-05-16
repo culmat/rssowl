@@ -120,6 +120,15 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
 
   /*
    * @see
+   * org.rssowl.core.connection.ICredentialsProvider#hasPersistedAuthCredentials
+   * (java.net.URI, java.lang.String)
+   */
+  public boolean hasPersistedAuthCredentials(URI link, String realm) throws CredentialsException {
+    return getAuthorizationInfo(link, realm) != null;
+  }
+
+  /*
+   * @see
    * org.rssowl.core.connection.ICredentialsProvider#getPersistedAuthCredentials
    * (java.net.URI, java.lang.String)
    */
@@ -138,16 +147,16 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
 
   private synchronized ICredentials internalGetAuthCredentials(URI link, String realm, boolean persistedOnly) throws CredentialsException {
 
+    /* Check Cache first */
+    if (isUnprotected(link, realm))
+      return null;
+
     /* Check In-Memory Store */
     if (!persistedOnly) {
       ICredentials inMemoryCredentials = fInMemoryStore.get(toCacheKey(link, realm));
       if (inMemoryCredentials != null)
         return inMemoryCredentials;
     }
-
-    /* Check Cache first */
-    if (isUnprotected(link, realm))
-      return null;
 
     /* Retrieve Credentials */
     ICredentials authorizationInfo = getAuthorizationInfo(link, realm);
