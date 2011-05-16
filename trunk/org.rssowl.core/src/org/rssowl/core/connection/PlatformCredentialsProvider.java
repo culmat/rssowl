@@ -138,16 +138,16 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
 
   private synchronized ICredentials internalGetAuthCredentials(URI link, String realm, boolean persistedOnly) throws CredentialsException {
 
-    /* Check Cache first */
-    if (isUnprotected(link, realm))
-      return null;
-
     /* Check In-Memory Store */
     if (!persistedOnly) {
       ICredentials inMemoryCredentials = fInMemoryStore.get(toCacheKey(link, realm));
       if (inMemoryCredentials != null)
         return inMemoryCredentials;
     }
+
+    /* Check Cache first */
+    if (isUnprotected(link, realm))
+      return null;
 
     /* Retrieve Credentials */
     ICredentials authorizationInfo = getAuthorizationInfo(link, realm);
@@ -445,6 +445,9 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
 
     /* Clear In-Memory Store */
     fInMemoryStore.clear();
+
+    /* Clear unprotected links cache */
+    fUnprotectedLinksCache.clear();
 
     /* Clear cached info */
     InternalExchangeUtils.passwordProvidersReset();

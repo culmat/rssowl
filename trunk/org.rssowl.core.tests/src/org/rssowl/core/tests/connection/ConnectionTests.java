@@ -48,6 +48,7 @@ import org.rssowl.core.connection.ICredentialsProvider;
 import org.rssowl.core.connection.IProtocolHandler;
 import org.rssowl.core.connection.IProxyCredentials;
 import org.rssowl.core.connection.NotModifiedException;
+import org.rssowl.core.connection.PlatformCredentialsProvider;
 import org.rssowl.core.internal.persist.Feed;
 import org.rssowl.core.persist.IConditionalGet;
 import org.rssowl.core.persist.IEntity;
@@ -226,8 +227,7 @@ public class ConnectionTests {
     assertNull(conManager.getAuthCredentials(feed1.getLink(), null));
     assertNull(conManager.getAuthCredentials(feed2.getLink(), null));
 
-    conManager.getCredentialsProvider(feedUrl1).deleteAuthCredentials(URIUtils.normalizeUri(feedUrl2, true), "Other Directory");
-    conManager.getCredentialsProvider(feedUrl1).deleteAuthCredentials(URIUtils.normalizeUri(feedUrl2, true), "Restricted Directory");
+    ((PlatformCredentialsProvider) conManager.getCredentialsProvider(feedUrl2)).clear();
   }
 
   /**
@@ -301,13 +301,16 @@ public class ConnectionTests {
     Owl.getInterpreter().interpret(inS, feed2, null);
     assertEquals("RSS 2.0", feed2.getFormat());
 
+    assertNull(conManager.getCredentialsProvider(feed1.getLink()).getPersistedAuthCredentials(feed1.getLink(), null));
+    assertNull(conManager.getCredentialsProvider(feed2.getLink()).getPersistedAuthCredentials(feed2.getLink(), null));
+
     DynamicDAO.delete(feed1);
     DynamicDAO.delete(feed2);
 
     assertNull(conManager.getAuthCredentials(feed1.getLink(), null));
     assertNull(conManager.getAuthCredentials(feed2.getLink(), null));
-    assertNull(conManager.getCredentialsProvider(feed1.getLink()).getPersistedAuthCredentials(feed1.getLink(), null));
-    assertNull(conManager.getCredentialsProvider(feed2.getLink()).getPersistedAuthCredentials(feed2.getLink(), null));
+
+    ((PlatformCredentialsProvider) conManager.getCredentialsProvider(feedUrl2)).clear();
   }
 
   /**
@@ -424,29 +427,6 @@ public class ConnectionTests {
   }
 
   /**
-   * Test contribution of Credentials Provider.
-   *
-   * @throws Exception
-   */
-  @Test
-  @SuppressWarnings("nls")
-  public void testAuthCredentialProviderContribution() throws Exception {
-    IConnectionService conManager = Owl.getConnectionService();
-    URI feedUrl = new URI("http://www.rssowl.org/rssowl2dg/tests/connection/authrequired/feed_rdf.xml");
-    IFeed feed = new Feed(feedUrl);
-    AuthenticationRequiredException e = null;
-
-    try {
-      conManager.getCredentialsProvider(feedUrl).deleteProxyCredentials(feedUrl); //Disable Proxy
-      Owl.getConnectionService().getHandler(feed.getLink()).openStream(feed.getLink(), null, null);
-    } catch (AuthenticationRequiredException e1) {
-      e = e1;
-    }
-
-    assertNull(e);
-  }
-
-  /**
    * @throws Exception
    */
   @Test
@@ -463,11 +443,11 @@ public class ConnectionTests {
       }
 
       public String getPassword() {
-        return null;
+        return "admin";
       }
 
       public String getUsername() {
-        return null;
+        return "bpasero";
       }
     };
 
@@ -479,6 +459,8 @@ public class ConnectionTests {
 
     assertNull(conManager.getAuthCredentials(feedUrl, null));
     assertNull(conManager.getCredentialsProvider(feedUrl).getPersistedAuthCredentials(feedUrl, null));
+
+    ((PlatformCredentialsProvider) conManager.getCredentialsProvider(feedUrl)).clear();
   }
 
   /**
@@ -498,11 +480,11 @@ public class ConnectionTests {
       }
 
       public String getPassword() {
-        return null;
+        return "admin";
       }
 
       public String getUsername() {
-        return null;
+        return "bpasero";
       }
     };
 
@@ -515,6 +497,8 @@ public class ConnectionTests {
 
     assertNull(conManager.getAuthCredentials(feedUrl, null));
     assertNull(conManager.getCredentialsProvider(feedUrl).getPersistedAuthCredentials(feedUrl, null));
+    
+    ((PlatformCredentialsProvider) conManager.getCredentialsProvider(feedUrl)).clear();
   }
 
   /**
