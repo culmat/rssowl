@@ -83,6 +83,7 @@ import org.rssowl.ui.internal.notifier.NotificationService;
 import org.rssowl.ui.internal.notifier.NotificationService.Mode;
 import org.rssowl.ui.internal.util.JobRunner;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -198,12 +199,28 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
   @Override
   public void postWindowCreate() {
 
+    /* If set to move to tray on startup, block shell opening once */
+    IWorkbenchWindow window = getWindowConfigurer().getWindow();
+    if (window != null && fPreferences.getBoolean(DefaultPreferences.TRAY_ON_START))
+      blockShellOpen(window);
+
     /* Toolbar & Status Visibility */
     IPreferenceScope preferences = Owl.getPreferenceService().getGlobalScope();
     if (!preferences.getBoolean(DefaultPreferences.SHOW_TOOLBAR))
       setToolBarVisible(false, false);
     if (!preferences.getBoolean(DefaultPreferences.SHOW_STATUS))
       setStatusVisible(false, false);
+  }
+
+  /* Calls safely into a patched version of JFaces Window class to block shell opening once */
+  private void blockShellOpen(IWorkbenchWindow window) {
+    try {
+      Method method = window.getClass().getMethod("blockShellOpenOnce"); //$NON-NLS-1$
+      if (method != null)
+        method.invoke(window);
+    } catch (Exception e) {
+      /* Ignore Silently */
+    }
   }
 
   /*
