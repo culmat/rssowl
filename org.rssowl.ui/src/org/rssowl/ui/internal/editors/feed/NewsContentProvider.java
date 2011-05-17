@@ -65,6 +65,7 @@ import org.rssowl.core.persist.reference.SearchMarkReference;
 import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.CoreUtils;
+import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.SearchHit;
 import org.rssowl.core.util.Triple;
@@ -84,6 +85,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -109,7 +111,7 @@ public class NewsContentProvider implements ITreeContentProvider {
   static final int NEWSMARK_SCOPE_SEARCH_LIMIT = 200;
 
   /* The maximum number of items in a Bookmark before scoping the results as specified by the filter */
-  static final int BOOKMARK_SCOPE_SEARCH_LIMIT = 1000;
+  static final int BOOKMARK_SCOPE_SEARCH_LIMIT = 500;
 
   private final NewsBrowserViewer fBrowserViewer;
   private final NewsTableViewer fTableViewer;
@@ -399,8 +401,13 @@ public class NewsContentProvider implements ITreeContentProvider {
     if (!(input instanceof IBookMark) || filter == Type.SHOW_ALL)
       return false;
 
+    /* Check for number of new, unread and updated news */
+    IBookMark bookmark = (IBookMark) input;
+    if (bookmark.getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)) > BOOKMARK_SCOPE_SEARCH_LIMIT)
+      return true;
+
     /* Return if bookmark retention is setup, assuming that the number of elements is limited already */
-    if (hasRetentionLimit((IBookMark) input))
+    if (hasRetentionLimit(bookmark))
       return false;
 
     return true;
@@ -437,6 +444,17 @@ public class NewsContentProvider implements ITreeContentProvider {
     /* Check for Sticky News in Bookmark */
     else if (filter == Type.SHOW_STICKY && input instanceof IBookMark && ((IBookMark) input).getStickyNewsCount() == 0)
       return false;
+
+    /* Check for Recent Date or 5 Days Age */
+    else if ((filter == Type.SHOW_RECENT || filter == Type.SHOW_LAST_5_DAYS) && input instanceof IBookMark) {
+      Date mostRecentNewsDate = ((IBookMark) input).getMostRecentNewsDate();
+      if (mostRecentNewsDate != null) { //Date can be null e.g. when having more than 1 Bookmark for the same Feed (known issue)
+        if (filter == Type.SHOW_RECENT && (mostRecentNewsDate.getTime() < (DateUtils.getToday().getTimeInMillis() - DateUtils.DAY)))
+          return false;
+        else if (filter == Type.SHOW_LAST_5_DAYS && (mostRecentNewsDate.getTime() < (DateUtils.getToday().getTimeInMillis() - 5 * DateUtils.DAY)))
+          return false;
+      }
+    }
 
     return true;
   }
