@@ -353,6 +353,7 @@ public class Activator extends AbstractUIPlugin {
       } catch (InterruptedException e) {
         System.exit(0);
       } finally {
+        safeLogInfo("RSSOwl Shutting Down (already running)" + fNl); //$NON-NLS-1$
         System.exit(0);
       }
     } catch (UnknownHostException e) {
