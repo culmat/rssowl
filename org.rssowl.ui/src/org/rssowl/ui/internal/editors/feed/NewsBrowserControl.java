@@ -65,7 +65,6 @@ import org.rssowl.ui.internal.LinkTransformer;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.OwlUI.Layout;
 import org.rssowl.ui.internal.OwlUI.PageSize;
-import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 /**
@@ -170,12 +169,8 @@ public class NewsBrowserControl implements IFeedViewPart {
     textLink.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
-        setInfoBarVisible(false);
-        JobRunner.runInUIThread(0, true, fViewer.getControl(), new Runnable() {
-          public void run() {
-            fViewer.refresh(true, true);
-          }
-        });
+        boolean moveToTop = OwlUI.getPageSize(fInputPreferences).getPageSize() == 0; //Only move to top when paging is disabled
+        fViewer.refresh(true, moveToTop); //Refresh will take care of closing the info bar
       }
     });
 
