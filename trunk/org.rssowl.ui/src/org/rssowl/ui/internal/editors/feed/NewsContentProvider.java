@@ -345,9 +345,9 @@ public class NewsContentProvider implements ITreeContentProvider {
     else
       states = INews.State.getVisible();
 
-    /* Handle Folder, Newsbin and Saved Search */
+    /* Handle Folder, Newsbin and Saved Search or bookmark under certain circumstances */
     boolean needToFilter = true;
-    if (input.isGetNewsRefsEfficient() || shouldResolveBookMarkWithSearch(input, filter)) {
+    if (input.isGetNewsRefsEfficient() || (input instanceof IBookMark && shouldResolveBookMarkWithSearch((IBookMark) input, filter))) {
       Pair<Boolean, List<NewsReference>> result = getNewsRefsFromInput(input, fFilter, states, monitor);
       needToFilter = !result.getFirst();
       List<NewsReference> newsReferences = result.getSecond();
@@ -400,22 +400,21 @@ public class NewsContentProvider implements ITreeContentProvider {
     }
   }
 
-  private boolean shouldResolveBookMarkWithSearch(INewsMark input, NewsFilter.Type filter) {
+  private boolean shouldResolveBookMarkWithSearch(IBookMark input, NewsFilter.Type filter) {
 
     /* Return if input is not a bookmark or not filtering at all */
-    if (!(input instanceof IBookMark) || filter == Type.SHOW_ALL)
+    if (filter == Type.SHOW_ALL)
       return false;
 
     /* Check for number of new, unread and updated news */
-    IBookMark bookmark = (IBookMark) input;
-    if (bookmark.getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)) > BOOKMARK_SCOPE_SEARCH_LIMIT)
+    if (input.getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)) > BOOKMARK_SCOPE_SEARCH_LIMIT)
       return true;
 
     /* Return if bookmark retention is setup, assuming that the number of elements is limited already */
-    if (hasRetentionLimit(bookmark))
-      return false;
+    if (!hasRetentionLimit(input))
+      return true;
 
-    return true;
+    return false;
   }
 
   private boolean hasRetentionLimit(IBookMark bookmark) {
