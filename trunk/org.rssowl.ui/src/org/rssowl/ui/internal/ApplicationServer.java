@@ -472,22 +472,39 @@ public class ApplicationServer {
 
   /* Process Message in Safe-Runnable */
   private void safeProcess(final Socket socket, final String message) {
-    SafeRunner.run(new LoggingSafeRunnable() {
+    final boolean isDisplayOperation = isDisplayOperation(message);
+    final boolean isResourceOperation = !isDisplayOperation && isResourceOperation(message);
+
+    LoggingSafeRunnable runnable = new LoggingSafeRunnable() {
       public void run() throws Exception {
 
         /* This is a Display-Operation */
-        if (isDisplayOperation(message))
+        if (isDisplayOperation)
           processDisplayOperation(socket, message);
 
         /* This is a Resource-Operation */
-        else if (isResourceOperation(message))
+        else if (isResourceOperation)
           processResourceOperation(socket, message);
 
         /* This is a startup handshake */
         else
           processHandshake(message);
       }
-    });
+    };
+
+    /*
+     * For some reason using SafeRunner from this method can cause in a Classloader deadlock
+     * where Equinox will terminate classloading after 5000 ms to avoid it. This happens when
+     * two instances of RSSOwl start at the same time, e.g. when clicking the icon twice.
+     */
+    if (!isDisplayOperation && !isResourceOperation) {
+      try {
+        runnable.run();
+      } catch (Exception e) {
+        runnable.handleException(e);
+      }
+    } else
+      SafeRunner.run(runnable);
   }
 
   /* Process Handshake-Message */
