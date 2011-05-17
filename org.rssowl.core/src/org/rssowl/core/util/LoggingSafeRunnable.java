@@ -43,6 +43,11 @@ import org.rssowl.core.internal.InternalOwl;
  * </p>
  */
 public abstract class LoggingSafeRunnable implements ISafeRunnable {
+
+  /*
+   * @see
+   * org.eclipse.core.runtime.ISafeRunnable#handleException(java.lang.Throwable)
+   */
   public void handleException(Throwable e) {
 
     /* In Testing, rethrow any RuntimeException */
