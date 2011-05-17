@@ -1526,6 +1526,9 @@
          <targetEntity
                class="org.rssowl.core.persist.INewsBin">
          </targetEntity>
+         <targetEntity
+               class="org.rssowl.core.persist.IFolder">
+         </targetEntity>
       </entityPropertyPage>
    </extension>
    <extension

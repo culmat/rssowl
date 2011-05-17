@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.LongArrayList;
 import org.rssowl.core.internal.persist.Mark;
+import org.rssowl.core.internal.persist.NewsContainer;
 import org.rssowl.core.internal.persist.SearchMark;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
@@ -363,6 +364,22 @@ public class FolderNewsMark extends Mark implements INewsMark {
    * @param monitor a monitor to react to cancellation.
    */
   public void resolve(NewsFilter.Type type, IProgressMonitor monitor) {
+    doResolve(type, monitor, false);
+  }
+
+  /**
+   * @param monitor a monitor to react to cancellation.
+   * @return a {@link NewsContainer} providing information on included states
+   * and news of this {@link IFolder}.
+   */
+  public NewsContainer resolveNewsContainer(IProgressMonitor monitor) {
+    return doResolve(NewsFilter.Type.SHOW_ALL, monitor, true);
+  }
+
+  private NewsContainer doResolve(NewsFilter.Type type, IProgressMonitor monitor, boolean resolveContainer) {
+    NewsContainer container = null;
+    if (resolveContainer)
+      container = new NewsContainer(Collections.<INews.State, Boolean> emptyMap());
 
     /* Clear caches */
     synchronized (this) {
@@ -371,7 +388,7 @@ public class FolderNewsMark extends Mark implements INewsMark {
 
     /* Return eary on cancellation */
     if (Controller.getDefault().isShuttingDown() || (monitor != null && monitor.isCanceled()))
-      return;
+      return container;
 
     /* Retrieve filter condition */
     ISearchCondition filterCondition = ModelUtils.getConditionForFilter(type);
@@ -388,9 +405,13 @@ public class FolderNewsMark extends Mark implements INewsMark {
       List<SearchHit<NewsReference>> results = fSearch.searchNews(conditions, conditions.size() == 2);
       addAll(results);
 
+      /* Add to container if necessary */
+      if (resolveContainer)
+        addAll(container, results);
+
       /* Return eary on cancellation */
       if (Controller.getDefault().isShuttingDown() || (monitor != null && monitor.isCanceled()))
-        return;
+        return container;
     }
 
     /* Resolve Searches */
@@ -404,6 +425,10 @@ public class FolderNewsMark extends Mark implements INewsMark {
           List<ISearchCondition> conditions = search.getSearchConditions();
           List<SearchHit<NewsReference>> results = fSearch.searchNews(conditions, filterCondition, search.matchAllConditions());
           addAll(results);
+
+          /* Add to container if necessary */
+          if (resolveContainer)
+            addAll(container, results);
         }
 
         /* Otherwise pick up the results from the search directly */
@@ -421,12 +446,35 @@ public class FolderNewsMark extends Mark implements INewsMark {
 
             addAll(newsIds[i].getElements());
           }
+
+          /* Add to container if necessary */
+          if (resolveContainer && container != null)
+            addAll(container, newsIds);
         }
 
         /* Return eary on cancellation */
         if (Controller.getDefault().isShuttingDown() || (monitor != null && monitor.isCanceled()))
-          return;
+          return container;
       }
+    }
+
+    return container;
+  }
+
+  private void addAll(NewsContainer container, LongArrayList[] newsIds) {
+    for (int i = 0; i < newsIds.length && i < container.internalGetNewsIds().length; i++) {
+      LongArrayList list = container.internalGetNewsIds()[i];
+      for (int j = 0; j < newsIds[i].size(); j++)
+        list.add(newsIds[i].get(j));
+    }
+  }
+
+  private void addAll(NewsContainer container, List<SearchHit<NewsReference>> results) {
+    LongArrayList[] newsIds = container.internalGetNewsIds();
+    for (SearchHit<NewsReference> result : results) {
+      INews.State state = (State) result.getData(INews.STATE);
+      if (newsIds.length > state.ordinal())
+        newsIds[state.ordinal()].add(result.getResult().getId());
     }
   }
 

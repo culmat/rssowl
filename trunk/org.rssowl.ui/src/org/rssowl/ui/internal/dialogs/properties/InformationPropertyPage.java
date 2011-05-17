@@ -38,17 +38,23 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
+import org.rssowl.core.internal.persist.NewsContainer;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
+import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.INewsMark;
+import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.dialogs.properties.IEntityPropertyPage;
 import org.rssowl.ui.dialogs.properties.IPropertyDialogSite;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Controller;
+import org.rssowl.ui.internal.FolderNewsMark;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.OpenInBrowserAction;
 import org.rssowl.ui.internal.util.JobRunner;
@@ -61,12 +67,14 @@ import java.text.DateFormat;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Information about selected Entities.
  *
  * @author bpasero
  */
+@SuppressWarnings("restriction")
 public class InformationPropertyPage implements IEntityPropertyPage {
   private List<IEntity> fEntities;
   private final DateFormat fDateFormat = OwlUI.getShortDateFormat();
@@ -90,29 +98,70 @@ public class InformationPropertyPage implements IEntityPropertyPage {
     fContainer = new Composite(parent, SWT.NONE);
     fContainer.setLayout(LayoutUtils.createGridLayout(2, 10, 10));
 
-    INewsMark newsmark = (INewsMark) fEntities.get(0);
+    IEntity entity = fEntities.get(0);
 
-    /* Bookmark Info */
-    if (newsmark instanceof IBookMark)
-      fillBookMarkInfo((IBookMark) fEntities.get(0));
+    /* Newsmark Info */
+    if (entity instanceof INewsMark) {
+      INewsMark newsmark = (INewsMark) fEntities.get(0);
 
-    /* Created */
-    if (newsmark.getCreationDate() != null) {
-      createLabel(fContainer, Messages.InformationPropertyPage_CREATED, true);
-      createLabel(fContainer, fDateFormat.format(newsmark.getCreationDate()), false);
+      /* Bookmark Info */
+      if (newsmark instanceof IBookMark)
+        fillBookMarkInfo((IBookMark) fEntities.get(0));
+
+      /* Created */
+      if (newsmark.getCreationDate() != null) {
+        createLabel(fContainer, Messages.InformationPropertyPage_CREATED, true);
+        createLabel(fContainer, fDateFormat.format(newsmark.getCreationDate()), false);
+      }
+
+      /* Last Visited */
+      createLabel(fContainer, Messages.InformationPropertyPage_LAST_VISITED, true);
+      if (newsmark.getLastVisitDate() != null)
+        createLabel(fContainer, fDateFormat.format(newsmark.getLastVisitDate()), false);
+      else
+        createLabel(fContainer, Messages.InformationPropertyPage_NEVER, false);
     }
 
-    /* Last Visited */
-    createLabel(fContainer, Messages.InformationPropertyPage_LAST_VISITED, true);
-    if (newsmark.getLastVisitDate() != null)
-      createLabel(fContainer, fDateFormat.format(newsmark.getLastVisitDate()), false);
-    else
-      createLabel(fContainer, Messages.InformationPropertyPage_NEVER, false);
+    /* Folder Info */
+    else if (entity instanceof IFolder) {
+      IFolder folder = (IFolder) fEntities.get(0);
+      AtomicInteger folders = new AtomicInteger();
+      AtomicInteger bookmarks = new AtomicInteger();
+      AtomicInteger newsbins = new AtomicInteger();
+      AtomicInteger searches = new AtomicInteger();
+
+      countFolderChilds(folder, folders, bookmarks, newsbins, searches);
+
+      /* Show Counts */
+      createLabel(fContainer, Messages.InformationPropertyPage_FOLDERS, true);
+      createLabel(fContainer, String.valueOf(folders.get()), false);
+      createLabel(fContainer, Messages.InformationPropertyPage_BOOKMARKS, true);
+      createLabel(fContainer, String.valueOf(bookmarks.get()), false);
+      createLabel(fContainer, Messages.InformationPropertyPage_NEWSBINS, true);
+      createLabel(fContainer, String.valueOf(newsbins.get()), false);
+      createLabel(fContainer, Messages.InformationPropertyPage_SEARCHES, true);
+      createLabel(fContainer, String.valueOf(searches.get()), false);
+    }
 
     /* News Count */
     createLabel(fContainer, Messages.InformationPropertyPage_NEWS_COUNT, true);
 
     return fContainer;
+  }
+
+  private void countFolderChilds(IFolder folder, AtomicInteger folders, AtomicInteger bookmarks, AtomicInteger newsbins, AtomicInteger searches) {
+    List<IFolderChild> children = folder.getChildren();
+    for (IFolderChild child : children) {
+      if (child instanceof IFolder) {
+        folders.incrementAndGet();
+        countFolderChilds((IFolder) child, folders, bookmarks, newsbins, searches);
+      } else if (child instanceof IBookMark)
+        bookmarks.incrementAndGet();
+      else if (child instanceof ISearchMark)
+        searches.incrementAndGet();
+      else if (child instanceof INewsBin)
+        newsbins.incrementAndGet();
+    }
   }
 
   private void fillBookMarkInfo(final IBookMark bm) {
@@ -228,11 +277,11 @@ public class InformationPropertyPage implements IEntityPropertyPage {
 
         @Override
         protected void runInBackground(IProgressMonitor monitor) {
-          INewsMark newsmark = (INewsMark) fEntities.get(0);
+          IEntity entity = fEntities.get(0);
 
           /* Resolve Bookmark Values */
-          if (newsmark instanceof IBookMark) {
-            IFeed feed = ((IBookMark) newsmark).getFeedLinkReference().resolve();
+          if (entity instanceof IBookMark) {
+            IFeed feed = ((IBookMark) entity).getFeedLinkReference().resolve();
             if (feed != null) {
               description = StringUtils.stripTags(feed.getDescription(), true);
               homepage = feed.getHomepage();
@@ -256,12 +305,25 @@ public class InformationPropertyPage implements IEntityPropertyPage {
             }
           }
 
-          /* Otherwise resolve news counts */
-          else {
+          /* Resolve news counts from news mark */
+          else if (entity instanceof INewsMark) {
+            INewsMark newsmark = (INewsMark) entity;
             totalCount = newsmark.getNewsCount(INews.State.getVisible());
             newCount = newsmark.getNewsCount(EnumSet.of(INews.State.NEW));
             unreadCount = newsmark.getNewsCount(EnumSet.of(INews.State.UNREAD));
             updatedCount = newsmark.getNewsCount(EnumSet.of(INews.State.UPDATED));
+          }
+
+          /* Resolve news counts from folder */
+          else if (entity instanceof IFolder) {
+            IFolder folder = (IFolder) entity;
+            FolderNewsMark resolver = new FolderNewsMark(folder);
+
+            NewsContainer newsContainer = resolver.resolveNewsContainer(monitor);
+            totalCount = newsContainer.getNewsCount(INews.State.getVisible());
+            newCount = newsContainer.getNewsCount(EnumSet.of(INews.State.NEW));
+            unreadCount = newsContainer.getNewsCount(EnumSet.of(INews.State.UNREAD));
+            updatedCount = newsContainer.getNewsCount(EnumSet.of(INews.State.UPDATED));
           }
         }
 
