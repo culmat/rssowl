@@ -105,13 +105,16 @@ public class NewsContentProvider implements ITreeContentProvider {
   static final int MAX_FOLDER_ELEMENTS = 500;
 
   /* The maximum number of items that will get resolved from a FolderNewsMark */
-  static final int MAX_RESOLVED_FOLDER_ELEMENTS = 5000;
+  private static final int MAX_RESOLVED_FOLDER_ELEMENTS = 5000;
 
   /* The maximum number of items in a NewsMark before scoping the results as specified by the filter */
-  static final int NEWSMARK_SCOPE_SEARCH_LIMIT = 200;
+  private static final int NEWSMARK_SCOPE_SEARCH_LIMIT = 200;
 
   /* The maximum number of items in a Bookmark before scoping the results as specified by the filter */
-  static final int BOOKMARK_SCOPE_SEARCH_LIMIT = 500;
+  private static final int BOOKMARK_SCOPE_SEARCH_LIMIT = 500;
+
+  /* System Property to override the limits above */
+  private static final String NO_FOLDER_LIMIT_PROPERTY = "noFolderLimit"; //$NON-NLS-1$
 
   private final NewsBrowserViewer fBrowserViewer;
   private final NewsTableViewer fTableViewer;
@@ -125,6 +128,7 @@ public class NewsContentProvider implements ITreeContentProvider {
   private final INewsDAO fNewsDao;
   private final IModelFactory fFactory;
   private final IModelSearch fSearch;
+  private final boolean fNoFolderLimit;
 
   /* Cache displayed News */
   private final Map<Long, INews> fCachedNews;
@@ -149,6 +153,7 @@ public class NewsContentProvider implements ITreeContentProvider {
     fNewsDao = DynamicDAO.getDAO(INewsDAO.class);
     fFactory = Owl.getModelFactory();
     fSearch = Owl.getPersistenceService().getModelSearch();
+    fNoFolderLimit = System.getProperty(NO_FOLDER_LIMIT_PROPERTY) != null;
   }
 
   /*
@@ -367,7 +372,7 @@ public class NewsContentProvider implements ITreeContentProvider {
           resolvedNews.add(resolvedNewsItem);
 
         /* Never resolve more than MAX_RESOLVED_FOLDER_ELEMENTS for a folder */
-        if (input instanceof FolderNewsMark && resolvedNews.size() > MAX_RESOLVED_FOLDER_ELEMENTS)
+        if (input instanceof FolderNewsMark && !fNoFolderLimit && resolvedNews.size() > MAX_RESOLVED_FOLDER_ELEMENTS)
           break;
       }
 
@@ -525,7 +530,7 @@ public class NewsContentProvider implements ITreeContentProvider {
       List<NewsReference> references = input.getNewsRefs(states);
 
       /* Optimization: If the folder has lots of elements and a text filter is set, limit result by this pattern */
-      if (input.getNewsCount(states) > MAX_FOLDER_ELEMENTS && newsFilter.isPatternSet()) {
+      if (!fNoFolderLimit && input.getNewsCount(states) > MAX_FOLDER_ELEMENTS && newsFilter.isPatternSet()) {
         Iterator<NewsReference> iterator = references.iterator();
         while (iterator.hasNext()) {
           if (!newsFilter.isTextPatternMatch(iterator.next().getId()))
@@ -534,7 +539,7 @@ public class NewsContentProvider implements ITreeContentProvider {
       }
 
       /* Optimization: If the folder contains more than MAX_RESOLVED_FOLDER_ELEMENTS, put the most recent at the beginning */
-      if (references.size() > MAX_RESOLVED_FOLDER_ELEMENTS)
+      if (!fNoFolderLimit && references.size() > MAX_RESOLVED_FOLDER_ELEMENTS)
         sortDescendingById(references);
 
       return Pair.create(filtered, references);
@@ -770,7 +775,7 @@ public class NewsContentProvider implements ITreeContentProvider {
   private List<INews> limitFolderNewsMark(List<INews> resolvedNews, NewsComparator comparer) {
 
     /* Return if no capping is required at all */
-    if (resolvedNews.size() <= MAX_FOLDER_ELEMENTS)
+    if (fNoFolderLimit || resolvedNews.size() <= MAX_FOLDER_ELEMENTS)
       return resolvedNews;
 
     /* First add those news that are Labeled or Sticky if this group mode is active */
