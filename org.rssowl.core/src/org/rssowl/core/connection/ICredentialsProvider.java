@@ -104,18 +104,6 @@ public interface ICredentialsProvider {
   void setInMemoryAuthCredentials(ICredentials credentials, URI link, String realm) throws CredentialsException;
 
   /**
-   * Find out if credentials are stored for the given link and relam.
-   *
-   * @param link The Link to supply authentication Credentials for
-   * @param realm The Realm to set credentials for or <code>null</code> if none.
-   * @return <code>true</code> if this provider has credentials stored for the
-   * given link and realm and <code>false</code> otherwise.
-   * @throws CredentialsException Checked Exception to be used in case of any
-   * Exception.
-   */
-  boolean hasPersistedAuthCredentials(URI link, String realm) throws CredentialsException;
-
-  /**
    * Set the Proxy-Credentials to be used to connect on the given Feed using a
    * Proxy Server.
    *
