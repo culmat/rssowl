@@ -681,7 +681,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   /*
    * @see org.rssowl.ui.internal.ILinkHandler#handle(java.lang.String, java.net.URI)
    */
-  public void handle(String id, URI link) {
+  public void handle(final String id, URI link) {
 
     /* Extract Query Part and Decode */
     String query = link.getQuery();
@@ -866,24 +866,18 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       }
     }
 
-    /* Go to Next News */
-    else if (NEXT_NEWS_HANDLER_ID.equals(id)) {
-      handleNavigateAction(id);
-    }
+    /* Go to Next News / Go to Next Unread News / Go to Previous News / Go to Previous Unread News */
+    else if (NEXT_NEWS_HANDLER_ID.equals(id) || NEXT_UNREAD_NEWS_HANDLER_ID.equals(id) || PREVIOUS_NEWS_HANDLER_ID.equals(id) || PREVIOUS_UNREAD_NEWS_HANDLER_ID.equals(id)) {
+      Runnable runnable = new Runnable() {
+        public void run() {
+          handleNavigateAction(id);
+        }
+      };
 
-    /* Go to Next Unread News */
-    else if (NEXT_UNREAD_NEWS_HANDLER_ID.equals(id)) {
-      handleNavigateAction(id);
-    }
-
-    /* Go to Previous News */
-    else if (PREVIOUS_NEWS_HANDLER_ID.equals(id)) {
-      handleNavigateAction(id);
-    }
-
-    /* Go to Previous Unread News */
-    else if (PREVIOUS_UNREAD_NEWS_HANDLER_ID.equals(id)) {
-      handleNavigateAction(id);
+      if (CBrowser.isMozillaRunningOnWindows()) //Bug in XULRunner, otherwise won't work
+        delayInUI(runnable);
+      else
+        runnable.run();
     }
 
     /* Transform News */
@@ -907,7 +901,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       };
 
       if (CBrowser.isMozillaRunningOnWindows()) //Bug in XULRunner, otherwise won't work
-        JobRunner.runInUIThread(0, true, fBrowser.getControl(), runnable);
+        delayInUI(runnable);
       else
         runnable.run();
     }
