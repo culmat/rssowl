@@ -394,7 +394,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
     /* Return HTML for a News */
     else if (element instanceof INews)
-      return getLabel((INews) element, withInternalLinks, withManagedLinks, index);
+      return getLabel((INews) element, withInternalLinks, withManagedLinks, false, index);
 
     /* Return HTML for Page Latch */
     else if (element instanceof PageLatch)
@@ -794,7 +794,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     return new StringBuilder(capacity);
   }
 
-  private String getLabel(INews news, boolean withInternalLinks, boolean withManagedLinks, int index) {
+  String getLabel(INews news, boolean withInternalLinks, boolean withManagedLinks, boolean onlyInnerContent, int index) {
     boolean isVisible = isVisible(news) || fForceNoPaging;
 
     String description = null; //Fetch description lazily if only headlines shown or news hidden
@@ -803,372 +803,381 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
     StringBuilder builder = getBuilder(news, description);
 
-    String newsTitle = CoreUtils.getHeadline(news, false);
-    String newsLink = CoreUtils.getLink(news);
-    boolean hasLink = newsLink != null;
     State state = news.getState();
     boolean isUnread = (state == State.NEW || state == State.UPDATED || state == State.UNREAD);
-    Set<ILabel> labels = CoreUtils.getSortedLabels(news);
-    String color = !labels.isEmpty() ? labels.iterator().next().getColor() : null;
-    if ("0,0,0".equals(color) || "255,255,255".equals(color)) //Don't let black or white override link color //$NON-NLS-1$ //$NON-NLS-2$
-      color = null;
 
-    boolean hasAttachments = false;
-    List<IAttachment> attachments = news.getAttachments();
-    for (IAttachment attachment : attachments) {
-      if (attachment.getLink() != null) {
-        hasAttachments = true;
-        break;
-      }
-    }
+    /* DIV: NewsItem (as needed) */
+    if (!onlyInnerContent) {
+      StringBuilder extraCSS = new StringBuilder();
+      if (!isVisible)
+        extraCSS.append("display: none; "); //$NON-NLS-1$
+      if (index != 0 && fIsNewsListBGColorDefined && index % 2 != 0)
+        extraCSS.append(fNewsListBGColorCSS);
 
-    /* DIV: NewsItem */
-    StringBuilder extraCSS = new StringBuilder();
-    if (!isVisible)
-      extraCSS.append("display: none; "); //$NON-NLS-1$
-    if (index != 0 && fIsNewsListBGColorDefined && index % 2 != 0)
-      extraCSS.append(fNewsListBGColorCSS);
-
-    if (extraCSS.length() != 0)
-      div(builder, isUnread ? "newsitemUnread" : "newsitemRead", extraCSS.toString(), Dynamic.NEWS.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
-    else
-      div(builder, isUnread ? "newsitemUnread" : "newsitemRead", Dynamic.NEWS.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
-
-    /* DIV: NewsItem/Header */
-    if (index == 0)
-      div(builder, news.isFlagged() ? "headerSticky" : "header", "border-top: none;", Dynamic.HEADER.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-    else
-      div(builder, news.isFlagged() ? "headerSticky" : "header", Dynamic.HEADER.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
-
-    /* News Title */
-    {
-
-      /* DIV: NewsItem/Header/Title */
-      div(builder, "title", Dynamic.TITLE.getId(news)); //$NON-NLS-1$
-
-      String cssClass = isUnread ? "unread" : "read"; //$NON-NLS-1$ //$NON-NLS-2$
-
-      /* Collapsed Title Bar */
-      if (fHeadlinesOnly) {
-
-        /* Make Sticky */
-        String link = HANDLER_PROTOCOL + TOGGLE_STICKY_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
-        imageLink(builder, link, Messages.NewsBrowserLabelProvider_STICKY, Messages.NewsBrowserLabelProvider_STICKY, "/icons/obj16/news_pin_light_tiny.gif", "news_pin_light_tiny.gif", Dynamic.TINY_TOGGLE_STICKY_LINK.getId(news), null); //$NON-NLS-1$//$NON-NLS-2$
-
-        /* Expand News when clicking on Title */
-        link = HANDLER_PROTOCOL + EXPAND_NEWS_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
-        link(builder, link, newsTitle, cssClass, Dynamic.TITLE_LINK.getId(news), color);
-
-        /* Subtitle */
-        StringBuilder subtitleContent = new StringBuilder();
-        fillSubtitle(subtitleContent, news, labels, false);
-        link(builder, link, subtitleContent.toString(), "subtitle", Dynamic.SUBTITLE_LINK.getId(news), "80, 80, 80"); //$NON-NLS-1$ //$NON-NLS-2$
-      }
-
-      /* Otherwise treat normally */
-      else {
-        if (hasLink)
-          link(builder, (fManageLinks && withManagedLinks) ? URIUtils.toManaged(newsLink) : newsLink, newsTitle, cssClass, Dynamic.TITLE_LINK.getId(news), color);
-        else
-          span(builder, newsTitle, cssClass, Dynamic.TITLE_LINK.getId(news), color);
-      }
-
-      /* Close: NewsItem/Header/Title */
-      close(builder, "div"); //$NON-NLS-1$
-    }
-
-    /* Delete */
-    if (withInternalLinks) {
-
-      /* DIV: NewsItem/Header/Delete */
-      if (fHeadlinesOnly)
-        div(builder, "delete", "display: none;", Dynamic.DELETE.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
+      if (extraCSS.length() != 0)
+        div(builder, isUnread ? "newsitemUnread" : "newsitemRead", extraCSS.toString(), Dynamic.NEWS.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
       else
-        div(builder, "delete", Dynamic.DELETE.getId(news)); //$NON-NLS-1$
-
-      String link = HANDLER_PROTOCOL + DELETE_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
-      imageLink(builder, link, Messages.NewsBrowserLabelProvider_DELETE, Messages.NewsBrowserLabelProvider_DELETE, "/icons/elcl16/remove_small.gif", "remove_small.gif", null, null); //$NON-NLS-1$ //$NON-NLS-2$
-
-      /* DIV: NewsItem/Header/Delete */
-      close(builder, "div"); //$NON-NLS-1$
+        div(builder, isUnread ? "newsitemUnread" : "newsitemRead", Dynamic.NEWS.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
-    /* DIV: NewsItem/Header/Subline */
-    if (fHeadlinesOnly) //Hidden initially in headlines mode
-      div(builder, "subline", "display: none;", Dynamic.SUBLINE.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
-    else
-      div(builder, "subline", Dynamic.SUBLINE.getId(news)); //$NON-NLS-1$
-    builder.append("<table class=\"subline\">"); //$NON-NLS-1$
-    builder.append("<tr class=\"subline\">"); //$NON-NLS-1$
+    /* Full content of News only added if the news is actually visible */
+    if (isVisible) {
+      String newsTitle = CoreUtils.getHeadline(news, false);
+      String newsLink = CoreUtils.getLink(news);
+      boolean hasLink = newsLink != null;
 
-    /* Actions */
-    if (withInternalLinks) {
+      Set<ILabel> labels = CoreUtils.getSortedLabels(news);
+      String color = !labels.isEmpty() ? labels.iterator().next().getColor() : null;
+      if ("0,0,0".equals(color) || "255,255,255".equals(color)) //Don't let black or white override link color //$NON-NLS-1$ //$NON-NLS-2$
+        color = null;
 
-      /* Toggle Read */
-      builder.append("<td class=\"firstactionsubline\">"); //$NON-NLS-1$
-      String link = HANDLER_PROTOCOL + TOGGLE_READ_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
-      String text = (news.getState() == INews.State.READ) ? Messages.NewsBrowserLabelProvider_MARK_UNREAD : Messages.NewsBrowserLabelProvider_MARK_READ;
-      imageLink(builder, link, text, text, "/icons/elcl16/mark_read_light.gif", "mark_read_light.gif", Dynamic.TOGGLE_READ_LINK.getId(news), Dynamic.TOGGLE_READ_IMG.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
-      builder.append("</td>"); //$NON-NLS-1$
+      /* DIV: NewsItem/Header */
+      if (index == 0)
+        div(builder, news.isFlagged() ? "headerSticky" : "header", "border-top: none;", Dynamic.HEADER.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      else
+        div(builder, news.isFlagged() ? "headerSticky" : "header", Dynamic.HEADER.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
 
-      /* Toggle Sticky */
-      builder.append("<td class=\"otheractionsubline\">"); //$NON-NLS-1$
-      link = HANDLER_PROTOCOL + TOGGLE_STICKY_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
-      imageLink(builder, link, Messages.NewsBrowserLabelProvider_STICKY, Messages.NewsBrowserLabelProvider_STICKY, news.isFlagged() ? "/icons/obj16/news_pinned_light.gif" : "/icons/obj16/news_pin_light.gif", news.isFlagged() ? "news_pinned_light.gif" : "news_pin_light.gif", Dynamic.TOGGLE_STICKY_LINK.getId(news), Dynamic.TOGGLE_STICKY_IMG.getId(news)); //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$ //$NON-NLS-4$
-      builder.append("</td>"); //$NON-NLS-1$
+      /* News Title */
+      {
 
-      /* Assign Labels */
-      builder.append("<td class=\"otheractionsubline\">"); //$NON-NLS-1$
-      link = HANDLER_PROTOCOL + LABELS_MENU_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
-      imageLink(builder, link, Messages.NewsBrowserLabelProvider_ASSIGN_LABELS, Messages.NewsBrowserLabelProvider_LABEL, "/icons/elcl16/labels_light.gif", "labels_light.gif", Dynamic.LABELS_MENU_LINK.getId(news), null); //$NON-NLS-1$ //$NON-NLS-2$
-      builder.append("</td>"); //$NON-NLS-1$
+        /* DIV: NewsItem/Header/Title */
+        div(builder, "title", Dynamic.TITLE.getId(news)); //$NON-NLS-1$
 
-      /* Archive News */
-      builder.append("<td class=\"otheractionsubline\">"); //$NON-NLS-1$
-      link = HANDLER_PROTOCOL + ARCHIVE_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
-      imageLink(builder, link, Messages.NewsBrowserLabelProvider_ARCHIVE_NEWS, Messages.NewsBrowserLabelProvider_ARCHIVE, "/icons/etool16/archive_light.gif", "archive_light.gif", Dynamic.ARCHIVE_LINK.getId(news), null); //$NON-NLS-1$ //$NON-NLS-2$
-      builder.append("</td>"); //$NON-NLS-1$
+        String cssClass = isUnread ? "unread" : "read"; //$NON-NLS-1$ //$NON-NLS-2$
 
-      /* Share News Context Menu */
-      builder.append("<td class=\"otheractionsubline\">"); //$NON-NLS-1$
-      link = HANDLER_PROTOCOL + SHARE_NEWS_MENU_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
-      imageLink(builder, link, Messages.NewsBrowserLabelProvider_SHARE_NEWS, Messages.NewsBrowserLabelProvider_SHARE, "/icons/elcl16/share_light.gif", "share_light.gif", Dynamic.SHARE_MENU_LINK.getId(news), null); //$NON-NLS-1$ //$NON-NLS-2$
-      builder.append("</td>"); //$NON-NLS-1$
+        /* Collapsed Title Bar */
+        if (fHeadlinesOnly) {
 
-      /* News Context Menu */
-      builder.append("<td class=\"otheractionsubline\">"); //$NON-NLS-1$
-      link = HANDLER_PROTOCOL + NEWS_MENU_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
-      imageLink(builder, link, Messages.NewsBrowserLabelProvider_MENU, Messages.NewsBrowserLabelProvider_MENU, "/icons/obj16/menu_light.gif", "menu_light.gif", Dynamic.NEWS_MENU_LINK.getId(news), null); //$NON-NLS-1$ //$NON-NLS-2$
-      builder.append("</td>"); //$NON-NLS-1$
+          /* Make Sticky */
+          String link = HANDLER_PROTOCOL + TOGGLE_STICKY_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
+          imageLink(builder, link, Messages.NewsBrowserLabelProvider_STICKY, Messages.NewsBrowserLabelProvider_STICKY, "/icons/obj16/news_pin_light_tiny.gif", "news_pin_light_tiny.gif", Dynamic.TINY_TOGGLE_STICKY_LINK.getId(news), null); //$NON-NLS-1$//$NON-NLS-2$
 
-      builder.append("<td class=\"actionsublineseparator\">"); //$NON-NLS-1$
-      builder.append("|"); //$NON-NLS-1$
-      builder.append("</td>"); //$NON-NLS-1$
-    }
+          /* Expand News when clicking on Title */
+          link = HANDLER_PROTOCOL + EXPAND_NEWS_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
+          link(builder, link, newsTitle, cssClass, Dynamic.TITLE_LINK.getId(news), color);
 
-    /* Date */
-    builder.append("<td class=\"subline\">"); //$NON-NLS-1$
-    fillDate(news, builder);
-    builder.append("</td>"); //$NON-NLS-1$
+          /* Subtitle */
+          StringBuilder subtitleContent = new StringBuilder();
+          fillSubtitle(subtitleContent, news, labels, false);
+          link(builder, link, subtitleContent.toString(), "subtitle", Dynamic.SUBTITLE_LINK.getId(news), "80, 80, 80"); //$NON-NLS-1$ //$NON-NLS-2$
+        }
 
-    /* Author */
-    IPerson author = news.getAuthor();
-    if (author != null) {
-      builder.append("<td class=\"sublineseparator\">"); //$NON-NLS-1$
-      builder.append("|"); //$NON-NLS-1$
-      builder.append("</td>"); //$NON-NLS-1$
+        /* Otherwise treat normally */
+        else {
+          if (hasLink)
+            link(builder, (fManageLinks && withManagedLinks) ? URIUtils.toManaged(newsLink) : newsLink, newsTitle, cssClass, Dynamic.TITLE_LINK.getId(news), color);
+          else
+            span(builder, newsTitle, cssClass, Dynamic.TITLE_LINK.getId(news), color);
+        }
 
+        /* Close: NewsItem/Header/Title */
+        close(builder, "div"); //$NON-NLS-1$
+      }
+
+      /* Delete */
+      if (withInternalLinks) {
+
+        /* DIV: NewsItem/Header/Delete */
+        if (fHeadlinesOnly)
+          div(builder, "delete", "display: none;", Dynamic.DELETE.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
+        else
+          div(builder, "delete", Dynamic.DELETE.getId(news)); //$NON-NLS-1$
+
+        String link = HANDLER_PROTOCOL + DELETE_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
+        imageLink(builder, link, Messages.NewsBrowserLabelProvider_DELETE, Messages.NewsBrowserLabelProvider_DELETE, "/icons/elcl16/remove_small.gif", "remove_small.gif", null, null); //$NON-NLS-1$ //$NON-NLS-2$
+
+        /* DIV: NewsItem/Header/Delete */
+        close(builder, "div"); //$NON-NLS-1$
+      }
+
+      /* DIV: NewsItem/Header/Subline */
+      if (fHeadlinesOnly) //Hidden initially in headlines mode
+        div(builder, "subline", "display: none;", Dynamic.SUBLINE.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
+      else
+        div(builder, "subline", Dynamic.SUBLINE.getId(news)); //$NON-NLS-1$
+      builder.append("<table class=\"subline\">"); //$NON-NLS-1$
+      builder.append("<tr class=\"subline\">"); //$NON-NLS-1$
+
+      /* Actions */
+      if (withInternalLinks) {
+
+        /* Toggle Read */
+        builder.append("<td class=\"firstactionsubline\">"); //$NON-NLS-1$
+        String link = HANDLER_PROTOCOL + TOGGLE_READ_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
+        String text = (news.getState() == INews.State.READ) ? Messages.NewsBrowserLabelProvider_MARK_UNREAD : Messages.NewsBrowserLabelProvider_MARK_READ;
+        imageLink(builder, link, text, text, "/icons/elcl16/mark_read_light.gif", "mark_read_light.gif", Dynamic.TOGGLE_READ_LINK.getId(news), Dynamic.TOGGLE_READ_IMG.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
+        builder.append("</td>"); //$NON-NLS-1$
+
+        /* Toggle Sticky */
+        builder.append("<td class=\"otheractionsubline\">"); //$NON-NLS-1$
+        link = HANDLER_PROTOCOL + TOGGLE_STICKY_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
+        imageLink(builder, link, Messages.NewsBrowserLabelProvider_STICKY, Messages.NewsBrowserLabelProvider_STICKY, news.isFlagged() ? "/icons/obj16/news_pinned_light.gif" : "/icons/obj16/news_pin_light.gif", news.isFlagged() ? "news_pinned_light.gif" : "news_pin_light.gif", Dynamic.TOGGLE_STICKY_LINK.getId(news), Dynamic.TOGGLE_STICKY_IMG.getId(news)); //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$ //$NON-NLS-4$
+        builder.append("</td>"); //$NON-NLS-1$
+
+        /* Assign Labels */
+        builder.append("<td class=\"otheractionsubline\">"); //$NON-NLS-1$
+        link = HANDLER_PROTOCOL + LABELS_MENU_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
+        imageLink(builder, link, Messages.NewsBrowserLabelProvider_ASSIGN_LABELS, Messages.NewsBrowserLabelProvider_LABEL, "/icons/elcl16/labels_light.gif", "labels_light.gif", Dynamic.LABELS_MENU_LINK.getId(news), null); //$NON-NLS-1$ //$NON-NLS-2$
+        builder.append("</td>"); //$NON-NLS-1$
+
+        /* Archive News */
+        builder.append("<td class=\"otheractionsubline\">"); //$NON-NLS-1$
+        link = HANDLER_PROTOCOL + ARCHIVE_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
+        imageLink(builder, link, Messages.NewsBrowserLabelProvider_ARCHIVE_NEWS, Messages.NewsBrowserLabelProvider_ARCHIVE, "/icons/etool16/archive_light.gif", "archive_light.gif", Dynamic.ARCHIVE_LINK.getId(news), null); //$NON-NLS-1$ //$NON-NLS-2$
+        builder.append("</td>"); //$NON-NLS-1$
+
+        /* Share News Context Menu */
+        builder.append("<td class=\"otheractionsubline\">"); //$NON-NLS-1$
+        link = HANDLER_PROTOCOL + SHARE_NEWS_MENU_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
+        imageLink(builder, link, Messages.NewsBrowserLabelProvider_SHARE_NEWS, Messages.NewsBrowserLabelProvider_SHARE, "/icons/elcl16/share_light.gif", "share_light.gif", Dynamic.SHARE_MENU_LINK.getId(news), null); //$NON-NLS-1$ //$NON-NLS-2$
+        builder.append("</td>"); //$NON-NLS-1$
+
+        /* News Context Menu */
+        builder.append("<td class=\"otheractionsubline\">"); //$NON-NLS-1$
+        link = HANDLER_PROTOCOL + NEWS_MENU_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
+        imageLink(builder, link, Messages.NewsBrowserLabelProvider_MENU, Messages.NewsBrowserLabelProvider_MENU, "/icons/obj16/menu_light.gif", "menu_light.gif", Dynamic.NEWS_MENU_LINK.getId(news), null); //$NON-NLS-1$ //$NON-NLS-2$
+        builder.append("</td>"); //$NON-NLS-1$
+
+        builder.append("<td class=\"actionsublineseparator\">"); //$NON-NLS-1$
+        builder.append("|"); //$NON-NLS-1$
+        builder.append("</td>"); //$NON-NLS-1$
+      }
+
+      /* Date */
       builder.append("<td class=\"subline\">"); //$NON-NLS-1$
-      fillAuthor(builder, author, true);
+      fillDate(news, builder);
       builder.append("</td>"); //$NON-NLS-1$
-    }
 
-    /* Feed Information */
-    if (showFeedInformation()) {
-      String feedName = getFeedName(news);
-      if (StringUtils.isSet(feedName)) {
+      /* Author */
+      IPerson author = news.getAuthor();
+      if (author != null) {
         builder.append("<td class=\"sublineseparator\">"); //$NON-NLS-1$
         builder.append("|"); //$NON-NLS-1$
         builder.append("</td>"); //$NON-NLS-1$
 
         builder.append("<td class=\"subline\">"); //$NON-NLS-1$
-        builder.append(feedName);
-        builder.append("</td>"); //$NON-NLS-1$
-      }
-    }
-
-    /* Comments */
-    if (StringUtils.isSet(news.getComments()) && news.getComments().trim().length() > 0 && URIUtils.looksLikeLink(news.getComments())) {
-      builder.append("<td class=\"sublineseparator\">"); //$NON-NLS-1$
-      builder.append("|"); //$NON-NLS-1$
-      builder.append("</td>"); //$NON-NLS-1$
-
-      builder.append("<td class=\"subline\">"); //$NON-NLS-1$
-
-      String comments = news.getComments();
-      imageLink(builder, comments, Messages.NewsBrowserLabelProvider_READ_COMMENTS, Messages.NewsBrowserLabelProvider_COMMENTS, "/icons/obj16/comments_light.gif", "comments_light.gif", null, null); //$NON-NLS-1$ //$NON-NLS-2$
-
-      builder.append("</td>"); //$NON-NLS-1$
-    }
-
-    /* Attachments Menu */
-    if (hasAttachments) {
-      builder.append("<td class=\"sublineseparator\">"); //$NON-NLS-1$
-      builder.append("|"); //$NON-NLS-1$
-      builder.append("</td>"); //$NON-NLS-1$
-
-      builder.append("<td class=\"subline\">"); //$NON-NLS-1$
-      String link = HANDLER_PROTOCOL + ATTACHMENTS_MENU_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
-      imageLink(builder, link, Messages.NewsBrowserLabelProvider_ATTACHMENTS, Messages.NewsBrowserLabelProvider_ATTACHMENTS, "/icons/obj16/attachment_light.gif", "attachment_light.gif", Dynamic.ATTACHMENTS_MENU_LINK.getId(news), null); //$NON-NLS-1$ //$NON-NLS-2$
-      builder.append("</td>"); //$NON-NLS-1$
-    }
-
-    /* Labels Separator  */
-    if (labels.isEmpty())
-      builder.append("<td id=\"").append(Dynamic.LABELS_SEPARATOR.getId(news)).append("\" class=\"sublineseparator\" style=\"display: none;\">"); //$NON-NLS-1$ //$NON-NLS-2$
-    else
-      builder.append("<td id=\"").append(Dynamic.LABELS_SEPARATOR.getId(news)).append("\" class=\"sublineseparator\">"); //$NON-NLS-1$ //$NON-NLS-2$
-    builder.append("|"); //$NON-NLS-1$
-    builder.append("</td>"); //$NON-NLS-1$
-
-    /* Labels */
-    builder.append("<td id=\"").append(Dynamic.LABELS.getId(news)).append("\" class=\"subline\">"); //$NON-NLS-1$ //$NON-NLS-2$
-    fillLabels(builder, labels);
-    builder.append("</td>"); //$NON-NLS-1$
-
-    /* Close: NewsItem/Header/Actions */
-    builder.append("</tr>"); //$NON-NLS-1$
-    builder.append("</table>"); //$NON-NLS-1$
-    close(builder, "div"); //$NON-NLS-1$
-
-    /* Close: NewsItem/Header */
-    close(builder, "div"); //$NON-NLS-1$
-
-    /* News Content */
-    {
-
-      /* DIV: NewsItem/Content */
-      extraCSS = new StringBuilder();
-      if (fHeadlinesOnly) //Hidden initially in headlines mode
-        extraCSS.append("display: none; "); //$NON-NLS-1$
-      if (index != 0 && fIsNewsListBGColorDefined && index % 2 != 0)
-        extraCSS.append(fNewsListBGColorCSS);
-
-      if (extraCSS.length() > 0)
-        div(builder, "content", extraCSS.toString(), Dynamic.CONTENT.getId(news)); //$NON-NLS-1$
-      else
-        div(builder, "content", Dynamic.CONTENT.getId(news)); //$NON-NLS-1$
-
-      /* Content is provided and should be displayed */
-      if (!fHeadlinesOnly && isVisible) {
-        if (StringUtils.isSet(description) && description != null && !description.equals(news.getTitle()))
-          builder.append(description);
-
-        /* Content is not provided */
-        else {
-
-          /* Inform the user */
-          builder.append(Messages.NewsBrowserLabelProvider_NO_CONTENT);
-
-          /* Provide a link to attempt to download the news content and show it */
-          if (withInternalLinks && hasLink) {
-            builder.append(" "); //$NON-NLS-1$
-            String link = HANDLER_PROTOCOL + TRANSFORM_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
-            link(builder, link, Messages.NewsBrowserLabelProvider_ATTEMPT_DOWNLOAD_AND_DISPLAY, null);
-          }
-        }
-      }
-
-      /* Close: NewsItem/Content */
-      close(builder, "div"); //$NON-NLS-1$
-    }
-
-    /* News Footer */
-    if (withInternalLinks && fShowFooter) {
-
-      /* DIV: NewsItem/Footer */
-      if (fHeadlinesOnly) //Hidden initially in headlines mode
-        div(builder, news.isFlagged() ? "footerSticky" : "footer", "display: none;", Dynamic.FOOTER.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-      else
-        div(builder, news.isFlagged() ? "footerSticky" : "footer", Dynamic.FOOTER.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
-
-      /* DIV: NewsItem/Footer/Footerline */
-      div(builder, "footerline"); //$NON-NLS-1$
-      builder.append("<table class=\"footerline\">"); //$NON-NLS-1$
-      builder.append("<tr class=\"footerline\">"); //$NON-NLS-1$
-
-      /* Related News Menu */
-      builder.append("<td class=\"footerline\">"); //$NON-NLS-1$
-      String link = HANDLER_PROTOCOL + RELATED_NEWS_MENU_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
-      imageLink(builder, link, Messages.NewsBrowserLabelProvider_RELATED_NEWS, Messages.NewsBrowserLabelProvider_SEARCH_FOR_RELATED_NEWS, null, "/icons/obj16/mono_search.gif", "mono_search.gif", Dynamic.FIND_RELATED_MENU_LINK.getId(news), null, null); //$NON-NLS-1$ //$NON-NLS-2$
-      builder.append("</td>"); //$NON-NLS-1$
-
-      /* Transform News */
-      if (hasLink) {
-        builder.append("<td class=\"footerlineseparator\">"); //$NON-NLS-1$
-        builder.append("|"); //$NON-NLS-1$
-        builder.append("</td>"); //$NON-NLS-1$
-
-        builder.append("<td class=\"footerline\">"); //$NON-NLS-1$
-        link = HANDLER_PROTOCOL + TRANSFORM_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
-        imageLink(builder, link, Messages.NewsBrowserLabelProvider_FULL_CONTENT, Messages.NewsBrowserLabelProvider_DISPLAY_FULL_CONTENT, null, "/icons/obj16/mono_transform.gif", "mono_transform.gif", Dynamic.FULL_CONTENT_LINK.getId(news), null, Dynamic.FULL_CONTENT_LINK_TEXT.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
+        fillAuthor(builder, author, true);
         builder.append("</td>"); //$NON-NLS-1$
       }
 
-      /* Attachments */
-      if (attachments.size() != 0) {
-        builder.append("<td class=\"footerlineseparator\">"); //$NON-NLS-1$
-        builder.append("|"); //$NON-NLS-1$
-        builder.append("</td>"); //$NON-NLS-1$
-
-        for (IAttachment attachment : attachments) {
-          if (attachment.getLink() != null) {
-            URI attachmentLink = attachment.getLink();
-            String name = URIUtils.getFile(attachmentLink, OwlUI.getExtensionForMime(attachment.getType()));
-            if (!StringUtils.isSet(name))
-              name = attachmentLink.toASCIIString();
-
-            String size = OwlUI.getSize(attachment.getLength());
-            if (size != null)
-              name = NLS.bind(Messages.NewsBrowserLabelProvider_NAME_SIZE, StringUtils.htmlEscape(name), size);
-            else
-              name = StringUtils.htmlEscape(name);
-
-            builder.append("<td class=\"footerline\">"); //$NON-NLS-1$
-            link = HANDLER_PROTOCOL + ATTACHMENT_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
-            imageLink(builder, link, name, null, null, "/icons/obj16/mono_attachment.gif", "mono_attachment.gif", Dynamic.ATTACHMENT_LINK.getId(news), null, null); //$NON-NLS-1$ //$NON-NLS-2$
-            builder.append("</td>"); //$NON-NLS-1$
-          }
-        }
-      }
-
-      /* Source */
-      ISource source = news.getSource();
-      if (source != null && source.getLink() != null) {
-        link = source.getLink().toASCIIString();
-        String name = source.getName();
-        if (StringUtils.isSet(link)) {
-          builder.append("<td class=\"footerlineseparator\">"); //$NON-NLS-1$
+      /* Feed Information */
+      if (showFeedInformation()) {
+        String feedName = getFeedName(news);
+        if (StringUtils.isSet(feedName)) {
+          builder.append("<td class=\"sublineseparator\">"); //$NON-NLS-1$
           builder.append("|"); //$NON-NLS-1$
           builder.append("</td>"); //$NON-NLS-1$
 
-          if (StringUtils.isSet(name))
-            name = StringUtils.htmlEscape(name);
-          else
-            name = StringUtils.htmlEscape(link);
-
-          builder.append("<td class=\"footerline\">"); //$NON-NLS-1$
-          imageLink(builder, link, name, null, null, "/icons/obj16/mono_source.gif", "mono_source.gif", null, null, null); //$NON-NLS-1$ //$NON-NLS-2$
+          builder.append("<td class=\"subline\">"); //$NON-NLS-1$
+          builder.append(feedName);
           builder.append("</td>"); //$NON-NLS-1$
         }
       }
 
-      /* Close: NewsItem/Footer/Footerline */
+      /* Comments */
+      if (StringUtils.isSet(news.getComments()) && news.getComments().trim().length() > 0 && URIUtils.looksLikeLink(news.getComments())) {
+        builder.append("<td class=\"sublineseparator\">"); //$NON-NLS-1$
+        builder.append("|"); //$NON-NLS-1$
+        builder.append("</td>"); //$NON-NLS-1$
+
+        builder.append("<td class=\"subline\">"); //$NON-NLS-1$
+
+        String comments = news.getComments();
+        imageLink(builder, comments, Messages.NewsBrowserLabelProvider_READ_COMMENTS, Messages.NewsBrowserLabelProvider_COMMENTS, "/icons/obj16/comments_light.gif", "comments_light.gif", null, null); //$NON-NLS-1$ //$NON-NLS-2$
+
+        builder.append("</td>"); //$NON-NLS-1$
+      }
+
+      boolean hasAttachments = false;
+      List<IAttachment> attachments = news.getAttachments();
+      for (IAttachment attachment : attachments) {
+        if (attachment.getLink() != null) {
+          hasAttachments = true;
+          break;
+        }
+      }
+
+      /* Attachments Menu */
+      if (hasAttachments) {
+        builder.append("<td class=\"sublineseparator\">"); //$NON-NLS-1$
+        builder.append("|"); //$NON-NLS-1$
+        builder.append("</td>"); //$NON-NLS-1$
+
+        builder.append("<td class=\"subline\">"); //$NON-NLS-1$
+        String link = HANDLER_PROTOCOL + ATTACHMENTS_MENU_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
+        imageLink(builder, link, Messages.NewsBrowserLabelProvider_ATTACHMENTS, Messages.NewsBrowserLabelProvider_ATTACHMENTS, "/icons/obj16/attachment_light.gif", "attachment_light.gif", Dynamic.ATTACHMENTS_MENU_LINK.getId(news), null); //$NON-NLS-1$ //$NON-NLS-2$
+        builder.append("</td>"); //$NON-NLS-1$
+      }
+
+      /* Labels Separator  */
+      if (labels.isEmpty())
+        builder.append("<td id=\"").append(Dynamic.LABELS_SEPARATOR.getId(news)).append("\" class=\"sublineseparator\" style=\"display: none;\">"); //$NON-NLS-1$ //$NON-NLS-2$
+      else
+        builder.append("<td id=\"").append(Dynamic.LABELS_SEPARATOR.getId(news)).append("\" class=\"sublineseparator\">"); //$NON-NLS-1$ //$NON-NLS-2$
+      builder.append("|"); //$NON-NLS-1$
+      builder.append("</td>"); //$NON-NLS-1$
+
+      /* Labels */
+      builder.append("<td id=\"").append(Dynamic.LABELS.getId(news)).append("\" class=\"subline\">"); //$NON-NLS-1$ //$NON-NLS-2$
+      fillLabels(builder, labels);
+      builder.append("</td>"); //$NON-NLS-1$
+
+      /* Close: NewsItem/Header/Actions */
       builder.append("</tr>"); //$NON-NLS-1$
       builder.append("</table>"); //$NON-NLS-1$
       close(builder, "div"); //$NON-NLS-1$
 
-      /* Close: NewsItem/Footer */
+      /* Close: NewsItem/Header */
       close(builder, "div"); //$NON-NLS-1$
+
+      /* News Content */
+      {
+
+        /* DIV: NewsItem/Content */
+        StringBuilder extraCSS = new StringBuilder();
+        if (fHeadlinesOnly) //Hidden initially in headlines mode
+          extraCSS.append("display: none; "); //$NON-NLS-1$
+        if (index != 0 && fIsNewsListBGColorDefined && index % 2 != 0)
+          extraCSS.append(fNewsListBGColorCSS);
+
+        if (extraCSS.length() > 0)
+          div(builder, "content", extraCSS.toString(), Dynamic.CONTENT.getId(news)); //$NON-NLS-1$
+        else
+          div(builder, "content", Dynamic.CONTENT.getId(news)); //$NON-NLS-1$
+
+        /* Content is provided and should be displayed */
+        if (!fHeadlinesOnly) {
+          if (StringUtils.isSet(description) && description != null && !description.equals(news.getTitle()))
+            builder.append(description);
+
+          /* Content is not provided */
+          else {
+
+            /* Inform the user */
+            builder.append(Messages.NewsBrowserLabelProvider_NO_CONTENT);
+
+            /* Provide a link to attempt to download the news content and show it */
+            if (withInternalLinks && hasLink) {
+              builder.append(" "); //$NON-NLS-1$
+              String link = HANDLER_PROTOCOL + TRANSFORM_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
+              link(builder, link, Messages.NewsBrowserLabelProvider_ATTEMPT_DOWNLOAD_AND_DISPLAY, null);
+            }
+          }
+        }
+
+        /* Close: NewsItem/Content */
+        close(builder, "div"); //$NON-NLS-1$
+      }
+
+      /* News Footer */
+      if (withInternalLinks && fShowFooter) {
+
+        /* DIV: NewsItem/Footer */
+        if (fHeadlinesOnly) //Hidden initially in headlines mode
+          div(builder, news.isFlagged() ? "footerSticky" : "footer", "display: none;", Dynamic.FOOTER.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        else
+          div(builder, news.isFlagged() ? "footerSticky" : "footer", Dynamic.FOOTER.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
+
+        /* DIV: NewsItem/Footer/Footerline */
+        div(builder, "footerline"); //$NON-NLS-1$
+        builder.append("<table class=\"footerline\">"); //$NON-NLS-1$
+        builder.append("<tr class=\"footerline\">"); //$NON-NLS-1$
+
+        /* Related News Menu */
+        builder.append("<td class=\"footerline\">"); //$NON-NLS-1$
+        String link = HANDLER_PROTOCOL + RELATED_NEWS_MENU_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
+        imageLink(builder, link, Messages.NewsBrowserLabelProvider_RELATED_NEWS, Messages.NewsBrowserLabelProvider_SEARCH_FOR_RELATED_NEWS, null, "/icons/obj16/mono_search.gif", "mono_search.gif", Dynamic.FIND_RELATED_MENU_LINK.getId(news), null, null); //$NON-NLS-1$ //$NON-NLS-2$
+        builder.append("</td>"); //$NON-NLS-1$
+
+        /* Transform News */
+        if (hasLink) {
+          builder.append("<td class=\"footerlineseparator\">"); //$NON-NLS-1$
+          builder.append("|"); //$NON-NLS-1$
+          builder.append("</td>"); //$NON-NLS-1$
+
+          builder.append("<td class=\"footerline\">"); //$NON-NLS-1$
+          link = HANDLER_PROTOCOL + TRANSFORM_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
+          imageLink(builder, link, Messages.NewsBrowserLabelProvider_FULL_CONTENT, Messages.NewsBrowserLabelProvider_DISPLAY_FULL_CONTENT, null, "/icons/obj16/mono_transform.gif", "mono_transform.gif", Dynamic.FULL_CONTENT_LINK.getId(news), null, Dynamic.FULL_CONTENT_LINK_TEXT.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
+          builder.append("</td>"); //$NON-NLS-1$
+        }
+
+        /* Attachments */
+        if (attachments.size() != 0) {
+          builder.append("<td class=\"footerlineseparator\">"); //$NON-NLS-1$
+          builder.append("|"); //$NON-NLS-1$
+          builder.append("</td>"); //$NON-NLS-1$
+
+          for (IAttachment attachment : attachments) {
+            if (attachment.getLink() != null) {
+              URI attachmentLink = attachment.getLink();
+              String name = URIUtils.getFile(attachmentLink, OwlUI.getExtensionForMime(attachment.getType()));
+              if (!StringUtils.isSet(name))
+                name = attachmentLink.toASCIIString();
+
+              String size = OwlUI.getSize(attachment.getLength());
+              if (size != null)
+                name = NLS.bind(Messages.NewsBrowserLabelProvider_NAME_SIZE, StringUtils.htmlEscape(name), size);
+              else
+                name = StringUtils.htmlEscape(name);
+
+              builder.append("<td class=\"footerline\">"); //$NON-NLS-1$
+              link = HANDLER_PROTOCOL + ATTACHMENT_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
+              imageLink(builder, link, name, null, null, "/icons/obj16/mono_attachment.gif", "mono_attachment.gif", Dynamic.ATTACHMENT_LINK.getId(news), null, null); //$NON-NLS-1$ //$NON-NLS-2$
+              builder.append("</td>"); //$NON-NLS-1$
+            }
+          }
+        }
+
+        /* Source */
+        ISource source = news.getSource();
+        if (source != null && source.getLink() != null) {
+          link = source.getLink().toASCIIString();
+          String name = source.getName();
+          if (StringUtils.isSet(link)) {
+            builder.append("<td class=\"footerlineseparator\">"); //$NON-NLS-1$
+            builder.append("|"); //$NON-NLS-1$
+            builder.append("</td>"); //$NON-NLS-1$
+
+            if (StringUtils.isSet(name))
+              name = StringUtils.htmlEscape(name);
+            else
+              name = StringUtils.htmlEscape(link);
+
+            builder.append("<td class=\"footerline\">"); //$NON-NLS-1$
+            imageLink(builder, link, name, null, null, "/icons/obj16/mono_source.gif", "mono_source.gif", null, null, null); //$NON-NLS-1$ //$NON-NLS-2$
+            builder.append("</td>"); //$NON-NLS-1$
+          }
+        }
+
+        /* Close: NewsItem/Footer/Footerline */
+        builder.append("</tr>"); //$NON-NLS-1$
+        builder.append("</table>"); //$NON-NLS-1$
+        close(builder, "div"); //$NON-NLS-1$
+
+        /* Close: NewsItem/Footer */
+        close(builder, "div"); //$NON-NLS-1$
+      }
+
+      /* Even though no footer wanted, need to have a div with clear:both to avoid hanging images from content */
+      else {
+        div(builder, "clearingFooter"); //$NON-NLS-1$
+        close(builder, "div"); //$NON-NLS-1$
+      }
     }
 
-    /* Even though no footer wanted, need to have a div with clear:both to avoid hanging images from content */
-    else {
-      div(builder, "clearingFooter"); //$NON-NLS-1$
+    /* Close: NewsItem (as needed) */
+    if (!onlyInnerContent) {
       close(builder, "div"); //$NON-NLS-1$
-    }
 
-    /* Close: NewsItem */
-    close(builder, "div"); //$NON-NLS-1$
+      /* Headlines Separator (as needed) */
+      if (fHeadlinesOnly) {
+        if (isVisible)
+          div(builder, "headlinesSeparator", Dynamic.HEADLINE_SEPARATOR.getId(news)); //$NON-NLS-1$
+        else
+          div(builder, "headlinesSeparator", "display: none;", Dynamic.HEADLINE_SEPARATOR.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
 
-    /* Headlines Separator */
-    if (fHeadlinesOnly) {
-      if (isVisible)
-        div(builder, "headlinesSeparator", Dynamic.HEADLINE_SEPARATOR.getId(news)); //$NON-NLS-1$
-      else
-        div(builder, "headlinesSeparator", "display: none;", Dynamic.HEADLINE_SEPARATOR.getId(news)); //$NON-NLS-1$ //$NON-NLS-2$
-
-      close(builder, "div"); //$NON-NLS-1$
+        close(builder, "div"); //$NON-NLS-1$
+      }
     }
 
     /* Highlight Support (if search is active) */

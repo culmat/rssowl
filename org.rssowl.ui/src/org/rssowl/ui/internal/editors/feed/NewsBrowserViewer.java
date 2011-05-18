@@ -1381,7 +1381,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       js.append(getElementById(Dynamic.GROUP.getId(groupId))).append(".style.display='block'; "); //$NON-NLS-1$
     }
 
-    /* Reveal News and insert content */
+    /* Reveal News */
     Long firstNewsId = null;
     for (Long newsId : revealedNews) {
       if (fViewModel.isNewsVisible(newsId))
@@ -1394,21 +1394,25 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       /* Update View Model */
       fViewModel.setNewsVisible(newsId, true);
 
-      /* Make News container visible */
-      js.append(getElementById(Dynamic.NEWS.getId(newsId))).append(".style.display='block'; "); //$NON-NLS-1$
+      /* Get News from Contentprovider */
+      INews news = resolve(newsId);
+      if (news == null)
+        continue;
 
-      /* Show separator in case of headlines layout */
+      final StringBuilder newsJs = new StringBuilder(); //Use own builder since News JS can be large depending on content
+
+      String html = ((NewsBrowserLabelProvider) getLabelProvider()).getLabel(news, true, true, true, fViewModel.indexOfNewsItem(newsId));
+      newsJs.append(getElementById(Dynamic.NEWS.getId(newsId))).append(".style.display='block'; "); //$NON-NLS-1$
+      newsJs.append(getElementById(Dynamic.NEWS.getId(newsId))).append(".innerHTML ='").append(escapeForInnerHtml(html)).append("'; "); //$NON-NLS-1$ //$NON-NLS-2$;
       if (isHeadlinesLayout())
-        js.append(getElementById(Dynamic.HEADLINE_SEPARATOR.getId(newsId))).append(".style.display='block'; "); //$NON-NLS-1$
+        newsJs.append(getElementById(Dynamic.HEADLINE_SEPARATOR.getId(newsId))).append(".style.display='block'; "); //$NON-NLS-1$
 
-      /* Fill full news content in newspaper layout */
-      else {
-        INews news = resolve(newsId);
-        if (news == null)
-          continue;
-
-        fillNewsContent(news, js, CoreUtils.getLink(news));
-      }
+      /* Block external navigation while setting innerHTML */
+      fBrowser.blockExternalNavigationWhile(new Runnable() {
+        public void run() {
+          fBrowser.execute(newsJs.toString());
+        }
+      });
     }
 
     /* Update Scroll Position */
@@ -2151,6 +2155,9 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       /* Update for each Event */
       for (NewsEvent newsEvent : newsEvents) {
         INews news = newsEvent.getEntity();
+        if (!fViewModel.isNewsVisible(news))
+          continue; //Do not update if news not visible at all
+
         StringBuilder js = new StringBuilder();
 
         /* State (Bold/Plain Title, Mark Read Tooltip) */
