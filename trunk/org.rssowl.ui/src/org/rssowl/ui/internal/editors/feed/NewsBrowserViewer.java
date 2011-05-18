@@ -1331,8 +1331,8 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
         if (CBrowser.isMozillaRunningOnWindows())
           line = StringUtils.replaceAll(line, "%", "%25"); //$NON-NLS-1$ //$NON-NLS-2$
 
-        /* Avoid multilines in JS innerHTML and just convert to whitespace */
-        result.append(line.trim()).append(" "); //$NON-NLS-1$
+        /* Properly escape multilines */
+        result.append(line).append("\\n"); //$NON-NLS-1$
       }
     } catch (IOException e) {
     }
