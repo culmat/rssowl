@@ -911,5 +911,10 @@ public class NewsBrowserViewModelTests {
     assertEquals(2, revealed.getSecond().size());
     assertEquals(news3.getId(), revealed.getSecond().get(0));
     assertEquals(news4.getId(), revealed.getSecond().get(1));
+    assertEquals(1, model.indexOfNewsItem(news1.getId()));
+    assertEquals(2, model.indexOfNewsItem(news2.getId()));
+    assertEquals(3, model.indexOfNewsItem(news3.getId()));
+    assertEquals(5, model.indexOfNewsItem(news4.getId()));
+    assertEquals(6, model.indexOfNewsItem(news5.getId()));
   }
 }
