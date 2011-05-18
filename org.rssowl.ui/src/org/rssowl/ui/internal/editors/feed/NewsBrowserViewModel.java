@@ -327,6 +327,22 @@ public class NewsBrowserViewModel {
   }
 
   /**
+   * @param newsId the news to get the index of
+   * @return the index of the provided news or <code>-1</code> if none.
+   */
+  public int indexOfNewsItem(long newsId) {
+    synchronized (fLock) {
+      for (int i = 0; i < fItemList.size(); i++) {
+        Item item = fItemList.get(i);
+        if (!(item instanceof Group) && item.getId() == newsId)
+          return i;
+      }
+    }
+
+    return -1;
+  }
+
+  /**
    * @param groupId the group to hide or show
    * @param visible <code>true</code> if visible and <code>false</code> if
    * hidden
