@@ -74,7 +74,7 @@ public class PreferencesDAOImpl extends AbstractEntityDAO<IPreference, Preferenc
       return false;
 
     /*
-     * Bug in RSSOwl 2.0.x: It was possible to happen that more than one
+     * Rare Bug in RSSOwl 2.0.x: It was possible to happen that more than one
      * preference was stored under the same key. The fix is to make sure that
      * upon delete, all instances of the preference are deleted and not just the
      * first.
