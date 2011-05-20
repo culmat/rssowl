@@ -69,11 +69,20 @@ public class PreferencesDAOImpl extends AbstractEntityDAO<IPreference, Preferenc
    * @see org.rssowl.core.persist.dao.IPreferenceDAO#delete(java.lang.String)
    */
   public boolean delete(String key) throws PersistenceException {
-    IPreference pref = load(key);
-    if (pref == null)
+    List<IPreference> preferences = loadAll(key);
+    if (preferences == null || preferences.isEmpty())
       return false;
 
-    delete(pref);
+    /*
+     * Bug in RSSOwl 2.0.x: It was possible to happen that more than one
+     * preference was stored under the same key. The fix is to make sure that
+     * upon delete, all instances of the preference are deleted and not just the
+     * first.
+     */
+    for (IPreference pref : preferences) {
+      delete(pref);
+    }
+
     return true;
   }
 
@@ -100,15 +109,21 @@ public class PreferencesDAOImpl extends AbstractEntityDAO<IPreference, Preferenc
    * @see org.rssowl.core.persist.dao.IPreferenceDAO#load(java.lang.String)
    */
   public IPreference load(String key) throws PersistenceException {
+    List<IPreference> prefs = loadAll(key);
+    if (!prefs.isEmpty())
+      return prefs.iterator().next();
+
+    return null;
+  }
+
+  private List<IPreference> loadAll(String key) {
     Query query = fDb.query();
     query.constrain(fEntityClass);
     query.descend("fKey").constrain(key); //$NON-NLS-1$
     List<IPreference> prefs = getList(query);
     activateAll(prefs);
-    if (!prefs.isEmpty()) {
-      return prefs.iterator().next();
-    }
-    return null;
+
+    return prefs;
   }
 
   /*
