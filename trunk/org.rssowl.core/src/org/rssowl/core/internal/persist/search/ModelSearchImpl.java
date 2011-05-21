@@ -45,6 +45,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.InternalOwl;
+import org.rssowl.core.internal.persist.service.DBManager;
 import org.rssowl.core.persist.IGuid;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearch;
@@ -577,6 +578,17 @@ public class ModelSearchImpl implements IModelSearch {
   void notifyIndexUpdated(int docCount) {
     for (IndexListener listener : fIndexListeners) {
       listener.indexUpdated(docCount);
+    }
+  }
+
+  /*
+   * @see org.rssowl.core.persist.service.IModelSearch#reIndexOnNextStartup()
+   */
+  public void reIndexOnNextStartup() throws PersistenceException {
+    try {
+      DBManager.getDefault().getReIndexFile().createNewFile();
+    } catch (IOException e) {
+      throw new PersistenceException(e);
     }
   }
 

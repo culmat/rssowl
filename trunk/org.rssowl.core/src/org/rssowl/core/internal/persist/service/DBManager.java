@@ -214,12 +214,20 @@ public class DBManager {
   }
 
   private boolean shouldReindex(MigrationResult migrationResult) {
+
+    /* First ask migration result */
     boolean shouldReindex = migrationResult.isReindex();
-    if (shouldReindex) {
-      System.setProperty("rssowl.reindex", "true"); //$NON-NLS-1$ //$NON-NLS-2$ //Let others know by setting property
+
+    /* Second look if the reindex file exists */
+    if (!shouldReindex && getReIndexFile().exists())
+      shouldReindex = true;
+
+    if (shouldReindex) { //Need to set system property as model search relies on it
+      System.setProperty("rssowl.reindex", "true"); //$NON-NLS-1$ //$NON-NLS-2$
       return true;
     }
 
+    /* Finally ask System Property */
     return Boolean.getBoolean("rssowl.reindex"); //$NON-NLS-1$
   }
 
@@ -338,6 +346,14 @@ public class DBManager {
   }
 
   /**
+   * @return the File indicating whether reindexing should be run or not.
+   */
+  public File getReIndexFile() {
+    File dir = new File(Activator.getDefault().getStateLocation().toOSString());
+    return new File(dir, "reindex"); //$NON-NLS-1$
+  }
+
+  /**
    * @return the File indicating whether the reindexing of news terminated
    * normally or not.
    */
@@ -442,7 +458,12 @@ public class DBManager {
           Activator.safeLogInfo("Start: Search Re-Indexing"); //$NON-NLS-1$
 
           File marker = getReindexMarkerFile();
+          File reIndexFile = getReIndexFile();
           try {
+
+            /* Make sure to delete the reindex file if existing */
+            if (reIndexFile.exists())
+              safeDelete(reIndexFile);
 
             /* Create Marker that Reindexing is Performed */
             if (!marker.exists())

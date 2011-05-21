@@ -131,6 +131,18 @@ public interface IModelSearch {
   void reindexAll(IProgressMonitor monitor) throws PersistenceException;
 
   /**
+   * Instructs the model search service to schedule an reindexing run during
+   * the next time the application is started. The actual reindexing type is
+   * dependent on the search system being used and implementors are free to
+   * leave this as a no-op in case the the search system reindexes itself
+   * automatically during runtime.
+   *
+   * @throws PersistenceException in case a problem occurs while trying to
+   * schedule this operation.
+   */
+  void reIndexOnNextStartup() throws PersistenceException;
+
+  /**
    * Adds a Listener to the list of Listeners that will be notified on index
    * events.
    *
