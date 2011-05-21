@@ -24,7 +24,6 @@
 
 package org.rssowl.core.persist.service;
 
-import org.eclipse.core.runtime.IStatus;
 import org.rssowl.core.persist.dao.DAOService;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IEntityDAO;
@@ -58,12 +57,6 @@ public interface IPersistenceService {
    * @param monitor
    */
   void startup(LongOperationMonitor monitor);
-
-  /**
-   * @return the start-up status. The user interface is responsible for checking
-   * this after start-up and displaying it to the user.
-   */
-  IStatus getStartupStatus();
 
   /**
    * Gets the implementation of <code>DAOService</code> that provides access to

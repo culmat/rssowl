@@ -133,7 +133,6 @@ public class DBManager {
   private ObjectContainer fObjectContainer;
   private final ReadWriteLock fLock = new ReentrantReadWriteLock();
   private final List<DatabaseListener> fEntityStoreListeners = new CopyOnWriteArrayList<DatabaseListener>();
-  private IStatus fStartupStatus;
 
   /**
    * @return The Singleton Instance.
@@ -179,19 +178,15 @@ public class DBManager {
     }
   }
 
-  private IStatus createObjectContainer(Configuration config) throws PersistenceException {
-    IStatus status = null;
+  private void createObjectContainer(Configuration config) throws PersistenceException {
 
     /* Open the DB */
     try {
       fObjectContainer = Db4o.openFile(config, getDBFilePath());
-      status = Status.OK_STATUS;
     }
 
     /* Error opening the DB */
     catch (Throwable e) {
-      if (!(e instanceof OutOfMemoryError))
-        Activator.safeLogError(e.getMessage(), e);
 
       /* Generic Error */
       if (e instanceof Error)
@@ -210,8 +205,6 @@ public class DBManager {
       /* Any other Error */
       throw new PersistenceException(e);
     }
-
-    return status;
   }
 
   private void checkDirPermissions() {
@@ -430,11 +423,10 @@ public class DBManager {
 
       /* Open the DB */
       Configuration config = createConfiguration(false);
-      fStartupStatus = createObjectContainer(config);
+      createObjectContainer(config);
 
       /* Notify Listeners that DB is opened */
-      if (fStartupStatus.isOK())
-        fireDatabaseEvent(new DatabaseEvent(fObjectContainer, fLock), true);
+      fireDatabaseEvent(new DatabaseEvent(fObjectContainer, fLock), true);
 
       /* Re-Index Search Index if necessary */
       boolean shouldReindex = shouldReindex(migrationResult);
@@ -1245,9 +1237,5 @@ public class DBManager {
 
   public final ObjectContainer getObjectContainer() {
     return fObjectContainer;
-  }
-
-  IStatus getStartupStatus() {
-    return fStartupStatus;
   }
 }
