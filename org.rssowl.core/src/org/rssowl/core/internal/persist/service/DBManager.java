@@ -107,6 +107,7 @@ public class DBManager {
   private static final int MAX_OFFLINE_BACKUPS_COUNT = 1; //Only used for backups from defragment
   private static final int MAX_ONLINE_BACKUPS_COUNT = 1; //Will keep 1 Current + 1 Weekly
   private static final int MAX_ONLINE_BACKUP_AGE = 1000 * 60 * 60 * 24 * 7; //7 Days
+  private static final String TMP_BACKUP_NAME = "tmp.bak"; //$NON-NLS-1$
   private static final String ONLINE_BACKUP_NAME = ".onlinebak"; //$NON-NLS-1$
   private static final String OFFLINE_BACKUP_NAME = ".backup"; //$NON-NLS-1$
   private static final int ONLINE_BACKUP_INITIAL = 1000 * 60 * 30; //30 Minutes
@@ -357,7 +358,9 @@ public class DBManager {
             safeCreate(marker);
 
           /* Use a tmp file to guard against RSSOwl shutdown while backing up */
-          tmpBackupFile = onlineBackupService.getTempBackupFile();
+          tmpBackupFile = new File(backupFile.getParentFile(), TMP_BACKUP_NAME);
+          if (tmpBackupFile.exists() && !tmpBackupFile.delete())
+            throw new PersistenceException("Failed to delete file: " + tmpBackupFile); //$NON-NLS-1$
           tmpBackupFile.deleteOnExit();
 
           /* Relies on fObjectContainer being set before calling backup */
@@ -778,7 +781,10 @@ public class DBManager {
 
     BackupService backupService = createScheduledBackupService(null);
     File database = new File(getDBFilePath());
-    File defragmentedDatabase = backupService.getTempBackupFile();
+    File defragmentedDatabase = new File(database.getParentFile(), TMP_BACKUP_NAME);
+    defragmentedDatabase.deleteOnExit();
+    if (defragmentedDatabase.exists() && !defragmentedDatabase.delete())
+      throw new PersistenceException("Failed to delete file: " + defragmentedDatabase); //$NON-NLS-1$
 
     /* User might have cancelled the operation */
     if (!useLargeBlockSize && monitor.isCanceled()) {
