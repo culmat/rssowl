@@ -24,7 +24,6 @@
 
 package org.rssowl.core.internal.persist.service;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -70,7 +69,6 @@ import com.db4o.config.Configuration;
 import com.db4o.config.ObjectClass;
 import com.db4o.config.ObjectField;
 import com.db4o.config.QueryEvaluationMode;
-import com.db4o.ext.DatabaseFileLockedException;
 import com.db4o.query.Query;
 
 import java.io.BufferedReader;
@@ -79,9 +77,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
@@ -183,12 +179,7 @@ public class DBManager {
     }
   }
 
-  private void createEmptyObjectContainer(Configuration config, IStatus status) {
-    Activator.getDefault().getLog().log(status); //Log in case there's also an exception creating an empty object container
-    fObjectContainer = Db4o.openFile(config, getDBFilePath());
-  }
-
-  private IStatus createObjectContainer(Configuration config) {
+  private IStatus createObjectContainer(Configuration config) throws PersistenceException {
     IStatus status = null;
 
     /* Open the DB */
@@ -207,30 +198,12 @@ public class DBManager {
 
       File file = new File(getDBFilePath());
       if (!file.exists())
-        throw new DiskFullException("Failed to create an empty database. This seems to indicate that the disk is full. Please free some space on the disk and restart RSSOwl.", e); //$NON-NLS-1$
+        throw new DiskFullException(Messages.DBManager_DISK_FULL_ERROR, e);
 
       if (!file.canRead() || (!file.canWrite()))
-        throw new InsufficientFilePermissionException("Current user has no permission to read and/or write file: " + file + ". Please make sure to start RSSOwl with sufficient permissions.", null); //$NON-NLS-1$ //$NON-NLS-2$
+        throw new InsufficientFilePermissionException(NLS.bind(Messages.DBManager_FILE_PERMISSION_ERROR, file), null);
 
-      BackupService onlineBackupService = createOnlineBackupService();
-      if (onlineBackupService == null || e instanceof DatabaseFileLockedException)
-        throw new PersistenceException(e);
-
-      BackupService offlineBackupService = createScheduledBackupService(null);
-      File currentDbCorruptedFile = onlineBackupService.getCorruptedFile(null);
-      DBHelper.rename(onlineBackupService.getFileToBackup(), currentDbCorruptedFile);
-
-      /*
-       * There was no online back-up file. This could only happen if the problem
-       * happened on the first start-up or if the user never used the
-       * application for more than 10 minutes.
-       */
-      if (onlineBackupService.getBackupFile(0) == null) {
-        status = Activator.getDefault().createErrorStatus("Database file is corrupted and no back-up could be found. The corrupted file has been saved to: " + currentDbCorruptedFile.getAbsolutePath(), e); //$NON-NLS-1$
-        createEmptyObjectContainer(config, status);
-      } else {
-        status = restoreFromBackup(config, e, currentDbCorruptedFile, onlineBackupService, offlineBackupService);
-      }
+      throw new PersistenceException(e);
     }
 
     final BackupService backupService = createOnlineBackupService();
@@ -260,53 +233,7 @@ public class DBManager {
   private void checkDirPermissions() {
     File dir = new File(Activator.getDefault().getStateLocation().toOSString());
     if (!dir.canRead() || (!dir.canWrite()))
-      throw new InsufficientFilePermissionException("Current user has no permission to read from and/or write to directory: " + dir + ". Please make sure to start RSSOwl with sufficient permissions.", null); //$NON-NLS-1$ //$NON-NLS-2$
-  }
-
-  private IStatus restoreFromBackup(Configuration config, Throwable startupException, File currentDbCorruptedFile, BackupService... backupServices) {
-    Assert.isNotNull(backupServices, "backupServices"); //$NON-NLS-1$
-    Assert.isLegal(backupServices.length > 0, "backupServices should have at least one element"); //$NON-NLS-1$
-    Assert.isNotNull(backupServices[0].getBackupFile(0), "backupServices[0] should contain at least one back-up"); //$NON-NLS-1$
-    long lastModified = -1;
-    boolean foundSuitableBackup = false;
-    for (BackupService backupService : backupServices) {
-      for (int i = 0;; ++i) {
-        File backupFile = backupService.getBackupFile(i);
-
-        /* Always false in first iteration */
-        if (backupFile == null)
-          break;
-
-        lastModified = backupFile.lastModified();
-
-        DBHelper.rename(backupFile, backupService.getFileToBackup());
-        try {
-          fObjectContainer = Db4o.openFile(config, getDBFilePath());
-          foundSuitableBackup = true;
-          break;
-        } catch (Throwable e1) {
-          Activator.getDefault().logError("Back-up database corrupted: " + backupFile, e1); //$NON-NLS-1$
-          DBHelper.rename(new File(getDBFilePath()), backupService.getCorruptedFile(i));
-        }
-      }
-
-      if (foundSuitableBackup)
-        break;
-    }
-
-    if (foundSuitableBackup) {
-      String message = createRecoveredFromCorruptedDatabaseMessage(currentDbCorruptedFile, lastModified);
-      return Activator.getDefault().createErrorStatus(message, startupException);
-    }
-
-    IStatus status = Activator.getDefault().createErrorStatus("Database file and its back-ups are all corrupted. The corrupted database file has been saved to: " + currentDbCorruptedFile.getAbsolutePath(), startupException); //$NON-NLS-1$
-    createEmptyObjectContainer(config, status);
-    return status;
-  }
-
-  private String createRecoveredFromCorruptedDatabaseMessage(File corruptedFile, long lastModified) {
-    String date = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(new Date(lastModified));
-    return "There was a problem opening the database file. RSSOwl has reverted to the last working back-up (from " + date + "). The corrupted file has been saved to: " + corruptedFile.getAbsolutePath(); //$NON-NLS-1$ //$NON-NLS-2$
+      throw new InsufficientFilePermissionException(NLS.bind(Messages.DBManager_DIRECTORY_PERMISSION_ERROR, dir), null);
   }
 
   private boolean shouldReindex(MigrationResult migrationResult, IStatus startupStatus) {
