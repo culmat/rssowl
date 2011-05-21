@@ -1224,7 +1224,7 @@ public class Controller {
 
     /* Check for Status of Startup */
     IStatus startupStatus = Owl.getPersistenceService().getStartupStatus();
-    if (startupStatus.getSeverity() == IStatus.ERROR)
+    if (startupStatus != null && startupStatus.getSeverity() == IStatus.ERROR)
       ErrorDialog.openError(OwlUI.getPrimaryShell(), Messages.Controller_STARTUP_ERROR, Messages.Controller_START_ERROR_MSG, startupStatus);
 
     /* Backup Subscriptions as OPML if no error */
