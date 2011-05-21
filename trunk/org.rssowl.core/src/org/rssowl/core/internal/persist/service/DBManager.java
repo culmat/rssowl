@@ -361,7 +361,6 @@ public class DBManager {
           tmpBackupFile = new File(backupFile.getParentFile(), TMP_BACKUP_NAME);
           if (tmpBackupFile.exists() && !tmpBackupFile.delete())
             throw new PersistenceException("Failed to delete file: " + tmpBackupFile); //$NON-NLS-1$
-          tmpBackupFile.deleteOnExit();
 
           /* Relies on fObjectContainer being set before calling backup */
           fObjectContainer.ext().backup(tmpBackupFile.getAbsolutePath());
@@ -380,7 +379,7 @@ public class DBManager {
           throw new PersistenceException(e);
         } finally {
           safeDelete(marker);
-          if (tmpBackupFile != null)
+          if (tmpBackupFile != null && tmpBackupFile.exists()) //Cleanup if something went wrong
             safeDelete(tmpBackupFile);
         }
       }
@@ -782,7 +781,6 @@ public class DBManager {
     BackupService backupService = createScheduledBackupService(null);
     File database = new File(getDBFilePath());
     File defragmentedDatabase = new File(database.getParentFile(), TMP_BACKUP_NAME);
-    defragmentedDatabase.deleteOnExit();
     if (defragmentedDatabase.exists() && !defragmentedDatabase.delete())
       throw new PersistenceException("Failed to delete file: " + defragmentedDatabase); //$NON-NLS-1$
 
