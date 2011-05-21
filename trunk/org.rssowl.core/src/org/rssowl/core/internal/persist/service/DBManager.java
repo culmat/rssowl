@@ -133,7 +133,7 @@ public class DBManager {
   private ObjectContainer fObjectContainer;
   private final ReadWriteLock fLock = new ReentrantReadWriteLock();
   private final List<DatabaseListener> fEntityStoreListeners = new CopyOnWriteArrayList<DatabaseListener>();
-  private IStatus startupStatus;
+  private IStatus fStartupStatus;
 
   /**
    * @return The Singleton Instance.
@@ -188,44 +188,28 @@ public class DBManager {
       status = Status.OK_STATUS;
     }
 
-    /* Error opening the DB - try to recover */
+    /* Error opening the DB */
     catch (Throwable e) {
       if (!(e instanceof OutOfMemoryError))
         Activator.safeLogError(e.getMessage(), e);
 
+      /* Generic Error */
       if (e instanceof Error)
         throw (Error) e;
 
       File file = new File(getDBFilePath());
+
+      /* Disk Full Error */
       if (!file.exists())
         throw new DiskFullException(Messages.DBManager_DISK_FULL_ERROR, e);
 
+      /* Permission Error */
       if (!file.canRead() || (!file.canWrite()))
         throw new InsufficientFilePermissionException(NLS.bind(Messages.DBManager_FILE_PERMISSION_ERROR, file), null);
 
+      /* Any other Error */
       throw new PersistenceException(e);
     }
-
-    final BackupService backupService = createOnlineBackupService();
-    Job job = new Job("Back-up service") { //$NON-NLS-1$
-      @Override
-      protected IStatus run(IProgressMonitor monitor) {
-        if (!Owl.isShuttingDown() && !monitor.isCanceled()) {
-          try {
-            backupService.backup(true, monitor);
-          } catch (PersistenceException e) {
-            Activator.safeLogError(e.getMessage(), e);
-          }
-
-          if (!Owl.isShuttingDown() && !monitor.isCanceled())
-            schedule(getOnlineBackupDelay(false));
-        }
-
-        return Status.OK_STATUS;
-      }
-    };
-    job.setSystem(true);
-    job.schedule(getOnlineBackupDelay(true));
 
     return status;
   }
@@ -236,8 +220,8 @@ public class DBManager {
       throw new InsufficientFilePermissionException(NLS.bind(Messages.DBManager_DIRECTORY_PERMISSION_ERROR, dir), null);
   }
 
-  private boolean shouldReindex(MigrationResult migrationResult, IStatus startupStatus) {
-    boolean shouldReindex = migrationResult.isReindex() || (!startupStatus.isOK());
+  private boolean shouldReindex(MigrationResult migrationResult) {
+    boolean shouldReindex = migrationResult.isReindex();
     if (shouldReindex) {
       System.setProperty("rssowl.reindex", "true"); //$NON-NLS-1$ //$NON-NLS-2$ //Let others know by setting property
       return true;
@@ -446,14 +430,14 @@ public class DBManager {
 
       /* Open the DB */
       Configuration config = createConfiguration(false);
-      startupStatus = createObjectContainer(config);
+      fStartupStatus = createObjectContainer(config);
 
       /* Notify Listeners that DB is opened */
-      if (startupStatus.isOK())
+      if (fStartupStatus.isOK())
         fireDatabaseEvent(new DatabaseEvent(fObjectContainer, fLock), true);
 
       /* Re-Index Search Index if necessary */
-      boolean shouldReindex = shouldReindex(migrationResult, startupStatus);
+      boolean shouldReindex = shouldReindex(migrationResult);
       if (shouldReindex) {
         progressMonitor.beginLongOperation(false);
         subMonitor = SubMonitor.convert(progressMonitor, Messages.DBManager_PROGRESS_WAIT, 20);
@@ -488,6 +472,28 @@ public class DBManager {
         if (migrationResult.isOptimizeIndex() && !progressMonitor.isCanceled())
           modelSearch.optimize();
       }
+
+      /* Start the periodic online backup service */
+      final BackupService backupService = createOnlineBackupService();
+      Job job = new Job("Back-up service") { //$NON-NLS-1$
+        @Override
+        protected IStatus run(IProgressMonitor monitor) {
+          if (!Owl.isShuttingDown() && !monitor.isCanceled()) {
+            try {
+              backupService.backup(true, monitor);
+            } catch (PersistenceException e) {
+              Activator.safeLogError(e.getMessage(), e);
+            }
+
+            if (!Owl.isShuttingDown() && !monitor.isCanceled())
+              schedule(getOnlineBackupDelay(false));
+          }
+
+          return Status.OK_STATUS;
+        }
+      };
+      job.setSystem(true);
+      job.schedule(getOnlineBackupDelay(true));
     } finally {
       if (subMonitor != null) //If we perform the migration, the subMonitor is not null. Otherwise we don't show progress.
         progressMonitor.done();
@@ -1223,7 +1229,7 @@ public class DBManager {
     }
   }
 
-  public void dropDatabase() throws PersistenceException {
+  void dropDatabase() throws PersistenceException {
     SafeRunner.run(new LoggingSafeRunnable() {
       public void run() throws Exception {
         shutdown();
@@ -1241,7 +1247,7 @@ public class DBManager {
     return fObjectContainer;
   }
 
-  public IStatus getStartupStatus() {
-    return startupStatus;
+  IStatus getStartupStatus() {
+    return fStartupStatus;
   }
 }
