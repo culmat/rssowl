@@ -627,6 +627,7 @@ public class ModelSearchImpl implements IModelSearch {
 
     /* Lock the indexer for the duration of the reindexing */
     synchronized (fIndexer) {
+      boolean userCanceled = false;
 
       /* Delete the Index first */
       clearIndex();
@@ -649,6 +650,12 @@ public class ModelSearchImpl implements IModelSearch {
 
         /* Index News Items */
         for (INews newsitem : newsChunkToBeIndexed) {
+
+          /* User might have canceled, so give feedback that work needs to complete */
+          if (!userCanceled && monitor.isCanceled()) {
+            monitor.setTaskName(Messages.ModelSearchImpl_WAIT_TASK_COMPLETION);
+            userCanceled = true;
+          }
 
           /* We don't pass the whole list at once to be able to report progress. */
           List<INews> indexList = new ArrayList<INews>(1);
