@@ -287,6 +287,10 @@ public final class BackupService {
     return new File(getBackupFile().getAbsolutePath() + ".temp"); //$NON-NLS-1$
   }
 
+  public File getWeeklyBackupFile() {
+    return new File(getBackupFile().getAbsolutePath() + ".weekly"); //$NON-NLS-1$
+  }
+
   public File getCorruptedFile(Integer index) {
     String fileName = getFileToBackup().getAbsolutePath() + ".corrupted"; //$NON-NLS-1$
     if (index != null)
