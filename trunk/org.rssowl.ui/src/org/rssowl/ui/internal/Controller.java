@@ -38,7 +38,6 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
@@ -1222,24 +1221,17 @@ public class Controller {
     /* Support Keybindings for assigning Labels */
     defineLabelCommands(CoreUtils.loadSortedLabels());
 
-    /* Check for Status of Startup */
-    IStatus startupStatus = Owl.getPersistenceService().getStartupStatus();
-    if (startupStatus != null && startupStatus.getSeverity() == IStatus.ERROR)
-      ErrorDialog.openError(OwlUI.getPrimaryShell(), Messages.Controller_STARTUP_ERROR, Messages.Controller_START_ERROR_MSG, startupStatus);
-
     /* Backup Subscriptions as OPML if no error */
-    else {
-      JobRunner.runDelayedInBackgroundThread(new Runnable() {
-        public void run() {
-          SafeRunner.run(new LoggingSafeRunnable() {
-            public void run() throws Exception {
-              if (!fShuttingDown)
-                backupSubscriptions();
-            }
-          });
-        }
-      });
-    }
+    JobRunner.runDelayedInBackgroundThread(new Runnable() {
+      public void run() {
+        SafeRunner.run(new LoggingSafeRunnable() {
+          public void run() throws Exception {
+            if (!fShuttingDown)
+              backupSubscriptions();
+          }
+        });
+      }
+    });
 
     /* Show the Welcome & Tutorial Wizard if this is the first startup */
     if (fShowWelcome) {

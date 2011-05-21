@@ -130,8 +130,6 @@ public class Messages extends NLS {
   public static String Controller_PERSONAL;
   public static String Controller_PROBLEM;
   public static String Controller_RESTART_RSSOWL;
-  public static String Controller_START_ERROR_MSG;
-  public static String Controller_STARTUP_ERROR;
   public static String Controller_TODO;
   public static String Controller_UPDATING;
   public static String Controller_UPDATING_FEEDS;
