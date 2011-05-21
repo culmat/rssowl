@@ -95,7 +95,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * The central class to configure the underlying database of RSSOwl.
  */
 public class DBManager {
-  private static final int MAX_BACKUPS_COUNT = 2;
   private static final String FORMAT_FILE_NAME = "format2"; //$NON-NLS-1$
   private static DBManager fInstance;
 
@@ -103,7 +102,13 @@ public class DBManager {
   private static final long LARGE_DB_STARTING_SIZE = 1610612736; //1.5 GB in Bytes
   private static final int LARGE_DB_BLOCK_SIZE = 8;
 
-  /* Backup Times */
+  /* Backup Settings */
+  private static final boolean PERFORM_SCHEDULED_BACKUPS = false; //Disabled in favor of online backups
+  private static final int MAX_OFFLINE_BACKUPS_COUNT = 1; //Only used for backups from defragment
+  private static final int MAX_ONLINE_BACKUPS_COUNT = 1; //Will keep 1 Current + 1 Weekly
+  private static final int MAX_ONLINE_BACKUP_AGE = 1000 * 60 * 60 * 24 * 7; //7 Days
+  private static final String ONLINE_BACKUP_NAME = ".onlinebak"; //$NON-NLS-1$
+  private static final String OFFLINE_BACKUP_NAME = ".backup"; //$NON-NLS-1$
   private static final int ONLINE_BACKUP_INITIAL = 1000 * 60 * 30; //30 Minutes
   private static final int ONLINE_BACKUP_INTERVAL = 1000 * 60 * 60 * 8; //8 Hours
   private static final int OFFLINE_BACKUP_INTERVAL = 1000 * 60 * 60 * 24 * 7; //7 Days
@@ -224,18 +229,19 @@ public class DBManager {
       }
     }
 
-    Assert.isNotNull(status, "status"); //$NON-NLS-1$
     final BackupService backupService = createOnlineBackupService();
     Job job = new Job("Back-up service") { //$NON-NLS-1$
       @Override
       protected IStatus run(IProgressMonitor monitor) {
-        if (!Owl.isShuttingDown()) {
+        if (!Owl.isShuttingDown() && !monitor.isCanceled()) {
           try {
             backupService.backup(true, monitor);
           } catch (PersistenceException e) {
             Activator.safeLogError(e.getMessage(), e);
           }
-          schedule(getOnlineBackupDelay(false));
+
+          if (!Owl.isShuttingDown() && !monitor.isCanceled())
+            schedule(getOnlineBackupDelay(false));
         }
 
         return Status.OK_STATUS;
@@ -243,6 +249,7 @@ public class DBManager {
     };
     job.setSystem(true);
     job.schedule(getOnlineBackupDelay(true));
+
     return status;
   }
 
@@ -338,26 +345,45 @@ public class DBManager {
     if (!file.exists())
       return null;
 
-    BackupService backupService = new BackupService(file, ".onlinebak", 2); //$NON-NLS-1$
-    backupService.setBackupStrategy(new BackupService.BackupStrategy() {
-      public void backup(File originFile, File destinationFile, IProgressMonitor monitor) {
+    final BackupService onlineBackupService = new BackupService(file, ONLINE_BACKUP_NAME, MAX_ONLINE_BACKUPS_COUNT);
+    onlineBackupService.setBackupStrategy(new BackupService.BackupStrategy() {
+      public void backup(File originFile, File backupFile, IProgressMonitor monitor) {
         File marker = getOnlineBackupMarkerFile();
+        File tmpBackupFile = null;
         try {
 
           /* Create Marker that Onlinebackup is Performed */
           if (!marker.exists())
             safeCreate(marker);
 
+          /* Use a tmp file to guard against RSSOwl shutdown while backing up */
+          tmpBackupFile = onlineBackupService.getTempBackupFile();
+          tmpBackupFile.deleteOnExit();
+
           /* Relies on fObjectContainer being set before calling backup */
-          fObjectContainer.ext().backup(destinationFile.getAbsolutePath());
+          fObjectContainer.ext().backup(tmpBackupFile.getAbsolutePath());
+
+          /* Store Backup as Weekly Backup if necessary */
+          File weeklyBackup = onlineBackupService.getWeeklyBackupFile();
+          boolean renameToWeekly = false;
+          if (!weeklyBackup.exists()) //First Weekly
+            renameToWeekly = true;
+          else if (weeklyBackup.lastModified() < (System.currentTimeMillis() - MAX_ONLINE_BACKUP_AGE)) //Weekly older 1 Week
+            renameToWeekly = true;
+
+          /* Atomic Rename */
+          DBHelper.rename(tmpBackupFile, renameToWeekly ? weeklyBackup : backupFile);
         } catch (IOException e) {
           throw new PersistenceException(e);
         } finally {
           safeDelete(marker);
+          if (tmpBackupFile != null)
+            safeDelete(tmpBackupFile);
         }
       }
     });
-    return backupService;
+
+    return onlineBackupService;
   }
 
   private void safeCreate(File file) {
@@ -481,7 +507,7 @@ public class DBManager {
          * We only run the time-based back-up if a defragment has not taken
          * place because we always back-up during defragment.
          */
-        else
+        else if (PERFORM_SCHEDULED_BACKUPS)
           scheduledBackup(progressMonitor);
       }
 
@@ -536,7 +562,7 @@ public class DBManager {
   }
 
   private BackupService createScheduledBackupService(Long backupFrequency) {
-    return new BackupService(new File(getDBFilePath()), ".backup", MAX_BACKUPS_COUNT, getDBLastBackUpFile(), backupFrequency); //$NON-NLS-1$
+    return new BackupService(new File(getDBFilePath()), OFFLINE_BACKUP_NAME, MAX_OFFLINE_BACKUPS_COUNT, getDBLastBackUpFile(), backupFrequency);
   }
 
   private void scheduledBackup(IProgressMonitor monitor) {
