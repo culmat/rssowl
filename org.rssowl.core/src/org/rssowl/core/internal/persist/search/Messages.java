@@ -36,6 +36,7 @@ public class Messages extends NLS {
   public static String ModelSearchImpl_ERROR_WILDCARDS;
   public static String ModelSearchImpl_PROGRESS_WAIT;
   public static String ModelSearchImpl_REINDEX_SEARCH_INDEX;
+  public static String ModelSearchImpl_WAIT_TASK_COMPLETION;
 
   private Messages() {}
 
