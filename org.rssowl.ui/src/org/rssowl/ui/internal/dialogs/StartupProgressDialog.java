@@ -76,6 +76,7 @@ public class StartupProgressDialog extends ProgressMonitorDialog {
     super.configureShell(shell);
 
     shell.setText("RSSOwl"); //$NON-NLS-1$
+    shell.setCursor(shell.getDisplay().getSystemCursor(SWT.CURSOR_APPSTARTING));
 
     /* Images not initialized yet */
     Image img_16x16 = OwlUI.getImage(fResources, "icons/product/16x16.png"); //$NON-NLS-1$
