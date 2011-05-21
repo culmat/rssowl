@@ -102,6 +102,9 @@ public class DBManager {
   private static final long LARGE_DB_STARTING_SIZE = 1610612736; //1.5 GB in Bytes
   private static final int LARGE_DB_BLOCK_SIZE = 8;
 
+  /* Migration Related */
+  private static final boolean ENABLE_MIGRATION = false; //Turned off as of RSSOwl 2.1
+
   /* Backup Settings */
   private static final boolean PERFORM_SCHEDULED_BACKUPS = false; //Disabled in favor of online backups
   private static final int MAX_OFFLINE_BACKUPS_COUNT = 1; //Only used for backups from defragment
@@ -459,6 +462,7 @@ public class DBManager {
     fEntityStoreListeners.remove(listener);
   }
 
+  @SuppressWarnings("unused")
   public void createDatabase(LongOperationMonitor progressMonitor) throws PersistenceException {
 
     /* Assert File Permissions */
@@ -492,7 +496,7 @@ public class DBManager {
       }
 
       /* Perform Migration if necessary */
-      if (workspaceVersion != getCurrentFormatVersion()) {
+      if (ENABLE_MIGRATION && workspaceVersion != getCurrentFormatVersion()) {
         progressMonitor.beginLongOperation(false);
         subMonitor = SubMonitor.convert(progressMonitor, Messages.DBManager_RSSOWL_MIGRATION, 100);
         migrationResult = migrate(workspaceVersion, getCurrentFormatVersion(), subMonitor.newChild(70));
@@ -523,7 +527,7 @@ public class DBManager {
 
       /* Re-Index Search Index if necessary */
       boolean shouldReindex = shouldReindex(migrationResult, startupStatus);
-      if (subMonitor == null && shouldReindex) {
+      if (shouldReindex) {
         progressMonitor.beginLongOperation(false);
         subMonitor = SubMonitor.convert(progressMonitor, Messages.DBManager_PROGRESS_WAIT, 20);
       }
