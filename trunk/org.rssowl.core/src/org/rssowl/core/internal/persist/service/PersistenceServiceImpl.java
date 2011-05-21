@@ -24,7 +24,6 @@
 
 package org.rssowl.core.internal.persist.service;
 
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.persist.service.AbstractPersistenceService;
@@ -126,12 +125,5 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
     } catch (IOException e) {
       throw new PersistenceException(e);
     }
-  }
-
-  /*
-   * @see org.rssowl.core.persist.service.IPersistenceService#getStartupStatus()
-   */
-  public IStatus getStartupStatus() {
-    return DBManager.getDefault().getStartupStatus();
   }
 }
