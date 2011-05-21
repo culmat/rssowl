@@ -209,24 +209,24 @@ public class DBManager {
       if (!file.canRead() || (!file.canWrite()))
         throw new InsufficientFilePermissionException("Current user has no permission to read and/or write file: " + file + ". Please make sure to start RSSOwl with sufficient permissions.", null); //$NON-NLS-1$ //$NON-NLS-2$
 
-      BackupService backupService = createOnlineBackupService();
-      if (backupService == null || e instanceof DatabaseFileLockedException)
+      BackupService onlineBackupService = createOnlineBackupService();
+      if (onlineBackupService == null || e instanceof DatabaseFileLockedException)
         throw new PersistenceException(e);
 
-      BackupService scheduledBackupService = createScheduledBackupService(null);
-      File currentDbCorruptedFile = backupService.getCorruptedFile(null);
-      DBHelper.rename(backupService.getFileToBackup(), currentDbCorruptedFile);
+      BackupService offlineBackupService = createScheduledBackupService(null);
+      File currentDbCorruptedFile = onlineBackupService.getCorruptedFile(null);
+      DBHelper.rename(onlineBackupService.getFileToBackup(), currentDbCorruptedFile);
 
       /*
        * There was no online back-up file. This could only happen if the problem
        * happened on the first start-up or if the user never used the
        * application for more than 10 minutes.
        */
-      if (backupService.getBackupFile(0) == null) {
+      if (onlineBackupService.getBackupFile(0) == null) {
         status = Activator.getDefault().createErrorStatus("Database file is corrupted and no back-up could be found. The corrupted file has been saved to: " + currentDbCorruptedFile.getAbsolutePath(), e); //$NON-NLS-1$
         createEmptyObjectContainer(config, status);
       } else {
-        status = restoreFromBackup(config, e, currentDbCorruptedFile, backupService, scheduledBackupService);
+        status = restoreFromBackup(config, e, currentDbCorruptedFile, onlineBackupService, offlineBackupService);
       }
     }
 
