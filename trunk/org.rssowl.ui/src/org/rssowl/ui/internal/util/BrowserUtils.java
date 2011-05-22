@@ -423,4 +423,17 @@ public class BrowserUtils {
     else
       openLinkExternal("http://sourceforge.net/projects/rssowl/forums/forum/296910"); //$NON-NLS-1$
   }
+
+  /**
+   * Will open the RSSOwl FAQ on the right topic depending on the error.
+   *
+   * @param errorStatus the {@link IStatus} from the error that lead to this
+   * action.
+   */
+  public static void openFAQ(IStatus errorStatus) {
+    if (errorStatus != null && errorStatus.getException() instanceof OutOfMemoryError)
+      Program.launch("http://www.rssowl.org/help#item_6g"); //$NON-NLS-1$
+    else
+      openLinkExternal("http://www.rssowl.org/help#item_6"); //$NON-NLS-1$
+  }
 }
