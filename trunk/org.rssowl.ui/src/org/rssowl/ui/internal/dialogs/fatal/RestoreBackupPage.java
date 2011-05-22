@@ -37,6 +37,7 @@ import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.rssowl.ui.internal.Application;
@@ -73,7 +74,8 @@ public class RestoreBackupPage extends WizardPage {
 
     /* Container */
     Composite container = new Composite(parent, SWT.NONE);
-    container.setLayout(LayoutUtils.createGridLayout(2, 5, 5));
+    container.setLayout(LayoutUtils.createGridLayout(2, 5, 0));
+    ((GridLayout) container.getLayout()).marginTop = 5;
 
     /* Controls to Restore from a Backup */
     Label backupInfo = new Label(container, SWT.WRAP);
