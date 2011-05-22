@@ -73,7 +73,7 @@ public class DefaultStatusHandler extends WorkbenchErrorHandler {
       public void run() {
         Throwable cause = ex.getCause();
         if (cause != null && cause instanceof IOException) {
-          ErrorDialog.openError(OwlUI.getPrimaryShell(), Messages.DefaultStatusHandler_ERROR, Messages.DefaultStatusHandler_ERROR_DISK_WRITE, Activator.getDefault().createErrorStatus(cause.getMessage(), (Exception) cause));
+          ErrorDialog.openError(OwlUI.getPrimaryShell(), Messages.DefaultStatusHandler_ERROR, Messages.DefaultStatusHandler_ERROR_DISK_WRITE, Activator.getDefault().createErrorStatus(cause.getMessage(), cause));
         }
       }
     });
