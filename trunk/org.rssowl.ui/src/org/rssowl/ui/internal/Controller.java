@@ -1657,12 +1657,12 @@ public class Controller {
   }
 
   /**
-   * Start a Workbench emergency shutdown due to an unrecoverable error (e.g.
-   * Out of Memory).
+   * Start a Workbench emergency shutdown due to an unrecoverable Out of Memory
+   * error.
    *
    * @param error the {@link Error} that causes an emergent shutdown.
    */
-  public void emergencyShutdown(final Error error) {
+  public void emergencyOutOfMemoryShutdown(final Error error) {
 
     /* Flag shutdown sequence about to start to reduce Job load */
     fShuttingDown = true;
@@ -1683,7 +1683,7 @@ public class Controller {
           IStatus errorStatus = new Status(IStatus.ERROR, "org.rssowl.ui", IStatus.ERROR, error.getMessage(), error); //$NON-NLS-1$
           FatalErrorDialog dialog = new FatalErrorDialog(errorStatus);
           if (dialog.open() == IDialogConstants.HELP_ID)
-            Program.launch("http://www.rssowl.org/help#item_6c"); //$NON-NLS-1$;
+            Program.launch("http://www.rssowl.org/help#item_6g"); //$NON-NLS-1$;
         }
 
         /* Serious problem - Exit (gives Shutdown Hook a chance to run) */
