@@ -80,6 +80,6 @@ public class DefaultStatusHandler extends WorkbenchErrorHandler {
   }
 
   private void handleOutOfMemoryError(final OutOfMemoryError error) {
-    Controller.getDefault().emergencyShutdown(error);
+    Controller.getDefault().emergencyOutOfMemoryShutdown(error);
   }
 }
