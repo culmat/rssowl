@@ -26,8 +26,14 @@ package org.rssowl.ui.internal.dialogs.fatal;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.equinox.app.IApplication;
+import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.osgi.util.NLS;
 import org.rssowl.core.Owl;
+import org.rssowl.core.persist.service.PersistenceException;
+import org.rssowl.core.util.StringUtils;
+import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Application;
 
 import java.io.File;
@@ -85,7 +91,22 @@ public class FatalErrorWizard extends Wizard {
       if (backup != null) {
 
         /* Trigger Backup Restore */
-        Owl.restore(backup);
+        try {
+          Owl.restore(backup);
+        } catch (PersistenceException e) {
+          Activator.getDefault().logError(e.getMessage(), e);
+
+          /* Show Error to the User */
+          String msg;
+          if (StringUtils.isSet(e.getMessage()))
+            msg = NLS.bind(Messages.FatalErrorWizard_RESTORE_ERROR_N, e.getMessage());
+          else
+            msg = Messages.FatalErrorWizard_RESTORE_ERROR;
+
+          ((WizardPage) getContainer().getCurrentPage()).setMessage(msg, IMessageProvider.ERROR);
+
+          return false;
+        }
       }
     }
 
