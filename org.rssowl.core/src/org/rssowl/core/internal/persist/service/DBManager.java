@@ -465,24 +465,26 @@ public class DBManager {
           File reIndexFile = getReIndexFile();
           try {
 
-            /* Make sure to delete the reindex file if existing */
-            if (reIndexFile.exists())
-              safeDelete(reIndexFile);
-
             /* Create Marker that Reindexing is Performed */
             if (!marker.exists())
               safeCreate(marker);
 
             /* Reindex Search Index */
             modelSearch.reindexAll(subMonitor != null ? subMonitor.newChild(20) : new NullProgressMonitor());
+
+            /*
+             * Make sure to delete the reindex file if existing only after the
+             * operation has completed without issues to ensure that upon next
+             * start the reindexing is started again if it failed prior.
+             */
+            if (reIndexFile.exists())
+              safeDelete(reIndexFile);
           } finally {
             safeDelete(marker);
           }
 
-          if (progressMonitor.isCanceled())
-            Activator.safeLogInfo("Cancelled: Search Re-Indexing"); //$NON-NLS-1$
-          else
-            Activator.safeLogInfo("Finished: Search Re-Indexing"); //$NON-NLS-1$
+          /* Log Status */
+          Activator.safeLogInfo("Finished: Search Re-Indexing"); //$NON-NLS-1$
         }
 
         /* Optimize Index if Necessary */
