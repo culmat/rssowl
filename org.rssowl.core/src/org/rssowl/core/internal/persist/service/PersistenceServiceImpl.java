@@ -30,7 +30,9 @@ import org.rssowl.core.persist.service.AbstractPersistenceService;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.LongOperationMonitor;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * The persistence service controls the lifecycle of the underlying database.
@@ -125,5 +127,19 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
     } catch (IOException e) {
       throw new PersistenceException(e);
     }
+  }
+
+  /*
+   * @see org.rssowl.core.persist.service.IPersistenceService#getBackups()
+   */
+  public List<File> getBackups() {
+    return DBManager.getDefault().getBackups();
+  }
+
+  /*
+   * @see org.rssowl.core.persist.service.IPersistenceService#restore(java.io.File)
+   */
+  public void restore(File backup) throws PersistenceException {
+    DBManager.getDefault().restore(backup);
   }
 }
