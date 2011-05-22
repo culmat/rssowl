@@ -648,8 +648,18 @@ public class OwlUI {
    * @return the shared instance of <code>Clipboard</code>.
    */
   public static Clipboard getClipboard() {
+    return getClipboard(PlatformUI.getWorkbench().getDisplay());
+  }
+
+  /**
+   * Get the shared instance of <code>Clipboard</code>.
+   *
+   * @param display the {@link Display} the clipboard is operating on.
+   * @return the shared instance of <code>Clipboard</code>.
+   */
+  public static Clipboard getClipboard(Display display) {
     if (fgClipboard == null)
-      fgClipboard = new Clipboard(PlatformUI.getWorkbench().getDisplay());
+      fgClipboard = new Clipboard(display);
 
     return fgClipboard;
   }
