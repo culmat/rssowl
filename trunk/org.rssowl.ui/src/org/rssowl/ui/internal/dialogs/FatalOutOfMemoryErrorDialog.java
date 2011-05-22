@@ -25,13 +25,11 @@
 package org.rssowl.ui.internal.dialogs;
 
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -40,23 +38,13 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
-import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.StringUtils;
-import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.BrowserUtils;
 import org.rssowl.ui.internal.util.LayoutUtils;
-
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.InputStream;
 
 /**
  * A Dialog that is shown to the user in case RSSOwl failed to start or during a
@@ -64,14 +52,14 @@ import java.io.InputStream;
  *
  * @author bpasero
  */
-public class FatalErrorDialog extends TitleAreaDialog {
+public class FatalOutOfMemoryErrorDialog extends TitleAreaDialog {
   private LocalResourceManager fResources;
   private final IStatus fErrorStatus;
 
   /**
    * @param errorStatus
    */
-  public FatalErrorDialog(IStatus errorStatus) {
+  public FatalOutOfMemoryErrorDialog(IStatus errorStatus) {
     super(null);
     fErrorStatus = errorStatus;
     fResources = new LocalResourceManager(JFaceResources.getResources());
@@ -124,9 +112,9 @@ public class FatalErrorDialog extends TitleAreaDialog {
       @Override
       public void widgetSelected(SelectionEvent e) {
         if ("save".equals(e.text)) //$NON-NLS-1$
-          doSaveErrorLog();
+          OwlUI.saveCrashReport(getShell());
         else
-          doSendErrorLog();
+          BrowserUtils.sendErrorLog();
       }
     });
 
@@ -140,7 +128,7 @@ public class FatalErrorDialog extends TitleAreaDialog {
         if ("faq".equals(e.text)) //$NON-NLS-1$
           doOpenFAQ();
         else if ("forum".equals(e.text)) //$NON-NLS-1$
-          doOpenForum();
+          BrowserUtils.openHelpForum(fErrorStatus);
       }
     });
 
@@ -200,59 +188,11 @@ public class FatalErrorDialog extends TitleAreaDialog {
     getShell().setBounds(location.x, location.y, bestSize.x, bestSize.y);
   }
 
-  private void doSaveErrorLog() {
-    FileDialog dialog = new FileDialog(getShell(), SWT.SAVE);
-    dialog.setText(Messages.StartupErrorDialog_SAVE_CRASH_REPORT);
-    dialog.setFilterExtensions(new String[] { "*.log" }); //$NON-NLS-1$
-    dialog.setFileName("rssowl.log"); //$NON-NLS-1$
-    dialog.setOverwrite(true);
-
-    String file = dialog.open();
-    if (StringUtils.isSet(file)) {
-      try {
-
-        /* Check for Log Message from Core to have a complete log */
-        String logMessages = CoreUtils.getAndFlushLogMessages();
-        if (logMessages != null && logMessages.length() > 0)
-          Activator.safeLogError(logMessages, null);
-
-        /* Help to find out where the log is coming from */
-        Activator.safeLogInfo("Crash Report Exported"); //$NON-NLS-1$
-
-        /* Export Log File */
-        File logFile = Platform.getLogFileLocation().toFile();
-        InputStream inS;
-        if (logFile.exists())
-          inS = new FileInputStream(logFile);
-        else
-          inS = new ByteArrayInputStream(new byte[0]);
-        FileOutputStream outS = new FileOutputStream(new File(file));
-        CoreUtils.copy(inS, outS);
-      } catch (FileNotFoundException e) {
-        Activator.getDefault().logError(e.getMessage(), e);
-      }
-    }
-  }
-
-  private void doSendErrorLog() {
-    String address = "crash-report@rssowl.org"; //$NON-NLS-1$
-    String subject = NLS.bind("RSSOwl Crash Report ({0})", CoreUtils.getUserAgent()); //$NON-NLS-1$
-    String body = Messages.StartupErrorDialog_ATTACH_CRASH_REPORT;
-
-    BrowserUtils.sendMail(address, subject, body);
-  }
-
   private void doOpenFAQ() {
     if (fErrorStatus != null && fErrorStatus.getException() instanceof OutOfMemoryError)
-      Program.launch("http://www.rssowl.org/help#item_6c"); //$NON-NLS-1$
+      Program.launch("http://www.rssowl.org/help#item_6g"); //$NON-NLS-1$
     else
-      BrowserUtils.openLinkExternal("http://www.rssowl.org/help#item_6"); //$NON-NLS-1$
+      BrowserUtils.openLinkExternal("http://www.rssowl.org/help#item_6g"); //$NON-NLS-1$
   }
 
-  private void doOpenForum() {
-    if (fErrorStatus != null && fErrorStatus.getException() instanceof OutOfMemoryError)
-      Program.launch("http://sourceforge.net/projects/rssowl/forums/forum/296910"); //$NON-NLS-1$
-    else
-      BrowserUtils.openLinkExternal("http://sourceforge.net/projects/rssowl/forums/forum/296910"); //$NON-NLS-1$
-  }
 }
