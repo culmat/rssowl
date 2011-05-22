@@ -28,6 +28,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
   private static final String BUNDLE_NAME = "org.rssowl.ui.internal.util.messages"; //$NON-NLS-1$
+  public static String BrowserUtils_ATTACH_REPORT_ADVISE;
   public static String BrowserUtils_ERROR_LAUNCH_BROWSER;
   public static String BrowserUtils_ERROR_LAUNCH_BROWSER_MSG;
   public static String CBrowser_BACK;

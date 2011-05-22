@@ -24,6 +24,8 @@
 
 package org.rssowl.ui.internal.util;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.MessageBox;
@@ -35,6 +37,7 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.StreamGobbler;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
@@ -394,5 +397,30 @@ public class BrowserUtils {
     };
     launcher.setDaemon(true);
     launcher.start();
+  }
+
+  /**
+   * Opens the default mail application to send the error log after a crash
+   * occured.
+   */
+  public static void sendErrorLog() {
+    String address = "crash-report@rssowl.org"; //$NON-NLS-1$
+    String subject = NLS.bind("RSSOwl Crash Report ({0})", CoreUtils.getUserAgent()); //$NON-NLS-1$
+    String body = Messages.BrowserUtils_ATTACH_REPORT_ADVISE;
+
+    sendMail(address, subject, body);
+  }
+
+  /**
+   * Will open the RSSOwl help forum.
+   *
+   * @param errorStatus the {@link IStatus} from the error that lead to this
+   * action.
+   */
+  public static void openHelpForum(IStatus errorStatus) {
+    if (errorStatus != null && errorStatus.getException() instanceof OutOfMemoryError)
+      Program.launch("http://sourceforge.net/projects/rssowl/forums/forum/296910"); //$NON-NLS-1$
+    else
+      openLinkExternal("http://sourceforge.net/projects/rssowl/forums/forum/296910"); //$NON-NLS-1$
   }
 }
