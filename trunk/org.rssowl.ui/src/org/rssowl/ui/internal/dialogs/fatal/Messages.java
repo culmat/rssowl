@@ -32,6 +32,7 @@ public class Messages extends NLS {
   public static String ErrorInfoPage_ERROR_DETAILS;
   public static String ErrorInfoPage_GENERAL_ERROR_ADVISE;
   public static String ErrorInfoPage_NEXT_PAGE_ADVISE;
+  public static String ErrorInfoPage_OOM_ERROR;
   public static String ErrorInfoPage_RSSOWL_CRASH;
   public static String ErrorInfoPage_SEND_LOGS_ADVISE;
   public static String FatalErrorWizard_CRASH_REPORTER;
