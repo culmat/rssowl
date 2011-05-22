@@ -36,8 +36,11 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.rssowl.ui.internal.Application;
@@ -57,6 +60,7 @@ public class RestoreBackupPage extends WizardPage {
   private List<File> fBackups;
   private ComboViewer fBackupsViewer;
   private final DateFormat fDateFormat = OwlUI.getShortDateFormat();
+  private Button fConfirmRestoreCheck;
 
   RestoreBackupPage(String pageName, List<File> backups) {
     super(pageName, pageName, null);
@@ -77,56 +81,77 @@ public class RestoreBackupPage extends WizardPage {
     container.setLayout(LayoutUtils.createGridLayout(2, 5, 0));
     ((GridLayout) container.getLayout()).marginTop = 5;
 
-    /* Controls to Restore from a Backup */
-    Label backupInfo = new Label(container, SWT.WRAP);
-    if (Application.IS_WINDOWS)
-      backupInfo.setText(Messages.RestoreBackupPage_BACKUP_INFO_RESTART);
-    else
-      backupInfo.setText(Messages.RestoreBackupPage_BACKUP_INFO_QUIT);
-    backupInfo.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
-    ((GridData) backupInfo.getLayoutData()).widthHint = 200;
+    /* Restore Information */
+    {
+      Label backupInfoLabel = new Label(container, SWT.NONE);
+      backupInfoLabel.setText(Messages.RestoreBackupPage_RESTORING_A_BACKUP);
+      backupInfoLabel.setFont(OwlUI.getBold(JFaceResources.DIALOG_FONT));
+      backupInfoLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false, 2, 1));
 
-    Label pickBackupLabel = new Label(container, SWT.NONE);
-    pickBackupLabel.setText(Messages.RestoreBackupPage_CHOOSE_BACKUP);
-    pickBackupLabel.setFont(OwlUI.getBold(JFaceResources.DIALOG_FONT));
-    pickBackupLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
-    ((GridData) pickBackupLabel.getLayoutData()).verticalIndent = 10;
+      Label backupTextLabel = new Label(container, SWT.WRAP);
+      backupTextLabel.setText(Application.IS_WINDOWS ? Messages.RestoreBackupPage_BACKUP_INFO_RESTART : Messages.RestoreBackupPage_BACKUP_INFO_QUIT);
+      backupTextLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
+      ((GridData) backupTextLabel.getLayoutData()).widthHint = 200;
+    }
 
-    fBackupsViewer = new ComboViewer(container, SWT.BORDER | SWT.READ_ONLY);
-    fBackupsViewer.getControl().setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
-    ((GridData) fBackupsViewer.getControl().getLayoutData()).verticalIndent = 10;
-    fBackupsViewer.getCombo().setVisibleItemCount(fBackups.size());
-    fBackupsViewer.setContentProvider(new ArrayContentProvider());
-    fBackupsViewer.setLabelProvider(new LabelProvider() {
-      @Override
-      public String getText(Object element) {
-        File file = (File) element;
-        return NLS.bind(Messages.RestoreBackupPage_BACKUP_LABEL, fDateFormat.format(file.lastModified()), OwlUI.getSize((int) file.length()));
-      }
-    });
+    /* Restore Controls */
+    {
+      Label chooseBackupLabel = new Label(container, SWT.NONE);
+      chooseBackupLabel.setText(Messages.RestoreBackupPage_CHOOSE_BACKUP);
+      chooseBackupLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
+      ((GridData) chooseBackupLabel.getLayoutData()).verticalIndent = 5;
 
-    fBackupsViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-      public void selectionChanged(SelectionChangedEvent event) {
-        getContainer().updateButtons();
-      }
-    });
+      fBackupsViewer = new ComboViewer(container, SWT.BORDER | SWT.READ_ONLY);
+      fBackupsViewer.getControl().setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
+      ((GridData) fBackupsViewer.getControl().getLayoutData()).verticalIndent = 5;
+      fBackupsViewer.getCombo().setVisibleItemCount(fBackups.size());
+      fBackupsViewer.setContentProvider(new ArrayContentProvider());
+      fBackupsViewer.setLabelProvider(new LabelProvider() {
+        @Override
+        public String getText(Object element) {
+          File file = (File) element;
+          return NLS.bind(Messages.RestoreBackupPage_BACKUP_LABEL, fDateFormat.format(file.lastModified()), OwlUI.getSize((int) file.length()));
+        }
+      });
 
-    fBackupsViewer.setInput(fBackups);
+      fBackupsViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+        public void selectionChanged(SelectionChangedEvent event) {
+          getContainer().updateButtons();
+        }
+      });
 
-    Composite adviseContainer = new Composite(container, SWT.None);
-    adviseContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
-    adviseContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
-    ((GridData) adviseContainer.getLayoutData()).verticalIndent = 10;
+      fBackupsViewer.setInput(fBackups);
+    }
 
-    Label adviseLabel = new Label(adviseContainer, SWT.NONE);
-    adviseLabel.setText(Messages.RestoreBackupPage_WARNING);
-    adviseLabel.setFont(OwlUI.getBold(JFaceResources.DIALOG_FONT));
-    adviseLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
+    /* Restore Advise */
+    {
+      Composite adviseContainer = new Composite(container, SWT.None);
+      adviseContainer.setLayout(LayoutUtils.createGridLayout(1, 0, 0));
+      adviseContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
+      ((GridData) adviseContainer.getLayoutData()).verticalIndent = 5;
 
-    Label adviseTextLabel = new Label(adviseContainer, SWT.WRAP);
-    adviseTextLabel.setText(Messages.RestoreBackupPage_RESTORE_WARNING);
-    adviseTextLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-    ((GridData) adviseTextLabel.getLayoutData()).widthHint = 200;
+      Label adviseLabel = new Label(adviseContainer, SWT.NONE);
+      adviseLabel.setText(Messages.RestoreBackupPage_CAUTION);
+      adviseLabel.setFont(OwlUI.getBold(JFaceResources.DIALOG_FONT));
+      adviseLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
+
+      Label adviseTextLabel = new Label(adviseContainer, SWT.WRAP);
+      adviseTextLabel.setText(Messages.RestoreBackupPage_RESTORE_WARNING);
+      adviseTextLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+      ((GridData) adviseTextLabel.getLayoutData()).widthHint = 200;
+
+      fConfirmRestoreCheck = new Button(adviseContainer, SWT.CHECK);
+      fConfirmRestoreCheck.setText(Messages.RestoreBackupPage_CONFIRM_RESTORE);
+      fConfirmRestoreCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+      ((GridData) fConfirmRestoreCheck.getLayoutData()).verticalIndent = 5;
+      ((GridData) fConfirmRestoreCheck.getLayoutData()).horizontalIndent = 5;
+      fConfirmRestoreCheck.addSelectionListener(new SelectionAdapter() {
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+          getContainer().updateButtons();
+        }
+      });
+    }
 
     Dialog.applyDialogFont(container);
 
@@ -138,19 +163,8 @@ public class RestoreBackupPage extends WizardPage {
    */
   @Override
   public boolean isPageComplete() {
-    return !fBackupsViewer.getSelection().isEmpty();
+    return fConfirmRestoreCheck.getSelection() && !fBackupsViewer.getSelection().isEmpty();
   }
-
-  /*
-   * @see org.eclipse.jface.dialogs.DialogPage#setVisible(boolean)
-   */
-  @Override
-  public void setVisible(boolean visible) {
-    super.setVisible(visible);
-
-    if (visible)
-      fBackupsViewer.getCombo().setFocus();
-  };
 
   File getSelectedBackup() {
     IStructuredSelection selection = (IStructuredSelection) fBackupsViewer.getSelection();
