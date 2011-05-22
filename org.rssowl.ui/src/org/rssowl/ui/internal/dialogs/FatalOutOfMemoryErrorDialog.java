@@ -35,7 +35,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -126,7 +125,7 @@ public class FatalOutOfMemoryErrorDialog extends TitleAreaDialog {
       @Override
       public void widgetSelected(SelectionEvent e) {
         if ("faq".equals(e.text)) //$NON-NLS-1$
-          doOpenFAQ();
+          BrowserUtils.openFAQ(fErrorStatus);
         else if ("forum".equals(e.text)) //$NON-NLS-1$
           BrowserUtils.openHelpForum(fErrorStatus);
       }
@@ -187,12 +186,4 @@ public class FatalOutOfMemoryErrorDialog extends TitleAreaDialog {
     Point location = getInitialLocation(bestSize);
     getShell().setBounds(location.x, location.y, bestSize.x, bestSize.y);
   }
-
-  private void doOpenFAQ() {
-    if (fErrorStatus != null && fErrorStatus.getException() instanceof OutOfMemoryError)
-      Program.launch("http://www.rssowl.org/help#item_6g"); //$NON-NLS-1$
-    else
-      BrowserUtils.openLinkExternal("http://www.rssowl.org/help#item_6g"); //$NON-NLS-1$
-  }
-
 }
