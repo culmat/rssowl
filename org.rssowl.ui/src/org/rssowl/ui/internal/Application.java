@@ -28,7 +28,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
-import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
@@ -46,8 +45,7 @@ import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.actions.NewBookMarkAction;
-import org.rssowl.ui.internal.dialogs.FatalErrorDialog;
-import org.rssowl.ui.internal.util.BrowserUtils;
+import org.rssowl.ui.internal.dialogs.fatal.FatalErrorWizard;
 import org.rssowl.ui.internal.util.JobRunner;
 
 import java.net.URI;
@@ -104,9 +102,11 @@ public class Application implements IApplication {
       };
 
       /* Check Startup Status */
-      IStatus startupStatus = Activator.getDefault().getStartupStatus();
+      Activator activator = Activator.getDefault();
+      IStatus startupStatus = activator.getStartupStatus();
+      boolean isOOMError = activator.isStartupOOMError();
       if (startupStatus.getSeverity() == IStatus.ERROR)
-        return handleStartupError(startupStatus);
+        return handleStartupError(startupStatus, isOOMError);
 
       /* Create the Workbench */
       fWorkbenchAdvisor = new ApplicationWorkbenchAdvisor(runAfterUIStartup);
@@ -120,12 +120,11 @@ public class Application implements IApplication {
     }
   }
 
-  private int handleStartupError(IStatus errorStatus) {
-    FatalErrorDialog dialog = new FatalErrorDialog(errorStatus);
-    if (dialog.open() == IDialogConstants.HELP_ID)
-      BrowserUtils.openLinkExternal("http://www.rssowl.org/help#item_6"); //$NON-NLS-1$;
+  private int handleStartupError(IStatus errorStatus, boolean isOOMError) {
+    FatalErrorWizard wizard = new FatalErrorWizard(errorStatus, !isOOMError);
+    OwlUI.openWizard(null, wizard, true, false, null, IS_WINDOWS ? Messages.Application_RESTART_RSSOWL : Messages.Application_QUIT_RSSOWL);
 
-    return IApplication.EXIT_OK;
+    return wizard.getReturnCode();
   }
 
   private boolean hasProtocolHandler(String link) {

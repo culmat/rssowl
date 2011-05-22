@@ -29,6 +29,8 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
   private static final String BUNDLE_NAME = "org.rssowl.ui.internal.messages"; //$NON-NLS-1$
   public static String Activator_ERROR_STARTUP;
+  public static String Application_QUIT_RSSOWL;
+  public static String Application_RESTART_RSSOWL;
   public static String ApplicationActionBarAdvisor_ABOUT_RSSOWL;
   public static String ApplicationActionBarAdvisor_ALL_ARTICLES;
   public static String ApplicationActionBarAdvisor_ASCENDING;
