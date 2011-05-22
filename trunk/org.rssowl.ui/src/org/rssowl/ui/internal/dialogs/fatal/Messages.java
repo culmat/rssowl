@@ -37,6 +37,8 @@ public class Messages extends NLS {
   public static String ErrorInfoPage_SEND_LOGS_ADVISE;
   public static String FatalErrorWizard_CRASH_REPORTER;
   public static String FatalErrorWizard_RESTORE_BACKUP;
+  public static String FatalErrorWizard_RESTORE_ERROR;
+  public static String FatalErrorWizard_RESTORE_ERROR_N;
   public static String FatalErrorWizard_WE_ARE_SORRY;
 
   public static String RestoreBackupPage_BACKUP_INFO_QUIT;
