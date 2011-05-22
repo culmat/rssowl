@@ -30,17 +30,21 @@ public class Messages extends NLS {
   private static final String BUNDLE_NAME = "org.rssowl.ui.internal.dialogs.fatal.messages"; //$NON-NLS-1$
   public static String ErrorInfoPage_COPY;
   public static String ErrorInfoPage_ERROR_DETAILS;
+  public static String ErrorInfoPage_FURTHER_STEPS;
   public static String ErrorInfoPage_GENERAL_ERROR_ADVISE;
+  public static String ErrorInfoPage_LET_US_KNOW;
   public static String ErrorInfoPage_NEXT_PAGE_ADVISE;
   public static String ErrorInfoPage_OOM_ERROR;
+  public static String ErrorInfoPage_OOM_ERROR_N;
   public static String ErrorInfoPage_RSSOWL_CRASH;
   public static String ErrorInfoPage_SEND_LOGS_ADVISE;
+  public static String ErrorInfoPage_STARTUP_ERROR;
+  public static String ErrorInfoPage_STARTUP_ERROR_N;
   public static String FatalErrorWizard_CRASH_REPORTER;
   public static String FatalErrorWizard_RESTORE_BACKUP;
   public static String FatalErrorWizard_RESTORE_ERROR;
   public static String FatalErrorWizard_RESTORE_ERROR_N;
   public static String FatalErrorWizard_WE_ARE_SORRY;
-
   public static String RestoreBackupPage_BACKUP_INFO_QUIT;
   public static String RestoreBackupPage_BACKUP_INFO_RESTART;
   public static String RestoreBackupPage_BACKUP_LABEL;
