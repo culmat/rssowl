@@ -73,7 +73,6 @@ public class Activator extends AbstractUIPlugin {
 
   private Thread fShutdownHook;
   private IStatus fStartupStatus = Status.OK_STATUS;
-  private boolean fStartupOOMError = false;
   private String fVersion;
   private String fNl;
 
@@ -245,8 +244,7 @@ public class Activator extends AbstractUIPlugin {
 
         /* Handle OOM Error */
         catch (OutOfMemoryError e) {
-          fStartupOOMError = true;
-          Activator.this.fStartupStatus = createErrorStatus(e.getMessage());
+          Activator.this.fStartupStatus = createErrorStatus(e.getMessage(), e);
           Activator.getDefault().getLog().log(Activator.this.fStartupStatus);
         }
 
@@ -270,10 +268,6 @@ public class Activator extends AbstractUIPlugin {
 
   IStatus getStartupStatus() {
     return fStartupStatus;
-  }
-
-  boolean isStartupOOMError() {
-    return fStartupOOMError;
   }
 
   /* Start the Application Server */
@@ -478,7 +472,7 @@ public class Activator extends AbstractUIPlugin {
    * @param e The Exception that occured.
    * @return An IStatus out of the given message and exception.
    */
-  public IStatus createErrorStatus(String msg, Exception e) {
+  public IStatus createErrorStatus(String msg, Throwable e) {
     return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), IStatus.ERROR, msg, e);
   }
 

@@ -104,9 +104,8 @@ public class Application implements IApplication {
       /* Check Startup Status */
       Activator activator = Activator.getDefault();
       IStatus startupStatus = activator.getStartupStatus();
-      boolean isOOMError = activator.isStartupOOMError();
       if (startupStatus.getSeverity() == IStatus.ERROR)
-        return handleStartupError(startupStatus, isOOMError);
+        return handleStartupError(startupStatus);
 
       /* Create the Workbench */
       fWorkbenchAdvisor = new ApplicationWorkbenchAdvisor(runAfterUIStartup);
@@ -120,8 +119,8 @@ public class Application implements IApplication {
     }
   }
 
-  private int handleStartupError(IStatus errorStatus, boolean isOOMError) {
-    FatalErrorWizard wizard = new FatalErrorWizard(errorStatus, !isOOMError);
+  private int handleStartupError(IStatus errorStatus) {
+    FatalErrorWizard wizard = new FatalErrorWizard(errorStatus);
     OwlUI.openWizard(null, wizard, true, false, null, IS_WINDOWS ? Messages.Application_RESTART_RSSOWL : Messages.Application_QUIT_RSSOWL);
 
     return wizard.getReturnCode();
