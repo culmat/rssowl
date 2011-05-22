@@ -71,6 +71,8 @@ public class Messages extends NLS {
   public static String CustomizeToolbarDialog_TEXT;
   public static String CustomizeToolbarDialog_USE_MOUSE_INFO;
   public static String CustomizeToolbarDialog_VISIBLE_ITEMS;
+  public static String FatalOutOfMemoryErrorDialog_OOM_ERROR;
+  public static String FatalOutOfMemoryErrorDialog_OOM_ERROR_N;
   public static String FolderWizard_ENTER_NAME;
   public static String FolderWizard_FOLDER;
   public static String FolderWizard_FOLDER_WIZ_TITLE;

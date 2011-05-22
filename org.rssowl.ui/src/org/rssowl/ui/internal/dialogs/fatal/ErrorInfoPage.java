@@ -30,6 +30,7 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
@@ -100,7 +101,10 @@ public class ErrorInfoPage extends WizardPage {
       ((GridData) reasonLabel.getLayoutData()).verticalIndent = 10;
 
       Label errorDetailsLabel = new Label(container, SWT.WRAP);
-      errorDetailsLabel.setText(fErrorStatus.getMessage());
+      if (fErrorStatus.getException() instanceof OutOfMemoryError)
+        errorDetailsLabel.setText(NLS.bind(Messages.ErrorInfoPage_OOM_ERROR, fErrorStatus.getMessage()));
+      else
+        errorDetailsLabel.setText(fErrorStatus.getMessage());
       errorDetailsLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
       ((GridData) errorDetailsLabel.getLayoutData()).widthHint = 200;
       ((GridData) errorDetailsLabel.getLayoutData()).verticalIndent = 10;

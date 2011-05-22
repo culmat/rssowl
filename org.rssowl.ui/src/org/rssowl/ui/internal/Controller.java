@@ -1660,9 +1660,9 @@ public class Controller {
    * Start a Workbench emergency shutdown due to an unrecoverable Out of Memory
    * error.
    *
-   * @param error the {@link Error} that causes an emergent shutdown.
+   * @param error the {@link OutOfMemoryError} that causes an emergent shutdown.
    */
-  public void emergencyOutOfMemoryShutdown(final Error error) {
+  public void emergencyOutOfMemoryShutdown(final OutOfMemoryError error) {
 
     /* Flag shutdown sequence about to start to reduce Job load */
     fShuttingDown = true;

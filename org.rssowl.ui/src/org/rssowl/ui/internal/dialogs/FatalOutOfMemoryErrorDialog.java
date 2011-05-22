@@ -30,6 +30,7 @@ import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -132,16 +133,17 @@ public class FatalOutOfMemoryErrorDialog extends TitleAreaDialog {
     });
 
     /* Error Details Label */
-    if (fErrorStatus != null && StringUtils.isSet(fErrorStatus.getMessage())) {
-      Label reasonLabel = new Label(composite, SWT.NONE);
-      reasonLabel.setText(Messages.StartupErrorDialog_ERROR_DETAILS);
-      reasonLabel.setFont(OwlUI.getBold(JFaceResources.DIALOG_FONT));
-      reasonLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
+    Label reasonLabel = new Label(composite, SWT.NONE);
+    reasonLabel.setText(Messages.StartupErrorDialog_ERROR_DETAILS);
+    reasonLabel.setFont(OwlUI.getBold(JFaceResources.DIALOG_FONT));
+    reasonLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
 
-      Label errorDetailsLabel = new Label(composite, SWT.WRAP);
-      errorDetailsLabel.setText(fErrorStatus.getMessage());
-      errorDetailsLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-    }
+    Label errorDetailsLabel = new Label(composite, SWT.WRAP);
+    if (StringUtils.isSet(fErrorStatus.getMessage()))
+      errorDetailsLabel.setText(NLS.bind(Messages.FatalOutOfMemoryErrorDialog_OOM_ERROR_N, fErrorStatus.getMessage()));
+    else
+      errorDetailsLabel.setText(Messages.FatalOutOfMemoryErrorDialog_OOM_ERROR);
+    errorDetailsLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     /* Holder for the separator to the OK and Cancel buttons */
     Composite sepHolder = new Composite(parent, SWT.NONE);
