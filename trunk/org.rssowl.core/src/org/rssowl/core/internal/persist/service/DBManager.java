@@ -110,6 +110,7 @@ public class DBManager {
   private static final int MAX_ONLINE_BACKUPS_COUNT = 1; //Will keep 1 Current + 1 Weekly
   private static final int MAX_ONLINE_BACKUP_AGE = 1000 * 60 * 60 * 24 * 7; //7 Days
   private static final String TMP_BACKUP_NAME = "tmp.bak"; //$NON-NLS-1$
+  private static final String RESTORE_BACKUP_NAME = ".restorebak"; //$NON-NLS-1$
   private static final String ONLINE_BACKUP_NAME = ".onlinebak"; //$NON-NLS-1$
   private static final String OFFLINE_BACKUP_NAME = ".backup"; //$NON-NLS-1$
   private static final int ONLINE_BACKUP_INITIAL = 1000 * 60 * 30; //30 Minutes
@@ -1304,7 +1305,21 @@ public class DBManager {
     if (fObjectContainer != null)
       while (!fObjectContainer.close());
 
+    /* Backup the current DB before restoring it */
+    File db = new File(getDBFilePath());
+    if (db.exists()) {
+      int i = 0;
+      File backupDir = new File(Activator.getDefault().getStateLocation().toOSString());
+      File restoreBackup = new File(backupDir, DB_NAME + RESTORE_BACKUP_NAME);
+      while (restoreBackup.exists()) {
+        restoreBackup = new File(backupDir, DB_NAME + RESTORE_BACKUP_NAME + "." + i++); //$NON-NLS-1$
+      }
+
+      /* Atomic Rename */
+      DBHelper.rename(db, restoreBackup);
+    }
+
     /* Atomic Rename */
-    DBHelper.rename(backup, new File(getDBFilePath()));
+    DBHelper.rename(backup, db);
   }
 }
