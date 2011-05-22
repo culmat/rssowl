@@ -2174,7 +2174,6 @@ public class OwlUI {
 
         return super.createButton(parent, id, label, defaultButton);
       }
-
     };
     dialog.setMinimumPageSize(0, 0);
     dialog.create();
