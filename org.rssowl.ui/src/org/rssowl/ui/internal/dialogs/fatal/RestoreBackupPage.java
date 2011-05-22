@@ -37,7 +37,6 @@ import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.rssowl.ui.internal.Application;
@@ -94,7 +93,7 @@ public class RestoreBackupPage extends WizardPage {
     fBackupsViewer = new ComboViewer(container, SWT.BORDER | SWT.READ_ONLY);
     fBackupsViewer.getControl().setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
     ((GridData) fBackupsViewer.getControl().getLayoutData()).verticalIndent = 10;
-    ((Combo) fBackupsViewer.getControl()).setVisibleItemCount(fBackups.size());
+    fBackupsViewer.getCombo().setVisibleItemCount(fBackups.size());
     fBackupsViewer.setContentProvider(new ArrayContentProvider());
     fBackupsViewer.setLabelProvider(new LabelProvider() {
       @Override
