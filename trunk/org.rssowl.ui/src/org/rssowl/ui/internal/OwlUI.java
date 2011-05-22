@@ -33,6 +33,7 @@ import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.bindings.keys.KeyStroke;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
 import org.eclipse.jface.fieldassist.ControlDecoration;
@@ -2097,6 +2098,20 @@ public class OwlUI {
    * @param dialogSettingsKey the key to use to store dialog settings.
    */
   public static void openWizard(Shell shell, Wizard wizard, final boolean modal, final boolean needsProgressPart, final String dialogSettingsKey) {
+    openWizard(shell, wizard, modal, needsProgressPart, dialogSettingsKey, null);
+  }
+
+  /**
+   * @param shell the {@link Shell} as parent of the {@link WizardDialog}.
+   * @param wizard the {@link Wizard} to use in the {@link WizardDialog}.
+   * @param modal if <code>false</code>, the wizard will not be a modal dialog.
+   * @param needsProgressPart <code>true</code> to leave some room for the
+   * {@link ProgressMonitorPart} and <code>false</code> otherwise.
+   * @param dialogSettingsKey the key to use to store dialog settings.
+   * @param finishLabel the label for the finish button or <code>null</code> to
+   * use the default.
+   */
+  public static void openWizard(Shell shell, Wizard wizard, final boolean modal, final boolean needsProgressPart, final String dialogSettingsKey, final String finishLabel) {
     CustomWizardDialog dialog = new CustomWizardDialog(shell, wizard) {
       private ProgressMonitorPart progressMonitorPart;
 
@@ -2151,6 +2166,15 @@ public class OwlUI {
       protected int getDialogBoundsStrategy() {
         return DIALOG_PERSISTSIZE;
       }
+
+      @Override
+      protected Button createButton(Composite parent, int id, String label, boolean defaultButton) {
+        if (IDialogConstants.FINISH_ID == id && StringUtils.isSet(finishLabel))
+          label = finishLabel;
+
+        return super.createButton(parent, id, label, defaultButton);
+      }
+
     };
     dialog.setMinimumPageSize(0, 0);
     dialog.create();
