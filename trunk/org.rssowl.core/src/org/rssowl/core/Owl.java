@@ -42,7 +42,11 @@ import org.rssowl.core.persist.pref.IPreferencesInitializer;
 import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.persist.service.IPersistenceService;
 import org.rssowl.core.persist.service.IPreferenceService;
+import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.LongOperationMonitor;
+
+import java.io.File;
+import java.util.List;
 
 /**
  * The <code>Owl</code> class is the main facade to all API in RSSOwl. It offers
@@ -204,10 +208,36 @@ public final class Owl {
   }
 
   /**
-   * @return <code>true</code> if {@link Owl#shutdown(boolean)} has
-   * been called already and <code>false</code> otherwise.
+   * @return <code>true</code> if {@link Owl#shutdown(boolean)} has been called
+   * already and <code>false</code> otherwise.
    */
   public static boolean isShuttingDown() {
     return InternalOwl.getDefault().isShuttingDown();
+  }
+
+  /**
+   * Provides a list of available backups for the user to restore from in case
+   * of an unrecoverable error. This method will work even in those cases where
+   * RSSOwl has not properly started up.
+   *
+   * @return a list of available backups for the user to restore from in case of
+   * an unrecoverable error.
+   */
+  public static List<File> getBackups() {
+    return InternalOwl.getDefault().getPersistenceService().getBackups();
+  }
+
+  /**
+   * Will rename the provided backup file to the operational RSSOwl profile
+   * database and trigger search reindexing after next start. This method will
+   * work even in those cases where RSSOwl has not properly started up.
+   *
+   * @param backup the backup {@link File} to restore from.
+   * @throws PersistenceException in case a problem occurs while trying to
+   * execute this operation.
+   */
+  public static void restore(File backup) throws PersistenceException {
+    InternalOwl.getDefault().getPersistenceService().restore(backup);
+    InternalOwl.getDefault().getPersistenceService().getModelSearch().reIndexOnNextStartup();
   }
 }

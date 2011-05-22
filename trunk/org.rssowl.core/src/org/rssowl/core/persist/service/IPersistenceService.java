@@ -29,6 +29,9 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IEntityDAO;
 import org.rssowl.core.util.LongOperationMonitor;
 
+import java.io.File;
+import java.util.List;
+
 /**
  * Provides access to ther persistence layer of RSSOwl. This layer is
  * contributable via the PersistenceService extension point provided by this
@@ -131,4 +134,23 @@ public interface IPersistenceService {
    * schedule this operation.
    */
   void optimizeOnNextStartup() throws PersistenceException;
+
+  /**
+   * Provides a list of available backups for the user to restore from in case
+   * of an unrecoverable error.
+   *
+   * @return a list of available backups for the user to restore from in case of
+   * an unrecoverable error.
+   */
+  List<File> getBackups();
+
+  /**
+   * Will rename the provided backup file to the operational RSSOwl profile
+   * database.
+   *
+   * @param backup the backup {@link File} to restore from.
+   * @throws PersistenceException in case a problem occurs while trying to
+   * execute this operation.
+   */
+  void restore(File backup) throws PersistenceException;
 }

@@ -78,6 +78,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
@@ -92,6 +94,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 public class DBManager {
   private static final String FORMAT_FILE_NAME = "format2"; //$NON-NLS-1$
+  private static final String DB_NAME = "rssowl.db"; //$NON-NLS-1$
   private static DBManager fInstance;
 
   /* Some constants used when defragmenting to a larger block size */
@@ -368,7 +371,7 @@ public class DBManager {
    * @return the path to the db file.
    */
   public static final String getDBFilePath() {
-    String filePath = Activator.getDefault().getStateLocation().toOSString() + File.separator + "rssowl.db"; //$NON-NLS-1$
+    String filePath = Activator.getDefault().getStateLocation().toOSString() + File.separator + DB_NAME;
     return filePath;
   }
 
@@ -1258,5 +1261,50 @@ public class DBManager {
 
   public final ObjectContainer getObjectContainer() {
     return fObjectContainer;
+  }
+
+  List<File> getBackups() {
+    List<File> backups = new ArrayList<File>();
+    File backupDir = new File(Activator.getDefault().getStateLocation().toOSString());
+
+    /* Locate Online Backups */
+    File onlineWeeklyBackup = new File(backupDir, DB_NAME + ONLINE_BACKUP_NAME + ".weekly"); //$NON-NLS-1$
+    if (onlineWeeklyBackup.exists())
+      backups.add(onlineWeeklyBackup);
+
+    File onlineDailyBackup = new File(backupDir, DB_NAME + ONLINE_BACKUP_NAME);
+    if (onlineDailyBackup.exists())
+      backups.add(onlineDailyBackup);
+
+    File onlineDailyBackupOlder = new File(backupDir, DB_NAME + ONLINE_BACKUP_NAME + ".0"); //$NON-NLS-1$
+    if (onlineDailyBackupOlder.exists())
+      backups.add(onlineDailyBackupOlder);
+
+    /* Locate Offline Backups */
+    File offlineBackup = new File(backupDir, DB_NAME + OFFLINE_BACKUP_NAME);
+    if (offlineBackup.exists())
+      backups.add(offlineBackup);
+
+    File offlineBackupOlder = new File(backupDir, DB_NAME + OFFLINE_BACKUP_NAME + ".0"); //$NON-NLS-1$
+    if (offlineBackupOlder.exists())
+      backups.add(offlineBackupOlder);
+
+    Collections.sort(backups, new Comparator<File>() {
+      public int compare(File f1, File f2) {
+        return f1.lastModified() > f2.lastModified() ? -1 : 1;
+      };
+    });
+
+    return backups;
+  }
+
+  void restore(File backup) throws PersistenceException {
+
+    /* Object Container might be opened, so try to close */
+    if (fObjectContainer != null)
+      while (!fObjectContainer.close());
+
+    /* Atomic Rename */
+    DBHelper.rename(backup, new File(getDBFilePath()));
   }
 }
