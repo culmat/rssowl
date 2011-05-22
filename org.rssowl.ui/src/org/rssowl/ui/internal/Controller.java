@@ -96,7 +96,7 @@ import org.rssowl.core.util.Triple;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.OwlUI.Layout;
 import org.rssowl.ui.internal.actions.FindUpdatesAction;
-import org.rssowl.ui.internal.dialogs.FatalErrorDialog;
+import org.rssowl.ui.internal.dialogs.FatalOutOfMemoryErrorDialog;
 import org.rssowl.ui.internal.dialogs.LoginDialog;
 import org.rssowl.ui.internal.dialogs.properties.EntityPropertyPageWrapper;
 import org.rssowl.ui.internal.dialogs.welcome.TutorialWizard;
@@ -1681,7 +1681,7 @@ public class Controller {
 
           /* Inform the User */
           IStatus errorStatus = new Status(IStatus.ERROR, "org.rssowl.ui", IStatus.ERROR, error.getMessage(), error); //$NON-NLS-1$
-          FatalErrorDialog dialog = new FatalErrorDialog(errorStatus);
+          FatalOutOfMemoryErrorDialog dialog = new FatalOutOfMemoryErrorDialog(errorStatus);
           if (dialog.open() == IDialogConstants.HELP_ID)
             Program.launch("http://www.rssowl.org/help#item_6g"); //$NON-NLS-1$;
         }
