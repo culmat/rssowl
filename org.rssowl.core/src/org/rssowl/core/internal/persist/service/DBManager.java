@@ -1302,6 +1302,7 @@ public class DBManager {
   }
 
   void restore(File backup) throws PersistenceException {
+    Activator.safeLogInfo(NLS.bind("Start: Database Restore from Backup ({0})", backup.getName())); //$NON-NLS-1$
 
     /* Object Container might be opened, so try to close */
     if (fObjectContainer != null)
@@ -1323,5 +1324,7 @@ public class DBManager {
 
     /* Atomic Rename */
     DBHelper.rename(backup, db);
+
+    Activator.safeLogInfo("End: Database Restore from Backup"); //$NON-NLS-1$
   }
 }
