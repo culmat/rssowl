@@ -73,7 +73,7 @@ public class RestoreBackupPage extends WizardPage {
 
     /* Container */
     Composite container = new Composite(parent, SWT.NONE);
-    container.setLayout(LayoutUtils.createGridLayout(2, 0, 0, 10, 5, false));
+    container.setLayout(LayoutUtils.createGridLayout(2, 5, 5));
 
     /* Controls to Restore from a Backup */
     Label backupInfo = new Label(container, SWT.WRAP);

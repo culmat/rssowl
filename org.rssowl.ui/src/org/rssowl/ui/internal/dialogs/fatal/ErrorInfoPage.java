@@ -76,71 +76,91 @@ public class ErrorInfoPage extends WizardPage {
 
     /* Container */
     Composite container = new Composite(parent, SWT.NONE);
-    container.setLayout(LayoutUtils.createGridLayout(2, 0, 0, 10, 5, false));
+    container.setLayout(LayoutUtils.createGridLayout(1, 5, 5));
 
-    /* Crash Report Label */
-    Link dialogMessageLabel = new Link(container, SWT.WRAP);
-    dialogMessageLabel.setText(Messages.ErrorInfoPage_SEND_LOGS_ADVISE);
-    dialogMessageLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
-    dialogMessageLabel.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        if ("save".equals(e.text)) //$NON-NLS-1$
-          OwlUI.saveCrashReport(getShell());
-        else
-          BrowserUtils.sendErrorLog();
-      }
-    });
-
-    /* Error Details Label */
-    if (fErrorStatus != null && StringUtils.isSet(fErrorStatus.getMessage())) {
-      Label reasonLabel = new Label(container, SWT.NONE);
-      reasonLabel.setText(Messages.ErrorInfoPage_ERROR_DETAILS);
-      reasonLabel.setFont(OwlUI.getBold(JFaceResources.DIALOG_FONT));
-      reasonLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
-      ((GridData) reasonLabel.getLayoutData()).verticalIndent = 10;
-
-      Label errorDetailsLabel = new Label(container, SWT.WRAP);
-      if (fErrorStatus.getException() instanceof OutOfMemoryError)
-        errorDetailsLabel.setText(NLS.bind(Messages.ErrorInfoPage_OOM_ERROR, fErrorStatus.getMessage()));
-      else
-        errorDetailsLabel.setText(fErrorStatus.getMessage());
+    /* Error Details */
+    {
+      Label errorDetailsLabel = new Label(container, SWT.NONE);
+      errorDetailsLabel.setText(Messages.ErrorInfoPage_ERROR_DETAILS);
+      errorDetailsLabel.setFont(OwlUI.getBold(JFaceResources.DIALOG_FONT));
       errorDetailsLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-      ((GridData) errorDetailsLabel.getLayoutData()).widthHint = 200;
-      ((GridData) errorDetailsLabel.getLayoutData()).verticalIndent = 10;
 
-      fCopyMenu = new Menu(errorDetailsLabel.getShell(), SWT.POP_UP);
+      String msg = null;
+      if (fErrorStatus.getException() instanceof OutOfMemoryError) {
+        if (StringUtils.isSet(fErrorStatus.getMessage()))
+          msg = NLS.bind(Messages.ErrorInfoPage_OOM_ERROR_N, fErrorStatus.getMessage());
+        else
+          msg = Messages.ErrorInfoPage_OOM_ERROR;
+      } else {
+        if (StringUtils.isSet(fErrorStatus.getMessage()))
+          msg = NLS.bind(Messages.ErrorInfoPage_STARTUP_ERROR_N, fErrorStatus.getMessage());
+        else
+          msg = Messages.ErrorInfoPage_STARTUP_ERROR;
+      }
+
+      final Label errorDetailsTextLabel = new Label(container, SWT.WRAP);
+      errorDetailsTextLabel.setText(msg);
+      errorDetailsTextLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+      ((GridData) errorDetailsTextLabel.getLayoutData()).widthHint = 200;
+
+      /* Context Menu to copy the error message */
+      fCopyMenu = new Menu(errorDetailsTextLabel.getShell(), SWT.POP_UP);
       MenuItem copyItem = new MenuItem(fCopyMenu, SWT.PUSH);
       copyItem.setText(Messages.ErrorInfoPage_COPY);
       copyItem.addSelectionListener(new SelectionAdapter() {
         @Override
         public void widgetSelected(SelectionEvent e) {
-          OwlUI.getClipboard(fCopyMenu.getDisplay()).setContents(new Object[] { fErrorStatus.getMessage() }, new Transfer[] { TextTransfer.getInstance() });
+          OwlUI.getClipboard(fCopyMenu.getDisplay()).setContents(new Object[] { errorDetailsTextLabel.getText() }, new Transfer[] { TextTransfer.getInstance() });
         }
       });
-      errorDetailsLabel.setMenu(fCopyMenu);
+      errorDetailsTextLabel.setMenu(fCopyMenu);
     }
 
-    /* Recovery Label */
-    Link moreInfoLabel = new Link(container, SWT.WRAP);
-    if (fHasBackups)
-      moreInfoLabel.setText(Messages.ErrorInfoPage_NEXT_PAGE_ADVISE);
-    else
-      moreInfoLabel.setText(Messages.ErrorInfoPage_GENERAL_ERROR_ADVISE);
-    moreInfoLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
-    ((GridData) moreInfoLabel.getLayoutData()).widthHint = 200;
-    if (fErrorStatus != null && StringUtils.isSet(fErrorStatus.getMessage()))
-      ((GridData) moreInfoLabel.getLayoutData()).verticalIndent = 10;
+    /* Report Crash */
+    {
+      Label crashReportLabel = new Label(container, SWT.NONE);
+      crashReportLabel.setText(Messages.ErrorInfoPage_LET_US_KNOW);
+      crashReportLabel.setFont(OwlUI.getBold(JFaceResources.DIALOG_FONT));
+      crashReportLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+      ((GridData) crashReportLabel.getLayoutData()).verticalIndent = 10;
 
-    moreInfoLabel.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        if ("faq".equals(e.text)) //$NON-NLS-1$
-          BrowserUtils.openFAQ(fErrorStatus);
-        else if ("forum".equals(e.text)) //$NON-NLS-1$
-          BrowserUtils.openHelpForum(fErrorStatus);
-      }
-    });
+      Link crashReportTextLabel = new Link(container, SWT.WRAP);
+      crashReportTextLabel.setText(Messages.ErrorInfoPage_SEND_LOGS_ADVISE);
+      crashReportTextLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+      crashReportTextLabel.addSelectionListener(new SelectionAdapter() {
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+          if ("save".equals(e.text)) //$NON-NLS-1$
+            OwlUI.saveCrashReport(getShell());
+          else
+            BrowserUtils.sendErrorLog();
+        }
+      });
+    }
+
+    /* Further Steps */
+    {
+      Label furtherStepsLabel = new Label(container, SWT.NONE);
+      furtherStepsLabel.setText(Messages.ErrorInfoPage_FURTHER_STEPS);
+      furtherStepsLabel.setFont(OwlUI.getBold(JFaceResources.DIALOG_FONT));
+      furtherStepsLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+      ((GridData) furtherStepsLabel.getLayoutData()).verticalIndent = 10;
+
+      Link moreInfoLabel = new Link(container, SWT.WRAP);
+      moreInfoLabel.setText(fHasBackups ? Messages.ErrorInfoPage_NEXT_PAGE_ADVISE : Messages.ErrorInfoPage_GENERAL_ERROR_ADVISE);
+      moreInfoLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+      ((GridData) moreInfoLabel.getLayoutData()).widthHint = 200;
+
+      moreInfoLabel.addSelectionListener(new SelectionAdapter() {
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+          if ("faq".equals(e.text)) //$NON-NLS-1$
+            BrowserUtils.openFAQ(fErrorStatus);
+          else if ("forum".equals(e.text)) //$NON-NLS-1$
+            BrowserUtils.openHelpForum(fErrorStatus);
+        }
+      });
+    }
 
     Dialog.applyDialogFont(container);
 
