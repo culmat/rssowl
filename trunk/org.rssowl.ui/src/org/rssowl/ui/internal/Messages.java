@@ -218,6 +218,8 @@ public class Messages extends NLS {
   public static String OwlUI_N_KB;
   public static String OwlUI_N_MB;
   public static String OwlUI_NEWSPAPER_LAYOUT;
+  public static String OwlUI_OwlUI_N_GB;
+  public static String OwlUI_SAVE_CRASH_REPORT;
   public static String OwlUI_SECOND;
   public static String OwlUI_SECONDS;
   public static String OwlUI_SIZE_FORMAT;

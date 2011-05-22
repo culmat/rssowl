@@ -27,6 +27,7 @@ package org.rssowl.ui.internal;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IContributionItem;
@@ -93,6 +94,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
@@ -148,9 +150,11 @@ import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.text.DateFormat;
@@ -2329,12 +2333,16 @@ public class OwlUI {
    * @param bytes the number of bytes.
    * @return a human readable representation of the bytes.
    */
-  public static String getSize(int bytes) {
+  public static String getSize(long bytes) {
     if (bytes > 0) {
+      double gb = bytes / (1024d * 1024d * 1024d);
       double mb = bytes / (1024d * 1024d);
       double kb = bytes / 1024d;
 
       NumberFormat format = new DecimalFormat(Messages.OwlUI_SIZE_FORMAT);
+
+      if (gb >= 1)
+        return NLS.bind(Messages.OwlUI_OwlUI_N_GB, format.format(gb));
 
       if (mb >= 1)
         return NLS.bind(Messages.OwlUI_N_MB, format.format(mb));
@@ -2761,6 +2769,45 @@ public class OwlUI {
       menu.dispose();
     } catch (NegativeArraySizeException e) {
       /* Bug in SWT that we can safely ignore */
+    }
+  }
+
+  /**
+   * Opens a file dialog to save the crash report.
+   *
+   * @param shell the parent {@link Shell} of the dialog that opens.
+   */
+  public static void saveCrashReport(Shell shell) {
+    FileDialog dialog = new FileDialog(shell, SWT.SAVE);
+    dialog.setText(Messages.OwlUI_SAVE_CRASH_REPORT);
+    dialog.setFilterExtensions(new String[] { "*.log" }); //$NON-NLS-1$
+    dialog.setFileName("rssowl.log"); //$NON-NLS-1$
+    dialog.setOverwrite(true);
+
+    String file = dialog.open();
+    if (StringUtils.isSet(file)) {
+      try {
+
+        /* Check for Log Message from Core to have a complete log */
+        String logMessages = CoreUtils.getAndFlushLogMessages();
+        if (logMessages != null && logMessages.length() > 0)
+          Activator.safeLogError(logMessages, null);
+
+        /* Help to find out where the log is coming from */
+        Activator.safeLogInfo("Crash Report Exported"); //$NON-NLS-1$
+
+        /* Export Log File */
+        File logFile = Platform.getLogFileLocation().toFile();
+        InputStream inS;
+        if (logFile.exists())
+          inS = new FileInputStream(logFile);
+        else
+          inS = new ByteArrayInputStream(new byte[0]);
+        FileOutputStream outS = new FileOutputStream(new File(file));
+        CoreUtils.copy(inS, outS);
+      } catch (FileNotFoundException e) {
+        Activator.getDefault().logError(e.getMessage(), e);
+      }
     }
   }
 }
