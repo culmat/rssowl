@@ -448,7 +448,7 @@ public class FolderNewsMark extends Mark implements INewsMark {
           }
 
           /* Add to container if necessary */
-          if (resolveContainer && container != null)
+          if (resolveContainer)
             addAll(container, newsIds);
         }
 
