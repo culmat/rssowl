@@ -139,6 +139,17 @@ public class RestoreBackupPage extends WizardPage {
     return !fBackupsViewer.getSelection().isEmpty();
   }
 
+  /*
+   * @see org.eclipse.jface.dialogs.DialogPage#setVisible(boolean)
+   */
+  @Override
+  public void setVisible(boolean visible) {
+    super.setVisible(visible);
+
+    if (visible)
+      fBackupsViewer.getCombo().setFocus();
+  };
+
   File getSelectedBackup() {
     IStructuredSelection selection = (IStructuredSelection) fBackupsViewer.getSelection();
     if (!selection.isEmpty())
