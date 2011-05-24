@@ -44,6 +44,7 @@ import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IModelSearch;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.SearchHit;
 import org.rssowl.ui.internal.util.ModelUtils;
@@ -513,6 +514,8 @@ public class CleanUpModel {
 
       if (fNewsDao.exists(searchHit.getResult().getId()))
         validResults.add(searchHit);
+      else
+        CoreUtils.reportIndexIssue();
     }
 
     return validResults;

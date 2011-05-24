@@ -63,6 +63,7 @@ import org.rssowl.core.persist.reference.ModelReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.persist.service.PersistenceException;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.JobQueue;
 import org.rssowl.core.util.SearchHit;
 
@@ -475,7 +476,8 @@ public class Indexer {
               if (news != null && !newsIndexed.contains(news.getId())) {
                 newsList.add(news);
                 newsIndexed.add(news.getId());
-              }
+              } else if (news == null)
+                CoreUtils.reportIndexIssue();
             }
 
             if (!newsList.isEmpty()) {

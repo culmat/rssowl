@@ -70,11 +70,11 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFilterAction;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.SearchSpecifier;
-import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.ISearchFilterDAO;
 import org.rssowl.core.persist.reference.NewsReference;
@@ -88,9 +88,9 @@ import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.filter.NewsActionDescriptor;
 import org.rssowl.ui.internal.filter.NewsActionPresentationManager;
 import org.rssowl.ui.internal.util.CColumnLayoutData;
+import org.rssowl.ui.internal.util.CColumnLayoutData.Size;
 import org.rssowl.ui.internal.util.CTable;
 import org.rssowl.ui.internal.util.LayoutUtils;
-import org.rssowl.ui.internal.util.CColumnLayoutData.Size;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -507,6 +507,8 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
             INews newsItemToFilter = chunkItem.getResult().resolve();
             if (newsItemToFilter != null)
               newsItemsToFilter.add(newsItemToFilter);
+            else
+              CoreUtils.reportIndexIssue();
           }
 
           applyFilterOnChunks(newsItemsToFilter, filter);

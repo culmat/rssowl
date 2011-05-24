@@ -371,6 +371,10 @@ public class NewsContentProvider implements ITreeContentProvider {
         if (resolvedNewsItem != null && resolvedNewsItem.isVisible())
           resolvedNews.add(resolvedNewsItem);
 
+        /* News is null from a search, potential index issue - report it */
+        else if (resolvedNewsItem == null && input instanceof ISearchMark)
+          CoreUtils.reportIndexIssue();
+
         /* Never resolve more than MAX_RESOLVED_FOLDER_ELEMENTS for a folder */
         if (input instanceof FolderNewsMark && !fNoFolderLimit && resolvedNews.size() > MAX_RESOLVED_FOLDER_ELEMENTS)
           break;
