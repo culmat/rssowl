@@ -2098,7 +2098,7 @@ public class OwlUI {
    * @param dialogSettingsKey the key to use to store dialog settings.
    */
   public static void openWizard(Shell shell, Wizard wizard, final boolean modal, final boolean needsProgressPart, final String dialogSettingsKey) {
-    openWizard(shell, wizard, modal, needsProgressPart, dialogSettingsKey, null);
+    openWizard(shell, wizard, modal, needsProgressPart, dialogSettingsKey, false, null);
   }
 
   /**
@@ -2108,10 +2108,12 @@ public class OwlUI {
    * @param needsProgressPart <code>true</code> to leave some room for the
    * {@link ProgressMonitorPart} and <code>false</code> otherwise.
    * @param dialogSettingsKey the key to use to store dialog settings.
+   * @param pack if <code>true</code>, make the wizard as compact as possible
+   * and <code>false</code> otherwise.
    * @param finishLabel the label for the finish button or <code>null</code> to
    * use the default.
    */
-  public static void openWizard(Shell shell, Wizard wizard, final boolean modal, final boolean needsProgressPart, final String dialogSettingsKey, final String finishLabel) {
+  public static void openWizard(Shell shell, Wizard wizard, final boolean modal, final boolean needsProgressPart, final String dialogSettingsKey, final boolean pack, final String finishLabel) {
     CustomWizardDialog dialog = new CustomWizardDialog(shell, wizard) {
       private ProgressMonitorPart progressMonitorPart;
 
@@ -2173,6 +2175,14 @@ public class OwlUI {
           label = finishLabel;
 
         return super.createButton(parent, id, label, defaultButton);
+      }
+
+      @Override
+      protected Point getInitialSize() {
+        if (pack)
+          return getShell().computeSize(convertHorizontalDLUsToPixels(350 /* Taken from TitleAreaDialog */), SWT.DEFAULT, true);
+
+        return super.getInitialSize();
       }
     };
     dialog.setMinimumPageSize(0, 0);

@@ -39,7 +39,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
@@ -78,8 +77,7 @@ public class RestoreBackupPage extends WizardPage {
 
     /* Container */
     Composite container = new Composite(parent, SWT.NONE);
-    container.setLayout(LayoutUtils.createGridLayout(2, 5, 0));
-    ((GridLayout) container.getLayout()).marginTop = 5;
+    container.setLayout(LayoutUtils.createGridLayout(2, 5, 5));
 
     /* Restore Information */
     {
