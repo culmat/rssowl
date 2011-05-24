@@ -348,9 +348,9 @@ public class NewsContentProvider implements ITreeContentProvider {
     /* Handle Folder, Newsbin and Saved Search or bookmark under certain circumstances */
     boolean needToFilter = true;
     if (input.isGetNewsRefsEfficient() || (input instanceof IBookMark && shouldResolveBookMarkWithSearch((IBookMark) input, filter))) {
-      Pair<Boolean, List<NewsReference>> result = getNewsRefsFromInput(input, fFilter, states, monitor);
+      Triple<Boolean, Boolean, List<NewsReference>> result = getNewsRefsFromInput(input, fFilter, states, monitor);
       needToFilter = !result.getFirst();
-      List<NewsReference> newsReferences = result.getSecond();
+      List<NewsReference> newsReferences = result.getThird();
       for (NewsReference newsRef : newsReferences) {
 
         /* Check if ContentProvider was already disposed or RSSOwl shutting down */
@@ -372,7 +372,7 @@ public class NewsContentProvider implements ITreeContentProvider {
           resolvedNews.add(resolvedNewsItem);
 
         /* News is null from a search, potential index issue - report it */
-        else if (input instanceof ISearchMark)
+        else if (result.getSecond()) //TRUE if search was involved
           CoreUtils.reportIndexIssue();
 
         /* Never resolve more than MAX_RESOLVED_FOLDER_ELEMENTS for a folder */
@@ -467,8 +467,7 @@ public class NewsContentProvider implements ITreeContentProvider {
     return true;
   }
 
-  private Pair<Boolean /* Filtered */, List<NewsReference>> getNewsRefsFromInput(INewsMark input, NewsFilter newsFilter, Set<State> states, IProgressMonitor monitor) {
-    boolean filtered = false;
+  private Triple<Boolean /* Filtered */, Boolean /* Searched */, List<NewsReference>> getNewsRefsFromInput(INewsMark input, NewsFilter newsFilter, Set<State> states, IProgressMonitor monitor) {
     Type filter = newsFilter.getType();
 
     /*
@@ -500,7 +499,7 @@ public class NewsContentProvider implements ITreeContentProvider {
           newsRefs.add(item.getResult());
         }
 
-        return Pair.create(true, newsRefs);
+        return Triple.create(true, true, newsRefs);
       }
     }
 
@@ -510,7 +509,7 @@ public class NewsContentProvider implements ITreeContentProvider {
 
       /* Return early if bookmark should not be resolved at all */
       if (!shouldResolve(bookmark, filter))
-        return Pair.create(true, Collections.<NewsReference> emptyList());
+        return Triple.create(true, false, Collections.<NewsReference> emptyList());
 
       ISearchCondition filterCondition = ModelUtils.getConditionForFilter(filter);
       ISearchField locationField = fFactory.createSearchField(INews.LOCATION, INews.class.getName());
@@ -523,13 +522,12 @@ public class NewsContentProvider implements ITreeContentProvider {
         newsRefs.add(item.getResult());
       }
 
-      return Pair.create(true, newsRefs);
+      return Triple.create(true, true, newsRefs);
     }
 
     /* Resolve Folder News Mark and pass in current filter */
     else if (input instanceof FolderNewsMark) {
       ((FolderNewsMark) input).resolve(filter, monitor);
-      filtered = true;
       List<NewsReference> references = input.getNewsRefs(states);
 
       /* Optimization: If the folder has lots of elements and a text filter is set, limit result by this pattern */
@@ -545,11 +543,11 @@ public class NewsContentProvider implements ITreeContentProvider {
       if (!fNoFolderLimit && references.size() > MAX_RESOLVED_FOLDER_ELEMENTS)
         sortDescendingById(references);
 
-      return Pair.create(filtered, references);
+      return Triple.create(true, true, references);
     }
 
     /* Return news refs by state */
-    return Pair.create(filtered, input.getNewsRefs(states));
+    return Triple.create(false, false, input.getNewsRefs(states));
   }
 
   private void sortDescendingById(List<NewsReference> references) {
