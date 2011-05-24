@@ -1849,4 +1849,14 @@ public class CoreUtilsTest {
 
     assertEquals(bin1, CoreUtils.findArchive());
   }
+
+  /**
+   * @throws Exception
+   */
+  @SuppressWarnings("unchecked")
+  @Test
+  public void testReportIndexIssue() throws Exception {
+    CoreUtils.reportIndexIssue();
+    assertTrue(Owl.getPreferenceService().getGlobalScope().getBoolean(DefaultPreferences.CLEAN_UP_INDEX));
+  }
 }
