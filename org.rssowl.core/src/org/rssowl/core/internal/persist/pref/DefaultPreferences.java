@@ -286,8 +286,8 @@ public class DefaultPreferences {
   /** Global: Clean Up: Number of days before showing the reminder for Clean-Up */
   public static final String CLEAN_UP_REMINDER_DAYS_VALUE = Preference.CLEAN_UP_REMINDER_DAYS_VALUE.id();
 
-  /** Global: Clean Up: Reindex Search after restart */
-  public static final String CLEAN_UP_REINDEX = Preference.CLEAN_UP_REINDEX.id();
+  /** Global: Clean Up: Search Index after restart */
+  public static final String CLEAN_UP_INDEX = Preference.CLEAN_UP_INDEX.id();
 
   /** Global: Search Dialog: State of showing Preview */
   public static final String SEARCH_DIALOG_PREVIEW_VISIBLE = Preference.SEARCH_DIALOG_PREVIEW_VISIBLE.id();
