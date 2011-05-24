@@ -29,6 +29,7 @@ import org.rssowl.core.internal.Activator;
 import org.rssowl.core.persist.service.AbstractPersistenceService;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.LongOperationMonitor;
+import org.rssowl.core.util.Pair;
 
 import java.io.File;
 import java.io.IOException;
@@ -132,7 +133,7 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
   /*
    * @see org.rssowl.core.persist.service.IPersistenceService#getProfile()
    */
-  public File getProfile() {
+  public Pair<File, Long> getProfile() {
     return DBManager.getDefault().getProfile();
   }
 
