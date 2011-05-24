@@ -130,6 +130,13 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
   }
 
   /*
+   * @see org.rssowl.core.persist.service.IPersistenceService#getProfile()
+   */
+  public File getProfile() {
+    return DBManager.getDefault().getProfile();
+  }
+
+  /*
    * @see org.rssowl.core.persist.service.IPersistenceService#getBackups()
    */
   public List<File> getBackups() {

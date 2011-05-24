@@ -216,6 +216,16 @@ public final class Owl {
   }
 
   /**
+   * Returns the profile {@link File} that contains all data. This method will
+   * work even in those cases where RSSOwl has not properly started up.
+   *
+   * @return the profile {@link File}.
+   */
+  public static File getProfile() {
+    return InternalOwl.getDefault().getPersistenceService().getProfile();
+  }
+
+  /**
    * Provides a list of available backups for the user to restore from in case
    * of an unrecoverable error. This method will work even in those cases where
    * RSSOwl has not properly started up.

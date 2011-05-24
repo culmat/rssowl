@@ -1266,6 +1266,10 @@ public class DBManager {
     return fObjectContainer;
   }
 
+  File getProfile() {
+    return new File(getDBFilePath());
+  }
+
   List<File> getBackups() {
     List<File> backups = new ArrayList<File>();
     File backupDir = new File(Activator.getDefault().getStateLocation().toOSString());
