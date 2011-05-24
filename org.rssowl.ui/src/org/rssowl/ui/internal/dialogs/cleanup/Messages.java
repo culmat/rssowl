@@ -84,6 +84,7 @@ public class Messages extends NLS {
   public static String FeedSelectionPage_SELECT_ALL;
   public static String NewsTask_DELETE_N_NEWS_FROM_M;
   public static String OptimizeSearchTask_IMPROVE_PERFORMANCE;
+  public static String ReindexTask_REPAIR_INDEX;
 
   private Messages() {}
 

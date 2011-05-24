@@ -143,6 +143,7 @@ public class CleanUpWizard extends Wizard {
     /* Runnable that performs the tasks */
     IRunnableWithProgress runnable = new IRunnableWithProgress() {
       public void run(IProgressMonitor monitor) {
+        IPreferenceScope preferences = Owl.getPreferenceService().getGlobalScope();
         boolean optimizeSearch = false;
         monitor.beginTask(Messages.CleanUpWizard_WAIT_CLEANUP, IProgressMonitor.UNKNOWN);
 
@@ -186,6 +187,13 @@ public class CleanUpWizard extends Wizard {
           else if (task instanceof OptimizeSearchTask)
             optimizeSearch = true;
 
+          /* Reindex Lucene */
+          else if (task instanceof ReindexTask) {
+            preferences.putBoolean(DefaultPreferences.CLEAN_UP_REINDEX, false);
+            Owl.getPersistenceService().getModelSearch().reIndexOnNextStartup();
+            askForRestart.set(true);
+          }
+
           /* Defrag Database */
           else if (task instanceof DefragDatabaseTask) {
             Owl.getPersistenceService().optimizeOnNextStartup();
@@ -202,8 +210,6 @@ public class CleanUpWizard extends Wizard {
           Owl.getPersistenceService().getModelSearch().optimize();
 
         /* Save Operations */
-        IPreferenceScope preferences = Owl.getPreferenceService().getGlobalScope();
-
         preferences.putBoolean(DefaultPreferences.CLEAN_UP_BM_BY_LAST_VISIT_STATE, operations.deleteFeedByLastVisit());
         preferences.putInteger(DefaultPreferences.CLEAN_UP_BM_BY_LAST_VISIT_VALUE, operations.getLastVisitDays());
 
