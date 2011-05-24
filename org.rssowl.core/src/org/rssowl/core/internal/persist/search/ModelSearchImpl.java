@@ -51,7 +51,6 @@ import org.rssowl.core.persist.IGuid;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearch;
 import org.rssowl.core.persist.ISearchCondition;
-import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IModelSearch;
@@ -703,7 +702,7 @@ public class ModelSearchImpl implements IModelSearch {
 
     /* Find News to delete */
     Set<NewsReference> newsToDelete = new HashSet<NewsReference>();
-    INewsDAO newsDao = DynamicDAO.getDAO(INewsDAO.class);
+    INewsDAO newsDao = InternalOwl.getDefault().getPersistenceService().getDAOService().getNewsDAO();
     for (NewsReference newsRef : results) {
 
       /* User might have cancelled the operation */
