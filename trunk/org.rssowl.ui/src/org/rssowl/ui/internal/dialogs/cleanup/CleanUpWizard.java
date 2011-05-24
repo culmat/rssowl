@@ -186,14 +186,14 @@ public class CleanUpWizard extends Wizard {
             DynamicDAO.saveAll(filters);
           }
 
-          /* Optimize Lucene */
+          /* Optimize Lucene Index */
           else if (task instanceof OptimizeSearchTask)
             optimizeSearch = true;
 
-          /* Reindex Lucene */
-          else if (task instanceof ReindexTask) {
+          /* Clean-Up Lucene Index */
+          else if (task instanceof CleanUpIndexTask) {
             preferences.putBoolean(DefaultPreferences.CLEAN_UP_REINDEX, false);
-            Owl.getPersistenceService().getModelSearch().reIndexOnNextStartup();
+            Owl.getPersistenceService().getModelSearch().cleanUpOnNextStartup();
             askForRestart.set(true);
           }
 

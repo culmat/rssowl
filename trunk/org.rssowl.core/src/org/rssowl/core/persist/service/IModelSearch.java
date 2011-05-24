@@ -131,8 +131,8 @@ public interface IModelSearch {
   void reindexAll(IProgressMonitor monitor) throws PersistenceException;
 
   /**
-   * Instructs the model search service to schedule an reindexing run during
-   * the next time the application is started. The actual reindexing type is
+   * Instructs the model search service to schedule an reindexing run during the
+   * next time the application is started. The actual reindexing type is
    * dependent on the search system being used and implementors are free to
    * leave this as a no-op in case the the search system reindexes itself
    * automatically during runtime.
@@ -141,6 +141,32 @@ public interface IModelSearch {
    * schedule this operation.
    */
   void reIndexOnNextStartup() throws PersistenceException;
+
+  /**
+   * Causes the underlying Index to clean up all entities. This means that every
+   * entry in the index is checked for a related entry in the DB including
+   * visibility. If the item is no longer part or hidden it will be removed from
+   * the index. Note that this is a cpu- and memory-intensive operation, thats
+   * why a <code>IProgressMonitor</code> is passed in to track progress and
+   * support cancelation.
+   *
+   * @param monitor An instance of <code>IProgressMonitor</code> to track
+   * progress and support cancelation during the operation.
+   * @throws PersistenceException
+   */
+  void cleanUp(IProgressMonitor monitor) throws PersistenceException;
+
+  /**
+   * Instructs the model search service to schedule an cleanup run during the
+   * next time the application is started. The actual cleanup type is dependent
+   * on the search system being used and implementors are free to leave this as
+   * a no-op in case the the search system cleans up itself automatically during
+   * runtime.
+   *
+   * @throws PersistenceException in case a problem occurs while trying to
+   * schedule this operation.
+   */
+  void cleanUpOnNextStartup() throws PersistenceException;
 
   /**
    * Adds a Listener to the list of Listeners that will be notified on index
