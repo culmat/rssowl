@@ -39,9 +39,11 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.rssowl.core.Owl;
 import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.LayoutUtils;
@@ -78,13 +80,14 @@ public class RestoreBackupPage extends WizardPage {
     /* Container */
     Composite container = new Composite(parent, SWT.NONE);
     container.setLayout(LayoutUtils.createGridLayout(2, 5, 5));
+    ((GridLayout) container.getLayout()).marginBottom = 5;
 
     /* Restore Information */
     {
       Label backupInfoLabel = new Label(container, SWT.NONE);
       backupInfoLabel.setText(Messages.RestoreBackupPage_RESTORING_A_BACKUP);
       backupInfoLabel.setFont(OwlUI.getBold(JFaceResources.DIALOG_FONT));
-      backupInfoLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false, 2, 1));
+      backupInfoLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false, 2, 1));
 
       Label backupTextLabel = new Label(container, SWT.WRAP);
       backupTextLabel.setText(Application.IS_WINDOWS ? Messages.RestoreBackupPage_BACKUP_INFO_RESTART : Messages.RestoreBackupPage_BACKUP_INFO_QUIT);
@@ -92,16 +95,28 @@ public class RestoreBackupPage extends WizardPage {
       ((GridData) backupTextLabel.getLayoutData()).widthHint = 200;
     }
 
+    /* Current Profile Info */
+    File profile = Owl.getProfile();
+    if (profile != null && profile.exists()) {
+      Label currentProfileLabel = new Label(container, SWT.NONE);
+      currentProfileLabel.setText(Messages.RestoreBackupPage_CURRENT_PROFILE);
+      currentProfileLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
+      ((GridData) currentProfileLabel.getLayoutData()).verticalIndent = 5;
+
+      Label currentProfileTextLabel = new Label(container, SWT.NONE);
+      currentProfileTextLabel.setText(NLS.bind(Messages.RestoreBackupPage_LAST_MODIFIED, fDateFormat.format(profile.lastModified()), OwlUI.getSize((int) profile.length())));
+      currentProfileTextLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+      ((GridData) currentProfileTextLabel.getLayoutData()).verticalIndent = 5;
+    }
+
     /* Restore Controls */
     {
       Label chooseBackupLabel = new Label(container, SWT.NONE);
       chooseBackupLabel.setText(Messages.RestoreBackupPage_CHOOSE_BACKUP);
       chooseBackupLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
-      ((GridData) chooseBackupLabel.getLayoutData()).verticalIndent = 5;
 
       fBackupsViewer = new ComboViewer(container, SWT.BORDER | SWT.READ_ONLY);
       fBackupsViewer.getControl().setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
-      ((GridData) fBackupsViewer.getControl().getLayoutData()).verticalIndent = 5;
       fBackupsViewer.getCombo().setVisibleItemCount(fBackups.size());
       fBackupsViewer.setContentProvider(new ArrayContentProvider());
       fBackupsViewer.setLabelProvider(new LabelProvider() {

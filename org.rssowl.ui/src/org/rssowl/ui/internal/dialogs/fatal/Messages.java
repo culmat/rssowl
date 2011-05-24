@@ -51,6 +51,8 @@ public class Messages extends NLS {
   public static String RestoreBackupPage_CAUTION;
   public static String RestoreBackupPage_CHOOSE_BACKUP;
   public static String RestoreBackupPage_CONFIRM_RESTORE;
+  public static String RestoreBackupPage_CURRENT_PROFILE;
+  public static String RestoreBackupPage_LAST_MODIFIED;
   public static String RestoreBackupPage_RESTORE_WARNING;
   public static String RestoreBackupPage_RESTORING_A_BACKUP;
   public static String RestoreBackupPage_RSSOWL_CRASH;
