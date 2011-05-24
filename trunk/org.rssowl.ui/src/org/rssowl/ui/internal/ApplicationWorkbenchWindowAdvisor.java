@@ -761,7 +761,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         for (int i = fTeasingNewsCache.size() - 1; i >= 0; i--) {
           NewsReference reference = new NewsReference(fTeasingNewsCache.get(i));
           INews newsitem = reference.resolve();
-          if (newsitem != null) {
+          if (newsitem != null && newsitem.isVisible()) {
             newsToShow.add(newsitem);
 
             if (++counter >= TEASE_LIMIT)

@@ -346,8 +346,10 @@ public class CleanUpModel {
               return;
 
             INews resolvedNewsItem = result.getResult().resolve();
-            if (resolvedNewsItem != null)
+            if (resolvedNewsItem != null && resolvedNewsItem.isVisible())
               resolvedNews.add(resolvedNewsItem);
+            else
+              CoreUtils.reportIndexIssue();
           }
 
           /* Return if user cancelled the preview */

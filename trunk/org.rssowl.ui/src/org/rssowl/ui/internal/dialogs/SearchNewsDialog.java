@@ -269,8 +269,11 @@ public class SearchNewsDialog extends TitleAreaDialog {
     }
 
     INews getNews() {
-      if (fResolvedNews == null)
+      if (fResolvedNews == null) {
         fResolvedNews = fNewsRef.resolve();
+        if (fResolvedNews == null || !fResolvedNews.isVisible())
+          CoreUtils.reportIndexIssue();
+      }
 
       return fResolvedNews;
     }
