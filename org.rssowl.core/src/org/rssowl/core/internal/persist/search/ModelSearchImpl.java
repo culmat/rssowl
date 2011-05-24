@@ -35,6 +35,7 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.BooleanQuery.TooManyClauses;
 import org.apache.lucene.search.HitCollector;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.Directory;
@@ -50,6 +51,8 @@ import org.rssowl.core.persist.IGuid;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearch;
 import org.rssowl.core.persist.ISearchCondition;
+import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.persist.service.IndexListener;
@@ -61,9 +64,11 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -298,7 +303,7 @@ public class ModelSearchImpl implements IModelSearch {
     return query;
   }
 
-  private List<NewsReference> simpleSearch(BooleanQuery query) {
+  private List<NewsReference> simpleSearch(Query query) {
     /* Make sure the searcher is in sync */
     IndexSearcher currentSearcher = getCurrentSearcher();
     try {
@@ -309,7 +314,7 @@ public class ModelSearchImpl implements IModelSearch {
     }
   }
 
-  private List<NewsReference> simpleSearch(IndexSearcher currentSearcher, BooleanQuery query) {
+  private List<NewsReference> simpleSearch(IndexSearcher currentSearcher, Query query) {
     List<NewsReference> resultList = new ArrayList<NewsReference>(2);
 
     try {
@@ -675,6 +680,72 @@ public class ModelSearchImpl implements IModelSearch {
     } finally {
       if (currentSearcher != null)
         disposeIfNecessary(currentSearcher);
+    }
+  }
+
+  /*
+   * @see
+   * org.rssowl.core.persist.service.IModelSearch#cleanUp(org.eclipse.core.runtime
+   * .IProgressMonitor)
+   */
+  public void cleanUp(IProgressMonitor monitor) throws PersistenceException {
+
+    /* Retrieve all News from the Index */
+    List<NewsReference> results = simpleSearch(new MatchAllDocsQuery());
+
+    /* User might have cancelled the operation */
+    if (monitor.isCanceled())
+      return;
+
+    /* Begin Task */
+    monitor.beginTask(Messages.ModelSearchImpl_PROGRESS_WAIT, results.size());
+    monitor.subTask(Messages.ModelSearchImpl_CLEANUP_SEARCH_INDEX);
+
+    /* Find News to delete */
+    Set<NewsReference> newsToDelete = new HashSet<NewsReference>();
+    INewsDAO newsDao = DynamicDAO.getDAO(INewsDAO.class);
+    for (NewsReference newsRef : results) {
+
+      /* User might have cancelled the operation */
+      if (monitor.isCanceled())
+        return;
+
+      /* Delete if news no longer exists in DB */
+      if (!newsDao.exists(newsRef.getId()))
+        newsToDelete.add(newsRef);
+
+      /* Delete if news either NULL or not visible */
+      else {
+        INews resolvedNews = newsDao.load(newsRef.getId());
+        if (resolvedNews == null || !resolvedNews.isVisible())
+          newsToDelete.add(newsRef);
+      }
+
+      /* Report Progress */
+      monitor.worked(1);
+    }
+
+    /* Remove News to Delete from Index */
+    synchronized (fIndexer) {
+      try {
+        fIndexer.removeFromIndex(newsToDelete);
+      } catch (IOException e) {
+        throw new PersistenceException(e.getMessage(), e);
+      }
+    }
+
+    /* Finished */
+    monitor.done();
+  }
+
+  /*
+   * @see org.rssowl.core.persist.service.IModelSearch#cleanUpOnNextStartup()
+   */
+  public void cleanUpOnNextStartup() throws PersistenceException {
+    try {
+      DBManager.getDefault().getCleanUpIndexFile().createNewFile();
+    } catch (IOException e) {
+      throw new PersistenceException(e);
     }
   }
 }

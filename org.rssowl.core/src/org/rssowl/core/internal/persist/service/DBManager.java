@@ -352,6 +352,14 @@ public class DBManager {
   }
 
   /**
+   * @return the File indicating whether cleanup index should be run or not.
+   */
+  public File getCleanUpIndexFile() {
+    File dir = new File(Activator.getDefault().getStateLocation().toOSString());
+    return new File(dir, "cleanupindex"); //$NON-NLS-1$
+  }
+
+  /**
    * @return the File indicating whether reindexing should be run or not.
    */
   public File getReIndexFile() {
@@ -451,47 +459,76 @@ public class DBManager {
       fireDatabaseEvent(new DatabaseEvent(fObjectContainer, fLock), true);
 
       /* Re-Index Search Index if necessary */
-      boolean shouldReindex = shouldReindex(migrationResult);
-      if (shouldReindex) {
-        progressMonitor.beginLongOperation(false);
-        subMonitor = SubMonitor.convert(progressMonitor, Messages.DBManager_PROGRESS_WAIT, 20);
-      }
-
-      IModelSearch modelSearch = InternalOwl.getDefault().getPersistenceService().getModelSearch();
-      if (!progressMonitor.isCanceled() && (shouldReindex || migrationResult.isOptimizeIndex())) {
-        modelSearch.startup();
-        if (shouldReindex && !progressMonitor.isCanceled()) {
-          Activator.safeLogInfo("Start: Search Re-Indexing"); //$NON-NLS-1$
-
-          File marker = getReindexMarkerFile();
-          File reIndexFile = getReIndexFile();
-          try {
-
-            /* Create Marker that Reindexing is Performed */
-            if (!marker.exists())
-              safeCreate(marker);
-
-            /* Reindex Search Index */
-            modelSearch.reindexAll(subMonitor != null ? subMonitor.newChild(20) : new NullProgressMonitor());
-
-            /*
-             * Make sure to delete the reindex file if existing only after the
-             * operation has completed without issues to ensure that upon next
-             * start the reindexing is started again if it failed prior.
-             */
-            if (reIndexFile.exists())
-              safeDelete(reIndexFile);
-          } finally {
-            safeDelete(marker);
-          }
-
-          /* Log Status */
-          Activator.safeLogInfo("Finished: Search Re-Indexing"); //$NON-NLS-1$
+      boolean reindexed = false;
+      {
+        boolean shouldReindex = shouldReindex(migrationResult);
+        if (shouldReindex) {
+          progressMonitor.beginLongOperation(false);
+          subMonitor = SubMonitor.convert(progressMonitor, Messages.DBManager_PROGRESS_WAIT, 20);
         }
 
-        /* Optimize Index if Necessary */
-        if (migrationResult.isOptimizeIndex() && !progressMonitor.isCanceled())
-          modelSearch.optimize();
+        IModelSearch modelSearch = InternalOwl.getDefault().getPersistenceService().getModelSearch();
+        if (!progressMonitor.isCanceled() && (shouldReindex || migrationResult.isOptimizeIndex())) {
+          modelSearch.startup();
+          if (shouldReindex && !progressMonitor.isCanceled()) {
+            Activator.safeLogInfo("Start: Search Re-Indexing"); //$NON-NLS-1$
+
+            File marker = getReindexMarkerFile();
+            File reIndexFile = getReIndexFile();
+            try {
+
+              /* Create Marker that Reindexing is Performed */
+              if (!marker.exists())
+                safeCreate(marker);
+
+              /* Reindex Search Index */
+              reindexed = true;
+              modelSearch.reindexAll(subMonitor != null ? subMonitor.newChild(20) : new NullProgressMonitor());
+
+              /*
+               * Make sure to delete the reindex file if existing only after the
+               * operation has completed without issues to ensure that upon next
+               * start the reindexing is started again if it failed prior.
+               */
+              if (reIndexFile.exists())
+                safeDelete(reIndexFile);
+            } finally {
+              safeDelete(marker);
+            }
+
+            /* Log Status */
+            Activator.safeLogInfo("Finished: Search Re-Indexing"); //$NON-NLS-1$
+          }
+
+          /* Optimize Index if Necessary */
+          if (migrationResult.isOptimizeIndex() && !progressMonitor.isCanceled())
+            modelSearch.optimize();
+        }
+      }
+
+      /* Clean-Up Search Index if necessary */
+      File cleanUpIndexFile = getCleanUpIndexFile();
+      if (!reindexed && cleanUpIndexFile.exists() && !progressMonitor.isCanceled()) {
+
+        /* Report Progress */
+        progressMonitor.beginLongOperation(false);
+        subMonitor = SubMonitor.convert(progressMonitor, Messages.DBManager_PROGRESS_WAIT, 20);
+
+        /* Startup Model Search to perform operation */
+        IModelSearch modelSearch = InternalOwl.getDefault().getPersistenceService().getModelSearch();
+        modelSearch.startup();
+
+        /* Trigger Clean Up */
+        if (!progressMonitor.isCanceled()) {
+          Activator.safeLogInfo("Start: Search Clean-Up"); //$NON-NLS-1$
+          modelSearch.cleanUp(subMonitor != null ? subMonitor.newChild(20) : new NullProgressMonitor());
+
+          /* Delete the Marker */
+          safeDelete(cleanUpIndexFile);
+
+          /* Log Status */
+          Activator.safeLogInfo("Finished: Search Clean-Up"); //$NON-NLS-1$
+        }
       }
 
       /* Start the periodic online backup service */

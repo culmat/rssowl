@@ -127,7 +127,7 @@ public class CleanUpModel {
     /* 0.) Create Recommended Tasks */
     CleanUpGroup recommendedTasks = new CleanUpGroup(Messages.CleanUpModel_RECOMMENDED_OPS);
     if (fPreferences.getBoolean(DefaultPreferences.CLEAN_UP_REINDEX))
-      recommendedTasks.addTask(new ReindexTask(recommendedTasks));
+      recommendedTasks.addTask(new CleanUpIndexTask(recommendedTasks));
     recommendedTasks.addTask(new DefragDatabaseTask(recommendedTasks));
     recommendedTasks.addTask(new OptimizeSearchTask(recommendedTasks));
     fTasks.add(recommendedTasks);

@@ -28,13 +28,13 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.rssowl.ui.internal.OwlUI;
 
 /**
- * An instance of <code>CleanUpTask</code> to reindex the search.
+ * An instance of <code>CleanUpTask</code> to cleanup the search.
  *
  * @author bpasero
  */
-class ReindexTask extends CleanUpTask {
+class CleanUpIndexTask extends CleanUpTask {
 
-  ReindexTask(CleanUpGroup group) {
+  CleanUpIndexTask(CleanUpGroup group) {
     super(group);
   }
 
