@@ -2011,8 +2011,8 @@ public class CoreUtils {
   public static void reportIndexIssue() {
     if (!fgReportedIndexIssue.getAndSet(true)) {
       IPreferenceScope preferences = Owl.getPreferenceService().getGlobalScope();
-      if (!preferences.getBoolean(DefaultPreferences.CLEAN_UP_REINDEX))
-        preferences.putBoolean(DefaultPreferences.CLEAN_UP_REINDEX, true);
+      if (!preferences.getBoolean(DefaultPreferences.CLEAN_UP_INDEX))
+        preferences.putBoolean(DefaultPreferences.CLEAN_UP_INDEX, true);
     }
   }
 }

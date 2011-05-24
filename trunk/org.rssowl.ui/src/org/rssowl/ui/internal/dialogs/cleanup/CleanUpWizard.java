@@ -192,7 +192,7 @@ public class CleanUpWizard extends Wizard {
 
           /* Clean-Up Lucene Index */
           else if (task instanceof CleanUpIndexTask) {
-            preferences.putBoolean(DefaultPreferences.CLEAN_UP_REINDEX, false);
+            preferences.putBoolean(DefaultPreferences.CLEAN_UP_INDEX, false);
             Owl.getPersistenceService().getModelSearch().cleanUpOnNextStartup();
             askForRestart.set(true);
           }

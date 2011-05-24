@@ -283,8 +283,8 @@ public enum Preference {
   /** Global: Clean Up: Number of days before showing the reminder for Clean-Up */
   CLEAN_UP_REMINDER_DAYS_VALUE("org.rssowl.pref.CleanUpReminderDaysValue", IPreferenceType.INTEGER), //$NON-NLS-1$
 
-  /** Global: Clean Up: Reindex Search after restart */
-  CLEAN_UP_REINDEX("org.rssowl.pref.CleanUpReindex", IPreferenceType.BOOLEAN), //$NON-NLS-1$
+  /** Global: Clean Up: Search Index after restart */
+  CLEAN_UP_INDEX("org.rssowl.pref.CleanUpIndex", IPreferenceType.BOOLEAN), //$NON-NLS-1$
 
   /** Global: Search Dialog: State of showing Preview */
   SEARCH_DIALOG_PREVIEW_VISIBLE("org.rssowl.pref.SearchDialogPreviewVisible", IPreferenceType.BOOLEAN), //$NON-NLS-1$
