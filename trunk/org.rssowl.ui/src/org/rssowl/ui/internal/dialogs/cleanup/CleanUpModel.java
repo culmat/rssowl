@@ -27,6 +27,7 @@ package org.rssowl.ui.internal.dialogs.cleanup;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.osgi.util.NLS;
 import org.rssowl.core.Owl;
+import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IModelFactory;
@@ -40,6 +41,7 @@ import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.ILabelDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
+import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.util.DateUtils;
@@ -71,14 +73,15 @@ public class CleanUpModel {
   /* One Day in millis */
   private static final long DAY = 24 * 60 * 60 * 1000;
 
-  private List<CleanUpGroup> fTasks;
+  private final List<CleanUpGroup> fTasks;
   private final CleanUpOperations fOps;
   private final Collection<IBookMark> fBookmarks;
-  private IModelFactory fFactory;
-  private IModelSearch fModelSearch;
-  private ISearchField fLocationField;
-  private String fNewsName;
-  private INewsDAO fNewsDao;
+  private final IModelFactory fFactory;
+  private final IModelSearch fModelSearch;
+  private final ISearchField fLocationField;
+  private final String fNewsName;
+  private final INewsDAO fNewsDao;
+  private final IPreferenceScope fPreferences;
 
   /**
    * @param operations
@@ -91,6 +94,7 @@ public class CleanUpModel {
     fFactory = Owl.getModelFactory();
     fModelSearch = Owl.getPersistenceService().getModelSearch();
     fNewsDao = DynamicDAO.getDAO(INewsDAO.class);
+    fPreferences = Owl.getPreferenceService().getGlobalScope();
 
     String newsName = INews.class.getName();
     fLocationField = fFactory.createSearchField(INews.LOCATION, newsName);
@@ -121,6 +125,8 @@ public class CleanUpModel {
 
     /* 0.) Create Recommended Tasks */
     CleanUpGroup recommendedTasks = new CleanUpGroup(Messages.CleanUpModel_RECOMMENDED_OPS);
+    if (fPreferences.getBoolean(DefaultPreferences.CLEAN_UP_REINDEX))
+      recommendedTasks.addTask(new ReindexTask(recommendedTasks));
     recommendedTasks.addTask(new DefragDatabaseTask(recommendedTasks));
     recommendedTasks.addTask(new OptimizeSearchTask(recommendedTasks));
     fTasks.add(recommendedTasks);
