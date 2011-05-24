@@ -136,6 +136,13 @@ public interface IPersistenceService {
   void optimizeOnNextStartup() throws PersistenceException;
 
   /**
+   * Returns the profile {@link File} containing all data.
+   *
+   * @return the profile {@link File}.
+   */
+  File getProfile();
+
+  /**
    * Provides a list of available backups for the user to restore from in case
    * of an unrecoverable error.
    *
