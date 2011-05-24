@@ -766,7 +766,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
             if (++counter >= TEASE_LIMIT)
               break;
-          }
+          } else
+            CoreUtils.reportIndexIssue();
 
           /* Return early if Notifier already showing */
           if (service.isPopupVisible())
@@ -820,7 +821,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
           if (++counter >= TEASE_LIMIT)
             break;
-        }
+        } else if (newsitem == null)
+          CoreUtils.reportIndexIssue();
 
         /* Return early if Notifier already showing */
         if (service.isPopupVisible())

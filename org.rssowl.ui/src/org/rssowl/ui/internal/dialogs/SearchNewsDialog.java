@@ -1250,8 +1250,10 @@ public class SearchNewsDialog extends TitleAreaDialog {
               continue;
 
             /* Have to test if Entity really exists (bug 337) */
-            if (!fNewsDao.exists(searchHit.getResult().getId()))
+            if (!fNewsDao.exists(searchHit.getResult().getId())) {
+              CoreUtils.reportIndexIssue();
               continue;
+            }
 
             Float relevanceRaw = searchHit.getRelevance();
             Relevance relevance = Relevance.LOW;

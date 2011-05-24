@@ -38,6 +38,7 @@ import org.rssowl.core.persist.event.NewsListener;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.PersistenceException;
+import org.rssowl.core.util.CoreUtils;
 
 import com.db4o.ext.Db4oException;
 import com.db4o.query.Constraint;
@@ -293,6 +294,8 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
         INews resolvedNewsItem = hit.resolve();
         if (resolvedNewsItem != null)
           news.add(resolvedNewsItem);
+        else
+          CoreUtils.reportIndexIssue();
       }
     }
 

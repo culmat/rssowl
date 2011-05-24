@@ -63,6 +63,7 @@ import org.rssowl.core.persist.dao.IBookMarkDAO;
 import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.persist.event.ModelEvent;
 import org.rssowl.core.persist.event.NewsEvent;
+import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.BookMarkReference;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.FolderReference;
@@ -100,6 +101,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Helper class for various Core operations.
@@ -125,6 +127,9 @@ public class CoreUtils {
 
   /* A buffer that can be used to add log entries from db4o */
   private static final StringBuffer fgLogBuffer = new StringBuffer();
+
+  /* Flag to remember if a index issue has been reported */
+  private static final AtomicBoolean fgReportedIndexIssue= new AtomicBoolean(false);
 
   /*
    * Special case structural actions that need to run as last action (but before
@@ -1998,5 +2003,16 @@ public class CoreUtils {
     }
 
     return null;
+  }
+
+  /**
+   * Report an issue with the search index.
+   */
+  public static void reportIndexIssue() {
+    if (!fgReportedIndexIssue.getAndSet(true)) {
+      IPreferenceScope preferences = Owl.getPreferenceService().getGlobalScope();
+      if (!preferences.getBoolean(DefaultPreferences.CLEAN_UP_REINDEX))
+        preferences.putBoolean(DefaultPreferences.CLEAN_UP_REINDEX, true);
+    }
   }
 }
