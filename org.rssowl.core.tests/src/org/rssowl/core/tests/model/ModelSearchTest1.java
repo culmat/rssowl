@@ -27,6 +27,7 @@ package org.rssowl.core.tests.model;
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.junit.Test;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.service.DBHelper;
@@ -37,13 +38,14 @@ import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.ISource;
 import org.rssowl.core.persist.SearchSpecifier;
-import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.tests.TestUtils;
@@ -52,6 +54,7 @@ import org.rssowl.core.util.SearchHit;
 
 import java.net.URI;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
@@ -1806,6 +1809,104 @@ public class ModelSearchTest1 extends AbstractModelSearchTest {
         result = fModelSearch.searchNews(list(condition), false);
         assertSame(result, news1, news2, news3, news4, news5);
       }
+    } catch (PersistenceException e) {
+      TestUtils.fail(e);
+    }
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings("nls")
+  public void testSearchCleanup() throws Exception {
+    try {
+
+      /* Run Clean Up */
+      fModelSearch.cleanUp(new NullProgressMonitor());
+
+      /* Add some Types */
+      IFeed feed = fFactory.createFeed(null, new URI("http://www.feed.com/feed.xml"));
+
+      INews news1 = createNews(feed, "Brabbels", "http://www.news.com/news1.html", State.READ);
+      ICategory news1cat1 = fFactory.createCategory(null, news1);
+      news1cat1.setName("apple");
+      ILabel label1 = fFactory.createLabel(null, "work");
+      news1.addLabel(label1);
+      IAttachment att1news1 = fFactory.createAttachment(null, news1);
+      att1news1.setLink(new URI("http://www.attachment.com/att1news1.file"));
+      att1news1.setType("bin/mp3");
+
+      INews news2 = createNews(feed, " Bar", "http://www.news.com/news2.html", State.NEW);
+      ICategory news2cat1 = fFactory.createCategory(null, news2);
+      news2cat1.setName("apple");
+      ICategory news2cat2 = fFactory.createCategory(null, news2);
+      news2cat2.setName("pasero");
+      ILabel label2 = fFactory.createLabel(null, "todo");
+      news2.addLabel(label2);
+      IAttachment att1news2 = fFactory.createAttachment(null, news2);
+      att1news2.setLink(new URI("http://www.attachment.com/att1news2.file"));
+      att1news2.setType("bin/doc");
+      IAttachment att2news2 = fFactory.createAttachment(null, news2);
+      att2news2.setLink(new URI("http://www.attachment.com/att2news2.file"));
+      att2news2.setType("bin/wav");
+
+      INews news3 = createNews(feed, "Foo Bar", "http://www.news.com/news3.html", State.NEW);
+      news3.setDescription("This is a longer description with \n newlines and <html><h2>included!</h2></html>");
+      IPerson author3 = fFactory.createPerson(null, news3);
+      author3.setName("Benjamin Pasero");
+      ICategory news3cat1 = fFactory.createCategory(null, news3);
+      news3cat1.setName("apple");
+      ICategory news3cat2 = fFactory.createCategory(null, news3);
+      news3cat2.setName("windows");
+      ICategory news3cat3 = fFactory.createCategory(null, news3);
+      news3cat3.setName("slashdot");
+
+      INews news4 = createNews(feed, "BAR FOO", "http://www.news.com/news4.html", State.UPDATED);
+      Date news4Date = new Date(1000000);
+      news4.setPublishDate(news4Date);
+      IPerson author4 = fFactory.createPerson(null, news4);
+      author4.setName("Pasero");
+      ISource source4 = fFactory.createSource(news4);
+      source4.setLink(new URI("http://www.source.com"));
+
+      INews news5 = createNews(feed, null, "http://www.news.com/news5.html", State.NEW);
+      news5.setFlagged(true);
+      IPerson author5 = fFactory.createPerson(null, news5);
+      author5.setEmail(new URI("test@rssowl.org"));
+      ISource source5 = fFactory.createSource(news5);
+      source5.setName("Source for News 5");
+
+      DynamicDAO.save(feed);
+
+      /* Wait for Indexer */
+      waitForIndexer();
+
+      ISearchField field = fFactory.createSearchField(INews.TITLE, fNewsEntityName);
+      ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "Brabbels");
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+      assertSame(result, news1);
+
+      /* Run Clean Up */
+      fModelSearch.cleanUp(new NullProgressMonitor());
+
+      result = fModelSearch.searchNews(list(condition), false);
+      assertSame(result, news1);
+
+      DynamicDAO.getDAO(INewsDAO.class).setState(Collections.singleton(news1), INews.State.HIDDEN, false, false);
+
+      /* Wait for Indexer */
+      waitForIndexer();
+
+      result = fModelSearch.searchNews(list(condition), false);
+      assertTrue(result.isEmpty());
+
+      /* Run Clean Up */
+      fModelSearch.cleanUp(new NullProgressMonitor());
+
+      result = fModelSearch.searchNews(list(condition), false);
+      assertTrue(result.isEmpty());
     } catch (PersistenceException e) {
       TestUtils.fail(e);
     }
