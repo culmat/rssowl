@@ -2179,8 +2179,10 @@ public class OwlUI {
 
       @Override
       protected Point getInitialSize() {
-        if (pack)
-          return getShell().computeSize(convertHorizontalDLUsToPixels(350 /* Taken from TitleAreaDialog */), SWT.DEFAULT, true);
+        if (pack) {
+          Point size = getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+          return getShell().computeSize(Math.max(size.x, convertHorizontalDLUsToPixels(350 /* Taken from TitleAreaDialog */)), SWT.DEFAULT, true);
+        }
 
         return super.getInitialSize();
       }
