@@ -44,6 +44,7 @@ import org.rssowl.core.persist.service.IPersistenceService;
 import org.rssowl.core.persist.service.IPreferenceService;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.LongOperationMonitor;
+import org.rssowl.core.util.Pair;
 
 import java.io.File;
 import java.util.List;
@@ -216,12 +217,14 @@ public final class Owl {
   }
 
   /**
-   * Returns the profile {@link File} that contains all data. This method will
+   * Returns the profile {@link File} that contains all data and the
+   * {@link Long} timestamp when it was last successfully used. This method will
    * work even in those cases where RSSOwl has not properly started up.
    *
-   * @return the profile {@link File}.
+   * @return the profile {@link File} and the {@link Long} timestamp when it was
+   * last successfully used.
    */
-  public static File getProfile() {
+  public static Pair<File /* Profile File */, Long /* Timestamp of last successful use */> getProfile() {
     return InternalOwl.getDefault().getPersistenceService().getProfile();
   }
 

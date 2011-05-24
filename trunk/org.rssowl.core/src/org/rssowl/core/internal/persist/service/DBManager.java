@@ -61,6 +61,7 @@ import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.LongOperationMonitor;
+import org.rssowl.core.util.Pair;
 
 import com.db4o.Db4o;
 import com.db4o.ObjectContainer;
@@ -187,6 +188,7 @@ public class DBManager {
     /* Open the DB */
     try {
       fObjectContainer = Db4o.openFile(config, getDBFilePath());
+      storeProfileLastUsed(); //Keep date of last successfull profile opened
     }
 
     /* Error opening the DB */
@@ -539,6 +541,36 @@ public class DBManager {
     File dir = new File(Activator.getDefault().getStateLocation().toOSString());
     File lastBackUpFile = new File(dir, "lastbackup"); //$NON-NLS-1$
     return lastBackUpFile;
+  }
+
+  private File getDBLastUsedFile() {
+    File dir = new File(Activator.getDefault().getStateLocation().toOSString());
+    File lastDBUseFile = new File(dir, "lastused"); //$NON-NLS-1$
+    return lastDBUseFile;
+  }
+
+  Long getProfileLastUsed() {
+    File file = getDBLastUsedFile();
+    if (file.exists()) {
+      try {
+        return Long.parseLong(DBHelper.readFirstLineFromFile(file));
+      } catch (Exception e) {
+        /* Ignore */
+      }
+    }
+
+    return null;
+  }
+
+  private void storeProfileLastUsed() {
+    File file = getDBLastUsedFile();
+    try {
+      if (!file.exists())
+        file.createNewFile();
+      DBHelper.writeToFile(file, String.valueOf(System.currentTimeMillis()));
+    } catch (Exception e) {
+      /* Ignore */
+    }
   }
 
   private MigrationResult migrate(final int workspaceFormat, int currentFormat, IProgressMonitor progressMonitor) {
@@ -1266,8 +1298,11 @@ public class DBManager {
     return fObjectContainer;
   }
 
-  File getProfile() {
-    return new File(getDBFilePath());
+  Pair<File, Long> getProfile() {
+    File profile = new File(getDBFilePath());
+    Long timestamp = getProfileLastUsed();
+
+    return Pair.create(profile, timestamp);
   }
 
   List<File> getBackups() {

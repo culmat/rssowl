@@ -28,6 +28,7 @@ import org.rssowl.core.persist.dao.DAOService;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IEntityDAO;
 import org.rssowl.core.util.LongOperationMonitor;
+import org.rssowl.core.util.Pair;
 
 import java.io.File;
 import java.util.List;
@@ -136,11 +137,13 @@ public interface IPersistenceService {
   void optimizeOnNextStartup() throws PersistenceException;
 
   /**
-   * Returns the profile {@link File} containing all data.
+   * Returns the profile {@link File} that contains all data and the
+   * {@link Long} timestamp when it was last successfully used.
    *
-   * @return the profile {@link File}.
+   * @return the profile {@link File} and the {@link Long} timestamp when it was
+   * last successfully used.
    */
-  File getProfile();
+  Pair<File /* Profile File */, Long /* Timestamp of last successful use */> getProfile();
 
   /**
    * Provides a list of available backups for the user to restore from in case

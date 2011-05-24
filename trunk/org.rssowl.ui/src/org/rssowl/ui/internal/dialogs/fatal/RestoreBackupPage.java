@@ -44,6 +44,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.rssowl.core.Owl;
+import org.rssowl.core.util.Pair;
 import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.LayoutUtils;
@@ -96,15 +97,18 @@ public class RestoreBackupPage extends WizardPage {
     }
 
     /* Current Profile Info */
-    File profile = Owl.getProfile();
+    Pair<File, Long> pair = Owl.getProfile();
+    File profile = pair.getFirst();
     if (profile != null && profile.exists()) {
       Label currentProfileLabel = new Label(container, SWT.NONE);
       currentProfileLabel.setText(Messages.RestoreBackupPage_CURRENT_PROFILE);
       currentProfileLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
       ((GridData) currentProfileLabel.getLayoutData()).verticalIndent = 5;
 
+      Long timestamp = (pair.getSecond() != null) ? pair.getSecond() : profile.lastModified();
+
       Label currentProfileTextLabel = new Label(container, SWT.NONE);
-      currentProfileTextLabel.setText(NLS.bind(Messages.RestoreBackupPage_LAST_MODIFIED, fDateFormat.format(profile.lastModified()), OwlUI.getSize((int) profile.length())));
+      currentProfileTextLabel.setText(NLS.bind(Messages.RestoreBackupPage_LAST_MODIFIED, fDateFormat.format(timestamp), OwlUI.getSize((int) profile.length())));
       currentProfileTextLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
       ((GridData) currentProfileTextLabel.getLayoutData()).verticalIndent = 5;
     }
