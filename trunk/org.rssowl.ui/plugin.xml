@@ -1958,6 +1958,12 @@
             name="%shareProvider.name.24"
             url="http://www.livejournal.com/update.bml?mode=full&amp;event=[L]&amp;subject=[T]">
       </shareProvider>
+      <shareProvider
+            icon="icons/obj16/share_buffer.gif"
+            id="org.rssowl.ui.BufferShareProvider"
+            name="%shareProvider.name.25"
+            url="http://bufferapp.com/add?url=[L]&amp;text=[T]">
+      </shareProvider>
    </extension>
    <extension
          point="org.rssowl.ui.FeedSearch">
