@@ -105,12 +105,20 @@ public class DBManager {
   /* Migration Related */
   private static final boolean ENABLE_MIGRATION = false; //Turned off as of RSSOwl 2.1
 
+  /* Files created and used in profile directory */
+  private static final String TMP_BACKUP_NAME = "tmp.bak"; //$NON-NLS-1$
+  private static final String DEFRAGMENT_MARKER = "defragment"; //$NON-NLS-1$
+  private static final String LARGE_BLOCK_SIZE_MARKER = "largeblocksize"; //$NON-NLS-1$
+  private static final String ONLINE_RUNNING_BACKUP_MARKER = "onlinebakmarker"; //$NON-NLS-1$
+  private static final String CLEANUP_INDEX_MARKER = "cleanupindex"; //$NON-NLS-1$
+  private static final String REINDEX_MARKER = "reindex"; //$NON-NLS-1$
+  private static final String REINDEX_RUNNING_MARKER = "reindexmarker"; //$NON-NLS-1$
+
   /* Backup Settings */
   private static final boolean PERFORM_SCHEDULED_BACKUPS = false; //Disabled in favor of online backups
   private static final int MAX_OFFLINE_BACKUPS_COUNT = 1; //Only used for backups from defragment
   private static final int MAX_ONLINE_BACKUPS_COUNT = 1; //Will keep 1 Current + 1 Weekly
   private static final int MAX_ONLINE_BACKUP_AGE = 1000 * 60 * 60 * 24 * 7; //7 Days
-  private static final String TMP_BACKUP_NAME = "tmp.bak"; //$NON-NLS-1$
   private static final String RESTORE_BACKUP_NAME = ".restorebak"; //$NON-NLS-1$
   private static final String ONLINE_BACKUP_NAME = ".onlinebak"; //$NON-NLS-1$
   private static final String OFFLINE_BACKUP_NAME = ".backup"; //$NON-NLS-1$
@@ -330,7 +338,7 @@ public class DBManager {
    */
   public File getDefragmentFile() {
     File dir = new File(Activator.getDefault().getStateLocation().toOSString());
-    return new File(dir, "defragment"); //$NON-NLS-1$
+    return new File(dir, DEFRAGMENT_MARKER);
   }
 
   /**
@@ -339,7 +347,7 @@ public class DBManager {
    */
   public static File getLargeBlockSizeMarkerFile() {
     File dir = new File(Activator.getDefault().getStateLocation().toOSString());
-    return new File(dir, "largeblocksize"); //$NON-NLS-1$
+    return new File(dir, LARGE_BLOCK_SIZE_MARKER);
   }
 
   /**
@@ -348,7 +356,7 @@ public class DBManager {
    */
   public File getOnlineBackupMarkerFile() {
     File dir = new File(Activator.getDefault().getStateLocation().toOSString());
-    return new File(dir, "onlinebakmarker"); //$NON-NLS-1$
+    return new File(dir, ONLINE_RUNNING_BACKUP_MARKER);
   }
 
   /**
@@ -356,7 +364,7 @@ public class DBManager {
    */
   public File getCleanUpIndexFile() {
     File dir = new File(Activator.getDefault().getStateLocation().toOSString());
-    return new File(dir, "cleanupindex"); //$NON-NLS-1$
+    return new File(dir, CLEANUP_INDEX_MARKER);
   }
 
   /**
@@ -364,7 +372,7 @@ public class DBManager {
    */
   public File getReIndexFile() {
     File dir = new File(Activator.getDefault().getStateLocation().toOSString());
-    return new File(dir, "reindex"); //$NON-NLS-1$
+    return new File(dir, REINDEX_MARKER);
   }
 
   /**
@@ -373,7 +381,7 @@ public class DBManager {
    */
   public File getReindexMarkerFile() {
     File dir = new File(Activator.getDefault().getStateLocation().toOSString());
-    return new File(dir, "reindexmarker"); //$NON-NLS-1$
+    return new File(dir, REINDEX_RUNNING_MARKER);
   }
 
   /**
