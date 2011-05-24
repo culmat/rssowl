@@ -107,10 +107,12 @@ import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.persist.service.UniqueConstraintException;
 import org.rssowl.core.tests.TestUtils;
+import org.rssowl.core.util.Pair;
 
 import com.db4o.ObjectContainer;
 import com.db4o.query.Query;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -2584,5 +2586,47 @@ public class DBManagerTest extends LargeBlockSizeTest {
 
     assertEquals(0, bookmark.getStickyNewsCount());
     assertEquals(0, bookmark.getNewsCount(INews.State.getVisible()));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testGetProfile() {
+    Pair<File, Long> profile = Owl.getProfile();
+    assertTrue(profile.getFirst().exists());
+    if (profile.getSecond() != null)
+      assertTrue(profile.getSecond() > 0);
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testBackups() {
+    List<File> backups = Owl.getBackups();
+    if (!backups.isEmpty()) {
+      for (File backup : backups) {
+        assertTrue(backup.exists());
+      }
+    }
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testCleanUpOnNextStartup() {
+    Owl.getPersistenceService().getModelSearch().cleanUpOnNextStartup();
+    assertTrue(DBManager.getDefault().getCleanUpIndexFile().exists());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testReIndexOnNextStartup() {
+    Owl.getPersistenceService().getModelSearch().reIndexOnNextStartup();
+    assertTrue(DBManager.getDefault().getReIndexFile().exists());
   }
 }
