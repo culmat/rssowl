@@ -505,7 +505,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
           List<INews> newsItemsToFilter = new ArrayList<INews>(FILTER_CHUNK_SIZE);
           for (SearchHit<NewsReference> chunkItem : chunk) {
             INews newsItemToFilter = chunkItem.getResult().resolve();
-            if (newsItemToFilter != null)
+            if (newsItemToFilter != null && newsItemToFilter.isVisible())
               newsItemsToFilter.add(newsItemToFilter);
             else
               CoreUtils.reportIndexIssue();

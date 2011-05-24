@@ -473,10 +473,12 @@ public class Indexer {
             List<INews> newsList = new ArrayList<INews>(hits.size());
             for (SearchHit<NewsReference> hit : hits) {
               INews news = hit.getResult().resolve();
-              if (news != null && !newsIndexed.contains(news.getId())) {
-                newsList.add(news);
-                newsIndexed.add(news.getId());
-              } else if (news == null)
+              if (news != null && news.isVisible()) {
+                if (!newsIndexed.contains(news.getId())) {
+                  newsList.add(news);
+                  newsIndexed.add(news.getId());
+                }
+              } else
                 CoreUtils.reportIndexIssue();
             }
 

@@ -540,11 +540,11 @@ public class ApplicationServiceImpl implements IApplicationService {
       if (equivalentNewsRefs != null && !equivalentNewsRefs.isEmpty()) {
         NewsReference newsRef = equivalentNewsRefs.get(0);
         INews resolvedNews = newsRef.resolve();
-        if (resolvedNews != null)
+        if (resolvedNews != null && resolvedNews.isVisible())
           newsItem.setState(resolvedNews.getState());
         else {
-          CoreUtils.reportIndexIssue();
           logWarning(NLS.bind(Messages.ApplicationServiceImpl_ERROR_STALE_LUCENE_INDEX, newsRef.getId()));
+          CoreUtils.reportIndexIssue();
         }
       }
 
@@ -554,11 +554,11 @@ public class ApplicationServiceImpl implements IApplicationService {
         if (equivalentNewsRefs != null && !equivalentNewsRefs.isEmpty()) {
           NewsReference newsRef = equivalentNewsRefs.get(0);
           INews resolvedNews = newsRef.resolve();
-          if (resolvedNews != null)
+          if (resolvedNews != null && resolvedNews.isVisible())
             newsItem.setState(resolvedNews.getState());
           else {
-            CoreUtils.reportIndexIssue();
             logWarning(NLS.bind(Messages.ApplicationServiceImpl_ERROR_STALE_LUCENE_INDEX, newsRef.getId()));
+            CoreUtils.reportIndexIssue();
           }
         }
       }

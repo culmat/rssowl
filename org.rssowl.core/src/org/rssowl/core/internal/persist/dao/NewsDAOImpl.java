@@ -292,7 +292,7 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
         news.add(newsItem);
       else {
         INews resolvedNewsItem = hit.resolve();
-        if (resolvedNewsItem != null)
+        if (resolvedNewsItem != null && resolvedNewsItem.isVisible())
           news.add(resolvedNewsItem);
         else
           CoreUtils.reportIndexIssue();

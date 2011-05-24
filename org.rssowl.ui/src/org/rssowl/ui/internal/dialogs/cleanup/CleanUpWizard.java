@@ -40,6 +40,7 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.NewsReference;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Controller;
@@ -161,8 +162,10 @@ public class CleanUpWizard extends Wizard {
             List<INews> resolvedNews = new ArrayList<INews>(news.size());
             for (NewsReference newsRef : news) {
               INews resolvedNewsItem = newsRef.resolve();
-              if (resolvedNewsItem != null)
+              if (resolvedNewsItem != null && resolvedNewsItem.isVisible())
                 resolvedNews.add(resolvedNewsItem);
+              else
+                CoreUtils.reportIndexIssue();
             }
 
             newsDao.setState(resolvedNews, INews.State.DELETED, false, false);

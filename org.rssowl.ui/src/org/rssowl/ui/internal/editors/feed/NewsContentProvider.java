@@ -372,7 +372,7 @@ public class NewsContentProvider implements ITreeContentProvider {
           resolvedNews.add(resolvedNewsItem);
 
         /* News is null from a search, potential index issue - report it */
-        else if (resolvedNewsItem == null && input instanceof ISearchMark)
+        else if (input instanceof ISearchMark)
           CoreUtils.reportIndexIssue();
 
         /* Never resolve more than MAX_RESOLVED_FOLDER_ELEMENTS for a folder */
