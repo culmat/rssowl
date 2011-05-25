@@ -42,6 +42,8 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
@@ -72,6 +74,7 @@ import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.util.CoreUtils;
+import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.NewNewsBinAction;
@@ -114,6 +117,7 @@ public class LocationControl extends Composite {
     private IFolderChild fSelectedElement;
     private Set<IFolderChild> fCheckedElementsCache = new HashSet<IFolderChild>();
     private FilteredTree fFilteredTree;
+    private Button fSelectAll;
 
     FolderChildChooserDialog(Shell parentShell, IFolderChild selectedElement, List<IFolderChild> checkedElements) {
       super(parentShell);
@@ -248,6 +252,23 @@ public class LocationControl extends Composite {
 
             /* Consume the Event */
             e.doit = false;
+          }
+        }
+      });
+
+      /* Handle some UI changes based on filter enabled or not */
+      fFilteredTree.getFilterControl().addModifyListener(new ModifyListener() {
+        public void modifyText(ModifyEvent e) {
+          boolean isFiltered = StringUtils.isSet(fFilteredTree.getFilterControl().getText());
+
+          /* "Select All" enablement */
+          if (fSelectAll != null)
+            fSelectAll.setEnabled(!isFiltered);
+
+          /* Remove all checked elements when filtering */
+          if (isFiltered) {
+            OwlUI.setAllChecked(fViewer.getTree(), false);
+            cacheAll(false);
           }
         }
       });
@@ -421,11 +442,11 @@ public class LocationControl extends Composite {
 
       /* Select All / Deselect All for Location Lookup */
       if (fMode == Mode.SEARCH_LOCATION) {
-        Button selectAll = new Button(buttonContainer, SWT.PUSH);
-        selectAll.setText(Messages.LocationControl_SELECT_ALL);
-        Dialog.applyDialogFont(selectAll);
-        setButtonLayoutData(selectAll);
-        selectAll.addSelectionListener(new SelectionAdapter() {
+        fSelectAll = new Button(buttonContainer, SWT.PUSH);
+        fSelectAll.setText(Messages.LocationControl_SELECT_ALL);
+        Dialog.applyDialogFont(fSelectAll);
+        setButtonLayoutData(fSelectAll);
+        fSelectAll.addSelectionListener(new SelectionAdapter() {
           @Override
           public void widgetSelected(SelectionEvent e) {
             OwlUI.setAllChecked(fViewer.getTree(), true);
