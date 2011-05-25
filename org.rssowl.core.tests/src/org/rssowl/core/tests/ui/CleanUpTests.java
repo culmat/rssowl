@@ -71,7 +71,7 @@ public class CleanUpTests {
   public void setUp() throws Exception {
     fFactory = Owl.getModelFactory();
 
-    Owl.getPersistenceService().recreateSchema();
+    Owl.getPersistenceService().recreateSchema(true);
   }
 
   /**

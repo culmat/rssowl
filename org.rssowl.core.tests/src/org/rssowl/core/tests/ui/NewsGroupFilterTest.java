@@ -93,7 +93,7 @@ public class NewsGroupFilterTest {
     fEarlierThisWeek = new Date(today.getTimeInMillis() + 1000);
     fLastWeek = new Date(fEarlierThisWeek.getTime() - WEEK);
 
-    Owl.getPersistenceService().recreateSchema();
+    Owl.getPersistenceService().recreateSchema(true);
   }
 
   private void waitForIndexer() throws InterruptedException {

@@ -117,7 +117,7 @@ public class ImportExportOPMLTest {
    */
   @Before
   public void setUp() throws Exception {
-    Owl.getPersistenceService().recreateSchema();
+    Owl.getPersistenceService().recreateSchema(true);
 
     fFactory = Owl.getModelFactory();
     fTmpFile = File.createTempFile("rssowl", ".opml2"); //Test the fallback to OPML format too
@@ -160,7 +160,7 @@ public class ImportExportOPMLTest {
     Owl.getInterpreter().exportTo(fTmpBackupFile, rootFolders, EnumSet.of(Options.EXPORT_FILTERS, Options.EXPORT_LABELS, Options.EXPORT_PREFERENCES));
 
     /* Clear */
-    Owl.getPersistenceService().recreateSchema();
+    Owl.getPersistenceService().recreateSchema(true);
 
     /* Add Default Set */
     DynamicDAO.getDAO(IFolderDAO.class).save(fFactory.createFolder(null, null, "My Bookmarks"));

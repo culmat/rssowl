@@ -57,7 +57,12 @@ public abstract class AbstractPersistenceService implements IPersistenceService 
 
   protected AbstractPersistenceService() {}
 
-  public void startup(LongOperationMonitor monitor) throws PersistenceException {
+  /*
+   * @see
+   * org.rssowl.core.persist.service.IPersistenceService#startup(org.rssowl.
+   * core.util.LongOperationMonitor, boolean)
+   */
+  public void startup(LongOperationMonitor monitor, boolean emergency) throws PersistenceException {
     getModelSearch();
     getIDGenerator();
     getDAOService();

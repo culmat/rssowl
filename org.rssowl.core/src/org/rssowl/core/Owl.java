@@ -25,6 +25,7 @@
 package org.rssowl.core;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.rssowl.core.connection.IConnectionService;
 import org.rssowl.core.connection.ICredentialsProvider;
 import org.rssowl.core.connection.IProtocolHandler;
@@ -188,7 +189,7 @@ public final class Owl {
    */
   public static void startup(LongOperationMonitor monitor) {
     if (!InternalOwl.getDefault().isStarted())
-      InternalOwl.getDefault().startup(monitor);
+      InternalOwl.getDefault().startup(monitor, false);
   }
 
   /**
@@ -262,6 +263,9 @@ public final class Owl {
    * persistence layer.
    */
   public static void recreateProfile() throws PersistenceException {
-    InternalOwl.getDefault().getPersistenceService().recreateSchema();
+    InternalOwl.getDefault().getPersistenceService().recreateSchema(false);
+    if (!InternalOwl.getDefault().isStarted())
+      InternalOwl.getDefault().startup(new LongOperationMonitor(new NullProgressMonitor()) {}, true);
+    InternalOwl.getDefault().getPersistenceService().getModelSearch().reIndexOnNextStartup();
   }
 }

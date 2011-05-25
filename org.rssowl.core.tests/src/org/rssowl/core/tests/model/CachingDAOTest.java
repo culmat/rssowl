@@ -90,7 +90,7 @@ public class CachingDAOTest extends LargeBlockSizeTest {
    */
   @Before
   public void setUp() throws Exception {
-    Owl.getPersistenceService().recreateSchema();
+    Owl.getPersistenceService().recreateSchema(true);
     fFactory = Owl.getModelFactory();
   }
 
@@ -552,7 +552,7 @@ public class CachingDAOTest extends LargeBlockSizeTest {
     subSubSubRoot1SM1 = null;
 
     System.gc();
-    Owl.getPersistenceService().startup(new NullOperationMonitor());
+    Owl.getPersistenceService().startup(new NullOperationMonitor(), false);
 
     /* Assert Folders */
     CachingDAO dao = (CachingDAO) DynamicDAO.getDAO(IFolderDAO.class);
@@ -908,7 +908,7 @@ public class CachingDAOTest extends LargeBlockSizeTest {
     subSubSubRoot1SM1 = null;
 
     System.gc();
-    Owl.getPersistenceService().startup(new NullOperationMonitor());
+    Owl.getPersistenceService().startup(new NullOperationMonitor(), false);
 
     /* Assert Folders */
     CachingDAO dao = (CachingDAO) DynamicDAO.getDAO(IFolderDAO.class);
@@ -1111,7 +1111,7 @@ public class CachingDAOTest extends LargeBlockSizeTest {
     /* Reopen Database */
     Owl.getPersistenceService().shutdown(false);
     System.gc();
-    Owl.getPersistenceService().startup(new NullOperationMonitor());
+    Owl.getPersistenceService().startup(new NullOperationMonitor(), false);
 
     /* Assert Folders */
     CachingDAO dao = (CachingDAO) DynamicDAO.getDAO(IFolderDAO.class);
@@ -1189,7 +1189,7 @@ public class CachingDAOTest extends LargeBlockSizeTest {
     /* Reopen Database */
     Owl.getPersistenceService().shutdown(false);
     System.gc();
-    Owl.getPersistenceService().startup(new NullOperationMonitor());
+    Owl.getPersistenceService().startup(new NullOperationMonitor(), false);
 
     /* Assert Folders */
     CachingDAO dao = (CachingDAO) DynamicDAO.getDAO(ILabelDAO.class);

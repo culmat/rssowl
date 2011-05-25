@@ -58,9 +58,12 @@ public interface IPersistenceService {
    * Startup the persistence layer. In case of a Database, this would be the
    * right place to open the connection.
    *
-   * @param monitor
+   * @param emergency if <code>true</code> indicates this startup method is
+   * called from an emergency situation like restoring a backup.
+   * @param monitor the {@link LongOperationMonitor} is used to react on
+   * cancellation and report accurate startup progress.
    */
-  void startup(LongOperationMonitor monitor);
+  void startup(LongOperationMonitor monitor, boolean emergency);
 
   /**
    * Gets the implementation of <code>DAOService</code> that provides access to
@@ -119,10 +122,12 @@ public interface IPersistenceService {
    * Recreate the Schema of the persistence layer. In case of a Database, this
    * would drop relations and create them again.
    *
+   * @param clearSearchIndex if <code>true</code> clears the search index as
+   * well.
    * @throws PersistenceException In case of an error while starting up the
    * persistence layer.
    */
-  void recreateSchema() throws PersistenceException;
+  void recreateSchema(boolean clearSearchIndex) throws PersistenceException;
 
   /**
    * Instructs the persistence service to schedule an optimization run during

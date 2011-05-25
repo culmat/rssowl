@@ -57,7 +57,7 @@ public class PreferencesDAOTest extends LargeBlockSizeTest {
    */
   @Before
   public void setUp() throws Exception {
-    Owl.getPersistenceService().recreateSchema();
+    Owl.getPersistenceService().recreateSchema(true);
     fDao = DynamicDAO.getDAO(IPreferenceDAO.class);
     fFactory = Owl.getModelFactory();
   }

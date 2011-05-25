@@ -45,21 +45,17 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
   /** Default Constructor */
   public PersistenceServiceImpl() {}
 
-  /**
-   * Startup the persistence layer. In case of a Database, this would be the
-   * right place to create relations. Subclasses should override. @throws
-   * PersistenceException In case of an error while starting up the persistence
-   * layer.
-   *
-   * @see org.rssowl.core.persist.service.AbstractPersistenceService#startup(org.
-   * rssowl.core.util.LongOperationMonitor)
+  /*
+   * @see
+   * org.rssowl.core.persist.service.IPersistenceService#startup(org.rssowl.
+   * core.util.LongOperationMonitor, boolean)
    */
   @Override
-  public void startup(LongOperationMonitor monitor) throws PersistenceException {
-    super.startup(monitor);
+  public void startup(LongOperationMonitor monitor, boolean emergency) {
+    super.startup(monitor, emergency);
 
     /* Startup DB and Model-Search */
-    DBManager.getDefault().startup(monitor);
+    DBManager.getDefault().startup(monitor, emergency);
     getModelSearch().startup();
   }
 
@@ -107,15 +103,17 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
   /*
    * @see org.rssowl.core.model.dao.IPersistService#recreateSchema()
    */
-  public void recreateSchema() throws PersistenceException {
+  public void recreateSchema(boolean clearSearchIndex) throws PersistenceException {
     DBManager.getDefault().dropDatabase();
     DBManager.getDefault().createDatabase(new LongOperationMonitor(new NullProgressMonitor()) {
       @Override
       public void beginLongOperation(boolean isCancelable) {
         //Do nothing
       }
-    });
-    getModelSearch().clearIndex();
+    }, true);
+
+    if (clearSearchIndex)
+      getModelSearch().clearIndex();
   }
 
   /*
@@ -145,7 +143,8 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
   }
 
   /*
-   * @see org.rssowl.core.persist.service.IPersistenceService#restore(java.io.File)
+   * @see
+   * org.rssowl.core.persist.service.IPersistenceService#restore(java.io.File)
    */
   public void restore(File backup) throws PersistenceException {
     DBManager.getDefault().restore(backup);

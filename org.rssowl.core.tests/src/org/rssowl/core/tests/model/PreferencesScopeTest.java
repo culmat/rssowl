@@ -82,7 +82,7 @@ public class PreferencesScopeTest extends LargeBlockSizeTest implements IPrefere
    */
   @Before
   public void setUp() throws Exception {
-    Owl.getPersistenceService().recreateSchema();
+    Owl.getPersistenceService().recreateSchema(true);
     ((GlobalScope) Owl.getPreferenceService().getGlobalScope()).clearCache();
     fFactory = Owl.getModelFactory();
   }

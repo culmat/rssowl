@@ -87,7 +87,7 @@ public class ModelTest1 extends LargeBlockSizeTest {
    */
   @Before
   public void setUp() throws Exception {
-    Owl.getPersistenceService().recreateSchema();
+    Owl.getPersistenceService().recreateSchema(true);
     fFactory = Owl.getModelFactory();
   }
 
@@ -896,7 +896,7 @@ public class ModelTest1 extends LargeBlockSizeTest {
     Runtime.getRuntime().gc();
 
     Owl.getPersistenceService().shutdown(false);
-    Owl.getPersistenceService().startup(new NullProgressLongOperationMonitor());
+    Owl.getPersistenceService().startup(new NullProgressLongOperationMonitor(), false);
 
     Collection<ISearchMark> sms = DynamicDAO.loadAll(ISearchMark.class);
     assertEquals(1, sms.size());
@@ -942,7 +942,7 @@ public class ModelTest1 extends LargeBlockSizeTest {
     Runtime.getRuntime().gc();
 
     Owl.getPersistenceService().shutdown(false);
-    Owl.getPersistenceService().startup(new NullProgressLongOperationMonitor());
+    Owl.getPersistenceService().startup(new NullProgressLongOperationMonitor(), false);
 
     Collection<ISearchMark> sms = DynamicDAO.loadAll(ISearchMark.class);
     assertEquals(1, sms.size());
@@ -998,7 +998,7 @@ public class ModelTest1 extends LargeBlockSizeTest {
     Runtime.getRuntime().gc();
 
     Owl.getPersistenceService().shutdown(false);
-    Owl.getPersistenceService().startup(new NullProgressLongOperationMonitor());
+    Owl.getPersistenceService().startup(new NullProgressLongOperationMonitor(), false);
 
     Collection<ISearchMark> sms = DynamicDAO.loadAll(ISearchMark.class);
     assertEquals(1, sms.size());
@@ -1069,7 +1069,7 @@ public class ModelTest1 extends LargeBlockSizeTest {
     Runtime.getRuntime().gc();
 
     Owl.getPersistenceService().shutdown(false);
-    Owl.getPersistenceService().startup(new NullProgressLongOperationMonitor());
+    Owl.getPersistenceService().startup(new NullProgressLongOperationMonitor(), false);
 
     Collection<ISearchMark> sms = DynamicDAO.loadAll(ISearchMark.class);
     assertEquals(1, sms.size());
@@ -1135,7 +1135,7 @@ public class ModelTest1 extends LargeBlockSizeTest {
     Runtime.getRuntime().gc();
 
     Owl.getPersistenceService().shutdown(false);
-    Owl.getPersistenceService().startup(new NullProgressLongOperationMonitor());
+    Owl.getPersistenceService().startup(new NullProgressLongOperationMonitor(), false);
 
     Collection<ISearchMark> sms = DynamicDAO.loadAll(ISearchMark.class);
     assertEquals(1, sms.size());
