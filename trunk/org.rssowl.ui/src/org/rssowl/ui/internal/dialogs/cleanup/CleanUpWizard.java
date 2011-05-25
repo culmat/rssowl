@@ -199,7 +199,7 @@ public class CleanUpWizard extends Wizard {
 
           /* Defrag Database */
           else if (task instanceof DefragDatabaseTask) {
-            Owl.getPersistenceService().optimizeOnNextStartup();
+            Owl.getPersistenceService().defragmentOnNextStartup();
             askForRestart.set(true);
           }
         }
