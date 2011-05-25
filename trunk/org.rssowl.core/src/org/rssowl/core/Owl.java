@@ -253,4 +253,15 @@ public final class Owl {
     InternalOwl.getDefault().getPersistenceService().restore(backup);
     InternalOwl.getDefault().getPersistenceService().getModelSearch().reIndexOnNextStartup();
   }
+
+  /**
+   * Recreate the Profile of the persistence layer. In case of a Database, this
+   * would drop relations and create them again.
+   *
+   * @throws PersistenceException In case of an error while starting up the
+   * persistence layer.
+   */
+  public static void recreateProfile() throws PersistenceException {
+    InternalOwl.getDefault().getPersistenceService().recreateSchema();
+  }
 }
