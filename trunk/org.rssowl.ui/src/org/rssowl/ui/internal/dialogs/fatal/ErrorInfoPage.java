@@ -58,12 +58,12 @@ import org.rssowl.ui.internal.util.LayoutUtils;
 public class ErrorInfoPage extends WizardPage {
   private final IStatus fErrorStatus;
   private Menu fCopyMenu;
-  private final boolean fHasBackups;
+  private final boolean fHasNextPage;
 
-  ErrorInfoPage(String pageName, IStatus errorStatus, boolean hasBackups) {
+  ErrorInfoPage(String pageName, IStatus errorStatus, boolean hasNextPage) {
     super(pageName, pageName, null);
     fErrorStatus = errorStatus;
-    fHasBackups = hasBackups;
+    fHasNextPage = hasNextPage;
   }
 
   /*
@@ -78,7 +78,7 @@ public class ErrorInfoPage extends WizardPage {
     /* Container */
     Composite container = new Composite(parent, SWT.NONE);
     container.setLayout(LayoutUtils.createGridLayout(1, 5, 5));
-    if (!fHasBackups)
+    if (!fHasNextPage)
       ((GridLayout) container.getLayout()).marginBottom = 5;
 
     /* Error Details */
@@ -150,7 +150,7 @@ public class ErrorInfoPage extends WizardPage {
       ((GridData) furtherStepsLabel.getLayoutData()).verticalIndent = 10;
 
       Link moreInfoLabel = new Link(container, SWT.WRAP);
-      moreInfoLabel.setText(fHasBackups ? Messages.ErrorInfoPage_NEXT_PAGE_ADVISE : Messages.ErrorInfoPage_GENERAL_ERROR_ADVISE);
+      moreInfoLabel.setText(fHasNextPage ? Messages.ErrorInfoPage_NEXT_PAGE_ADVISE : Messages.ErrorInfoPage_GENERAL_ERROR_ADVISE);
       moreInfoLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
       ((GridData) moreInfoLabel.getLayoutData()).widthHint = 200;
 

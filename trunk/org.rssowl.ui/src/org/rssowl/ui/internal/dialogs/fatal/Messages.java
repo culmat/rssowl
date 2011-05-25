@@ -28,6 +28,16 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
   private static final String BUNDLE_NAME = "org.rssowl.ui.internal.dialogs.fatal.messages"; //$NON-NLS-1$
+  public static String CleanProfilePage_CAUTION;
+  public static String CleanProfilePage_CAUTION_TEXT_RESTORE;
+  public static String CleanProfilePage_CAUTION_TEXT_START_OVER;
+  public static String CleanProfilePage_CONFIRM_TEXT;
+  public static String CleanProfilePage_NO_BACKUPS;
+  public static String CleanProfilePage_OPML_BACKUP_INFO;
+  public static String CleanProfilePage_RESTORE_SUBSCRIPTIONS_SETTINGS;
+  public static String CleanProfilePage_RESTORING_SUBSCRIPTIONS_SETTINGS;
+  public static String CleanProfilePage_START_OVER;
+  public static String CleanProfilePage_STARTING_OVER;
   public static String ErrorInfoPage_COPY;
   public static String ErrorInfoPage_ERROR_DETAILS;
   public static String ErrorInfoPage_FURTHER_STEPS;
@@ -44,6 +54,8 @@ public class Messages extends NLS {
   public static String FatalErrorWizard_RESTORE_BACKUP;
   public static String FatalErrorWizard_RESTORE_ERROR;
   public static String FatalErrorWizard_RESTORE_ERROR_N;
+  public static String FatalErrorWizard_RESTORE_SUBSCRIPTIONS_SETTINGS;
+  public static String FatalErrorWizard_START_OVER;
   public static String FatalErrorWizard_WE_ARE_SORRY;
   public static String RestoreBackupPage_BACKUP_INFO_QUIT;
   public static String RestoreBackupPage_BACKUP_INFO_RESTART;

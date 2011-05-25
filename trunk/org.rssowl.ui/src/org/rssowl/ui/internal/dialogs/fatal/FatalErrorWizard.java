@@ -24,7 +24,9 @@
 
 package org.rssowl.ui.internal.dialogs.fatal;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.wizard.Wizard;
@@ -35,9 +37,10 @@ import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Application;
+import org.rssowl.ui.internal.Controller;
 
 import java.io.File;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -49,15 +52,42 @@ import java.util.List;
 public class FatalErrorWizard extends Wizard {
   private ErrorInfoPage fErrorInfoPage;
   private RestoreBackupPage fRestoreBackupPage;
+  private CleanProfilePage fCleanProfilePage;
   private final IStatus fErrorStatus;
   private int fReturnCode = IApplication.EXIT_OK;
-  private final List<File> fBackups;
+  private final List<File> fProfileBackups = new ArrayList<File>();
+  private final List<File> fOPMLBackups = new ArrayList<File>();
+  private final boolean fIsOOMError;
 
   public FatalErrorWizard(IStatus errorStatus) {
     fErrorStatus = errorStatus;
+    fIsOOMError = (fErrorStatus.getException() instanceof OutOfMemoryError);
+    if (!fIsOOMError)
+      findBackups();
+  }
 
-    boolean allowToRestoreBackups = !(errorStatus.getException() instanceof OutOfMemoryError);
-    fBackups = allowToRestoreBackups ? Owl.getBackups() : Collections.<File> emptyList();
+  private void findBackups() {
+
+    /* Collect Profile Backups */
+    fProfileBackups.addAll(Owl.getBackups());
+
+    /* Collect OPML Backups if no profile backups can be found */
+    if (fProfileBackups.isEmpty()) {
+      IPath backPath = Platform.getLocation();
+      File backupDir = backPath.toFile();
+      if (backupDir.exists()) {
+
+        /* Daily OPML Backup */
+        File dailyBackupFile = backPath.append(Controller.DAILY_BACKUP).toFile();
+        if (dailyBackupFile.exists())
+          fOPMLBackups.add(dailyBackupFile);
+
+        /* Weekly OPML Backup */
+        File weeklyBackupFile = backPath.append(Controller.WEEKLY_BACKUP).toFile();
+        if (weeklyBackupFile.exists())
+          fOPMLBackups.add(weeklyBackupFile);
+      }
+    }
   }
 
   /*
@@ -69,13 +99,23 @@ public class FatalErrorWizard extends Wizard {
     setHelpAvailable(false);
 
     /* Error Info */
-    fErrorInfoPage = new ErrorInfoPage(Messages.FatalErrorWizard_WE_ARE_SORRY, fErrorStatus, !fBackups.isEmpty());
+    fErrorInfoPage = new ErrorInfoPage(Messages.FatalErrorWizard_WE_ARE_SORRY, fErrorStatus, !fIsOOMError);
     addPage(fErrorInfoPage);
 
-    /* Restore Backup (if backups are present) */
-    if (!fBackups.isEmpty()) {
-      fRestoreBackupPage = new RestoreBackupPage(Messages.FatalErrorWizard_RESTORE_BACKUP, fBackups);
-      addPage(fRestoreBackupPage);
+    /* Add Restore Pages if this is not an OOM Error */
+    if (!fIsOOMError) {
+
+      /* Restore Profile Backup (if profile backups are present) */
+      if (!fProfileBackups.isEmpty()) {
+        fRestoreBackupPage = new RestoreBackupPage(Messages.FatalErrorWizard_RESTORE_BACKUP, fProfileBackups);
+        addPage(fRestoreBackupPage);
+      }
+
+      /* Otherwise allow to restore from OPML Backup or clean start */
+      else {
+        fCleanProfilePage = new CleanProfilePage(fOPMLBackups.isEmpty() ? Messages.FatalErrorWizard_START_OVER : Messages.FatalErrorWizard_RESTORE_SUBSCRIPTIONS_SETTINGS, !fOPMLBackups.isEmpty());
+        addPage(fCleanProfilePage);
+      }
     }
   }
 
@@ -110,6 +150,11 @@ public class FatalErrorWizard extends Wizard {
       }
     }
 
+    /* Handle Clean Profile if selected */
+    else if (fCleanProfilePage != null && fCleanProfilePage.doCleanProfile()) {
+      //TODO
+    }
+
     /* Windows: Support to restart from dialog */
     if (Application.IS_WINDOWS)
       fReturnCode = IApplication.EXIT_RESTART;
@@ -125,6 +170,8 @@ public class FatalErrorWizard extends Wizard {
 
     /* Make sure user is on last page to Finish */
     if (fRestoreBackupPage != null && getContainer().getCurrentPage() != fRestoreBackupPage)
+      return false;
+    else if (fCleanProfilePage != null && getContainer().getCurrentPage() != fCleanProfilePage)
       return false;
 
     /* Other Pages decide on their own */
