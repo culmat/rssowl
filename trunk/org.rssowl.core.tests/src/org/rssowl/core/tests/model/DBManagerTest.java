@@ -35,6 +35,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.rssowl.core.Owl;
+import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.internal.persist.BookMark;
 import org.rssowl.core.internal.persist.Category;
 import org.rssowl.core.internal.persist.Feed;
@@ -2593,7 +2594,7 @@ public class DBManagerTest extends LargeBlockSizeTest {
    */
   @Test
   public void testGetProfile() {
-    Pair<File, Long> profile = Owl.getProfile();
+    Pair<File, Long> profile = InternalOwl.getDefault().getProfile();
     assertTrue(profile.getFirst().exists());
     if (profile.getSecond() != null)
       assertTrue(profile.getSecond() > 0);
@@ -2604,7 +2605,7 @@ public class DBManagerTest extends LargeBlockSizeTest {
    */
   @Test
   public void testBackups() {
-    List<File> backups = Owl.getBackups();
+    List<File> backups = InternalOwl.getDefault().getProfileBackups();
     if (!backups.isEmpty()) {
       for (File backup : backups) {
         assertTrue(backup.exists());

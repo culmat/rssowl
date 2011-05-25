@@ -116,9 +116,15 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
       getModelSearch().clearIndex();
   }
 
-  /*
-   * @see
-   * org.rssowl.core.persist.service.IPersistenceService#optimizeOnNextStartup()
+  /**
+   * Instructs the persistence service to schedule an optimization run during
+   * the next time the application is started. The actual optimization type is
+   * dependent on the persistence system being used and implementors are free to
+   * leave this as a no-op in case the the persistence system tunes itself
+   * automatically during runtime.
+   *
+   * @throws PersistenceException in case a problem occurs while trying to
+   * schedule this operation.
    */
   public void optimizeOnNextStartup() throws PersistenceException {
     try {
@@ -128,25 +134,37 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
     }
   }
 
-  /*
-   * @see org.rssowl.core.persist.service.IPersistenceService#getProfile()
+  /**
+   * Returns the profile {@link File} that contains all data and the
+   * {@link Long} timestamp when it was last successfully used.
+   *
+   * @return the profile {@link File} and the {@link Long} timestamp when it was
+   * last successfully used.
    */
   public Pair<File, Long> getProfile() {
     return DBManager.getDefault().getProfile();
   }
 
-  /*
-   * @see org.rssowl.core.persist.service.IPersistenceService#getBackups()
+  /**
+   * Provides a list of available backups for the user to restore from in case
+   * of an unrecoverable error.
+   *
+   * @return a list of available backups for the user to restore from in case of
+   * an unrecoverable error.
    */
-  public List<File> getBackups() {
+  public List<File> getProfileBackups() {
     return DBManager.getDefault().getBackups();
   }
 
-  /*
-   * @see
-   * org.rssowl.core.persist.service.IPersistenceService#restore(java.io.File)
+  /**
+   * Will rename the provided backup file to the operational RSSOwl profile
+   * database.
+   *
+   * @param backup the backup {@link File} to restore from.
+   * @throws PersistenceException in case a problem occurs while trying to
+   * execute this operation.
    */
-  public void restore(File backup) throws PersistenceException {
+  public void restoreProfile(File backup) throws PersistenceException {
     DBManager.getDefault().restore(backup);
   }
 }

@@ -43,7 +43,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.rssowl.core.Owl;
+import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.util.Pair;
 import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.OwlUI;
@@ -97,7 +97,7 @@ public class RestoreBackupPage extends WizardPage {
     }
 
     /* Current Profile Info */
-    Pair<File, Long> pair = Owl.getProfile();
+    Pair<File, Long> pair = InternalOwl.getDefault().getProfile();
     File profile = pair.getFirst();
     if (profile != null && profile.exists()) {
       Label currentProfileLabel = new Label(container, SWT.NONE);
