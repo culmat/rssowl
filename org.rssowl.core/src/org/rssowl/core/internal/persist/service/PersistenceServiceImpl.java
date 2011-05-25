@@ -177,25 +177,13 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
    */
   public void recreateProfile() throws PersistenceException {
 
-    /* Backup DB */
-    DBManager.getDefault().backupProfile();
+    /* Move DB to Backup */
+    DBManager.getDefault().backupAndDeleteProfile();
 
-    /* Drop DB Schema */
-    DBManager.getDefault().dropDatabase();
-    
-    /* Create Empty Database */
-    DBManager.getDefault().createDatabase(new LongOperationMonitor(new NullProgressMonitor()) {
-      @Override
-      public void beginLongOperation(boolean isCancelable) {
-        //Do nothing
-      }
-    }, true);
-
-    /* Make sure to be started */
-    if (!InternalOwl.getDefault().isStarted())
-      InternalOwl.getDefault().startup(new LongOperationMonitor(new NullProgressMonitor()) {}, true);
+    /* Start to create DB Scheme */
+    InternalOwl.getDefault().startup(new LongOperationMonitor(new NullProgressMonitor()) {}, true);
 
     /* Reindex Search on next startup */
-   getModelSearch().reIndexOnNextStartup();
+    getModelSearch().reIndexOnNextStartup();
   }
 }
