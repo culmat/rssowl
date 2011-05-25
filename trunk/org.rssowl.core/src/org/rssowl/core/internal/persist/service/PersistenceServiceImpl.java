@@ -183,7 +183,11 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
     /* Start to create DB Scheme */
     InternalOwl.getDefault().startup(new LongOperationMonitor(new NullProgressMonitor()) {}, true);
 
-    /* Reindex Search on next startup */
-    getModelSearch().reIndexOnNextStartup();
+    /* Clear Search Index and fallback to reindexing after next start in case this fails */
+    try {
+      getModelSearch().clearIndex();
+    } catch (Exception e) {
+      getModelSearch().reIndexOnNextStartup();
+    }
   }
 }
