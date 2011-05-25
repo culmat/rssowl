@@ -26,20 +26,27 @@ package org.rssowl.ui.internal.dialogs.fatal;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.rssowl.core.Owl;
+import org.rssowl.core.internal.InternalOwl;
+import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.service.PersistenceException;
+import org.rssowl.core.util.LongOperationMonitor;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.Controller;
+import org.rssowl.ui.internal.util.ImportUtils;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -125,34 +132,26 @@ public class FatalErrorWizard extends Wizard {
   @Override
   public boolean performFinish() {
 
-    /* Handle selected backup if present */
-    if (fRestoreBackupPage != null) {
-      File backup = fRestoreBackupPage.getSelectedBackup();
-      if (backup != null) {
-
-        /* Trigger Backup Restore */
-        try {
-          Owl.restore(backup);
-        } catch (PersistenceException e) {
-          Activator.getDefault().logError(e.getMessage(), e);
-
-          /* Show Error to the User */
-          String msg;
-          if (StringUtils.isSet(e.getMessage()))
-            msg = NLS.bind(Messages.FatalErrorWizard_RESTORE_ERROR_N, e.getMessage());
-          else
-            msg = Messages.FatalErrorWizard_RESTORE_ERROR;
-
-          ((WizardPage) getContainer().getCurrentPage()).setMessage(msg, IMessageProvider.ERROR);
-
-          return false;
+    /* Finish */
+    try {
+      BusyIndicator.showWhile(getShell().getDisplay(), new Runnable() {
+        public void run() {
+          internalPerformFinish();
         }
-      }
-    }
+      });
+    } catch (PersistenceException e) {
+      Activator.getDefault().logError(e.getMessage(), e);
 
-    /* Handle Clean Profile if selected */
-    else if (fCleanProfilePage != null && fCleanProfilePage.doCleanProfile()) {
-      //TODO
+      /* Show Error to the User */
+      String msg;
+      if (StringUtils.isSet(e.getMessage()))
+        msg = NLS.bind(Messages.FatalErrorWizard_RESTORE_ERROR_N, e.getMessage());
+      else
+        msg = Messages.FatalErrorWizard_RESTORE_ERROR;
+
+      ((WizardPage) getContainer().getCurrentPage()).setMessage(msg, IMessageProvider.ERROR);
+
+      return false;
     }
 
     /* Windows: Support to restart from dialog */
@@ -160,6 +159,58 @@ public class FatalErrorWizard extends Wizard {
       fReturnCode = IApplication.EXIT_RESTART;
 
     return true;
+  }
+
+  private void internalPerformFinish() throws PersistenceException {
+
+    /* Handle selected backup if present */
+    if (fRestoreBackupPage != null) {
+      File backup = fRestoreBackupPage.getSelectedBackup();
+      if (backup != null)
+        Owl.restore(backup);
+    }
+
+    /* Handle Clean Profile if selected */
+    else if (fCleanProfilePage != null && fCleanProfilePage.doCleanProfile()) {
+
+      /* Recreate the Scheme */
+      Owl.recreateProfile();
+
+      /* Startup as Necessary */
+      Owl.startup(new LongOperationMonitor(new NullProgressMonitor()) {});
+
+      /* Try to Import from OPML backups if present */
+      if (!fOPMLBackups.isEmpty()) {
+        List<? extends IEntity> types = null;
+
+        /* First Try Daily Backup */
+        File recentBackup = fOPMLBackups.get(0);
+        try {
+          types = InternalOwl.getDefault().getInterpreter().importFrom(new FileInputStream(recentBackup));
+        } catch (Exception e) {
+          if (fOPMLBackups.size() == 1)
+            throw new PersistenceException(e.getMessage(), e);
+        }
+
+        /* Second Try Weekly Backup */
+        if (types == null && fOPMLBackups.size() == 2) {
+          File weeklyBackup = fOPMLBackups.get(1);
+          try {
+            types = Owl.getInterpreter().importFrom(new FileInputStream(weeklyBackup));
+          } catch (Exception e) {
+            throw new PersistenceException(e.getMessage(), e);
+          }
+        }
+
+        /* Do Import */
+        if (types != null) {
+          ImportUtils.doImport(null, types, false);
+
+          /* Mark for Reindex */
+          Owl.getPersistenceService().getModelSearch().reIndexOnNextStartup();
+        }
+      }
+    }
   }
 
   /*
