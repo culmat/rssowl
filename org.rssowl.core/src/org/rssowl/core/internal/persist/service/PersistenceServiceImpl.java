@@ -126,7 +126,7 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
    * @throws PersistenceException in case a problem occurs while trying to
    * schedule this operation.
    */
-  public void optimizeOnNextStartup() throws PersistenceException {
+  public void defragmentOnNextStartup() throws PersistenceException {
     try {
       DBManager.getDefault().getDefragmentFile().createNewFile();
     } catch (IOException e) {
@@ -153,7 +153,7 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
    * an unrecoverable error.
    */
   public List<File> getProfileBackups() {
-    return DBManager.getDefault().getBackups();
+    return DBManager.getDefault().getProfileBackups();
   }
 
   /**
@@ -165,6 +165,6 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
    * execute this operation.
    */
   public void restoreProfile(File backup) throws PersistenceException {
-    DBManager.getDefault().restore(backup);
+    DBManager.getDefault().restoreProfile(backup);
   }
 }

@@ -116,7 +116,8 @@ public interface IPersistenceService {
 
   /**
    * Recreate the Schema of the persistence layer. In case of a Database, this
-   * would drop relations and create them again.
+   * would drop relations and create them again. Will optionally also clear the
+   * search index if the given parameter is set to <code>true</code>.
    *
    * @param clearSearchIndex if <code>true</code> clears the search index as
    * well.
@@ -135,5 +136,5 @@ public interface IPersistenceService {
    * @throws PersistenceException in case a problem occurs while trying to
    * schedule this operation.
    */
-  void optimizeOnNextStartup() throws PersistenceException;
+  void defragmentOnNextStartup() throws PersistenceException;
 }

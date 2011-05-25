@@ -1365,7 +1365,7 @@ public class DBManager {
     return Pair.create(profile, timestamp);
   }
 
-  List<File> getBackups() {
+  List<File> getProfileBackups() {
     List<File> backups = new ArrayList<File>();
     File backupDir = new File(Activator.getDefault().getStateLocation().toOSString());
 
@@ -1400,7 +1400,7 @@ public class DBManager {
     return backups;
   }
 
-  void restore(File backup) throws PersistenceException {
+  void restoreProfile(File backup) throws PersistenceException {
     Activator.safeLogInfo(NLS.bind("Start: Database Restore from Backup ({0})", backup.getName())); //$NON-NLS-1$
 
     /* Object Container might be opened, so try to close */
