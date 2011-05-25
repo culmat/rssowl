@@ -71,7 +71,7 @@ public class RetentionStrategyTests {
    */
   @Before
   public void setUp() throws Exception {
-    Owl.getPersistenceService().recreateSchema(true);
+    Owl.getPersistenceService().recreateSchema();
     fFactory = Owl.getModelFactory();
     Owl.getPreferenceService().getGlobalScope().putBoolean(DefaultPreferences.NEVER_DEL_UNREAD_NEWS_STATE, false);
   }

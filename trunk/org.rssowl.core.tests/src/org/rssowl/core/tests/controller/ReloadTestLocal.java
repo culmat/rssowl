@@ -93,7 +93,7 @@ public class ReloadTestLocal extends LargeBlockSizeTest {
    */
   @Before
   public void setUp() throws Exception {
-    Owl.getPersistenceService().recreateSchema(true);
+    Owl.getPersistenceService().recreateSchema();
     InMemoryProtocolHandler.FEED = null;
 
     fController = Controller.getDefault();

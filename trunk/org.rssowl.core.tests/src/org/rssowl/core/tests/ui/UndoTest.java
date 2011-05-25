@@ -63,7 +63,7 @@ public class UndoTest {
   @Before
   public void setUp() throws Exception {
     fFactory = Owl.getModelFactory();
-    Owl.getPersistenceService().recreateSchema(true);
+    Owl.getPersistenceService().recreateSchema();
     UndoStack.getInstance().clear();
   }
 

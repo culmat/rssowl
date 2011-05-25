@@ -26,6 +26,7 @@ package org.rssowl.core.internal.persist.service;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.rssowl.core.internal.Activator;
+import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.persist.service.AbstractPersistenceService;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.LongOperationMonitor;
@@ -103,7 +104,7 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
   /*
    * @see org.rssowl.core.model.dao.IPersistService#recreateSchema()
    */
-  public void recreateSchema(boolean clearSearchIndex) throws PersistenceException {
+  public void recreateSchema() throws PersistenceException {
     DBManager.getDefault().dropDatabase();
     DBManager.getDefault().createDatabase(new LongOperationMonitor(new NullProgressMonitor()) {
       @Override
@@ -112,8 +113,7 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
       }
     }, true);
 
-    if (clearSearchIndex)
-      getModelSearch().clearIndex();
+    getModelSearch().clearIndex();
   }
 
   /**
@@ -166,5 +166,36 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
    */
   public void restoreProfile(File backup) throws PersistenceException {
     DBManager.getDefault().restoreProfile(backup);
+  }
+
+  /**
+   * Recreate the Profile of the persistence layer. In case of a Database, this
+   * would drop relations and create them again.
+   *
+   * @throws PersistenceException In case of an error while starting up the
+   * persistence layer.
+   */
+  public void recreateProfile() throws PersistenceException {
+
+    /* Backup DB */
+    DBManager.getDefault().backupProfile();
+
+    /* Drop DB Schema */
+    DBManager.getDefault().dropDatabase();
+    
+    /* Create Empty Database */
+    DBManager.getDefault().createDatabase(new LongOperationMonitor(new NullProgressMonitor()) {
+      @Override
+      public void beginLongOperation(boolean isCancelable) {
+        //Do nothing
+      }
+    }, true);
+
+    /* Make sure to be started */
+    if (!InternalOwl.getDefault().isStarted())
+      InternalOwl.getDefault().startup(new LongOperationMonitor(new NullProgressMonitor()) {}, true);
+
+    /* Reindex Search on next startup */
+   getModelSearch().reIndexOnNextStartup();
   }
 }

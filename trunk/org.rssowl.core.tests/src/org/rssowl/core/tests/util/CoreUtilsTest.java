@@ -91,7 +91,7 @@ public class CoreUtilsTest {
    */
   @Before
   public void setUp() throws Exception {
-    Owl.getPersistenceService().recreateSchema(true);
+    Owl.getPersistenceService().recreateSchema();
   }
 
   /**
