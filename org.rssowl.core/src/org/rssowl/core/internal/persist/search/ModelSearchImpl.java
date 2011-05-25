@@ -97,6 +97,10 @@ public class ModelSearchImpl implements IModelSearch {
    * @see org.rssowl.core.model.search.IModelSearch#startup()
    */
   public void startup() throws PersistenceException {
+    startup(false);
+  }
+
+  private void startup(boolean clearIndex) throws PersistenceException {
     try {
       if (fDirectory == null) {
         String path = Activator.getDefault().getStateLocation().toOSString();
@@ -107,7 +111,7 @@ public class ModelSearchImpl implements IModelSearch {
       if (fIndexer == null)
         fIndexer = new Indexer(this, fDirectory);
 
-      fIndexer.initIfNecessary();
+      fIndexer.initIfNecessary(clearIndex);
 
       synchronized (this) {
         if (fSearcher == null)
@@ -123,6 +127,7 @@ public class ModelSearchImpl implements IModelSearch {
    */
   public void shutdown(boolean emergency) throws PersistenceException {
     try {
+
       /*
        * Close fIndexer first because it's more important (reduces the chance of
        * a corrupt index). Can be null if exception thrown during start-up
@@ -138,28 +143,35 @@ public class ModelSearchImpl implements IModelSearch {
         return;
 
       synchronized (this) {
+
         /* We first close all the searchers whose refCount is 0 */
         for (Map.Entry<IndexSearcher, AtomicInteger> mapEntry : fSearchers.entrySet()) {
           if (mapEntry.getValue().get() == 0)
             dispose(mapEntry.getKey());
         }
+
         while (!fSearchers.isEmpty()) {
           try {
+
             /*
              * We sleep with a lock held because the Threads that we're waiting
              * to make progress don't acquire a lock
              */
             Thread.sleep(50);
-          } catch (InterruptedException e) {
-            /* If interrupted, we just leave the rest of the searchers open */
+          }
+
+          /* If interrupted, we just leave the rest of the searchers open */
+          catch (InterruptedException e) {
             return;
           }
+
           /* Try again for the ones that are left */
           for (Map.Entry<IndexSearcher, AtomicInteger> mapEntry : fSearchers.entrySet()) {
             if (mapEntry.getValue().get() == 0)
               dispose(mapEntry.getKey());
           }
         }
+
         fSearcher = null;
       }
     } catch (IOException e) {
@@ -316,9 +328,8 @@ public class ModelSearchImpl implements IModelSearch {
   private List<NewsReference> simpleSearch(IndexSearcher currentSearcher, Query query) {
     List<NewsReference> resultList = new ArrayList<NewsReference>(2);
 
+    /* Use custom hit collector for performance reasons */
     try {
-      /* Use custom hit collector for performance reasons */
-      /* Perform the Search */
       currentSearcher.search(query, new SimpleHitCollector(currentSearcher, resultList));
       return resultList;
     } catch (IOException e) {
@@ -330,6 +341,7 @@ public class ModelSearchImpl implements IModelSearch {
     AtomicInteger referenceCount = fSearchers.get(currentSearcher);
     if (referenceCount.decrementAndGet() == 0 && fSearcher != currentSearcher) {
       try {
+
         /*
          * May be called by getCurrentSearcher at the same time, but safe
          * because dispose is safe to be called many times for the same
@@ -451,6 +463,7 @@ public class ModelSearchImpl implements IModelSearch {
       IndexSearcher currentSearcher = fSearcher;
 
       synchronized (this) {
+
         /*
          * If there are changes and currentSearcher == fSearcher, it means we
          * won the race for the lock, so we reopen the searcher. If flushed is
@@ -476,6 +489,7 @@ public class ModelSearchImpl implements IModelSearch {
 
             AtomicInteger referenceCount = fSearchers.get(currentSearcher);
             if (referenceCount != null && referenceCount.get() == 0) {
+
               /*
                * May be called by disposeIfNecessary at the same time, but safe
                * because dispose is safe to be called many times for the same
@@ -526,6 +540,7 @@ public class ModelSearchImpl implements IModelSearch {
           if (refCount == null)
             break;
           else if (refCount.get() == 0) {
+
             /*
              * This may be called at the same time from disposeIfNecessary, but
              * that's fine.
@@ -534,6 +549,7 @@ public class ModelSearchImpl implements IModelSearch {
             break;
           } else {
             try {
+
               /*
                * We sleep with a lock held because the Threads that we're
                * waiting to make progress don't acquire a lock
@@ -628,6 +644,9 @@ public class ModelSearchImpl implements IModelSearch {
     /* User might have cancelled the operation */
     if (monitor.isCanceled())
       return;
+
+    /* Startup Modelsearch and clean the index directory */
+    startup(true);
 
     /* Lock the indexer for the duration of the reindexing */
     synchronized (fIndexer) {

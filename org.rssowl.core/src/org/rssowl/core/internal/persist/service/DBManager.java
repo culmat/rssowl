@@ -488,9 +488,6 @@ public class DBManager {
           IModelSearch modelSearch = InternalOwl.getDefault().getPersistenceService().getModelSearch();
           if (!progressMonitor.isCanceled() && (shouldReindex || migrationResult.isOptimizeIndex())) {
 
-            /* Ensure the Model Search is started by now */
-            modelSearch.startup();
-
             /* Reindex */
             if (shouldReindex && !progressMonitor.isCanceled()) {
               Activator.safeLogInfo("Start: Search Re-Indexing"); //$NON-NLS-1$
@@ -522,10 +519,6 @@ public class DBManager {
               /* Log Status */
               Activator.safeLogInfo("Finished: Search Re-Indexing"); //$NON-NLS-1$
             }
-
-            /* Optimize Index if Necessary */
-            if (migrationResult.isOptimizeIndex() && !progressMonitor.isCanceled())
-              modelSearch.optimize();
           }
         }
 

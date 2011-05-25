@@ -252,7 +252,7 @@ public class Indexer {
         return true;
 
       dispose();
-      createIndexWriter();
+      createIndexWriter(false);
       saveCommittedNews(false, new EntityIdsByEventType(fUncommittedNews));
       fUncommittedNews.clear();
     }
@@ -287,14 +287,14 @@ public class Indexer {
    * @throws IOException
    */
   synchronized void clearIndex() throws IOException {
+
+    /* Dispose Resources held by the Indexer */
     dispose();
 
-    /*
-     * Database got cleared, so we don't need to worry about syncing these
-     * values
-     */
+    /* Database got cleared, so we don't need to worry about syncing these values */
     fUncommittedNews.clear();
 
+    /* Re-Create the Index */
     if (IndexReader.indexExists(fIndexDirectory))
       fIndexWriter = createIndexWriter(fIndexDirectory, true);
   }
@@ -341,10 +341,10 @@ public class Indexer {
     return analyzer;
   }
 
-  private void init() throws PersistenceException {
+  private void init(boolean clearIndex) throws PersistenceException {
 
     /* Create Index Writer */
-    createIndexWriter();
+    createIndexWriter(clearIndex);
 
     /* Listen to Model Events */
     registerListeners();
@@ -403,16 +403,16 @@ public class Indexer {
     return indexingTasks;
   }
 
-  synchronized void initIfNecessary() {
+  synchronized void initIfNecessary(boolean clearIndex) {
     if (fIndexWriter == null)
-      init();
+      init(clearIndex);
   }
 
-  private void createIndexWriter() {
+  private void createIndexWriter(boolean clearIndex) {
 
     /* Create the Index if required */
     try {
-      fIndexWriter = createIndexWriter(fIndexDirectory, !IndexReader.indexExists(fIndexDirectory));
+      fIndexWriter = createIndexWriter(fIndexDirectory, clearIndex || !IndexReader.indexExists(fIndexDirectory));
     } catch (IOException e) {
       throw new PersistenceException(e.getMessage(), e);
     }
