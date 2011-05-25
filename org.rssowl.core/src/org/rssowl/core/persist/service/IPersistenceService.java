@@ -28,10 +28,6 @@ import org.rssowl.core.persist.dao.DAOService;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IEntityDAO;
 import org.rssowl.core.util.LongOperationMonitor;
-import org.rssowl.core.util.Pair;
-
-import java.io.File;
-import java.util.List;
 
 /**
  * Provides access to ther persistence layer of RSSOwl. This layer is
@@ -140,32 +136,4 @@ public interface IPersistenceService {
    * schedule this operation.
    */
   void optimizeOnNextStartup() throws PersistenceException;
-
-  /**
-   * Returns the profile {@link File} that contains all data and the
-   * {@link Long} timestamp when it was last successfully used.
-   *
-   * @return the profile {@link File} and the {@link Long} timestamp when it was
-   * last successfully used.
-   */
-  Pair<File /* Profile File */, Long /* Timestamp of last successful use */> getProfile();
-
-  /**
-   * Provides a list of available backups for the user to restore from in case
-   * of an unrecoverable error.
-   *
-   * @return a list of available backups for the user to restore from in case of
-   * an unrecoverable error.
-   */
-  List<File> getBackups();
-
-  /**
-   * Will rename the provided backup file to the operational RSSOwl profile
-   * database.
-   *
-   * @param backup the backup {@link File} to restore from.
-   * @throws PersistenceException in case a problem occurs while trying to
-   * execute this operation.
-   */
-  void restore(File backup) throws PersistenceException;
 }

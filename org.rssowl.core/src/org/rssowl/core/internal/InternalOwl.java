@@ -24,12 +24,14 @@
 
 package org.rssowl.core.internal;
 
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.rssowl.core.IApplicationService;
 import org.rssowl.core.connection.IConnectionService;
 import org.rssowl.core.connection.ICredentialsProvider;
 import org.rssowl.core.connection.IProtocolHandler;
 import org.rssowl.core.internal.connection.ConnectionServiceImpl;
 import org.rssowl.core.internal.interpreter.InterpreterServiceImpl;
+import org.rssowl.core.internal.persist.service.PersistenceServiceImpl;
 import org.rssowl.core.internal.persist.service.PreferenceServiceImpl;
 import org.rssowl.core.interpreter.IElementHandler;
 import org.rssowl.core.interpreter.IFormatInterpreter;
@@ -43,8 +45,13 @@ import org.rssowl.core.persist.pref.IPreferencesInitializer;
 import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.persist.service.IPersistenceService;
 import org.rssowl.core.persist.service.IPreferenceService;
+import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.ExtensionUtils;
 import org.rssowl.core.util.LongOperationMonitor;
+import org.rssowl.core.util.Pair;
+
+import java.io.File;
+import java.util.List;
 
 /**
  * The <code>InternalOwl</code> is being used from the public <code>Owl</code>
@@ -275,6 +282,55 @@ public final class InternalOwl {
    */
   public IModelFactory getModelFactory() {
     return fModelFactory;
+  }
+
+  /**
+   * Returns the profile {@link File} that contains all data and the
+   * {@link Long} timestamp when it was last successfully used.
+   *
+   * @return the profile {@link File} and the {@link Long} timestamp when it was
+   * last successfully used.
+   */
+  public Pair<File /* Profile File */, Long /* Timestamp of last successful use */> getProfile() {
+    return ((PersistenceServiceImpl) fPersistenceService).getProfile();
+  }
+
+  /**
+   * Provides a list of available backups for the user to restore from in case
+   * of an unrecoverable error.
+   *
+   * @return a list of available backups for the user to restore from in case of
+   * an unrecoverable error.
+   */
+  public List<File> getProfileBackups() {
+    return ((PersistenceServiceImpl) fPersistenceService).getProfileBackups();
+  }
+
+  /**
+   * Will rename the provided backup file to the operational RSSOwl profile
+   * database and trigger search reindexing after next start.
+   *
+   * @param backup the backup {@link File} to restore from.
+   * @throws PersistenceException in case a problem occurs while trying to
+   * execute this operation.
+   */
+  public void restoreProfile(File backup) throws PersistenceException {
+    ((PersistenceServiceImpl) fPersistenceService).restoreProfile(backup);
+    fPersistenceService.getModelSearch().reIndexOnNextStartup();
+  }
+
+  /**
+   * Recreate the Profile of the persistence layer. In case of a Database, this
+   * would drop relations and create them again.
+   *
+   * @throws PersistenceException In case of an error while starting up the
+   * persistence layer.
+   */
+  public void recreateProfile() throws PersistenceException {
+    fPersistenceService.recreateSchema(false);
+    if (!isStarted())
+      startup(new LongOperationMonitor(new NullProgressMonitor()) {}, true);
+    fPersistenceService.getModelSearch().reIndexOnNextStartup();
   }
 
   /* Load Model Types Factory contribution */

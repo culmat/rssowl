@@ -74,7 +74,7 @@ public class FatalErrorWizard extends Wizard {
   private void findBackups() {
 
     /* Collect Profile Backups */
-    fProfileBackups.addAll(Owl.getBackups());
+    fProfileBackups.addAll(InternalOwl.getDefault().getProfileBackups());
 
     /* Collect OPML Backups if no profile backups can be found */
     if (fProfileBackups.isEmpty()) {
@@ -165,14 +165,14 @@ public class FatalErrorWizard extends Wizard {
     if (fRestoreBackupPage != null) {
       File backup = fRestoreBackupPage.getSelectedBackup();
       if (backup != null)
-        Owl.restore(backup);
+        InternalOwl.getDefault().restoreProfile(backup);
     }
 
     /* Handle Clean Profile if selected */
     else if (fCleanProfilePage != null && fCleanProfilePage.doCleanProfile()) {
 
       /* Recreate the Profile */
-      Owl.recreateProfile();
+      InternalOwl.getDefault().recreateProfile();
 
       /* Try to Import from OPML backups if present */
       if (!fOPMLBackups.isEmpty()) {
