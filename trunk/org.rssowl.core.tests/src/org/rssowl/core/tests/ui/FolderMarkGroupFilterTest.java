@@ -83,7 +83,7 @@ public class FolderMarkGroupFilterTest {
    */
   @Before
   public void setUp() throws Exception {
-    Owl.getPersistenceService().recreateSchema();
+    Owl.getPersistenceService().recreateSchema(true);
     fFactory = Owl.getModelFactory();
     fGrouping = new BookMarkGrouping();
     fFiltering = new BookMarkFilter();

@@ -97,7 +97,7 @@ public class ApplicationLayerTest extends LargeBlockSizeTest {
    */
   @Before
   public void setUp() throws Exception {
-    Owl.getPersistenceService().recreateSchema();
+    Owl.getPersistenceService().recreateSchema(true);
     fFactory = Owl.getModelFactory();
     fAppService = Owl.getApplicationService();
   }

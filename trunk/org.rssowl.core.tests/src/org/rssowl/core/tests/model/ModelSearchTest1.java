@@ -85,7 +85,7 @@ public class ModelSearchTest1 extends AbstractModelSearchTest {
     entitiesToBeIndexed = DBHelper.getEntitiesToBeIndexedDAO().load();
     assertEquals(2, entitiesToBeIndexed.size());
     Owl.getPersistenceService().shutdown(true);
-    Owl.getPersistenceService().startup(new NullProgressLongOperationMonitor());
+    Owl.getPersistenceService().startup(new NullProgressLongOperationMonitor(), false);
 
     entitiesToBeIndexed = DBHelper.getEntitiesToBeIndexedDAO().load();
     assertEquals(2, entitiesToBeIndexed.size());
@@ -94,7 +94,7 @@ public class ModelSearchTest1 extends AbstractModelSearchTest {
     }
 
     Owl.getPersistenceService().shutdown(false);
-    Owl.getPersistenceService().startup(new NullProgressLongOperationMonitor());
+    Owl.getPersistenceService().startup(new NullProgressLongOperationMonitor(), false);
     assertEquals(0, entitiesToBeIndexed.size());
   }
 

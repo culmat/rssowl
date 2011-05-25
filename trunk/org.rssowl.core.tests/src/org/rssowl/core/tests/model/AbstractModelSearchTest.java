@@ -76,7 +76,7 @@ public abstract class AbstractModelSearchTest {
     fFactory = Owl.getModelFactory();
     fNewsEntityName = INews.class.getName();
 
-    Owl.getPersistenceService().recreateSchema();
+    Owl.getPersistenceService().recreateSchema(true);
   }
 
   /**

@@ -26,7 +26,6 @@ package org.rssowl.ui.internal.dialogs.fatal;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -38,7 +37,6 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.service.PersistenceException;
-import org.rssowl.core.util.LongOperationMonitor;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Application;
@@ -173,11 +171,8 @@ public class FatalErrorWizard extends Wizard {
     /* Handle Clean Profile if selected */
     else if (fCleanProfilePage != null && fCleanProfilePage.doCleanProfile()) {
 
-      /* Recreate the Scheme */
+      /* Recreate the Profile */
       Owl.recreateProfile();
-
-      /* Startup as Necessary */
-      Owl.startup(new LongOperationMonitor(new NullProgressMonitor()) {});
 
       /* Try to Import from OPML backups if present */
       if (!fOPMLBackups.isEmpty()) {
@@ -203,12 +198,8 @@ public class FatalErrorWizard extends Wizard {
         }
 
         /* Do Import */
-        if (types != null) {
+        if (types != null)
           ImportUtils.doImport(null, types, false);
-
-          /* Mark for Reindex */
-          Owl.getPersistenceService().getModelSearch().reIndexOnNextStartup();
-        }
       }
     }
   }

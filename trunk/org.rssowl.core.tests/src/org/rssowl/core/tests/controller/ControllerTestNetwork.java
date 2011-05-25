@@ -66,7 +66,7 @@ public class ControllerTestNetwork {
    */
   @Before
   public void setUp() throws Exception {
-    Owl.getPersistenceService().recreateSchema();
+    Owl.getPersistenceService().recreateSchema(true);
   }
 
   /**

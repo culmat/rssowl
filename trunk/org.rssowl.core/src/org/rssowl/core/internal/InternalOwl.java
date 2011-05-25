@@ -82,7 +82,7 @@ public final class InternalOwl {
   public volatile static boolean TESTING = false;
 
   /** Flag indicating we are running from Eclipse */
-  public static final  boolean IS_ECLIPSE = false;
+  public static final boolean IS_ECLIPSE = false;
 
   private InternalOwl() {}
 
@@ -91,12 +91,14 @@ public final class InternalOwl {
    *
    * @param monitor A progress monitor to report progress on long running
    * operations (e.g. migration).
+   * @param emergency if <code>true</code> indicates this startup method is
+   * called from an emergency situation like restoring a backup.
    */
-  public void startup(LongOperationMonitor monitor) {
+  public void startup(LongOperationMonitor monitor, boolean emergency) {
     fModelFactory = loadTypesFactory();
     fPersistenceService = loadPersistenceService();
     fApplicationService = loadApplicationService();
-    fPersistenceService.startup(monitor);
+    fPersistenceService.startup(monitor, emergency);
     fConnectionService = new ConnectionServiceImpl();
     fInterpreterService = new InterpreterServiceImpl();
     fPreferencesService = new PreferenceServiceImpl();
@@ -161,9 +163,9 @@ public final class InternalOwl {
    * </p>
    * Subclasses may override to provide their own implementation.
    *
-   * @return Returns the Implementation of <code>IApplicationService</code>
-   * that contains special Methods which are used through the Application and
-   * access the persistence layer.
+   * @return Returns the Implementation of <code>IApplicationService</code> that
+   * contains special Methods which are used through the Application and access
+   * the persistence layer.
    */
   public IApplicationService getApplicationService() {
     return fApplicationService;
@@ -201,8 +203,8 @@ public final class InternalOwl {
    * plugin. The work that is done by the layer includes:
    * <ul>
    * <li>Controlling the lifecycle of the persistence layer</li>
-   * <li>Providing the DAOService that contains DAOs for each persistable
-   * entity</li>
+   * <li>Providing the DAOService that contains DAOs for each persistable entity
+   * </li>
    * <li>Providing the model search to perform full-text searching</li>
    * </ul>
    *
@@ -225,9 +227,9 @@ public final class InternalOwl {
    * It is also the central place to ask for credentials if a resource requires
    * authentication. Several extension points allow to customize the behavor of
    * this service, including the ability to register
-   * <code>IProtocolHandler</code> to define the lookup process on per
-   * protocol basis or contributing <code>ICredentialsProvider</code> to
-   * define how credentials should be stored and retrieved.
+   * <code>IProtocolHandler</code> to define the lookup process on per protocol
+   * basis or contributing <code>ICredentialsProvider</code> to define how
+   * credentials should be stored and retrieved.
    *
    * @return Returns the service responsible for all connection related tasks.
    * @see IProtocolHandler
@@ -246,9 +248,8 @@ public final class InternalOwl {
    * <ul>
    * <li>Contribute a new format interpreter using the FormatInterpreter
    * extension point. This allows to display any XML in RSSOwl as Feed.</li>
-   * <li>Contribute a new namespace handler using the NamespaceHandler
-   * extension point. This allows to properly handle any new namespace in
-   * RSSOwl.</li>
+   * <li>Contribute a new namespace handler using the NamespaceHandler extension
+   * point. This allows to properly handle any new namespace in RSSOwl.</li>
    * <li>Contribute a new element handler using the ElementHandler extension
    * point. This makes RSSOwl understand new elements or even attributes.</li>
    * <li>Contribute a new xml parser using the XMLParser extension point if you

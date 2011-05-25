@@ -98,7 +98,7 @@ public class DefragmentTest {
    */
   @Before
   public void setUp() throws Exception {
-    Owl.getPersistenceService().recreateSchema();
+    Owl.getPersistenceService().recreateSchema(true);
     fPluginLocation = FileLocator.toFileURL(Platform.getBundle("org.rssowl.core.tests").getEntry("/")).toURI();
 
     /* Label */
