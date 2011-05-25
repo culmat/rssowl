@@ -93,6 +93,7 @@ public class CleanProfilePage extends WizardPage {
         @Override
         public void widgetSelected(SelectionEvent e) {
           getContainer().updateButtons();
+          fConfirmWarningCheck.setEnabled(fDoRecoverCheck.getSelection());
         }
       });
     }
@@ -118,6 +119,7 @@ public class CleanProfilePage extends WizardPage {
       fConfirmWarningCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
       ((GridData) fConfirmWarningCheck.getLayoutData()).verticalIndent = 5;
       ((GridData) fConfirmWarningCheck.getLayoutData()).horizontalIndent = 5;
+      fConfirmWarningCheck.setEnabled(false);
       fConfirmWarningCheck.addSelectionListener(new SelectionAdapter() {
         @Override
         public void widgetSelected(SelectionEvent e) {
@@ -136,7 +138,7 @@ public class CleanProfilePage extends WizardPage {
    */
   @Override
   public boolean isPageComplete() {
-    return fDoRecoverCheck.getSelection() && fConfirmWarningCheck.getSelection();
+    return !fDoRecoverCheck.getSelection() || fConfirmWarningCheck.getSelection();
   }
 
   boolean doCleanProfile() {

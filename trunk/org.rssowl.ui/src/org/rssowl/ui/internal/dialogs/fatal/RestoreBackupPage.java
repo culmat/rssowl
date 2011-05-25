@@ -134,6 +134,7 @@ public class RestoreBackupPage extends WizardPage {
       fBackupsViewer.addSelectionChangedListener(new ISelectionChangedListener() {
         public void selectionChanged(SelectionChangedEvent event) {
           getContainer().updateButtons();
+          fConfirmRestoreCheck.setEnabled(!event.getSelection().isEmpty());
         }
       });
 
@@ -162,6 +163,7 @@ public class RestoreBackupPage extends WizardPage {
       fConfirmRestoreCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
       ((GridData) fConfirmRestoreCheck.getLayoutData()).verticalIndent = 5;
       ((GridData) fConfirmRestoreCheck.getLayoutData()).horizontalIndent = 5;
+      fConfirmRestoreCheck.setEnabled(false);
       fConfirmRestoreCheck.addSelectionListener(new SelectionAdapter() {
         @Override
         public void widgetSelected(SelectionEvent e) {
@@ -180,7 +182,7 @@ public class RestoreBackupPage extends WizardPage {
    */
   @Override
   public boolean isPageComplete() {
-    return fConfirmRestoreCheck.getSelection() && !fBackupsViewer.getSelection().isEmpty();
+    return fBackupsViewer.getSelection().isEmpty() || fConfirmRestoreCheck.getSelection();
   }
 
   File getSelectedBackup() {
