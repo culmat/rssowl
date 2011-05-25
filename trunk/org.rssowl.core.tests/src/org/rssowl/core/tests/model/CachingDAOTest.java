@@ -1159,6 +1159,82 @@ public class CachingDAOTest extends LargeBlockSizeTest {
   }
 
   /**
+   * Tests Bookmarks, News Bins, Searchmarks and Folders in a crazy deeply
+   * nested hierarchy are fully resolvable from the caching DAOs.
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testCrazyDeepHierarchyResolvedWithCachingDAOSingleRootEmergencyStartup() throws Exception {
+    IFolder folder = null;
+    for (int i = 0; i < 20; i++) {
+      folder = DynamicDAO.save(fFactory.createFolder(null, folder, "Folder " + i));
+      setProperties(folder);
+
+      IFeed feed = fFactory.createFeed(null, URI.create("1"));
+      IBookMark bm = DynamicDAO.save(fFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "Bookmark " + i));
+      setProperties(bm);
+
+      INewsBin nb = DynamicDAO.save(fFactory.createNewsBin(null, folder, "Newsbin " + i));
+      setProperties(nb);
+
+      ISearchMark sm = DynamicDAO.save(fFactory.createSearchMark(null, folder, "Searchmark " + i));
+      setProperties(sm);
+
+      DynamicDAO.save(folder);
+    }
+
+    /* Reopen Database */
+    Owl.getPersistenceService().shutdown(false);
+    System.gc();
+    Owl.getPersistenceService().startup(new NullOperationMonitor(), true);
+
+    /* Assert Folders */
+    CachingDAO dao = (CachingDAO) DynamicDAO.getDAO(IFolderDAO.class);
+    Collection all = dao.loadAll();
+    assertEquals(20, all.size());
+    for (Object object : all) {
+      if (object instanceof IFolder)
+        assertProperties((IFolder) object);
+      else
+        fail();
+    }
+
+    /* Assert Bookmarks */
+    dao = (CachingDAO) DynamicDAO.getDAO(IBookMarkDAO.class);
+    all = dao.loadAll();
+    assertEquals(20, all.size());
+    for (Object object : all) {
+      if (object instanceof IBookMark)
+        assertProperties((IBookMark) object);
+      else
+        fail();
+    }
+
+    /* Assert News Bins */
+    dao = (CachingDAO) DynamicDAO.getDAO(INewsBinDAO.class);
+    all = dao.loadAll();
+    assertEquals(20, all.size());
+    for (Object object : all) {
+      if (object instanceof INewsBin)
+        assertProperties((INewsBin) object);
+      else
+        fail();
+    }
+
+    /* Assert Search Marks */
+    dao = (CachingDAO) DynamicDAO.getDAO(ISearchMarkDAO.class);
+    all = dao.loadAll();
+    assertEquals(20, all.size());
+    for (Object object : all) {
+      if (object instanceof ISearchMark)
+        assertProperties((ISearchMark) object);
+      else
+        fail();
+    }
+  }
+
+  /**
    * @throws Exception
    */
   @Test
@@ -1190,6 +1266,55 @@ public class CachingDAOTest extends LargeBlockSizeTest {
     Owl.getPersistenceService().shutdown(false);
     System.gc();
     Owl.getPersistenceService().startup(new NullOperationMonitor(), false);
+
+    /* Assert Folders */
+    CachingDAO dao = (CachingDAO) DynamicDAO.getDAO(ILabelDAO.class);
+
+    label1 = (ILabel) dao.load(label1Id);
+    assertEquals("Hello", label1.getName());
+    assertEquals(5, label1.getOrder());
+
+    label2 = (ILabel) dao.load(label2Id);
+    assertEquals("Hello World", label2.getName());
+    assertEquals("255,255,0", label2.getColor());
+
+    label3 = (ILabel) dao.load(label3Id);
+    assertEquals("Foo Bar", label3.getName());
+    assertEquals("value", label3.getProperty("key"));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testCachingLabelDAOEmergencyStartup() throws Exception {
+    ILabel label1 = fFactory.createLabel(null, "Hello");
+    label1.setOrder(5);
+    label1= DynamicDAO.save(label1);
+    Long label1Id = label1.getId();
+
+    ILabel label2 = fFactory.createLabel(null, "Hello World");
+    label2.setColor("255,255,0");
+    label2= DynamicDAO.save(label2);
+    Long label2Id = label2.getId();
+
+    ILabel label3 = fFactory.createLabel(null, "Foo Bar");
+    label3.setProperty("key", "value");
+    label3= DynamicDAO.save(label3);
+    Long label3Id = label3.getId();
+
+    DynamicDAO.save(label1);
+    DynamicDAO.save(label2);
+    DynamicDAO.save(label3);
+
+    label1 = null;
+    label2 = null;
+    label3 = null;
+
+    /* Reopen Database */
+    Owl.getPersistenceService().shutdown(false);
+    System.gc();
+    Owl.getPersistenceService().startup(new NullOperationMonitor(), true);
 
     /* Assert Folders */
     CachingDAO dao = (CachingDAO) DynamicDAO.getDAO(ILabelDAO.class);

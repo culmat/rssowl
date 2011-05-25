@@ -1162,6 +1162,55 @@ public class ModelTest1 extends LargeBlockSizeTest {
     assertTrue("Did not find Folder in Location Conditions", foundFolder);
   }
 
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testEmergencyStartup() throws Exception {
+    IFolder root = fFactory.createFolder(null, null, "Root");
+
+    IFeed feed = fFactory.createFeed(null, new URI("http://www.foo.com"));
+    DynamicDAO.save(feed);
+
+    IFolderChild bookmark = fFactory.createBookMark(null, root, new FeedLinkReference(feed.getLink()), "Bookmark");
+    DynamicDAO.save(root);
+
+    ISearchField locationField = fFactory.createSearchField(INews.LOCATION, INews.class.getName());
+    ISearchCondition condition = fFactory.createSearchCondition(locationField, SearchSpecifier.IS, ModelUtils.toPrimitive(Collections.singletonList(bookmark)));
+    ISearchMark sm = fFactory.createSearchMark(null, root, "Search");
+    sm.addSearchCondition(condition);
+
+    DynamicDAO.save(root);
+
+    Long bmId = bookmark.getId();
+
+    root = null;
+    feed = null;
+    locationField = null;
+    condition = null;
+    sm = null;
+    bookmark = null;
+
+    Runtime.getRuntime().gc();
+
+    Owl.getPersistenceService().shutdown(false);
+    Owl.getPersistenceService().startup(new NullProgressLongOperationMonitor(), true);
+
+    Collection<ISearchMark> sms = DynamicDAO.loadAll(ISearchMark.class);
+    assertEquals(1, sms.size());
+
+    sm = sms.iterator().next();
+    assertEquals(1, sm.getSearchConditions().size());
+
+    condition = sm.getSearchConditions().get(0);
+    assertNotNull(condition.getValue());
+    assertEquals(true, condition.getValue() instanceof Long[][]);
+
+    Long[][] value = (Long[][]) condition.getValue();
+    assertEquals(1, value[1].length);
+    assertEquals(bmId, value[1][0]);
+  }
+
   private IFeed createFeed(String url) throws URISyntaxException {
     return fFactory.createFeed(null, new URI(url));
   }
