@@ -68,7 +68,6 @@ import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
-import org.rssowl.core.persist.IPreference;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
@@ -76,7 +75,6 @@ import org.rssowl.core.persist.dao.IBookMarkDAO;
 import org.rssowl.core.persist.dao.IConditionalGetDAO;
 import org.rssowl.core.persist.dao.ILabelDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
-import org.rssowl.core.persist.dao.IPreferenceDAO;
 import org.rssowl.core.persist.dao.ISearchMarkDAO;
 import org.rssowl.core.persist.event.BookMarkAdapter;
 import org.rssowl.core.persist.event.BookMarkEvent;
@@ -169,9 +167,6 @@ public class Controller {
   /* The Singleton Instance */
   private static Controller fInstance;
 
-  /* Token to ask the DB if this is the first start of RSSOwl */
-  private static final String FIRST_START_TOKEN = "org.rssowl.ui.FirstStartToken"; //$NON-NLS-1$
-
   /* Default Max. number of concurrent running reload Jobs */
   private static final int DEFAULT_MAX_CONCURRENT_RELOAD_JOBS = 10;
 
@@ -261,7 +256,6 @@ public class Controller {
   private final IBookMarkDAO fBookMarkDAO;
   private final ISearchMarkDAO fSearchMarkDAO;
   private final IConditionalGetDAO fConditionalGetDAO;
-  private final IPreferenceDAO fPrefsDAO;
   private final ILabelDAO fLabelDao;
   private final IModelFactory fFactory;
   private final Lock fLoginDialogLock = new ReentrantLock();
@@ -356,7 +350,6 @@ public class Controller {
     fSearchMarkDAO = DynamicDAO.getDAO(ISearchMarkDAO.class);
     fConditionalGetDAO = DynamicDAO.getDAO(IConditionalGetDAO.class);
     fLabelDao = DynamicDAO.getDAO(ILabelDAO.class);
-    fPrefsDAO = Owl.getPersistenceService().getDAOService().getPreferencesDAO();
     fAppService = Owl.getApplicationService();
     fFactory = Owl.getModelFactory();
     fConnectionTimeout = getSystemProperty(FEED_CON_TIMEOUT_PROPERTY, DEFAULT_FEED_CON_TIMEOUT, DEFAULT_FEED_CON_TIMEOUT);
@@ -941,8 +934,14 @@ public class Controller {
         public void run() throws Exception {
 
           /* First check wether this action is required */
-          IPreference firstStartToken = fPrefsDAO.load(FIRST_START_TOKEN);
-          if (firstStartToken != null) {
+          IPreferenceScope preferences = Owl.getPreferenceService().getGlobalScope();
+          boolean isSubsequentStartup = preferences.hasKey(DefaultPreferences.FIRST_START_TOKEN);
+          if (isSubsequentStartup) {
+
+            /* Pre 2.1 the boolean was not stored, so add it if necessary */
+            if (!preferences.getBoolean(DefaultPreferences.FIRST_START_TOKEN))
+              preferences.putBoolean(DefaultPreferences.FIRST_START_TOKEN, true);
+
             onSubsequentStartup();
             return;
           }
@@ -951,7 +950,7 @@ public class Controller {
           onFirstStartup();
 
           /* Mark this as the first start */
-          fPrefsDAO.save(fFactory.createPreference(FIRST_START_TOKEN));
+          preferences.putBoolean(DefaultPreferences.FIRST_START_TOKEN, true);
         }
       });
     }

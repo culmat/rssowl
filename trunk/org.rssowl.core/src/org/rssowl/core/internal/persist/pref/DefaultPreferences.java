@@ -34,6 +34,9 @@ import org.rssowl.core.persist.pref.Preference;
  */
 public class DefaultPreferences {
 
+  /** Global: Token to indicate if RSSOwl has been started before or not */
+  public static final String FIRST_START_TOKEN = Preference.FIRST_START_TOKEN.id();
+
   /** Global: Use Master Password to encrypt passwords to feeds */
   public static final String USE_MASTER_PASSWORD = Preference.USE_MASTER_PASSWORD.id();
 

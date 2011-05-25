@@ -31,6 +31,9 @@ package org.rssowl.core.persist.pref;
  */
 public enum Preference {
 
+  /** Global: Token to indicate if RSSOwl has been started before or not */
+  FIRST_START_TOKEN("org.rssowl.ui.FirstStartToken", IPreferenceType.BOOLEAN), //$NON-NLS-1$
+
   /** Global: Use Master Password to encrypt passwords to feeds */
   USE_MASTER_PASSWORD("org.rssowl.pref.UseMasterPassword", IPreferenceType.BOOLEAN), //$NON-NLS-1$
 
