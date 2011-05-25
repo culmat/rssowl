@@ -180,14 +180,10 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
     /* Move DB to Backup */
     DBManager.getDefault().backupAndDeleteProfile();
 
-    /* Start to create DB Scheme */
+    /* Emergency Start to create DB Scheme */
     InternalOwl.getDefault().startup(new LongOperationMonitor(new NullProgressMonitor()) {}, true);
 
-    /* Clear Search Index and fallback to reindexing after next start in case this fails */
-    try {
-      getModelSearch().clearIndex();
-    } catch (Exception e) {
-      getModelSearch().reIndexOnNextStartup();
-    }
+    /* Reindex on next startup */
+    InternalOwl.getDefault().getPersistenceService().getModelSearch().reIndexOnNextStartup();
   }
 }
