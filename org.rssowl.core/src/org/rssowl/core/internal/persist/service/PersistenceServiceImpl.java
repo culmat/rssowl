@@ -55,9 +55,12 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
   public void startup(LongOperationMonitor monitor, boolean emergency) {
     super.startup(monitor, emergency);
 
-    /* Startup DB and Model-Search */
+    /* Startup DB */
     DBManager.getDefault().startup(monitor, emergency);
-    getModelSearch().startup();
+
+    /* Startup Model Search (not in case of emergency) */
+    if (!emergency)
+      getModelSearch().startup();
   }
 
   /*
