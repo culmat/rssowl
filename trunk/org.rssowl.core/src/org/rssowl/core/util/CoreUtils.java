@@ -2009,10 +2009,16 @@ public class CoreUtils {
    * Report an issue with the search index.
    */
   public static void reportIndexIssue() {
-    if (!fgReportedIndexIssue.getAndSet(true)) {
+    if (!fgReportedIndexIssue.getAndSet(true)) { //Single Access per Application Run
       IPreferenceScope preferences = Owl.getPreferenceService().getGlobalScope();
-      if (!preferences.getBoolean(DefaultPreferences.CLEAN_UP_INDEX))
+
+      /* Enable Clean Up option and restore Clean Up Reminder if necessary */
+      if (!preferences.getBoolean(DefaultPreferences.CLEAN_UP_INDEX)) {
         preferences.putBoolean(DefaultPreferences.CLEAN_UP_INDEX, true);
+
+        if (!preferences.getBoolean(DefaultPreferences.CLEAN_UP_REMINDER_STATE))
+          preferences.putBoolean(DefaultPreferences.CLEAN_UP_READ_NEWS_STATE, true);
+      }
     }
   }
 }
