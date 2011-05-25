@@ -1343,13 +1343,19 @@ public class DBManager {
   void dropDatabase() throws PersistenceException {
     SafeRunner.run(new LoggingSafeRunnable() {
       public void run() throws Exception {
+
+        /* Shutdown DB */
         shutdown();
-        if (!new File(getDBFilePath()).delete()) {
+
+        /* Delete DB */
+        File dbFile = new File(getDBFilePath());
+        if (dbFile.exists() && !dbFile.delete())
           Activator.getDefault().logError("Failed to delete db file", null); //$NON-NLS-1$
-        }
-        if (!getDBFormatFile().delete()) {
+
+        /* Delete DB Format File */
+        File dbFormatFile = getDBFormatFile();
+        if (dbFormatFile.exists() && !dbFormatFile.delete())
           Activator.getDefault().logError("Failed to delete db format file", null); //$NON-NLS-1$
-        }
       }
     });
   }
@@ -1403,8 +1409,8 @@ public class DBManager {
   void restoreProfile(File backup) throws PersistenceException {
     Activator.safeLogInfo(NLS.bind("Start: Database Restore from Backup ({0})", backup.getName())); //$NON-NLS-1$
 
-    /* Backup the current DB before restoring it */
-    backupProfile();
+    /* Delete the Profile by Moving it to a Backup */
+    backupAndDeleteProfile();
 
     /* Atomic Rename */
     File db = new File(getDBFilePath());
@@ -1413,13 +1419,13 @@ public class DBManager {
     Activator.safeLogInfo("End: Database Restore from Backup"); //$NON-NLS-1$
   }
 
-  void backupProfile() {
+  /* Delete the Profile by Moving it to a Backup */
+  void backupAndDeleteProfile() {
     File db = new File(getDBFilePath());
     if (db.exists()) {
 
       /* Object Container might be opened, so try to close */
-      if (fObjectContainer != null)
-        while (!fObjectContainer.close());
+      shutdown();
 
       /* Find Suitable Backup Name */
       int i = 0;
