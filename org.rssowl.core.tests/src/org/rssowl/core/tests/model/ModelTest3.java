@@ -121,7 +121,7 @@ public class ModelTest3 extends LargeBlockSizeTest {
    */
   @Before
   public void setUp() throws Exception {
-    Owl.getPersistenceService().recreateSchema(true);
+    Owl.getPersistenceService().recreateSchema();
     fFactory = Owl.getModelFactory();
   }
 

@@ -55,7 +55,7 @@ public class ControllerTestLocal extends LargeBlockSizeTest {
    */
   @Before
   public void setUp() throws Exception {
-    Owl.getPersistenceService().recreateSchema(true);
+    Owl.getPersistenceService().recreateSchema();
   }
 
   private NewsCounter loadNewsCounter() {
@@ -154,7 +154,7 @@ public class ControllerTestLocal extends LargeBlockSizeTest {
     assertEquals(2, getStickyCount(feed));
 
     /* Simulate Dirty Shutdown */
-    Owl.getPersistenceService().recreateSchema(true);
+    Owl.getPersistenceService().recreateSchema();
 
     feed = new Feed(new URI("http://www.rssowl.org/rssowl2dg/tests/manager/rss_2_0.xml")); //$NON-NLS-1$
     feed = DynamicDAO.save(feed);

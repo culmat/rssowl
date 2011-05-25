@@ -24,7 +24,6 @@
 
 package org.rssowl.core.internal;
 
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.rssowl.core.IApplicationService;
 import org.rssowl.core.connection.IConnectionService;
 import org.rssowl.core.connection.ICredentialsProvider;
@@ -327,10 +326,7 @@ public final class InternalOwl {
    * persistence layer.
    */
   public void recreateProfile() throws PersistenceException {
-    fPersistenceService.recreateSchema(false);
-    if (!isStarted())
-      startup(new LongOperationMonitor(new NullProgressMonitor()) {}, true);
-    fPersistenceService.getModelSearch().reIndexOnNextStartup();
+    ((PersistenceServiceImpl) fPersistenceService).recreateProfile();
   }
 
   /* Load Model Types Factory contribution */

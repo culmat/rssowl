@@ -77,7 +77,7 @@ public class FileImportTest {
    */
   @Before
   public void setUp() throws Exception {
-    Owl.getPersistenceService().recreateSchema(true);
+    Owl.getPersistenceService().recreateSchema();
   }
 
   /**

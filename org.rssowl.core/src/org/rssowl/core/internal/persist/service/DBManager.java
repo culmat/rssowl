@@ -1403,27 +1403,34 @@ public class DBManager {
   void restoreProfile(File backup) throws PersistenceException {
     Activator.safeLogInfo(NLS.bind("Start: Database Restore from Backup ({0})", backup.getName())); //$NON-NLS-1$
 
-    /* Object Container might be opened, so try to close */
-    if (fObjectContainer != null)
-      while (!fObjectContainer.close());
-
     /* Backup the current DB before restoring it */
-    File db = new File(getDBFilePath());
-    if (db.exists()) {
-      int i = 0;
-      File backupDir = new File(Activator.getDefault().getStateLocation().toOSString());
-      File restoreBackup = new File(backupDir, DB_NAME + RESTORE_BACKUP_NAME);
-      while (restoreBackup.exists()) {
-        restoreBackup = new File(backupDir, DB_NAME + RESTORE_BACKUP_NAME + "." + i++); //$NON-NLS-1$
-      }
-
-      /* Atomic Rename */
-      DBHelper.rename(db, restoreBackup);
-    }
+    backupProfile();
 
     /* Atomic Rename */
+    File db = new File(getDBFilePath());
     DBHelper.rename(backup, db);
 
     Activator.safeLogInfo("End: Database Restore from Backup"); //$NON-NLS-1$
+  }
+
+  void backupProfile() {
+    File db = new File(getDBFilePath());
+    if (db.exists()) {
+
+      /* Object Container might be opened, so try to close */
+      if (fObjectContainer != null)
+        while (!fObjectContainer.close());
+
+      /* Find Suitable Backup Name */
+      int i = 0;
+      File backupDir = new File(Activator.getDefault().getStateLocation().toOSString());
+      File backupCandidate = new File(backupDir, DB_NAME + RESTORE_BACKUP_NAME);
+      while (backupCandidate.exists()) {
+        backupCandidate = new File(backupDir, DB_NAME + RESTORE_BACKUP_NAME + "." + i++); //$NON-NLS-1$
+      }
+
+      /* Atomic Rename */
+      DBHelper.rename(db, backupCandidate);
+    }
   }
 }
