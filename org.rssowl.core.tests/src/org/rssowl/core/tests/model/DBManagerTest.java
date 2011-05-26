@@ -31,6 +31,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -108,12 +109,16 @@ import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.persist.service.UniqueConstraintException;
 import org.rssowl.core.tests.TestUtils;
+import org.rssowl.core.util.CoreUtils;
+import org.rssowl.core.util.LongOperationMonitor;
 import org.rssowl.core.util.Pair;
 
 import com.db4o.ObjectContainer;
 import com.db4o.query.Query;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -2681,5 +2686,41 @@ public class DBManagerTest extends LargeBlockSizeTest {
     assertNotNull(news.toReference().resolve());
     assertNotNull(folder.toReference().resolve());
     assertNotNull(bookmark.toReference().resolve());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testRestoreProfile() throws IOException {
+    IFeed feed = DynamicDAO.save(createFeed());
+    INews news = createNews(feed);
+    news.setState(INews.State.NEW);
+    news.setFlagged(true);
+
+    DynamicDAO.save(news);
+
+    IFolder folder = Owl.getModelFactory().createFolder(null, null, "Root");
+    IBookMark bookmark = Owl.getModelFactory().createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "Bookmark");
+
+    DynamicDAO.save(bookmark);
+
+    assertNotNull(feed.toReference().resolve());
+    assertNotNull(news.toReference().resolve());
+    assertNotNull(folder.toReference().resolve());
+    assertNotNull(bookmark.toReference().resolve());
+
+    File tmpFile = File.createTempFile("rssowldb", "tmp");
+    if (!tmpFile.exists())
+      tmpFile.createNewFile();
+    tmpFile.deleteOnExit();
+
+    CoreUtils.copy(DBManagerTest.class.getResourceAsStream("/data/rssowl.db"), new FileOutputStream(tmpFile));
+    InternalOwl.getDefault().restoreProfile(tmpFile);
+    InternalOwl.getDefault().startup(new LongOperationMonitor(new NullProgressMonitor()) {}, true);
+
+    assertTrue(DynamicDAO.loadAll(INews.class).isEmpty());
+    assertTrue(DynamicDAO.loadAll(IBookMark.class).size() > 100);
+    assertTrue(DynamicDAO.loadAll(IFolder.class).size() > 20);
   }
 }
