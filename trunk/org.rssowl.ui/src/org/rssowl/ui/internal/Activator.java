@@ -242,14 +242,8 @@ public class Activator extends AbstractUIPlugin {
           Owl.startup(callbackMonitor);
         }
 
-        /* Handle OOM Error */
-        catch (OutOfMemoryError e) {
-          Activator.this.fStartupStatus = createErrorStatus(e.getMessage(), e);
-          Activator.getDefault().getLog().log(Activator.this.fStartupStatus);
-        }
-
-        /* Handle Exception (because any exception here is a show stopper) */
-        catch (Exception e) {
+        /* Handle any Throwable */
+        catch (Throwable e) {
           Activator.this.fStartupStatus = createErrorStatus(e.getMessage(), e);
           Activator.getDefault().getLog().log(Activator.this.fStartupStatus);
         }
