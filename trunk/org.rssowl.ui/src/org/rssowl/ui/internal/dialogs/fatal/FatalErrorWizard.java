@@ -137,7 +137,7 @@ public class FatalErrorWizard extends Wizard {
           internalPerformFinish();
         }
       });
-    } catch (PersistenceException e) {
+    } catch (Throwable e) {
       Activator.getDefault().logError(e.getMessage(), e);
 
       /* Show Error to the User */
