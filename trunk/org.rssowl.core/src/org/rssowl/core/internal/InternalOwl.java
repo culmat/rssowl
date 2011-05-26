@@ -152,29 +152,17 @@ public final class InternalOwl {
     fShuttingDown = true;
 
     /* Shutdown Connection Manager (safely) */
-    try {
-      if (!emergency && fConnectionService != null) {
-        try {
-          fConnectionService.shutdown();
-        } catch (Exception e) {
-          Activator.safeLogError(e.getMessage(), e);
-        }
+    if (!emergency && fConnectionService != null) {
+      try {
+        fConnectionService.shutdown();
+      } catch (Exception e) {
+        Activator.safeLogError(e.getMessage(), e);
       }
-
-      /* Shutdown Persistence Service */
-      if (fPersistenceService != null)
-        fPersistenceService.shutdown(emergency);
     }
 
-    /* Clear fields so that a call to startup can safely be done from same object */
-    finally {
-      fModelFactory = null;
-      fPersistenceService = null;
-      fApplicationService = null;
-      fConnectionService = null;
-      fInterpreterService = null;
-      fPreferencesService = null;
-    }
+    /* Shutdown Persistence Service */
+    if (fPersistenceService != null)
+      fPersistenceService.shutdown(emergency);
   }
 
   /**
