@@ -185,10 +185,11 @@ public class DBManagerTest extends LargeBlockSizeTest {
 
   /**
    * Tests that {@link INewsDAO#setState(Set, State, boolean)} works correctly.
+   *
    * @throws Exception s
    */
   @Test
-  public void testNewsDAODeleteByStates() throws Exception  {
+  public void testNewsDAODeleteByStates() throws Exception {
     String feed0Link = "http://www.feed0.com";
     IFeed feed = fTypesFactory.createFeed(null, new URI(feed0Link));
     INews news = fTypesFactory.createNews(null, feed, new Date());
@@ -254,6 +255,7 @@ public class DBManagerTest extends LargeBlockSizeTest {
   /**
    * Tests that saving a NewsBin with a INews that was never saved in DELETED
    * state causes the INews to be removed from the INewsBin.
+   *
    * @throws Exception
    */
   @Test
@@ -277,9 +279,10 @@ public class DBManagerTest extends LargeBlockSizeTest {
   }
 
   /**
-   * Test case where original news is copied with a state != NEW, the copied news
-   * state is changed to NEW before saving and then it's saved. The news bin
-   * should have the news in the right bucket after save is finished.
+   * Test case where original news is copied with a state != NEW, the copied
+   * news state is changed to NEW before saving and then it's saved. The news
+   * bin should have the news in the right bucket after save is finished.
+   *
    * @throws Exception
    */
   @Test
@@ -322,10 +325,9 @@ public class DBManagerTest extends LargeBlockSizeTest {
   }
 
   /**
-   * Tests that deleting a INews.isCopy() will cause either:
-   * <li>The original feed not to be deleted if it is referenced by a BM or
-   * another INews.isCopy()</li>
-   * <li>The original feed to be deleted otherwise.</li>
+   * Tests that deleting a INews.isCopy() will cause either: <li>The original
+   * feed not to be deleted if it is referenced by a BM or another
+   * INews.isCopy()</li> <li>The original feed to be deleted otherwise.</li>
    */
   @Test
   public void testDeleteNewsIsCopy() {
@@ -342,7 +344,6 @@ public class DBManagerTest extends LargeBlockSizeTest {
     INews newsCopy = fTypesFactory.createNews(news, newsBin);
     DynamicDAO.save(newsCopy);
     DynamicDAO.save(newsBin);
-
 
     /* Feed referenced by bookMark and newsCopy */
     fNewsDAO.setState(Collections.singleton(newsCopy), INews.State.DELETED, false, false);
@@ -431,8 +432,9 @@ public class DBManagerTest extends LargeBlockSizeTest {
 
   /**
    * Tests that copying a sticky news from the original feed to a INewsBin
-   * followed by deletion of the original IBookMark works correctly. In other words,
-   * we want to verify that the original feed is not deleted with the IBookMark.
+   * followed by deletion of the original IBookMark works correctly. In other
+   * words, we want to verify that the original feed is not deleted with the
+   * IBookMark.
    */
   @Test
   public void testCopyStickyNewsAndDeleteOriginalBookMark() {
@@ -488,8 +490,8 @@ public class DBManagerTest extends LargeBlockSizeTest {
   }
 
   /**
-   * Tests that querying on News#fParentId to determine if it is contained
-   * in a INewsBin works.
+   * Tests that querying on News#fParentId to determine if it is contained in a
+   * INewsBin works.
    */
   @Test
   public void testQueryNewsOnIsCopy() {
@@ -598,7 +600,10 @@ public class DBManagerTest extends LargeBlockSizeTest {
     DynamicDAO.save(newsCopy);
     DynamicDAO.save(bin);
 
-    /* Ensure that arrays are treated specially by db4o, don't need to delete them manually */
+    /*
+     * Ensure that arrays are treated specially by db4o, don't need to delete
+     * them manually
+     */
     assertFalse(fDb.ext().isStored(bin.internalGetNewsContainer().internalGetNewsIds()));
 
     NewsContainer newsContainer = bin.internalGetNewsContainer();
@@ -919,8 +924,8 @@ public class DBManagerTest extends LargeBlockSizeTest {
   }
 
   /**
-   * Checks: - Addition of label - That ADD event is issued - Updating of label -
-   * That UPDATE event is issued - Getting of label
+   * Checks: - Addition of label - That ADD event is issued - Updating of label
+   * - That UPDATE event is issued - Getting of label
    */
   @Test
   public void testAddUpdateAndGetLabel() {
@@ -1371,9 +1376,9 @@ public class DBManagerTest extends LargeBlockSizeTest {
    */
   @Test
   public void testSaveFeedTwiceAfterMerging() {
-      IFeed savedFeed = DynamicDAO.save(createFeed());
-      savedFeed.merge(createFeed());
-      DynamicDAO.save(savedFeed);
+    IFeed savedFeed = DynamicDAO.save(createFeed());
+    savedFeed.merge(createFeed());
+    DynamicDAO.save(savedFeed);
   }
 
   /**
@@ -2629,5 +2634,52 @@ public class DBManagerTest extends LargeBlockSizeTest {
   public void testReIndexOnNextStartup() {
     Owl.getPersistenceService().getModelSearch().reIndexOnNextStartup();
     assertTrue(DBManager.getDefault().getReIndexFile().exists());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testRecreateProfile() {
+    IFeed feed = DynamicDAO.save(createFeed());
+    INews news = createNews(feed);
+    news.setState(INews.State.NEW);
+    news.setFlagged(true);
+
+    DynamicDAO.save(news);
+
+    IFolder folder = Owl.getModelFactory().createFolder(null, null, "Root");
+    IBookMark bookmark = Owl.getModelFactory().createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "Bookmark");
+
+    DynamicDAO.save(bookmark);
+
+    assertNotNull(feed.toReference().resolve());
+    assertNotNull(news.toReference().resolve());
+    assertNotNull(folder.toReference().resolve());
+    assertNotNull(bookmark.toReference().resolve());
+
+    InternalOwl.getDefault().recreateProfile(true);
+
+    assertNull(feed.toReference().resolve());
+    assertNull(news.toReference().resolve());
+    assertNull(folder.toReference().resolve());
+    assertNull(bookmark.toReference().resolve());
+
+    feed = DynamicDAO.save(createFeed());
+    news = createNews(feed);
+    news.setState(INews.State.NEW);
+    news.setFlagged(true);
+
+    DynamicDAO.save(news);
+
+    folder = Owl.getModelFactory().createFolder(null, null, "Root");
+    bookmark = Owl.getModelFactory().createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "Bookmark");
+
+    DynamicDAO.save(bookmark);
+
+    assertNotNull(feed.toReference().resolve());
+    assertNotNull(news.toReference().resolve());
+    assertNotNull(folder.toReference().resolve());
+    assertNotNull(bookmark.toReference().resolve());
   }
 }
