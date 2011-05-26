@@ -172,7 +172,8 @@ public class FatalErrorWizard extends Wizard {
     else if (fCleanProfilePage != null && fCleanProfilePage.doCleanProfile()) {
 
       /* Recreate the Profile */
-      InternalOwl.getDefault().recreateProfile();
+      boolean needsEmergencyStartup = !fOPMLBackups.isEmpty();
+      InternalOwl.getDefault().recreateProfile(needsEmergencyStartup);
 
       /* Try to Import from OPML backups if present */
       if (!fOPMLBackups.isEmpty()) {

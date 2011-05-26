@@ -76,6 +76,11 @@ public class CachingFolderDAO extends CachingDAO<FolderDAOImpl, IFolder, FolderL
   protected void onDatabaseOpened(DatabaseEvent event) {
     if (USE_LEGACY_CACHE_ACTIVATION) {
       super.onDatabaseOpened(event);
+
+      /* Ensure we start with a fresh cache */
+      fRootFolders.clear();
+
+      /* Load Roots */
       for (IFolder folder : getDAO().loadRoots())
         fRootFolders.put(folder, PRESENT);
     } else {

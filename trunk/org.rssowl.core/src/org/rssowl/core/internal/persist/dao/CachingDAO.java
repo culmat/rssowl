@@ -74,24 +74,30 @@ public abstract class CachingDAO<D extends AbstractEntityDAO<T, L, E>, T extends
   }
 
   protected void putAll(Set<E> events) {
-    for (E event : events)
+    for (E event : events) {
       fCache.put(event.getEntity().getId(), fDAO.getEntityClass().cast(event.getEntity()));
+    }
   }
 
   protected void removeAll(Set<E> events) {
-    for (E event : events)
+    for (E event : events) {
       fCache.remove(event.getEntity().getId());
+    }
   }
 
-  protected void onDatabaseClosed(@SuppressWarnings("unused")
-  DatabaseEvent event) {
+  protected void onDatabaseClosed(@SuppressWarnings("unused") DatabaseEvent event) {
     fCache.clear();
   }
 
-  protected void onDatabaseOpened(@SuppressWarnings("unused")
-  DatabaseEvent event) {
-    for (T entity : fDAO.loadAll())
+  protected void onDatabaseOpened(@SuppressWarnings("unused") DatabaseEvent event) {
+
+    /* Ensure we start with a fresh cache */
+    fCache.clear();
+
+    /* Add all from DAO */
+    for (T entity : fDAO.loadAll()) {
       fCache.put(entity.getId(), entity);
+    }
   }
 
   /**
