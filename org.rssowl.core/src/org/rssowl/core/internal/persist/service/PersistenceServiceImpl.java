@@ -175,16 +175,20 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
    * Recreate the Profile of the persistence layer. In case of a Database, this
    * would drop relations and create them again.
    *
+   * @param needsEmergencyStartup if <code>true</code> causes this method to
+   * also trigger an emergency startup so that other operations can be normally
+   * done afterwards like importing from a OPML backup.
    * @throws PersistenceException In case of an error while starting up the
    * persistence layer.
    */
-  public void recreateProfile() throws PersistenceException {
+  public void recreateProfile(boolean needsEmergencyStartup) throws PersistenceException {
 
     /* Move DB to Backup */
     DBManager.getDefault().backupAndDeleteProfile();
 
     /* Emergency Start to create DB Scheme */
-    InternalOwl.getDefault().startup(new LongOperationMonitor(new NullProgressMonitor()) {}, true);
+    if (needsEmergencyStartup)
+      InternalOwl.getDefault().startup(new LongOperationMonitor(new NullProgressMonitor()) {}, true);
 
     /* Reindex on next startup */
     InternalOwl.getDefault().getPersistenceService().getModelSearch().reIndexOnNextStartup();

@@ -101,13 +101,26 @@ public final class InternalOwl {
    * called from an emergency situation like restoring a backup.
    */
   public void startup(LongOperationMonitor monitor, boolean emergency) {
-    fModelFactory = loadTypesFactory();
-    fPersistenceService = loadPersistenceService();
-    fApplicationService = loadApplicationService();
+    if (fModelFactory == null)
+      fModelFactory = loadTypesFactory();
+
+    if (fPersistenceService == null)
+      fPersistenceService = loadPersistenceService();
+
+    if (fApplicationService == null)
+      fApplicationService = loadApplicationService();
+
+    /* Persistence Layer has its own startup routine */
     fPersistenceService.startup(monitor, emergency);
-    fConnectionService = new ConnectionServiceImpl();
-    fInterpreterService = new InterpreterServiceImpl();
-    fPreferencesService = new PreferenceServiceImpl();
+
+    if (fConnectionService == null)
+      fConnectionService = new ConnectionServiceImpl();
+
+    if (fInterpreterService == null)
+      fInterpreterService = new InterpreterServiceImpl();
+
+    if (fPreferencesService == null)
+      fPreferencesService = new PreferenceServiceImpl();
 
     /* Flag as started */
     fStarted = true;
@@ -139,17 +152,29 @@ public final class InternalOwl {
     fShuttingDown = true;
 
     /* Shutdown Connection Manager (safely) */
-    if (!emergency && fConnectionService != null) {
-      try {
-        fConnectionService.shutdown();
-      } catch (Exception e) {
-        Activator.safeLogError(e.getMessage(), e);
+    try {
+      if (!emergency && fConnectionService != null) {
+        try {
+          fConnectionService.shutdown();
+        } catch (Exception e) {
+          Activator.safeLogError(e.getMessage(), e);
+        }
       }
+
+      /* Shutdown Persistence Service */
+      if (fPersistenceService != null)
+        fPersistenceService.shutdown(emergency);
     }
 
-    /* Shutdown Persistence Service */
-    if (fPersistenceService != null)
-      fPersistenceService.shutdown(emergency);
+    /* Clear fields so that a call to startup can safely be done from same object */
+    finally {
+      fModelFactory = null;
+      fPersistenceService = null;
+      fApplicationService = null;
+      fConnectionService = null;
+      fInterpreterService = null;
+      fPreferencesService = null;
+    }
   }
 
   /**
@@ -322,11 +347,14 @@ public final class InternalOwl {
    * Recreate the Profile of the persistence layer. In case of a Database, this
    * would drop relations and create them again.
    *
+   * @param needsEmergencyStartup if <code>true</code> causes this method to
+   * also trigger an emergency startup so that other operations can be normally
+   * done afterwards like importing from a OPML backup.
    * @throws PersistenceException In case of an error while starting up the
    * persistence layer.
    */
-  public void recreateProfile() throws PersistenceException {
-    ((PersistenceServiceImpl) fPersistenceService).recreateProfile();
+  public void recreateProfile(boolean needsEmergencyStartup) throws PersistenceException {
+    ((PersistenceServiceImpl) fPersistenceService).recreateProfile(needsEmergencyStartup);
   }
 
   /* Load Model Types Factory contribution */
