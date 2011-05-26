@@ -52,10 +52,13 @@ import org.rssowl.core.internal.persist.SearchCondition;
 import org.rssowl.core.internal.persist.SearchMark;
 import org.rssowl.core.internal.persist.Source;
 import org.rssowl.core.internal.persist.service.DBManager;
+import org.rssowl.core.interpreter.InterpreterException;
+import org.rssowl.core.interpreter.ParserException;
 import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ICategory;
 import org.rssowl.core.persist.IConditionalGet;
+import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFilterAction;
 import org.rssowl.core.persist.IFolder;
@@ -112,11 +115,13 @@ import org.rssowl.core.tests.TestUtils;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.LongOperationMonitor;
 import org.rssowl.core.util.Pair;
+import org.rssowl.ui.internal.util.ImportUtils;
 
 import com.db4o.ObjectContainer;
 import com.db4o.query.Query;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
@@ -2645,7 +2650,7 @@ public class DBManagerTest extends LargeBlockSizeTest {
    * @throws Exception
    */
   @Test
-  public void testRecreateProfile() {
+  public void testRecreateEmptyProfile() {
     IFeed feed = DynamicDAO.save(createFeed());
     INews news = createNews(feed);
     news.setState(INews.State.NEW);
@@ -2686,6 +2691,50 @@ public class DBManagerTest extends LargeBlockSizeTest {
     assertNotNull(news.toReference().resolve());
     assertNotNull(folder.toReference().resolve());
     assertNotNull(bookmark.toReference().resolve());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testRecreateOPMLProfile() throws IOException, InterpreterException, ParserException {
+    IFeed feed = DynamicDAO.save(createFeed());
+    INews news = createNews(feed);
+    news.setState(INews.State.NEW);
+    news.setFlagged(true);
+
+    DynamicDAO.save(news);
+
+    IFolder folder = Owl.getModelFactory().createFolder(null, null, "Root");
+    IBookMark bookmark = Owl.getModelFactory().createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "Bookmark");
+
+    DynamicDAO.save(bookmark);
+
+    assertNotNull(feed.toReference().resolve());
+    assertNotNull(news.toReference().resolve());
+    assertNotNull(folder.toReference().resolve());
+    assertNotNull(bookmark.toReference().resolve());
+
+    InternalOwl.getDefault().recreateProfile(true);
+
+    assertNull(feed.toReference().resolve());
+    assertNull(news.toReference().resolve());
+    assertNull(folder.toReference().resolve());
+    assertNull(bookmark.toReference().resolve());
+
+    File tmpFile = File.createTempFile("rssowlopml", "tmp");
+    if (!tmpFile.exists())
+      tmpFile.createNewFile();
+    tmpFile.deleteOnExit();
+
+    CoreUtils.copy(DBManagerTest.class.getResourceAsStream("/data/default_feeds.xml"), new FileOutputStream(tmpFile));
+
+    List<? extends IEntity> types = InternalOwl.getDefault().getInterpreter().importFrom(new FileInputStream(tmpFile));
+    ImportUtils.doImport(null, types, false);
+
+    assertTrue(DynamicDAO.loadAll(INews.class).isEmpty());
+    assertTrue(DynamicDAO.loadAll(IBookMark.class).size() > 100);
+    assertTrue(DynamicDAO.loadAll(IFolder.class).size() > 20);
   }
 
   /**
