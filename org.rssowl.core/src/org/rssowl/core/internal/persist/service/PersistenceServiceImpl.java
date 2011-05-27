@@ -25,6 +25,7 @@
 package org.rssowl.core.internal.persist.service;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.rssowl.core.Owl.StartLevel;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.persist.service.AbstractPersistenceService;
@@ -57,10 +58,13 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
 
     /* Startup DB */
     DBManager.getDefault().startup(monitor, emergency);
+    InternalOwl.getDefault().setStartLevel(StartLevel.DB_OPENED);
 
     /* Startup Model Search (not in case of emergency) */
-    if (!emergency)
+    if (!emergency) {
       getModelSearch().startup();
+      InternalOwl.getDefault().setStartLevel(StartLevel.SEARCH_INDEX_OPENED);
+    }
   }
 
   /*
