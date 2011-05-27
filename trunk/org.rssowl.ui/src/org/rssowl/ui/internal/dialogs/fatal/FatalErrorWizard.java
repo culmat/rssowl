@@ -161,14 +161,12 @@ public class FatalErrorWizard extends Wizard {
 
   private void internalPerformFinish() throws PersistenceException {
 
-    /* Handle selected backup if present */
-    if (fRestoreBackupPage != null) {
-      File backup = fRestoreBackupPage.getSelectedBackup();
-      if (backup != null)
-        InternalOwl.getDefault().restoreProfile(backup);
+    /* Restore Profile from Backup */
+    if (fRestoreBackupPage != null && fRestoreBackupPage.getSelectedBackup() != null) {
+      InternalOwl.getDefault().restoreProfile(fRestoreBackupPage.getSelectedBackup());
     }
 
-    /* Handle Clean Profile if selected */
+    /* Clean Profile */
     else if (fCleanProfilePage != null && fCleanProfilePage.doCleanProfile()) {
 
       /* Recreate the Profile */
@@ -182,7 +180,7 @@ public class FatalErrorWizard extends Wizard {
         /* First Try Daily Backup */
         File recentBackup = fOPMLBackups.get(0);
         try {
-          types = InternalOwl.getDefault().getInterpreter().importFrom(new FileInputStream(recentBackup));
+          types = Owl.getInterpreter().importFrom(new FileInputStream(recentBackup));
         } catch (Exception e) {
           if (fOPMLBackups.size() == 1)
             throw new PersistenceException(e.getMessage(), e);
@@ -202,6 +200,11 @@ public class FatalErrorWizard extends Wizard {
         if (types != null)
           ImportUtils.doImport(null, types, false);
       }
+    }
+
+    /* If user decides to try a restart first before restoring, try to recover from error by reindexing Lucene index */
+    else if (!fIsOOMError) {
+      InternalOwl.getDefault().getPersistenceService().getModelSearch().reIndexOnNextStartup();
     }
   }
 
