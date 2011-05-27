@@ -218,6 +218,12 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     }
 
     public IStatus run(IProgressMonitor monitor) {
+
+      /* Return early if canceled or disposed */
+      if (monitor.isCanceled() || fCBrowser.getControl().isDisposed())
+        return Status.OK_STATUS;
+
+      /* Reveal next page as necessary */
       if (fViewModel.hasHiddenNews()) {
         long lastVisibleNewsId = fViewModel.getLastVisibleNews();
         if (lastVisibleNewsId != -1) {
@@ -239,7 +245,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
           js.append("  }"); //$NON-NLS-1$
           js.append("}"); //$NON-NLS-1$
 
-          if (!monitor.isCanceled())
+          if (!monitor.isCanceled() && !fCBrowser.getControl().isDisposed())
             fCBrowser.execute(js.toString());
         }
       }
@@ -313,15 +319,16 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     /* Reveal paged (hidden) news dynamically as the user uses the browser */
     Listener listener = new Listener() {
       public void handleEvent(Event event) {
-        onMouseInteraction(event);
+        if (!event.widget.isDisposed())
+          triggerPageReveal();
       }
     };
     fBrowser.getControl().addListener(SWT.MouseWheel, listener);
     fBrowser.getControl().addListener(SWT.MouseDown, listener);
   }
 
-  private void onMouseInteraction(Event event) {
-    if (fPageSize == 0 || event.widget.isDisposed() || fJobTracker.isRunning())
+  private void triggerPageReveal() {
+    if (fPageSize == 0 || fBrowser.getControl().isDisposed() || fJobTracker.isRunning())
       return;
 
     /* Tell the tracker to reveal the next page if possible */
@@ -786,8 +793,10 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     /* Toggle News Item Visibility */
     else if (queryProvided && (EXPAND_NEWS_HANDLER_ID.equals(id) || COLLAPSE_NEWS_HANDLER_ID.equals(id))) {
       INews news = getNews(query);
-      if (news != null)
+      if (news != null) {
         setNewsExpanded(news, EXPAND_NEWS_HANDLER_ID.equals(id));
+        triggerPageReveal(); //Reveal more news if possible
+      }
     }
 
     /* Toggle Group Items Visibility */
@@ -1857,7 +1866,11 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       js.append("} "); //$NON-NLS-1$
     }
 
+    /* Execute in Browser */
     fBrowser.execute(js.toString());
+
+    /* If we are at the end of the page, reveal more items if possible */
+    triggerPageReveal();
   }
 
   private void navigateInHeadlines(boolean next, boolean unread) {
@@ -1892,6 +1905,9 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       StringBuilder js = new StringBuilder();
       js.append(getElementById(Dynamic.NEWS.getId(targetNews))).append(".scrollIntoView(true); "); //$NON-NLS-1$
       fBrowser.execute(js.toString());
+
+      /* If we are at the end of the page, reveal more items if possible */
+      triggerPageReveal();
     }
 
     /* If navigation did not find a suitable target, call the outer navigation function */
