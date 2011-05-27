@@ -25,6 +25,7 @@
 package org.rssowl.core.internal;
 
 import org.rssowl.core.IApplicationService;
+import org.rssowl.core.Owl.StartLevel;
 import org.rssowl.core.connection.IConnectionService;
 import org.rssowl.core.connection.ICredentialsProvider;
 import org.rssowl.core.connection.IProtocolHandler;
@@ -80,6 +81,7 @@ public final class InternalOwl {
   private volatile IModelFactory fModelFactory;
   private volatile boolean fShuttingDown;
   private volatile boolean fStarted;
+  private volatile StartLevel fStartLevel = StartLevel.NOT_STARTED;
 
   /** Flag indicating Performance-Tests are running */
   public volatile static boolean PERF_TESTING = false;
@@ -101,6 +103,9 @@ public final class InternalOwl {
    * called from an emergency situation like restoring a backup.
    */
   public void startup(LongOperationMonitor monitor, boolean emergency) {
+    if (fStartLevel == StartLevel.NOT_STARTED)
+      fStartLevel = StartLevel.STARTING;
+
     if (fModelFactory == null)
       fModelFactory = loadTypesFactory();
 
@@ -124,6 +129,22 @@ public final class InternalOwl {
 
     /* Flag as started */
     fStarted = true;
+    fStartLevel = StartLevel.STARTED;
+  }
+
+  /**
+   * @param level the new {@link StartLevel}
+   */
+  public void setStartLevel(StartLevel level) {
+    fStartLevel = level;
+  }
+
+  /**
+   * @return the {@link StartLevel} from the
+   * {@link #startup(LongOperationMonitor, boolean)} sequence.
+   */
+  public StartLevel getStartLevel() {
+    return fStartLevel;
   }
 
   /**
@@ -163,6 +184,8 @@ public final class InternalOwl {
     /* Shutdown Persistence Service */
     if (fPersistenceService != null)
       fPersistenceService.shutdown(emergency);
+
+    fStartLevel = StartLevel.NOT_STARTED;
   }
 
   /**

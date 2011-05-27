@@ -56,6 +56,25 @@ import org.rssowl.core.util.LongOperationMonitor;
 public final class Owl {
 
   /**
+   * Gives extra information on the state to the
+   * {@link Owl#startup(LongOperationMonitor)} call
+   */
+  public enum StartLevel {
+    NOT_STARTED, STARTING, DB_OPENED, SEARCH_INDEX_OPENED, STARTED;
+  }
+
+  /**
+   * Returns the {@link StartLevel} as reached from a call to the
+   * {@link #startup(LongOperationMonitor)} sequence.
+   *
+   * @return the {@link StartLevel} from the
+   * {@link #startup(LongOperationMonitor)} sequence.
+   */
+  public static StartLevel getStartLevel() {
+    return InternalOwl.getDefault().getStartLevel();
+  }
+
+  /**
    * <p>
    * Get the Implementation of <code>IApplicationService</code> that contains
    * special Methods which are used through the Application and access the
