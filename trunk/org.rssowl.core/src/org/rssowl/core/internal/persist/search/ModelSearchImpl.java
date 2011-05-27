@@ -121,7 +121,7 @@ public class ModelSearchImpl implements IModelSearch {
           fSearcher = createIndexSearcher();
       }
     } catch (IOException e) {
-      Activator.getDefault().getLog().log(Activator.getDefault().createErrorStatus(e.getMessage(), e));
+      throw new PersistenceException(e.getMessage(), e);
     }
   }
 
