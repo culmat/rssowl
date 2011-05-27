@@ -51,12 +51,17 @@ public class Messages extends NLS {
   public static String ErrorInfoPage_STARTUP_ERROR;
   public static String ErrorInfoPage_STARTUP_ERROR_N;
   public static String FatalErrorWizard_CRASH_REPORTER;
+  public static String FatalErrorWizard_RECREATE_SEARCH_INDEX;
   public static String FatalErrorWizard_RESTORE_BACKUP;
   public static String FatalErrorWizard_RESTORE_ERROR;
   public static String FatalErrorWizard_RESTORE_ERROR_N;
   public static String FatalErrorWizard_RESTORE_SUBSCRIPTIONS_SETTINGS;
   public static String FatalErrorWizard_START_OVER;
   public static String FatalErrorWizard_WE_ARE_SORRY;
+  public static String RecreateSearchPage_INFORMATION;
+  public static String RecreateSearchPage_RECREATING_DETAILS;
+  public static String RecreateSearchPage_RECREATING_INFORMATION;
+  public static String RecreateSearchPage_RECREATING_SEARCH_INDEX;
   public static String RestoreBackupPage_BACKUP_INFO_QUIT;
   public static String RestoreBackupPage_BACKUP_INFO_RESTART;
   public static String RestoreBackupPage_BACKUP_LABEL;

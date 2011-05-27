@@ -34,6 +34,7 @@ import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.rssowl.core.Owl;
+import org.rssowl.core.Owl.StartLevel;
 import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.service.PersistenceException;
@@ -58,6 +59,7 @@ public class FatalErrorWizard extends Wizard {
   private ErrorInfoPage fErrorInfoPage;
   private RestoreBackupPage fRestoreBackupPage;
   private CleanProfilePage fCleanProfilePage;
+  private RecreateSearchPage fReindexSearchPage;
   private final IStatus fErrorStatus;
   private int fReturnCode = IApplication.EXIT_OK;
   private final List<File> fProfileBackups = new ArrayList<File>();
@@ -110,8 +112,14 @@ public class FatalErrorWizard extends Wizard {
     /* Add Restore Pages if this is not an OOM Error */
     if (!fIsOOMError) {
 
+      /* Not an actual issue with the DB, rather search, so provide reindex page */
+      if (Owl.getStartLevel() == StartLevel.DB_OPENED) {
+        fReindexSearchPage = new RecreateSearchPage(Messages.FatalErrorWizard_RECREATE_SEARCH_INDEX);
+        addPage(fReindexSearchPage);
+      }
+
       /* Restore Profile Backup (if profile backups are present) */
-      if (!fProfileBackups.isEmpty()) {
+      else if (!fProfileBackups.isEmpty()) {
         fRestoreBackupPage = new RestoreBackupPage(Messages.FatalErrorWizard_RESTORE_BACKUP, fProfileBackups);
         addPage(fRestoreBackupPage);
       }
@@ -161,8 +169,13 @@ public class FatalErrorWizard extends Wizard {
 
   private void internalPerformFinish() throws PersistenceException {
 
+    /* Recreate Search Index */
+    if (fReindexSearchPage != null) {
+      InternalOwl.getDefault().getPersistenceService().getModelSearch().reIndexOnNextStartup();
+    }
+
     /* Restore Profile from Backup */
-    if (fRestoreBackupPage != null && fRestoreBackupPage.getSelectedBackup() != null) {
+    else if (fRestoreBackupPage != null && fRestoreBackupPage.getSelectedBackup() != null) {
       InternalOwl.getDefault().restoreProfile(fRestoreBackupPage.getSelectedBackup());
     }
 
@@ -201,11 +214,6 @@ public class FatalErrorWizard extends Wizard {
           ImportUtils.doImport(null, types, false);
       }
     }
-
-    /* If user decides to try a restart first before restoring, try to recover from error by reindexing Lucene index */
-    else if (!fIsOOMError) {
-      InternalOwl.getDefault().getPersistenceService().getModelSearch().reIndexOnNextStartup();
-    }
   }
 
   /*
@@ -218,6 +226,8 @@ public class FatalErrorWizard extends Wizard {
     if (fRestoreBackupPage != null && getContainer().getCurrentPage() != fRestoreBackupPage)
       return false;
     else if (fCleanProfilePage != null && getContainer().getCurrentPage() != fCleanProfilePage)
+      return false;
+    else if (fReindexSearchPage != null && getContainer().getCurrentPage() != fReindexSearchPage)
       return false;
 
     /* Other Pages decide on their own */
