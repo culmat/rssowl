@@ -59,7 +59,8 @@ public class Messages extends NLS {
   public static String FatalErrorWizard_START_OVER;
   public static String FatalErrorWizard_WE_ARE_SORRY;
   public static String RecreateSearchPage_INFORMATION;
-  public static String RecreateSearchPage_RECREATING_DETAILS;
+  public static String RecreateSearchPage_RECREATING_DETAILS_RESTART;
+  public static String RecreateSearchPage_RECREATING_DETAILS_QUIT;
   public static String RecreateSearchPage_RECREATING_INFORMATION;
   public static String RecreateSearchPage_RECREATING_SEARCH_INDEX;
   public static String RestoreBackupPage_BACKUP_INFO_QUIT;
