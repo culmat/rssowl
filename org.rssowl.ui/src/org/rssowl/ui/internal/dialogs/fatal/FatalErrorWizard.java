@@ -59,7 +59,7 @@ public class FatalErrorWizard extends Wizard {
   private ErrorInfoPage fErrorInfoPage;
   private RestoreBackupPage fRestoreBackupPage;
   private CleanProfilePage fCleanProfilePage;
-  private RecreateSearchPage fReindexSearchPage;
+  private RecreateSearchIndexPage fReindexSearchPage;
   private final IStatus fErrorStatus;
   private int fReturnCode = IApplication.EXIT_OK;
   private final List<File> fProfileBackups = new ArrayList<File>();
@@ -114,7 +114,7 @@ public class FatalErrorWizard extends Wizard {
 
       /* Not an actual issue with the DB, rather search, so provide reindex page */
       if (Owl.getStartLevel() == StartLevel.DB_OPENED) {
-        fReindexSearchPage = new RecreateSearchPage(Messages.FatalErrorWizard_RECREATE_SEARCH_INDEX);
+        fReindexSearchPage = new RecreateSearchIndexPage(Messages.FatalErrorWizard_RECREATE_SEARCH_INDEX);
         addPage(fReindexSearchPage);
       }
 

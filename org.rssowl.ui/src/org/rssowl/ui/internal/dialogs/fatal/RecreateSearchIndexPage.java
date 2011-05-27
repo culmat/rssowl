@@ -41,8 +41,8 @@ import org.rssowl.ui.internal.util.LayoutUtils;
  *
  * @author bpasero
  */
-public class RecreateSearchPage extends WizardPage {
-  RecreateSearchPage(String pageName) {
+public class RecreateSearchIndexPage extends WizardPage {
+  RecreateSearchIndexPage(String pageName) {
     super(pageName, pageName, null);
   }
 
