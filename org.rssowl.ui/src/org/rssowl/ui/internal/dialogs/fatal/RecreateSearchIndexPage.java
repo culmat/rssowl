@@ -33,6 +33,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
@@ -68,7 +69,10 @@ public class RecreateSearchIndexPage extends WizardPage {
       recoverInfoLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
 
       Label recoverInfoTextLabel = new Label(container, SWT.WRAP);
-      recoverInfoTextLabel.setText(Messages.RecreateSearchPage_RECREATING_DETAILS);
+      if (Application.IS_WINDOWS)
+        recoverInfoTextLabel.setText(Messages.RecreateSearchPage_RECREATING_DETAILS_RESTART);
+      else
+        recoverInfoTextLabel.setText(Messages.RecreateSearchPage_RECREATING_DETAILS_QUIT);
       recoverInfoTextLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
       ((GridData) recoverInfoTextLabel.getLayoutData()).widthHint = 200;
     }
