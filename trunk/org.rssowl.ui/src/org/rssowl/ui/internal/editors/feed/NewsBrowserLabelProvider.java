@@ -516,8 +516,8 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
     /* Content */
     writer.append("div.content { \n"); //$NON-NLS-1$
-    writer.append("   padding: 15px 10px 15px 10px; border-top: dotted 1px silver; \n"); //$NON-NLS-1$
-    writer.append("  background-color: #fff; clear: both; ").append(fNormalFontCSS).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("  padding: 15px 10px 15px 10px; border-top: dotted 1px silver; \n"); //$NON-NLS-1$
+    writer.append("  background-color: #fff; clear: both; ").append(fNormalFontCSS).append(" font-style: normal; \n"); //$NON-NLS-1$ //$NON-NLS-2$
     writer.append("}\n"); //$NON-NLS-1$
 
     /* Restrict the style of embedded Paragraphs */
@@ -588,29 +588,29 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
     /* Title (Collapsed - Initially) */
     writer.append("div.title {  ").append(fNormalFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
-    writer.append("div.title a { color: black; text-decoration: none; }\n"); //$NON-NLS-1$
-    writer.append("div.title a.unread { font-weight: bold; text-decoration: none; }\n"); //$NON-NLS-1$
-    writer.append("div.title a:hover { color: black; text-decoration: none; }\n"); //$NON-NLS-1$
-    writer.append("div.title a:visited { color: black; text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.append("div.title a { color: black; text-decoration: none; font-style: normal; }\n"); //$NON-NLS-1$
+    writer.append("div.title a.unread { font-weight: bold; text-decoration: none; font-style: normal; }\n"); //$NON-NLS-1$
+    writer.append("div.title a:hover { color: black; text-decoration: none; font-style: normal; }\n"); //$NON-NLS-1$
+    writer.append("div.title a:visited { color: black; text-decoration: none; font-style: normal; }\n"); //$NON-NLS-1$
 
     /* Title (Expanded) */
     writer.append("div.titleExpanded { width: 90%; float: left; ").append(fBiggerFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
-    writer.append("div.titleExpanded a { ").append(fLinkFGColorCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
-    writer.append("div.titleExpanded a.unread { font-weight: bold; text-decoration: none; }\n"); //$NON-NLS-1$
-    writer.append("div.titleExpanded a:hover { ").append(fLinkFGColorCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
-    writer.append("div.titleExpanded a:visited { ").append(fLinkFGColorCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("div.titleExpanded a { ").append(fLinkFGColorCSS).append(" text-decoration: none; font-style: normal; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("div.titleExpanded a.unread { font-weight: bold; text-decoration: none; font-style: normal; }\n"); //$NON-NLS-1$
+    writer.append("div.titleExpanded a:hover { ").append(fLinkFGColorCSS).append(" text-decoration: none; font-style: normal; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("div.titleExpanded a:visited { ").append(fLinkFGColorCSS).append(" text-decoration: none; font-style: normal; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* Title (Collapsed - By user) */
     writer.append("div.titleCollapsed { ").append(fNormalFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
-    writer.append("div.titleCollapsed a { color: rgb(80, 80, 80); text-decoration: none; }\n"); //$NON-NLS-1$
-    writer.append("div.titleCollapsed a.unread { color: rgb(80, 80, 80); font-weight: bold; text-decoration: none; }\n"); //$NON-NLS-1$
-    writer.append("div.titleCollapsed a:hover { color: rgb(80, 80, 80); text-decoration: none; }\n"); //$NON-NLS-1$
-    writer.append("div.titleCollapsed a:visited { color: rgb(80, 80, 80); text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.append("div.titleCollapsed a { color: rgb(80, 80, 80); text-decoration: none; font-style: normal; }\n"); //$NON-NLS-1$
+    writer.append("div.titleCollapsed a.unread { color: rgb(80, 80, 80); font-weight: bold; text-decoration: none; font-style: normal; }\n"); //$NON-NLS-1$
+    writer.append("div.titleCollapsed a:hover { color: rgb(80, 80, 80); text-decoration: none; font-style: normal; }\n"); //$NON-NLS-1$
+    writer.append("div.titleCollapsed a:visited { color: rgb(80, 80, 80); text-decoration: none; font-style: normal; }\n"); //$NON-NLS-1$
 
     /* Subtitle */
-    writer.append("a.subtitle { font-style: italic; text-decoration: none; padding-left: 10px; color: rgb(80, 80, 80); ").append(fVerySmallFontCSS).append(" }"); //$NON-NLS-1$ //$NON-NLS-2$
-    writer.append("a.subtitle:hover { font-style: italic; text-decoration: none; padding-left: 10px; color: rgb(80, 80, 80); ").append(fVerySmallFontCSS).append(" }"); //$NON-NLS-1$ //$NON-NLS-2$
-    writer.append("a.subtitle:visited { font-style: italic; text-decoration: none; padding-left: 10px; color: rgb(80, 80, 80); ").append(fVerySmallFontCSS).append(" }"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("a.subtitle { font-style: italic !important; text-decoration: none; padding-left: 10px; color: rgb(80, 80, 80); ").append(fVerySmallFontCSS).append(" }"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("a.subtitle:hover { font-style: italic !important; text-decoration: none; padding-left: 10px; color: rgb(80, 80, 80); ").append(fVerySmallFontCSS).append(" }"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("a.subtitle:visited { font-style: italic !important; text-decoration: none; padding-left: 10px; color: rgb(80, 80, 80); ").append(fVerySmallFontCSS).append(" }"); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* Delete */
     writer.append("div.delete { padding-top: 5px; text-align: right; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -628,10 +628,10 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
     /* Title */
     writer.append("div.title { width: 90%; float: left; padding-bottom: 6px; ").append(fBiggerFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
-    writer.append("div.title a { ").append(fLinkFGColorCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
-    writer.append("div.title a.unread { font-weight: bold; text-decoration: none; }\n"); //$NON-NLS-1$
-    writer.append("div.title a:hover { ").append(fLinkFGColorCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
-    writer.append("div.title a:visited { ").append(fLinkFGColorCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("div.title a { ").append(fLinkFGColorCSS).append(" text-decoration: none; font-style: normal; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("div.title a.unread { font-weight: bold; text-decoration: none; font-style: normal; }\n"); //$NON-NLS-1$
+    writer.append("div.title a:hover { ").append(fLinkFGColorCSS).append(" text-decoration: none; font-style: normal; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("div.title a:visited { ").append(fLinkFGColorCSS).append(" text-decoration: none; font-style: normal; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* Delete */
     writer.append("div.delete { text-align: right; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
