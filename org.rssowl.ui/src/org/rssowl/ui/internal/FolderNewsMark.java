@@ -105,7 +105,7 @@ public class FolderNewsMark extends Mark implements INewsMark {
    * {@link INewsMark}.
    */
   public FolderNewsMark(IFolder folder) {
-    super(folder.getId(), folder.getParent(), folder.getName());
+    super(folder.getId(), folder, folder.getName());
     fFolder = folder;
     fNewsContainer = new HashSet<Long>();
     fNewsDao = DynamicDAO.getDAO(INewsDAO.class);
