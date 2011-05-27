@@ -1349,12 +1349,17 @@ public class DBManager {
         if (dbFile.exists() && !dbFile.delete())
           Activator.getDefault().logError("Failed to delete db file", null); //$NON-NLS-1$
 
-        /* Delete DB Format File */
-        File dbFormatFile = getDBFormatFile();
-        if (dbFormatFile.exists() && !dbFormatFile.delete())
-          Activator.getDefault().logError("Failed to delete db format file", null); //$NON-NLS-1$
+        /* Delete other marker files */
+        delete(getDBFormatFile(), getDefragmentFile(), getReIndexFile(), getCleanUpIndexFile());
       }
     });
+  }
+
+  private void delete(File... files) {
+    for (File file : files) {
+      if (file.exists())
+        file.delete();
+    }
   }
 
   public final ObjectContainer getObjectContainer() {
