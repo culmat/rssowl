@@ -28,6 +28,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 import org.rssowl.core.tests.controller.ControllerTestLocal;
+import org.rssowl.core.tests.controller.ControllerTestLocalLBS;
 import org.rssowl.core.tests.controller.ReloadTestLocal;
 import org.rssowl.core.tests.importer.ImporterTest;
 import org.rssowl.core.tests.interpreter.InterpreterTest;
@@ -68,7 +69,7 @@ import org.rssowl.core.tests.util.URIUtilsTest;
   InterpreterTest.class,
   ImporterTest.class,
   ControllerTestLocal.class,
-  ControllerTestLocal.class, //Running twice to test with large block size
+  ControllerTestLocalLBS.class, //Running twice to test with large block size
   ReloadTestLocal.class,
   ReloadTestLocal.class, //Running twice to test with large block size
   ModelTest1.class,
