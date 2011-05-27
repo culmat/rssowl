@@ -509,10 +509,10 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
     /* Group */
     writer.append("div.group { color: #678; ").append(fBiggestFontCSS).append(" font-weight: bold; margin: 10px 0px 5px 5px; padding-bottom: 3px; border-bottom: 1px solid #678; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
-    writer.append("div.group a { color: #678; ").append(fBiggestFontCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
-    writer.append("div.group a:hover { color: #678; ").append(fBiggestFontCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
-    writer.append("div.group a:visited { color: #678; ").append(fBiggestFontCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
-    writer.append("span.groupNote { margin-left: 5px; ").append(fNormalFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("div.group a { color: #678; ").append(fBiggestFontCSS).append(" text-decoration: none; font-style: normal; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("div.group a:hover { color: #678; ").append(fBiggestFontCSS).append(" text-decoration: none; font-style: normal; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("div.group a:visited { color: #678; ").append(fBiggestFontCSS).append(" text-decoration: none; font-style: normal; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("span.groupNote { margin-left: 5px; ").append(fNormalFontCSS).append(" font-style: normal; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* Content */
     writer.append("div.content { \n"); //$NON-NLS-1$
@@ -577,10 +577,10 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
     /* Page Latch */
     writer.append("div.pageLatch { padding: 5px; text-align: center; ").append(fNormalFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
-    writer.append("div.pageLatch a { ").append(fLinkFGColorCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
-    writer.append("div.pageLatch a:hover { ").append(fLinkFGColorCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
-    writer.append("div.pageLatch a:active { ").append(fLinkFGColorCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
-    writer.append("div.pageLatch a:visited { ").append(fLinkFGColorCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("div.pageLatch a { ").append(fLinkFGColorCSS).append(" text-decoration: none; font-style: normal; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("div.pageLatch a:hover { ").append(fLinkFGColorCSS).append(" text-decoration: none; font-style: normal; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("div.pageLatch a:active { ").append(fLinkFGColorCSS).append(" text-decoration: none; font-style: normal; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("div.pageLatch a:visited { ").append(fLinkFGColorCSS).append(" text-decoration: none; font-style: normal; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
   }
 
   /* Common CSS for Headlines Layout */
