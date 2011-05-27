@@ -84,6 +84,9 @@ public class ModelSearchImpl implements IModelSearch {
   /* Cached News States */
   private static final INews.State[] NEWS_STATES = INews.State.values();
 
+  /* Number of news to resolve for indexing at once */
+  private static final int INDEX_CHUNK_SIZE = 500;
+
   /* An increased clauses count to set in case of a MaxClouseCountException */
   static final int MAX_CLAUSE_COUNT = 65536;
 
@@ -638,7 +641,6 @@ public class ModelSearchImpl implements IModelSearch {
   }
 
   private void reindexInChunks(Iterator<INews> iterator, IProgressMonitor monitor) {
-    int chunkSize = 1000;
     boolean isFirstRun = true;
 
     /* User might have cancelled the operation */
@@ -659,8 +661,8 @@ public class ModelSearchImpl implements IModelSearch {
       while (iterator.hasNext()) {
 
         /* Obtain the next chunk of news from the List */
-        List<INews> newsChunkToBeIndexed = new ArrayList<INews>(chunkSize);
-        for (int i = 0; i < chunkSize && iterator.hasNext(); i++)
+        List<INews> newsChunkToBeIndexed = new ArrayList<INews>(INDEX_CHUNK_SIZE);
+        for (int i = 0; i < INDEX_CHUNK_SIZE && iterator.hasNext(); i++)
           newsChunkToBeIndexed.add(iterator.next());
 
         /* Return if nothing to do */
