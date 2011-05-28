@@ -25,6 +25,7 @@
 package org.rssowl.core.tests.persist;
 
 import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -35,7 +36,9 @@ import org.junit.Test;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.internal.persist.Feed;
+import org.rssowl.core.internal.persist.service.DBHelper;
 import org.rssowl.core.internal.persist.service.DBManager;
+import org.rssowl.core.internal.persist.service.EntityIdsByEventType;
 import org.rssowl.core.internal.persist.service.PersistenceServiceImpl;
 import org.rssowl.core.interpreter.InterpreterException;
 import org.rssowl.core.interpreter.ParserException;
@@ -54,6 +57,7 @@ import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.ISource;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.reference.FeedLinkReference;
+import org.rssowl.core.tests.TestUtils.NullProgressLongOperationMonitor;
 import org.rssowl.core.tests.model.DBManagerTest;
 import org.rssowl.core.tests.model.LargeBlockSizeTest;
 import org.rssowl.core.util.CoreUtils;
@@ -247,6 +251,60 @@ public class StartupShutdownTest extends LargeBlockSizeTest {
 
     if (markerExists && !marker.exists())
       marker.createNewFile();
+  }
+
+  /**
+   * Tests that uncommitted news are saved and loaded correctly in the presence
+   * of an emergency or normal shutdown.
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testSaveLoadEntitiesToBeIndexed() throws Exception {
+    EntityIdsByEventType entitiesToBeIndexed = DBHelper.getEntitiesToBeIndexedDAO().load();
+    assertEquals(0, entitiesToBeIndexed.size());
+
+    IFeed feed = fFactory.createFeed(null, new URI("http://www.feed.com/feed.xml"));
+    INews news1 = createNews(feed, "Foo", null, "http://www.news.com/news1.html", State.READ);
+    INews news2 = createNews(feed, " Bar", null, "http://www.news.com/news2.html", State.NEW);
+    DynamicDAO.save(feed);
+
+    entitiesToBeIndexed = DBHelper.getEntitiesToBeIndexedDAO().load();
+    assertEquals(2, entitiesToBeIndexed.size());
+    Owl.getPersistenceService().shutdown(true);
+    Owl.getPersistenceService().startup(new NullProgressLongOperationMonitor(), false, false);
+
+    entitiesToBeIndexed = DBHelper.getEntitiesToBeIndexedDAO().load();
+    assertEquals(2, entitiesToBeIndexed.size());
+    for (long id : entitiesToBeIndexed.getPersistedEntityIds().toArray()) {
+      assertTrue(id == news1.getId().longValue() || id == news2.getId().longValue());
+    }
+
+    Owl.getPersistenceService().shutdown(false);
+    Owl.getPersistenceService().startup(new NullProgressLongOperationMonitor(), false, false);
+
+    waitForIndexer();
+
+    entitiesToBeIndexed = DBHelper.getEntitiesToBeIndexedDAO().load();
+    assertEquals(0, entitiesToBeIndexed.size());
+  }
+
+  private INews createNews(IFeed feed, String title, String description, String link, INews.State state) throws URISyntaxException {
+    INews news = fFactory.createNews(null, feed, new Date(System.currentTimeMillis()));
+    news.setState(state);
+    news.setLink(new URI(link));
+    news.setTitle(title);
+    if (description != null)
+      news.setDescription(description);
+
+    return news;
+  }
+
+  /**
+   * @throws InterruptedException
+   */
+  protected void waitForIndexer() throws InterruptedException {
+    Thread.sleep(500);
   }
 
   private INews createNews(IFeed feed) {
