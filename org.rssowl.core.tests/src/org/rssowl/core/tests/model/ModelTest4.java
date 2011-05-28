@@ -35,6 +35,7 @@ import org.junit.Test;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.LazyList;
 import org.rssowl.core.internal.persist.NewsBin;
+import org.rssowl.core.internal.persist.service.PersistenceServiceImpl;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ICategory;
 import org.rssowl.core.persist.IFeed;
@@ -86,7 +87,7 @@ public class ModelTest4 extends LargeBlockSizeTest {
    */
   @Before
   public void setUp() throws Exception {
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     fFactory = Owl.getModelFactory();
   }
 

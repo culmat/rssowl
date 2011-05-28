@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
+import org.rssowl.core.internal.persist.service.PersistenceServiceImpl;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
@@ -71,7 +72,7 @@ public class CleanUpTests {
   public void setUp() throws Exception {
     fFactory = Owl.getModelFactory();
 
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
   }
 
   /**

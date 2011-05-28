@@ -38,6 +38,7 @@ import org.rssowl.core.internal.newsaction.MoveNewsAction;
 import org.rssowl.core.internal.persist.Label;
 import org.rssowl.core.internal.persist.Preference;
 import org.rssowl.core.internal.persist.SearchFilter;
+import org.rssowl.core.internal.persist.service.PersistenceServiceImpl;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
@@ -77,7 +78,7 @@ public class FileImportTest {
    */
   @Before
   public void setUp() throws Exception {
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
   }
 
   /**

@@ -50,6 +50,7 @@ import org.rssowl.core.connection.IProxyCredentials;
 import org.rssowl.core.connection.NotModifiedException;
 import org.rssowl.core.connection.PlatformCredentialsProvider;
 import org.rssowl.core.internal.persist.Feed;
+import org.rssowl.core.internal.persist.service.PersistenceServiceImpl;
 import org.rssowl.core.persist.IConditionalGet;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
@@ -84,7 +85,7 @@ public class ConnectionTests {
    */
   @Before
   public void setUp() throws Exception {
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
   }
 
   /**
@@ -497,7 +498,7 @@ public class ConnectionTests {
 
     assertNull(conManager.getAuthCredentials(feedUrl, null));
     assertNull(conManager.getCredentialsProvider(feedUrl).getPersistedAuthCredentials(feedUrl, null));
-    
+
     ((PlatformCredentialsProvider) conManager.getCredentialsProvider(feedUrl)).clear();
   }
 

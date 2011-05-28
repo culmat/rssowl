@@ -30,6 +30,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.Feed;
+import org.rssowl.core.internal.persist.service.PersistenceServiceImpl;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.NewsCounter;
@@ -55,7 +56,7 @@ public class ControllerTestLocal extends LargeBlockSizeTest {
    */
   @Before
   public void setUp() throws Exception {
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
   }
 
   private NewsCounter loadNewsCounter() {
@@ -154,7 +155,7 @@ public class ControllerTestLocal extends LargeBlockSizeTest {
     assertEquals(2, getStickyCount(feed));
 
     /* Simulate Dirty Shutdown */
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
 
     feed = new Feed(new URI("http://www.rssowl.org/rssowl2dg/tests/manager/rss_2_0.xml")); //$NON-NLS-1$
     feed = DynamicDAO.save(feed);

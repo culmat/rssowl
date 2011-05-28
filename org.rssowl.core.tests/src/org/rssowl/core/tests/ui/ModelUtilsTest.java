@@ -41,6 +41,7 @@ import org.rssowl.core.internal.persist.Folder;
 import org.rssowl.core.internal.persist.Label;
 import org.rssowl.core.internal.persist.News;
 import org.rssowl.core.internal.persist.Person;
+import org.rssowl.core.internal.persist.service.PersistenceServiceImpl;
 import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ICategory;
@@ -90,7 +91,7 @@ public class ModelUtilsTest {
    */
   @Before
   public void setUp() throws Exception {
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     fFactory = Owl.getModelFactory();
   }
 

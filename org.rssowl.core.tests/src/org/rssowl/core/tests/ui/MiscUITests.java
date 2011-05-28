@@ -36,6 +36,7 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.BookMark;
 import org.rssowl.core.internal.persist.Feed;
 import org.rssowl.core.internal.persist.Folder;
+import org.rssowl.core.internal.persist.service.PersistenceServiceImpl;
 import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ICategory;
@@ -80,7 +81,7 @@ public class MiscUITests {
    */
   @Before
   public void setUp() throws Exception {
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
   }
 
   /**

@@ -29,6 +29,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
 import org.rssowl.core.Owl;
+import org.rssowl.core.internal.persist.service.PersistenceServiceImpl;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
@@ -76,7 +77,7 @@ public abstract class AbstractModelSearchTest {
     fFactory = Owl.getModelFactory();
     fNewsEntityName = INews.class.getName();
 
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
   }
 
   /**

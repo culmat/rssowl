@@ -50,6 +50,7 @@ import org.rssowl.core.internal.persist.service.Counter;
 import org.rssowl.core.internal.persist.service.DBHelper;
 import org.rssowl.core.internal.persist.service.DBManager;
 import org.rssowl.core.internal.persist.service.EntityIdsByEventType;
+import org.rssowl.core.internal.persist.service.PersistenceServiceImpl;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IConditionalGet;
 import org.rssowl.core.persist.IEntity;
@@ -98,7 +99,7 @@ public class DefragmentTest {
    */
   @Before
   public void setUp() throws Exception {
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     fPluginLocation = FileLocator.toFileURL(Platform.getBundle("org.rssowl.core.tests").getEntry("/")).toURI();
 
     /* Label */

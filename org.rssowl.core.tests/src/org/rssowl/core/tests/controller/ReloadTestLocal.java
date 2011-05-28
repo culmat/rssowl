@@ -33,6 +33,7 @@ import org.junit.Test;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.Feed;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
+import org.rssowl.core.internal.persist.service.PersistenceServiceImpl;
 import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFeed;
@@ -93,7 +94,7 @@ public class ReloadTestLocal extends LargeBlockSizeTest {
    */
   @Before
   public void setUp() throws Exception {
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     InMemoryProtocolHandler.FEED = null;
 
     fController = Controller.getDefault();

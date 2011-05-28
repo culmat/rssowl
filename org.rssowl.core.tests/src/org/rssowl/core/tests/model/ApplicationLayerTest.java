@@ -39,6 +39,7 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.Feed;
 import org.rssowl.core.internal.persist.MergeResult;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
+import org.rssowl.core.internal.persist.service.PersistenceServiceImpl;
 import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ICategory;
@@ -97,7 +98,7 @@ public class ApplicationLayerTest extends LargeBlockSizeTest {
    */
   @Before
   public void setUp() throws Exception {
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     fFactory = Owl.getModelFactory();
     fAppService = Owl.getApplicationService();
   }

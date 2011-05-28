@@ -39,6 +39,7 @@ import org.rssowl.core.internal.persist.MergeResult;
 import org.rssowl.core.internal.persist.dao.EntitiesToBeIndexedDAOImpl;
 import org.rssowl.core.internal.persist.service.DBHelper;
 import org.rssowl.core.internal.persist.service.EntityIdsByEventType;
+import org.rssowl.core.internal.persist.service.PersistenceServiceImpl;
 import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ICategory;
@@ -121,7 +122,7 @@ public class ModelTest3 extends LargeBlockSizeTest {
    */
   @Before
   public void setUp() throws Exception {
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     fFactory = Owl.getModelFactory();
   }
 
