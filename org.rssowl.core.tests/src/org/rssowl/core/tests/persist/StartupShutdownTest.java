@@ -233,7 +233,7 @@ public class StartupShutdownTest extends LargeBlockSizeTest {
     InternalOwl.getDefault().restoreProfile(tmpFile);
     if (markerExists)
       assertFalse(marker.exists());
-    InternalOwl.getDefault().startup(new LongOperationMonitor(new NullProgressMonitor()) {}, true);
+    InternalOwl.getDefault().startup(new LongOperationMonitor(new NullProgressMonitor()) {}, true, false);
 
     assertTrue(DynamicDAO.loadAll(INews.class).isEmpty());
     assertTrue(DynamicDAO.loadAll(IBookMark.class).size() > 100);

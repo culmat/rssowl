@@ -203,7 +203,7 @@ public final class Owl {
    */
   public static void startup(LongOperationMonitor monitor) {
     if (!InternalOwl.getDefault().isStarted())
-      InternalOwl.getDefault().startup(monitor, false);
+      InternalOwl.getDefault().startup(monitor, false, false);
   }
 
   /**

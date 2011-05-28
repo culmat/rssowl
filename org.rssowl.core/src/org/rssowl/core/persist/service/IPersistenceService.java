@@ -58,8 +58,10 @@ public interface IPersistenceService {
    * called from an emergency situation like restoring a backup.
    * @param monitor the {@link LongOperationMonitor} is used to react on
    * cancellation and report accurate startup progress.
+   * @param forRestore if <code>true</code> will open the restore DB as profile
+   * and <code>false</code> to open the default profile location.
    */
-  void startup(LongOperationMonitor monitor, boolean emergency);
+  void startup(LongOperationMonitor monitor, boolean emergency, boolean forRestore);
 
   /**
    * Gets the implementation of <code>DAOService</code> that provides access to
