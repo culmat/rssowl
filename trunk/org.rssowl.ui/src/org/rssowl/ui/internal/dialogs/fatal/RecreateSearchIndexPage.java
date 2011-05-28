@@ -59,7 +59,7 @@ public class RecreateSearchIndexPage extends WizardPage {
     /* Container */
     Composite container = new Composite(parent, SWT.NONE);
     container.setLayout(LayoutUtils.createGridLayout(1, 5, 5));
-    ((GridLayout) container.getLayout()).marginBottom = 5;
+    ((GridLayout) container.getLayout()).marginBottom = 10;
 
     /* Recreate Information */
     {
