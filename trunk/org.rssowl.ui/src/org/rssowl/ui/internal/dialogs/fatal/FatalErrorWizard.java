@@ -68,7 +68,11 @@ public class FatalErrorWizard extends Wizard {
 
   public FatalErrorWizard(IStatus errorStatus) {
     fErrorStatus = errorStatus;
-    fOfferRestorePages = !(fErrorStatus.getException() instanceof OutOfMemoryError) && InternalOwl.getDefault().getPersistenceService() != null;
+
+    boolean isOOMError = (fErrorStatus.getException() instanceof OutOfMemoryError);
+    boolean canUsePersistenceService = (InternalOwl.getDefault().getPersistenceService() != null);
+    StartLevel startLevel = InternalOwl.getDefault().getStartLevel();
+    fOfferRestorePages = !isOOMError && canUsePersistenceService && startLevel != StartLevel.STARTED && startLevel != StartLevel.SEARCH_INDEX_OPENED;
     if (fOfferRestorePages)
       findBackups();
   }
