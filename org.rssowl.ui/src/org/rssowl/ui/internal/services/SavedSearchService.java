@@ -30,9 +30,10 @@ import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.rssowl.core.Owl;
+import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.persist.INews;
-import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.INews.State;
+import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.ISearchMarkDAO;
 import org.rssowl.core.persist.event.SearchMarkEvent;
@@ -111,8 +112,12 @@ public class SavedSearchService {
   private IndexListener registerListeners() {
     IndexListener listener = new IndexListener() {
       public void indexUpdated(int entitiesCount) {
-        if (!Controller.getDefault().isShuttingDown())
-          onIndexUpdated(entitiesCount);
+        if (!Controller.getDefault().isShuttingDown()) {
+          if (!InternalOwl.TESTING)
+            onIndexUpdated(entitiesCount);
+          else
+            updateSavedSearches(true);
+        }
       }
     };
 
