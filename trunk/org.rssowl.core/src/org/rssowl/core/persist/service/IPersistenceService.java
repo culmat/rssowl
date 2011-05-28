@@ -115,16 +115,6 @@ public interface IPersistenceService {
   void shutdown(boolean emergency) throws PersistenceException;
 
   /**
-   * Recreate the Schema of the persistence layer. In case of a Database, this
-   * would drop relations and create them again. Will also clear the search
-   * index.
-   *
-   * @throws PersistenceException In case of an error while starting up the
-   * persistence layer.
-   */
-  void recreateSchema() throws PersistenceException;
-
-  /**
    * Instructs the persistence service to schedule an optimization run during
    * the next time the application is started. The actual optimization type is
    * dependent on the persistence system being used and implementors are free to

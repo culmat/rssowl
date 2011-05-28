@@ -39,6 +39,7 @@ import org.rssowl.core.internal.persist.Feed;
 import org.rssowl.core.internal.persist.Folder;
 import org.rssowl.core.internal.persist.News;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
+import org.rssowl.core.internal.persist.service.PersistenceServiceImpl;
 import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ICategory;
@@ -52,6 +53,7 @@ import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.IPersistable;
 import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.ISearch;
@@ -62,7 +64,6 @@ import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.ISource;
 import org.rssowl.core.persist.ITextInput;
 import org.rssowl.core.persist.SearchSpecifier;
-import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
@@ -122,7 +123,7 @@ public class PerformanceTest {
   @Before
   public void setUp() throws Exception {
     InternalOwl.PERF_TESTING = true;
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     fModelSearch = Owl.getPersistenceService().getModelSearch();
     fPluginLocation = FileLocator.toFileURL(Platform.getBundle("org.rssowl.core.tests").getEntry("/")).toURI();
     fController = Controller.getDefault();
@@ -338,11 +339,11 @@ public class PerformanceTest {
     System.out.println("Running Saved Search Service on " + FEEDS + " Feeds [Cold - " + 1 + " Jobs] took: " + TestUtils.executeAndWait(tasks, 1) + "ms");
 
     /* Warm-Start: Run Saved Search Service on 216 Feeds */
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     tasks = getSavedSearchServiceTestTasks(ex);
     long l1 = TestUtils.executeAndWait(tasks, 1);
 
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     tasks = getSavedSearchServiceTestTasks(ex);
     long l2 = TestUtils.executeAndWait(tasks, 1);
 
@@ -565,24 +566,24 @@ public class PerformanceTest {
     System.out.println("Saving and Indexing " + FEEDS + " Feeds [Cold - " + 1 + " Jobs] took: " + TestUtils.executeAndWait(tasks, 1) + "ms");
 
     /* Warm-Start: Save and Index 216 Feeds */
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     tasks = getSaveAndIndexFeedsTasks(ex);
     long l1 = TestUtils.executeAndWait(tasks, 1);
 
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     tasks = getSaveAndIndexFeedsTasks(ex);
     long l2 = TestUtils.executeAndWait(tasks, 1);
 
     System.out.println("Saving and Indexing " + FEEDS + " Feeds [Warm - " + 1 + " Jobs] took: " + (l1 + l2) / 2 + "ms");
 
     /* Warm-Start: Save 216 Feeds with search disabled (to calculate plain index time) */
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     Owl.getPersistenceService().getModelSearch().shutdown(false);
     tasks = getSaveAndIndexFeedsTasks(ex);
     long l3 = TestUtils.executeAndWait(tasks, 1);
 
     Owl.getPersistenceService().getModelSearch().startup();
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     Owl.getPersistenceService().getModelSearch().shutdown(false);
     tasks = getSaveAndIndexFeedsTasks(ex);
     long l4 = TestUtils.executeAndWait(tasks, 1);
@@ -652,7 +653,7 @@ public class PerformanceTest {
     System.out.println("Searching [States (" + results[0] + " results, Occur.SHOULD, Cold)] in " + FEEDS + " Feeds took: " + l1 + "ms");
 
     /* Recreate */
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     saveFeedsHelper();
 
     /* Query 2: Entire News contains 'news' */
@@ -675,7 +676,7 @@ public class PerformanceTest {
     System.out.println("Searching [Entire News (" + results[0] + " results, Occur.SHOULD, Cold)] in " + FEEDS + " Feeds took: " + l2 + "ms");
 
     /* Recreate */
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     saveFeedsHelper();
 
     /*
@@ -707,7 +708,7 @@ public class PerformanceTest {
     System.out.println("Searching [Title, Author, Categories (" + results[0] + " results, Occur.SHOULD, Cold)] in " + FEEDS + " Feeds took: " + l3 + "ms");
 
     /* Recreate */
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     saveFeedsHelper();
 
     /*
@@ -739,7 +740,7 @@ public class PerformanceTest {
     System.out.println("Searching [Title, Author, Categories (" + results[0] + " results, Occur.MUST, Cold)] in " + FEEDS + " Feeds took: " + l4 + "ms");
 
     /* Recreate */
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     saveFeedsHelper();
 
     /* Query 5: Publish Date before Now AND After 2000 */
@@ -768,7 +769,7 @@ public class PerformanceTest {
     System.out.println("Searching [Date Range (" + results[0] + " results, Occur.MUST, Cold)] in " + FEEDS + " Feeds took: " + l5 + "ms");
 
     /* Recreate */
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     saveFeedsHelper();
 
     /* Query 6: News is *new*, *unread*, *updated* and Has Attachments IS TRUE */
@@ -807,11 +808,11 @@ public class PerformanceTest {
     /* Cold-Start: Interpret 216 Feeds */
     System.out.println("Reloading Feeds (No Retention): " + FEEDS + " Feeds [Cold - " + JOBS + " Jobs] took: " + TestUtils.executeAndWait(tasks, JOBS) + "ms");
 
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     tasks = getReloadFeedsTasks(false);
     long l1 = TestUtils.executeAndWait(tasks, JOBS);
 
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     tasks = getReloadFeedsTasks(false);
     long l2 = TestUtils.executeAndWait(tasks, JOBS);
 
@@ -829,11 +830,11 @@ public class PerformanceTest {
     /* Cold-Start: Interpret 216 Feeds */
     System.out.println("Reloading Feeds (With Retention): " + FEEDS + " Feeds [Cold - " + JOBS + " Jobs] took: " + TestUtils.executeAndWait(tasks, JOBS) + "ms");
 
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     tasks = getReloadFeedsTasks(true);
     long l1 = TestUtils.executeAndWait(tasks, JOBS);
 
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     tasks = getReloadFeedsTasks(true);
     long l2 = TestUtils.executeAndWait(tasks, JOBS);
 
@@ -916,11 +917,11 @@ public class PerformanceTest {
     System.out.println(message + "[Cold - " + JOBS + " Jobs] took: " + TestUtils.executeAndWait(tasks, JOBS) + "ms");
 
     /* Warm-Start: Interpret 216 Feeds */
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     tasks = getSetNewsStateTask(true, true, true);
     long l1 = TestUtils.executeAndWait(tasks, JOBS);
 
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     tasks = getSetNewsStateTask(true, true, true);
     long l2 = TestUtils.executeAndWait(tasks, JOBS);
 
@@ -940,11 +941,11 @@ public class PerformanceTest {
     System.out.println(message + "[Cold - " + JOBS + " Jobs] took: " + TestUtils.executeAndWait(tasks, JOBS) + "ms");
 
     /* Warm-Start: Interpret 216 Feeds */
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     tasks = getSetNewsStateTask(true, true, false);
     long l1 = TestUtils.executeAndWait(tasks, JOBS);
 
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     tasks = getSetNewsStateTask(true, true, false);
     long l2 = TestUtils.executeAndWait(tasks, JOBS);
 
@@ -964,11 +965,11 @@ public class PerformanceTest {
     System.out.println(message + "[Cold - " + JOBS + " Jobs] took: " + TestUtils.executeAndWait(tasks, JOBS) + "ms");
 
     /* Warm-Start: Interpret 216 Feeds */
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     tasks = getSetNewsStateTask(true, false, true);
     long l1 = TestUtils.executeAndWait(tasks, JOBS);
 
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     tasks = getSetNewsStateTask(true, false, true);
     long l2 = TestUtils.executeAndWait(tasks, JOBS);
 
@@ -988,11 +989,11 @@ public class PerformanceTest {
     System.out.println(message + "[Cold - " + JOBS + " Jobs] took: " + TestUtils.executeAndWait(tasks, JOBS) + "ms");
 
     /* Warm-Start: Interpret 216 Feeds */
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     tasks = getSetNewsStateTask(true, false, false);
     long l1 = TestUtils.executeAndWait(tasks, JOBS);
 
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     tasks = getSetNewsStateTask(true, false, false);
     long l2 = TestUtils.executeAndWait(tasks, JOBS);
 
@@ -1054,11 +1055,11 @@ public class PerformanceTest {
     System.out.println("Setting news state (Ignore Equivalent): " + FEEDS + " Feeds [Cold - " + JOBS + " Jobs] took: " + TestUtils.executeAndWait(tasks, JOBS) + "ms");
 
     /* Warm-Start: Interpret 216 Feeds */
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     tasks = getSetNewsStateTask(false, true, true);
     long l1 = TestUtils.executeAndWait(tasks, JOBS);
 
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     tasks = getSetNewsStateTask(false, true, true);
     long l2 = TestUtils.executeAndWait(tasks, JOBS);
 
@@ -1119,11 +1120,11 @@ public class PerformanceTest {
     System.out.println("Saving " + FEEDS + " Feeds [Cold - " + JOBS + " Jobs] took: " + TestUtils.executeAndWait(tasks, JOBS) + "ms");
 
     /* Warm-Start: Save 216 Feeds */
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     tasks = getSaveFeedsTasks(ex);
     long l1 = TestUtils.executeAndWait(tasks, JOBS);
 
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     tasks = getSaveFeedsTasks(ex);
     long l2 = TestUtils.executeAndWait(tasks, JOBS);
 
@@ -1368,11 +1369,11 @@ public class PerformanceTest {
     System.out.println("Deleting " + FEEDS + " Feeds [Cold - " + JOBS + " Jobs] took: " + TestUtils.executeAndWait(tasks, JOBS) + "ms");
 
     /* Warm-Start: Delete 216 Feeds */
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     tasks = getDeleteFeedsTasks(ex);
     long l1 = TestUtils.executeAndWait(tasks, JOBS);
 
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     tasks = getDeleteFeedsTasks(ex);
     long l2 = TestUtils.executeAndWait(tasks, JOBS);
 
@@ -1415,11 +1416,11 @@ public class PerformanceTest {
     System.out.println("Updating " + FEEDS + " Feeds [Cold - " + JOBS + " Jobs] took: " + TestUtils.executeAndWait(tasks, JOBS) + "ms");
 
     /* Warm-Start: Update 216 Feeds */
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     tasks = getUpdateFeedsTasks(ex);
     long l1 = TestUtils.executeAndWait(tasks, JOBS);
 
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     tasks = getUpdateFeedsTasks(ex);
     long l2 = TestUtils.executeAndWait(tasks, JOBS);
 
@@ -1507,11 +1508,11 @@ public class PerformanceTest {
     System.out.println("Saving/Resolving " + FEEDS / 2 + " Feeds [Cold - " + JOBS + " Jobs] took: " + TestUtils.executeAndWait(tasks, JOBS) + "ms");
 
     /* Warm-Start: Save and Resolve 216 Feeds */
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     tasks = getResolveSaveFeedsTasks(ex);
     long l1 = TestUtils.executeAndWait(tasks, JOBS);
 
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     tasks = getResolveSaveFeedsTasks(ex);
     long l2 = TestUtils.executeAndWait(tasks, JOBS);
 

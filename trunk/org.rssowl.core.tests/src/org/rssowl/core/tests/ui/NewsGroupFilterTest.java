@@ -30,6 +30,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
+import org.rssowl.core.internal.persist.service.PersistenceServiceImpl;
 import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
@@ -93,7 +94,7 @@ public class NewsGroupFilterTest {
     fEarlierThisWeek = new Date(today.getTimeInMillis() + 1000);
     fLastWeek = new Date(fEarlierThisWeek.getTime() - WEEK);
 
-    Owl.getPersistenceService().recreateSchema();
+    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
   }
 
   private void waitForIndexer() throws InterruptedException {

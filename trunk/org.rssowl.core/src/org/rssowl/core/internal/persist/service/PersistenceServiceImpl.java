@@ -108,21 +108,6 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
     }
   }
 
-  /*
-   * @see org.rssowl.core.model.dao.IPersistService#recreateSchema()
-   */
-  public void recreateSchema() throws PersistenceException {
-    DBManager.getDefault().dropDatabase();
-    DBManager.getDefault().createDatabase(new LongOperationMonitor(new NullProgressMonitor()) {
-      @Override
-      public void beginLongOperation(boolean isCancelable) {
-        //Do nothing
-      }
-    }, true);
-
-    getModelSearch().clearIndex();
-  }
-
   /**
    * Instructs the persistence service to schedule an optimization run during
    * the next time the application is started. The actual optimization type is
@@ -197,4 +182,22 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
     /* Reindex on next startup */
     InternalOwl.getDefault().getPersistenceService().getModelSearch().reIndexOnNextStartup();
   }
+
+  /**
+   * Only used from tests to get a clean start for each test case.
+   *
+   * @throws PersistenceException
+   */
+  public void recreateSchemaForTests() throws PersistenceException {
+    DBManager.getDefault().dropDatabase();
+    DBManager.getDefault().createDatabase(new LongOperationMonitor(new NullProgressMonitor()) {
+      @Override
+      public void beginLongOperation(boolean isCancelable) {
+        //Do nothing
+      }
+    }, true);
+
+    getModelSearch().clearIndex();
+  }
+
 }
