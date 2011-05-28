@@ -38,6 +38,7 @@ import org.rssowl.core.Owl.StartLevel;
 import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.service.PersistenceException;
+import org.rssowl.core.persist.service.ProfileLockedException;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Application;
@@ -70,9 +71,10 @@ public class FatalErrorWizard extends Wizard {
     fErrorStatus = errorStatus;
 
     boolean isOOMError = (fErrorStatus.getException() instanceof OutOfMemoryError);
+    boolean isProfileLockedError = (fErrorStatus.getException() instanceof ProfileLockedException);
     boolean canUsePersistenceService = (InternalOwl.getDefault().getPersistenceService() != null);
     StartLevel startLevel = InternalOwl.getDefault().getStartLevel();
-    fOfferRestorePages = !isOOMError && canUsePersistenceService && startLevel != StartLevel.STARTED && startLevel != StartLevel.SEARCH_INDEX_OPENED;
+    fOfferRestorePages = !isOOMError && !isProfileLockedError && canUsePersistenceService && startLevel != StartLevel.STARTED && startLevel != StartLevel.SEARCH_INDEX_OPENED;
     if (fOfferRestorePages)
       findBackups();
   }

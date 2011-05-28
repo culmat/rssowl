@@ -58,6 +58,7 @@ import org.rssowl.core.persist.service.DiskFullException;
 import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.persist.service.InsufficientFilePermissionException;
 import org.rssowl.core.persist.service.PersistenceException;
+import org.rssowl.core.persist.service.ProfileLockedException;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.LongOperationMonitor;
@@ -70,6 +71,7 @@ import com.db4o.config.Configuration;
 import com.db4o.config.ObjectClass;
 import com.db4o.config.ObjectField;
 import com.db4o.config.QueryEvaluationMode;
+import com.db4o.ext.DatabaseFileLockedException;
 import com.db4o.query.Query;
 
 import java.io.BufferedReader;
@@ -230,6 +232,10 @@ public class DBManager {
       /* Generic Error */
       if (e instanceof Error)
         throw (Error) e;
+
+      /* Profile locked by another running instance */
+      if (e instanceof DatabaseFileLockedException)
+        throw new ProfileLockedException(e.getMessage(), e);
 
       File file = new File(getDBFilePath());
 
@@ -1288,7 +1294,7 @@ public class DBManager {
       }
     });
 
-    config.lockDatabaseFile(false);
+    config.lockDatabaseFile(true);
     config.queries().evaluationMode(forDefrag ? QueryEvaluationMode.LAZY : QueryEvaluationMode.IMMEDIATE);
     config.automaticShutDown(false);
     config.callbacks(false);
