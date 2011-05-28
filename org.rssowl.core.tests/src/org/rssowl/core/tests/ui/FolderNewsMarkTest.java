@@ -153,8 +153,7 @@ public class FolderNewsMarkTest {
     folder = DynamicDAO.save(folder);
 
     waitForIndexer();
-    Controller.getDefault().getSavedSearchService().forceQuickUpdate();
-    waitForIndexer();
+    Controller.getDefault().getSavedSearchService().updateSavedSearches(true);
 
     FolderNewsMark mark = new FolderNewsMark(childFolder);
     mark.resolve(NewsFilter.Type.SHOW_ALL, null);
@@ -315,8 +314,7 @@ public class FolderNewsMarkTest {
     folder = DynamicDAO.save(folder);
 
     waitForIndexer();
-    Controller.getDefault().getSavedSearchService().forceQuickUpdate();
-    waitForIndexer();
+    Controller.getDefault().getSavedSearchService().updateSavedSearches(true);
 
     mark.add(Collections.singleton(news1));
     mark.add(Collections.singleton(news2));
@@ -473,8 +471,7 @@ public class FolderNewsMarkTest {
     folder = DynamicDAO.save(folder);
 
     waitForIndexer();
-    Controller.getDefault().getSavedSearchService().forceQuickUpdate();
-    waitForIndexer();
+    Controller.getDefault().getSavedSearchService().updateSavedSearches(true);
 
     FolderNewsMark mark = new FolderNewsMark(childFolder);
     mark.resolve(NewsFilter.Type.SHOW_ALL, null);
@@ -632,8 +629,7 @@ public class FolderNewsMarkTest {
     folder = DynamicDAO.save(folder);
 
     waitForIndexer();
-    Controller.getDefault().getSavedSearchService().forceQuickUpdate();
-    waitForIndexer();
+    Controller.getDefault().getSavedSearchService().updateSavedSearches(true);
 
     FolderNewsMark mark = new FolderNewsMark(childFolder);
     mark.resolve(NewsFilter.Type.SHOW_ALL, null);
@@ -814,8 +810,7 @@ public class FolderNewsMarkTest {
     folder = DynamicDAO.save(folder);
 
     waitForIndexer();
-    Controller.getDefault().getSavedSearchService().forceQuickUpdate();
-    waitForIndexer();
+    Controller.getDefault().getSavedSearchService().updateSavedSearches(true);
 
     FolderNewsMark mark = new FolderNewsMark(childFolder);
 
@@ -910,8 +905,7 @@ public class FolderNewsMarkTest {
     folder = DynamicDAO.save(folder);
 
     waitForIndexer();
-    Controller.getDefault().getSavedSearchService().forceQuickUpdate();
-    waitForIndexer();
+    Controller.getDefault().getSavedSearchService().updateSavedSearches(true);
 
     FolderNewsMark mark = new FolderNewsMark(childFolder);
 
@@ -1006,8 +1000,7 @@ public class FolderNewsMarkTest {
     folder = DynamicDAO.save(folder);
 
     waitForIndexer();
-    Controller.getDefault().getSavedSearchService().forceQuickUpdate();
-    waitForIndexer();
+    Controller.getDefault().getSavedSearchService().updateSavedSearches(true);
 
     FolderNewsMark mark = new FolderNewsMark(childFolder);
 
