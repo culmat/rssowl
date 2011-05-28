@@ -36,6 +36,7 @@ public class Messages extends NLS {
   public static String DBManager_OPTIMIZING_NEWSFEEDS;
   public static String DBManager_PROGRESS_WAIT;
   public static String DBManager_RSSOWL_MIGRATION;
+  public static String DBManager_UNABLE_TO_OPEN_PROFILE;
   public static String DBManager_WAIT_TASK_COMPLETION;
 
   private Messages() {}
