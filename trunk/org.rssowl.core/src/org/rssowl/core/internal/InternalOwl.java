@@ -101,8 +101,10 @@ public final class InternalOwl {
    * operations (e.g. migration).
    * @param emergency if <code>true</code> indicates this startup method is
    * called from an emergency situation like restoring a backup.
+   * @param forRestore if <code>true</code> will open the restore DB as profile
+   * and <code>false</code> to open the default profile location.
    */
-  public void startup(LongOperationMonitor monitor, boolean emergency) {
+  public void startup(LongOperationMonitor monitor, boolean emergency, boolean forRestore) {
     if (fStartLevel == StartLevel.NOT_STARTED)
       fStartLevel = StartLevel.STARTING;
 
@@ -116,7 +118,7 @@ public final class InternalOwl {
       fApplicationService = loadApplicationService();
 
     /* Persistence Layer has its own startup routine */
-    fPersistenceService.startup(monitor, emergency);
+    fPersistenceService.startup(monitor, emergency, forRestore);
 
     if (fConnectionService == null)
       fConnectionService = new ConnectionServiceImpl();
@@ -142,7 +144,7 @@ public final class InternalOwl {
 
   /**
    * @return the {@link StartLevel} from the
-   * {@link #startup(LongOperationMonitor, boolean)} sequence.
+   * {@link #startup(LongOperationMonitor, boolean, boolean)} sequence.
    */
   public StartLevel getStartLevel() {
     return fStartLevel;

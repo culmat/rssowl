@@ -49,15 +49,15 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
 
   /*
    * @see
-   * org.rssowl.core.persist.service.IPersistenceService#startup(org.rssowl.
-   * core.util.LongOperationMonitor, boolean)
+   * org.rssowl.core.persist.service.AbstractPersistenceService#startup(org.
+   * rssowl.core.util.LongOperationMonitor, boolean, boolean)
    */
   @Override
-  public void startup(LongOperationMonitor monitor, boolean emergency) {
-    super.startup(monitor, emergency);
+  public void startup(LongOperationMonitor monitor, boolean emergency, boolean forRestore) {
+    super.startup(monitor, emergency, forRestore);
 
     /* Startup DB */
-    DBManager.getDefault().startup(monitor, emergency);
+    DBManager.getDefault().startup(monitor, emergency, forRestore);
     InternalOwl.getDefault().setStartLevel(StartLevel.DB_OPENED);
 
     /* Startup Model Search (not in case of emergency) */
@@ -172,9 +172,18 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
    */
   public void recreateProfile(boolean needsEmergencyStartup) throws PersistenceException {
 
-    /* Emergency Start to create DB Scheme */
-    if (needsEmergencyStartup)
-      InternalOwl.getDefault().startup(new LongOperationMonitor(new NullProgressMonitor()) {}, true);
+    /* First check to delete the "rssowl.db.restore" file that is being used */
+    File restoreDBFile = new File(DBManager.getDBRestoreFilePath());
+    if (restoreDBFile.exists())
+      restoreDBFile.delete();
+
+    /* Open new empty DB for restore */
+    if (!needsEmergencyStartup)
+      DBManager.getDefault().createDatabase(new LongOperationMonitor(new NullProgressMonitor()) {}, true, true);
+
+    /* Otherwise if startup is needed, startup with empty DB */
+    else
+      InternalOwl.getDefault().startup(new LongOperationMonitor(new NullProgressMonitor()) {}, true, true);
 
     /* Reindex on next startup */
     InternalOwl.getDefault().getPersistenceService().getModelSearch().reIndexOnNextStartup();
@@ -187,12 +196,7 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
    */
   public void recreateSchemaForTests() throws PersistenceException {
     DBManager.getDefault().dropDatabaseForTests();
-    DBManager.getDefault().createDatabase(new LongOperationMonitor(new NullProgressMonitor()) {
-      @Override
-      public void beginLongOperation(boolean isCancelable) {
-        //Do nothing
-      }
-    }, true);
+    DBManager.getDefault().createDatabase(new LongOperationMonitor(new NullProgressMonitor()) {}, true, false);
 
     getModelSearch().clearIndex();
   }

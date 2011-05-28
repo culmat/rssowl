@@ -165,12 +165,14 @@ public class DBManager {
    * cancellation and report accurate startup progress.
    * @param emergency if <code>true</code> indicates this startup method is
    * called from an emergency situation like restoring a backup.
+   * @param forRestore if <code>true</code> will open the restore DB as profile
+   * and <code>false</code> to open the default profile location.
    * @throws PersistenceException In case of an error while initializing and
    * loading the contributed DataBase.
    */
-  public void startup(LongOperationMonitor monitor, boolean emergency) throws PersistenceException {
+  public void startup(LongOperationMonitor monitor, boolean emergency, boolean forRestore) throws PersistenceException {
     EventManager.getInstance();
-    createDatabase(monitor, emergency);
+    createDatabase(monitor, emergency, forRestore);
   }
 
   public void addEntityStoreListener(DatabaseListener listener) {
@@ -195,22 +197,24 @@ public class DBManager {
     }
   }
 
-  private void createObjectContainer(Configuration config) throws PersistenceException {
+  private void createObjectContainer(Configuration config, boolean forRestore) throws PersistenceException {
     try {
 
       /* Check if DB needs to be restored */
-      File restoreDBFile = new File(getDBRestoreFilePath());
-      if (restoreDBFile.exists()) {
+      if (!forRestore) {
+        File restoreDBFile = new File(getDBRestoreFilePath());
+        if (restoreDBFile.exists()) {
 
-        /* Backup and Delete current profile */
-        backupAndDeleteProfile();
+          /* Backup and Delete current profile */
+          backupAndDeleteProfile();
 
-        /* Atomic Rename Restore to Profile */
-        DBHelper.rename(restoreDBFile, new File(getDBFilePath()));
+          /* Atomic Rename Restore to Profile */
+          DBHelper.rename(restoreDBFile, new File(getDBFilePath()));
+        }
       }
 
       /* Open DB */
-      fObjectContainer = Db4o.openFile(config, getDBFilePath());
+      fObjectContainer = Db4o.openFile(config, forRestore ? getDBRestoreFilePath() : getDBFilePath());
 
       /* Handle Fatal Error while opening DB */
       if (fObjectContainer == null)
@@ -436,7 +440,7 @@ public class DBManager {
   }
 
   @SuppressWarnings("unused")
-  public void createDatabase(LongOperationMonitor progressMonitor, boolean emergency) throws PersistenceException {
+  public void createDatabase(LongOperationMonitor progressMonitor, boolean emergency, boolean forRestore) throws PersistenceException {
 
     /* Assert File Permissions */
     checkDirPermissions();
@@ -496,7 +500,7 @@ public class DBManager {
 
       /* Open the DB */
       Configuration config = createConfiguration(false);
-      createObjectContainer(config);
+      createObjectContainer(config, forRestore);
 
       /* Notify Listeners that DB is opened */
       fireDatabaseEvent(new DatabaseEvent(fObjectContainer, fLock), true);
