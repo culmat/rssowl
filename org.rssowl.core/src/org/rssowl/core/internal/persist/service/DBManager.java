@@ -199,6 +199,8 @@ public class DBManager {
     /* Open the DB */
     try {
       fObjectContainer = Db4o.openFile(config, getDBFilePath());
+      if (fObjectContainer == null)
+        throw new PersistenceException(Messages.DBManager_UNABLE_TO_OPEN_PROFILE);
       storeProfileLastUsed(); //Keep date of last successfull profile opened
     }
 
