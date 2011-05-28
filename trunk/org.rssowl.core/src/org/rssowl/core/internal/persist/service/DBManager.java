@@ -1393,6 +1393,17 @@ public class DBManager {
     File db = new File(getDBFilePath());
     DBHelper.rename(backup, db);
 
+    /* Handle Large Block Size properly */
+    try {
+      File largeBlockSizeMarkerFile = getLargeBlockSizeMarkerFile();
+      if (largeBlockSizeMarkerFile.exists() && db.length() < LARGE_DB_STARTING_SIZE)
+        largeBlockSizeMarkerFile.delete();
+      else if (!largeBlockSizeMarkerFile.exists() && db.length() > LARGE_DB_STARTING_SIZE)
+        largeBlockSizeMarkerFile.createNewFile();
+    } catch (IOException e) {
+      Activator.getDefault().logError(e.getMessage(), e);
+    }
+
     Activator.safeLogInfo("End: Database Restore from Backup"); //$NON-NLS-1$
   }
 

@@ -25,6 +25,7 @@
 package org.rssowl.core.tests.persist;
 
 import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
@@ -203,6 +204,9 @@ public class StartupShutdownTest extends LargeBlockSizeTest {
    */
   @Test
   public void testRestoreProfile() throws IOException {
+    File marker = DBManager.getLargeBlockSizeMarkerFile();
+    boolean markerExists = marker.exists();
+
     IFeed feed = DynamicDAO.save(createFeed());
     INews news = createNews(feed);
     news.setState(INews.State.NEW);
@@ -227,11 +231,16 @@ public class StartupShutdownTest extends LargeBlockSizeTest {
 
     CoreUtils.copy(DBManagerTest.class.getResourceAsStream("/data/rssowl.db"), new FileOutputStream(tmpFile));
     InternalOwl.getDefault().restoreProfile(tmpFile);
+    if (markerExists)
+      assertFalse(marker.exists());
     InternalOwl.getDefault().startup(new LongOperationMonitor(new NullProgressMonitor()) {}, true);
 
     assertTrue(DynamicDAO.loadAll(INews.class).isEmpty());
     assertTrue(DynamicDAO.loadAll(IBookMark.class).size() > 100);
     assertTrue(DynamicDAO.loadAll(IFolder.class).size() > 20);
+
+    if (markerExists && !marker.exists())
+      marker.createNewFile();
   }
 
   private INews createNews(IFeed feed) {
