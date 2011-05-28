@@ -64,12 +64,12 @@ public class FatalErrorWizard extends Wizard {
   private int fReturnCode = IApplication.EXIT_OK;
   private final List<File> fProfileBackups = new ArrayList<File>();
   private final List<File> fOPMLBackups = new ArrayList<File>();
-  private final boolean fIsOOMError;
+  private final boolean fOfferRestorePages;
 
   public FatalErrorWizard(IStatus errorStatus) {
     fErrorStatus = errorStatus;
-    fIsOOMError = (fErrorStatus.getException() instanceof OutOfMemoryError);
-    if (!fIsOOMError)
+    fOfferRestorePages = !(fErrorStatus.getException() instanceof OutOfMemoryError) && InternalOwl.getDefault().getPersistenceService() != null;
+    if (fOfferRestorePages)
       findBackups();
   }
 
@@ -106,11 +106,11 @@ public class FatalErrorWizard extends Wizard {
     setHelpAvailable(false);
 
     /* Error Info */
-    fErrorInfoPage = new ErrorInfoPage(Messages.FatalErrorWizard_WE_ARE_SORRY, fErrorStatus, !fIsOOMError);
+    fErrorInfoPage = new ErrorInfoPage(Messages.FatalErrorWizard_WE_ARE_SORRY, fErrorStatus, fOfferRestorePages);
     addPage(fErrorInfoPage);
 
-    /* Add Restore Pages if this is not an OOM Error */
-    if (!fIsOOMError) {
+    /* Add Restore Pages as necessary */
+    if (fOfferRestorePages) {
 
       /* Not an actual issue with the DB, rather search, so provide reindex page */
       if (Owl.getStartLevel() == StartLevel.DB_OPENED) {
