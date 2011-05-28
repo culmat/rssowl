@@ -81,7 +81,7 @@ public class RestoreBackupPage extends WizardPage {
     /* Container */
     Composite container = new Composite(parent, SWT.NONE);
     container.setLayout(LayoutUtils.createGridLayout(2, 5, 5));
-    ((GridLayout) container.getLayout()).marginBottom = 5;
+    ((GridLayout) container.getLayout()).marginBottom = 10;
 
     /* Restore Information */
     {
