@@ -94,6 +94,42 @@ public class StartupShutdownTest extends LargeBlockSizeTest {
   }
 
   /**
+   * Tests that uncommitted news are saved and loaded correctly in the presence
+   * of an emergency or normal shutdown.
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testSaveLoadEntitiesToBeIndexed() throws Exception {
+    EntityIdsByEventType entitiesToBeIndexed = DBHelper.getEntitiesToBeIndexedDAO().load();
+    assertEquals(0, entitiesToBeIndexed.size());
+
+    IFeed feed = fFactory.createFeed(null, new URI("http://www.feed.com/feed.xml"));
+    INews news1 = createNews(feed, "Foo", null, "http://www.news.com/news1.html", State.READ);
+    INews news2 = createNews(feed, " Bar", null, "http://www.news.com/news2.html", State.NEW);
+    DynamicDAO.save(feed);
+
+    entitiesToBeIndexed = DBHelper.getEntitiesToBeIndexedDAO().load();
+    assertEquals(2, entitiesToBeIndexed.size());
+    Owl.getPersistenceService().shutdown(true);
+    Owl.getPersistenceService().startup(new NullProgressLongOperationMonitor(), false, false);
+
+    entitiesToBeIndexed = DBHelper.getEntitiesToBeIndexedDAO().load();
+    assertEquals(2, entitiesToBeIndexed.size());
+    for (long id : entitiesToBeIndexed.getPersistedEntityIds().toArray()) {
+      assertTrue(id == news1.getId().longValue() || id == news2.getId().longValue());
+    }
+
+    Owl.getPersistenceService().shutdown(false);
+    Owl.getPersistenceService().startup(new NullProgressLongOperationMonitor(), false, false);
+
+    waitForIndexer();
+
+    entitiesToBeIndexed = DBHelper.getEntitiesToBeIndexedDAO().load();
+    assertEquals(0, entitiesToBeIndexed.size());
+  }
+
+  /**
    * @throws Exception
    */
   @Test
@@ -251,42 +287,6 @@ public class StartupShutdownTest extends LargeBlockSizeTest {
 
     if (markerExists && !marker.exists())
       marker.createNewFile();
-  }
-
-  /**
-   * Tests that uncommitted news are saved and loaded correctly in the presence
-   * of an emergency or normal shutdown.
-   *
-   * @throws Exception
-   */
-  @Test
-  public void testSaveLoadEntitiesToBeIndexed() throws Exception {
-    EntityIdsByEventType entitiesToBeIndexed = DBHelper.getEntitiesToBeIndexedDAO().load();
-    assertEquals(0, entitiesToBeIndexed.size());
-
-    IFeed feed = fFactory.createFeed(null, new URI("http://www.feed.com/feed.xml"));
-    INews news1 = createNews(feed, "Foo", null, "http://www.news.com/news1.html", State.READ);
-    INews news2 = createNews(feed, " Bar", null, "http://www.news.com/news2.html", State.NEW);
-    DynamicDAO.save(feed);
-
-    entitiesToBeIndexed = DBHelper.getEntitiesToBeIndexedDAO().load();
-    assertEquals(2, entitiesToBeIndexed.size());
-    Owl.getPersistenceService().shutdown(true);
-    Owl.getPersistenceService().startup(new NullProgressLongOperationMonitor(), false, false);
-
-    entitiesToBeIndexed = DBHelper.getEntitiesToBeIndexedDAO().load();
-    assertEquals(2, entitiesToBeIndexed.size());
-    for (long id : entitiesToBeIndexed.getPersistedEntityIds().toArray()) {
-      assertTrue(id == news1.getId().longValue() || id == news2.getId().longValue());
-    }
-
-    Owl.getPersistenceService().shutdown(false);
-    Owl.getPersistenceService().startup(new NullProgressLongOperationMonitor(), false, false);
-
-    waitForIndexer();
-
-    entitiesToBeIndexed = DBHelper.getEntitiesToBeIndexedDAO().load();
-    assertEquals(0, entitiesToBeIndexed.size());
   }
 
   private INews createNews(IFeed feed, String title, String description, String link, INews.State state) throws URISyntaxException {
