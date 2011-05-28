@@ -27,8 +27,13 @@ package org.rssowl.core.tests;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
+import org.rssowl.core.tests.model.CachingDAOTest;
+import org.rssowl.core.tests.model.CachingDAOTestLBS;
+import org.rssowl.core.tests.model.ModelTest1;
+import org.rssowl.core.tests.model.ModelTest1LBS;
 import org.rssowl.core.tests.persist.StartupShutdownTest;
 import org.rssowl.core.tests.persist.StartupShutdownTestLBS;
+import org.rssowl.core.tests.persist.service.DefragmentTest;
 
 /**
  * Tests that trigger lifecycle methods run as last tests to not interfer other tests.
@@ -39,6 +44,11 @@ import org.rssowl.core.tests.persist.StartupShutdownTestLBS;
 
 @RunWith(Suite.class)
 @SuiteClasses( {
+  ModelTest1.class,
+  ModelTest1LBS.class, //Running twice to test with large block size
+  CachingDAOTest.class,
+  CachingDAOTestLBS.class, //Running twice to test with large block size
+  DefragmentTest.class,
   StartupShutdownTest.class,
   StartupShutdownTestLBS.class })
 public class StartupShutdownTests {}

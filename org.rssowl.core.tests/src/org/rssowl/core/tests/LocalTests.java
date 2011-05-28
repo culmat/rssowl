@@ -35,16 +35,12 @@ import org.rssowl.core.tests.importer.ImporterTest;
 import org.rssowl.core.tests.interpreter.InterpreterTest;
 import org.rssowl.core.tests.model.ApplicationLayerTest;
 import org.rssowl.core.tests.model.ApplicationLayerTestLBS;
-import org.rssowl.core.tests.model.CachingDAOTest;
-import org.rssowl.core.tests.model.CachingDAOTestLBS;
 import org.rssowl.core.tests.model.DBManagerTest;
 import org.rssowl.core.tests.model.DBManagerTestLBS;
 import org.rssowl.core.tests.model.ModelSearchTest1;
 import org.rssowl.core.tests.model.ModelSearchTest2;
 import org.rssowl.core.tests.model.ModelSearchTest3;
 import org.rssowl.core.tests.model.ModelSearchTest4;
-import org.rssowl.core.tests.model.ModelTest1;
-import org.rssowl.core.tests.model.ModelTest1LBS;
 import org.rssowl.core.tests.model.ModelTest2;
 import org.rssowl.core.tests.model.ModelTest2LBS;
 import org.rssowl.core.tests.model.ModelTest3;
@@ -60,7 +56,6 @@ import org.rssowl.core.tests.model.PreferencesScopeTestLBS;
 import org.rssowl.core.tests.persist.INewsTest;
 import org.rssowl.core.tests.persist.LongArrayListTest;
 import org.rssowl.core.tests.persist.MigrationsTest;
-import org.rssowl.core.tests.persist.service.DefragmentTest;
 import org.rssowl.core.tests.ui.ExpandingReaderTests;
 import org.rssowl.core.tests.ui.RetentionStrategyTests;
 import org.rssowl.core.tests.ui.TreeTraversalTest;
@@ -83,8 +78,6 @@ import org.rssowl.core.tests.util.URIUtilsTest;
   ControllerTestLocalLBS.class, //Running twice to test with large block size
   ReloadTestLocal.class,
   ReloadTestLocalLBS.class, //Running twice to test with large block size
-  ModelTest1.class,
-  ModelTest1LBS.class, //Running twice to test with large block size
   ModelTest2.class,
   ModelTest2LBS.class, //Running twice to test with large block size
   ModelTest3.class,
@@ -103,8 +96,6 @@ import org.rssowl.core.tests.util.URIUtilsTest;
   ModelSearchTest4.class,
   DBManagerTest.class,
   DBManagerTestLBS.class, //Running twice to test with large block size
-  CachingDAOTest.class,
-  CachingDAOTestLBS.class, //Running twice to test with large block size
   PreferencesScopeTest.class,
   PreferencesScopeTestLBS.class, //Running twice to test with large block size
   MergeUtilsTest.class,
@@ -112,7 +103,6 @@ import org.rssowl.core.tests.util.URIUtilsTest;
   StringUtilsTest.class,
   CoreUtilsTest.class,
   URIUtilsTest.class,
-  DefragmentTest.class,
   MigrationsTest.class,
   LongArrayListTest.class,
   RetentionStrategyTests.class,

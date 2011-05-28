@@ -74,7 +74,7 @@ import java.util.List;
  * tests.
  */
 public class StartupShutdownTest extends LargeBlockSizeTest {
-  private IModelFactory fTypesFactory;
+  private IModelFactory fFactory;
 
   /**
    * @throws Exception
@@ -82,7 +82,7 @@ public class StartupShutdownTest extends LargeBlockSizeTest {
   @Before
   public void setUp() throws Exception {
     ((PersistenceServiceImpl) Owl.getPersistenceService()).recreateSchemaForTests();
-    fTypesFactory = Owl.getModelFactory();
+    fFactory = Owl.getModelFactory();
 
     DBManager.getDefault().getReIndexFile().delete();
     DBManager.getDefault().getDefragmentFile().delete();
@@ -244,22 +244,22 @@ public class StartupShutdownTest extends LargeBlockSizeTest {
   }
 
   private INews createNews(IFeed feed) {
-    INews news = fTypesFactory.createNews(null, feed, createDate());
-    IAttachment attachment = fTypesFactory.createAttachment(null, news);
+    INews news = fFactory.createNews(null, feed, createDate());
+    IAttachment attachment = fFactory.createAttachment(null, news);
     attachment.setLink(createURI("http://attachmenturi.com"));
-    ICategory category = fTypesFactory.createCategory(null, news);
+    ICategory category = fFactory.createCategory(null, news);
     category.setName("Category name #1");
     news.setAuthor(createPersonMary(news));
     news.setBase(createURI("http://www.someuri.com"));
     news.setComments("One comment");
     news.setState(State.HIDDEN);
     news.setDescription("News description");
-    fTypesFactory.createGuid(news, "someGUIDvalue", null);
+    fFactory.createGuid(news, "someGUIDvalue", null);
     news.setLink(createURI("http://www.somelocation.com/feed.rss"));
     news.setModifiedDate(createDate());
     news.setProperty("property", "value");
     news.setPublishDate(createDate());
-    ISource source = fTypesFactory.createSource(news);
+    ISource source = fFactory.createSource(news);
     source.setLink(createURI("http://www.someuri.com"));
     news.setSource(source);
     news.setTitle("This is the news title");
@@ -272,7 +272,7 @@ public class StartupShutdownTest extends LargeBlockSizeTest {
   }
 
   private Feed createFeed(String link) {
-    Feed feed = (Feed) fTypesFactory.createFeed(null, createURI(link));
+    Feed feed = (Feed) fFactory.createFeed(null, createURI(link));
     feed.setTitle("feed title");
     feed.setDescription("feed description");
     feed.setHomepage(createURI("http://www.rssowl.org"));
@@ -303,7 +303,7 @@ public class StartupShutdownTest extends LargeBlockSizeTest {
   }
 
   private IPerson createPersonJohn(IPersistable type) {
-    IPerson person = fTypesFactory.createPerson(null, type);
+    IPerson person = fFactory.createPerson(null, type);
     person.setName("John");
     person.setEmail(createURI("john@hotmail.com"));
     person.setUri(createURI("http://mysite.hotmail.com"));
@@ -312,7 +312,7 @@ public class StartupShutdownTest extends LargeBlockSizeTest {
   }
 
   private IPerson createPersonMary(IPersistable type) {
-    IPerson person = fTypesFactory.createPerson(null, type);
+    IPerson person = fFactory.createPerson(null, type);
     person.setName("Mary");
     person.setEmail(createURI("mary@hotmail.com"));
     person.setUri(createURI("http://mary.hotmail.com"));
@@ -322,7 +322,7 @@ public class StartupShutdownTest extends LargeBlockSizeTest {
 
   @SuppressWarnings("unused")
   private IPerson createPersonDan(IPersistable type) {
-    IPerson person = fTypesFactory.createPerson(null, type);
+    IPerson person = fFactory.createPerson(null, type);
     person.setName("Dan");
     person.setEmail(createURI("dan@yahoo.com"));
     return person;
@@ -333,7 +333,7 @@ public class StartupShutdownTest extends LargeBlockSizeTest {
   }
 
   private IImage createImage(IFeed feed) {
-    IImage image = fTypesFactory.createImage(feed);
+    IImage image = fFactory.createImage(feed);
     image.setHomepage(createURI("http://www.rssowl.org/image.png"));
     return image;
   }
