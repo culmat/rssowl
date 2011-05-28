@@ -29,9 +29,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.junit.Test;
-import org.rssowl.core.Owl;
-import org.rssowl.core.internal.persist.service.DBHelper;
-import org.rssowl.core.internal.persist.service.EntityIdsByEventType;
 import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.ICategory;
 import org.rssowl.core.persist.IEntity;
@@ -49,7 +46,6 @@ import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.tests.TestUtils;
-import org.rssowl.core.tests.TestUtils.NullProgressLongOperationMonitor;
 import org.rssowl.core.util.SearchHit;
 
 import java.net.URI;
@@ -65,42 +61,6 @@ import java.util.List;
  * @author bpasero
  */
 public class ModelSearchTest1 extends AbstractModelSearchTest {
-
-  /**
-   * Tests that uncommitted news are saved and loaded correctly in the presence
-   * of an emergency or normal shutdown.
-   *
-   * @throws Exception
-   */
-  @Test
-  public void testSaveLoadEntitiesToBeIndexed() throws Exception {
-    EntityIdsByEventType entitiesToBeIndexed = DBHelper.getEntitiesToBeIndexedDAO().load();
-    assertEquals(0, entitiesToBeIndexed.size());
-
-    IFeed feed = fFactory.createFeed(null, new URI("http://www.feed.com/feed.xml"));
-    INews news1 = createNews(feed, "Foo", "http://www.news.com/news1.html", State.READ);
-    INews news2 = createNews(feed, " Bar", "http://www.news.com/news2.html", State.NEW);
-    DynamicDAO.save(feed);
-
-    entitiesToBeIndexed = DBHelper.getEntitiesToBeIndexedDAO().load();
-    assertEquals(2, entitiesToBeIndexed.size());
-    Owl.getPersistenceService().shutdown(true);
-    Owl.getPersistenceService().startup(new NullProgressLongOperationMonitor(), false, false);
-
-    entitiesToBeIndexed = DBHelper.getEntitiesToBeIndexedDAO().load();
-    assertEquals(2, entitiesToBeIndexed.size());
-    for (long id : entitiesToBeIndexed.getPersistedEntityIds().toArray()) {
-      assertTrue(id == news1.getId().longValue() || id == news2.getId().longValue());
-    }
-
-    Owl.getPersistenceService().shutdown(false);
-    Owl.getPersistenceService().startup(new NullProgressLongOperationMonitor(), false, false);
-
-    waitForIndexer();
-
-    entitiesToBeIndexed = DBHelper.getEntitiesToBeIndexedDAO().load();
-    assertEquals(0, entitiesToBeIndexed.size());
-  }
 
   /**
    * @throws Exception
