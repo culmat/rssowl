@@ -2180,7 +2180,7 @@ public class OwlUI {
       @Override
       protected Point getInitialSize() {
         if (pack)
-          return getShell().computeSize(convertHorizontalDLUsToPixels(380), SWT.DEFAULT, true);
+          return getShell().computeSize(convertHorizontalDLUsToPixels(350), SWT.DEFAULT, true);
 
         return super.getInitialSize();
       }
