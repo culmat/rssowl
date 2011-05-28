@@ -130,7 +130,10 @@ public class StartupShutdownTest extends LargeBlockSizeTest {
     assertNotNull(folder.toReference().resolve());
     assertNotNull(bookmark.toReference().resolve());
 
-    InternalOwl.getDefault().recreateProfile(true);
+    InternalOwl.getDefault().recreateProfile(false); //Creates a new, empty rssowl.db.restore
+    assertTrue(new File(DBManager.getDBRestoreFilePath()).exists());
+    InternalOwl.getDefault().startup(new LongOperationMonitor(new NullProgressMonitor()) {}, false, false); //Normal startup will pickup rssowl.db.restore
+    assertFalse(new File(DBManager.getDBRestoreFilePath()).exists());
 
     assertNull(feed.toReference().resolve());
     assertNull(news.toReference().resolve());
@@ -178,6 +181,7 @@ public class StartupShutdownTest extends LargeBlockSizeTest {
     assertNotNull(bookmark.toReference().resolve());
 
     InternalOwl.getDefault().recreateProfile(true);
+    assertTrue(new File(DBManager.getDBRestoreFilePath()).exists());
 
     assertNull(feed.toReference().resolve());
     assertNull(news.toReference().resolve());
@@ -231,9 +235,11 @@ public class StartupShutdownTest extends LargeBlockSizeTest {
 
     CoreUtils.copy(DBManagerTest.class.getResourceAsStream("/data/rssowl.db"), new FileOutputStream(tmpFile));
     InternalOwl.getDefault().restoreProfile(tmpFile);
+    assertTrue(new File(DBManager.getDBRestoreFilePath()).exists());
     if (markerExists)
       assertFalse(marker.exists());
     InternalOwl.getDefault().startup(new LongOperationMonitor(new NullProgressMonitor()) {}, true, false);
+    assertFalse(new File(DBManager.getDBRestoreFilePath()).exists());
 
     assertTrue(DynamicDAO.loadAll(INews.class).isEmpty());
     assertTrue(DynamicDAO.loadAll(IBookMark.class).size() > 100);
