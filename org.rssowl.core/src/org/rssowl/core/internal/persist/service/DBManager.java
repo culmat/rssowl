@@ -930,12 +930,32 @@ public class DBManager {
    * @param monitor
    */
   public final static void copyDatabase(File source, File destination, boolean useLargeBlockSize, IProgressMonitor monitor) {
-    ObjectContainer sourceDb = Db4o.openFile(createConfiguration(true), source.getAbsolutePath());
+    ObjectContainer sourceDb = null;
+    ObjectContainer destinationDb = null;
+    try {
 
-    Configuration destinationDbConfiguration = createConfiguration(true);
-    if (useLargeBlockSize)
-      destinationDbConfiguration.blockSize(LARGE_DB_BLOCK_SIZE);
-    ObjectContainer destinationDb = Db4o.openFile(destinationDbConfiguration, destination.getAbsolutePath());
+      /* Open Source DB */
+      sourceDb = Db4o.openFile(createConfiguration(true), source.getAbsolutePath());
+
+      Configuration destinationDbConfiguration = createConfiguration(true);
+      if (useLargeBlockSize)
+        destinationDbConfiguration.blockSize(LARGE_DB_BLOCK_SIZE);
+
+      /* Open Destination DB */
+      destinationDb = Db4o.openFile(destinationDbConfiguration, destination.getAbsolutePath());
+
+      /* Copy (Defragment) */
+      internalCopyDatabase(sourceDb, destinationDb, useLargeBlockSize, monitor);
+    } finally {
+      if (sourceDb != null)
+        sourceDb.close();
+
+      if (destinationDb != null)
+        destinationDb.close();
+    }
+  }
+
+  public final static void internalCopyDatabase(ObjectContainer sourceDb, ObjectContainer destinationDb, boolean useLargeBlockSize, IProgressMonitor monitor) {
 
     /* User might have cancelled the operation */
     if (isCanceled(monitor, useLargeBlockSize, sourceDb, destinationDb))
