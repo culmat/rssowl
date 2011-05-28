@@ -172,9 +172,6 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
    */
   public void recreateProfile(boolean needsEmergencyStartup) throws PersistenceException {
 
-    /* Move DB to Backup */
-    DBManager.getDefault().backupAndDeleteProfile();
-
     /* Emergency Start to create DB Scheme */
     if (needsEmergencyStartup)
       InternalOwl.getDefault().startup(new LongOperationMonitor(new NullProgressMonitor()) {}, true);

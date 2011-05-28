@@ -96,6 +96,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class DBManager {
   private static final String FORMAT_FILE_NAME = "format2"; //$NON-NLS-1$
   private static final String DB_NAME = "rssowl.db"; //$NON-NLS-1$
+  private static final String DB_RESTORE_NAME = "rssowl.db.restore"; //$NON-NLS-1$
   private static DBManager fInstance;
 
   /* Some constants used when defragmenting to a larger block size */
@@ -195,13 +196,28 @@ public class DBManager {
   }
 
   private void createObjectContainer(Configuration config) throws PersistenceException {
-
-    /* Open the DB */
     try {
+
+      /* Check if DB needs to be restored */
+      File restoreDBFile = new File(getDBRestoreFilePath());
+      if (restoreDBFile.exists()) {
+
+        /* Backup and Delete current profile */
+        backupAndDeleteProfile();
+
+        /* Atomic Rename Restore to Profile */
+        DBHelper.rename(restoreDBFile, new File(getDBFilePath()));
+      }
+
+      /* Open DB */
       fObjectContainer = Db4o.openFile(config, getDBFilePath());
+
+      /* Handle Fatal Error while opening DB */
       if (fObjectContainer == null)
         throw new PersistenceException(Messages.DBManager_UNABLE_TO_OPEN_PROFILE);
-      storeProfileLastUsed(); //Keep date of last successfull profile opened
+
+      /* Keep date of last successfull profile opened */
+      storeProfileLastUsed();
     }
 
     /* Error opening the DB */
@@ -396,6 +412,16 @@ public class DBManager {
    */
   public static final String getDBFilePath() {
     String filePath = Activator.getDefault().getStateLocation().toOSString() + File.separator + DB_NAME;
+    return filePath;
+  }
+
+  /**
+   * Internal method, exposed for tests only.
+   *
+   * @return the path to the db file.
+   */
+  public static final String getDBRestoreFilePath() {
+    String filePath = Activator.getDefault().getStateLocation().toOSString() + File.separator + DB_RESTORE_NAME;
     return filePath;
   }
 
@@ -1388,11 +1414,8 @@ public class DBManager {
   void restoreProfile(File backup) throws PersistenceException {
     Activator.safeLogInfo(NLS.bind("Start: Database Restore from Backup ({0})", backup.getName())); //$NON-NLS-1$
 
-    /* Delete the Profile by Moving it to a Backup */
-    backupAndDeleteProfile();
-
-    /* Atomic Rename */
-    File db = new File(getDBFilePath());
+    /* Atomic Rename to "rssowl.db.restore" */
+    File db = new File(getDBRestoreFilePath());
     DBHelper.rename(backup, db);
 
     /* Handle Large Block Size properly */
@@ -1410,7 +1433,7 @@ public class DBManager {
   }
 
   /* Delete the Profile by Moving it to a Backup */
-  void backupAndDeleteProfile() {
+  private void backupAndDeleteProfile() {
     File db = new File(getDBFilePath());
     if (db.exists()) {
 
