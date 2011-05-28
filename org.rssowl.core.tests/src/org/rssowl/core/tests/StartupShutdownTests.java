@@ -27,11 +27,11 @@ package org.rssowl.core.tests;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
-
-import junit.framework.JUnit4TestAdapter;
+import org.rssowl.core.tests.persist.StartupShutdownTest;
+import org.rssowl.core.tests.persist.StartupShutdownTestLBS;
 
 /**
- * Test-Suite for Core- and UI-Tests.
+ * Tests that trigger lifecycle methods run as last tests to not interfer other tests.
  *
  * @author bpasero
  * @author Ismael Juma (ismael@juma.me.uk)
@@ -39,17 +39,6 @@ import junit.framework.JUnit4TestAdapter;
 
 @RunWith(Suite.class)
 @SuiteClasses( {
-  CoreTests.class,
-  UITests.class,
-  StartupShutdownTests.class })
-public class AllTests {
-
-  /**
-   * Support JUnit3 as well
-   *
-   * @return the Test for JUnit3 to function properly.
-   */
-  public static junit.framework.Test suite() {
-    return new JUnit4TestAdapter(AllTests.class);
-  }
-}
+  StartupShutdownTest.class,
+  StartupShutdownTestLBS.class })
+public class StartupShutdownTests {}
