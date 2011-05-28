@@ -136,7 +136,8 @@ public final class InternalOwl {
    * @param level the new {@link StartLevel}
    */
   public void setStartLevel(StartLevel level) {
-    fStartLevel = level;
+    if (level.ordinal() > fStartLevel.ordinal())
+      fStartLevel = level;
   }
 
   /**
