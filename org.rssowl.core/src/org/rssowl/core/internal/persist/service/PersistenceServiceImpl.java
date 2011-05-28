@@ -177,6 +177,11 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
     if (restoreDBFile.exists())
       restoreDBFile.delete();
 
+    /* Delete the large blocksize marker if present because we start with an empty profile again */
+    File largeBlockSizeMarkerFile = DBManager.getLargeBlockSizeMarkerFile();
+    if (largeBlockSizeMarkerFile.exists())
+      largeBlockSizeMarkerFile.delete();
+
     /* Open new empty DB for restore */
     if (!needsEmergencyStartup)
       DBManager.getDefault().createDatabase(new LongOperationMonitor(new NullProgressMonitor()) {}, true, true);
