@@ -187,7 +187,7 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
 
     /* Open new empty DB for restore */
     if (!needsEmergencyStartup)
-      DBManager.getDefault().createDatabase(new LongOperationMonitor(new NullProgressMonitor()) {}, true, true);
+      DBManager.getDefault().startup(new LongOperationMonitor(new NullProgressMonitor()) {}, true, true);
 
     /* Otherwise if startup is needed, startup with empty DB */
     else
