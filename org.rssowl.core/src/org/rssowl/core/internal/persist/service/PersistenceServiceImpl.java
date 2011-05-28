@@ -189,7 +189,7 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
    * @throws PersistenceException
    */
   public void recreateSchemaForTests() throws PersistenceException {
-    DBManager.getDefault().dropDatabase();
+    DBManager.getDefault().dropDatabaseForTests();
     DBManager.getDefault().createDatabase(new LongOperationMonitor(new NullProgressMonitor()) {
       @Override
       public void beginLongOperation(boolean isCancelable) {

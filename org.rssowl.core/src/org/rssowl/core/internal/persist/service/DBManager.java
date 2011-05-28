@@ -1337,31 +1337,6 @@ public class DBManager {
     }
   }
 
-  void dropDatabase() throws PersistenceException {
-    SafeRunner.run(new LoggingSafeRunnable() {
-      public void run() throws Exception {
-
-        /* Shutdown DB */
-        shutdown();
-
-        /* Delete DB */
-        File dbFile = new File(getDBFilePath());
-        if (dbFile.exists() && !dbFile.delete())
-          Activator.getDefault().logError("Failed to delete db file", null); //$NON-NLS-1$
-
-        /* Delete other marker files */
-        delete(getDBFormatFile(), getDefragmentFile(), getReIndexFile(), getCleanUpIndexFile());
-      }
-    });
-  }
-
-  private void delete(File... files) {
-    for (File file : files) {
-      if (file.exists())
-        file.delete();
-    }
-  }
-
   public final ObjectContainer getObjectContainer() {
     return fObjectContainer;
   }
@@ -1439,6 +1414,31 @@ public class DBManager {
 
       /* Atomic Rename */
       DBHelper.rename(db, backupCandidate);
+    }
+  }
+
+  void dropDatabaseForTests() throws PersistenceException {
+    SafeRunner.run(new LoggingSafeRunnable() {
+      public void run() throws Exception {
+
+        /* Shutdown DB */
+        shutdown();
+
+        /* Delete DB */
+        File dbFile = new File(getDBFilePath());
+        if (dbFile.exists() && !dbFile.delete())
+          Activator.getDefault().logError("Failed to delete db file", null); //$NON-NLS-1$
+
+        /* Delete other marker files */
+        delete(getDBFormatFile(), getDefragmentFile(), getReIndexFile(), getCleanUpIndexFile());
+      }
+    });
+  }
+
+  private void delete(File... files) {
+    for (File file : files) {
+      if (file.exists())
+        file.delete();
     }
   }
 }
