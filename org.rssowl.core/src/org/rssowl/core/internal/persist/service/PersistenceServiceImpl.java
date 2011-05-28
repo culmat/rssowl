@@ -182,6 +182,9 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
     if (largeBlockSizeMarkerFile.exists())
       largeBlockSizeMarkerFile.delete();
 
+    /* Communicate shutdown to listeners (mandatory before reopening for restore) */
+    DBManager.getDefault().shutdown();
+
     /* Open new empty DB for restore */
     if (!needsEmergencyStartup)
       DBManager.getDefault().createDatabase(new LongOperationMonitor(new NullProgressMonitor()) {}, true, true);
