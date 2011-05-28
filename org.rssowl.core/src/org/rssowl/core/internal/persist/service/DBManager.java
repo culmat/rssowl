@@ -173,7 +173,24 @@ public class DBManager {
    * loading the contributed DataBase.
    */
   public void startup(LongOperationMonitor monitor, boolean emergency, boolean forRestore) throws PersistenceException {
+
+    /* Trigger Singleton EventManager */
     EventManager.getInstance();
+
+    /* Handle Restore Case */
+    if (!forRestore) {
+      File restoreDBFile = new File(getDBRestoreFilePath());
+      if (restoreDBFile.exists()) {
+
+        /* Backup and Delete current profile */
+        backupAndDeleteProfile();
+
+        /* Atomic Rename Restore to Profile */
+        DBHelper.rename(restoreDBFile, new File(getDBFilePath()));
+      }
+    }
+
+    /* Create Database */
     createDatabase(monitor, emergency, forRestore);
   }
 
@@ -201,19 +218,6 @@ public class DBManager {
 
   private void createObjectContainer(Configuration config, boolean forRestore) throws PersistenceException {
     try {
-
-      /* Check if DB needs to be restored */
-      if (!forRestore) {
-        File restoreDBFile = new File(getDBRestoreFilePath());
-        if (restoreDBFile.exists()) {
-
-          /* Backup and Delete current profile */
-          backupAndDeleteProfile();
-
-          /* Atomic Rename Restore to Profile */
-          DBHelper.rename(restoreDBFile, new File(getDBFilePath()));
-        }
-      }
 
       /* Open DB */
       fObjectContainer = Db4o.openFile(config, forRestore ? getDBRestoreFilePath() : getDBFilePath());
@@ -446,7 +450,7 @@ public class DBManager {
   }
 
   @SuppressWarnings("unused")
-  public void createDatabase(LongOperationMonitor progressMonitor, boolean emergency, boolean forRestore) throws PersistenceException {
+  private void createDatabase(LongOperationMonitor progressMonitor, boolean emergency, boolean forRestore) throws PersistenceException {
 
     /* Assert File Permissions */
     checkDirPermissions();
