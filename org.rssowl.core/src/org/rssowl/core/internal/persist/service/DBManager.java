@@ -125,8 +125,8 @@ public class DBManager {
   private static final String RESTORE_BACKUP_NAME = ".restorebak"; //$NON-NLS-1$
   private static final String ONLINE_BACKUP_NAME = ".onlinebak"; //$NON-NLS-1$
   private static final String OFFLINE_BACKUP_NAME = ".backup"; //$NON-NLS-1$
-  private static final int ONLINE_BACKUP_INITIAL = 1000 * 60 * 30; //30 Minutes
-  private static final int ONLINE_BACKUP_INTERVAL = 1000 * 60 * 60 * 8; //8 Hours
+  private static final int ONLINE_BACKUP_INITIAL = 1000 * 60 * 55; //55 Minutes
+  private static final int ONLINE_BACKUP_INTERVAL = 1000 * 60 * 60 * 10; //10 Hours
   private static final int OFFLINE_BACKUP_INTERVAL = 1000 * 60 * 60 * 24 * 7; //7 Days
 
   /* Defrag Tasks Work Ticks */
