@@ -204,7 +204,7 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
    */
   public void recreateSchemaForTests() throws PersistenceException {
     DBManager.getDefault().dropDatabaseForTests();
-    DBManager.getDefault().createDatabase(new LongOperationMonitor(new NullProgressMonitor()) {}, true, false);
+    DBManager.getDefault().startup(new LongOperationMonitor(new NullProgressMonitor()) {}, true, false);
 
     getModelSearch().clearIndex();
   }

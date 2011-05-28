@@ -255,6 +255,8 @@ public class DefragmentTest {
 
   @SuppressWarnings({ "unchecked", "null" })
   private void internalDefragment(boolean useLargeBlocksize) {
+    DBManager.getDefault().shutdown();
+
     String dbPath = DBManager.getDBFilePath();
 
     File originDbFile = new File(dbPath + ".origin");
