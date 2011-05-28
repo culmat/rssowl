@@ -36,6 +36,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.rssowl.core.Owl;
+import org.rssowl.core.Owl.StartLevel;
 import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.internal.persist.BookMark;
 import org.rssowl.core.internal.persist.Category;
@@ -2772,5 +2773,14 @@ public class DBManagerTest extends LargeBlockSizeTest {
     assertTrue(DynamicDAO.loadAll(INews.class).isEmpty());
     assertTrue(DynamicDAO.loadAll(IBookMark.class).size() > 100);
     assertTrue(DynamicDAO.loadAll(IFolder.class).size() > 20);
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testStartLevel() {
+    StartLevel startLevel = Owl.getStartLevel();
+    assertEquals(StartLevel.STARTED, startLevel);
   }
 }
