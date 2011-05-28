@@ -43,6 +43,9 @@ public class Messages extends NLS {
   public static String ErrorInfoPage_FURTHER_STEPS;
   public static String ErrorInfoPage_GENERAL_ERROR_ADVISE;
   public static String ErrorInfoPage_LET_US_KNOW;
+  public static String ErrorInfoPage_LOCKED_ERROR;
+  public static String ErrorInfoPage_LOCKED_ERROR_N;
+  public static String ErrorInfoPage_LOCKED_PROFILE_ADVISE;
   public static String ErrorInfoPage_NEXT_PAGE_ADVISE;
   public static String ErrorInfoPage_OOM_ERROR;
   public static String ErrorInfoPage_OOM_ERROR_N;

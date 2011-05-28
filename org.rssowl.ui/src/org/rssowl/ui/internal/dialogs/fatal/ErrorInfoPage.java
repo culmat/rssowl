@@ -44,6 +44,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.rssowl.core.persist.service.ProfileLockedException;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.dialogs.CustomWizardDialog;
@@ -89,12 +90,25 @@ public class ErrorInfoPage extends WizardPage {
       errorDetailsLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
       String msg = null;
+
+      /* Out of memory error */
       if (fErrorStatus.getException() instanceof OutOfMemoryError) {
         if (StringUtils.isSet(fErrorStatus.getMessage()))
           msg = NLS.bind(Messages.ErrorInfoPage_OOM_ERROR_N, fErrorStatus.getMessage());
         else
           msg = Messages.ErrorInfoPage_OOM_ERROR;
-      } else {
+      }
+
+      /* Profile Locked by another Instance */
+      else if (fErrorStatus.getException() instanceof ProfileLockedException) {
+        if (StringUtils.isSet(fErrorStatus.getMessage()))
+          msg = NLS.bind(Messages.ErrorInfoPage_LOCKED_ERROR_N, fErrorStatus.getMessage());
+        else
+          msg = Messages.ErrorInfoPage_LOCKED_ERROR;
+      }
+
+      /* Any other error */
+      else {
         if (StringUtils.isSet(fErrorStatus.getMessage()))
           msg = NLS.bind(Messages.ErrorInfoPage_STARTUP_ERROR_N, fErrorStatus.getMessage());
         else
@@ -119,8 +133,8 @@ public class ErrorInfoPage extends WizardPage {
       errorDetailsTextLabel.setMenu(fCopyMenu);
     }
 
-    /* Report Crash */
-    {
+    /* Report Crash (not for OutOfMemory and ProfileLockedException  */
+    if (!(fErrorStatus.getException() instanceof ProfileLockedException) && !(fErrorStatus.getException() instanceof OutOfMemoryError)) {
       Label crashReportLabel = new Label(container, SWT.NONE);
       crashReportLabel.setText(Messages.ErrorInfoPage_LET_US_KNOW);
       crashReportLabel.setFont(OwlUI.getBold(JFaceResources.DIALOG_FONT));
@@ -150,7 +164,10 @@ public class ErrorInfoPage extends WizardPage {
       ((GridData) furtherStepsLabel.getLayoutData()).verticalIndent = 10;
 
       Link moreInfoLabel = new Link(container, SWT.WRAP);
-      moreInfoLabel.setText(fHasNextPage ? Messages.ErrorInfoPage_NEXT_PAGE_ADVISE : Messages.ErrorInfoPage_GENERAL_ERROR_ADVISE);
+      if (fErrorStatus.getException() instanceof ProfileLockedException)
+        moreInfoLabel.setText(Messages.ErrorInfoPage_LOCKED_PROFILE_ADVISE);
+      else
+        moreInfoLabel.setText(fHasNextPage ? Messages.ErrorInfoPage_NEXT_PAGE_ADVISE : Messages.ErrorInfoPage_GENERAL_ERROR_ADVISE);
       moreInfoLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
       ((GridData) moreInfoLabel.getLayoutData()).widthHint = 200;
 
