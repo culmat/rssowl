@@ -86,6 +86,7 @@ public class StartupShutdownTest extends LargeBlockSizeTest {
   @Before
   public void setUp() throws Exception {
     ((PersistenceServiceImpl) Owl.getPersistenceService()).recreateSchemaForTests();
+    System.setProperty("rssowl.reindex", "false"); //Clear any set reindex marker
     fFactory = Owl.getModelFactory();
 
     DBManager.getDefault().getReIndexFile().delete();
