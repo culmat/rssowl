@@ -164,7 +164,9 @@ public class FindUpdatesAction extends Action implements IWorkbenchWindowActionD
             IConfiguredSite configSite = org.eclipse.update.internal.operations.UpdateUtils.getDefaultTargetSite(SiteManager.getLocalSite().getCurrentConfiguration(), update);
             if (configSite != null) {
               update.setTargetSite(configSite);
+              Activator.safeLogInfo("Start: Application Update"); //$NON-NLS-1$
               update.execute(monitor, null);
+              Activator.safeLogInfo("Finished: Application Update"); //$NON-NLS-1$
             }
           } catch (CoreException e) {
             errorUpdating = true;
