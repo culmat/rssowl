@@ -1,7 +1,7 @@
 /*   **********************************************************************  **
  **   Copyright notice                                                       **
  **                                                                          **
- **   (c) 2003-2009 RSSOwl Development Team                                  **
+ **   (c) 2003-2011 RSSOwl Development Team                                  **
  **   http://www.rssowl.org/                                                 **
  **                                                                          **
  **   All rights reserved                                                    **
