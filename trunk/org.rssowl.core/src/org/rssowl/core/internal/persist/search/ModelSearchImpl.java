@@ -41,6 +41,7 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.LockFactory;
+import org.apache.lucene.store.LockObtainFailedException;
 import org.apache.lucene.store.NativeFSLockFactory;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -56,6 +57,7 @@ import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.persist.service.IndexListener;
 import org.rssowl.core.persist.service.PersistenceException;
+import org.rssowl.core.persist.service.ProfileLockedException;
 import org.rssowl.core.util.SearchHit;
 
 import java.io.IOException;
@@ -120,6 +122,8 @@ public class ModelSearchImpl implements IModelSearch {
         if (fSearcher == null)
           fSearcher = createIndexSearcher();
       }
+    } catch (LockObtainFailedException e) {
+      throw new ProfileLockedException(e.getMessage(), e);
     } catch (IOException e) {
       throw new PersistenceException(e.getMessage(), e);
     }
