@@ -195,6 +195,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   private final IPreferenceScope fPreferences = Owl.getPreferenceService().getGlobalScope();
   private final INewsDAO fNewsDao = DynamicDAO.getDAO(INewsDAO.class);
   private final JobTracker fUserInteractionTracker = new JobTracker(USER_INTERACTION_DELAY, false, true, Priority.INTERACTIVE);
+  private final Set<Long> fMarkedUnreadByUserCache= Collections.synchronizedSet(new HashSet<Long>());
 
   /* This viewer's sorter. <code>null</code> means there is no sorter. */
   private ViewerComparator fSorter;
@@ -276,6 +277,9 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
         js.append("  var lastNewsPosY = lastNews.offsetTop; "); //$NON-NLS-1$
         js.append("  var lastNewsHeight = lastNews.offsetHeight; "); //$NON-NLS-1$
         for (Long id : visibleUnreadNews) {
+          if (fMarkedUnreadByUserCache.contains(id))
+            continue; //Skip those news explicitly marked as unread by the user
+
           if (!varDefined) {
             js.append("var "); //$NON-NLS-1$
             varDefined = true;
@@ -788,6 +792,8 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
         boolean affectEquivalentNews = (newState != INews.State.UNREAD && OwlUI.markReadDuplicates());
         UndoStack.getInstance().addOperation(new NewsStateOperation(singleNewsSet, newState, affectEquivalentNews));
         fNewsDao.setState(singleNewsSet, newState, affectEquivalentNews, false);
+        if (newState == INews.State.UNREAD)
+          fMarkedUnreadByUserCache.add(news.getId());
       }
     }
 
@@ -1726,6 +1732,9 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
     /* Remember Input */
     fInput = input;
+
+    /* Clear Cache of news marked as unread by user */
+    fMarkedUnreadByUserCache.clear();
 
     /* Update Settings based on Input */
     if (fSite != null) {
