@@ -93,6 +93,7 @@ public class NewsBrowserViewModelTests {
     assertEquals(-1L, model.getLastVisibleNews());
     assertFalse(model.hasHiddenNews());
     assertTrue(model.getVisibleUnreadNews().isEmpty());
+    assertEquals(-1L, model.getLastNews());
 
     Pair<List<Long>, List<Long>> nextPage = model.getNextPage(0);
     assertTrue(nextPage.getFirst().isEmpty());
@@ -140,6 +141,7 @@ public class NewsBrowserViewModelTests {
     assertEquals(-1L, model.getLastVisibleNews());
     assertFalse(model.hasHiddenNews());
     assertTrue(model.getVisibleUnreadNews().isEmpty());
+    assertEquals(-1L, model.getLastNews());
 
     assertEquals(0, model.getNewsCount());
     assertEquals(0, model.getVisibleNewsCount());
@@ -188,6 +190,7 @@ public class NewsBrowserViewModelTests {
     assertEquals(-1L, model.previousNews(true, 5L));
     assertEquals(-1L, model.removeNews(fFactory.createNews(5L, fFactory.createFeed(null, URI.create("rssowl.org")), new Date())));
     assertTrue(model.getVisibleUnreadNews().isEmpty());
+    assertEquals(-1L, model.getLastNews());
 
     assertEquals(0, model.getNewsCount());
     assertEquals(0, model.getVisibleNewsCount());
@@ -246,6 +249,7 @@ public class NewsBrowserViewModelTests {
     assertEquals(news3.getId().longValue(), model.getLastVisibleNews());
     assertFalse(model.hasHiddenNews());
     assertEquals(2, model.getVisibleUnreadNews().size());
+    assertEquals(3L, model.getLastNews());
 
     assertEquals(1L, model.nextNews(false, -1L));
     assertEquals(1L, model.nextNews(true, -1L));
@@ -268,6 +272,7 @@ public class NewsBrowserViewModelTests {
     assertEquals(-1L, model.removeNews(news2));
     assertEquals(3L, model.nextNews(false, 1L));
     assertEquals(3L, model.nextNews(true, 1L));
+    assertEquals(3L, model.getLastNews());
 
     assertEquals(2, model.getNewsCount());
     assertEquals(2, model.getVisibleNewsCount());
@@ -911,6 +916,7 @@ public class NewsBrowserViewModelTests {
     assertTrue(revealed.getFirst().isEmpty());
     assertTrue(revealed.getSecond().isEmpty());
     assertEquals(2, model.getVisibleUnreadNews().size());
+    assertEquals(5L, model.getLastNews());
 
     revealed = model.revealPage(news4.getId(), 2);
     assertFalse(revealed.getFirst().isEmpty());
