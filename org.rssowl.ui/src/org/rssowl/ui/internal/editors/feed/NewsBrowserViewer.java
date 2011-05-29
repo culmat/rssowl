@@ -251,7 +251,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
             fCBrowser.execute(js.toString());
         }
       }
-      
+
       /* Return early if canceled or disposed */
       if (monitor.isCanceled() || fCBrowser.getControl().isDisposed())
         return Status.OK_STATUS;
@@ -269,12 +269,12 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
         boolean varDefined = false;
         List<Long> visibleUnreadNews = fViewModel.getVisibleUnreadNews();
-        long lastVisibleNews = fViewModel.getLastVisibleNews();
-        js.append("var lastVisibleNews = document.getElementById('").append(Dynamic.NEWS.getId(lastVisibleNews)).append("'); "); //$NON-NLS-1$//$NON-NLS-2$
-        js.append("if (lastVisibleNews != null) {"); //$NON-NLS-1$
+        long lastNews = fViewModel.getLastNews();
+        js.append("var lastNews = document.getElementById('").append(Dynamic.NEWS.getId(lastNews)).append("'); "); //$NON-NLS-1$//$NON-NLS-2$
+        js.append("if (lastNews != null) {"); //$NON-NLS-1$
         js.append("  var newsIds = ''; "); //$NON-NLS-1$
-        js.append("  var lastVisibleNewsPosY = lastVisibleNews.offsetTop; "); //$NON-NLS-1$
-        js.append("  var lastVisibleNewsHeight = lastVisibleNews.offsetHeight; "); //$NON-NLS-1$
+        js.append("  var lastNewsPosY = lastNews.offsetTop; "); //$NON-NLS-1$
+        js.append("  var lastNewsHeight = lastNews.offsetHeight; "); //$NON-NLS-1$
         for (Long id : visibleUnreadNews) {
           if (!varDefined) {
             js.append("var "); //$NON-NLS-1$
@@ -286,13 +286,13 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
            *
            * "divPosY < scrollPosY" : Top Border of News is above top scroll position
            *
-           * "lastVisibleNewsPosY < scrollPosY + windowHeight" : Last news is visible
+           * "lastNewsPosY < scrollPosY + windowHeight" : Last news is visible
            */
           js.append("node = document.getElementById('").append(Dynamic.NEWS.getId(id)).append("'); "); //$NON-NLS-1$//$NON-NLS-2$
           js.append("  if (node != null) {"); //$NON-NLS-1$
           js.append("    var divPosY = node.offsetTop; "); //$NON-NLS-1$
           js.append("    var divHeight = node.offsetHeight; "); //$NON-NLS-1$
-          js.append("    if (divPosY < scrollPosY || lastVisibleNewsPosY < scrollPosY + windowHeight) {"); //$NON-NLS-1$
+          js.append("    if (divPosY < scrollPosY || lastNewsPosY < scrollPosY + windowHeight) {"); //$NON-NLS-1$
           js.append("      newsIds = newsIds + '").append(id).append(",'; "); //$NON-NLS-1$ //$NON-NLS-2$
           js.append("    }"); //$NON-NLS-1$
           js.append("  }"); //$NON-NLS-1$

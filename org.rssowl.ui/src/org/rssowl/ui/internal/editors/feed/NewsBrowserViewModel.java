@@ -514,6 +514,23 @@ public class NewsBrowserViewModel {
   }
 
   /**
+   * @return the last news item of this model or -1 if none.
+   */
+  public long getLastNews() {
+    synchronized (fLock) {
+      for (int i = fItemList.size() - 1; i >= 0; i--) {
+        Item item = fItemList.get(i);
+        if (item instanceof Group)
+          continue;
+
+        return item.getId();
+      }
+    }
+
+    return -1;
+  }
+
+  /**
    * @param news the news to remove from the view model.
    * @return the identifier of a group that needs an update now that the news
    * has been removed or -1 if none.
