@@ -226,6 +226,7 @@ public class BrowserUtils {
         p = Runtime.getRuntime().exec(webBrowser + " " + href); //$NON-NLS-1$
       } catch (IOException e) {
         Activator.getDefault().logError(e.getMessage(), e);
+        showErrorIfExternalBrowserFails();
       }
     }
     return p;
