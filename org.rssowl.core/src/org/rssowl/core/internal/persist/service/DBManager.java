@@ -317,6 +317,10 @@ public class DBManager {
         File tmpBackupFile = null;
         try {
 
+          /* Handle Shutdown and Cancellation */
+          if (Owl.isShuttingDown() || monitor.isCanceled())
+            return;
+
           /* Create Marker that Onlinebackup is Performed */
           if (!marker.exists())
             safeCreate(marker);
