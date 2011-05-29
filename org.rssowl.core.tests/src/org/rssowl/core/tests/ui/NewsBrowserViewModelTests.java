@@ -931,5 +931,11 @@ public class NewsBrowserViewModelTests {
     assertEquals(3, model.indexOfNewsItem(news3.getId()));
     assertEquals(5, model.indexOfNewsItem(news4.getId()));
     assertEquals(6, model.indexOfNewsItem(news5.getId()));
+
+    model.setGroupExpanded(group1.getId(), false);
+    assertEquals(0, model.getVisibleUnreadNews().size());
+
+    model.setGroupExpanded(group1.getId(), true);
+    assertEquals(2, model.getVisibleUnreadNews().size());
   }
 }
