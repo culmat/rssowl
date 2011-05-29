@@ -126,6 +126,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
   private Button fMarkReadStateCheck;
   private Spinner fMarkReadAfterSpinner;
   private Button fMarkReadOnMinimize;
+  private Button fMarkReadOnScrolling;
   private Button fMarkReadOnChange;
   private Button fMarkReadDuplicateNews;
   private LocalResourceManager fResources;
@@ -305,6 +306,11 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
 
     Label label = new Label(markReadAfterContainer, SWT.None);
     label.setText(Messages.FeedsPreferencePage_SECONDS);
+
+    /* Mark Read on Scrolling */
+    fMarkReadOnScrolling = new Button(group, SWT.CHECK);
+    fMarkReadOnScrolling.setText(Messages.FeedsPreferencePage_MARK_READ_ON_SCROLLING);
+    fMarkReadOnScrolling.setSelection(fGlobalScope.getBoolean(DefaultPreferences.MARK_READ_ON_SCROLLING));
 
     /* Mark Read on changing displayed Feed */
     fMarkReadOnChange = new Button(group, SWT.CHECK);
@@ -679,6 +685,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     fGlobalScope.putBoolean(DefaultPreferences.BM_RELOAD_ON_STARTUP, fReloadOnStartupCheck.getSelection());
 
     /* Reading */
+    fGlobalScope.putBoolean(DefaultPreferences.MARK_READ_ON_SCROLLING, fMarkReadOnScrolling.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.MARK_READ_ON_MINIMIZE, fMarkReadOnMinimize.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.MARK_READ_ON_CHANGE, fMarkReadOnChange.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.MARK_READ_ON_TAB_CLOSE, fMarkReadOnTabClose.getSelection());
@@ -867,6 +874,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     fReloadOnStartupCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.BM_RELOAD_ON_STARTUP));
 
     /* Reading */
+    fMarkReadOnScrolling.setSelection(defaultScope.getBoolean(DefaultPreferences.MARK_READ_ON_SCROLLING));
     fMarkReadOnMinimize.setSelection(defaultScope.getBoolean(DefaultPreferences.MARK_READ_ON_MINIMIZE));
     fMarkReadOnChange.setSelection(defaultScope.getBoolean(DefaultPreferences.MARK_READ_ON_CHANGE));
     fMarkReadOnTabClose.setSelection(defaultScope.getBoolean(DefaultPreferences.MARK_READ_ON_TAB_CLOSE));

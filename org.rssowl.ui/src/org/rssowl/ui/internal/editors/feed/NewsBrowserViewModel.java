@@ -442,6 +442,27 @@ public class NewsBrowserViewModel {
   }
 
   /**
+   * @return a list of ids of news that are unread and visible.
+   */
+  public List<Long> getVisibleUnreadNews() {
+    List<Long> visibleUnreadNewsIds = new ArrayList<Long>();
+    synchronized (fLock) {
+      for (Item item : fItemList) {
+        if (item instanceof Group)
+          continue;
+
+        if (!isNewsVisible(item.getId()))
+          break;
+
+        if (isUnread(item))
+          visibleUnreadNewsIds.add(item.getId());
+      }
+    }
+
+    return visibleUnreadNewsIds;
+  }
+
+  /**
    * Returns the first news that is hidden and optionally unread or
    * <code>-1</code> if none.
    *

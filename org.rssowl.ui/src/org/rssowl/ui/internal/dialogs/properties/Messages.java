@@ -86,6 +86,7 @@ public class Messages extends NLS {
   public static String ReadingPropertyPage_MARK_READ_AFTER;
   public static String ReadingPropertyPage_MARK_READ_ON_CLOSE;
   public static String ReadingPropertyPage_MARK_READ_ON_MINIMIZE;
+  public static String ReadingPropertyPage_MARK_READ_ON_SCROLLING;
   public static String ReadingPropertyPage_MARK_READ_ON_SWITCH;
   public static String ReadingPropertyPage_SECONDS;
   public static String RetentionPropertyPage_CLEANUP_INFO;
