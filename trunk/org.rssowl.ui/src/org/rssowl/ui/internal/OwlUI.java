@@ -2819,8 +2819,9 @@ public class OwlUI {
    * Opens a file dialog to save the crash report.
    *
    * @param shell the parent {@link Shell} of the dialog that opens.
+   * @throws FileNotFoundException in case of an error
    */
-  public static void saveCrashReport(Shell shell) {
+  public static void saveCrashReport(Shell shell) throws FileNotFoundException {
     FileDialog dialog = new FileDialog(shell, SWT.SAVE);
     dialog.setText(Messages.OwlUI_SAVE_CRASH_REPORT);
     dialog.setFilterExtensions(new String[] { "*.log" }); //$NON-NLS-1$
@@ -2829,28 +2830,25 @@ public class OwlUI {
 
     String file = dialog.open();
     if (StringUtils.isSet(file)) {
-      try {
 
-        /* Check for Log Message from Core to have a complete log */
-        String logMessages = CoreUtils.getAndFlushLogMessages();
-        if (logMessages != null && logMessages.length() > 0)
-          Activator.safeLogError(logMessages, null);
+      /* Check for Log Message from Core to have a complete log */
+      String logMessages = CoreUtils.getAndFlushLogMessages();
+      if (logMessages != null && logMessages.length() > 0)
+        Activator.safeLogError(logMessages, null);
 
-        /* Help to find out where the log is coming from */
-        Activator.safeLogInfo("Crash Report Exported"); //$NON-NLS-1$
+      /* Help to find out where the log is coming from */
+      Activator.safeLogInfo("Crash Report Exported"); //$NON-NLS-1$
 
-        /* Export Log File */
-        File logFile = Platform.getLogFileLocation().toFile();
-        InputStream inS;
-        if (logFile.exists())
-          inS = new FileInputStream(logFile);
-        else
-          inS = new ByteArrayInputStream(new byte[0]);
-        FileOutputStream outS = new FileOutputStream(new File(file));
-        CoreUtils.copy(inS, outS);
-      } catch (FileNotFoundException e) {
-        Activator.getDefault().logError(e.getMessage(), e);
-      }
+      /* Export Log File */
+      File logFile = Platform.getLogFileLocation().toFile();
+      InputStream inS;
+      if (logFile.exists())
+        inS = new FileInputStream(logFile);
+      else
+        inS = new ByteArrayInputStream(new byte[0]);
+      
+      FileOutputStream outS = new FileOutputStream(new File(file));
+      CoreUtils.copy(inS, outS);
     }
   }
 }

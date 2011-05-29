@@ -147,10 +147,14 @@ public class ErrorInfoPage extends WizardPage {
       crashReportTextLabel.addSelectionListener(new SelectionAdapter() {
         @Override
         public void widgetSelected(SelectionEvent e) {
-          if ("save".equals(e.text)) //$NON-NLS-1$
-            OwlUI.saveCrashReport(getShell());
-          else
-            BrowserUtils.sendErrorLog();
+          try {
+            if ("save".equals(e.text)) //$NON-NLS-1$
+              OwlUI.saveCrashReport(getShell());
+            else
+              BrowserUtils.sendErrorLog();
+          } catch (Throwable t) {
+            setMessage(t.getMessage(), IMessageProvider.ERROR);
+          }
         }
       });
     }
@@ -174,10 +178,14 @@ public class ErrorInfoPage extends WizardPage {
       moreInfoLabel.addSelectionListener(new SelectionAdapter() {
         @Override
         public void widgetSelected(SelectionEvent e) {
-          if ("faq".equals(e.text)) //$NON-NLS-1$
-            BrowserUtils.openFAQ(fErrorStatus);
-          else if ("forum".equals(e.text)) //$NON-NLS-1$
-            BrowserUtils.openHelpForum(fErrorStatus);
+          try {
+            if ("faq".equals(e.text)) //$NON-NLS-1$
+              BrowserUtils.openFAQ(fErrorStatus);
+            else if ("forum".equals(e.text)) //$NON-NLS-1$
+              BrowserUtils.openHelpForum(fErrorStatus);
+          } catch (Throwable t) {
+            setMessage(t.getMessage(), IMessageProvider.ERROR);
+          }
         }
       });
     }
