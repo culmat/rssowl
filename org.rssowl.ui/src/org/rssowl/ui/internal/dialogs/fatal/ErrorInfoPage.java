@@ -83,7 +83,7 @@ public class ErrorInfoPage extends WizardPage {
       ((GridLayout) container.getLayout()).marginBottom = 5;
 
     /* Error Details */
-    {
+    if (!fErrorStatus.isOK()){
       Label errorDetailsLabel = new Label(container, SWT.NONE);
       errorDetailsLabel.setText(Messages.ErrorInfoPage_ERROR_DETAILS);
       errorDetailsLabel.setFont(OwlUI.getBold(JFaceResources.DIALOG_FONT));
