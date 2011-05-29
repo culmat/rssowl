@@ -257,7 +257,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
         return Status.OK_STATUS;
 
       /* Mark Seen News as Read if necessary */
-      if (fMarkReadOnScrolling) {
+      if (fMarkReadOnScrolling && !isGroupingByState()) {//Ignore if grouping by state to avoid refresh
         StringBuilder js = new StringBuilder();
         if (fCBrowser.isIE()) {
           js.append("var scrollPosY = document.body.scrollTop; "); //$NON-NLS-1$
