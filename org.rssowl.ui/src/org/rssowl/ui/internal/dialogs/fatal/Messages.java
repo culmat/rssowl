@@ -36,6 +36,7 @@ public class Messages extends NLS {
   public static String CleanProfilePage_OPML_BACKUP_INFO;
   public static String CleanProfilePage_RESTORE_SUBSCRIPTIONS_SETTINGS;
   public static String CleanProfilePage_RESTORING_SUBSCRIPTIONS_SETTINGS;
+  public static String CleanProfilePage_RSSOWL_CRASH;
   public static String CleanProfilePage_START_OVER;
   public static String CleanProfilePage_STARTING_OVER;
   public static String ErrorInfoPage_COPY;
@@ -61,6 +62,7 @@ public class Messages extends NLS {
   public static String FatalErrorWizard_RESTORE_SUBSCRIPTIONS_SETTINGS;
   public static String FatalErrorWizard_START_OVER;
   public static String FatalErrorWizard_WE_ARE_SORRY;
+  public static String RecreateSearchIndexPage_RSSOWL_CRASH;
   public static String RecreateSearchPage_INFORMATION;
   public static String RecreateSearchPage_RECREATING_DETAILS_RESTART;
   public static String RecreateSearchPage_RECREATING_DETAILS_QUIT;

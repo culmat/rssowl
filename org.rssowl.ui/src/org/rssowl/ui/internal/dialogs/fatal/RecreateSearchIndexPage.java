@@ -54,7 +54,7 @@ public class RecreateSearchIndexPage extends WizardPage {
 
     /* Title Image and Message */
     setImageDescriptor(OwlUI.getImageDescriptor("icons/wizban/welcome_wiz.gif")); //$NON-NLS-1$
-    setMessage(Messages.RestoreBackupPage_RSSOWL_CRASH, IMessageProvider.WARNING);
+    setMessage(Messages.RecreateSearchIndexPage_RSSOWL_CRASH, IMessageProvider.WARNING);
 
     /* Container */
     Composite container = new Composite(parent, SWT.NONE);
