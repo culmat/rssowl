@@ -70,6 +70,9 @@ public class Application implements IApplication {
   /** Flag to indicate RSSOwl integrated to Eclipse or not */
   public static final boolean IS_ECLIPSE = InternalOwl.IS_ECLIPSE;
 
+  /* System Property to force opening of the restore profile wizard */
+  private static final String OPEN_RESTORE_WIZARD_PROPERTY = "restoreOwlProfile"; //$NON-NLS-1$
+
   /*
    * @see org.eclipse.equinox.app.IApplication#start(org.eclipse.equinox.app.IApplicationContext)
    */
@@ -105,7 +108,11 @@ public class Application implements IApplication {
       Activator activator = Activator.getDefault();
       IStatus startupStatus = activator.getStartupStatus();
       if (startupStatus.getSeverity() == IStatus.ERROR)
-        return handleStartupError(startupStatus);
+        return handleStartupError(startupStatus, false);
+
+      /* Open Fatal Error Wizard if user explicitly asked for it (to restore a backup) */
+      if (System.getProperty(OPEN_RESTORE_WIZARD_PROPERTY) != null)
+        return handleStartupError(startupStatus, true);
 
       /* Create the Workbench */
       fWorkbenchAdvisor = new ApplicationWorkbenchAdvisor(runAfterUIStartup);
@@ -119,8 +126,8 @@ public class Application implements IApplication {
     }
   }
 
-  private int handleStartupError(IStatus errorStatus) {
-    FatalErrorWizard wizard = new FatalErrorWizard(errorStatus);
+  private int handleStartupError(IStatus errorStatus, boolean forceAllowRestore) {
+    FatalErrorWizard wizard = new FatalErrorWizard(errorStatus, forceAllowRestore);
     OwlUI.openWizard(null, wizard, true, false, null, true, IS_WINDOWS ? Messages.Application_RESTART_RSSOWL : Messages.Application_QUIT_RSSOWL);
 
     return wizard.getReturnCode();

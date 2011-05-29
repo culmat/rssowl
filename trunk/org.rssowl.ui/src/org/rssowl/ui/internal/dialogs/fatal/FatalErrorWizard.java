@@ -65,9 +65,13 @@ public class FatalErrorWizard extends Wizard {
   private int fReturnCode = IApplication.EXIT_OK;
   private final List<File> fProfileBackups = new ArrayList<File>();
   private final List<File> fOPMLBackups = new ArrayList<File>();
-  private final boolean fOfferRestorePages;
+  private boolean fOfferRestorePages;
 
   public FatalErrorWizard(IStatus errorStatus) {
+    this(errorStatus, false);
+  }
+
+  public FatalErrorWizard(IStatus errorStatus, boolean forceAllowRestore) {
     fErrorStatus = errorStatus;
 
     boolean isOOMError = (fErrorStatus.getException() instanceof OutOfMemoryError);
@@ -75,6 +79,12 @@ public class FatalErrorWizard extends Wizard {
     boolean canUsePersistenceService = (InternalOwl.getDefault().getPersistenceService() != null);
     StartLevel startLevel = InternalOwl.getDefault().getStartLevel();
     fOfferRestorePages = !isOOMError && !isProfileLockedError && canUsePersistenceService && startLevel != StartLevel.STARTED && startLevel != StartLevel.SEARCH_INDEX_OPENED;
+
+    /* Check if caller wants to force profile restore pages */
+    if (!fOfferRestorePages && forceAllowRestore && canUsePersistenceService)
+      fOfferRestorePages = true;
+
+    /* Search for backups as necessary */
     if (fOfferRestorePages)
       findBackups();
   }
