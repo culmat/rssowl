@@ -758,13 +758,20 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
     /* Mark Read */
     if (queryProvided && MARK_READ_HANDLER_ID.equals(id)) {
-      List<INews> news = getNewsList(query);
+      final List<INews> news = getNewsList(query);
+      Runnable runnable = new Runnable() {
+        public void run() {
+          INews.State newState = INews.State.READ;
+          boolean affectEquivalentNews = OwlUI.markReadDuplicates();
+          UndoStack.getInstance().addOperation(new NewsStateOperation(news, newState, affectEquivalentNews));
+          fNewsDao.setState(news, newState, affectEquivalentNews, false);
+        }
+      };
 
-      /* Update State */
-      INews.State newState = INews.State.READ;
-      boolean affectEquivalentNews = OwlUI.markReadDuplicates();
-      UndoStack.getInstance().addOperation(new NewsStateOperation(news, newState, affectEquivalentNews));
-      fNewsDao.setState(news, newState, affectEquivalentNews, false);
+      if (CBrowser.isMozillaRunningOnWindows()) //Bug in XULRunner, otherwise won't work
+        delayInUI(runnable);
+      else
+        runnable.run();
     }
 
     /*  Toggle Read */
