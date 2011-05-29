@@ -145,6 +145,7 @@ import java.util.StringTokenizer;
 public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
   /* ID for Link Handlers */
+  static final String MARK_READ_HANDLER_ID = "org.rssowl.ui.MarkRead"; //$NON-NLS-1$
   static final String TOGGLE_READ_HANDLER_ID = "org.rssowl.ui.ToggleRead"; //$NON-NLS-1$
   static final String TOGGLE_STICKY_HANDLER_ID = "org.rssowl.ui.ToggleSticky"; //$NON-NLS-1$
   static final String ARCHIVE_HANDLER_ID = "org.rssowl.ui.Archive"; //$NON-NLS-1$
@@ -168,8 +169,8 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   static final String NEXT_PAGE_HANDLER_ID = "org.rssowl.ui.NextPage"; //$NON-NLS-1$
   static final String SCROLL_NEXT_PAGE_HANDLER_ID = "org.rssowl.ui.ScrollNextPage"; //$NON-NLS-1$
 
-  /* Delay in millies before revealing the next page from user interaction */
-  private static final int AUTOMATIC_PAGE_REVEAL_DELAY = 500;
+  /* Delay in millies before reacting on user interaction */
+  private static final int USER_INTERACTION_DELAY = 500;
 
   /* Unique identifier of the <body> element */
   private static final String BODY_ELEMENT_ID = "owlbody"; //$NON-NLS-1$
@@ -188,11 +189,12 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   private final String fId;
   private boolean fBlockRefresh;
   private boolean fMarkReadOnExpand = true;
+  private boolean fMarkReadOnScrolling = true;
   private int fPageSize;
   private final IModelFactory fFactory;
   private final IPreferenceScope fPreferences = Owl.getPreferenceService().getGlobalScope();
   private final INewsDAO fNewsDao = DynamicDAO.getDAO(INewsDAO.class);
-  private final JobTracker fJobTracker = new JobTracker(AUTOMATIC_PAGE_REVEAL_DELAY, false, true, Priority.INTERACTIVE);
+  private final JobTracker fUserInteractionTracker = new JobTracker(USER_INTERACTION_DELAY, false, true, Priority.INTERACTIVE);
 
   /* This viewer's sorter. <code>null</code> means there is no sorter. */
   private ViewerComparator fSorter;
@@ -207,12 +209,12 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   /* Special Element that denotes a Paging Latch */
   static final class PageLatch {}
 
-  /* Task to reveal the next page as necessary */
-  static final class RevealPageTask implements ITask {
+  /* Task to perform some news related actions based on user interaction */
+  final class UserInteractionTask implements ITask {
     private final NewsBrowserViewModel fViewModel;
     private final CBrowser fCBrowser;
 
-    public RevealPageTask(NewsBrowserViewModel model, CBrowser browser) {
+    public UserInteractionTask(NewsBrowserViewModel model, CBrowser browser) {
       fViewModel = model;
       fCBrowser = browser;
     }
@@ -224,7 +226,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
         return Status.OK_STATUS;
 
       /* Reveal next page as necessary */
-      if (fViewModel.hasHiddenNews()) {
+      if (fPageSize != 0 && fViewModel.hasHiddenNews()) {
         long lastVisibleNewsId = fViewModel.getLastVisibleNews();
         if (lastVisibleNewsId != -1) {
           StringBuilder js = new StringBuilder();
@@ -248,6 +250,61 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
           if (!monitor.isCanceled() && !fCBrowser.getControl().isDisposed())
             fCBrowser.execute(js.toString());
         }
+      }
+      
+      /* Return early if canceled or disposed */
+      if (monitor.isCanceled() || fCBrowser.getControl().isDisposed())
+        return Status.OK_STATUS;
+
+      /* Mark Seen News as Read if necessary */
+      if (fMarkReadOnScrolling) {
+        StringBuilder js = new StringBuilder();
+        if (fCBrowser.isIE()) {
+          js.append("var scrollPosY = document.body.scrollTop; "); //$NON-NLS-1$
+          js.append("var windowHeight = document.body.clientHeight; "); //$NON-NLS-1$
+        } else {
+          js.append("var scrollPosY = window.pageYOffset; "); //$NON-NLS-1$
+          js.append("var windowHeight = window.innerHeight; "); //$NON-NLS-1$
+        }
+
+        boolean varDefined = false;
+        List<Long> visibleUnreadNews = fViewModel.getVisibleUnreadNews();
+        long lastVisibleNews = fViewModel.getLastVisibleNews();
+        js.append("var lastVisibleNews = document.getElementById('").append(Dynamic.NEWS.getId(lastVisibleNews)).append("'); "); //$NON-NLS-1$//$NON-NLS-2$
+        js.append("if (lastVisibleNews != null) {"); //$NON-NLS-1$
+        js.append("  var newsIds = ''; "); //$NON-NLS-1$
+        js.append("  var lastVisibleNewsPosY = lastVisibleNews.offsetTop; "); //$NON-NLS-1$
+        js.append("  var lastVisibleNewsHeight = lastVisibleNews.offsetHeight; "); //$NON-NLS-1$
+        for (Long id : visibleUnreadNews) {
+          if (!varDefined) {
+            js.append("var "); //$NON-NLS-1$
+            varDefined = true;
+          }
+
+          /*
+           * Conditions under which a news gets marked as read:
+           *
+           * "divPosY < scrollPosY" : Top Border of News is above top scroll position
+           *
+           * "lastVisibleNewsPosY < scrollPosY + windowHeight" : Last news is visible
+           */
+          js.append("node = document.getElementById('").append(Dynamic.NEWS.getId(id)).append("'); "); //$NON-NLS-1$//$NON-NLS-2$
+          js.append("  if (node != null) {"); //$NON-NLS-1$
+          js.append("    var divPosY = node.offsetTop; "); //$NON-NLS-1$
+          js.append("    var divHeight = node.offsetHeight; "); //$NON-NLS-1$
+          js.append("    if (divPosY < scrollPosY || lastVisibleNewsPosY < scrollPosY + windowHeight) {"); //$NON-NLS-1$
+          js.append("      newsIds = newsIds + '").append(id).append(",'; "); //$NON-NLS-1$ //$NON-NLS-2$
+          js.append("    }"); //$NON-NLS-1$
+          js.append("  }"); //$NON-NLS-1$
+        }
+
+        js.append("  if (newsIds.length != 0) { "); //$NON-NLS-1$
+        js.append("    window.location.href = '").append(ILinkHandler.HANDLER_PROTOCOL + MARK_READ_HANDLER_ID + "?").append("' + newsIds; "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        js.append("  } "); //$NON-NLS-1$
+        js.append("}"); //$NON-NLS-1$
+
+        if (!monitor.isCanceled() && !fCBrowser.getControl().isDisposed())
+          fCBrowser.execute(js.toString());
       }
 
       return Status.OK_STATUS;
@@ -293,6 +350,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     fFactory = Owl.getModelFactory();
 
     /* Register Link Handler */
+    fBrowser.addLinkHandler(MARK_READ_HANDLER_ID, this);
     fBrowser.addLinkHandler(TOGGLE_READ_HANDLER_ID, this);
     fBrowser.addLinkHandler(TOGGLE_STICKY_HANDLER_ID, this);
     fBrowser.addLinkHandler(ARCHIVE_HANDLER_ID, this);
@@ -316,23 +374,23 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     fBrowser.addLinkHandler(NEXT_PAGE_HANDLER_ID, this);
     fBrowser.addLinkHandler(SCROLL_NEXT_PAGE_HANDLER_ID, this);
 
-    /* Reveal paged (hidden) news dynamically as the user uses the browser */
+    /* React on User Interaction */
     Listener listener = new Listener() {
       public void handleEvent(Event event) {
         if (!event.widget.isDisposed())
-          triggerPageReveal();
+          onUserInteraction();
       }
     };
     fBrowser.getControl().addListener(SWT.MouseWheel, listener);
     fBrowser.getControl().addListener(SWT.MouseDown, listener);
   }
 
-  private void triggerPageReveal() {
-    if (fPageSize == 0 || fBrowser.getControl().isDisposed() || fJobTracker.isRunning())
+  private void onUserInteraction() {
+    if (fBrowser.getControl().isDisposed() || fUserInteractionTracker.isRunning())
       return;
 
-    /* Tell the tracker to reveal the next page if possible */
-    fJobTracker.run(new RevealPageTask(fViewModel, fBrowser));
+    /* Tell the tracker about user interaction*/
+    fUserInteractionTracker.run(new UserInteractionTask(fViewModel, fBrowser));
   }
 
   private void hookNewsContextMenu() {
@@ -698,8 +756,19 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       queryProvided = StringUtils.isSet(query);
     }
 
+    /* Mark Read */
+    if (queryProvided && MARK_READ_HANDLER_ID.equals(id)) {
+      List<INews> news = getNewsList(query);
+
+      /* Update State */
+      INews.State newState = INews.State.READ;
+      boolean affectEquivalentNews = OwlUI.markReadDuplicates();
+      UndoStack.getInstance().addOperation(new NewsStateOperation(news, newState, affectEquivalentNews));
+      fNewsDao.setState(news, newState, affectEquivalentNews, false);
+    }
+
     /*  Toggle Read */
-    if (queryProvided && TOGGLE_READ_HANDLER_ID.equals(id)) {
+    else if (queryProvided && TOGGLE_READ_HANDLER_ID.equals(id)) {
       INews news = getNews(query);
       if (news != null) {
 
@@ -795,7 +864,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       INews news = getNews(query);
       if (news != null) {
         setNewsExpanded(news, EXPAND_NEWS_HANDLER_ID.equals(id));
-        triggerPageReveal(); //Reveal more news if possible
+        onUserInteraction();
       }
     }
 
@@ -1469,7 +1538,25 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       return resolve(id);
     } catch (NullPointerException e) {
       return null;
+    } catch (NumberFormatException e) {
+      return null;
     }
+  }
+
+  private List<INews> getNewsList(String query) {
+    List<INews> news = new ArrayList<INews>();
+
+    StringTokenizer tokenizer = new StringTokenizer(query, ","); //$NON-NLS-1$
+    while (tokenizer.hasMoreTokens()) {
+      String nextElement = tokenizer.nextToken();
+      if (StringUtils.isSet(nextElement)) {
+        INews item = getNews(nextElement);
+        if (item != null)
+          news.add(item);
+      }
+    }
+
+    return news;
   }
 
   private EntityGroup getEntityGroup(String query) {
@@ -1608,10 +1695,20 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   }
 
   /**
-   * @param size the {@link PageSize} to use for this browser viewer.
+   * @param newLayout the new {@link Layout} to use in this viewer.
    */
-  void setPageSize(PageSize size) {
-    fPageSize = size.getPageSize();
+  void onLayoutChanged(Layout newLayout) {
+    if (fSite == null)
+      return;
+
+    /* Update Page Size */
+    if (newLayout == Layout.HEADLINES || newLayout == Layout.NEWSPAPER)
+      fPageSize = OwlUI.getPageSize(fSite.getInputPreferences()).getPageSize();
+    else
+      fPageSize = PageSize.NO_PAGING.getPageSize();
+
+    /* Update "Mark Read on Scrolling" */
+    fMarkReadOnScrolling = fSite.getInputPreferences().getBoolean(DefaultPreferences.MARK_READ_ON_SCROLLING) && newLayout == Layout.NEWSPAPER;
   }
 
   private void internalSetInput(Object input, boolean force, boolean blockExternalNavigation) {
@@ -1628,12 +1725,9 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       IPreferenceScope inputPreferences = fSite.getInputPreferences();
       fMarkReadOnExpand = inputPreferences.getBoolean(DefaultPreferences.MARK_READ_STATE);
 
-      /* Update Page Size (only relevant to Newspaper and Headlines layout) */
+      /* Update settings based on Layout */
       Layout layout = OwlUI.getLayout(inputPreferences);
-      if (layout == Layout.NEWSPAPER || layout == Layout.HEADLINES)
-        fPageSize = inputPreferences.getInteger(DefaultPreferences.NEWS_BROWSER_PAGE_SIZE);
-      else
-        fPageSize = 0;
+      onLayoutChanged(layout);
     }
 
     /* Stop any other Website if required */
@@ -1870,7 +1964,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     fBrowser.execute(js.toString());
 
     /* If we are at the end of the page, reveal more items if possible */
-    triggerPageReveal();
+    onUserInteraction();
   }
 
   private void navigateInHeadlines(boolean next, boolean unread) {
@@ -1907,7 +2001,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       fBrowser.execute(js.toString());
 
       /* If we are at the end of the page, reveal more items if possible */
-      triggerPageReveal();
+      onUserInteraction();
     }
 
     /* If navigation did not find a suitable target, call the outer navigation function */

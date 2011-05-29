@@ -46,6 +46,9 @@ public enum Preference {
   /** Global: Mark all news as read on minimize */
   MARK_READ_ON_MINIMIZE("org.rssowl.pref.MarkNewsReadOnMinimize", IPreferenceType.BOOLEAN), //$NON-NLS-1$
 
+  /** Global: Mark news read on scrolling (Newspaper Layout only) */
+  MARK_READ_ON_SCROLLING("org.rssowl.pref.MarkNewsReadOnScrolling", IPreferenceType.BOOLEAN), //$NON-NLS-1$
+
   /** Global: Mark feed as read when feed changes */
   MARK_READ_ON_CHANGE("org.rssowl.pref.MarkFeedReadOnChange", IPreferenceType.BOOLEAN), //$NON-NLS-1$
 

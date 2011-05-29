@@ -64,7 +64,6 @@ import org.rssowl.ui.internal.ILinkHandler;
 import org.rssowl.ui.internal.LinkTransformer;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.OwlUI.Layout;
-import org.rssowl.ui.internal.OwlUI.PageSize;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 /**
@@ -120,11 +119,8 @@ public class NewsBrowserControl implements IFeedViewPart {
       if (fViewer.getLabelProvider() != null)
         ((NewsBrowserLabelProvider) fViewer.getLabelProvider()).setHeadlinesOnly(fHeadlinesOnly);
 
-      /* Indicate Page Size */
-      if (newLayout == Layout.HEADLINES || newLayout == Layout.NEWSPAPER)
-        fViewer.setPageSize(OwlUI.getPageSize(fFeedViewSite.getInputPreferences()));
-      else
-        fViewer.setPageSize(PageSize.NO_PAGING);
+      /* Pass on to Viewer */
+      fViewer.onLayoutChanged(newLayout);
     }
   }
 

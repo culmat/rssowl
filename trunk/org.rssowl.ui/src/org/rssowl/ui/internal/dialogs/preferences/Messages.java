@@ -81,6 +81,7 @@ public class Messages extends NLS {
   public static String FeedsPreferencePage_MARK_READ_AFTER;
   public static String FeedsPreferencePage_MARK_READ_ON_CLOSE;
   public static String FeedsPreferencePage_MARK_READ_ON_MINIMIZE;
+  public static String FeedsPreferencePage_MARK_READ_ON_SCROLLING;
   public static String FeedsPreferencePage_MARK_READ_ON_SWITCH;
   public static String FeedsPreferencePage_MAX_AGE;
   public static String FeedsPreferencePage_MAX_NUMBER;

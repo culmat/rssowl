@@ -49,6 +49,9 @@ public class DefaultPreferences {
   /** Global: Mark all news as read on minimize */
   public static final String MARK_READ_ON_MINIMIZE = Preference.MARK_READ_ON_MINIMIZE.id();
 
+  /** Global: Mark read while scrolling in newspaper layout */
+  public static final String MARK_READ_ON_SCROLLING = Preference.MARK_READ_ON_SCROLLING.id();
+
   /** Global: Mark feed as read when feed changes */
   public static final String MARK_READ_ON_CHANGE = Preference.MARK_READ_ON_CHANGE.id();
 

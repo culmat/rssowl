@@ -92,6 +92,7 @@ public class NewsBrowserViewModelTests {
     assertEquals(0, model.getVisibleNewsCount());
     assertEquals(-1L, model.getLastVisibleNews());
     assertFalse(model.hasHiddenNews());
+    assertTrue(model.getVisibleUnreadNews().isEmpty());
 
     Pair<List<Long>, List<Long>> nextPage = model.getNextPage(0);
     assertTrue(nextPage.getFirst().isEmpty());
@@ -138,6 +139,7 @@ public class NewsBrowserViewModelTests {
     assertEquals(-1L, model.removeNews(fFactory.createNews(5L, fFactory.createFeed(null, URI.create("rssowl.org")), new Date())));
     assertEquals(-1L, model.getLastVisibleNews());
     assertFalse(model.hasHiddenNews());
+    assertTrue(model.getVisibleUnreadNews().isEmpty());
 
     assertEquals(0, model.getNewsCount());
     assertEquals(0, model.getVisibleNewsCount());
@@ -185,6 +187,7 @@ public class NewsBrowserViewModelTests {
     assertEquals(-1L, model.nextNews(true, 5L));
     assertEquals(-1L, model.previousNews(true, 5L));
     assertEquals(-1L, model.removeNews(fFactory.createNews(5L, fFactory.createFeed(null, URI.create("rssowl.org")), new Date())));
+    assertTrue(model.getVisibleUnreadNews().isEmpty());
 
     assertEquals(0, model.getNewsCount());
     assertEquals(0, model.getVisibleNewsCount());
@@ -242,6 +245,7 @@ public class NewsBrowserViewModelTests {
     assertEquals(3, model.getVisibleNewsCount());
     assertEquals(news3.getId().longValue(), model.getLastVisibleNews());
     assertFalse(model.hasHiddenNews());
+    assertEquals(2, model.getVisibleUnreadNews().size());
 
     assertEquals(1L, model.nextNews(false, -1L));
     assertEquals(1L, model.nextNews(true, -1L));
@@ -268,7 +272,9 @@ public class NewsBrowserViewModelTests {
     assertEquals(2, model.getNewsCount());
     assertEquals(2, model.getVisibleNewsCount());
 
+    assertEquals(2, model.getVisibleUnreadNews().size());
     model.setNewsVisible(news1, false);
+
     assertEquals(2, model.getNewsCount());
     assertEquals(1, model.getVisibleNewsCount());
     assertTrue(model.hasHiddenNews());
@@ -276,6 +282,7 @@ public class NewsBrowserViewModelTests {
     model.setNewsVisible(news3, false);
     assertEquals(2, model.getNewsCount());
     assertEquals(0, model.getVisibleNewsCount());
+    assertEquals(0, model.getVisibleUnreadNews().size());
 
     model.setNewsVisible(news1, true);
     model.setNewsVisible(news3, true);
@@ -903,6 +910,7 @@ public class NewsBrowserViewModelTests {
     Pair<List<Long>, List<Long>> revealed = model.revealPage(news1.getId(), 2);
     assertTrue(revealed.getFirst().isEmpty());
     assertTrue(revealed.getSecond().isEmpty());
+    assertEquals(2, model.getVisibleUnreadNews().size());
 
     revealed = model.revealPage(news4.getId(), 2);
     assertFalse(revealed.getFirst().isEmpty());

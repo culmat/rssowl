@@ -59,11 +59,13 @@ public class ReadingPropertyPage implements IEntityPropertyPage {
   private boolean fPrefMarkReadState;
   private int fPrefMarkReadVal;
   private boolean fPrefMarkReadOnMinimize;
+  private boolean fPrefMarkReadOnScrolling;
   private boolean fPrefMarkReadOnTabClose;
   private boolean fPrefMarkReadOnFeedChange;
   private Button fMarkReadStateCheck;
   private Spinner fMarkReadAfterSpinner;
   private Button fMarkReadOnMinimize;
+  private Button fMarkReadOnScrolling;
   private Button fMarkReadOnChange;
   private boolean fSettingsChanged;
   private Button fMarkReadOnTabClose;
@@ -92,6 +94,7 @@ public class ReadingPropertyPage implements IEntityPropertyPage {
     fPrefMarkReadState = firstScope.getBoolean(DefaultPreferences.MARK_READ_STATE);
     fPrefMarkReadVal = firstScope.getInteger(DefaultPreferences.MARK_READ_IN_MILLIS);
     fPrefMarkReadOnMinimize = firstScope.getBoolean(DefaultPreferences.MARK_READ_ON_MINIMIZE);
+    fPrefMarkReadOnScrolling = firstScope.getBoolean(DefaultPreferences.MARK_READ_ON_SCROLLING);
     fPrefMarkReadOnTabClose = firstScope.getBoolean(DefaultPreferences.MARK_READ_ON_TAB_CLOSE);
     fPrefMarkReadOnFeedChange = firstScope.getBoolean(DefaultPreferences.MARK_READ_ON_CHANGE);
 
@@ -114,6 +117,9 @@ public class ReadingPropertyPage implements IEntityPropertyPage {
 
       if (otherScope.getBoolean(DefaultPreferences.MARK_READ_ON_TAB_CLOSE) != fPrefMarkReadOnTabClose)
         fPrefMarkReadOnTabClose = defaultScope.getBoolean(DefaultPreferences.MARK_READ_ON_TAB_CLOSE);
+
+      if (otherScope.getBoolean(DefaultPreferences.MARK_READ_ON_SCROLLING) != fPrefMarkReadOnScrolling)
+        fPrefMarkReadOnScrolling = defaultScope.getBoolean(DefaultPreferences.MARK_READ_ON_SCROLLING);
     }
   }
 
@@ -148,6 +154,11 @@ public class ReadingPropertyPage implements IEntityPropertyPage {
     Label label = new Label(markReadAfterContainer, SWT.None);
     label.setText(Messages.ReadingPropertyPage_SECONDS);
 
+    /* Mark Read on Scrolling */
+    fMarkReadOnScrolling = new Button(container, SWT.CHECK);
+    fMarkReadOnScrolling.setText(Messages.ReadingPropertyPage_MARK_READ_ON_SCROLLING);
+    fMarkReadOnScrolling.setSelection(fPrefMarkReadOnScrolling);
+
     /* Mark Read on changing displayed Feed */
     fMarkReadOnChange = new Button(container, SWT.CHECK);
     fMarkReadOnChange.setText(Messages.ReadingPropertyPage_MARK_READ_ON_SWITCH);
@@ -162,7 +173,6 @@ public class ReadingPropertyPage implements IEntityPropertyPage {
     fMarkReadOnMinimize = new Button(container, SWT.CHECK);
     fMarkReadOnMinimize.setText(Messages.ReadingPropertyPage_MARK_READ_ON_MINIMIZE);
     fMarkReadOnMinimize.setSelection(fPrefMarkReadOnMinimize);
-
 
     return container;
   }
@@ -257,6 +267,13 @@ public class ReadingPropertyPage implements IEntityPropertyPage {
     bVal = fMarkReadOnTabClose.getSelection();
     if (fPrefMarkReadOnTabClose != bVal) {
       scope.putBoolean(DefaultPreferences.MARK_READ_ON_TAB_CLOSE, bVal);
+      changed = true;
+    }
+
+    /* Mark Read on Scrolling */
+    bVal = fMarkReadOnScrolling.getSelection();
+    if (fPrefMarkReadOnScrolling != bVal) {
+      scope.putBoolean(DefaultPreferences.MARK_READ_ON_SCROLLING, bVal);
       changed = true;
     }
 
