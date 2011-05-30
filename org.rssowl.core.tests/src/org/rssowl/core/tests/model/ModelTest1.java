@@ -31,11 +31,13 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.Feed;
 import org.rssowl.core.internal.persist.SearchValueType;
+import org.rssowl.core.internal.persist.service.DBManager;
 import org.rssowl.core.internal.persist.service.PersistenceServiceImpl;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ICategory;
@@ -90,6 +92,17 @@ public class ModelTest1 extends LargeBlockSizeTest {
   public void setUp() throws Exception {
     ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     fFactory = Owl.getModelFactory();
+  }
+
+  /**
+   * @throws Exception
+   */
+  @After
+  public void tearDown() throws Exception {
+    System.setProperty("rssowl.reindex", "false"); //Clear any set reindex marker
+    DBManager.getDefault().getReIndexFile().delete();
+    DBManager.getDefault().getDefragmentFile().delete();
+    DBManager.getDefault().getCleanUpIndexFile().delete();
   }
 
   /**

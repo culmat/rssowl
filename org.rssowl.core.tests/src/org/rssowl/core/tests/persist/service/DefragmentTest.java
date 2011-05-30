@@ -31,6 +31,7 @@ import static org.junit.Assert.assertTrue;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
@@ -233,6 +234,17 @@ public class DefragmentTest {
     DynamicDAO.save(conditionalGet);
     conditionalGet = fFactory.createConditionalGet("2008-10-12-1943", URI.create("http://www.rssowl.de"), "foobar");
     DynamicDAO.save(conditionalGet);
+  }
+
+  /**
+   * @throws Exception
+   */
+  @After
+  public void tearDown() throws Exception {
+    System.setProperty("rssowl.reindex", "false"); //Clear any set reindex marker
+    DBManager.getDefault().getReIndexFile().delete();
+    DBManager.getDefault().getDefragmentFile().delete();
+    DBManager.getDefault().getCleanUpIndexFile().delete();
   }
 
   /**
