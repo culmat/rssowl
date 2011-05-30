@@ -128,7 +128,7 @@ public class Application implements IApplication {
 
   private int handleStartupError(IStatus errorStatus, boolean forceAllowRestore) {
     FatalErrorWizard wizard = new FatalErrorWizard(errorStatus, forceAllowRestore);
-    OwlUI.openWizard(null, wizard, true, false, null, true, IS_WINDOWS ? Messages.Application_RESTART_RSSOWL : Messages.Application_QUIT_RSSOWL);
+    OwlUI.openWizard(null, wizard, true, false, null, true, IS_WINDOWS && !forceAllowRestore ? Messages.Application_RESTART_RSSOWL : Messages.Application_QUIT_RSSOWL);
 
     return wizard.getReturnCode();
   }

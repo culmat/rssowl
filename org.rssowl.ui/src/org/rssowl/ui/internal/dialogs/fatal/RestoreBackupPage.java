@@ -97,7 +97,7 @@ public class RestoreBackupPage extends WizardPage {
       backupInfoLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false, 2, 1));
 
       Label backupTextLabel = new Label(container, SWT.WRAP);
-      backupTextLabel.setText(Application.IS_WINDOWS ? Messages.RestoreBackupPage_BACKUP_INFO_RESTART : Messages.RestoreBackupPage_BACKUP_INFO_QUIT);
+      backupTextLabel.setText(Application.IS_WINDOWS && !fErrorStatus.isOK() ? Messages.RestoreBackupPage_BACKUP_INFO_RESTART : Messages.RestoreBackupPage_BACKUP_INFO_QUIT);
       backupTextLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
       ((GridData) backupTextLabel.getLayoutData()).widthHint = 200;
     }
