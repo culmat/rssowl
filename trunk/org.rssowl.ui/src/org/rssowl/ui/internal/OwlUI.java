@@ -973,6 +973,27 @@ public class OwlUI {
   }
 
   /**
+   * Deletes all stored icons from the org.rssowl.ui icons folder.
+   */
+  public static void clearFavicons() {
+    Activator activator = Activator.getDefault();
+    if (activator == null)
+      return;
+
+    IPath path = new Path(activator.getStateLocation().toOSString());
+    path = path.append(ICONS_FOLDER);
+    File iconsFolder = new File(path.toOSString());
+    if (!iconsFolder.exists())
+      return;
+
+    File[] files = iconsFolder.listFiles();
+    for (File file : files) {
+      if (file.getName().endsWith(".ico")) //$NON-NLS-1$
+        file.delete();
+    }
+  }
+
+  /**
    * @param id
    * @param bytes
    * @param defaultImage
@@ -2846,7 +2867,7 @@ public class OwlUI {
         inS = new FileInputStream(logFile);
       else
         inS = new ByteArrayInputStream(new byte[0]);
-      
+
       FileOutputStream outS = new FileOutputStream(new File(file));
       CoreUtils.copy(inS, outS);
     }
