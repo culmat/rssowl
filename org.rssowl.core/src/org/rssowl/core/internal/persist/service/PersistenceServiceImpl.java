@@ -171,6 +171,7 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
    * persistence layer.
    */
   public void recreateProfile(boolean needsEmergencyStartup) throws PersistenceException {
+    Activator.safeLogInfo(needsEmergencyStartup ? "Start: Recreate Profile with OPML Import" : "Start: Start Over with Fresh Profile"); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* First check to delete the "rssowl.db.restore" file that is being used */
     File restoreDBFile = new File(DBManager.getDBRestoreFilePath());
@@ -195,6 +196,8 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
 
     /* Reindex on next startup */
     InternalOwl.getDefault().getPersistenceService().getModelSearch().reIndexOnNextStartup();
+
+    Activator.safeLogInfo(needsEmergencyStartup ? "End: Recreate Profile with OPML Import" : "End: Start Over with Fresh Profile"); //$NON-NLS-1$ //$NON-NLS-2$
   }
 
   /**
