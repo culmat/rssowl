@@ -27,6 +27,7 @@ package org.rssowl.ui.internal.notifier;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchPage;
@@ -116,6 +117,12 @@ public class SearchNotificationItem extends NotificationItem {
    */
   @Override
   public void setRead(boolean read) {}
+
+  /*
+   * @see org.rssowl.ui.internal.notifier.NotificationItem#setColor(org.eclipse.swt.graphics.RGB)
+   */
+  @Override
+  public void setColor(RGB color) {}
 
   /*
    * @see org.rssowl.ui.internal.notifier.NotificationItem#isRead()
