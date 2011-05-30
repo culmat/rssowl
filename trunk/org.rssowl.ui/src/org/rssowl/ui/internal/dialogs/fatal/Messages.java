@@ -31,6 +31,8 @@ public class Messages extends NLS {
   public static String CleanProfilePage_CAUTION;
   public static String CleanProfilePage_CAUTION_TEXT_RESTORE;
   public static String CleanProfilePage_CAUTION_TEXT_START_OVER;
+  public static String CleanProfilePage_CLEAN_TEXT_OK;
+  public static String CleanProfilePage_CLEAN_TEXT_OPML_OK;
   public static String CleanProfilePage_CONFIRM_TEXT;
   public static String CleanProfilePage_NO_BACKUPS;
   public static String CleanProfilePage_OPML_BACKUP_INFO;
@@ -55,6 +57,7 @@ public class Messages extends NLS {
   public static String ErrorInfoPage_STARTUP_ERROR;
   public static String ErrorInfoPage_STARTUP_ERROR_N;
   public static String FatalErrorWizard_CRASH_REPORTER;
+  public static String FatalErrorWizard_PROFILE_RECOVERY;
   public static String FatalErrorWizard_RECREATE_SEARCH_INDEX;
   public static String FatalErrorWizard_RESTORE_BACKUP;
   public static String FatalErrorWizard_RESTORE_ERROR;
@@ -76,6 +79,7 @@ public class Messages extends NLS {
   public static String RestoreBackupPage_CONFIRM_RESTORE;
   public static String RestoreBackupPage_CURRENT_PROFILE;
   public static String RestoreBackupPage_LAST_MODIFIED;
+  public static String RestoreBackupPage_RESTORE_TEXT_OK;
   public static String RestoreBackupPage_RESTORE_WARNING;
   public static String RestoreBackupPage_RESTORING_A_BACKUP;
   public static String RestoreBackupPage_RSSOWL_CRASH;

@@ -24,6 +24,7 @@
 
 package org.rssowl.ui.internal.dialogs.fatal;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.resource.JFaceResources;
@@ -63,9 +64,11 @@ public class RestoreBackupPage extends WizardPage {
   private ComboViewer fBackupsViewer;
   private final DateFormat fDateFormat = OwlUI.getShortDateFormat();
   private Button fConfirmRestoreCheck;
+  private final IStatus fErrorStatus;
 
-  RestoreBackupPage(String pageName, List<File> backups) {
+  RestoreBackupPage(String pageName, IStatus errorStatus, List<File> backups) {
     super(pageName, pageName, null);
+    fErrorStatus = errorStatus;
     fBackups = backups;
   }
 
@@ -76,7 +79,10 @@ public class RestoreBackupPage extends WizardPage {
 
     /* Title Image and Message */
     setImageDescriptor(OwlUI.getImageDescriptor("icons/wizban/welcome_wiz.gif")); //$NON-NLS-1$
-    setMessage(Messages.RestoreBackupPage_RSSOWL_CRASH, IMessageProvider.WARNING);
+    if (!fErrorStatus.isOK())
+      setMessage(Messages.RestoreBackupPage_RSSOWL_CRASH, IMessageProvider.WARNING);
+    else
+      setMessage(Messages.RestoreBackupPage_RESTORE_TEXT_OK, IMessageProvider.INFORMATION);
 
     /* Container */
     Composite container = new Composite(parent, SWT.NONE);

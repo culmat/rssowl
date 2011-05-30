@@ -118,12 +118,14 @@ public class FatalErrorWizard extends Wizard {
    */
   @Override
   public void addPages() {
-    setWindowTitle(Messages.FatalErrorWizard_CRASH_REPORTER);
+    setWindowTitle(fErrorStatus.isOK() ? Messages.FatalErrorWizard_PROFILE_RECOVERY : Messages.FatalErrorWizard_CRASH_REPORTER);
     setHelpAvailable(false);
 
-    /* Error Info */
-    fErrorInfoPage = new ErrorInfoPage(Messages.FatalErrorWizard_WE_ARE_SORRY, fErrorStatus, fOfferRestorePages);
-    addPage(fErrorInfoPage);
+    /* Error Info (not if wizard was forced to open by user) */
+    if (!fErrorStatus.isOK() || !fOfferRestorePages) {
+      fErrorInfoPage = new ErrorInfoPage(Messages.FatalErrorWizard_WE_ARE_SORRY, fErrorStatus, fOfferRestorePages);
+      addPage(fErrorInfoPage);
+    }
 
     /* Add Restore Pages as necessary */
     if (fOfferRestorePages) {
@@ -136,13 +138,13 @@ public class FatalErrorWizard extends Wizard {
 
       /* Restore Profile Backup (if profile backups are present) */
       else if (!fProfileBackups.isEmpty()) {
-        fRestoreBackupPage = new RestoreBackupPage(Messages.FatalErrorWizard_RESTORE_BACKUP, fProfileBackups);
+        fRestoreBackupPage = new RestoreBackupPage(Messages.FatalErrorWizard_RESTORE_BACKUP, fErrorStatus, fProfileBackups);
         addPage(fRestoreBackupPage);
       }
 
       /* Otherwise allow to restore from OPML Backup or clean start */
       else {
-        fCleanProfilePage = new CleanProfilePage(fOPMLBackups.isEmpty() ? Messages.FatalErrorWizard_START_OVER : Messages.FatalErrorWizard_RESTORE_SUBSCRIPTIONS_SETTINGS, !fOPMLBackups.isEmpty());
+        fCleanProfilePage = new CleanProfilePage(fOPMLBackups.isEmpty() ? Messages.FatalErrorWizard_START_OVER : Messages.FatalErrorWizard_RESTORE_SUBSCRIPTIONS_SETTINGS, fErrorStatus, !fOPMLBackups.isEmpty());
         addPage(fCleanProfilePage);
       }
     }
