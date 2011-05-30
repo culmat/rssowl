@@ -179,7 +179,7 @@ public class FatalErrorWizard extends Wizard {
     }
 
     /* Windows: Support to restart from dialog */
-    if (Application.IS_WINDOWS)
+    if (Application.IS_WINDOWS && !fErrorStatus.isOK()) //Status only OK if user forced dialog, quit in this case
       fReturnCode = IApplication.EXIT_RESTART;
 
     return true;
