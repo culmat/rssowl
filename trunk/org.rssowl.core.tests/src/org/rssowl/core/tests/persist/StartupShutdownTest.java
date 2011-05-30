@@ -31,6 +31,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
@@ -86,9 +87,15 @@ public class StartupShutdownTest extends LargeBlockSizeTest {
   @Before
   public void setUp() throws Exception {
     ((PersistenceServiceImpl) Owl.getPersistenceService()).recreateSchemaForTests();
-    System.setProperty("rssowl.reindex", "false"); //Clear any set reindex marker
     fFactory = Owl.getModelFactory();
+  }
 
+  /**
+   * @throws Exception
+   */
+  @After
+  public void tearDown() throws Exception {
+    System.setProperty("rssowl.reindex", "false"); //Clear any set reindex marker
     DBManager.getDefault().getReIndexFile().delete();
     DBManager.getDefault().getDefragmentFile().delete();
     DBManager.getDefault().getCleanUpIndexFile().delete();

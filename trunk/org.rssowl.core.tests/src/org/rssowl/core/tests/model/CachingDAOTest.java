@@ -30,10 +30,12 @@ import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.dao.CachingDAO;
+import org.rssowl.core.internal.persist.service.DBManager;
 import org.rssowl.core.internal.persist.service.PersistenceServiceImpl;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
@@ -93,6 +95,17 @@ public class CachingDAOTest extends LargeBlockSizeTest {
   public void setUp() throws Exception {
     ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
     fFactory = Owl.getModelFactory();
+  }
+
+  /**
+   * @throws Exception
+   */
+  @After
+  public void tearDown() throws Exception {
+    System.setProperty("rssowl.reindex", "false"); //Clear any set reindex marker
+    DBManager.getDefault().getReIndexFile().delete();
+    DBManager.getDefault().getDefragmentFile().delete();
+    DBManager.getDefault().getCleanUpIndexFile().delete();
   }
 
   private void setProperties(IEntity entity) {
