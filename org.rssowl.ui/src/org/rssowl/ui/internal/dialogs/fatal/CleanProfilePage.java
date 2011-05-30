@@ -24,6 +24,7 @@
 
 package org.rssowl.ui.internal.dialogs.fatal;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.resource.JFaceResources;
@@ -49,9 +50,11 @@ public class CleanProfilePage extends WizardPage {
   private final boolean fHasOPMLBackup;
   private Button fConfirmWarningCheck;
   private Button fDoRecoverCheck;
+  private final IStatus fErrorStatus;
 
-  CleanProfilePage(String pageName, boolean hasOPMLBackup) {
+  CleanProfilePage(String pageName, IStatus errorStatus, boolean hasOPMLBackup) {
     super(pageName, pageName, null);
+    fErrorStatus = errorStatus;
     fHasOPMLBackup = hasOPMLBackup;
   }
 
@@ -62,7 +65,10 @@ public class CleanProfilePage extends WizardPage {
 
     /* Title Image and Message */
     setImageDescriptor(OwlUI.getImageDescriptor("icons/wizban/welcome_wiz.gif")); //$NON-NLS-1$
-    setMessage(Messages.CleanProfilePage_RSSOWL_CRASH, IMessageProvider.WARNING);
+    if (!fErrorStatus.isOK())
+      setMessage(Messages.CleanProfilePage_RSSOWL_CRASH, IMessageProvider.WARNING);
+    else
+      setMessage(fHasOPMLBackup ? Messages.CleanProfilePage_CLEAN_TEXT_OPML_OK : Messages.CleanProfilePage_CLEAN_TEXT_OK, IMessageProvider.INFORMATION);
 
     /* Container */
     Composite container = new Composite(parent, SWT.NONE);

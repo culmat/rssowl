@@ -83,55 +83,53 @@ public class ErrorInfoPage extends WizardPage {
       ((GridLayout) container.getLayout()).marginBottom = 5;
 
     /* Error Details */
-    if (!fErrorStatus.isOK()){
-      Label errorDetailsLabel = new Label(container, SWT.NONE);
-      errorDetailsLabel.setText(Messages.ErrorInfoPage_ERROR_DETAILS);
-      errorDetailsLabel.setFont(OwlUI.getBold(JFaceResources.DIALOG_FONT));
-      errorDetailsLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+    Label errorDetailsLabel = new Label(container, SWT.NONE);
+    errorDetailsLabel.setText(Messages.ErrorInfoPage_ERROR_DETAILS);
+    errorDetailsLabel.setFont(OwlUI.getBold(JFaceResources.DIALOG_FONT));
+    errorDetailsLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
-      String msg = null;
+    String msg = null;
 
-      /* Out of memory error */
-      if (fErrorStatus.getException() instanceof OutOfMemoryError) {
-        if (StringUtils.isSet(fErrorStatus.getMessage()))
-          msg = NLS.bind(Messages.ErrorInfoPage_OOM_ERROR_N, fErrorStatus.getMessage());
-        else
-          msg = Messages.ErrorInfoPage_OOM_ERROR;
-      }
-
-      /* Profile Locked by another Instance */
-      else if (fErrorStatus.getException() instanceof ProfileLockedException) {
-        if (StringUtils.isSet(fErrorStatus.getMessage()))
-          msg = NLS.bind(Messages.ErrorInfoPage_LOCKED_ERROR_N, fErrorStatus.getMessage());
-        else
-          msg = Messages.ErrorInfoPage_LOCKED_ERROR;
-      }
-
-      /* Any other error */
-      else {
-        if (StringUtils.isSet(fErrorStatus.getMessage()))
-          msg = NLS.bind(Messages.ErrorInfoPage_STARTUP_ERROR_N, fErrorStatus.getMessage());
-        else
-          msg = Messages.ErrorInfoPage_STARTUP_ERROR;
-      }
-
-      final Label errorDetailsTextLabel = new Label(container, SWT.WRAP);
-      errorDetailsTextLabel.setText(msg);
-      errorDetailsTextLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-      ((GridData) errorDetailsTextLabel.getLayoutData()).widthHint = 200;
-
-      /* Context Menu to copy the error message */
-      fCopyMenu = new Menu(errorDetailsTextLabel.getShell(), SWT.POP_UP);
-      MenuItem copyItem = new MenuItem(fCopyMenu, SWT.PUSH);
-      copyItem.setText(Messages.ErrorInfoPage_COPY);
-      copyItem.addSelectionListener(new SelectionAdapter() {
-        @Override
-        public void widgetSelected(SelectionEvent e) {
-          OwlUI.getClipboard(fCopyMenu.getDisplay()).setContents(new Object[] { errorDetailsTextLabel.getText() }, new Transfer[] { TextTransfer.getInstance() });
-        }
-      });
-      errorDetailsTextLabel.setMenu(fCopyMenu);
+    /* Out of memory error */
+    if (fErrorStatus.getException() instanceof OutOfMemoryError) {
+      if (StringUtils.isSet(fErrorStatus.getMessage()))
+        msg = NLS.bind(Messages.ErrorInfoPage_OOM_ERROR_N, fErrorStatus.getMessage());
+      else
+        msg = Messages.ErrorInfoPage_OOM_ERROR;
     }
+
+    /* Profile Locked by another Instance */
+    else if (fErrorStatus.getException() instanceof ProfileLockedException) {
+      if (StringUtils.isSet(fErrorStatus.getMessage()))
+        msg = NLS.bind(Messages.ErrorInfoPage_LOCKED_ERROR_N, fErrorStatus.getMessage());
+      else
+        msg = Messages.ErrorInfoPage_LOCKED_ERROR;
+    }
+
+    /* Any other error */
+    else {
+      if (StringUtils.isSet(fErrorStatus.getMessage()))
+        msg = NLS.bind(Messages.ErrorInfoPage_STARTUP_ERROR_N, fErrorStatus.getMessage());
+      else
+        msg = Messages.ErrorInfoPage_STARTUP_ERROR;
+    }
+
+    final Label errorDetailsTextLabel = new Label(container, SWT.WRAP);
+    errorDetailsTextLabel.setText(msg);
+    errorDetailsTextLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+    ((GridData) errorDetailsTextLabel.getLayoutData()).widthHint = 200;
+
+    /* Context Menu to copy the error message */
+    fCopyMenu = new Menu(errorDetailsTextLabel.getShell(), SWT.POP_UP);
+    MenuItem copyItem = new MenuItem(fCopyMenu, SWT.PUSH);
+    copyItem.setText(Messages.ErrorInfoPage_COPY);
+    copyItem.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        OwlUI.getClipboard(fCopyMenu.getDisplay()).setContents(new Object[] { errorDetailsTextLabel.getText() }, new Transfer[] { TextTransfer.getInstance() });
+      }
+    });
+    errorDetailsTextLabel.setMenu(fCopyMenu);
 
     /* Report Crash (not for OutOfMemory and ProfileLockedException  */
     if (!(fErrorStatus.getException() instanceof ProfileLockedException) && !(fErrorStatus.getException() instanceof OutOfMemoryError)) {
