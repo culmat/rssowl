@@ -43,6 +43,7 @@ import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.Controller;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.ImportUtils;
 
 import java.io.File;
@@ -231,6 +232,9 @@ public class FatalErrorWizard extends Wizard {
         if (types != null)
           ImportUtils.doImport(null, types, false);
       }
+
+      /* Clear Stored Favicons (since Ids change after import) */
+      OwlUI.clearFavicons();
     }
   }
 
