@@ -403,13 +403,13 @@ public class Controller {
 
       @Override
       public void entitiesAdded(Set<LabelEvent> events) {
-        if (!fShuttingDown)
+        if (!fShuttingDown && PlatformUI.isWorkbenchRunning())
           updateLabelCommands();
       }
 
       @Override
       public void entitiesUpdated(Set<LabelEvent> events) {
-        if (!fShuttingDown) {
+        if (!fShuttingDown && PlatformUI.isWorkbenchRunning()) {
           updateLabelCommands();
 
           for (LabelEvent event : events) {
@@ -424,7 +424,7 @@ public class Controller {
 
       @Override
       public void entitiesDeleted(Set<LabelEvent> events) {
-        if (!fShuttingDown)
+        if (!fShuttingDown && PlatformUI.isWorkbenchRunning())
           updateLabelCommands();
       }
     };
