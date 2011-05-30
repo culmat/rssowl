@@ -146,6 +146,14 @@ public class NewsNotificationItem extends NotificationItem {
   }
 
   /*
+   * @see org.rssowl.ui.internal.notifier.NotificationItem#setColor(org.eclipse.swt.graphics.RGB)
+   */
+  @Override
+  public void setColor(RGB color) {
+    fColor = color;
+  }
+
+  /*
    * @see org.rssowl.ui.internal.notifier.NotificationItem#getColor()
    */
   @Override

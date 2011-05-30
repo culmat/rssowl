@@ -96,6 +96,12 @@ public abstract class NotificationItem implements Comparable<NotificationItem> {
   public abstract void setRead(boolean read);
 
   /**
+   * @param color The foreground color for the News in the notifier or
+   * <code>null</code> if none.
+   */
+  public abstract void setColor(RGB color);
+
+  /**
    * @return The text of the item to show in the popup.
    */
   public String getText() {

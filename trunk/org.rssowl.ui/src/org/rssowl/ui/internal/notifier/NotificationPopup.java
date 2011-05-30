@@ -361,8 +361,13 @@ public class NotificationPopup extends PopupDialog {
       int indexOfItem = fDisplayedItems.indexOf(item);
 
       /* Replace existing Item */
-      if (indexOfItem >= 0)
+      if (indexOfItem >= 0) {
+        NotificationItem existingItem = fDisplayedItems.get(indexOfItem);
+        if (existingItem.getColor() != null && item.getColor() == null)
+          item.setColor(existingItem.getColor());
+
         fDisplayedItems.set(indexOfItem, item);
+      }
 
       /* Add new Item to the end */
       else
