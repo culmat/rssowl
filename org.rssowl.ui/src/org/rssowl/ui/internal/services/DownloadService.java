@@ -576,8 +576,17 @@ public class DownloadService {
 
       Date date = DateUtils.getRecentDate(news);
       if (date != null) {
-        String fileNamePrefix = DOWNLOAD_FILE_DATE_FORMAT.format(date);
-        downloadFileName = fileNamePrefix + "_" + downloadFileName; //$NON-NLS-1$
+        String fileNameSuffix = DOWNLOAD_FILE_DATE_FORMAT.format(date);
+
+        int index = downloadFileName.lastIndexOf('.');
+        if (index == -1)
+          downloadFileName += "_" + fileNameSuffix; //$NON-NLS-1$
+        else {
+          String pre = downloadFileName.substring(0, index);
+          String post = downloadFileName.substring(index);
+
+          downloadFileName = pre + "_" + fileNameSuffix + post; //$NON-NLS-1$
+        }
       }
     }
 
