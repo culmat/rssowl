@@ -169,7 +169,7 @@ public class DownloadServiceTests {
     request = getAttachmentDownloadRequest("http://www.rssowl.org/rssowl2dg/tests/download/test.txt", null, 0, tmpDir, null, date);
     fService.download(request);
 
-    File secondDownload = new File(tmpDir, DOWNLOAD_FILE_DATE_FORMAT.format(date) + "_" + "test.txt");
+    File secondDownload = new File(tmpDir, "test_" + DOWNLOAD_FILE_DATE_FORMAT.format(date) + ".txt");
     assertTrue(secondDownload.exists());
 
     secondDownload.delete();
