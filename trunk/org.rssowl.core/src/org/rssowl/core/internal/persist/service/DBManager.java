@@ -1475,8 +1475,9 @@ public class DBManager {
     File db = new File(getDBFilePath());
     if (db.exists()) {
 
-      /* Object Container might be opened, so try to close */
-      shutdown();
+      /* Object Container might be opened, so try to close (only for testing, not in production) */
+      if (InternalOwl.TESTING)
+        shutdown();
 
       /* Find Suitable Backup Name */
       int i = 0;
