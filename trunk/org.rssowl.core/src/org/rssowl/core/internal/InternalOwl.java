@@ -46,11 +46,14 @@ import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.persist.service.IPersistenceService;
 import org.rssowl.core.persist.service.IPreferenceService;
 import org.rssowl.core.persist.service.PersistenceException;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.ExtensionUtils;
 import org.rssowl.core.util.LongOperationMonitor;
 import org.rssowl.core.util.Pair;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.PrintStream;
 import java.util.List;
 
 /**
@@ -105,27 +108,44 @@ public final class InternalOwl {
    * and <code>false</code> to open the default profile location.
    */
   public void startup(LongOperationMonitor monitor, boolean emergency, boolean forRestore) {
+
+    /* Increment Start Level */
     if (fStartLevel == StartLevel.NOT_STARTED)
       fStartLevel = StartLevel.STARTING;
 
+    /* Make sure that any error gets logged to the global log */
+    System.setErr(new PrintStream(new ByteArrayOutputStream()) {
+      @Override
+      public void write(byte[] buf, int off, int len) {
+        if (buf != null && len >= 0 && off >= 0 && off <= buf.length - len)
+          CoreUtils.appendLogMessage(new String(buf, off, len));
+      }
+    });
+
+    /* Create Model Factory */
     if (fModelFactory == null)
       fModelFactory = loadTypesFactory();
 
+    /* Create Persistence Service */
     if (fPersistenceService == null)
       fPersistenceService = loadPersistenceService();
 
+    /* Create Application Service */
     if (fApplicationService == null)
       fApplicationService = loadApplicationService();
 
     /* Persistence Layer has its own startup routine */
     fPersistenceService.startup(monitor, emergency, forRestore);
 
+    /* Create Connection Service */
     if (fConnectionService == null)
       fConnectionService = new ConnectionServiceImpl();
 
+    /* Create Interpreter Service */
     if (fInterpreterService == null)
       fInterpreterService = new InterpreterServiceImpl();
 
+    /* Create Preferences Service */
     if (fPreferencesService == null)
       fPreferencesService = new PreferenceServiceImpl();
 
