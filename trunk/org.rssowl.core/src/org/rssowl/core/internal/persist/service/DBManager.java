@@ -237,6 +237,10 @@ public class DBManager {
       if (e instanceof Error)
         throw (Error) e;
 
+      /* Persistence Exception */
+      if (e instanceof PersistenceException)
+        throw (PersistenceException)e;
+
       /* Profile locked by another running instance */
       if (e instanceof DatabaseFileLockedException)
         throw new ProfileLockedException(e.getMessage(), e);
