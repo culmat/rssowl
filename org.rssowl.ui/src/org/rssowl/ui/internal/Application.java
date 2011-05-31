@@ -127,6 +127,7 @@ public class Application implements IApplication {
   }
 
   private int handleStartupError(IStatus errorStatus, boolean forceAllowRestore) {
+    Activator.safeLogInfo(forceAllowRestore ? "Opening Fatal Error Wizard (forced by user)" : "Opening Fatal Error Wizard"); //$NON-NLS-1$ //$NON-NLS-2$
     FatalErrorWizard wizard = new FatalErrorWizard(errorStatus, forceAllowRestore);
     OwlUI.openWizard(null, wizard, true, false, null, true, IS_WINDOWS && !forceAllowRestore ? Messages.Application_RESTART_RSSOWL : Messages.Application_QUIT_RSSOWL);
 
