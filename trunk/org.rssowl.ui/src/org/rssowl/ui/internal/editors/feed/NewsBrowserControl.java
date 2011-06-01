@@ -36,6 +36,8 @@ import org.eclipse.swt.browser.LocationAdapter;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.StatusTextEvent;
 import org.eclipse.swt.browser.StatusTextListener;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -58,6 +60,7 @@ import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
+import org.rssowl.ui.internal.ApplicationServer;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.ILinkHandler;
@@ -72,7 +75,6 @@ import org.rssowl.ui.internal.util.LayoutUtils;
  * @author bpasero
  */
 public class NewsBrowserControl implements IFeedViewPart {
-  private static final String LOCALHOST = "127.0.0.1"; //$NON-NLS-1$
   private IFeedViewSite fFeedViewSite;
   private NewsBrowserViewer fViewer;
   private ISelectionListener fSelectionListener;
@@ -152,6 +154,13 @@ public class NewsBrowserControl implements IFeedViewPart {
     fInfoBar.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
     fInfoBar.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     fInfoBar.setLayout(LayoutUtils.createGridLayout(3, 3, 3));
+    fInfoBar.setCursor(parent.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
+    fInfoBar.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseUp(MouseEvent e) {
+        onInfoBarClicked();
+      }
+    });
 
     Label imgLabel = new Label(fInfoBar, SWT.None);
     imgLabel.setImage(OwlUI.getImage(imgLabel, "icons/obj16/info.gif")); //$NON-NLS-1$
@@ -161,12 +170,19 @@ public class NewsBrowserControl implements IFeedViewPart {
     Link textLink = new Link(fInfoBar, SWT.NONE);
     textLink.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
     textLink.setBackground(fInfoBar.getBackground());
+    textLink.setCursor(parent.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
     textLink.setText(Messages.NewsBrowserControl_ADDITIONAL_NEWS_INFO);
     textLink.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
-        boolean moveToTop = OwlUI.getPageSize(fInputPreferences).getPageSize() == 0; //Only move to top when paging is disabled
-        fViewer.refresh(true, moveToTop); //Refresh will take care of closing the info bar
+        onInfoBarClicked();
+      }
+    });
+
+    textLink.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseUp(MouseEvent e) {
+        onInfoBarClicked();
       }
     });
 
@@ -187,6 +203,11 @@ public class NewsBrowserControl implements IFeedViewPart {
     /* Separator */
     fInfoBarSeparator = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
     fInfoBarSeparator.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+  }
+
+  private void onInfoBarClicked() {
+    boolean moveToTop = OwlUI.getPageSize(fInputPreferences).getPageSize() == 0; //Only move to top when paging is disabled
+    fViewer.refresh(true, moveToTop); //Refresh will take care of closing the info bar
   }
 
   /**
@@ -385,7 +406,7 @@ public class NewsBrowserControl implements IFeedViewPart {
       public void changed(StatusTextEvent event) {
 
         /* Don't show Status for the Handler Protocol */
-        if (event.text != null && !event.text.contains(ILinkHandler.HANDLER_PROTOCOL) && !event.text.contains(LOCALHOST)) {
+        if (event.text != null && !event.text.contains(ILinkHandler.HANDLER_PROTOCOL) && !event.text.contains(ApplicationServer.DEFAULT_LOCALHOST)) {
 
           /* Do not post to status line if browser is hidden (e.g. hidden tab) */
           if (!fViewer.getControl().isDisposed() && fViewer.getControl().isVisible()) {
