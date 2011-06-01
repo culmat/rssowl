@@ -181,12 +181,15 @@ public class DBManager {
     if (!forRestore) {
       File restoreDBFile = new File(getDBRestoreFilePath());
       if (restoreDBFile.exists()) {
+        Activator.safeLogInfo("Start: Restoring a Backup (renaming rssowl.db.restore to rssowl.db"); //$NON-NLS-1$
 
         /* Backup and Delete current profile */
         backupAndDeleteProfile();
 
         /* Atomic Rename Restore to Profile */
         DBHelper.rename(restoreDBFile, new File(getDBFilePath()));
+
+        Activator.safeLogInfo("End: Restoring a Backup (renaming rssowl.db.restore to rssowl.db"); //$NON-NLS-1$
       }
     }
 
@@ -239,7 +242,7 @@ public class DBManager {
 
       /* Persistence Exception */
       if (e instanceof PersistenceException)
-        throw (PersistenceException)e;
+        throw (PersistenceException) e;
 
       /* Profile locked by another running instance */
       if (e instanceof DatabaseFileLockedException)
@@ -1478,6 +1481,7 @@ public class DBManager {
   private void backupAndDeleteProfile() {
     File db = new File(getDBFilePath());
     if (db.exists()) {
+      Activator.safeLogInfo("Start: Backup and Delete Profile"); //$NON-NLS-1$
 
       /* Object Container might be opened, so try to close (only for testing, not in production) */
       if (InternalOwl.TESTING)
@@ -1493,6 +1497,8 @@ public class DBManager {
 
       /* Atomic Rename */
       DBHelper.rename(db, backupCandidate);
+
+      Activator.safeLogInfo(NLS.bind("End: Backup and Delete Profile ({0})", backupCandidate.getName())); //$NON-NLS-1$
     }
   }
 
