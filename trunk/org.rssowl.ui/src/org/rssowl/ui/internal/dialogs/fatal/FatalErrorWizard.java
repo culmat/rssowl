@@ -81,6 +81,12 @@ public class FatalErrorWizard extends Wizard {
     StartLevel startLevel = InternalOwl.getDefault().getStartLevel();
     fOfferRestorePages = !isOOMError && !isProfileLockedError && canUsePersistenceService && startLevel != StartLevel.STARTED && startLevel != StartLevel.SEARCH_INDEX_OPENED;
 
+    /* Log State */
+    if (forceAllowRestore)
+      Activator.safeLogInfo("Opening Fatal Error Wizard (forced by user)"); //$NON-NLS-1$
+    else if (!isOOMError && !isProfileLockedError)
+      Activator.safeLogInfo(fOfferRestorePages ? "Opening Fatal Error Wizard (offering restore options)" : "Opening Fatal Error Wizard (without restore options)"); //$NON-NLS-1$ //$NON-NLS-2$
+
     /* Check if caller wants to force profile restore pages */
     if (!fOfferRestorePages && forceAllowRestore && canUsePersistenceService)
       fOfferRestorePages = true;
