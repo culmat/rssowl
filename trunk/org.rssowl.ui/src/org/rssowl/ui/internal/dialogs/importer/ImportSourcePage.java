@@ -562,7 +562,7 @@ public class ImportSourcePage extends WizardPage {
 
           /* Apply Proposals */
           if (!fKeywordInput.isDisposed())
-            OwlUI.applyAutoCompleteProposals(values, autoComplete.getFirst(), autoComplete.getSecond(), true);
+            OwlUI.applyAutoCompleteProposals(values, autoComplete.getFirst(), autoComplete.getSecond(), false);
         }
       }
     });

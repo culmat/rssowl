@@ -306,7 +306,7 @@ public class FeedDefinitionPage extends WizardPage {
       return;
     fIsAutoCompleteKeywordHooked = true;
 
-    final Pair<SimpleContentProposalProvider, ContentProposalAdapter> autoComplete = OwlUI.hookAutoComplete(fKeywordInput, null, true, true);
+    final Pair<SimpleContentProposalProvider, ContentProposalAdapter> autoComplete = OwlUI.hookAutoComplete(fKeywordInput, null, true, false);
 
     /* Load proposals in the Background */
     JobRunner.runInBackgroundThread(new Runnable() {
@@ -327,7 +327,7 @@ public class FeedDefinitionPage extends WizardPage {
 
           /* Apply Proposals */
           if (!fKeywordInput.isDisposed())
-            OwlUI.applyAutoCompleteProposals(values, autoComplete.getFirst(), autoComplete.getSecond(), true);
+            OwlUI.applyAutoCompleteProposals(values, autoComplete.getFirst(), autoComplete.getSecond(), false);
         }
       }
     });
