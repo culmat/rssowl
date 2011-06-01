@@ -195,7 +195,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   private final IPreferenceScope fPreferences = Owl.getPreferenceService().getGlobalScope();
   private final INewsDAO fNewsDao = DynamicDAO.getDAO(INewsDAO.class);
   private final JobTracker fUserInteractionTracker = new JobTracker(USER_INTERACTION_DELAY, false, true, Priority.INTERACTIVE);
-  private final Set<Long> fMarkedUnreadByUserCache= Collections.synchronizedSet(new HashSet<Long>());
+  private final Set<Long> fMarkedUnreadByUserCache = Collections.synchronizedSet(new HashSet<Long>());
 
   /* This viewer's sorter. <code>null</code> means there is no sorter. */
   private ViewerComparator fSorter;
@@ -378,18 +378,24 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     fBrowser.addLinkHandler(NEXT_PAGE_HANDLER_ID, this);
     fBrowser.addLinkHandler(SCROLL_NEXT_PAGE_HANDLER_ID, this);
 
-    /* React on User Interaction */
+    /* React on User Interaction (Mouse Scrolling, Mouse Down, Key Pressed) */
     Listener listener = new Listener() {
       public void handleEvent(Event event) {
-        if (!event.widget.isDisposed())
-          onUserInteraction();
+        onUserInteraction();
       }
     };
     fBrowser.getControl().addListener(SWT.MouseWheel, listener);
     fBrowser.getControl().addListener(SWT.MouseDown, listener);
+    fBrowser.getControl().addListener(SWT.KeyDown, listener);
   }
 
   private void onUserInteraction() {
+
+    /* Return if feature not necessary at all */
+    if (!fMarkReadOnScrolling && fPageSize == 0)
+      return;
+
+    /* Return if disposed or already running */
     if (fBrowser.getControl().isDisposed() || fUserInteractionTracker.isRunning())
       return;
 
@@ -1721,7 +1727,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       fPageSize = PageSize.NO_PAGING.getPageSize();
 
     /* Update "Mark Read on Scrolling" */
-    fMarkReadOnScrolling = fSite.getInputPreferences().getBoolean(DefaultPreferences.MARK_READ_ON_SCROLLING) && newLayout == Layout.NEWSPAPER;
+    fMarkReadOnScrolling = (newLayout == Layout.NEWSPAPER) && fSite.getInputPreferences().getBoolean(DefaultPreferences.MARK_READ_ON_SCROLLING);
   }
 
   private void internalSetInput(Object input, boolean force, boolean blockExternalNavigation) {
