@@ -82,12 +82,14 @@ public class InformationPropertyPage implements IEntityPropertyPage {
   private Composite fContainer;
   private Label fDescriptionLabel;
   private Link fHomepageLink;
+  private IPropertyDialogSite fSite;
 
   /*
    * @see org.rssowl.ui.dialogs.properties.IEntityPropertyPage#init(org.rssowl.ui.dialogs.properties.IPropertyDialogSite, java.util.List)
    */
   public void init(IPropertyDialogSite site, List<IEntity> entities) {
     Assert.isTrue(!entities.isEmpty());
+    fSite = site;
     fEntities = entities;
   }
 
@@ -369,6 +371,7 @@ public class InformationPropertyPage implements IEntityPropertyPage {
 
           /* Update Layout */
           fContainer.layout(true, true);
+          fSite.contentsChanged();
         }
       });
     }
