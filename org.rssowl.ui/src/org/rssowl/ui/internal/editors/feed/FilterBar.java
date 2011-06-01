@@ -40,6 +40,8 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.TraverseEvent;
@@ -121,6 +123,7 @@ public class FilterBar {
   private boolean fBlockRefresh;
   private NewsFilter.Type fLastFilterType;
   private NewsGrouping.Type fLastGroupType;
+  private boolean fSearchSelectAllOnce = true;
 
   /**
    * @param feedView
@@ -455,6 +458,18 @@ public class FilterBar {
         fFeedView.getEditorSite().getActionBars().getGlobalActionHandler(ActionFactory.CUT.getId()).setEnabled(false);
         fFeedView.getEditorSite().getActionBars().getGlobalActionHandler(ActionFactory.COPY.getId()).setEnabled(false);
         fFeedView.getEditorSite().getActionBars().getGlobalActionHandler(ActionFactory.PASTE.getId()).setEnabled(false);
+        fSearchSelectAllOnce = true;
+      }
+    });
+
+    /* Select All on Mouse Up */
+    fSearchInput.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseUp(MouseEvent e) {
+        if (fSearchSelectAllOnce && fSearchInput.getSelectionCount() == 0)
+          fSearchInput.selectAll();
+
+        fSearchSelectAllOnce = false;
       }
     });
 
