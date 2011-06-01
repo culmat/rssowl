@@ -395,4 +395,17 @@ public class EntityPropertyDialog extends Dialog implements IPropertyDialogSite 
   public boolean entitiesUpdated() {
     return fEntitiesUpdated;
   }
+
+  /*
+   * @see org.rssowl.ui.dialogs.properties.IPropertyDialogSite#contentsChanged()
+   */
+  public void contentsChanged() {
+
+    /* Check if the Dialog size needs to be updated now */
+    Shell shell = getShell();
+    Point requiredSize = getRequiredSize(shell);
+    Point currentSize = shell.getSize();
+    if (requiredSize.x > currentSize.x || requiredSize.y > currentSize.y)
+      shell.setSize(new Point(Math.max(currentSize.x, requiredSize.x), Math.max(currentSize.y, requiredSize.y)));
+  }
 }

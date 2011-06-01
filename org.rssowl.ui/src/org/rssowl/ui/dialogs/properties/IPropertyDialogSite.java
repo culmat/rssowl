@@ -83,4 +83,10 @@ public interface IPropertyDialogSite {
    * @return the number of pixels
    */
   int getHorizontalPixels(int dlus);
+
+  /**
+   * Notify the entity property dialog that the contents of the page have
+   * changed so that the dialog can adjust its size properly.
+   */
+  void contentsChanged();
 }
