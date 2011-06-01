@@ -126,7 +126,7 @@ public class PreferencesInitializer implements IPreferencesInitializer {
     defaultScope.putInteger(Preference.SEARCH_DIALOG_NEWS_SORT_COLUMN.id(), NewsColumn.RELEVANCE.ordinal());
     defaultScope.putBoolean(Preference.SEARCH_DIALOG_NEWS_SORT_ASCENDING.id(), false);
 
-    defaultScope.putIntegers(Preference.SHARE_PROVIDER_STATE.id(), new int[] { 1, 2, 3, 4, 5, 6, 7, -8, -9, -10, -11, -12, -13, -14, -15, -16, -17, -18, -19, -20, -21, -22, -23, -24, -25, -26 });
+    defaultScope.putIntegers(Preference.SHARE_PROVIDER_STATE.id(), new int[] { 3, 5, 1, 6, 7, 24, -8, -19, -9, -10, -12, -13, -4, -14, -15, -16, -17, -11, -18, -20, -21, -2, -22, -23, -25, -26 });
     defaultScope.putInteger(Preference.BM_MENU_FILTER.id(), BookMarkFilter.Type.SHOW_ALL.ordinal());
   }
 
