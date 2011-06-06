@@ -127,7 +127,7 @@ public class DBManager {
   private static final String ONLINE_BACKUP_NAME = ".onlinebak"; //$NON-NLS-1$
   private static final String OFFLINE_BACKUP_NAME = ".backup"; //$NON-NLS-1$
   private static final int OFFLINE_BACKUP_INTERVAL = 1000 * 60 * 60 * 24 * 7; //7 Days
-  private static final int ONLINE_BACKUP_SCHEDULER = 1000 * 60 * 5; //5 Minutes
+  private static final int ONLINE_BACKUP_SCHEDULE_INTERVAL = 1000 * 60 * 5; //5 Minutes
   private static final int ONLINE_BACKUP_DELAY_THRESHOLD = 1000 * 60 * 30; //30 Minutes
   private static final int ONLINE_BACKUP_SHORT_INTERVAL = 1000 * 60 * 55; //55 Minutes
   private static final int ONLINE_BACKUP_LONG_INTERVAL = 1000 * 60 * 60 * 10; //10 Hours
@@ -365,14 +365,14 @@ public class DBManager {
 
               /* Store Next Backup Time */
               if (!Owl.isShuttingDown() && !monitor.isCanceled())
-                schedule(ONLINE_BACKUP_SCHEDULER);
+                schedule(ONLINE_BACKUP_SCHEDULE_INTERVAL);
             }
 
             return Status.OK_STATUS;
           }
         };
         job.setSystem(true);
-        job.schedule(ONLINE_BACKUP_SCHEDULER);
+        job.schedule(ONLINE_BACKUP_SCHEDULE_INTERVAL);
 
         /* Store next online backup time */
         fNextOnlineBackup.set(System.currentTimeMillis() + getOnlineBackupDelay(true));
