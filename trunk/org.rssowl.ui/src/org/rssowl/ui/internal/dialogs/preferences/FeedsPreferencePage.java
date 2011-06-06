@@ -270,6 +270,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     /* Open on Startup */
     fOpenOnStartupCheck = new Button(group, SWT.CHECK);
     fOpenOnStartupCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+    ((GridData)fOpenOnStartupCheck.getLayoutData()).exclude = true; //Disabled due to performance issues opening 100 feeds at once
     fOpenOnStartupCheck.setText(Messages.FeedsPreferencePage_DISPLAY_ON_STARTUP);
     fOpenOnStartupCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.BM_OPEN_ON_STARTUP));
   }
