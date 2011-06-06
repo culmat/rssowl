@@ -2407,16 +2407,20 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
         }
 
         js.append("node = ").append(getElementById(Dynamic.NEWS.getId(news))).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
-        js.append("if (node != null) { "); //$NON-NLS-1$
+        js.append("if (node != null && node.parentNode == body) { "); //$NON-NLS-1$
         js.append("  body.removeChild(node); "); //$NON-NLS-1$
+        js.append("} else if (node != null) { "); //$NON-NLS-1$
+        js.append("  node.style.display='none'; "); //$NON-NLS-1$
         js.append("} "); //$NON-NLS-1$
 
         /* Hide Separator if using headlines layout */
         if (isHeadlinesLayout()) {
           js.append("node = ").append(getElementById(Dynamic.HEADLINE_SEPARATOR.getId(news))).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
-          js.append("if (node != null) { "); //$NON-NLS-1$
+          js.append("if (node != null && node.parentNode == body) { "); //$NON-NLS-1$
           js.append("  body.removeChild(node); "); //$NON-NLS-1$
-          js.append("}"); //$NON-NLS-1$
+          js.append("} else if (node != null) {"); //$NON-NLS-1$
+          js.append("  node.style.display='none'; "); //$NON-NLS-1$
+          js.append("} "); //$NON-NLS-1$
         }
       }
     }
@@ -2425,11 +2429,19 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     IBaseLabelProvider labelProvider = getLabelProvider();
     for (Long groupId : groupsToUpdate) {
 
+      /* Remove Groups from DOM or update it */
+      if (!varDefined) {
+        js.append("var "); //$NON-NLS-1$
+        varDefined = true;
+      }
+
       /* Group is empty now: Remove it from DOM */
       if (!fViewModel.hasGroup(groupId)) {
         js.append("node = ").append(getElementById(Dynamic.GROUP.getId(groupId))).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
-        js.append("if (node != null) { "); //$NON-NLS-1$
+        js.append("if (node != null && node.parentNode == body) { "); //$NON-NLS-1$
         js.append("  body.removeChild(node); "); //$NON-NLS-1$
+        js.append("} else if (node != null) { "); //$NON-NLS-1$
+        js.append("  node.style.display='none'; "); //$NON-NLS-1$
         js.append("} "); //$NON-NLS-1$
       }
 
