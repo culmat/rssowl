@@ -187,8 +187,14 @@ public enum Preference {
   /** BookMark News-Filtering */
   BM_NEWS_GROUPING("org.rssowl.pref.BMNewsGrouping", IPreferenceType.INTEGER), //$NON-NLS-1$
 
-  /** BookMark Load Images */
+  /** BookMark Load Images (deprecated as of 2.1) */
   BM_LOAD_IMAGES("org.rssowl.pref.BMLoadImages", IPreferenceType.BOOLEAN), //$NON-NLS-1$
+
+  /** Enable Images in Article Content */
+  ENABLE_IMAGES("org.rssowl.pref.EnableImages", IPreferenceType.BOOLEAN), //$NON-NLS-1$
+
+  /** Enable Media in Article Content */
+  ENABLE_MEDIA("org.rssowl.pref.EnableMedia", IPreferenceType.BOOLEAN), //$NON-NLS-1$
 
   /** NewsMark Selected News */
   NM_SELECTED_NEWS("org.rssowl.pref.NMSelectedNews", IPreferenceType.LONG, IPreferenceScope.Kind.ENTITY), //$NON-NLS-1$

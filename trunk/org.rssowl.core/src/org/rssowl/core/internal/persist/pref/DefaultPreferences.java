@@ -190,8 +190,14 @@ public class DefaultPreferences {
   /** BookMark News-Filtering */
   public static final String BM_NEWS_GROUPING = Preference.BM_NEWS_GROUPING.id();
 
-  /** BookMark Load Images */
+  /** BookMark Load Images (deprecated as of 2.1) */
   public static final String BM_LOAD_IMAGES = Preference.BM_LOAD_IMAGES.id();
+
+  /** Enable Images in Article Content */
+  public static final String ENABLE_IMAGES = Preference.ENABLE_IMAGES.id();
+
+  /** Enable Media in Article Content */
+  public static final String ENABLE_MEDIA = Preference.ENABLE_MEDIA.id();
 
   /** NewsMark Selected News */
   public static final String NM_SELECTED_NEWS = Preference.NM_SELECTED_NEWS.id();

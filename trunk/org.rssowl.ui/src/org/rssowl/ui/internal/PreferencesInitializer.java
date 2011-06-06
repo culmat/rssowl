@@ -174,6 +174,8 @@ public class PreferencesInitializer implements IPreferencesInitializer {
     defaultScope.putInteger(Preference.BM_NEWS_FILTERING.id(), -1);
     defaultScope.putInteger(Preference.BM_NEWS_GROUPING.id(), -1);
     defaultScope.putBoolean(Preference.BM_LOAD_IMAGES.id(), true);
+    defaultScope.putBoolean(Preference.ENABLE_IMAGES.id(), true);
+    defaultScope.putBoolean(Preference.ENABLE_MEDIA.id(), true);
   }
 
   /**

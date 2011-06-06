@@ -119,6 +119,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
   private Combo fPageSizeCombo;
   private Button fOpenSiteForEmptyNewsCheck;
   private Button fLoadImagesForNewsCheck;
+  private Button fLoadMediaForNewsCheck;
   private Button fDisplayContentsOfNewsRadio;
   private Button fOpenLinkOfNewsRadio;
   private Button fUseTransformerCheck;
@@ -440,11 +441,17 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     bottomSubContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
     ((GridLayout) bottomSubContainer.getLayout()).marginLeft = 15;
 
-    /* Load Images, Media and Flash Content */
+    /* Load Images */
     fLoadImagesForNewsCheck = new Button(bottomSubContainer, SWT.CHECK);
-    fLoadImagesForNewsCheck.setText(Messages.FeedsPreferencePage_LOAD_MEDIA);
+    fLoadImagesForNewsCheck.setText(Messages.FeedsPreferencePage_LOAD_IMAGES);
     fLoadImagesForNewsCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false));
-    fLoadImagesForNewsCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.BM_LOAD_IMAGES));
+    fLoadImagesForNewsCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.ENABLE_IMAGES));
+
+    /* Load other Media and Flash Content */
+    fLoadMediaForNewsCheck= new Button(bottomSubContainer, SWT.CHECK);
+    fLoadMediaForNewsCheck.setText(Messages.FeedsPreferencePage_LOAD_MEDIA);
+    fLoadMediaForNewsCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false));
+    fLoadMediaForNewsCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.ENABLE_MEDIA));
 
     /* Open Link of News */
     fOpenLinkOfNewsRadio = new Button(bottomContainer, SWT.RADIO);
@@ -523,6 +530,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     /* Update Enablement */
     fDisplayContentsOfNewsRadio.setEnabled(!isListLayout);
     fLoadImagesForNewsCheck.setEnabled(!isListLayout && (fDisplayContentsOfNewsRadio.getSelection() || fOpenSiteForEmptyNewsCheck.getSelection()));
+    fLoadMediaForNewsCheck.setEnabled(!isListLayout && (fDisplayContentsOfNewsRadio.getSelection() || fOpenSiteForEmptyNewsCheck.getSelection()));
     fOpenLinkOfNewsRadio.setEnabled(!isListLayout && !isNewspaperLayout);
     fOpenSiteForEmptyNewsCheck.setEnabled(!isListLayout && !isNewspaperLayout && fOpenLinkOfNewsRadio.getSelection());
     fUseTransformerCheck.setEnabled(!isListLayout && !isNewspaperLayout && fOpenLinkOfNewsRadio.getSelection());
@@ -718,7 +726,8 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
 
     fGlobalScope.putBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_NEWS, fOpenLinkOfNewsRadio.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_EMPTY_NEWS, fOpenSiteForEmptyNewsCheck.getSelection());
-    fGlobalScope.putBoolean(DefaultPreferences.BM_LOAD_IMAGES, fLoadImagesForNewsCheck.getSelection());
+    fGlobalScope.putBoolean(DefaultPreferences.ENABLE_IMAGES, fLoadImagesForNewsCheck.getSelection());
+    fGlobalScope.putBoolean(DefaultPreferences.ENABLE_MEDIA, fLoadMediaForNewsCheck.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.BM_USE_TRANSFORMER, fUseTransformerCheck.getSelection());
 
     IStructuredSelection selection = (IStructuredSelection) fLinkTransformerViewer.getSelection();
@@ -892,7 +901,8 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     fDisplayContentsOfNewsRadio.setSelection(!defaultScope.getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_NEWS));
     fOpenLinkOfNewsRadio.setSelection(defaultScope.getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_NEWS));
     fOpenSiteForEmptyNewsCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_EMPTY_NEWS));
-    fLoadImagesForNewsCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.BM_LOAD_IMAGES));
+    fLoadImagesForNewsCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.ENABLE_IMAGES));
+    fLoadMediaForNewsCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.ENABLE_MEDIA));
     fUseTransformerCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.BM_USE_TRANSFORMER));
     fLinkTransformerViewer.setSelection(new StructuredSelection(Controller.getDefault().getLinkTransformer(defaultScope)));
 
