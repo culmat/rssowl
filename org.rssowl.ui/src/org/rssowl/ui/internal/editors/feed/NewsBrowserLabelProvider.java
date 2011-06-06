@@ -524,6 +524,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.append("a:hover { ").append(fLinkFGColorCSS).append(" text-decoration: underline; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     writer.append("a:visited { ").append(fLinkFGColorCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     writer.append("img { border: none; }\n"); //$NON-NLS-1$
+    writer.append("div.hidden { display: none; }\n"); //$NON-NLS-1$
 
     /* Group */
     writer.append("div.group { color: #678; ").append(fBiggestFontCSS).append(" font-weight: bold; margin: 10px 0px 5px 5px; padding-bottom: 3px; border-bottom: 1px solid #678; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
