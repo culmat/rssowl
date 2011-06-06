@@ -111,7 +111,6 @@ public class Messages extends NLS {
   public static String ManageLabelsPreferencePage_MOVE_UP;
   public static String ManageLabelsPreferencePage_NEW;
   public static String ManageLabelsPreferencePage_NO_UNDO;
-  public static String MiscPreferencePage_AGGREGATE_AS_SEARCH;
   public static String MiscPreferencePage_DOUBLE_CLICK_RESTORE;
   public static String MiscPreferencePage_MISC;
   public static String MiscPreferencePage_MOVE_TO_TRAY;

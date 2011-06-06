@@ -565,12 +565,6 @@
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
-            description="%command.description.17"
-            id="org.rssowl.ui.AggregateFolderAction"
-            name="%command.name.32">
-      </command>
-      <command
-            categoryId="org.rssowl.ui.commands.category.RSSOwl"
             defaultHandler="org.rssowl.ui.internal.handler.ToggleFullScreenHandler"
             description="%command.description.18"
             id="org.rssowl.ui.FullScreenCommand"
@@ -790,12 +784,6 @@
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+L">
-      </key>
-      <key
-            commandId="org.rssowl.ui.AggregateFolderAction"
-            contextId="org.eclipse.ui.contexts.window"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+ENTER">
       </key>
    </extension>
    <extension
