@@ -102,10 +102,10 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   private DateFormat fTimeFormat = OwlUI.getShortTimeFormat();
 
   /* Potential Image Tags */
-  private final Set<String> fImageTags = new HashSet<String>(Arrays.asList(new String[] { "img", "map" })); //$NON-NLS-1$ //$NON-NLS-2$
+  private final Set<String> fImageTags = new HashSet<String>(Arrays.asList(new String[] { "img", "map", "area" })); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
   /* Potential Media Tags */
-  private final Set<String> fMediaTags = new HashSet<String>(Arrays.asList(new String[] { "applet", "embed", "area", "frame", "frameset", "iframe", "object" })); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
+  private final Set<String> fMediaTags = new HashSet<String>(Arrays.asList(new String[] { "applet", "embed", "frame", "frameset", "iframe", "object" })); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 
   /* Image and Media Tags */
   private final Set<String> fImageAndMediaTags;
@@ -206,7 +206,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
   /**
    * Creates a new Browser LabelProvider for News
-   * 
+   *
    * @param browser
    */
   public NewsBrowserLabelProvider(CBrowser browser) {
@@ -215,7 +215,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
   /**
    * Creates a new Browser LabelProvider for News
-   * 
+   *
    * @param viewer
    */
   public NewsBrowserLabelProvider(NewsBrowserViewer viewer) {
@@ -457,7 +457,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
   /**
    * Writes the CSS information to the given Writer.
-   * 
+   *
    * @param writer the writer to add the CSS information to.
    * @throws IOException In case of an error while writing.
    */
@@ -467,7 +467,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
   /**
    * Writes the CSS information to the given Writer.
-   * 
+   *
    * @param writer the writer to add the CSS information to.
    * @param forSingleNews if <code>true</code>, the site contains a single news,
    * or <code>false</code> if it contains a collection of news.
@@ -1444,7 +1444,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
   /**
    * Renders the provided list of elements in HTML for reading.
-   * 
+   *
    * @param elements the elements to render as HTML.
    * @param base a URI that should be used as base URI for the HTML document.
    * @param withManagedLinks if set to <code>false</code>, the output will not
