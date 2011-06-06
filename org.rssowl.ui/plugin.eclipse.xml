@@ -1393,7 +1393,7 @@
             url="http://delicious.com/save?url=[L]&amp;title=[T]">
       </shareProvider>
       <shareProvider
-            enabled="true"
+            enabled="false"
             icon="icons/obj16/share_technorati.gif"
             id="org.rssowl.ui.TechnoratiShareProvider"
             name="%shareProvider.name.0"
@@ -1407,7 +1407,7 @@
             url="http://www.facebook.com/sharer.php?u=[L]&amp;t=[T]">
       </shareProvider>
       <shareProvider
-            enabled="true"
+            enabled="false"
             icon="icons/obj16/share_digg.gif"
             id="org.rssowl.ui.DiggShareProvider"
             maxTitleLength="75"
@@ -1548,7 +1548,7 @@
             url="http://www.evernote.com/clip.action?url=[L]&amp;title=[T]">
       </shareProvider>
       <shareProvider
-            enabled="false"
+            enabled="true"
             icon="icons/obj16/share_readitlater.gif"
             id="org.rssowl.ui.ReadItLaterShareProvider"
             name="%shareProvider.name.22"
@@ -1569,6 +1569,7 @@
             url="http://www.livejournal.com/update.bml?mode=full&amp;event=[L]&amp;subject=[T]">
       </shareProvider>
       <shareProvider
+            enabled="false"
             icon="icons/obj16/share_buffer.gif"
             id="org.rssowl.ui.BufferShareProvider"
             name="%shareProvider.name.25"
