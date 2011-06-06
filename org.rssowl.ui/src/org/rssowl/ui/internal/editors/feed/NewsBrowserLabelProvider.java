@@ -101,8 +101,14 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   /* Time Formatter for News */
   private DateFormat fTimeFormat = OwlUI.getShortTimeFormat();
 
+  /* Potential Image Tags */
+  private final Set<String> fImageTags = new HashSet<String>(Arrays.asList(new String[] { "img", "map" })); //$NON-NLS-1$ //$NON-NLS-2$
+
   /* Potential Media Tags */
-  private final Set<String> fMediaTags = new HashSet<String>(Arrays.asList(new String[] { "img", "applet", "embed", "area", "frame", "frameset", "iframe", "map", "object" })); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$
+  private final Set<String> fMediaTags = new HashSet<String>(Arrays.asList(new String[] { "applet", "embed", "area", "frame", "frameset", "iframe", "object" })); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
+
+  /* Image and Media Tags */
+  private final Set<String> fImageAndMediaTags;
 
   /* Windows only: Mark of the Web */
   private static final String IE_MOTW = "<!-- saved from url=(0014)about:internet -->"; //$NON-NLS-1$
@@ -187,6 +193,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   /* Label Provider State */
   private final NewsBrowserViewer fViewer;
   private final boolean fIsIE;
+  private boolean fStripImagesFromNews;
   private boolean fStripMediaFromNews;
   private boolean fForceShowFeedInformation;
   private boolean fManageLinks;
@@ -199,7 +206,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
   /**
    * Creates a new Browser LabelProvider for News
-   *
+   * 
    * @param browser
    */
   public NewsBrowserLabelProvider(CBrowser browser) {
@@ -208,7 +215,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
   /**
    * Creates a new Browser LabelProvider for News
-   *
+   * 
    * @param viewer
    */
   public NewsBrowserLabelProvider(NewsBrowserViewer viewer) {
@@ -222,22 +229,33 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     fShowFooter = true;
     fTodayInMillies = DateUtils.getToday().getTimeInMillis();
 
+    fImageAndMediaTags = new HashSet<String>();
+    fImageAndMediaTags.addAll(fImageTags);
+    fImageAndMediaTags.addAll(fMediaTags);
+
     createFonts();
     createColors();
     registerListeners();
   }
 
   /**
-   * @param stripMediaFromNews <code>true</code> to strip images and other media
-   * from the news and <code>false</code> otherwise.
+   * @param stripImagesFromNews <code>true</code> to strip images from the news
+   * and <code>false</code> otherwise.
+   * @param stripMediaFromNews <code>true</code> to strip media from the news
+   * and <code>false</code> otherwise.
    */
-  public void setStripMediaFromNews(boolean stripMediaFromNews) {
+  public void setStripMediaFromNews(boolean stripImagesFromNews, boolean stripMediaFromNews) {
+    fStripImagesFromNews = stripImagesFromNews;
     fStripMediaFromNews = stripMediaFromNews;
   }
 
   /* Removes Media Tags from the provided String if the provider is configured to do so */
   String stripMediaTagsIfNecessary(String str) {
-    if (fStripMediaFromNews)
+    if (fStripImagesFromNews && fStripMediaFromNews)
+      return StringUtils.filterTags(str, fImageAndMediaTags, false);
+    else if (fStripImagesFromNews)
+      return StringUtils.filterTags(str, fImageTags, false);
+    else if (fStripMediaFromNews)
       return StringUtils.filterTags(str, fMediaTags, false);
 
     return str;
@@ -439,7 +457,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
   /**
    * Writes the CSS information to the given Writer.
-   *
+   * 
    * @param writer the writer to add the CSS information to.
    * @throws IOException In case of an error while writing.
    */
@@ -449,7 +467,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
   /**
    * Writes the CSS information to the given Writer.
-   *
+   * 
    * @param writer the writer to add the CSS information to.
    * @param forSingleNews if <code>true</code>, the site contains a single news,
    * or <code>false</code> if it contains a collection of news.
@@ -1426,7 +1444,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
   /**
    * Renders the provided list of elements in HTML for reading.
-   *
+   * 
    * @param elements the elements to render as HTML.
    * @param base a URI that should be used as base URI for the HTML document.
    * @param withManagedLinks if set to <code>false</code>, the output will not
@@ -1437,11 +1455,13 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   public String render(Object[] elements, URI base, boolean withManagedLinks) {
 
     /* Store existing settings to restore later */
+    boolean stripImagesFromNews = fStripImagesFromNews;
     boolean stripMediaFromNews = fStripMediaFromNews;
     boolean showFooter = fShowFooter;
     boolean headlinesOnly = fHeadlinesOnly;
     boolean showFeedInformation = fForceShowFeedInformation;
 
+    fStripImagesFromNews = false;
     fStripMediaFromNews = false;
     fShowFooter = false;
     fHeadlinesOnly = false;
@@ -1451,6 +1471,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     try {
       return internalRender(elements, base, withManagedLinks);
     } finally {
+      fStripImagesFromNews = stripImagesFromNews;
       fStripMediaFromNews = stripMediaFromNews;
       fShowFooter = showFooter;
       fHeadlinesOnly = headlinesOnly;

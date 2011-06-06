@@ -75,6 +75,7 @@ public class DisplayPropertyPage implements IEntityPropertyPage {
   private Combo fLayoutCombo;
   private Combo fPageSizeCombo;
   private Button fLoadImagesForNewsCheck;
+  private Button fLoadMediaForNewsCheck;
   private Button fDisplayContentsOfNewsRadio;
   private Button fOpenLinkOfNewsRadio;
   private Button fOpenSiteForEmptyNewsCheck;
@@ -92,6 +93,7 @@ public class DisplayPropertyPage implements IEntityPropertyPage {
   private boolean fPrefUseLinkTransformer;
   private String fPrefLinkTransformerId;
   private boolean fPrefLoadImagesForNews;
+  private boolean fPrefLoadMediaForNews;
   private boolean fSettingsChanged;
 
   /*
@@ -123,7 +125,8 @@ public class DisplayPropertyPage implements IEntityPropertyPage {
     fPrefOpenSiteForEmptyNews = firstScope.getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_EMPTY_NEWS);
     fPrefUseLinkTransformer = firstScope.getBoolean(DefaultPreferences.BM_USE_TRANSFORMER);
     fPrefLinkTransformerId = firstScope.getString(DefaultPreferences.BM_TRANSFORMER_ID);
-    fPrefLoadImagesForNews = firstScope.getBoolean(DefaultPreferences.BM_LOAD_IMAGES);
+    fPrefLoadImagesForNews = firstScope.getBoolean(DefaultPreferences.ENABLE_IMAGES);
+    fPrefLoadMediaForNews = firstScope.getBoolean(DefaultPreferences.ENABLE_MEDIA);
     fPrefSelectedLayout = firstScope.getInteger(DefaultPreferences.FV_LAYOUT);
     fPrefSelectedPageSize = firstScope.getInteger(DefaultPreferences.NEWS_BROWSER_PAGE_SIZE);
 
@@ -149,8 +152,11 @@ public class DisplayPropertyPage implements IEntityPropertyPage {
       if (fPrefLinkTransformerId != null && !fPrefLinkTransformerId.equals(otherScope.getString(DefaultPreferences.BM_TRANSFORMER_ID)))
         fPrefLinkTransformerId = defaultScope.getString(DefaultPreferences.BM_TRANSFORMER_ID);
 
-      if (otherScope.getBoolean(DefaultPreferences.BM_LOAD_IMAGES) != fPrefLoadImagesForNews)
-        fPrefLoadImagesForNews = defaultScope.getBoolean(DefaultPreferences.BM_LOAD_IMAGES);
+      if (otherScope.getBoolean(DefaultPreferences.ENABLE_IMAGES) != fPrefLoadImagesForNews)
+        fPrefLoadImagesForNews = defaultScope.getBoolean(DefaultPreferences.ENABLE_IMAGES);
+
+      if (otherScope.getBoolean(DefaultPreferences.ENABLE_MEDIA) != fPrefLoadMediaForNews)
+        fPrefLoadMediaForNews = defaultScope.getBoolean(DefaultPreferences.ENABLE_MEDIA);
 
       if (otherScope.getInteger(DefaultPreferences.FV_LAYOUT) != fPrefSelectedLayout)
         fPrefSelectedLayout = defaultScope.getInteger(DefaultPreferences.FV_LAYOUT);
@@ -250,11 +256,17 @@ public class DisplayPropertyPage implements IEntityPropertyPage {
     bottomSubContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
     ((GridLayout) bottomSubContainer.getLayout()).marginLeft = 15;
 
-    /* Load Images, Media and Flash Content */
+    /* Load Images */
     fLoadImagesForNewsCheck = new Button(bottomSubContainer, SWT.CHECK);
-    fLoadImagesForNewsCheck.setText(Messages.DisplayPropertyPage_LOAD_MEDIA);
+    fLoadImagesForNewsCheck.setText(Messages.DisplayPropertyPage_LOAD_IMAGES);
     fLoadImagesForNewsCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false));
     fLoadImagesForNewsCheck.setSelection(fPrefLoadImagesForNews);
+
+    /* Load Media and Flash Content */
+    fLoadMediaForNewsCheck = new Button(bottomSubContainer, SWT.CHECK);
+    fLoadMediaForNewsCheck.setText(Messages.DisplayPropertyPage_LOAD_MEDIA);
+    fLoadMediaForNewsCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false));
+    fLoadMediaForNewsCheck.setSelection(fPrefLoadMediaForNews);
 
     /* Open Link of News */
     fOpenLinkOfNewsRadio = new Button(bottomContainer, SWT.RADIO);
@@ -341,6 +353,7 @@ public class DisplayPropertyPage implements IEntityPropertyPage {
     /* Update Enablement */
     fDisplayContentsOfNewsRadio.setEnabled(!isListLayout);
     fLoadImagesForNewsCheck.setEnabled(!isListLayout && (fDisplayContentsOfNewsRadio.getSelection() || fOpenSiteForEmptyNewsCheck.getSelection()));
+    fLoadMediaForNewsCheck.setEnabled(!isListLayout && (fDisplayContentsOfNewsRadio.getSelection() || fOpenSiteForEmptyNewsCheck.getSelection()));
     fOpenLinkOfNewsRadio.setEnabled(!isListLayout && !isNewspaperLayout);
     fOpenSiteForEmptyNewsCheck.setEnabled(!isListLayout && !isNewspaperLayout && fOpenLinkOfNewsRadio.getSelection());
     fUseTransformerCheck.setEnabled(!isListLayout && !isNewspaperLayout && fOpenLinkOfNewsRadio.getSelection());
@@ -452,6 +465,8 @@ public class DisplayPropertyPage implements IEntityPropertyPage {
       otherDisplayChanges = true;
     else if (fLoadImagesForNewsCheck.getSelection() != fPrefLoadImagesForNews)
       otherDisplayChanges = true;
+    else if (fLoadMediaForNewsCheck.getSelection() != fPrefLoadMediaForNews)
+      otherDisplayChanges = true;
     else if (fUseTransformerCheck.getSelection() != fPrefUseLinkTransformer)
       otherDisplayChanges = true;
     else {
@@ -474,7 +489,8 @@ public class DisplayPropertyPage implements IEntityPropertyPage {
 
       scope.putBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_NEWS, fOpenLinkOfNewsRadio.getSelection());
       scope.putBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_EMPTY_NEWS, fOpenSiteForEmptyNewsCheck.getSelection());
-      scope.putBoolean(DefaultPreferences.BM_LOAD_IMAGES, fLoadImagesForNewsCheck.getSelection());
+      scope.putBoolean(DefaultPreferences.ENABLE_IMAGES, fLoadImagesForNewsCheck.getSelection());
+      scope.putBoolean(DefaultPreferences.ENABLE_MEDIA, fLoadMediaForNewsCheck.getSelection());
       scope.putBoolean(DefaultPreferences.BM_USE_TRANSFORMER, fUseTransformerCheck.getSelection());
 
       IStructuredSelection selection = (IStructuredSelection) fLinkTransformerViewer.getSelection();

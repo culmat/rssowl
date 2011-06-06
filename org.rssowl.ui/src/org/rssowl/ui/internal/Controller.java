@@ -1461,6 +1461,13 @@ public class Controller {
       else if (!browserMaximized && !layoutClassic)
         pref.putInteger(DefaultPreferences.FV_LAYOUT, Layout.VERTICAL.ordinal());
     }
+
+    /* Migrate old image/media setting from pre 2.1 to 2.1 */
+    if (pref.hasKey(DefaultPreferences.BM_LOAD_IMAGES) && !pref.getBoolean(DefaultPreferences.BM_LOAD_IMAGES)) {
+      pref.putBoolean(DefaultPreferences.ENABLE_IMAGES, false);
+      pref.putBoolean(DefaultPreferences.ENABLE_MEDIA, false);
+      pref.delete(DefaultPreferences.BM_LOAD_IMAGES);
+    }
   }
 
   private void addDefaultLabels() throws PersistenceException {

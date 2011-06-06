@@ -82,6 +82,7 @@ public class NewsBrowserControl implements IFeedViewPart {
   private boolean fInputSet;
   private IPreferenceScope fInputPreferences;
   private IPropertyChangeListener fPropertyChangeListener;
+  private boolean fStripImagesFromNews;
   private boolean fStripMediaFromNews;
   private boolean fHeadlinesOnly;
   private NewsComparator fNewsSorter;
@@ -102,10 +103,11 @@ public class NewsBrowserControl implements IFeedViewPart {
   public void onInputChanged(FeedViewInput input) {
     fEditorInput = input;
     fInputPreferences = Owl.getPreferenceService().getEntityScope(input.getMark());
-    fStripMediaFromNews = !fInputPreferences.getBoolean(DefaultPreferences.BM_LOAD_IMAGES);
+    fStripImagesFromNews = !fInputPreferences.getBoolean(DefaultPreferences.ENABLE_IMAGES);
+    fStripMediaFromNews = !fInputPreferences.getBoolean(DefaultPreferences.ENABLE_MEDIA);
     fHeadlinesOnly = (OwlUI.getLayout(fInputPreferences) == Layout.HEADLINES);
     if (fViewer != null && fViewer.getLabelProvider() != null) {
-      ((NewsBrowserLabelProvider) fViewer.getLabelProvider()).setStripMediaFromNews(fStripMediaFromNews);
+      ((NewsBrowserLabelProvider) fViewer.getLabelProvider()).setStripMediaFromNews(fStripImagesFromNews, fStripMediaFromNews);
       ((NewsBrowserLabelProvider) fViewer.getLabelProvider()).setHeadlinesOnly(fHeadlinesOnly);
     }
   }
@@ -255,7 +257,7 @@ public class NewsBrowserControl implements IFeedViewPart {
 
     /* Create LabelProvider */
     NewsBrowserLabelProvider labelProvider = new NewsBrowserLabelProvider(fViewer);
-    labelProvider.setStripMediaFromNews(fStripMediaFromNews);
+    labelProvider.setStripMediaFromNews(fStripImagesFromNews, fStripMediaFromNews);
     labelProvider.setHeadlinesOnly(fHeadlinesOnly);
     fViewer.setLabelProvider(labelProvider);
 

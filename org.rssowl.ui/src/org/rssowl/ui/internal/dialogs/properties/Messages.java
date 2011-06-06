@@ -32,6 +32,7 @@ public class Messages extends NLS {
   public static String DisplayPropertyPage_FILTER;
   public static String DisplayPropertyPage_GROUP;
   public static String DisplayPropertyPage_LAYOUT;
+  public static String DisplayPropertyPage_LOAD_IMAGES;
   public static String DisplayPropertyPage_LOAD_MEDIA;
   public static String DisplayPropertyPage_ONLY_EMPTY_CONTENT;
   public static String DisplayPropertyPage_OPEN_NEWS_LINK;
