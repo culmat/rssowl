@@ -2387,6 +2387,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
   private boolean internalRemove(Object[] elements) {
     StringBuilder js = new StringBuilder();
+    js.append("var body = ").append(getElementById(BODY_ELEMENT_ID)).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
 
     boolean varDefined = false;
     Set<Long> groupsToUpdate = new HashSet<Long>();
@@ -2407,14 +2408,14 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
         js.append("node = ").append(getElementById(Dynamic.NEWS.getId(news))).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
         js.append("if (node != null) { "); //$NON-NLS-1$
-        js.append(getElementById(BODY_ELEMENT_ID)).append(".removeChild(node); "); //$NON-NLS-1$
+        js.append("  body.removeChild(node); "); //$NON-NLS-1$
         js.append("} "); //$NON-NLS-1$
 
         /* Hide Separator if using headlines layout */
         if (isHeadlinesLayout()) {
           js.append("node = ").append(getElementById(Dynamic.HEADLINE_SEPARATOR.getId(news))).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
           js.append("if (node != null) { "); //$NON-NLS-1$
-          js.append(getElementById(BODY_ELEMENT_ID)).append(".removeChild(node); "); //$NON-NLS-1$
+          js.append("  body.removeChild(node); "); //$NON-NLS-1$
           js.append("}"); //$NON-NLS-1$
         }
       }
@@ -2428,7 +2429,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       if (!fViewModel.hasGroup(groupId)) {
         js.append("node = ").append(getElementById(Dynamic.GROUP.getId(groupId))).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
         js.append("if (node != null) { "); //$NON-NLS-1$
-        js.append(getElementById(BODY_ELEMENT_ID)).append(".removeChild(node); "); //$NON-NLS-1$
+        js.append("  body.removeChild(node); "); //$NON-NLS-1$
         js.append("} "); //$NON-NLS-1$
       }
 
