@@ -2410,7 +2410,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
         js.append("if (node != null && node.parentNode == body) { "); //$NON-NLS-1$
         js.append("  body.removeChild(node); "); //$NON-NLS-1$
         js.append("} else if (node != null) { "); //$NON-NLS-1$
-        js.append("  node.style.display='none'; "); //$NON-NLS-1$
+        js.append("  node.className='hidden';"); //$NON-NLS-1$
         js.append("} "); //$NON-NLS-1$
 
         /* Hide Separator if using headlines layout */
@@ -2419,7 +2419,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
           js.append("if (node != null && node.parentNode == body) { "); //$NON-NLS-1$
           js.append("  body.removeChild(node); "); //$NON-NLS-1$
           js.append("} else if (node != null) {"); //$NON-NLS-1$
-          js.append("  node.style.display='none'; "); //$NON-NLS-1$
+          js.append("  node.className='hidden';"); //$NON-NLS-1$
           js.append("} "); //$NON-NLS-1$
         }
       }
@@ -2441,7 +2441,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
         js.append("if (node != null && node.parentNode == body) { "); //$NON-NLS-1$
         js.append("  body.removeChild(node); "); //$NON-NLS-1$
         js.append("} else if (node != null) { "); //$NON-NLS-1$
-        js.append("  node.style.display='none'; "); //$NON-NLS-1$
+        js.append("  node.className='hidden';"); //$NON-NLS-1$
         js.append("} "); //$NON-NLS-1$
       }
 
