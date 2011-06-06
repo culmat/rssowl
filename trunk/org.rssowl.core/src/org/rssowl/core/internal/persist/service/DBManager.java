@@ -342,16 +342,19 @@ public class DBManager {
 
         /* Start the periodic online backup service */
         final BackupService backupService = createOnlineBackupService();
-        Job job = new Job("Back-up service") { //$NON-NLS-1$
+        Job job = new Job("Online Backup Service") { //$NON-NLS-1$
           @Override
           protected IStatus run(IProgressMonitor monitor) {
             if (!Owl.isShuttingDown() && !monitor.isCanceled()) {
+
+              /* Perform Backup */
               try {
                 backupService.backup(true, monitor);
               } catch (PersistenceException e) {
                 Activator.safeLogError(e.getMessage(), e);
               }
 
+              /* Store Next Backup Time */
               if (!Owl.isShuttingDown() && !monitor.isCanceled())
                 schedule(getOnlineBackupDelay(false));
             }
@@ -366,6 +369,29 @@ public class DBManager {
       if (subMonitor != null) //If we perform the migration, the subMonitor is not null. Otherwise we don't show progress.
         progressMonitor.done();
     }
+  }
+
+  private long getOnlineBackupDelay(boolean initial) {
+    if (initial)
+      return ONLINE_BACKUP_INITIAL;
+
+    return getLongProperty("rssowl.onlinebackup.interval", ONLINE_BACKUP_INTERVAL); //$NON-NLS-1$
+  }
+
+  private long getLongProperty(String propertyName, long defaultValue) {
+    String propertyValue = System.getProperty(propertyName);
+
+    if (propertyValue != null) {
+      try {
+        long longProperty = Long.parseLong(propertyValue);
+        if (longProperty > 0) {
+          return longProperty;
+        }
+      } catch (NumberFormatException e) {
+        /* Let it fall through and use default */
+      }
+    }
+    return defaultValue;
   }
 
   public void addEntityStoreListener(DatabaseListener listener) {
@@ -456,29 +482,6 @@ public class DBManager {
 
     /* Finally ask System Property */
     return Boolean.getBoolean("rssowl.reindex"); //$NON-NLS-1$
-  }
-
-  private long getOnlineBackupDelay(boolean initial) {
-    if (initial)
-      return ONLINE_BACKUP_INITIAL;
-
-    return getLongProperty("rssowl.onlinebackup.interval", ONLINE_BACKUP_INTERVAL); //$NON-NLS-1$
-  }
-
-  private long getLongProperty(String propertyName, long defaultValue) {
-    String backupIntervalText = System.getProperty(propertyName);
-
-    if (backupIntervalText != null) {
-      try {
-        long backupInterval = Long.parseLong(backupIntervalText);
-        if (backupInterval > 0) {
-          return backupInterval;
-        }
-      } catch (NumberFormatException e) {
-        /* Let it fall through and use default */
-      }
-    }
-    return defaultValue;
   }
 
   private BackupService createOnlineBackupService() {
@@ -1486,7 +1489,10 @@ public class DBManager {
     if (db.exists()) {
       Activator.safeLogInfo("Start: Backup and Delete Profile"); //$NON-NLS-1$
 
-      /* Object Container might be opened, so try to close (only for testing, not in production) */
+      /*
+       * Object Container might be opened, so try to close (only for testing,
+       * not in production)
+       */
       if (InternalOwl.TESTING)
         shutdown();
 
