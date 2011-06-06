@@ -49,8 +49,10 @@ import org.rssowl.core.connection.IProtocolHandler;
 import org.rssowl.core.connection.IProxyCredentials;
 import org.rssowl.core.connection.NotModifiedException;
 import org.rssowl.core.connection.PlatformCredentialsProvider;
+import org.rssowl.core.internal.connection.DefaultProtocolHandler;
 import org.rssowl.core.internal.persist.Feed;
 import org.rssowl.core.internal.persist.service.PersistenceServiceImpl;
+import org.rssowl.core.interpreter.EncodingException;
 import org.rssowl.core.persist.IConditionalGet;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
@@ -69,6 +71,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URL;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -567,7 +570,12 @@ public class ConnectionTests {
         assertNotNull(id, inS);
 
         assertNull(id, feed.getFormat());
-        Owl.getInterpreter().interpret(inS, feed, null);
+        try {
+          Owl.getInterpreter().interpret(inS, feed, null);
+        } catch (EncodingException e) {
+          inS = Owl.getConnectionService().getHandler(feed.getLink()).openStream(feed.getLink(), null, null);
+          Owl.getInterpreter().interpret(inS, feed, Collections.singletonMap((Object) DefaultProtocolHandler.USE_PLATFORM_ENCODING, (Object) Boolean.TRUE));
+        }
         assertNotNull(id, feed.getFormat());
       } catch (Exception e) {
         fail(feedUrlStr);
