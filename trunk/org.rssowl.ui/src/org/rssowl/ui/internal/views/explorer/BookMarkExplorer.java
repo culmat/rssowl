@@ -38,8 +38,6 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IElementComparer;
 import org.eclipse.jface.viewers.IInputProvider;
 import org.eclipse.jface.viewers.IOpenListener;
@@ -162,7 +160,7 @@ import java.util.Set;
  * fViewer.setLabelProvider(new DecoratingLabelProvider(new BookMarkLabelProvider(), decorator);
  * </code>
  * </p>
- * 
+ *
  * @author bpasero
  */
 public class BookMarkExplorer extends ViewPart {
@@ -229,7 +227,7 @@ public class BookMarkExplorer extends ViewPart {
   /**
    * Returns the preferences key for the selected bookmark set for the given
    * workbench window.
-   * 
+   *
    * @param window the active workbench window.
    * @return the preferences key for the selected bookmark set for the given
    * workbench window.
@@ -353,13 +351,6 @@ public class BookMarkExplorer extends ViewPart {
       }
     });
 
-    /* Hook Doubleclick Support */
-    fViewer.addDoubleClickListener(new IDoubleClickListener() {
-      public void doubleClick(DoubleClickEvent event) {
-        onDoubleClick(event);
-      }
-    });
-
     /* Hook Open Support */
     fViewer.addOpenListener(new IOpenListener() {
       public void open(OpenEvent event) {
@@ -413,18 +404,6 @@ public class BookMarkExplorer extends ViewPart {
     fLastSelection = (IStructuredSelection) event.getSelection();
     if (fLinkingEnabled)
       linkToFeedView(fLastSelection);
-  }
-
-  private void onDoubleClick(DoubleClickEvent event) {
-    IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-    Object firstElem = selection.getFirstElement();
-
-    /* Expand / Collapse Folders */
-    if (firstElem instanceof IFolder || firstElem instanceof EntityGroup) {
-      boolean expandedState = !fViewer.getExpandedState(firstElem);
-      fViewer.setExpandedState(firstElem, expandedState);
-      onTreeEvent(firstElem, expandedState);
-    }
   }
 
   private void onTreeEvent(Object element, boolean expanded) {
@@ -1660,7 +1639,7 @@ public class BookMarkExplorer extends ViewPart {
   /**
    * Navigate to the next/previous read or unread Feed respecting the Marks that
    * are displayed in the Tree-Viewer.
-   * 
+   *
    * @param next If <code>TRUE</code>, move to the next item, or previous if
    * <code>FALSE</code>.
    * @param unread If <code>TRUE</code>, only move to unread items, or ignore if
@@ -1977,7 +1956,7 @@ public class BookMarkExplorer extends ViewPart {
   /**
    * Allows to disable saving settings on dispose. Useful if settings have been
    * imported and the application is to restart.
-   * 
+   *
    * @param saveStateOnDispose <code>true</code> to save settings on dispose and
    * <code>false</code> to block this.
    */
