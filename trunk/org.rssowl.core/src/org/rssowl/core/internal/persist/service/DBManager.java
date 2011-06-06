@@ -89,6 +89,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -125,9 +126,11 @@ public class DBManager {
   private static final String RESTORE_BACKUP_NAME = ".restorebak"; //$NON-NLS-1$
   private static final String ONLINE_BACKUP_NAME = ".onlinebak"; //$NON-NLS-1$
   private static final String OFFLINE_BACKUP_NAME = ".backup"; //$NON-NLS-1$
-  private static final int ONLINE_BACKUP_INITIAL = 1000 * 60 * 55; //55 Minutes
-  private static final int ONLINE_BACKUP_INTERVAL = 1000 * 60 * 60 * 10; //10 Hours
   private static final int OFFLINE_BACKUP_INTERVAL = 1000 * 60 * 60 * 24 * 7; //7 Days
+  private static final int ONLINE_BACKUP_SCHEDULER = 1000 * 60 * 5; //5 Minutes
+  private static final int ONLINE_BACKUP_DELAY_THRESHOLD = 1000 * 60 * 30; //30 Minutes
+  private static final int ONLINE_BACKUP_SHORT_INTERVAL = 1000 * 60 * 55; //55 Minutes
+  private static final int ONLINE_BACKUP_LONG_INTERVAL = 1000 * 60 * 60 * 10; //10 Hours
 
   /* Defrag Tasks Work Ticks */
   private static final int DEFRAG_TOTAL_WORK = 10000000; //100% (but don't fill to 100% to leave room for backup)
@@ -147,6 +150,7 @@ public class DBManager {
   private static final int DEFRAG_SUB_WORK_FINISH = 100000; //1%
 
   private ObjectContainer fObjectContainer;
+  private final AtomicLong fNextOnlineBackup = new AtomicLong();
   private final ReadWriteLock fLock = new ReentrantReadWriteLock();
   private final List<DatabaseListener> fEntityStoreListeners = new CopyOnWriteArrayList<DatabaseListener>();
 
@@ -347,23 +351,31 @@ public class DBManager {
           protected IStatus run(IProgressMonitor monitor) {
             if (!Owl.isShuttingDown() && !monitor.isCanceled()) {
 
-              /* Perform Backup */
-              try {
-                backupService.backup(true, monitor);
-              } catch (PersistenceException e) {
-                Activator.safeLogError(e.getMessage(), e);
+              /* Perform Backup and store next online backup time unless delayed */
+              synchronized (fNextOnlineBackup) {
+                if (shouldOnlineBackup() && !delayOnlineBackup()) {
+                  try {
+                    backupService.backup(true, monitor);
+                    fNextOnlineBackup.set(System.currentTimeMillis() + getOnlineBackupDelay(false));
+                  } catch (PersistenceException e) {
+                    Activator.safeLogError(e.getMessage(), e);
+                  }
+                }
               }
 
               /* Store Next Backup Time */
               if (!Owl.isShuttingDown() && !monitor.isCanceled())
-                schedule(getOnlineBackupDelay(false));
+                schedule(ONLINE_BACKUP_SCHEDULER);
             }
 
             return Status.OK_STATUS;
           }
         };
         job.setSystem(true);
-        job.schedule(getOnlineBackupDelay(true));
+        job.schedule(ONLINE_BACKUP_SCHEDULER);
+
+        /* Store next online backup time */
+        fNextOnlineBackup.set(System.currentTimeMillis() + getOnlineBackupDelay(true));
       }
     } finally {
       if (subMonitor != null) //If we perform the migration, the subMonitor is not null. Otherwise we don't show progress.
@@ -371,11 +383,25 @@ public class DBManager {
     }
   }
 
+  private boolean shouldOnlineBackup() {
+    return System.currentTimeMillis() >= fNextOnlineBackup.get();
+  }
+
+  private boolean delayOnlineBackup() {
+    boolean delay = System.currentTimeMillis() >= (fNextOnlineBackup.get() + ONLINE_BACKUP_DELAY_THRESHOLD);
+
+    /* Re-Schedule to the future if delay threshold is hit */
+    if (delay)
+      fNextOnlineBackup.set(System.currentTimeMillis() + ONLINE_BACKUP_SHORT_INTERVAL);
+
+    return delay;
+  }
+
   private long getOnlineBackupDelay(boolean initial) {
     if (initial)
-      return ONLINE_BACKUP_INITIAL;
+      return ONLINE_BACKUP_SHORT_INTERVAL;
 
-    return getLongProperty("rssowl.onlinebackup.interval", ONLINE_BACKUP_INTERVAL); //$NON-NLS-1$
+    return getLongProperty("rssowl.onlinebackup.interval", ONLINE_BACKUP_LONG_INTERVAL); //$NON-NLS-1$
   }
 
   private long getLongProperty(String propertyName, long defaultValue) {
