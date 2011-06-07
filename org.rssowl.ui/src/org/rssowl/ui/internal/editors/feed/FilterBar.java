@@ -562,8 +562,8 @@ public class FilterBar {
     }
 
     /* Layout as necessary */
-    if (layout && fClearQuicksearchToolBar != null)
-      fClearQuicksearchToolBar.getControl().getParent().layout();
+    if (layout)
+      fSearchInput.getParent().layout();
   }
 
   /* News Filter */
