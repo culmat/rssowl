@@ -35,6 +35,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.bindings.TriggerSequence;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
@@ -1882,22 +1883,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         shareMenu.add(new Action(provider.getName()) {
           @Override
           public void run() {
-
-            /* Special Case "Send E-Mail" action */
-            if (SendLinkAction.ID.equals(provider.getId())) {
-              IActionDelegate action = new SendLinkAction();
-              action.selectionChanged(null, selection);
-              action.run(null);
-            }
-
-            /* Other Action */
-            else {
-              Object obj = selection.getFirstElement();
-              if (obj != null && obj instanceof INews) {
-                String shareLink = provider.toShareUrl((INews) obj);
-                new OpenInBrowserAction(new StructuredSelection(shareLink)).run();
-              }
-            }
+            Controller.getDefault().share(selection, provider);
           };
 
           @Override
@@ -1907,6 +1893,14 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
             return super.getImageDescriptor();
           };
+
+          @Override
+          public String getText() {
+            IBindingService bs = (IBindingService) PlatformUI.getWorkbench().getService(IBindingService.class);
+            TriggerSequence binding = bs.getBestActiveBindingFor(provider.getId());
+
+            return binding != null ? NLS.bind(Messages.ApplicationActionBarAdvisor_SHARE_BINDING, provider.getName(), binding.format()) : provider.getName();
+          }
 
           @Override
           public boolean isEnabled() {

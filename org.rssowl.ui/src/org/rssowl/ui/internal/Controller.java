@@ -40,10 +40,13 @@ import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IActionDelegate;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.rssowl.core.IApplicationService;
@@ -94,12 +97,15 @@ import org.rssowl.core.util.Triple;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.OwlUI.Layout;
 import org.rssowl.ui.internal.actions.FindUpdatesAction;
+import org.rssowl.ui.internal.actions.OpenInBrowserAction;
+import org.rssowl.ui.internal.actions.SendLinkAction;
 import org.rssowl.ui.internal.dialogs.FatalOutOfMemoryErrorDialog;
 import org.rssowl.ui.internal.dialogs.LoginDialog;
 import org.rssowl.ui.internal.dialogs.properties.EntityPropertyPageWrapper;
 import org.rssowl.ui.internal.dialogs.welcome.TutorialWizard;
 import org.rssowl.ui.internal.dialogs.welcome.WelcomeWizard;
 import org.rssowl.ui.internal.handler.LabelNewsHandler;
+import org.rssowl.ui.internal.handler.ShareNewsHandler;
 import org.rssowl.ui.internal.notifier.NotificationService;
 import org.rssowl.ui.internal.services.CleanUpReminderService;
 import org.rssowl.ui.internal.services.ContextService;
@@ -1080,6 +1086,29 @@ public class Controller {
   }
 
   /**
+   * @param selection the {@link IStructuredSelection} to share.
+   * @param provider the {@link ShareProvider} to use.
+   */
+  public void share(IStructuredSelection selection, ShareProvider provider) {
+
+    /* Special Case "Send E-Mail" action */
+    if (SendLinkAction.ID.equals(provider.getId())) {
+      IActionDelegate action = new SendLinkAction();
+      action.selectionChanged(null, selection);
+      action.run(null);
+    }
+
+    /* Other Action */
+    else {
+      Object obj = selection.getFirstElement();
+      if (obj != null && obj instanceof INews) {
+        String shareLink = provider.toShareUrl((INews) obj);
+        new OpenInBrowserAction(new StructuredSelection(shareLink)).run();
+      }
+    }
+  }
+
+  /**
    * @return a {@link List} of {@link LinkTransformer} sorted by name;
    */
   public List<LinkTransformer> getLinkTransformers() {
@@ -1219,6 +1248,9 @@ public class Controller {
 
     /* Support Keybindings for assigning Labels */
     defineLabelCommands(CoreUtils.loadSortedLabels());
+
+    /* Support Keybindings for sharing News */
+    defineSharingCommands(getShareProviders());
 
     /* Backup Subscriptions as OPML if no error */
     JobRunner.runDelayedInBackgroundThread(new Runnable() {
@@ -1544,6 +1576,22 @@ public class Controller {
       Command command = commandService.getCommand(LABEL_ACTION_PREFIX + label.getOrder());
       command.define(NLS.bind(Messages.Controller_LABEL, label.getName()), NLS.bind(Messages.Controller_LABEL_MSG, label.getName()), commandService.getCategory(RSSOWL_KEYBINDING_CATEGORY));
       command.setHandler(new LabelNewsHandler(label));
+    }
+  }
+
+  private void defineSharingCommands(List<ShareProvider> shareProviders) {
+    if (InternalOwl.TESTING)
+      return;
+
+    ICommandService commandService = (ICommandService) PlatformUI.getWorkbench().getService(ICommandService.class);
+    if (commandService == null)
+      return;
+
+    /* Define Command For Each Share Provider */
+    for (final ShareProvider provider : shareProviders) {
+      Command command = commandService.getCommand(provider.getId());
+      command.define(NLS.bind(Messages.Controller_SHARE, provider.getName()), NLS.bind(Messages.Controller_SHARE_MSG, provider.getName()), commandService.getCategory(RSSOWL_KEYBINDING_CATEGORY));
+      command.setHandler(new ShareNewsHandler(provider));
     }
   }
 
