@@ -562,7 +562,7 @@ public class FilterBar {
     }
 
     /* Layout as necessary */
-    if (layout)
+    if (layout && fClearQuicksearchToolBar != null)
       fClearQuicksearchToolBar.getControl().getParent().layout();
   }
 
