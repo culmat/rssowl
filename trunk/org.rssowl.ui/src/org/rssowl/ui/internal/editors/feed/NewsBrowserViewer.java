@@ -1316,6 +1316,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     StringBuilder js = new StringBuilder();
     js.append(getElementById(Dynamic.FULL_CONTENT_LINK_TEXT.getId(news)).append(".innerHTML='").append(escapeForInnerHtml(Messages.NewsBrowserViewer_LOADING)).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$
     js.append(getElementById(Dynamic.FULL_CONTENT_LINK.getId(news)).append(".blur(); ")); //$NON-NLS-1$
+    js.append(getElementById(Dynamic.FULL_CONTENT_LINK.getId(news)).append(".style.fontStyle = 'italic'; ")); //$NON-NLS-1$
     fBrowser.execute(js.toString());
 
     /* First cancel all running jobs for this news if any */
@@ -1395,6 +1396,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
     final StringBuilder js = new StringBuilder();
     js.append(getElementById(Dynamic.CONTENT.getId(news)).append(".innerHTML='").append(escapeForInnerHtml(result)).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$
+    js.append(getElementById(Dynamic.FULL_CONTENT_LINK.getId(news)).append(".style.fontStyle = 'normal'; ")); //$NON-NLS-1$
     js.append(getElementById(Dynamic.FULL_CONTENT_LINK_TEXT.getId(news)).append(".innerHTML='").append(escapeForInnerHtml(Messages.NewsBrowserViewer_FULL_CONTENT)).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$
     scrollIfNecessary(news, js);
 
