@@ -90,6 +90,7 @@ public class Messages extends NLS {
   public static String ApplicationActionBarAdvisor_RESTORE_DEFAULT_COLUMNS;
   public static String ApplicationActionBarAdvisor_SELECT_FILE_FOR_DOWNLOAD;
   public static String ApplicationActionBarAdvisor_SELECT_FOLDER_FOR_DOWNLOADS;
+  public static String ApplicationActionBarAdvisor_SHARE_BINDING;
   public static String ApplicationActionBarAdvisor_SHARE_NEWS;
   public static String ApplicationActionBarAdvisor_SHOW_ALL;
   public static String ApplicationActionBarAdvisor_SHOW_KEY_BINDINGS;
@@ -132,6 +133,8 @@ public class Messages extends NLS {
   public static String Controller_PERSONAL;
   public static String Controller_PROBLEM;
   public static String Controller_RESTART_RSSOWL;
+  public static String Controller_SHARE;
+  public static String Controller_SHARE_MSG;
   public static String Controller_TODO;
   public static String Controller_UPDATING;
   public static String Controller_UPDATING_FEEDS;
