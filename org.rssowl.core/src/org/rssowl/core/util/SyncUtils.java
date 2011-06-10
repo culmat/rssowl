@@ -88,13 +88,15 @@ public class SyncUtils {
    */
   public static String getGoogleAuthToken(String email, String pw, boolean refresh, IProgressMonitor monitor) throws ConnectionException {
 
-    /* Clear as necessary */
-    if (refresh)
-      fgSharedAuthToken = null;
-
-    /* Return the shared token if existing */
-    if (fgSharedAuthToken != null)
+    /*
+     * Return the shared token if existing or even null if not willing to
+     * refresh. Clients have to force refresh to get the token then.
+     */
+    if (!refresh)
       return fgSharedAuthToken;
+
+    /* Clear Shared Token */
+    fgSharedAuthToken = null;
 
     /* Return on cancellation */
     if (monitor.isCanceled())
@@ -106,6 +108,10 @@ public class SyncUtils {
       /* Another thread might have won the race */
       if (fgSharedAuthToken != null)
         return fgSharedAuthToken;
+
+      /* Return on cancellation */
+      if (monitor.isCanceled())
+        return null;
 
       /* Now Connect to Google */
       try {
