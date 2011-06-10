@@ -36,17 +36,19 @@ import org.eclipse.osgi.util.NLS;
 import org.jdom.Document;
 import org.jdom.input.DOMBuilder;
 import org.rssowl.core.internal.Activator;
+import org.rssowl.core.internal.interpreter.json.JSONInterpreter;
+import org.rssowl.core.internal.interpreter.json.JSONObject;
 import org.rssowl.core.interpreter.IElementHandler;
 import org.rssowl.core.interpreter.IFormatInterpreter;
 import org.rssowl.core.interpreter.IInterpreterService;
 import org.rssowl.core.interpreter.INamespaceHandler;
 import org.rssowl.core.interpreter.ITypeExporter;
+import org.rssowl.core.interpreter.ITypeExporter.Options;
 import org.rssowl.core.interpreter.ITypeImporter;
 import org.rssowl.core.interpreter.IXMLParser;
 import org.rssowl.core.interpreter.InterpreterException;
 import org.rssowl.core.interpreter.ParserException;
 import org.rssowl.core.interpreter.UnknownFormatException;
-import org.rssowl.core.interpreter.ITypeExporter.Options;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolderChild;
@@ -155,6 +157,16 @@ public class InterpreterServiceImpl implements IInterpreterService {
 
     /* Interpret Document into a Feed */
     fFormatInterpreters.get(format).interpret(document, feed);
+  }
+
+  /*
+   * @see
+   * org.rssowl.core.interpreter.IInterpreterService#interpretJSONObject(org
+   * .rssowl.core.internal.interpreter.json.JSONObject,
+   * org.rssowl.core.persist.IFeed)
+   */
+  public void interpretJSONObject(JSONObject json, IFeed feed) throws InterpreterException {
+    new JSONInterpreter().interpret(json, feed);
   }
 
   /*

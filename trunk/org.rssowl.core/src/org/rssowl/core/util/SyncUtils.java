@@ -30,6 +30,7 @@ import org.rssowl.core.connection.ConnectionException;
 import org.rssowl.core.connection.IConnectionPropertyConstants;
 import org.rssowl.core.connection.IProtocolHandler;
 import org.rssowl.core.internal.Activator;
+import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.INews;
 
 import java.io.BufferedReader;
@@ -100,7 +101,7 @@ public class SyncUtils {
       return null;
 
     /* Obtain a new token (only 1 Thread permitted) */
-    synchronized (fgSharedAuthToken) {
+    synchronized (GOOGLE_LOGIN) {
 
       /* Another thread might have won the race */
       if (fgSharedAuthToken != null)
@@ -171,5 +172,15 @@ public class SyncUtils {
    */
   public static boolean isSynchronized(INews news) {
     return news != null && news.getGuid() != null && news.getGuid().getValue().startsWith(SYNCED_NEWS_ID_PART) && StringUtils.isSet(news.getInReplyTo());
+  }
+
+  /**
+   * @param bm the {@link IBookMark} to check for synchronization.
+   * @return <code>true</code> if the bookmark is under synchronization control
+   * and <code>false</code> otherwise.
+   */
+  public static boolean isSynchronized(IBookMark bm) {
+    String link = bm.getFeedLinkReference().getLinkAsText();
+    return link.startsWith(READER_HTTP_SCHEME);
   }
 }
