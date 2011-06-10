@@ -77,6 +77,7 @@ public class LoginDialog extends TitleAreaDialog {
   private String fSubline;
   private ImageDescriptor fTitleImageDescriptor;
   private final IPreferenceScope fPreferences;
+  private boolean fStorePermanently;
 
   /**
    * @param parentShell
@@ -97,6 +98,15 @@ public class LoginDialog extends TitleAreaDialog {
    */
   public void setHeader(String header) {
     fHeader = header;
+  }
+
+  /**
+   * @param storePermanently if <code>true</code> stores the login credentials
+   * permanently without asking the user and <code>false</code> otherwise (the
+   * default).
+   */
+  public void setStorePermanently(boolean storePermanently) {
+    fStorePermanently = storePermanently;
   }
 
   /**
@@ -130,7 +140,7 @@ public class LoginDialog extends TitleAreaDialog {
 
     /* User pressed OK Button */
     if (buttonId == IDialogConstants.OK_ID) {
-      boolean rememberPassword = fRememberPassword.getSelection();
+      boolean rememberPassword = fStorePermanently || fRememberPassword.getSelection();
       if (rememberPassword != fPreferences.getBoolean(DefaultPreferences.REMEMBER_PASSWORD))
         fPreferences.putBoolean(DefaultPreferences.REMEMBER_PASSWORD, rememberPassword);
 
@@ -254,14 +264,16 @@ public class LoginDialog extends TitleAreaDialog {
     fPassword.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
     /* Spacer */
-    new Label(composite, SWT.NONE);
+    if (!fStorePermanently) {
+      new Label(composite, SWT.NONE);
 
-    /* Remember Password */
-    fRememberPassword = new Button(composite, SWT.CHECK);
-    fRememberPassword.setText(Messages.LoginDialog_REMEMBER_PASSWORD);
-    fRememberPassword.setSelection(fPreferences.getBoolean(DefaultPreferences.REMEMBER_PASSWORD));
-    fRememberPassword.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-    ((GridData) fRememberPassword.getLayoutData()).verticalIndent = 5;
+      /* Remember Password */
+      fRememberPassword = new Button(composite, SWT.CHECK);
+      fRememberPassword.setText(Messages.LoginDialog_REMEMBER_PASSWORD);
+      fRememberPassword.setSelection(fPreferences.getBoolean(DefaultPreferences.REMEMBER_PASSWORD));
+      fRememberPassword.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+      ((GridData) fRememberPassword.getLayoutData()).verticalIndent = 5;
+    }
 
     /* Separator */
     Label separator = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
