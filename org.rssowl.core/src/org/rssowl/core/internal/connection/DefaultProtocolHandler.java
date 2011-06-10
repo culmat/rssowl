@@ -95,7 +95,7 @@ import java.util.zip.GZIPInputStream;
  * Protocol. After loading the Inputstream of the given URL, the stream is
  * passed to the Interpreter-Component to interpret it as one of the supported
  * XML-Formats for Newsfeeds.
- *
+ * 
  * @author bpasero
  */
 public class DefaultProtocolHandler implements IProtocolHandler {
@@ -192,7 +192,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     return Triple.create(feed, conditionalGet, link);
   }
 
-  private IConditionalGet getConditionalGet(URI link, InputStream inS) {
+  protected IConditionalGet getConditionalGet(URI link, InputStream inS) {
     IModelFactory typesFactory = Owl.getModelFactory();
 
     if (inS instanceof IConditionalGetCompatible) {
@@ -206,7 +206,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     return null;
   }
 
-  private void closeStream(InputStream inS, boolean abort) {
+  protected void closeStream(InputStream inS, boolean abort) {
     try {
       if (abort && inS instanceof IAbortable)
         ((IAbortable) inS).abort();
@@ -318,7 +318,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
   /**
    * Do not override default URLStreamHandler of HTTP/HTTPS and therefor return
    * NULL.
-   *
+   * 
    * @see org.rssowl.core.connection.IProtocolHandler#getURLStreamHandler()
    */
   public URLStreamHandlerService getURLStreamHandler() {
@@ -346,7 +346,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
    * properties may be used in conjunction with the
    * <code>IConnectionPropertyConstants</code> to define connection related
    * properties..
-   *
+   * 
    * @param link The URL to load.
    * @param properties Connection related properties as defined in
    * <code>IConnectionPropertyConstants</code> for example, or <code>NULL</code>
@@ -357,7 +357,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
    * @see AuthenticationRequiredException
    * @see NotModifiedException
    */
-  private InputStream openStream(URI link, Map<Object, Object> properties) throws ConnectionException {
+  protected InputStream openStream(URI link, Map<Object, Object> properties) throws ConnectionException {
 
     /* Retrieve the InputStream out of the Link */
     try {
@@ -572,8 +572,8 @@ public class DefaultProtocolHandler implements IProtocolHandler {
   }
 
   private void setHeaders(Map<Object, Object> properties, HttpMethodBase method) {
-    setRequestHeader(method, HEADER_RESPOND_ACCEPT_ENCODING, "gzip"); //$NON-NLS-1$
-    setRequestHeader(method, HEADER_RESPOND_USER_AGENT, USER_AGENT);
+    method.setRequestHeader(HEADER_RESPOND_ACCEPT_ENCODING, "gzip"); //$NON-NLS-1$
+    method.setRequestHeader(HEADER_RESPOND_USER_AGENT, USER_AGENT);
 
     /* Add Conditional GET Headers if present */
     if (properties != null) {
@@ -581,19 +581,19 @@ public class DefaultProtocolHandler implements IProtocolHandler {
       String ifNoneMatch = (String) properties.get(IConnectionPropertyConstants.IF_NONE_MATCH);
 
       if (ifModifiedSince != null)
-        setRequestHeader(method, HEADER_RESPOND_IF_MODIFIED_SINCE, ifModifiedSince);
+        method.setRequestHeader(HEADER_RESPOND_IF_MODIFIED_SINCE, ifModifiedSince);
 
       if (ifNoneMatch != null)
-        setRequestHeader(method, HEADER_RESPOND_IF_NONE_MATCH, ifNoneMatch);
+        method.setRequestHeader(HEADER_RESPOND_IF_NONE_MATCH, ifNoneMatch);
     }
 
     /* Add Accept-Language Header if present */
     if (properties != null && properties.containsKey(IConnectionPropertyConstants.ACCEPT_LANGUAGE))
-      setRequestHeader(method, HEADER_ACCEPT_LANGUAGE, (String) properties.get(IConnectionPropertyConstants.ACCEPT_LANGUAGE));
+      method.setRequestHeader(HEADER_ACCEPT_LANGUAGE, (String) properties.get(IConnectionPropertyConstants.ACCEPT_LANGUAGE));
 
     /* Add Cookie Header if present */
     if (properties != null && properties.containsKey(IConnectionPropertyConstants.COOKIE))
-      setRequestHeader(method, HEADER_COOKIE, (String) properties.get(IConnectionPropertyConstants.COOKIE));
+      method.setRequestHeader(HEADER_COOKIE, (String) properties.get(IConnectionPropertyConstants.COOKIE));
 
     /* Add more Headers */
     if (properties != null && properties.containsKey(IConnectionPropertyConstants.HEADERS)) {
@@ -601,16 +601,9 @@ public class DefaultProtocolHandler implements IProtocolHandler {
       Set<?> entries = headers.entrySet();
       for (Object obj : entries) {
         Entry<?, ?> entry = (Entry<?, ?>) obj;
-        setRequestHeader(method, (String) entry.getKey(), (String) entry.getValue());
+        method.setRequestHeader((String) entry.getKey(), (String) entry.getValue());
       }
     }
-  }
-
-  private void setRequestHeader(HttpMethodBase method, String key, String value) {
-    if (method instanceof GetMethod)
-      ((GetMethod) method).setRequestHeader(key, value);
-    else if (method instanceof PostMethod)
-      ((PostMethod) method).addParameter(key, value);
   }
 
   private HttpClient initClient(Map<Object, Object> properties) {
@@ -651,6 +644,16 @@ public class DefaultProtocolHandler implements IProtocolHandler {
 
     /* Set Headers */
     setHeaders(properties, method);
+
+    /* Set Parameters (POST only) */
+    if (method instanceof PostMethod && properties != null && properties.containsKey(IConnectionPropertyConstants.PARAMETERS)) {
+      Map<?, ?> parameters = (Map<?, ?>) properties.get(IConnectionPropertyConstants.PARAMETERS);
+      Set<?> entries = parameters.entrySet();
+      for (Object obj : entries) {
+        Entry<?, ?> entry = (Entry<?, ?>) obj;
+        ((PostMethod) method).addParameter((String) entry.getKey(), (String) entry.getValue());
+      }
+    }
 
     /* Follow Redirects */
     if (method instanceof GetMethod)

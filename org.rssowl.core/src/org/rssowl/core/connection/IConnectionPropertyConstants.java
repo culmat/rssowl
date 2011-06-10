@@ -54,6 +54,9 @@ public interface IConnectionPropertyConstants {
   /** Key for storing Headers */
   public static final String HEADERS = "HEADERS"; //$NON-NLS-1$
 
+  /** Key for storing Parameters (POST only) */
+  public static final String PARAMETERS = "PARAMETERS"; //$NON-NLS-1$
+
   /** Key for forcing a POST */
   public static final String POST = "POST"; //$NON-NLS-1$
 

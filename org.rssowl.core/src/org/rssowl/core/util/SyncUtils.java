@@ -30,6 +30,7 @@ import org.rssowl.core.connection.ConnectionException;
 import org.rssowl.core.connection.IConnectionPropertyConstants;
 import org.rssowl.core.connection.IProtocolHandler;
 import org.rssowl.core.internal.Activator;
+import org.rssowl.core.persist.INews;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -49,6 +50,16 @@ public class SyncUtils {
 
   /** Google Client Login Site */
   public static final String GOOGLE_LOGIN = "https://www.google.com/accounts/ClientLogin"; //$NON-NLS-1$
+
+  /** Google Token Service */
+  public static final String TOKEN_URL = "http://www.google.com/reader/api/0/token"; //$NON-NLS-1$
+
+  /** Schemes to use for synced feeds */
+  public static final String READER_HTTP_SCHEME = "reader"; //$NON-NLS-1$
+  public static final String READER_HTTPS_SCHEME = "readers"; //$NON-NLS-1$
+
+  /* Part of the identifier of synchronized news */
+  private static final String SYNCED_NEWS_ID_PART = "tag:google.com"; //$NON-NLS-1$
 
   /* Google Auth Identifier */
   private static final String AUTH_IDENTIFIER = "Auth="; //$NON-NLS-1$
@@ -75,16 +86,16 @@ public class SyncUtils {
       IProtocolHandler handler = Owl.getConnectionService().getHandler(uri);
       if (handler != null) {
 
-        /* Google Specific Headers */
-        Map<String, String> headers = new HashMap<String, String>();
-        headers.put("accountType", "GOOGLE"); //$NON-NLS-1$ //$NON-NLS-2$
-        headers.put("Email", email); //$NON-NLS-1$
-        headers.put("Passwd", pw); //$NON-NLS-1$
-        headers.put("service", "reader"); //$NON-NLS-1$ //$NON-NLS-2$
-        headers.put("source", "RSSOwl.org-RSSOwl-" + Activator.getDefault().getVersion()); //$NON-NLS-1$ //$NON-NLS-2$
+        /* Google Specific Parameters */
+        Map<String, String> parameters = new HashMap<String, String>();
+        parameters.put("accountType", "GOOGLE"); //$NON-NLS-1$ //$NON-NLS-2$
+        parameters.put("Email", email); //$NON-NLS-1$
+        parameters.put("Passwd", pw); //$NON-NLS-1$
+        parameters.put("service", "reader"); //$NON-NLS-1$ //$NON-NLS-2$
+        parameters.put("source", "RSSOwl.org-RSSOwl-" + Activator.getDefault().getVersion()); //$NON-NLS-1$ //$NON-NLS-2$
 
         Map<Object, Object> properties = new HashMap<Object, Object>();
-        properties.put(IConnectionPropertyConstants.HEADERS, headers);
+        properties.put(IConnectionPropertyConstants.PARAMETERS, parameters);
         properties.put(IConnectionPropertyConstants.POST, Boolean.TRUE);
 
         BufferedReader reader = null;
@@ -118,5 +129,14 @@ public class SyncUtils {
    */
   public static String getGoogleAuthorizationHeader(String authToken) {
     return GOOGLE_LOGIN_HEADER_VALUE + authToken;
+  }
+
+  /**
+   * @param news the {@link INews} to check for synchronization.
+   * @return <code>true</code> if the news is under synchronization control and
+   * <code>false</code> otherwise.
+   */
+  public static boolean isSynchronized(INews news) {
+    return news != null && news.getGuid() != null && news.getGuid().getValue().startsWith(SYNCED_NEWS_ID_PART) && StringUtils.isSet(news.getInReplyTo());
   }
 }
