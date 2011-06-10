@@ -32,10 +32,11 @@ import org.eclipse.core.runtime.jobs.Job;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * The <code>BatchedBuffer</code> can be used to batch certain types of
- * Objects for later processing. The type of Object is identified by the generic
+ * The <code>BatchedBuffer</code> can be used to batch certain types of Objects
+ * for later processing. The type of Object is identified by the generic
  * <code>T</code>.
  *
  * @author bpasero
@@ -46,6 +47,7 @@ public class BatchedBuffer<T> {
   private final List<T> fBuffer;
   private final Job fBufferProcessor;
   private final Receiver<T> fReceiver;
+  private final AtomicBoolean fSealed = new AtomicBoolean(false);
 
   /**
    * @param <T> The type that will be received from the
@@ -54,13 +56,15 @@ public class BatchedBuffer<T> {
   public interface Receiver<T> {
 
     /**
-     * Asks the implementor to process the given Collection of Objects. This method
-     * will be called after <code>batchInterval</code> millies.
+     * Asks the implementor to process the given Collection of Objects. This
+     * method will be called after <code>batchInterval</code> millies.
      *
      * @param objects A Collection of Objects that have been added during
      * <code>batchInterval</code>.
+     * @param monitor a progress monitor to report progress and react on
+     * cancellation.
      */
-    void receive(Collection<T> objects);
+    void receive(Collection<T> objects, IProgressMonitor monitor);
   }
 
   /**
@@ -83,7 +87,7 @@ public class BatchedBuffer<T> {
    * @param objects The Collection of Objects to add into this Buffer.
    */
   public void addAll(Collection<T> objects) {
-    if (objects.isEmpty())
+    if (objects.isEmpty() || fSealed.get())
       return;
 
     synchronized (fBuffer) {
@@ -104,13 +108,24 @@ public class BatchedBuffer<T> {
     }
   }
 
+  /**
+   * Cancels the BatchedBuffer from running or processing tasks.
+   */
+  public void cancel() {
+    fSealed.set(true);
+    fBufferProcessor.cancel();
+  }
+
   /* Creates a Job to process the contents of the Buffer */
   private Job createBufferProcessor() {
     Job job = new Job("") { //$NON-NLS-1$
       @Override
       protected IStatus run(IProgressMonitor monitor) {
+        if (monitor.isCanceled())
+          return Status.CANCEL_STATUS;
+
         synchronized (fBuffer) {
-          fReceiver.receive(new ArrayList<T>(fBuffer));
+          fReceiver.receive(new ArrayList<T>(fBuffer), monitor);
           fBuffer.clear();
         }
 

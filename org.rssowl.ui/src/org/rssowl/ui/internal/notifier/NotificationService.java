@@ -24,6 +24,7 @@
 
 package org.rssowl.ui.internal.notifier;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Shell;
 import org.rssowl.core.Owl;
@@ -96,8 +97,9 @@ public class NotificationService {
 
     /* Process Events batched */
     BatchedBuffer.Receiver<NotificationItem> receiver = new BatchedBuffer.Receiver<NotificationItem>() {
-      public void receive(Collection<NotificationItem> items) {
-        showItems(items, Mode.INCOMING_AUTOMATIC);
+      public void receive(Collection<NotificationItem> items, IProgressMonitor monitor) {
+        if (!monitor.isCanceled())
+          showItems(items, Mode.INCOMING_AUTOMATIC, monitor);
       }
     };
 
@@ -109,6 +111,7 @@ public class NotificationService {
 
   /** Shutdown this Service */
   public void stopService() {
+    fBatchedBuffer.cancel();
     DynamicDAO.removeEntityListener(INews.class, fNewsListener);
     DynamicDAO.removeEntityListener(ISearchMark.class, fSearchMarkListener);
   }
@@ -142,7 +145,7 @@ public class NotificationService {
 
     /* Show Directly otherwise */
     else
-      showItems(items, mode);
+      showItems(items, mode, null);
   }
 
   /**
@@ -251,7 +254,7 @@ public class NotificationService {
 
     /* Show Directly */
     else
-      showItems(items, Mode.INCOMING_AUTOMATIC);
+      showItems(items, Mode.INCOMING_AUTOMATIC, null);
   }
 
   private void onNewsAdded(final Set<NewsEvent> events) {
@@ -302,7 +305,7 @@ public class NotificationService {
 
         /* Show Directly */
         else
-          showItems(items, Mode.INCOMING_AUTOMATIC);
+          showItems(items, Mode.INCOMING_AUTOMATIC, null);
       }
     };
 
@@ -350,7 +353,7 @@ public class NotificationService {
   }
 
   /* Show Notification in UI Thread */
-  private void showItems(final Collection<NotificationItem> items, final Mode mode) {
+  private void showItems(final Collection<NotificationItem> items, final Mode mode, final IProgressMonitor monitor) {
 
     /* Ignore empty lists */
     if (items.isEmpty())
@@ -361,7 +364,7 @@ public class NotificationService {
       public void run() {
 
         /* Return early if shutting down */
-        if (Controller.getDefault().isShuttingDown())
+        if (Controller.getDefault().isShuttingDown() || (monitor != null && monitor.isCanceled()))
           return;
 
         /* Return if Notification should only show when minimized */
