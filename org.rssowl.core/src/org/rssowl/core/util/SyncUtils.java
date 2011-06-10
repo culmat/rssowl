@@ -67,12 +67,17 @@ public class SyncUtils {
   /* Google Auth Header */
   private static final String GOOGLE_LOGIN_HEADER_VALUE = "GoogleLogin auth="; //$NON-NLS-1$
 
+  /* Google Authentication Token can be shared during the session */
+  private static String fgSharedAuthToken;
+
   /**
    * Obtains the Google Auth Token to perform REST operations for Google
    * Services.
    *
    * @param email the user account for google
    * @param pw the password for the user account
+   * @param refresh if <code>true</code> causes a fresh authentication token to
+   * be obtained and a shared one to be picked up otherwise.
    * @param monitor an instance of {@link IProgressMonitor} that can be used to
    * cancel the operation and report progress.
    * @return the google Auth Token for the given account or <code>null</code> if
@@ -80,42 +85,70 @@ public class SyncUtils {
    * @throws ConnectionException Checked Exception to be used in case of any
    * Exception.
    */
-  public static String getGoogleAuthToken(String email, String pw, IProgressMonitor monitor) throws ConnectionException {
-    try {
-      URI uri = new URI(GOOGLE_LOGIN);
-      IProtocolHandler handler = Owl.getConnectionService().getHandler(uri);
-      if (handler != null) {
+  public static String getGoogleAuthToken(String email, String pw, boolean refresh, IProgressMonitor monitor) throws ConnectionException {
 
-        /* Google Specific Parameters */
-        Map<String, String> parameters = new HashMap<String, String>();
-        parameters.put("accountType", "GOOGLE"); //$NON-NLS-1$ //$NON-NLS-2$
-        parameters.put("Email", email); //$NON-NLS-1$
-        parameters.put("Passwd", pw); //$NON-NLS-1$
-        parameters.put("service", "reader"); //$NON-NLS-1$ //$NON-NLS-2$
-        parameters.put("source", "RSSOwl.org-RSSOwl-" + Activator.getDefault().getVersion()); //$NON-NLS-1$ //$NON-NLS-2$
+    /* Clear as necessary */
+    if (refresh)
+      fgSharedAuthToken = null;
 
-        Map<Object, Object> properties = new HashMap<Object, Object>();
-        properties.put(IConnectionPropertyConstants.PARAMETERS, parameters);
-        properties.put(IConnectionPropertyConstants.POST, Boolean.TRUE);
+    /* Return the shared token if existing */
+    if (fgSharedAuthToken != null)
+      return fgSharedAuthToken;
 
-        BufferedReader reader = null;
-        try {
-          InputStream inS = handler.openStream(uri, monitor, properties);
-          reader = new BufferedReader(new InputStreamReader(inS));
-          String line;
-          while (!monitor.isCanceled() && (line = reader.readLine()) != null) {
-            if (line.startsWith(AUTH_IDENTIFIER))
-              return line.substring(AUTH_IDENTIFIER.length());
-          }
-        } finally {
-          if (reader != null)
-            reader.close();
-        }
+    /* Return on cancellation */
+    if (monitor.isCanceled())
+      return null;
+
+    /* Obtain a new token (only 1 Thread permitted) */
+    synchronized (fgSharedAuthToken) {
+
+      /* Another thread might have won the race */
+      if (fgSharedAuthToken != null)
+        return fgSharedAuthToken;
+
+      /* Now Connect to Google */
+      try {
+        internalGetGoogleAuthToken(email, pw, monitor);
+      } catch (URISyntaxException e) {
+        throw new ConnectionException(Activator.getDefault().createErrorStatus(e.getMessage(), e));
+      } catch (IOException e) {
+        throw new ConnectionException(Activator.getDefault().createErrorStatus(e.getMessage(), e));
       }
-    } catch (URISyntaxException e) {
-      throw new ConnectionException(Activator.getDefault().createErrorStatus(e.getMessage(), e));
-    } catch (IOException e) {
-      throw new ConnectionException(Activator.getDefault().createErrorStatus(e.getMessage(), e));
+    }
+
+    return null;
+  }
+
+  private static String internalGetGoogleAuthToken(String email, String pw, IProgressMonitor monitor) throws ConnectionException, URISyntaxException, IOException {
+    URI uri = new URI(GOOGLE_LOGIN);
+    IProtocolHandler handler = Owl.getConnectionService().getHandler(uri);
+    if (handler != null) {
+
+      /* Google Specific Parameters */
+      Map<String, String> parameters = new HashMap<String, String>();
+      parameters.put("accountType", "GOOGLE"); //$NON-NLS-1$ //$NON-NLS-2$
+      parameters.put("Email", email); //$NON-NLS-1$
+      parameters.put("Passwd", pw); //$NON-NLS-1$
+      parameters.put("service", "reader"); //$NON-NLS-1$ //$NON-NLS-2$
+      parameters.put("source", "RSSOwl.org-RSSOwl-" + Activator.getDefault().getVersion()); //$NON-NLS-1$ //$NON-NLS-2$
+
+      Map<Object, Object> properties = new HashMap<Object, Object>();
+      properties.put(IConnectionPropertyConstants.PARAMETERS, parameters);
+      properties.put(IConnectionPropertyConstants.POST, Boolean.TRUE);
+
+      BufferedReader reader = null;
+      try {
+        InputStream inS = handler.openStream(uri, monitor, properties);
+        reader = new BufferedReader(new InputStreamReader(inS));
+        String line;
+        while (!monitor.isCanceled() && (line = reader.readLine()) != null) {
+          if (line.startsWith(AUTH_IDENTIFIER))
+            return line.substring(AUTH_IDENTIFIER.length());
+        }
+      } finally {
+        if (reader != null)
+          reader.close();
+      }
     }
 
     return null;
@@ -123,7 +156,7 @@ public class SyncUtils {
 
   /**
    * @param authToken the authorization token that can be obtained from
-   * {@link SyncUtils#getGoogleAuthToken(String, String, IProgressMonitor)}
+   * {@link SyncUtils#getGoogleAuthToken(String, String, boolean, IProgressMonitor)}
    * @return a header value that can be used inside <code>Authorization</code>
    * to get access to Google Services.
    */

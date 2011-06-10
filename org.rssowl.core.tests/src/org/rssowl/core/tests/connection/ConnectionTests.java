@@ -667,7 +667,7 @@ public class ConnectionTests {
    */
   @Test
   public void testGoogleReaderSync() throws Exception {
-    String authToken = SyncUtils.getGoogleAuthToken("rssowl@mailinator.com", "rssowl.org", new NullProgressMonitor());
+    String authToken = SyncUtils.getGoogleAuthToken("rssowl@mailinator.com", "rssowl.org", true, new NullProgressMonitor());
     assertNotNull(authToken);
 
     URI uri = URI.create("https://www.google.com/reader/subscriptions/export");

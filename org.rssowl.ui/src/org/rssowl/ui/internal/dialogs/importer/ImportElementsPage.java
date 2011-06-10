@@ -857,7 +857,7 @@ public class ImportElementsPage extends WizardPage {
           }
 
           /* Obtain Auth Token */
-          String googleAuthToken = SyncUtils.getGoogleAuthToken(credentials.getUsername(), credentials.getPassword(), monitor);
+          String googleAuthToken = SyncUtils.getGoogleAuthToken(credentials.getUsername(), credentials.getPassword(), true, monitor);
 
           /* Open Stream */
           in = openStream(URI.create(GOOGLE_READER_OPML_URI), monitor, INITIAL_CON_TIMEOUT, false, false, googleAuthToken);
