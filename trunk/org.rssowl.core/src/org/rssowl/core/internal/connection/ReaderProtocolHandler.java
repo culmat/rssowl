@@ -58,7 +58,7 @@ import java.util.Map;
  * Extends the {@link DefaultProtocolHandler} dealing with Google Reader
  * synchronization. The result from loading a feed is a JSON Object that is
  * passed on to the responsible JSON interpreter service.
- * 
+ *
  * @author bpasero
  */
 public class ReaderProtocolHandler extends DefaultProtocolHandler {
@@ -67,7 +67,7 @@ public class ReaderProtocolHandler extends DefaultProtocolHandler {
   private static final String UTF_8 = "UTF-8"; //$NON-NLS-1$
   private static final String HTTP = "http"; //$NON-NLS-1$
   private static final String HTTPS = "https"; //$NON-NLS-1$
-  private static final String BROWSER_USER_AGENT = "Mozilla/5.0"; //$NON-NLS-1$
+  private static final String BROWSER_USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; rv:2.0.1) Gecko/20100101 Firefox/4.0.1"; //$NON-NLS-1$
 
   /*
    * @see
@@ -232,7 +232,7 @@ public class ReaderProtocolHandler extends DefaultProtocolHandler {
   /**
    * Do not override default URLStreamHandler of HTTP/HTTPS and therefor return
    * NULL.
-   * 
+   *
    * @see org.rssowl.core.connection.IProtocolHandler#getURLStreamHandler()
    */
   @Override
