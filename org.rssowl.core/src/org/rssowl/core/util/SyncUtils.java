@@ -108,7 +108,7 @@ public class SyncUtils {
 
       /* Now Connect to Google */
       try {
-        internalGetGoogleAuthToken(email, pw, monitor);
+        fgSharedAuthToken = internalGetGoogleAuthToken(email, pw, monitor);
       } catch (URISyntaxException e) {
         throw new ConnectionException(Activator.getDefault().createErrorStatus(e.getMessage(), e));
       } catch (IOException e) {
@@ -116,7 +116,7 @@ public class SyncUtils {
       }
     }
 
-    return null;
+    return fgSharedAuthToken;
   }
 
   private static String internalGetGoogleAuthToken(String email, String pw, IProgressMonitor monitor) throws ConnectionException, URISyntaxException, IOException {
