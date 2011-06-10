@@ -139,7 +139,9 @@ import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.StringUtils;
+import org.rssowl.core.util.SyncUtils;
 import org.rssowl.ui.internal.dialogs.CustomWizardDialog;
+import org.rssowl.ui.internal.dialogs.LoginDialog;
 import org.rssowl.ui.internal.editors.browser.WebBrowserInput;
 import org.rssowl.ui.internal.editors.browser.WebBrowserView;
 import org.rssowl.ui.internal.editors.feed.FeedView;
@@ -2871,5 +2873,31 @@ public class OwlUI {
       FileOutputStream outS = new FileOutputStream(new File(file));
       CoreUtils.copy(inS, outS);
     }
+  }
+
+  /**
+   * Opens the Login Dialog to authenticate against sync services.
+   *
+   * @param shell the {@link Shell} as parent of the dialog or <code>null</code>
+   * if none.
+   * @return one of the {@link IDialogConstants} depending on the users choice
+   * of closing the dialog with OK or Cancel.
+   */
+  public static int openSyncLogin(Shell shell) {
+    if (shell == null)
+      shell = getActiveShell();
+
+    if (shell != null) {
+      URI googleLoginUri = URI.create(SyncUtils.GOOGLE_LOGIN);
+      LoginDialog dialog = new LoginDialog(shell, googleLoginUri, null);
+      dialog.setStorePermanently(Application.SYNC);
+      dialog.setHeader(Messages.OwlUI_SYNC_LOGIN);
+      dialog.setSubline(Messages.OwlUI_SYNC_LOGIN_TEXT);
+      dialog.setTitleImageDescriptor(OwlUI.getImageDescriptor("icons/wizban/reader_wiz.png")); //$NON-NLS-1$
+
+      return dialog.open();
+    }
+
+    return IDialogConstants.CANCEL_ID;
   }
 }

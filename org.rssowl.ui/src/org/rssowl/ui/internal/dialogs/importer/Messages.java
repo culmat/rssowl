@@ -34,14 +34,12 @@ public class Messages extends NLS {
   public static String ImportElementsPage_CHOOSE_ELEMENTS_MESSAGE;
   public static String ImportElementsPage_CONNECTING;
   public static String ImportElementsPage_DESELECT_ALL;
-  public static String ImportElementsPage_ENTER_GOOGLE_ACCOUNT;
   public static String ImportElementsPage_FEED_TITLE;
   public static String ImportElementsPage_FETCHING_RESULTS;
   public static String ImportElementsPage_FLATTEN;
   public static String ImportElementsPage_HIDDEN_ELEMENTS_INFO;
   public static String ImportElementsPage_HIDE_EXISTING;
   public static String ImportElementsPage_IMPORT_GOOGLE_READER;
-  public static String ImportElementsPage_LOGIN_GOOGLE_READER;
   public static String ImportElementsPage_MISSING_ACCOUNT;
   public static String ImportElementsPage_N_RESULTS;
   public static String ImportElementsPage_NO_FEEDS_FOUND;
