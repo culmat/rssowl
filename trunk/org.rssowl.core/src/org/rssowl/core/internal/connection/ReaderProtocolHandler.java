@@ -26,6 +26,7 @@ package org.rssowl.core.internal.connection;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Status;
 import org.osgi.service.url.URLStreamHandlerService;
 import org.rssowl.core.Owl;
 import org.rssowl.core.connection.AuthenticationRequiredException;
@@ -114,6 +115,7 @@ public class ReaderProtocolHandler extends DefaultProtocolHandler {
     /* Read JSON Object from Response and parse */
     IModelFactory typesFactory = Owl.getModelFactory();
     IFeed feed = typesFactory.createFeed(null, link);
+    feed.setBase(readerToHTTP(link));
     try {
       JSONObject obj = new JSONObject(StringUtils.readString(new InputStreamReader(inS, UTF_8)));
       Owl.getInterpreter().interpretJSONObject(obj, feed);
@@ -149,12 +151,12 @@ public class ReaderProtocolHandler extends DefaultProtocolHandler {
     ICredentialsProvider provider = Owl.getConnectionService().getCredentialsProvider(URI.create(SyncUtils.GOOGLE_LOGIN));
     ICredentials credentials = provider.getAuthCredentials(URI.create(SyncUtils.GOOGLE_LOGIN), null);
     if (credentials == null)
-      throw new AuthenticationRequiredException(null, null);
+      throw new AuthenticationRequiredException(null, Status.CANCEL_STATUS);
 
     /* Obtain Google Authentication Token */
     String token = SyncUtils.getGoogleAuthToken(credentials.getUsername(), credentials.getPassword(), refresh, monitor);
     if (token == null)
-      throw new AuthenticationRequiredException(null, null);
+      throw new AuthenticationRequiredException(null, Status.CANCEL_STATUS);
 
     return token;
   }

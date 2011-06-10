@@ -71,6 +71,10 @@ public class SyncUtils {
   /* Google Authentication Token can be shared during the session */
   private static String fgSharedAuthToken;
 
+  /* Some special preferences a news can have after parsed from the JSONInterpreter */
+  public static final String GOOGLE_MARKED_READ = "org.rssowl.pref.GoogleMarkedRead"; //$NON-NLS-1$
+  public static final String GOOGLE_LABELS = "org.rssowl.pref.GoogleLabels"; //$NON-NLS-1$
+
   /**
    * Obtains the Google Auth Token to perform REST operations for Google
    * Services.
