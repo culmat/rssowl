@@ -92,6 +92,7 @@ import org.rssowl.core.util.ITask;
 import org.rssowl.core.util.JobQueue;
 import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.StringUtils;
+import org.rssowl.core.util.SyncUtils;
 import org.rssowl.core.util.TaskAdapter;
 import org.rssowl.core.util.Triple;
 import org.rssowl.core.util.URIUtils;
@@ -760,20 +761,31 @@ public class Controller {
                 if (!shouldProceedReloading(monitor, bookmark))
                   return;
 
+                /* If this feed is synchronized, we offer a special Login Dialog */
+                boolean isSynchronizedFeed = SyncUtils.isSynchronized(bookmark);
+
                 /* Credentials might have been provided meanwhile in another dialog */
-                try {
-                  URI normalizedUri = URIUtils.normalizeUri(feedLink, true);
-                  if (Owl.getConnectionService().getAuthCredentials(normalizedUri, authEx.getRealm()) != null) {
-                    reloadQueued(bookmark, shellAr[0]);
-                    return;
+                if (!isSynchronizedFeed) {
+                  try {
+                    URI normalizedUri = URIUtils.normalizeUri(feedLink, true);
+                    if (Owl.getConnectionService().getAuthCredentials(normalizedUri, authEx.getRealm()) != null) {
+                      reloadQueued(bookmark, shellAr[0]);
+                      return;
+                    }
+                  } catch (CredentialsException exe) {
+                    Activator.getDefault().getLog().log(exe.getStatus());
                   }
-                } catch (CredentialsException exe) {
-                  Activator.getDefault().getLog().log(exe.getStatus());
                 }
 
                 /* Show Login Dialog */
-                LoginDialog login = new LoginDialog(shellAr[0], feedLink, authEx.getRealm());
-                if (login.open() == Window.OK && shouldProceedReloading(monitor, bookmark)) {
+                int status;
+                if (isSynchronizedFeed)
+                  status = OwlUI.openSyncLogin(shellAr[0]);
+                else
+                  status = new LoginDialog(shellAr[0], feedLink, authEx.getRealm()).open();
+
+                /* Trigger another Reload if credentials have been provided */
+                if (status == Window.OK && shouldProceedReloading(monitor, bookmark)) {
 
                   /* Store info about Realm in Bookmark */
                   if (StringUtils.isSet(authEx.getRealm())) {
