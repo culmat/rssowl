@@ -112,6 +112,7 @@ import org.rssowl.ui.internal.services.ContextService;
 import org.rssowl.ui.internal.services.DownloadService;
 import org.rssowl.ui.internal.services.FeedReloadService;
 import org.rssowl.ui.internal.services.SavedSearchService;
+import org.rssowl.ui.internal.services.SyncService;
 import org.rssowl.ui.internal.util.ImportUtils;
 import org.rssowl.ui.internal.util.JobRunner;
 
@@ -145,7 +146,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * Note: As required by the UI, the controller should be filled with more
  * methods.
  * </p>
- *
+ * 
  * @author bpasero
  */
 public class Controller {
@@ -220,6 +221,9 @@ public class Controller {
 
   /* Feed-Reload Service */
   private FeedReloadService fFeedReloadService;
+
+  /* Synchronization Service */
+  private SyncService fSyncService;
 
   /* Contributed Entity-Property-Pages */
   final List<EntityPropertyPageWrapper> fEntityPropertyPages;
@@ -583,7 +587,7 @@ public class Controller {
    * Reload the given List of BookMarks. The BookMarks are processed in a queue
    * that stores all Tasks of this kind and guarantees that a certain amount of
    * Jobs process the Task concurrently.
-   *
+   * 
    * @param bookmarks The BookMarks to reload.
    * @param shell The Shell this operation is running in, used to open Dialogs
    * if necessary.
@@ -610,7 +614,7 @@ public class Controller {
    * Reload the given BookMark. The BookMark is processed in a queue that stores
    * all Tasks of this kind and guarantees that a certain amount of Jobs process
    * the Task concurrently.
-   *
+   * 
    * @param bookmark The BookMark to reload.
    * @param shell The Shell this operation is running in, used to open Dialogs
    * if necessary.
@@ -627,7 +631,7 @@ public class Controller {
 
   /**
    * Reload the given BookMark.
-   *
+   * 
    * @param bookmark The BookMark to reload.
    * @param shell The Shell this operation is running in, used to open Dialogs
    * if necessary, or <code>NULL</code> if no Shell is available.
@@ -978,6 +982,10 @@ public class Controller {
     /* Create the Download Service */
     fDownloadService = new DownloadService();
 
+    /* Create the Sync Service */
+    if (!InternalOwl.TESTING)
+      fSyncService = new SyncService();
+
     /* Register Listeners */
     registerListeners();
 
@@ -1167,7 +1175,7 @@ public class Controller {
   /**
    * Tells the Controller to stop. This method is called automatically from osgi
    * as soon as the org.rssowl.ui bundle gets stopped.
-   *
+   * 
    * @param emergency If set to <code>TRUE</code>, this method is called from a
    * shutdown hook that got triggered from a non-normal shutdown (e.g. System
    * Shutdown).
@@ -1217,6 +1225,10 @@ public class Controller {
     /* Stop the Saved Search Service */
     if (fSavedSearchService != null)
       fSavedSearchService.stopService();
+
+    /* Stop the Sync Service */
+    if (fSyncService != null)
+      fSyncService.stopService();
 
     /* Shutdown ApplicationServer */
     ApplicationServer.getDefault().shutdown();
@@ -1362,7 +1374,7 @@ public class Controller {
 
   /**
    * Returns wether the application is in process of shutting down.
-   *
+   * 
    * @return <code>TRUE</code> if the application has been closed, and
    * <code>FALSE</code> otherwise.
    */
@@ -1372,7 +1384,7 @@ public class Controller {
 
   /**
    * Returns wether the application is in process of an emergency shut down.
-   *
+   * 
    * @return <code>TRUE</code> if the application is in the process of an
    * emergency shut down, and <code>FALSE</code> otherwise.
    */
@@ -1382,7 +1394,7 @@ public class Controller {
 
   /**
    * Returns wether the application is in process of restarting.
-   *
+   * 
    * @return <code>TRUE</code> if the application is restarting, and
    * <code>FALSE</code> otherwise.
    */
@@ -1392,7 +1404,7 @@ public class Controller {
 
   /**
    * Returns wether the application has finished starting.
-   *
+   * 
    * @return <code>TRUE</code> if the application is started, and
    * <code>FALSE</code> otherwise if still initializing.
    */
@@ -1403,7 +1415,7 @@ public class Controller {
   /**
    * This method is called immediately prior to workbench shutdown before any
    * windows have been closed.
-   *
+   * 
    * @return <code>true</code> to allow the workbench to proceed with shutdown,
    * <code>false</code> to veto a non-forced shutdown
    */
@@ -1713,7 +1725,7 @@ public class Controller {
   /**
    * Start a Workbench emergency shutdown due to an unrecoverable Out of Memory
    * error.
-   *
+   * 
    * @param error the {@link OutOfMemoryError} that causes an emergent shutdown.
    */
   public void emergencyOutOfMemoryShutdown(final OutOfMemoryError error) {
