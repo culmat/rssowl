@@ -112,6 +112,14 @@
             class="org.rssowl.core.internal.connection.DefaultProtocolHandler"
             protocol="feed">
       </protocolHandler>
+      <protocolHandler
+            class="org.rssowl.core.internal.connection.ReaderProtocolHandler"
+            protocol="reader">
+      </protocolHandler>
+      <protocolHandler
+            class="org.rssowl.core.internal.connection.ReaderProtocolHandler"
+            protocol="readers">
+      </protocolHandler>
    </extension>
    <extension
          point="org.rssowl.core.DAOService">
