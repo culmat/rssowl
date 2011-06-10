@@ -70,6 +70,9 @@ public class Application implements IApplication {
   /** Flag to indicate RSSOwl integrated to Eclipse or not */
   public static final boolean IS_ECLIPSE = InternalOwl.IS_ECLIPSE;
 
+  /** Temporary flag to control enabled state of syncing */
+  public static final boolean SYNC = false;
+
   /* System Property to force opening of the restore profile wizard */
   private static final String OPEN_RESTORE_WIZARD_PROPERTY = "restoreOwlProfile"; //$NON-NLS-1$
 
