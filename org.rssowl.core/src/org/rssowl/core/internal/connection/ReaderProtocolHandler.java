@@ -58,17 +58,16 @@ import java.util.Map;
  * Extends the {@link DefaultProtocolHandler} dealing with Google Reader
  * synchronization. The result from loading a feed is a JSON Object that is
  * passed on to the responsible JSON interpreter service.
- *
+ * 
  * @author bpasero
  */
-//TODO Verify that UTF-8 is the correct encoding to use for the JSONObject returned
-//TODO Check if the gzip compression is actually supported (seems to be at least from response)
 public class ReaderProtocolHandler extends DefaultProtocolHandler {
 
   /* Normal Protocol Constants */
   private static final String UTF_8 = "UTF-8"; //$NON-NLS-1$
   private static final String HTTP = "http"; //$NON-NLS-1$
   private static final String HTTPS = "https"; //$NON-NLS-1$
+  private static final String BROWSER_USER_AGENT = "Mozilla/5.0"; //$NON-NLS-1$
 
   /*
    * @see
@@ -138,6 +137,7 @@ public class ReaderProtocolHandler extends DefaultProtocolHandler {
     Map<String, String> headers = new HashMap<String, String>();
     headers.put("Authorization", SyncUtils.getGoogleAuthorizationHeader(authToken)); //$NON-NLS-1$
     headers.put("Accept-Charset", UTF_8.toLowerCase()); //$NON-NLS-1$
+    headers.put("User-Agent", BROWSER_USER_AGENT); //Necessary as otherwise the content is not sent over as gzip for some unknown reason //$NON-NLS-1$
     properties.put(IConnectionPropertyConstants.HEADERS, headers);
 
     /* Add Monitor to support early cancelation */
@@ -232,7 +232,7 @@ public class ReaderProtocolHandler extends DefaultProtocolHandler {
   /**
    * Do not override default URLStreamHandler of HTTP/HTTPS and therefor return
    * NULL.
-   *
+   * 
    * @see org.rssowl.core.connection.IProtocolHandler#getURLStreamHandler()
    */
   @Override
