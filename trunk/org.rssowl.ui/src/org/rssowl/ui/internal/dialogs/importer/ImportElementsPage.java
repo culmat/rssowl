@@ -544,13 +544,7 @@ public class ImportElementsPage extends WizardPage {
 
     /* Ask for Username and Password if importing from Google */
     if (source == Source.GOOGLE) {
-      URI googleLoginUri = URI.create(SyncUtils.GOOGLE_LOGIN);
-      LoginDialog dialog = new LoginDialog(getShell(), googleLoginUri, null);
-      dialog.setStorePermanently(Application.SYNC);
-      dialog.setHeader(Messages.ImportElementsPage_LOGIN_GOOGLE_READER);
-      dialog.setSubline(Messages.ImportElementsPage_ENTER_GOOGLE_ACCOUNT);
-      dialog.setTitleImageDescriptor(OwlUI.getImageDescriptor("icons/wizban/reader_wiz.png")); //$NON-NLS-1$
-      if (dialog.open() != IDialogConstants.OK_ID) {
+      if (OwlUI.openSyncLogin(getShell()) != IDialogConstants.OK_ID) {
         setErrorMessage(Messages.ImportElementsPage_MISSING_ACCOUNT);
         setPageComplete(false);
         fCurrentSourceKind = null;
