@@ -95,7 +95,7 @@ import java.util.zip.GZIPInputStream;
  * Protocol. After loading the Inputstream of the given URL, the stream is
  * passed to the Interpreter-Component to interpret it as one of the supported
  * XML-Formats for Newsfeeds.
- * 
+ *
  * @author bpasero
  */
 public class DefaultProtocolHandler implements IProtocolHandler {
@@ -107,10 +107,10 @@ public class DefaultProtocolHandler implements IProtocolHandler {
   private static final int HTTP_ERROR_PROXY_AUTH_REQUIRED = 407;
 
   /* Response Header */
-  private static final String HEADER_COOKIE = "Cookie"; //$NON-NLS-1$
-  private static final String HEADER_ACCEPT_LANGUAGE = "Accept-Language"; //$NON-NLS-1$
-  private static final String HEADER_RESPOND_USER_AGENT = "User-Agent"; //$NON-NLS-1$
-  private static final String HEADER_RESPOND_ACCEPT_ENCODING = "Accept-Encoding"; //$NON-NLS-1$
+  private static final String HEADER_REQUEST_COOKIE = "Cookie"; //$NON-NLS-1$
+  private static final String HEADER_REQUEST_ACCEPT_LANGUAGE = "Accept-Language"; //$NON-NLS-1$
+  private static final String HEADER_REQUEST_USER_AGENT = "User-Agent"; //$NON-NLS-1$
+  private static final String HEADER_REQUEST_ACCEPT_ENCODING = "Accept-Encoding"; //$NON-NLS-1$
   private static final String HEADER_RESPOND_IF_NONE_MATCH = "If-None-Match"; //$NON-NLS-1$
   private static final String HEADER_RESPOND_IF_MODIFIED_SINCE = "If-Modified-Since"; //$NON-NLS-1$
 
@@ -318,7 +318,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
   /**
    * Do not override default URLStreamHandler of HTTP/HTTPS and therefor return
    * NULL.
-   * 
+   *
    * @see org.rssowl.core.connection.IProtocolHandler#getURLStreamHandler()
    */
   public URLStreamHandlerService getURLStreamHandler() {
@@ -346,7 +346,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
    * properties may be used in conjunction with the
    * <code>IConnectionPropertyConstants</code> to define connection related
    * properties..
-   * 
+   *
    * @param link The URL to load.
    * @param properties Connection related properties as defined in
    * <code>IConnectionPropertyConstants</code> for example, or <code>NULL</code>
@@ -572,8 +572,8 @@ public class DefaultProtocolHandler implements IProtocolHandler {
   }
 
   private void setHeaders(Map<Object, Object> properties, HttpMethodBase method) {
-    method.setRequestHeader(HEADER_RESPOND_ACCEPT_ENCODING, "gzip"); //$NON-NLS-1$
-    method.setRequestHeader(HEADER_RESPOND_USER_AGENT, USER_AGENT);
+    method.setRequestHeader(HEADER_REQUEST_ACCEPT_ENCODING, "gzip"); //$NON-NLS-1$
+    method.setRequestHeader(HEADER_REQUEST_USER_AGENT, USER_AGENT);
 
     /* Add Conditional GET Headers if present */
     if (properties != null) {
@@ -589,11 +589,11 @@ public class DefaultProtocolHandler implements IProtocolHandler {
 
     /* Add Accept-Language Header if present */
     if (properties != null && properties.containsKey(IConnectionPropertyConstants.ACCEPT_LANGUAGE))
-      method.setRequestHeader(HEADER_ACCEPT_LANGUAGE, (String) properties.get(IConnectionPropertyConstants.ACCEPT_LANGUAGE));
+      method.setRequestHeader(HEADER_REQUEST_ACCEPT_LANGUAGE, (String) properties.get(IConnectionPropertyConstants.ACCEPT_LANGUAGE));
 
     /* Add Cookie Header if present */
     if (properties != null && properties.containsKey(IConnectionPropertyConstants.COOKIE))
-      method.setRequestHeader(HEADER_COOKIE, (String) properties.get(IConnectionPropertyConstants.COOKIE));
+      method.setRequestHeader(HEADER_REQUEST_COOKIE, (String) properties.get(IConnectionPropertyConstants.COOKIE));
 
     /* Add more Headers */
     if (properties != null && properties.containsKey(IConnectionPropertyConstants.HEADERS)) {
