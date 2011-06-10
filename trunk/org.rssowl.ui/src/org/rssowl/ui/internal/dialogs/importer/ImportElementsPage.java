@@ -60,6 +60,7 @@ import org.rssowl.core.connection.IAbortable;
 import org.rssowl.core.connection.IConnectionPropertyConstants;
 import org.rssowl.core.connection.ICredentials;
 import org.rssowl.core.connection.IProtocolHandler;
+import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.interpreter.ITypeImporter;
 import org.rssowl.core.interpreter.InterpreterException;
 import org.rssowl.core.interpreter.ParserException;
@@ -75,6 +76,7 @@ import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IBookMarkDAO;
+import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.Pair;
@@ -107,6 +109,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -135,6 +138,9 @@ public class ImportElementsPage extends WizardPage {
 
   /* URL to export from Google Reader */
   private static final String GOOGLE_READER_OPML_URI = "https://www.google.com/reader/subscriptions/export"; //$NON-NLS-1$
+
+  /* HTTPS Protocol used for secure feeds */
+  private static final String HTTPS = "https"; //$NON-NLS-1$
 
   private CheckboxTreeViewer fViewer;
   private FolderChildCheckboxTree fFolderChildTree;
@@ -540,6 +546,7 @@ public class ImportElementsPage extends WizardPage {
     if (source == Source.GOOGLE) {
       URI googleLoginUri = URI.create(SyncUtils.GOOGLE_LOGIN);
       LoginDialog dialog = new LoginDialog(getShell(), googleLoginUri, null);
+      dialog.setStorePermanently(Application.SYNC);
       dialog.setHeader(Messages.ImportElementsPage_LOGIN_GOOGLE_READER);
       dialog.setSubline(Messages.ImportElementsPage_ENTER_GOOGLE_ACCOUNT);
       dialog.setTitleImageDescriptor(OwlUI.getImageDescriptor("icons/wizban/reader_wiz.png")); //$NON-NLS-1$
@@ -870,6 +877,8 @@ public class ImportElementsPage extends WizardPage {
           /* Try to Import */
           try {
             final List<? extends IEntity> types = Owl.getInterpreter().importFrom(in);
+            if (Application.SYNC)
+              enableSynchronization(types);
 
             /* Return on Cancellation */
             if (monitor.isCanceled() || Controller.getDefault().isShuttingDown()) {
@@ -922,6 +931,41 @@ public class ImportElementsPage extends WizardPage {
 
     /* Run Operation in Background and allow for Cancellation */
     getContainer().run(true, true, runnable);
+  }
+
+  private void enableSynchronization(List<? extends IEntity> types) throws URISyntaxException {
+    for (IEntity entity : types) {
+      if (entity instanceof IFolder)
+        enableSynchronization((IFolder) entity);
+      else if (entity instanceof IBookMark)
+        enableSynchronization((IBookMark) entity);
+    }
+  }
+
+  private void enableSynchronization(IFolder folder) throws URISyntaxException {
+    List<IFolderChild> children = folder.getChildren();
+    for (IFolderChild child : children) {
+      if (child instanceof IFolder)
+        enableSynchronization((IFolder) child);
+      else if (child instanceof IBookMark)
+        enableSynchronization((IBookMark) child);
+    }
+  }
+
+  private void enableSynchronization(IBookMark bm) throws URISyntaxException {
+
+    /* Convert the Feed Link to enable Synchronization */
+    FeedLinkReference feedLinkReference = bm.getFeedLinkReference();
+    bm.setFeedLinkReference(new FeedLinkReference(enableSynchronization(feedLinkReference.getLink())));
+
+    /* Configure Feed to reload on startup to enforce Synchronization */
+    IPreferenceScope preferences = Owl.getPreferenceService().getEntityScope(bm);
+    preferences.putBoolean(DefaultPreferences.BM_RELOAD_ON_STARTUP, true);
+  }
+
+  private URI enableSynchronization(URI uri) throws URISyntaxException {
+    String scheme = HTTPS.equals(uri.getScheme()) ? SyncUtils.READER_HTTPS_SCHEME : SyncUtils.READER_HTTP_SCHEME;
+    return new URI(scheme, uri.getUserInfo(), uri.getHost(), uri.getPort(), uri.getPath(), uri.getQuery(), uri.getFragment());
   }
 
   private void importFromKeywordSearch(final String keywords, final boolean isLocalizedSearch) throws Exception {
