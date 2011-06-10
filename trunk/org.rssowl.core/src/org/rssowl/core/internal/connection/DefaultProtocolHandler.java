@@ -106,13 +106,14 @@ public class DefaultProtocolHandler implements IProtocolHandler {
   private static final int HTTP_ERROR_AUTH_REQUIRED = 401;
   private static final int HTTP_ERROR_PROXY_AUTH_REQUIRED = 407;
 
-  /* Response Header */
+  /* Header Constants */
   private static final String HEADER_REQUEST_COOKIE = "Cookie"; //$NON-NLS-1$
   private static final String HEADER_REQUEST_ACCEPT_LANGUAGE = "Accept-Language"; //$NON-NLS-1$
   private static final String HEADER_REQUEST_USER_AGENT = "User-Agent"; //$NON-NLS-1$
   private static final String HEADER_REQUEST_ACCEPT_ENCODING = "Accept-Encoding"; //$NON-NLS-1$
-  private static final String HEADER_RESPOND_IF_NONE_MATCH = "If-None-Match"; //$NON-NLS-1$
-  private static final String HEADER_RESPOND_IF_MODIFIED_SINCE = "If-Modified-Since"; //$NON-NLS-1$
+  private static final String HEADER_RESPONSE_IF_NONE_MATCH = "If-None-Match"; //$NON-NLS-1$
+  private static final String HEADER_RESPONSE_IF_MODIFIED_SINCE = "If-Modified-Since"; //$NON-NLS-1$
+  private static final String HEADER_RESPONSE_CONTENT_ENCODING = "Content-Encoding"; //$NON-NLS-1$
 
   /** Property to tell the XML parser to use platform encoding */
   public static final String USE_PLATFORM_ENCODING = "org.rssowl.core.internal.connection.DefaultProtocolHandler.UsePlatformEncoding"; //$NON-NLS-1$
@@ -581,10 +582,10 @@ public class DefaultProtocolHandler implements IProtocolHandler {
       String ifNoneMatch = (String) properties.get(IConnectionPropertyConstants.IF_NONE_MATCH);
 
       if (ifModifiedSince != null)
-        method.setRequestHeader(HEADER_RESPOND_IF_MODIFIED_SINCE, ifModifiedSince);
+        method.setRequestHeader(HEADER_RESPONSE_IF_MODIFIED_SINCE, ifModifiedSince);
 
       if (ifNoneMatch != null)
-        method.setRequestHeader(HEADER_RESPOND_IF_NONE_MATCH, ifNoneMatch);
+        method.setRequestHeader(HEADER_RESPONSE_IF_NONE_MATCH, ifNoneMatch);
     }
 
     /* Add Accept-Language Header if present */
@@ -675,7 +676,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     Assert.isNotNull(inputStream);
 
     /* Retrieve the Content Encoding */
-    String contentEncoding = method.getResponseHeader("Content-Encoding") != null ? method.getResponseHeader("Content-Encoding").getValue() : null; //$NON-NLS-1$ //$NON-NLS-2$
+    String contentEncoding = method.getResponseHeader(HEADER_RESPONSE_CONTENT_ENCODING) != null ? method.getResponseHeader(HEADER_RESPONSE_CONTENT_ENCODING).getValue() : null;
     boolean isGzipStream = false;
 
     /*
