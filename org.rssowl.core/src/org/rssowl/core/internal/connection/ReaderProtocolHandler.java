@@ -137,6 +137,7 @@ public class ReaderProtocolHandler extends DefaultProtocolHandler {
     /* Fill necessary headers to retrieve feed from Google */
     Map<String, String> headers = new HashMap<String, String>();
     headers.put("Authorization", SyncUtils.getGoogleAuthorizationHeader(authToken)); //$NON-NLS-1$
+    headers.put("Accept-Charset", UTF_8.toLowerCase()); //$NON-NLS-1$
     properties.put(IConnectionPropertyConstants.HEADERS, headers);
 
     /* Add Monitor to support early cancelation */
