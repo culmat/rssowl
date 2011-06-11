@@ -149,8 +149,9 @@ public class ReaderProtocolHandler extends DefaultProtocolHandler {
   private String handleAuthentication(boolean refresh, IProgressMonitor monitor) throws ConnectionException {
 
     /* Obtain Google Credentials */
-    ICredentialsProvider provider = Owl.getConnectionService().getCredentialsProvider(URI.create(SyncUtils.GOOGLE_LOGIN));
-    ICredentials credentials = provider.getAuthCredentials(URI.create(SyncUtils.GOOGLE_LOGIN), null);
+    URI googleLoginUri = URI.create(SyncUtils.GOOGLE_LOGIN);
+    ICredentialsProvider provider = Owl.getConnectionService().getCredentialsProvider(googleLoginUri);
+    ICredentials credentials = provider.getAuthCredentials(googleLoginUri, null);
     if (credentials == null)
       throw new AuthenticationRequiredException(null, Status.CANCEL_STATUS);
 
