@@ -53,6 +53,7 @@ import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.RegExUtils;
 import org.rssowl.core.util.ReparentInfo;
+import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.ImportAction;
@@ -160,7 +161,7 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
       /* IBookMark */
       if (selectedObject instanceof IBookMark) {
         IBookMark bookmark = (IBookMark) selectedObject;
-        str.append(bookmark.getFeedLinkReference().getLinkAsText()).append("\n"); //$NON-NLS-1$
+        str.append(URIUtils.toHTTP(bookmark.getFeedLinkReference().getLinkAsText())).append("\n"); //$NON-NLS-1$
         str.append(bookmark.getName()).append("\n\n"); //$NON-NLS-1$
       }
 
@@ -190,7 +191,7 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
       /* IBookMark */
       if (selectedObject instanceof IBookMark) {
         IBookMark bookmark = (IBookMark) selectedObject;
-        str.append(bookmark.getFeedLinkReference().getLinkAsText()).append("\n"); //$NON-NLS-1$
+        str.append(URIUtils.toHTTP(bookmark.getFeedLinkReference().getLinkAsText())).append("\n"); //$NON-NLS-1$
       }
     }
 

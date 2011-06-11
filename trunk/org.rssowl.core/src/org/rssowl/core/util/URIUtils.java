@@ -81,6 +81,10 @@ public class URIUtils {
   /** Identifier for a Protocol */
   public static final String PROTOCOL_IDENTIFIER = "://"; //$NON-NLS-1$
 
+  /** Some HTTP Schemes */
+  public static final String HTTP_SCHEME = "http"; //$NON-NLS-1$
+  public static final String HTTPS_SCHEME = "https"; //$NON-NLS-1$
+
   /** The JavaScript Identifier */
   public static final String JS_IDENTIFIER = "javascript:"; //$NON-NLS-1$
 
@@ -587,5 +591,50 @@ public class URIUtils {
     }
 
     return null;
+  }
+
+  /**
+   * A helper to convert custom schemes (like feed://) to the HTTP counterpart.
+   *
+   * @param uri the uri to get as HTTP/HTTPS {@link URI}.
+   * @return the converted {@link URI} if necessary.
+   */
+  public static URI toHTTP(URI uri) {
+    if (uri == null)
+      return uri;
+
+    String scheme = uri.getScheme();
+    if (HTTP_SCHEME.equals(scheme) || HTTPS_SCHEME.equals(scheme))
+      return uri;
+
+    String newScheme = HTTP_SCHEME;
+    if (SyncUtils.READER_HTTPS_SCHEME.equals(scheme))
+      newScheme = HTTPS_SCHEME;
+
+    try {
+      return new URI(newScheme, uri.getUserInfo(), uri.getHost(), uri.getPort(), uri.getPath(), uri.getQuery(), uri.getFragment());
+    } catch (URISyntaxException e) {
+      return uri;
+    }
+  }
+
+  /**
+   * A helper to convert custom schemes (like feed://) to the HTTP counterpart.
+   *
+   * @param str the uri to get as HTTP/HTTPS {@link URI}.
+   * @return the converted {@link String} if necessary.
+   */
+  public static String toHTTP(String str) {
+    if (!StringUtils.isSet(str))
+      return str;
+
+    if (str.startsWith(HTTP) || str.startsWith(HTTPS))
+      return str;
+
+    try {
+      return toHTTP(new URI(str)).toString();
+    } catch (URISyntaxException e) {
+      return str;
+    }
   }
 }

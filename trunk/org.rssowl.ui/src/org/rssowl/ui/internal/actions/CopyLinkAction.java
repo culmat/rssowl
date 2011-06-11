@@ -34,6 +34,7 @@ import org.eclipse.ui.IActionDelegate;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.util.CoreUtils;
+import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.OwlUI;
 
 import java.util.List;
@@ -95,7 +96,7 @@ public class CopyLinkAction extends Action implements IActionDelegate {
         int i = 0;
         for (Object element : list) {
           if (element instanceof IBookMark) {
-            str.append(i > 0 ? "\n" : "").append(((IBookMark) element).getFeedLinkReference().getLinkAsText()); //$NON-NLS-1$ //$NON-NLS-2$
+            str.append(i > 0 ? "\n" : "").append(URIUtils.toHTTP(((IBookMark) element).getFeedLinkReference().getLinkAsText())); //$NON-NLS-1$ //$NON-NLS-2$
             i++;
           } else if (element instanceof INews) {
             INews news = (INews) element;

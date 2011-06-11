@@ -58,6 +58,7 @@ import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.StringUtils;
+import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.OpenInBrowserAction;
@@ -303,7 +304,7 @@ public class PreviewFeedDialog extends Dialog {
         news = news.subList(0, MAX_NEWS_SHOWN);
 
       /* Render Elements */
-      String html = fLabelProvider.render(news.toArray(), (feed.getBase() != null) ? feed.getBase() : feed.getLink(), true);
+      String html = fLabelProvider.render(news.toArray(), (feed.getBase() != null) ? URIUtils.toHTTP(feed.getBase()) : URIUtils.toHTTP(feed.getLink()), true);
 
       /* Apply to Browser */
       fBrowser.getControl().setText(html);

@@ -75,7 +75,7 @@ public class DownloadAttachmentsNewsAction implements INewsAction {
             if (link != null) {
               if (!link.isAbsolute()) {
                 try {
-                  link = URIUtils.resolve(newsitem.getFeedReference().getLink(), link);
+                  link = URIUtils.resolve(URIUtils.toHTTP(newsitem.getFeedReference().getLink()), link);
                 } catch (URISyntaxException e) {
                   Activator.safeLogError(e.getMessage(), e);
                   continue; //Proceed with other Attachments

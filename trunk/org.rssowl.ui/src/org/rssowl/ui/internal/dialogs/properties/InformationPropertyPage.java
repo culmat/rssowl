@@ -205,7 +205,7 @@ public class InformationPropertyPage implements IEntityPropertyPage {
         @Override
         public void widgetSelected(SelectionEvent e) {
           try {
-            URI uri = new URI("http://www.feedvalidator.org/check.cgi?url=" + URIUtils.urlEncode(bm.getFeedLinkReference().getLinkAsText())); //$NON-NLS-1$
+            URI uri = new URI("http://www.feedvalidator.org/check.cgi?url=" + URIUtils.urlEncode(URIUtils.toHTTP(bm.getFeedLinkReference().getLinkAsText()))); //$NON-NLS-1$
 
             OpenInBrowserAction action = new OpenInBrowserAction();
             action.selectionChanged(null, new StructuredSelection(uri));

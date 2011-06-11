@@ -143,7 +143,7 @@ public class ShareProvider {
    * @return a link that can be used to share the bookmark with this provider.
    */
   public String toShareUrl(IBookMark mark) {
-    String link = mark.getFeedLinkReference().getLinkAsText();
+    String link = URIUtils.toHTTP(mark.getFeedLinkReference().getLinkAsText());
     String title = mark.getName();
 
     return toShareUrl(link, title);
