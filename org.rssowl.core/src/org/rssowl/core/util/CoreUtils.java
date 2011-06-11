@@ -502,7 +502,7 @@ public class CoreUtils {
         return URIUtils.HTTP + linkAsStr;
 
       /* Now try to resolve the relative link as absolute if a base is provided */
-      URI base = news.getBase();
+      URI base = URIUtils.toHTTP(news.getBase());
       if (base != null) {
         try {
           return URIUtils.resolve(base, new URI(linkAsStr)).toString();
@@ -513,7 +513,7 @@ public class CoreUtils {
 
       /* Finally resolve against Feed Link */
       try {
-        return URIUtils.resolve(new URI(news.getFeedLinkAsText()), new URI(linkAsStr)).toString();
+        return URIUtils.resolve(new URI(URIUtils.toHTTP(news.getFeedLinkAsText())), new URI(linkAsStr)).toString();
       } catch (URISyntaxException e) {
         return linkAsStr;
       }

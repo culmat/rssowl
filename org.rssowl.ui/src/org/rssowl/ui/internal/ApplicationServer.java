@@ -750,10 +750,10 @@ public class ApplicationServer {
 
         /* Base-Information explicitly set */
         if (news.getBase() != null)
-          return news.getBase().toString();
+          return URIUtils.toHTTP(news.getBase()).toString();
 
         /* Use Feed's Link as fallback */
-        return news.getFeedLinkAsText();
+        return URIUtils.toHTTP(news.getFeedLinkAsText());
       }
     }
 

@@ -325,7 +325,7 @@ public class ModelUtils {
         if (link != null) {
           if (!link.isAbsolute()) {
             try {
-              link = URIUtils.resolve(newsitem.getFeedReference().getLink(), link);
+              link = URIUtils.resolve(URIUtils.toHTTP(newsitem.getFeedReference().getLink()), link);
             } catch (URISyntaxException e) {
               Activator.getDefault().logError(e.getMessage(), e);
               continue; //Proceed with other Attachments

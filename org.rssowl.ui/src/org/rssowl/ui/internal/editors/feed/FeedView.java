@@ -110,6 +110,7 @@ import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.RetentionStrategy;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.TreeTraversal;
+import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.ApplicationServer;
@@ -390,7 +391,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
     URI base = null;
     if (fInput.getMark() instanceof IBookMark) {
       try {
-        base = new URI(((IBookMark) fInput.getMark()).getFeedLinkReference().getLinkAsText());
+        base = URIUtils.toHTTP(new URI(((IBookMark) fInput.getMark()).getFeedLinkReference().getLinkAsText()));
       } catch (URISyntaxException e) {
         /* Ignore and fallback to not using a Base at all */
       }

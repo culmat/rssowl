@@ -32,6 +32,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.util.CoreUtils;
+import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.util.BrowserUtils;
 
 import java.util.List;
@@ -71,7 +72,7 @@ public class SendLinkAction implements IObjectActionDelegate {
         if (element instanceof IBookMark) {
           IBookMark bookmark = (IBookMark) element;
           String title = bookmark.getName();
-          str.append(i > 0 ? "\n\n" : "").append(title).append("\n").append(bookmark.getFeedLinkReference().getLinkAsText()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+          str.append(i > 0 ? "\n\n" : "").append(title).append("\n").append(URIUtils.toHTTP(bookmark.getFeedLinkReference().getLinkAsText())); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
           i++;
         }
 

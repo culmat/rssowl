@@ -65,8 +65,6 @@ public class ReaderProtocolHandler extends DefaultProtocolHandler {
 
   /* Normal Protocol Constants */
   private static final String UTF_8 = "UTF-8"; //$NON-NLS-1$
-  private static final String HTTP = "http"; //$NON-NLS-1$
-  private static final String HTTPS = "https"; //$NON-NLS-1$
   private static final String BROWSER_USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; rv:2.0.1) Gecko/20100101 Firefox/4.0.1"; //$NON-NLS-1$
 
   /*
@@ -243,7 +241,7 @@ public class ReaderProtocolHandler extends DefaultProtocolHandler {
 
   private URI readerToHTTP(URI uri) throws ConnectionException {
     try {
-      String scheme = SyncUtils.READER_HTTPS_SCHEME.equals(uri.getScheme()) ? HTTPS : HTTP;
+      String scheme = SyncUtils.READER_HTTPS_SCHEME.equals(uri.getScheme()) ? URIUtils.HTTPS_SCHEME : URIUtils.HTTP_SCHEME;
       return new URI(scheme, uri.getUserInfo(), uri.getHost(), uri.getPort(), uri.getPath(), uri.getQuery(), uri.getFragment());
     } catch (URISyntaxException e) {
       throw new ConnectionException(Activator.getDefault().createErrorStatus(e.getMessage(), e));
