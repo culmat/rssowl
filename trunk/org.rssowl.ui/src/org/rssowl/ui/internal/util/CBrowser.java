@@ -204,7 +204,7 @@ public class CBrowser {
 
     /* Any other OS, or Mozilla unavailable, use default */
     if (browser == null)
-      browser = new Browser(parent, style);
+      browser = new Browser(parent, styleForLinux(style));
 
     /* Add Focusless Scroll Hook on Windows */
     if (Application.IS_WINDOWS)
@@ -235,6 +235,14 @@ public class CBrowser {
     });
 
     return browser;
+  }
+
+  /* If RSSOwl runs with SWT 3.7, force use of Mozilla over WebKit */
+  private int styleForLinux(int style) {
+    if (Application.IS_LINUX && SWT.getVersion() >= 3700)
+      return style | SWT.MOZILLA;
+
+    return style;
   }
 
   private Method callCoInternetSetFeatureEnabled(Method method, int feature, int scope, boolean enable) {
@@ -503,7 +511,7 @@ public class CBrowser {
         if (OwlUI.useExternalBrowser()) {
 
           /* Avoid IE being loaded from SWT on Windows */
-          final Browser tempBrowser = new Browser(fBrowser.getShell(), useMozilla() ? SWT.MOZILLA : SWT.NONE);
+          final Browser tempBrowser = new Browser(fBrowser.getShell(), useMozilla() ? SWT.MOZILLA : styleForLinux(SWT.NONE));
           tempBrowser.setVisible(false);
           event.browser = tempBrowser;
           tempBrowser.getDisplay().timerExec(BROWSER_URL_DELAY, new Runnable() {
@@ -529,7 +537,7 @@ public class CBrowser {
 
         /* Open internal Browser in same Browser */
         else {
-          final Browser tempBrowser = new Browser(fBrowser.getShell(), useMozilla() ? SWT.MOZILLA : SWT.NONE);
+          final Browser tempBrowser = new Browser(fBrowser.getShell(), useMozilla() ? SWT.MOZILLA : styleForLinux(SWT.NONE));
           tempBrowser.setVisible(false);
           event.browser = tempBrowser;
           tempBrowser.getDisplay().timerExec(BROWSER_URL_DELAY, new Runnable() {
