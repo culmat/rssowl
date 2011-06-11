@@ -2920,6 +2920,6 @@ public class OwlUI {
     if (Application.IS_MAC)
       return false; //Mac supports native cancel button in text fields
 
-    return SWT.getVersion() > 3700; //Some Linux distros support it with recent SWT version
+    return SWT.getVersion() < 3700; //Some Linux distros support it with recent SWT version
   }
 }
