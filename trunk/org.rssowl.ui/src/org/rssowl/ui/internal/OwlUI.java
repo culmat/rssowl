@@ -2907,4 +2907,19 @@ public class OwlUI {
 
     return IDialogConstants.CANCEL_ID;
   }
+
+  /**
+   * @return <code>true</code> in case the a text control needs an extra cancel
+   * control to clear a search and <code>false</code> if the OS provides a
+   * native one already.
+   */
+  public static boolean needsCancelControl() {
+    if (Application.IS_WINDOWS)
+      return true; //Windows does not support a native cancel button in text fields
+
+    if (Application.IS_MAC)
+      return false; //Mac supports native cancel button in text fields
+
+    return SWT.getVersion() > 3700; //Some Linux distros support it with recent SWT version
+  }
 }
