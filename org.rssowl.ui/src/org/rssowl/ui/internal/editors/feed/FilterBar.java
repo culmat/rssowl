@@ -74,7 +74,6 @@ import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.ITask;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.TaskAdapter;
-import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.ContextMenuCreator;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.FolderNewsMark;
@@ -231,7 +230,7 @@ public class FilterBar {
   /* Quick Search */
   private void createQuickSearch(Composite parent) {
     Composite searchContainer = new Composite(parent, SWT.NONE);
-    searchContainer.setLayout(LayoutUtils.createGridLayout(Application.IS_MAC ? 3 : 4, 0, 0, 0, 0, false));
+    searchContainer.setLayout(LayoutUtils.createGridLayout(OwlUI.needsCancelControl() ? 4 : 3, 0, 0, 0, 0, false));
     ((GridLayout) searchContainer.getLayout()).marginTop = 1;
     searchContainer.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
     ((GridData) searchContainer.getLayoutData()).widthHint = 280;
@@ -474,7 +473,7 @@ public class FilterBar {
     });
 
     /* Clear Button */
-    if (!Application.IS_MAC) {
+    if (OwlUI.needsCancelControl()) {
       ToolBar toolBar = new ToolBar(searchContainer, SWT.FLAT | SWT.HORIZONTAL);
       fClearQuicksearchToolBar = new ToolBarManager(toolBar);
       toolBar.setBackground(parent.getBackground());

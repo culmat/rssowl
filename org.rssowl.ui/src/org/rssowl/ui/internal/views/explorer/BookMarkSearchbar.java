@@ -65,7 +65,6 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.progress.WorkbenchJob;
-import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.ContextMenuCreator;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
@@ -152,7 +151,7 @@ class BookMarkSearchbar extends Composite {
 
     /* Container for Filter Controls */
     fFilterComposite = new Composite(this, SWT.NONE);
-    GridLayout filterLayout = new GridLayout(Application.IS_MAC ? 2 : 3, false);
+    GridLayout filterLayout = new GridLayout(OwlUI.needsCancelControl() ? 3 : 2, false);
     filterLayout.marginHeight = 0;
     filterLayout.marginWidth = 0;
     filterLayout.horizontalSpacing = 3;
@@ -178,7 +177,7 @@ class BookMarkSearchbar extends Composite {
   private Composite createFilterControls(Composite parent) {
     createFilterTarget(parent);
     createFilterText(parent);
-    if (!Application.IS_MAC)
+    if (OwlUI.needsCancelControl())
       createClearText(parent);
 
     if (fFilterToolBar != null) {
