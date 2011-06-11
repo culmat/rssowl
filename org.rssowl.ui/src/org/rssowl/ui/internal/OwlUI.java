@@ -366,6 +366,11 @@ public class OwlUI {
   private static final String LONG_DATE_FORMAT_PROPERTY = "longDateFormat"; //$NON-NLS-1$
   private static final String SHORT_TIME_FORMAT_PROPERTY = "shortTimeFormat"; //$NON-NLS-1$
 
+  /* Packed Wizard Width per OS (in DLUs) */
+  private static final int WINDOWS_PACKED_WIZARD_WIDTH = 380;
+  private static final int LINUX_PACKED_WIZARD_WIDTH = 370;
+  private static final int MAC_PACKED_WIZARD_WIDTH = 300;
+
   /* Map Common Mime Types to Extensions (used for Attachments) */
   private static final Map<String, String> fgMapMimeToExtension = new HashMap<String, String>();
   static {
@@ -2202,8 +2207,10 @@ public class OwlUI {
 
       @Override
       protected Point getInitialSize() {
-        if (pack)
-          return getShell().computeSize(convertHorizontalDLUsToPixels(380), SWT.DEFAULT, true);
+        if (pack) {
+          int width = Application.IS_WINDOWS ? WINDOWS_PACKED_WIZARD_WIDTH : Application.IS_LINUX ? LINUX_PACKED_WIZARD_WIDTH : MAC_PACKED_WIZARD_WIDTH;
+          return getShell().computeSize(convertHorizontalDLUsToPixels(width), SWT.DEFAULT, true);
+        }
 
         return super.getInitialSize();
       }
