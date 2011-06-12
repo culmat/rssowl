@@ -62,6 +62,7 @@ import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
+import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.dialogs.NewsFiltersListDialog;
 import org.rssowl.ui.internal.util.LayoutUtils;
@@ -562,7 +563,13 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
       /* Save */
       BusyIndicator.showWhile(getShell().getDisplay(), new Runnable() {
         public void run() {
+
+          /* Save Entities */
           DynamicDAO.saveAll(entitiesToSave);
+
+          /* Inform Notification Service */
+          if (!entitiesToSave.isEmpty())
+            Controller.getDefault().getNotificationService().notifySettingsChanged();
         }
       });
     }
