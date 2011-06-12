@@ -30,10 +30,17 @@ import org.eclipse.swt.widgets.Shell;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
+import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.event.BookMarkAdapter;
+import org.rssowl.core.persist.event.BookMarkEvent;
+import org.rssowl.core.persist.event.BookMarkListener;
+import org.rssowl.core.persist.event.FolderAdapter;
+import org.rssowl.core.persist.event.FolderEvent;
+import org.rssowl.core.persist.event.FolderListener;
 import org.rssowl.core.persist.event.NewsAdapter;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.NewsListener;
@@ -73,6 +80,8 @@ public class NotificationService {
 
   private final NewsListener fNewsListener;
   private final SearchMarkListener fSearchMarkListener;
+  private final BookMarkListener fBookMarkListener;
+  private final FolderListener fFolderListener;
   private final IPreferenceScope fGlobalPreferences;
   private final BatchedBuffer<NotificationItem> fBatchedBuffer;
   private final Map<String /* Feed Link */, Boolean /* Enablement State */> fNotifierEnablementCache = new ConcurrentHashMap<String, Boolean>();
@@ -111,6 +120,8 @@ public class NotificationService {
     fGlobalPreferences = Owl.getPreferenceService().getGlobalScope();
     fNewsListener = registerNewsListener();
     fSearchMarkListener = registerSearchMarkListener();
+    fBookMarkListener = registerBookMarkListener();
+    fFolderListener = registerFolderListener();
   }
 
   /** Shutdown this Service */
@@ -118,6 +129,8 @@ public class NotificationService {
     fBatchedBuffer.cancel();
     DynamicDAO.removeEntityListener(INews.class, fNewsListener);
     DynamicDAO.removeEntityListener(ISearchMark.class, fSearchMarkListener);
+    DynamicDAO.removeEntityListener(IBookMark.class, fBookMarkListener);
+    DynamicDAO.removeEntityListener(IFolder.class, fFolderListener);
   }
 
   /**
@@ -198,6 +211,40 @@ public class NotificationService {
     };
 
     DynamicDAO.addEntityListener(INews.class, listener);
+    return listener;
+  }
+
+  private BookMarkListener registerBookMarkListener() {
+    BookMarkListener listener = new BookMarkAdapter() {
+      @Override
+      public void entitiesUpdated(Set<BookMarkEvent> events) {
+        for (BookMarkEvent event : events) {
+          if (event.isRoot() && event.getOldParent() != null) {
+            notifySettingsChanged();
+            break;
+          }
+        }
+      }
+    };
+    DynamicDAO.addEntityListener(IBookMark.class, listener);
+
+    return listener;
+  }
+
+  private FolderListener registerFolderListener() {
+    FolderListener listener = new FolderAdapter() {
+      @Override
+      public void entitiesUpdated(Set<FolderEvent> events) {
+        for (FolderEvent event : events) {
+          if (event.isRoot() && event.getOldParent() != null) {
+            notifySettingsChanged();
+            break;
+          }
+        }
+      }
+    };
+    DynamicDAO.addEntityListener(IFolder.class, listener);
+
     return listener;
   }
 
