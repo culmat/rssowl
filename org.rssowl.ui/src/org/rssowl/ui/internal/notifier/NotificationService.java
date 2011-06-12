@@ -391,6 +391,31 @@ public class NotificationService {
       runnable.run();
   }
 
+  /**
+   * @param news the {@link INews} to check if it can show or not.
+   * @return <code>true</code> if the news can be shown and <code>false</code>
+   * if it should not show due to filter rules.
+   */
+  public boolean shouldShow(INews news) {
+    if (!fGlobalPreferences.getBoolean(DefaultPreferences.LIMIT_NOTIFIER_TO_SELECTION))
+      return true;
+
+    return shouldShow(news.getFeedLinkAsText());
+  }
+
+  private boolean shouldShow(String feedLink) {
+    synchronized (fNotifierEnablementCache) {
+      if (!fNotifierEnablementCache.containsKey(feedLink))
+        updateEnabledFeedCache();
+
+      Boolean notifierEnabled = fNotifierEnablementCache.get(feedLink);
+      if (notifierEnabled != null && notifierEnabled)
+        return true;
+
+      return false;
+    }
+  }
+
   private Set<NewsEvent> filterEvents(Set<NewsEvent> events) {
     Set<NewsEvent> filteredEvents = new HashSet<NewsEvent>();
 
@@ -398,15 +423,8 @@ public class NotificationService {
       if (!event.getEntity().isVisible())
         continue;
 
-      String feedLink = event.getEntity().getFeedLinkAsText();
-      synchronized (fNotifierEnablementCache) {
-        if (!fNotifierEnablementCache.containsKey(feedLink))
-          updateEnabledFeedCache();
-
-        Boolean notifierEnabled = fNotifierEnablementCache.get(event.getEntity().getFeedLinkAsText());
-        if (notifierEnabled != null && notifierEnabled)
-          filteredEvents.add(event);
-      }
+      if (shouldShow(event.getEntity().getFeedLinkAsText()))
+        filteredEvents.add(event);
     }
 
     return filteredEvents;

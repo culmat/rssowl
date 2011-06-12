@@ -761,7 +761,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         for (int i = fTeasingNewsCache.size() - 1; i >= 0; i--) {
           NewsReference reference = new NewsReference(fTeasingNewsCache.get(i));
           INews newsitem = reference.resolve();
-          if (newsitem != null && newsitem.isVisible()) {
+          if (newsitem != null && newsitem.isVisible() && service.shouldShow(newsitem)) {
             newsToShow.add(newsitem);
 
             if (++counter >= TEASE_LIMIT)
@@ -816,7 +816,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       int counter = 0;
       for (NewsReference reference : recentNews) {
         INews newsitem = reference.resolve();
-        if (newsitem != null && newsitem.isVisible()) {
+        if (newsitem != null && newsitem.isVisible() && service.shouldShow(newsitem)) {
           newsToShow.add(newsitem);
 
           if (++counter >= TEASE_LIMIT)
