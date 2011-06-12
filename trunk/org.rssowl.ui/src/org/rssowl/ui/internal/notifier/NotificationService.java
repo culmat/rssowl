@@ -47,14 +47,17 @@ import org.rssowl.ui.internal.ApplicationWorkbenchAdvisor;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.dialogs.preferences.NotifierPreferencesPage;
 import org.rssowl.ui.internal.util.JobRunner;
 
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The <code>NotificationService</code> listens on News being downloaded and
@@ -72,6 +75,7 @@ public class NotificationService {
   private final SearchMarkListener fSearchMarkListener;
   private final IPreferenceScope fGlobalPreferences;
   private final BatchedBuffer<NotificationItem> fBatchedBuffer;
+  private final Map<String /* Feed Link */, Boolean /* Enablement State */> fNotifierEnablementCache = new ConcurrentHashMap<String, Boolean>();
 
   /* Singleton instance */
   private static NotificationPopup fgNotificationPopup;
@@ -114,6 +118,16 @@ public class NotificationService {
     fBatchedBuffer.cancel();
     DynamicDAO.removeEntityListener(INews.class, fNewsListener);
     DynamicDAO.removeEntityListener(ISearchMark.class, fSearchMarkListener);
+  }
+
+  /**
+   * Called whenever settings on the {@link NotifierPreferencesPage} have
+   * changed. In our case, we will invalidate the cache of enabled bookmarks.
+   */
+  public void notifySettingsChanged() {
+    synchronized (fNotifierEnablementCache) {
+      fNotifierEnablementCache.clear();
+    }
   }
 
   /**
@@ -273,19 +287,8 @@ public class NotificationService {
         Set<NewsEvent> eventsToShow = events;
 
         /* Filter Events if user decided to show Notifier only for selected Elements */
-        if (fGlobalPreferences.getBoolean(DefaultPreferences.LIMIT_NOTIFIER_TO_SELECTION)) {
-          Set<String> enabledFeeds = new HashSet<String>();
-
-          /* TODO This can be slow, try to optimize performance! */
-          Collection<IBookMark> bookMarks = DynamicDAO.loadAll(IBookMark.class);
-          for (IBookMark bookMark : bookMarks) {
-            IPreferenceScope prefs = Owl.getPreferenceService().getEntityScope(bookMark);
-            if (prefs.getBoolean(DefaultPreferences.ENABLE_NOTIFIER))
-              enabledFeeds.add(bookMark.getFeedLinkReference().getLinkAsText());
-          }
-
-          eventsToShow = filterEvents(eventsToShow, enabledFeeds);
-        }
+        if (fGlobalPreferences.getBoolean(DefaultPreferences.LIMIT_NOTIFIER_TO_SELECTION))
+          eventsToShow = filterEvents(eventsToShow);
 
         /* Create Items */
         Set<NotificationItem> items = new TreeSet<NotificationItem>();
@@ -341,15 +344,33 @@ public class NotificationService {
       runnable.run();
   }
 
-  private Set<NewsEvent> filterEvents(Set<NewsEvent> events, Set<String> enabledFeeds) {
+  private Set<NewsEvent> filterEvents(Set<NewsEvent> events) {
     Set<NewsEvent> filteredEvents = new HashSet<NewsEvent>();
 
     for (NewsEvent event : events) {
-      if (event.getEntity().isVisible() && enabledFeeds.contains(event.getEntity().getFeedLinkAsText()))
-        filteredEvents.add(event);
+      if (!event.getEntity().isVisible())
+        continue;
+
+      String feedLink = event.getEntity().getFeedLinkAsText();
+      synchronized (fNotifierEnablementCache) {
+        if (!fNotifierEnablementCache.containsKey(feedLink))
+          updateEnabledFeedCache();
+
+        Boolean notifierEnabled = fNotifierEnablementCache.get(event.getEntity().getFeedLinkAsText());
+        if (notifierEnabled != null && notifierEnabled)
+          filteredEvents.add(event);
+      }
     }
 
     return filteredEvents;
+  }
+
+  private void updateEnabledFeedCache() {
+    Collection<IBookMark> bookMarks = DynamicDAO.loadAll(IBookMark.class);
+    for (IBookMark bookMark : bookMarks) {
+      IPreferenceScope prefs = Owl.getPreferenceService().getEntityScope(bookMark);
+      fNotifierEnablementCache.put(bookMark.getFeedLinkReference().getLinkAsText(), prefs.getBoolean(DefaultPreferences.ENABLE_NOTIFIER));
+    }
   }
 
   /* Show Notification in UI Thread */
