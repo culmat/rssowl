@@ -95,6 +95,9 @@ public final class InternalOwl {
   /** Flag indicating we are running from Eclipse */
   public static final boolean IS_ECLIPSE = false;
 
+  /** Temporary flag to control enabled state of syncing */
+  public static final boolean SYNC = false;
+
   private InternalOwl() {}
 
   /**

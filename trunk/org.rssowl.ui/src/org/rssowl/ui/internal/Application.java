@@ -71,7 +71,7 @@ public class Application implements IApplication {
   public static final boolean IS_ECLIPSE = InternalOwl.IS_ECLIPSE;
 
   /** Temporary flag to control enabled state of syncing */
-  public static boolean SYNC = false;
+  public static boolean SYNC = InternalOwl.SYNC;
 
   /* System Property to force opening of the restore profile wizard */
   private static final String OPEN_RESTORE_WIZARD_PROPERTY = "restoreOwlProfile"; //$NON-NLS-1$
