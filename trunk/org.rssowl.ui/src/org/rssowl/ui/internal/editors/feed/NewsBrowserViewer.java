@@ -392,7 +392,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   private void onUserInteraction() {
 
     /* Return if feature not necessary at all */
-    if (!fMarkReadOnScrolling && fPageSize == 0)
+    if (!fIsEmbedded || (!fMarkReadOnScrolling && fPageSize == 0))
       return;
 
     /* Return if disposed or already running */
