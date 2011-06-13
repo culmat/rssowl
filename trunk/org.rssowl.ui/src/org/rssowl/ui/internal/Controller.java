@@ -57,6 +57,7 @@ import org.rssowl.core.connection.CredentialsException;
 import org.rssowl.core.connection.IConnectionPropertyConstants;
 import org.rssowl.core.connection.MonitorCanceledException;
 import org.rssowl.core.connection.NotModifiedException;
+import org.rssowl.core.connection.SyncConnectionException;
 import org.rssowl.core.connection.UnknownProtocolException;
 import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
@@ -168,6 +169,7 @@ public class Controller {
 
   /** Key to store error messages into entities during reload */
   public static final String LOAD_ERROR_KEY = "org.rssowl.ui.internal.LoadErrorKey"; //$NON-NLS-1$
+  public static final String LOAD_ERROR_LINK_KEY = "org.rssowl.ui.internal.LoadErrorLinkKey"; //$NON-NLS-1$
 
   /* ID of RSSOwl's Keybinding Category */
   private static final String RSSOWL_KEYBINDING_CATEGORY = "org.rssowl.ui.commands.category.RSSOwl"; //$NON-NLS-1$
@@ -802,6 +804,7 @@ public class Controller {
                   bookmark.setErrorLoading(true);
                   if (StringUtils.isSet(authEx.getMessage()))
                     bookmark.setProperty(LOAD_ERROR_KEY, authEx.getMessage());
+                  bookmark.removeProperty(LOAD_ERROR_LINK_KEY);
                   fBookMarkDAO.save(bookmark);
                 }
               }
@@ -874,22 +877,33 @@ public class Controller {
     if (bookmark.isErrorLoading() && (ex == null || ex instanceof NotModifiedException)) {
       bookmark.setErrorLoading(false);
       bookmark.removeProperty(LOAD_ERROR_KEY);
+      bookmark.removeProperty(LOAD_ERROR_LINK_KEY);
       fBookMarkDAO.save(bookmark);
     }
 
     /* Set Error-Loading flag if necessary */
     else if (ex != null && !(ex instanceof NotModifiedException) && !(ex instanceof AuthenticationRequiredException)) {
       boolean wasShowingError = bookmark.isErrorLoading();
-      Object oldMessage = bookmark.getProperty(LOAD_ERROR_KEY);
-
       bookmark.setErrorLoading(true);
+
+      Object oldMessage = bookmark.getProperty(LOAD_ERROR_KEY);
+      Object oldLink = bookmark.getProperty(LOAD_ERROR_LINK_KEY);
+
       String message = CoreUtils.toMessage(ex);
       if (StringUtils.isSet(message))
         bookmark.setProperty(LOAD_ERROR_KEY, message);
       else
         bookmark.removeProperty(LOAD_ERROR_KEY);
 
-      if (!wasShowingError || (oldMessage != null && message == null) || (message != null && !message.equals(oldMessage)))
+      String link = null;
+      if (ex instanceof SyncConnectionException)
+        link = ((SyncConnectionException) ex).getUserUrl();
+      if (StringUtils.isSet(link))
+        bookmark.setProperty(LOAD_ERROR_LINK_KEY, link);
+      else
+        bookmark.removeProperty(LOAD_ERROR_LINK_KEY);
+
+      if (!wasShowingError || (oldMessage != null && message == null) || (message != null && !message.equals(oldMessage)) || (oldLink != null && link == null) || (link != null && !link.equals(oldLink)))
         fBookMarkDAO.save(bookmark);
     }
   }
