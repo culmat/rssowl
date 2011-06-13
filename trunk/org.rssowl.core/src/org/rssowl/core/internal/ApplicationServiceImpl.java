@@ -67,6 +67,7 @@ import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFilterAction;
 import org.rssowl.core.persist.IGuid;
+import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearch;
 import org.rssowl.core.persist.ISearchCondition;
@@ -76,12 +77,14 @@ import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.dao.ISearchFilterDAO;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.runnable.NewsEventRunnable;
+import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IDGenerator;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.RetentionStrategy;
+import org.rssowl.core.util.SyncUtils;
 
 import com.db4o.ObjectContainer;
 import com.db4o.ext.Db4oException;
@@ -96,6 +99,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -188,9 +192,91 @@ public class ApplicationServiceImpl implements IApplicationService {
       if (monitor.isCanceled() || Owl.isShuttingDown())
         return;
 
+      /* Create labels as necessary from Sync and assign to news */
+      boolean isSynced = SyncUtils.isSynchronized(bookMark);
+      if (isSynced) {
+
+        /* Collect All Incoming Labels */
+        Set<String> incomingLabels = new HashSet<String>();
+        for (INews item : interpretedFeed.getNews()) {
+          IPreferenceScope properties = Owl.getPreferenceService().getEntityScope(item);
+          String[] labels = properties.getStrings(SyncUtils.GOOGLE_LABELS);
+          if (labels != null) {
+            for (String label : labels) {
+              incomingLabels.add(label);
+            }
+          }
+        }
+
+        /* Determine the New Labels to Create */
+        if (!incomingLabels.isEmpty()) {
+
+          /* Existing Labels */
+          Collection<ILabel> existingLabels = DynamicDAO.loadAll(ILabel.class);
+          Map<String, ILabel> mapNameToLabel = new HashMap<String, ILabel>();
+          for (ILabel label : existingLabels) {
+            mapNameToLabel.put(label.getName(), label);
+          }
+
+          /* New Labels to Create */
+          Set<ILabel> labelsToCreate = new HashSet<ILabel>();
+          for (String incomingLabel : incomingLabels) {
+            if (!mapNameToLabel.containsKey(incomingLabel)) {
+              ILabel newLabel = Owl.getModelFactory().createLabel(null, incomingLabel);
+              newLabel.setColor("0,0,0"); //$NON-NLS-1$
+              newLabel.setOrder(mapNameToLabel.size());
+              mapNameToLabel.put(incomingLabel, newLabel);
+
+              labelsToCreate.add(newLabel);
+            }
+          }
+
+          /* Save new Labels */
+          if (!labelsToCreate.isEmpty())
+            DynamicDAO.saveAll(labelsToCreate);
+
+          /* Assign Labels to News */
+          for (INews item : interpretedFeed.getNews()) {
+            IPreferenceScope properties = Owl.getPreferenceService().getEntityScope(item);
+            String[] labels = properties.getStrings(SyncUtils.GOOGLE_LABELS);
+            if (labels != null) {
+              for (String labelName : labels) {
+                ILabel label = mapNameToLabel.get(labelName);
+                if (label != null)
+                  item.addLabel(label);
+              }
+            }
+            properties.delete(SyncUtils.GOOGLE_LABELS);
+          }
+        }
+
+        /* Return early on cancellation */
+        if (monitor.isCanceled() || Owl.isShuttingDown())
+          return;
+      }
+
       /* Merge with existing */
       mergeResult = feed.mergeAndCleanUp(interpretedFeed);
       final List<INews> newNewsAdded = getNewNewsAdded(feed);
+
+      /* Now adjust News State based on Sync */
+      if (isSynced) {
+        for (INews item : newNewsAdded) {
+          IPreferenceScope properties = Owl.getPreferenceService().getEntityScope(item);
+
+          /* News Marked Read */
+          if (properties.getBoolean(SyncUtils.GOOGLE_MARKED_READ)) {
+            item.setState(INews.State.READ);
+            properties.delete(SyncUtils.GOOGLE_MARKED_READ);
+          }
+
+          /* News Marked Unread */
+          else if (properties.getBoolean(SyncUtils.GOOGLE_MARKED_UNREAD)) {
+            item.setState(INews.State.UNREAD);
+            properties.delete(SyncUtils.GOOGLE_MARKED_UNREAD);
+          }
+        }
+      }
 
       /* Return early on cancellation */
       if (monitor.isCanceled() || Owl.isShuttingDown())
