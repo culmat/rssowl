@@ -30,6 +30,7 @@ import org.rssowl.core.connection.ConnectionException;
 import org.rssowl.core.connection.IConnectionPropertyConstants;
 import org.rssowl.core.connection.IProtocolHandler;
 import org.rssowl.core.internal.Activator;
+import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.INews;
 
@@ -72,6 +73,7 @@ public class SyncUtils {
   private static String fgSharedAuthToken;
 
   /* Some special preferences a news can have after parsed from the JSONInterpreter */
+  public static final String GOOGLE_MARKED_UNREAD = "org.rssowl.pref.GoogleMarkedUnRead"; //$NON-NLS-1$
   public static final String GOOGLE_MARKED_READ = "org.rssowl.pref.GoogleMarkedRead"; //$NON-NLS-1$
   public static final String GOOGLE_LABELS = "org.rssowl.pref.GoogleLabels"; //$NON-NLS-1$
 
@@ -180,7 +182,11 @@ public class SyncUtils {
    * @return <code>true</code> if the news is under synchronization control and
    * <code>false</code> otherwise.
    */
+  @SuppressWarnings("unused")
   public static boolean isSynchronized(INews news) {
+    if (!InternalOwl.SYNC)
+      return false;
+
     return news != null && news.getGuid() != null && news.getGuid().getValue().startsWith(SYNCED_NEWS_ID_PART) && StringUtils.isSet(news.getInReplyTo());
   }
 
@@ -189,7 +195,11 @@ public class SyncUtils {
    * @return <code>true</code> if the bookmark is under synchronization control
    * and <code>false</code> otherwise.
    */
+  @SuppressWarnings("unused")
   public static boolean isSynchronized(IBookMark bm) {
+    if (!InternalOwl.SYNC)
+      return false;
+
     String link = bm.getFeedLinkReference().getLinkAsText();
     return link.startsWith(READER_HTTP_SCHEME);
   }
