@@ -34,6 +34,8 @@ public class Messages extends NLS {
   public static String ImportElementsPage_CHOOSE_ELEMENTS_MESSAGE;
   public static String ImportElementsPage_CONNECTING;
   public static String ImportElementsPage_DESELECT_ALL;
+  public static String ImportElementsPage_ERROR_IMPORT_GR;
+  public static String ImportElementsPage_ERROR_IMPORT_GR_DETAILS;
   public static String ImportElementsPage_FEED_TITLE;
   public static String ImportElementsPage_FETCHING_RESULTS;
   public static String ImportElementsPage_FLATTEN;

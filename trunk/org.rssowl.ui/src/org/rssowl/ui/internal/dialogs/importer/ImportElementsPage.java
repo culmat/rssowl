@@ -50,6 +50,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.rssowl.core.Owl;
 import org.rssowl.core.connection.AuthenticationRequiredException;
@@ -60,6 +61,7 @@ import org.rssowl.core.connection.IAbortable;
 import org.rssowl.core.connection.IConnectionPropertyConstants;
 import org.rssowl.core.connection.ICredentials;
 import org.rssowl.core.connection.IProtocolHandler;
+import org.rssowl.core.connection.SyncConnectionException;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.interpreter.ITypeImporter;
 import org.rssowl.core.interpreter.InterpreterException;
@@ -93,6 +95,7 @@ import org.rssowl.ui.internal.dialogs.LoginDialog;
 import org.rssowl.ui.internal.dialogs.PreviewFeedDialog;
 import org.rssowl.ui.internal.dialogs.importer.ImportSourcePage.Source;
 import org.rssowl.ui.internal.dialogs.welcome.WelcomeWizard;
+import org.rssowl.ui.internal.util.BrowserUtils;
 import org.rssowl.ui.internal.util.FolderChildCheckboxTree;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
@@ -580,6 +583,20 @@ public class ImportElementsPage extends WizardPage {
 
         /* Log and Show any Exception during Import */
         catch (Exception e) {
+
+          /* Handle SyncConnectionException */
+          if (e instanceof InvocationTargetException && e.getCause() instanceof SyncConnectionException) {
+            String userLink = ((SyncConnectionException) e.getCause()).getUserUrl();
+            if (StringUtils.isSet(userLink)) {
+              MessageBox box = new MessageBox(getShell(), SWT.ICON_ERROR | SWT.OK | SWT.CANCEL);
+              box.setText(Messages.ImportElementsPage_ERROR_IMPORT_GR);
+              String msg = NLS.bind(Messages.ImportElementsPage_ERROR_IMPORT_GR_DETAILS, e.getCause().getMessage());
+
+              box.setMessage(msg);
+              if (box.open() == SWT.OK)
+                BrowserUtils.openLinkExternal(userLink);
+            }
+          }
 
           /* Log Message */
           String logMessage = e.getMessage();
