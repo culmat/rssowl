@@ -40,6 +40,7 @@ import org.rssowl.core.interpreter.ITypeImporter;
 import org.rssowl.core.interpreter.InterpreterException;
 import org.rssowl.core.interpreter.ParserException;
 import org.rssowl.core.interpreter.UnknownFormatException;
+import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ICategory;
 import org.rssowl.core.persist.IEntity;
@@ -129,7 +130,7 @@ public class CoreUtils {
   private static final StringBuffer fgLogBuffer = new StringBuffer();
 
   /* Flag to remember if a index issue has been reported */
-  private static final AtomicBoolean fgReportedIndexIssue= new AtomicBoolean(false);
+  private static final AtomicBoolean fgReportedIndexIssue = new AtomicBoolean(false);
 
   /*
    * Special case structural actions that need to run as last action (but before
@@ -2020,5 +2021,23 @@ public class CoreUtils {
           preferences.putBoolean(DefaultPreferences.CLEAN_UP_READ_NEWS_STATE, true);
       }
     }
+  }
+
+  /**
+   * @param news the {@link INews} to check if it contains an
+   * {@link IAttachment} with the given link.
+   * @param link the {@link URI} of an attachment.
+   * @return <code>true</code> if the {@link INews} contains an
+   * {@link IAttachment} with the provided link and <code>false</code>
+   * otherwise.
+   */
+  public static boolean hasAttachment(INews news, URI link) {
+    List<IAttachment> attachments = news.getAttachments();
+    for (IAttachment attachment : attachments) {
+      if (link.equals(attachment.getLink()))
+        return true;
+    }
+
+    return false;
   }
 }

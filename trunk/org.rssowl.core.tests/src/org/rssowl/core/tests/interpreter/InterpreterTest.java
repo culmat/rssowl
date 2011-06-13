@@ -34,6 +34,7 @@ import org.junit.Test;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.Feed;
 import org.rssowl.core.interpreter.UnknownFormatException;
+import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.util.DateUtils;
@@ -966,5 +967,40 @@ public class InterpreterTest {
     Owl.getInterpreter().interpret(inS, feed, null);
 
     assertEquals("RSS 2.0", feed.getFormat());
+  }
+
+  /**
+   * Test a Media Feed with multiple Attachments.
+   *
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings("nls")
+  public void testMedia() throws Exception {
+    InputStream inS = getClass().getResourceAsStream("/data/interpreter/feed_media.xml");
+    IFeed feed = new Feed(new URI("http://www.data.interpreter.feed_media.xml"));
+    Owl.getInterpreter().interpret(inS, feed, null);
+
+    assertEquals(2, feed.getNews().size());
+
+    INews news = feed.getNews().get(0);
+    assertEquals(1, news.getAttachments().size());
+    IAttachment attachment = news.getAttachments().get(0);
+    assertEquals("http://blip.tv/file/get/NostalgiaCritic-HercNYBMB104.FLV", attachment.getLink().toString());
+    assertEquals("video/x-flv", attachment.getType());
+    assertEquals(162018262, attachment.getLength());
+
+    news = feed.getNews().get(1);
+    assertEquals(2, news.getAttachments().size());
+    IAttachment attachment1 = news.getAttachments().get(0);
+    IAttachment attachment2 = news.getAttachments().get(1);
+
+    assertEquals("http://blip.tv/file/get/NostalgiaCritic-BimbosBCCrossover552.wmv", attachment1.getLink().toString());
+    assertEquals("video/ms-wmv", attachment1.getType());
+    assertEquals(434020795, attachment1.getLength());
+
+    assertEquals("http://blip.tv/file/get/NostalgiaCritic-BimbosBCCrossover785.m4v", attachment2.getLink().toString());
+    assertEquals("video/x-m4v", attachment2.getType());
+    assertEquals(217916291, attachment2.getLength());
   }
 }

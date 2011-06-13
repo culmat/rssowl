@@ -38,6 +38,7 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.ISource;
 import org.rssowl.core.persist.ITextInput;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
@@ -465,7 +466,9 @@ public class RSSInterpreter extends BasicInterpreter {
   }
 
   private void processEnclosure(Element element, INews news) {
-    IAttachment attachment = Owl.getModelFactory().createAttachment(null, news);
+    URI attachmentUri = null;
+    String attachmentType = null;
+    int attachmentLength = -1;
 
     /* Interpret Attributes */
     List<?> attachmentAttributes = element.getAttributes();
@@ -473,26 +476,35 @@ public class RSSInterpreter extends BasicInterpreter {
       Attribute attribute = (Attribute) iter.next();
       String name = attribute.getName().toLowerCase();
 
-      /* Check wether this Attribute is to be processed by a Contribution */
-      if (processAttributeExtern(attribute, attachment))
-        continue;
-
       /* URL */
-      else if ("url".equals(name)) {//$NON-NLS-1$
+      if ("url".equals(name)) {//$NON-NLS-1$
         URI uri = URIUtils.createURI(attribute.getValue());
         if (uri != null)
-          attachment.setLink(uri);
+          attachmentUri = uri;
       }
 
       /* Type */
       else if ("type".equals(name)) //$NON-NLS-1$
-        attachment.setType(attribute.getValue());
+        attachmentType = attribute.getValue();
 
       /* Length */
-      else if ("length".equals(name)) {//$NON-NLS-1$
-        int length = StringUtils.stringToInt(attribute.getValue());
-        if (length >= 0)
-          attachment.setLength(length);
+      else if ("length".equals(name)) //$NON-NLS-1$
+        attachmentLength = StringUtils.stringToInt(attribute.getValue());
+    }
+
+    /* Create Attachment only if valid */
+    if (attachmentUri != null && !CoreUtils.hasAttachment(news, attachmentUri)) {
+      IAttachment attachment = Owl.getModelFactory().createAttachment(null, news);
+      attachment.setLink(attachmentUri);
+      if (StringUtils.isSet(attachmentType))
+        attachment.setType(attachmentType);
+      if (attachmentLength != -1)
+        attachment.setLength(attachmentLength);
+
+      /* Check wether this Attribute is to be processed by a Contribution */
+      for (Iterator<?> iter = attachmentAttributes.iterator(); iter.hasNext();) {
+        Attribute attribute = (Attribute) iter.next();
+        processAttributeExtern(attribute, attachment);
       }
     }
   }
