@@ -59,6 +59,7 @@ import org.rssowl.core.connection.IProxyCredentials;
 import org.rssowl.core.connection.MonitorCanceledException;
 import org.rssowl.core.connection.NotModifiedException;
 import org.rssowl.core.connection.ProxyAuthenticationRequiredException;
+import org.rssowl.core.connection.SyncConnectionException;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.interpreter.EncodingException;
 import org.rssowl.core.persist.IConditionalGet;
@@ -119,10 +120,12 @@ public class DefaultProtocolHandler implements IProtocolHandler {
 
   /* Google Error Response Codes */
   private static final String HEADER_RESPONSE_ERROR = "Error"; //$NON-NLS-1$
+  private static final String HEADER_RESPONSE_URL = "Url"; //$NON-NLS-1$
   private static final String ERROR_BAD_AUTH = "BadAuthentication"; //$NON-NLS-1$
   private static final String ERROR_NOT_VERIFIED = "NotVerified"; //$NON-NLS-1$
   private static final String ERROR_NO_TERMS = "TermsNotAgreed"; //$NON-NLS-1$
   private static final String ERROR_CAPTCHA_REQUIRED = "CaptchaRequired"; //$NON-NLS-1$
+  private static final String CAPTCHA_UNLOCK_URL = "https://www.google.com/accounts/DisplayUnlockCaptcha"; //$NON-NLS-1$
   private static final String ERROR_UNKNOWN = "Unknown"; //$NON-NLS-1$
   private static final String ERROR_ACCOUNT_DELETED = "AccountDeleted"; //$NON-NLS-1$
   private static final String ERROR_ACCOUNT_DISABLED = "AccountDisabled"; //$NON-NLS-1$
@@ -497,6 +500,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
 
   protected void handleForbidden(HttpMethodBase method) throws ConnectionException {
     String errorMsg = null;
+    String errorUrl = null;
 
     /* Lookup Google Error if present */
     Header errorHeader = method.getResponseHeader(HEADER_RESPONSE_ERROR);
@@ -508,8 +512,6 @@ public class DefaultProtocolHandler implements IProtocolHandler {
         errorMsg = Messages.DefaultProtocolHandler_GR_ERROR_NOT_VERIFIED;
       else if (ERROR_NO_TERMS.equals(errorCode))
         errorMsg = Messages.DefaultProtocolHandler_GR_ERROR_NO_TERMS;
-      else if (ERROR_CAPTCHA_REQUIRED.equals(errorCode))
-        errorMsg = Messages.DefaultProtocolHandler_GR_ERROR_CAPTCHA_REQUIRED;
       else if (ERROR_UNKNOWN.equals(errorCode))
         errorMsg = Messages.DefaultProtocolHandler_GR_ERROR_UNKNOWN;
       else if (ERROR_ACCOUNT_DELETED.equals(errorCode))
@@ -520,11 +522,25 @@ public class DefaultProtocolHandler implements IProtocolHandler {
         errorMsg = Messages.DefaultProtocolHandler_GR_ERROR_SERVICE_DISABLED;
       else if (ERROR_SERVICE_UNAVAILABLE.equals(errorCode))
         errorMsg = Messages.DefaultProtocolHandler_GR_ERROR_SERVICE_UNAVAILABLE;
+      else if (ERROR_CAPTCHA_REQUIRED.equals(errorCode)) {
+        errorMsg = Messages.DefaultProtocolHandler_GR_ERROR_CAPTCHA_REQUIRED;
+        errorUrl = CAPTCHA_UNLOCK_URL;
+      }
+
+      /* Also look up specified Error URL as necessary */
+      if (errorUrl == null) {
+        Header urlHeader = method.getResponseHeader(HEADER_RESPONSE_URL);
+        if (urlHeader != null && StringUtils.isSet(urlHeader.getValue()))
+          errorUrl = urlHeader.getValue();
+      }
     }
 
     /* Otherwise throw generic Forbidden Exception */
     if (errorMsg == null)
       errorMsg = Messages.DefaultProtocolHandler_ERROR_FORBIDDEN;
+
+    if (errorUrl != null)
+      throw new SyncConnectionException(errorUrl, Activator.getDefault().createErrorStatus(errorMsg, null));
 
     throw new ConnectionException(Activator.getDefault().createErrorStatus(errorMsg, null));
   }
