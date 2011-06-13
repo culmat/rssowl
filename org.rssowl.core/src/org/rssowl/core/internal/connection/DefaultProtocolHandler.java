@@ -24,6 +24,7 @@
 
 package org.rssowl.core.internal.connection;
 
+import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpMethodBase;
@@ -114,6 +115,18 @@ public class DefaultProtocolHandler implements IProtocolHandler {
   private static final String HEADER_RESPONSE_IF_NONE_MATCH = "If-None-Match"; //$NON-NLS-1$
   private static final String HEADER_RESPONSE_IF_MODIFIED_SINCE = "If-Modified-Since"; //$NON-NLS-1$
   private static final String HEADER_RESPONSE_CONTENT_ENCODING = "Content-Encoding"; //$NON-NLS-1$
+
+  /* Google Error Response Codes */
+  private static final String HEADER_RESPONSE_ERROR = "Error"; //$NON-NLS-1$
+  private static final String ERROR_BAD_AUTH = "BadAuthentication"; //$NON-NLS-1$
+  private static final String ERROR_NOT_VERIFIED = "NotVerified"; //$NON-NLS-1$
+  private static final String ERROR_NO_TERMS = "TermsNotAgreed"; //$NON-NLS-1$
+  private static final String ERROR_CAPTCHA_REQUIRED = "CaptchaRequired"; //$NON-NLS-1$
+  private static final String ERROR_UNKNOWN = "Unknown"; //$NON-NLS-1$
+  private static final String ERROR_ACCOUNT_DELETED = "AccountDeleted"; //$NON-NLS-1$
+  private static final String ERROR_ACCOUNT_DISABLED = "AccountDisabled"; //$NON-NLS-1$
+  private static final String ERROR_SERVICE_DISABLED = "ServiceDisabled"; //$NON-NLS-1$
+  private static final String ERROR_SERVICE_UNAVAILABLE = "ServiceUnavailable"; //$NON-NLS-1$
 
   /** Property to tell the XML parser to use platform encoding */
   public static final String USE_PLATFORM_ENCODING = "org.rssowl.core.internal.connection.DefaultProtocolHandler.UsePlatformEncoding"; //$NON-NLS-1$
@@ -442,10 +455,8 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     }
 
     /* In case authentication required / failed */
-    if (method.getStatusCode() == HTTP_ERROR_AUTH_REQUIRED) {
-      AuthState hostAuthState = method.getHostAuthState();
-      throw new AuthenticationRequiredException(hostAuthState != null ? hostAuthState.getRealm() : null, Activator.getDefault().createErrorStatus(Messages.DefaultProtocolHandler_ERROR_AUTHENTICATION_REQUIRED, null));
-    }
+    if (method.getStatusCode() == HTTP_ERROR_AUTH_REQUIRED)
+      handleAuthenticationRequired(method);
 
     /* In case proxy-authentication required / failed */
     if (method.getStatusCode() == HTTP_ERROR_PROXY_AUTH_REQUIRED)
@@ -475,6 +486,41 @@ public class DefaultProtocolHandler implements IProtocolHandler {
 
     /* Return a Stream that releases the connection once closed */
     return new HttpConnectionInputStream(link, method, monitor, inS);
+  }
+
+  protected void handleAuthenticationRequired(HttpMethodBase method) throws AuthenticationRequiredException {
+    String errorMsg = null;
+
+    /* Lookup Google Error if present */
+    Header errorHeader = method.getResponseHeader(HEADER_RESPONSE_ERROR);
+    if (errorHeader != null && StringUtils.isSet(errorHeader.getValue())) {
+      String errorCode = errorHeader.getValue();
+      if (ERROR_BAD_AUTH.equals(errorCode))
+        errorMsg = Messages.DefaultProtocolHandler_GR_ERROR_BAD_AUTH;
+      else if (ERROR_NOT_VERIFIED.equals(errorCode))
+        errorMsg = Messages.DefaultProtocolHandler_GR_ERROR_NOT_VERIFIED;
+      else if (ERROR_NO_TERMS.equals(errorCode))
+        errorMsg = Messages.DefaultProtocolHandler_GR_ERROR_NO_TERMS;
+      else if (ERROR_CAPTCHA_REQUIRED.equals(errorCode))
+        errorMsg = Messages.DefaultProtocolHandler_GR_ERROR_CAPTCHA_REQUIRED;
+      else if (ERROR_UNKNOWN.equals(errorCode))
+        errorMsg = Messages.DefaultProtocolHandler_GR_ERROR_UNKNOWN;
+      else if (ERROR_ACCOUNT_DELETED.equals(errorCode))
+        errorMsg = Messages.DefaultProtocolHandler_GR_ERROR_ACCOUNT_DELETED;
+      else if (ERROR_ACCOUNT_DISABLED.equals(errorCode))
+        errorMsg = Messages.DefaultProtocolHandler_GR_ERROR_ACCOUNT_DISABLED;
+      else if (ERROR_SERVICE_DISABLED.equals(errorCode))
+        errorMsg = Messages.DefaultProtocolHandler_GR_ERROR_SERVICE_DISABLED;
+      else if (ERROR_SERVICE_UNAVAILABLE.equals(errorCode))
+        errorMsg = Messages.DefaultProtocolHandler_GR_ERROR_SERVICE_UNAVAILABLE;
+    }
+
+    /* Otherwise throw generic Authentication Exception */
+    if (errorMsg == null)
+      errorMsg = Messages.DefaultProtocolHandler_ERROR_AUTHENTICATION_REQUIRED;
+
+    AuthState hostAuthState = method.getHostAuthState();
+    throw new AuthenticationRequiredException(hostAuthState != null ? hostAuthState.getRealm() : null, Activator.getDefault().createErrorStatus(errorMsg, null));
   }
 
   /* Some HTTP Error Messages */
