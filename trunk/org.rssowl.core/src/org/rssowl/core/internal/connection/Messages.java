@@ -36,6 +36,15 @@ public class Messages extends NLS {
   public static String DefaultProtocolHandler_ERROR_HTTP_STATUS_MSG;
   public static String DefaultProtocolHandler_ERROR_PROXY_AUTHENTICATION_REQUIRED;
   public static String DefaultProtocolHandler_ERROR_STREAM_UNAVAILABLE;
+  public static String DefaultProtocolHandler_GR_ERROR_ACCOUNT_DELETED;
+  public static String DefaultProtocolHandler_GR_ERROR_ACCOUNT_DISABLED;
+  public static String DefaultProtocolHandler_GR_ERROR_BAD_AUTH;
+  public static String DefaultProtocolHandler_GR_ERROR_CAPTCHA_REQUIRED;
+  public static String DefaultProtocolHandler_GR_ERROR_NO_TERMS;
+  public static String DefaultProtocolHandler_GR_ERROR_NOT_VERIFIED;
+  public static String DefaultProtocolHandler_GR_ERROR_SERVICE_DISABLED;
+  public static String DefaultProtocolHandler_GR_ERROR_SERVICE_UNAVAILABLE;
+  public static String DefaultProtocolHandler_GR_ERROR_UNKNOWN;
   public static String DefaultProtocolHandler_INFO_NOT_MODIFIED_SINCE;
 
   private Messages() {}
