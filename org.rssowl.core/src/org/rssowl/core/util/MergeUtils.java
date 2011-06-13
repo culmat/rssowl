@@ -32,10 +32,13 @@ import org.rssowl.core.persist.Reparentable;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Some useful methods for dealing with MergeCapable objects.,
@@ -43,6 +46,9 @@ import java.util.Map;
  * @author Ismael Juma (ismael@juma.me.uk)
  */
 public class MergeUtils {
+
+  /* Set of Properties to ignore during merge */
+  private static final Set<String> EXCLUDE_PROPERTIES = new HashSet<String>(Arrays.asList(SyncUtils.GOOGLE_MARKED_READ, SyncUtils.GOOGLE_MARKED_UNREAD, SyncUtils.GOOGLE_LABELS));
 
   /**
    * Helper method that simply does:
@@ -216,6 +222,9 @@ public class MergeUtils {
     /* Add / Update Properties from New Type */
     for (Map.Entry<String, Serializable> entry : newProperties.entrySet()) {
       String key = entry.getKey();
+      if (EXCLUDE_PROPERTIES.contains(key))
+        continue;
+
       Serializable value = entry.getValue();
       Serializable existingValue = existingProperties.get(key);
       if (!value.equals(existingValue)) {
@@ -231,6 +240,9 @@ public class MergeUtils {
     List<Map.Entry<String, ?>> entries = new ArrayList<Map.Entry<String, ?>>(existingProperties.entrySet());
     for (Map.Entry<String, ?> entry : entries) {
       String key = entry.getKey();
+      if (EXCLUDE_PROPERTIES.contains(key))
+        continue;
+
       Object value = newProperties.get(key);
       if (value == null) {
         existingType.removeProperty(key);
