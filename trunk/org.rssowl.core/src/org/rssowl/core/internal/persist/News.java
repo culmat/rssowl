@@ -1070,7 +1070,7 @@ public class News extends AbstractEntity implements INews {
         mergeDescription(result, n);
         updated |= processListMergeResult(result, mergeSource(n.fSource));
 
-        if (SyncUtils.isSynchronized(this)) {
+        if (isVisible() && SyncUtils.isSynchronized(this)) {
           updated |= mergeLabels(n.fLabels);
           updated |= (fIsFlagged != n.fIsFlagged);
           fIsFlagged = n.fIsFlagged;
@@ -1152,6 +1152,9 @@ public class News extends AbstractEntity implements INews {
   }
 
   private State getState(INews news) {
+    if (!isVisible())
+      return news.getState(); //Avoid marking a deleted news as visible from a sync merge
+
     if (SyncUtils.isSynchronized(news)) {
       if (news.getProperty(SyncUtils.GOOGLE_MARKED_READ) != null)
         return State.READ;
