@@ -105,6 +105,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
   private static final int HTTP_ERRORS = 400;
   private static final int HTTP_STATUS_NOT_MODIFIED = 304;
   private static final int HTTP_ERROR_AUTH_REQUIRED = 401;
+  private static final int HTTP_ERROR_FORBIDDEN = 403;
   private static final int HTTP_ERROR_PROXY_AUTH_REQUIRED = 407;
 
   /* Header Constants */
@@ -455,15 +456,21 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     }
 
     /* In case authentication required / failed */
-    if (method.getStatusCode() == HTTP_ERROR_AUTH_REQUIRED)
-      handleAuthenticationRequired(method);
+    if (method.getStatusCode() == HTTP_ERROR_AUTH_REQUIRED) {
+      AuthState hostAuthState = method.getHostAuthState();
+      throw new AuthenticationRequiredException(hostAuthState != null ? hostAuthState.getRealm() : null, Activator.getDefault().createErrorStatus(Messages.DefaultProtocolHandler_ERROR_AUTHENTICATION_REQUIRED, null));
+    }
+
+    /* In case of Forbidden Status with Error Code (Google Reader) */
+    else if (method.getStatusCode() == HTTP_ERROR_FORBIDDEN && method.getResponseHeader(HEADER_RESPONSE_ERROR) != null)
+      handleForbidden(method);
 
     /* In case proxy-authentication required / failed */
-    if (method.getStatusCode() == HTTP_ERROR_PROXY_AUTH_REQUIRED)
+    else if (method.getStatusCode() == HTTP_ERROR_PROXY_AUTH_REQUIRED)
       throw new ProxyAuthenticationRequiredException(Activator.getDefault().createErrorStatus(Messages.DefaultProtocolHandler_ERROR_PROXY_AUTHENTICATION_REQUIRED, null));
 
     /* If status code is 4xx, throw an IOException with the status code included */
-    if (method.getStatusCode() >= HTTP_ERRORS) {
+    else if (method.getStatusCode() >= HTTP_ERRORS) {
       String error = getError(method.getStatusCode());
       if (error != null)
         throw new ConnectionException(Activator.getDefault().createErrorStatus(NLS.bind(Messages.DefaultProtocolHandler_ERROR_HTTP_STATUS_MSG, String.valueOf(method.getStatusCode()), error), null));
@@ -472,7 +479,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     }
 
     /* In case the Feed has not been modified since */
-    if (method.getStatusCode() == HTTP_STATUS_NOT_MODIFIED)
+    else if (method.getStatusCode() == HTTP_STATUS_NOT_MODIFIED)
       throw new NotModifiedException(Activator.getDefault().createInfoStatus(Messages.DefaultProtocolHandler_INFO_NOT_MODIFIED_SINCE, null));
 
     /* In case response body is not available */
@@ -488,7 +495,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     return new HttpConnectionInputStream(link, method, monitor, inS);
   }
 
-  protected void handleAuthenticationRequired(HttpMethodBase method) throws AuthenticationRequiredException {
+  protected void handleForbidden(HttpMethodBase method) throws ConnectionException {
     String errorMsg = null;
 
     /* Lookup Google Error if present */
@@ -515,12 +522,11 @@ public class DefaultProtocolHandler implements IProtocolHandler {
         errorMsg = Messages.DefaultProtocolHandler_GR_ERROR_SERVICE_UNAVAILABLE;
     }
 
-    /* Otherwise throw generic Authentication Exception */
+    /* Otherwise throw generic Forbidden Exception */
     if (errorMsg == null)
-      errorMsg = Messages.DefaultProtocolHandler_ERROR_AUTHENTICATION_REQUIRED;
+      errorMsg = Messages.DefaultProtocolHandler_ERROR_FORBIDDEN;
 
-    AuthState hostAuthState = method.getHostAuthState();
-    throw new AuthenticationRequiredException(hostAuthState != null ? hostAuthState.getRealm() : null, Activator.getDefault().createErrorStatus(errorMsg, null));
+    throw new ConnectionException(Activator.getDefault().createErrorStatus(errorMsg, null));
   }
 
   /* Some HTTP Error Messages */
