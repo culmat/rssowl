@@ -194,18 +194,23 @@ public class InformationPropertyPage implements IEntityPropertyPage {
     ((GridData) msgLabel.getLayoutData()).widthHint = 200;
     msgLabel.setText(message);
 
-    /* Link to Feedvalidator in case of an error */
+    /* Link to "Find out more" in case of an error */
     if (bm.isErrorLoading()) {
       new Label(fContainer, SWT.None);
 
-      Link validateLink = new Link(fContainer, SWT.None);
-      validateLink.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
-      validateLink.setText(Messages.InformationPropertyPage_FIND_OUT_MORE);
-      validateLink.addSelectionListener(new SelectionAdapter() {
+      Link findOutMoreLink = new Link(fContainer, SWT.None);
+      findOutMoreLink.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
+      findOutMoreLink.setText(Messages.InformationPropertyPage_FIND_OUT_MORE);
+      findOutMoreLink.addSelectionListener(new SelectionAdapter() {
         @Override
         public void widgetSelected(SelectionEvent e) {
           try {
-            URI uri = new URI("http://www.feedvalidator.org/check.cgi?url=" + URIUtils.urlEncode(URIUtils.toHTTP(bm.getFeedLinkReference().getLinkAsText()))); //$NON-NLS-1$
+            URI uri;
+            Object errorLink = bm.getProperty(Controller.LOAD_ERROR_LINK_KEY);
+            if (errorLink != null)
+              uri = new URI(errorLink.toString());
+            else
+              uri = new URI("http://www.feedvalidator.org/check.cgi?url=" + URIUtils.urlEncode(URIUtils.toHTTP(bm.getFeedLinkReference().getLinkAsText()))); //$NON-NLS-1$
 
             OpenInBrowserAction action = new OpenInBrowserAction();
             action.selectionChanged(null, new StructuredSelection(uri));
