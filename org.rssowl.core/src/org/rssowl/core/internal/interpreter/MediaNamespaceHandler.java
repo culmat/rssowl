@@ -26,8 +26,18 @@ package org.rssowl.core.internal.interpreter;
 
 import org.jdom.Attribute;
 import org.jdom.Element;
+import org.rssowl.core.Owl;
 import org.rssowl.core.interpreter.INamespaceHandler;
+import org.rssowl.core.persist.IAttachment;
+import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPersistable;
+import org.rssowl.core.util.CoreUtils;
+import org.rssowl.core.util.StringUtils;
+import org.rssowl.core.util.URIUtils;
+
+import java.net.URI;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Handler for the Media Namespace.
@@ -52,5 +62,66 @@ public class MediaNamespaceHandler implements INamespaceHandler {
    * org.rssowl.core.interpreter.INamespaceHandler#processElement(org.jdom.Element
    * , org.rssowl.core.persist.IPersistable)
    */
-  public void processElement(Element element, IPersistable type) {}
+  public void processElement(Element element, IPersistable type) {
+
+    /* Contribution only valid for news */
+    if (!(type instanceof INews))
+      return;
+
+    /* Media Group */
+    String name = element.getName().toLowerCase();
+    if ("group".equals(name)) { //$NON-NLS-1$
+      List<?> groupChilds = element.getChildren();
+      for (Iterator<?> iter = groupChilds.iterator(); iter.hasNext();) {
+        Element child = (Element) iter.next();
+        if ("content".equals(child.getName().toLowerCase())) //$NON-NLS-1$
+          processContent(child, (INews) type);
+      }
+    }
+
+    /* Media Content */
+    else if ("content".equals(name)) { //$NON-NLS-1$
+      processContent(element, (INews) type);
+    }
+  }
+
+  private void processContent(Element element, INews news) {
+
+    /* In case no Attributes present to interpret */
+    if (element.getAttributes().isEmpty())
+      return;
+
+    URI attachmentUri = null;
+    String attachmentType = null;
+    int attachmentLength = -1;
+
+    /* Interpret Attributes */
+    List<?> attributes = element.getAttributes();
+    for (Iterator<?> iter = attributes.iterator(); iter.hasNext();) {
+      Attribute attribute = (Attribute) iter.next();
+      String name = attribute.getName();
+
+      /* URL */
+      if ("url".equals(name)) //$NON-NLS-1$
+        attachmentUri = URIUtils.createURI(attribute.getValue());
+
+      /* Type */
+      else if ("type".equals(name)) //$NON-NLS-1$
+        attachmentType = attribute.getValue();
+
+      /* Length */
+      else if ("fileSize".equals(name))//$NON-NLS-1$
+        attachmentLength = StringUtils.stringToInt(attribute.getValue());
+    }
+
+    /* Create Attachment only if valid */
+    if (attachmentUri != null && !CoreUtils.hasAttachment(news, attachmentUri)) {
+      IAttachment attachment = Owl.getModelFactory().createAttachment(null, news);
+      attachment.setLink(attachmentUri);
+      if (StringUtils.isSet(attachmentType))
+        attachment.setType(attachmentType);
+      if (attachmentLength != -1)
+        attachment.setLength(attachmentLength);
+    }
+  }
 }

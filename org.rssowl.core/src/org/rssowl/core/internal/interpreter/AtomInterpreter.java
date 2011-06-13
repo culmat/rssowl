@@ -39,6 +39,7 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPersistable;
 import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.ISource;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
@@ -59,7 +60,8 @@ public class AtomInterpreter extends BasicInterpreter {
   private int fNewsCounter;
 
   /*
-   * @see org.rssowl.core.interpreter.IFormatInterpreter#interpret(org.jdom.Document,
+   * @see
+   * org.rssowl.core.interpreter.IFormatInterpreter#interpret(org.jdom.Document,
    * org.rssowl.core.interpreter.types.IFeed)
    */
   public void interpret(Document document, IFeed feed) {
@@ -73,8 +75,8 @@ public class AtomInterpreter extends BasicInterpreter {
   private void processFeed(Element element, IFeed feed) {
 
     /* Interpret Attributes */
-    List< ? > attributes = element.getAttributes();
-    for (Iterator< ? > iter = attributes.iterator(); iter.hasNext();) {
+    List<?> attributes = element.getAttributes();
+    for (Iterator<?> iter = attributes.iterator(); iter.hasNext();) {
       Attribute attribute = (Attribute) iter.next();
       String name = attribute.getName();
 
@@ -92,8 +94,8 @@ public class AtomInterpreter extends BasicInterpreter {
     }
 
     /* Interpret Children */
-    List< ? > channelChildren = element.getChildren();
-    for (Iterator< ? > iter = channelChildren.iterator(); iter.hasNext();) {
+    List<?> channelChildren = element.getChildren();
+    for (Iterator<?> iter = channelChildren.iterator(); iter.hasNext();) {
       Element child = (Element) iter.next();
       String name = child.getName().toLowerCase();
 
@@ -175,8 +177,8 @@ public class AtomInterpreter extends BasicInterpreter {
     processNamespaceAttributes(element, news);
 
     /* Interpret Children */
-    List< ? > newsChilds = element.getChildren();
-    for (Iterator< ? > iter = newsChilds.iterator(); iter.hasNext();) {
+    List<?> newsChilds = element.getChildren();
+    for (Iterator<?> iter = newsChilds.iterator(); iter.hasNext();) {
       Element child = (Element) iter.next();
       String name = child.getName().toLowerCase();
 
@@ -229,15 +231,22 @@ public class AtomInterpreter extends BasicInterpreter {
 
         /* Enclosure */
         else if ("enclosure".equals(rel)) { //$NON-NLS-1$
-          IAttachment attachment = Owl.getModelFactory().createAttachment(null, news);
+          URI attachmentUri = URIUtils.createURI(child.getAttributeValue("href")); //$NON-NLS-1$
+          String attachmentType = child.getAttributeValue("type"); //$NON-NLS-1$
+          int attachmentLength = StringUtils.stringToInt(child.getAttributeValue("length")); //$NON-NLS-1$
 
-          URI uri = URIUtils.createURI(child.getAttributeValue("href")); //$NON-NLS-1$
-          if (uri != null)
-            attachment.setLink(uri);
-          attachment.setType(child.getAttributeValue("type")); //$NON-NLS-1$
-          attachment.setLength(StringUtils.stringToInt(child.getAttributeValue("length"))); //$NON-NLS-1$
+          /* Create Attachment only if valid */
+          if (attachmentUri != null && !CoreUtils.hasAttachment(news, attachmentUri)) {
+            IAttachment attachment = Owl.getModelFactory().createAttachment(null, news);
+            attachment.setLink(attachmentUri);
+            if (StringUtils.isSet(attachmentType))
+              attachment.setType(attachmentType);
+            if (attachmentLength != -1)
+              attachment.setLength(attachmentLength);
 
-          processNamespaceAttributes(child, attachment);
+            /* Allow Contributions */
+            processNamespaceAttributes(child, attachment);
+          }
         }
       }
 
@@ -260,8 +269,8 @@ public class AtomInterpreter extends BasicInterpreter {
 
     /* XHTML Type makes use of a single <DIV> to surround the XHTML */
     if ("xhtml".equals(type) || "application/xhtml+xml".equals(type)) { //$NON-NLS-1$ //$NON-NLS-2$
-      List< ? > children = element.getChildren();
-      for (Iterator< ? > iter = children.iterator(); iter.hasNext();) {
+      List<?> children = element.getChildren();
+      for (Iterator<?> iter = children.iterator(); iter.hasNext();) {
         Element contentChild = (Element) iter.next();
         String name = contentChild.getName();
 
@@ -309,8 +318,8 @@ public class AtomInterpreter extends BasicInterpreter {
     processNamespaceAttributes(element, source);
 
     /* Interpret Children */
-    List< ? > sourceChilds = element.getChildren();
-    for (Iterator< ? > iter = sourceChilds.iterator(); iter.hasNext();) {
+    List<?> sourceChilds = element.getChildren();
+    for (Iterator<?> iter = sourceChilds.iterator(); iter.hasNext();) {
       Element child = (Element) iter.next();
       String name = child.getName().toLowerCase();
 
@@ -346,8 +355,8 @@ public class AtomInterpreter extends BasicInterpreter {
     ICategory category = Owl.getModelFactory().createCategory(null, type);
 
     /* Interpret Attributes */
-    List< ? > categoryAttributes = element.getAttributes();
-    for (Iterator< ? > iter = categoryAttributes.iterator(); iter.hasNext();) {
+    List<?> categoryAttributes = element.getAttributes();
+    for (Iterator<?> iter = categoryAttributes.iterator(); iter.hasNext();) {
       Attribute attribute = (Attribute) iter.next();
       String name = attribute.getName().toLowerCase();
 
@@ -377,8 +386,8 @@ public class AtomInterpreter extends BasicInterpreter {
     processNamespaceAttributes(element, person);
 
     /* Interpret Children */
-    List< ? > personChilds = element.getChildren();
-    for (Iterator< ? > iter = personChilds.iterator(); iter.hasNext();) {
+    List<?> personChilds = element.getChildren();
+    for (Iterator<?> iter = personChilds.iterator(); iter.hasNext();) {
       Element child = (Element) iter.next();
       String name = child.getName().toLowerCase();
 
