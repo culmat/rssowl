@@ -37,11 +37,13 @@ import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.MergeUtils;
 import org.rssowl.core.util.StringUtils;
+import org.rssowl.core.util.SyncUtils;
 
 import java.io.Serializable;
 import java.net.URI;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -72,7 +74,7 @@ public class News extends AbstractEntity implements INews {
     void acquireWriteLock() {
       if (fReadLockThread == Thread.currentThread()) {
         throw new IllegalStateException("Cannot acquire the write lock from the " + //$NON-NLS-1$
-        		"same thread as the read lock."); //$NON-NLS-1$
+            "same thread as the read lock."); //$NON-NLS-1$
       }
       fLock.writeLock().lock();
     }
@@ -217,7 +219,7 @@ public class News extends AbstractEntity implements INews {
    * Default constructor for deserialization
    */
   protected News() {
-  // As per javadoc
+    // As per javadoc
   }
 
   /**
@@ -237,8 +239,8 @@ public class News extends AbstractEntity implements INews {
    * Acquires the read lock used by all non-mutating public methods of this
    * object. This method also ensures that an IllegalStateException is thrown if
    * the same thread tries to acquire the write lock (by calling one of the
-   * mutating methods) while still holding this read lock (to prevent deadlocks).
-   *
+   * mutating methods) while still holding this read lock (to prevent
+   * deadlocks).
    * <p>
    * This method should only be used in very specific circumstances. Avoid if
    * possible.
@@ -262,7 +264,7 @@ public class News extends AbstractEntity implements INews {
     fLock.releaseReadLockSpecial();
   }
 
-  private <T>Boolean isEquivalentCompare(T o1, T o2) {
+  private <T> Boolean isEquivalentCompare(T o1, T o2) {
     if ((o1 == null) && (o2 == null))
       return null;
 
@@ -400,7 +402,7 @@ public class News extends AbstractEntity implements INews {
   /*
    * @see org.rssowl.core.persist.INews#getLabels()
    */
-  public Set<ILabel> getLabels()    {
+  public Set<ILabel> getLabels() {
     fLock.acquireReadLock();
     try {
       if (fLabels == null)
@@ -422,6 +424,32 @@ public class News extends AbstractEntity implements INews {
         fLabels = new HashSet<ILabel>(1);
 
       return fLabels.add(label);
+    } finally {
+      fLock.releaseWriteLock();
+    }
+  }
+
+  void clearLabels() {
+    fLock.acquireWriteLock();
+    try {
+      if (fLabels == null)
+        return;
+
+      fLabels.clear();
+    } finally {
+      fLock.releaseWriteLock();
+    }
+  }
+
+  void setLabels(Set<ILabel> labels) {
+    fLock.acquireWriteLock();
+    try {
+      if (fLabels == null)
+        fLabels = new HashSet<ILabel>(1);
+      else
+        fLabels.clear();
+
+      fLabels.addAll(labels);
     } finally {
       fLock.releaseWriteLock();
     }
@@ -521,7 +549,7 @@ public class News extends AbstractEntity implements INews {
     try {
       return fLinkText == null ? null : createURI(fLinkText);
     } finally {
-     fLock.releaseReadLock();
+      fLock.releaseReadLock();
     }
   }
 
@@ -556,7 +584,7 @@ public class News extends AbstractEntity implements INews {
     fLock.acquireWriteLock();
     try {
       fPublishDate = publishDate;
-    } finally	{
+    } finally {
       fLock.releaseWriteLock();
     }
   }
@@ -1041,8 +1069,14 @@ public class News extends AbstractEntity implements INews {
         updated |= mergeGuid(n.fGuid);
         mergeDescription(result, n);
         updated |= processListMergeResult(result, mergeSource(n.fSource));
-        updated |= !simpleFieldsEqual(n);
 
+        if (SyncUtils.isSynchronized(this)) {
+          updated |= mergeLabels(n.fLabels);
+          updated |= (fIsFlagged != n.fIsFlagged);
+          fIsFlagged = n.fIsFlagged;
+        }
+
+        updated |= !simpleFieldsEqual(n);
         fBaseUri = n.fBaseUri;
         fComments = n.fComments;
         fLinkText = n.fLinkText;
@@ -1103,7 +1137,7 @@ public class News extends AbstractEntity implements INews {
 
   private boolean mergeState(INews news) {
     State thisState = getState();
-    State otherState = news.getState();
+    State otherState = getState(news); //Considers special Sync State as needed
     if (thisState != otherState && otherState != State.NEW) {
       setState(otherState);
       return true;
@@ -1115,6 +1149,18 @@ public class News extends AbstractEntity implements INews {
     }
 
     return false;
+  }
+
+  private State getState(INews news) {
+    if (SyncUtils.isSynchronized(news)) {
+      if (news.getProperty(SyncUtils.GOOGLE_MARKED_READ) != null)
+        return State.READ;
+
+      if (news.getProperty(SyncUtils.GOOGLE_MARKED_UNREAD) != null)
+        return State.UNREAD;
+    }
+
+    return news.getState();
   }
 
   private boolean isUpdated(INews news) {
@@ -1193,6 +1239,35 @@ public class News extends AbstractEntity implements INews {
     ComplexMergeResult<List<IAttachment>> mergeResult = MergeUtils.merge(fAttachments, attachments, comparator, this);
     fAttachments = mergeResult.getMergedObject();
     return mergeResult;
+  }
+
+  private boolean mergeLabels(Set<ILabel> labels) {
+
+    /* Identical #1: Null, Null */
+    if (fLabels == null && labels == null)
+      return false;
+
+    /* Identical #2: Null, Empty */
+    if (fLabels == null && labels != null && labels.isEmpty())
+      return false;
+
+    /* Identical #3: Empty, Null */
+    if (fLabels != null && fLabels.isEmpty() && labels == null)
+      return false;
+
+    /* Identical #4: Equals */
+    if (fLabels != null && labels != null && Arrays.equals(fLabels.toArray(), labels.toArray()))
+      return false;
+
+    /* Remove All Labels */
+    if (labels == null || labels.isEmpty())
+      clearLabels();
+
+    /* Set All Labels */
+    else
+      setLabels(labels);
+
+    return true;
   }
 
   /*
