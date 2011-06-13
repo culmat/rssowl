@@ -24,12 +24,14 @@
 
 package org.rssowl.ui.internal.util;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.browser.Browser;
@@ -57,9 +59,11 @@ import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.editors.browser.WebBrowserContext;
 import org.rssowl.ui.internal.editors.browser.WebBrowserView;
 
+import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -86,6 +90,11 @@ public class CBrowser {
 
   /* System Property to force disable XULRunner even if registered */
   private static final String DISABLE_XULRUNNER = "noXulrunner"; //$NON-NLS-1$
+
+  /* Local XULRunner Runtime Constants */
+  private static final String XULRUNNER_PATH_PROPERTY = "org.eclipse.swt.browser.XULRunnerPath"; //$NON-NLS-1$
+  private static final String XULRUNNER_DIR = "xulrunner"; //$NON-NLS-1$
+  private static boolean fgXulrunnerRuntimeSet = false;
 
   /* Delay in millies after a refresh until to allow ext. navigation again (see Bug 1429) */
   private static final long REFRESH_NAVIGATION_DELAY = 3000;
@@ -183,9 +192,6 @@ public class CBrowser {
       if (useProxy() && StringUtils.isSet(proxyHost) && StringUtils.isSet(proxyPort)) {
         System.setProperty(XULRUNNER_PROXY_HOST, proxyHost);
         System.setProperty(XULRUNNER_PROXY_PORT, proxyPort);
-      } else {
-        System.setProperty(XULRUNNER_PROXY_HOST, ""); //$NON-NLS-1$
-        System.setProperty(XULRUNNER_PROXY_PORT, ""); //$NON-NLS-1$
       }
     }
 
@@ -200,6 +206,15 @@ public class CBrowser {
         if (!"No more handles [Could not detect registered XULRunner to use]".equals(e.getMessage())) //This happens too often to log it //$NON-NLS-1$
           Activator.getDefault().getLog().log(Activator.getDefault().createInfoStatus(e.getMessage(), null));
       }
+    }
+
+    /* Linux: Check for deployed XULRunner runtime and use */
+    if (Application.IS_LINUX && System.getProperty(XULRUNNER_PATH_PROPERTY) == null && !fgXulrunnerRuntimeSet) {
+      File xulRunnerRuntimeDir = getXULRunnerRuntimeDir();
+      if (xulRunnerRuntimeDir != null)
+        System.setProperty(XULRUNNER_PATH_PROPERTY, xulRunnerRuntimeDir.toString());
+
+      fgXulrunnerRuntimeSet= true; //Avoid redundant lookup if XULRunner runtime not found
     }
 
     /* Any other OS, or Mozilla unavailable, use default */
@@ -235,6 +250,34 @@ public class CBrowser {
     });
 
     return browser;
+  }
+
+  private File getXULRunnerRuntimeDir() {
+
+    /* Retrieve Install Location */
+    Location installLocation = Platform.getInstallLocation();
+    if (installLocation == null || installLocation.getURL() == null)
+      return null;
+
+    /* Retrieve Program Dir as File Object */
+    File programDir = toFile(installLocation.getURL());
+    if (programDir == null || !programDir.isDirectory() || !programDir.exists())
+      return null;
+
+    /* Retrieve the XULRunner Directory */
+    File xulrunnerDir = new File(programDir, XULRUNNER_DIR);
+    if (!xulrunnerDir.exists() || !xulrunnerDir.isDirectory())
+      return null;
+
+    return xulrunnerDir;
+  }
+
+  private File toFile(URL url) {
+    try {
+      return new File(url.toURI());
+    } catch (URISyntaxException e) {
+      return new File(url.getPath());
+    }
   }
 
   /* If RSSOwl runs with SWT 3.7, force use of Mozilla over WebKit */
