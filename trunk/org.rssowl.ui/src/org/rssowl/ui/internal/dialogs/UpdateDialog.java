@@ -267,7 +267,6 @@ public class UpdateDialog extends TitleAreaDialog {
     long dlSize = 0;
     String provider = null;
     String description = null;
-    boolean isQualifierUpdate = false;
 
     if (fUpdates != null && fUpdates.length > 0) {
       IFeature oldFeature = fUpdates[0].getOldFeature();
@@ -282,7 +281,6 @@ public class UpdateDialog extends TitleAreaDialog {
 
       /* Special Treat Case of a Qualifier Update */
       if (newVer.equals(oldVer) && oldVersion != null) {
-        isQualifierUpdate = true;
         String newQualifierComponent = newVersion.getQualifierComponent();
         String oldQualifierComponent = oldVersion.getQualifierComponent();
         if (newQualifierComponent.length() == 12 && oldQualifierComponent.length() == 12) {
@@ -298,15 +296,15 @@ public class UpdateDialog extends TitleAreaDialog {
       dlSize = newFeature.getDownloadSize() * 1000;
       provider = newFeature.getProvider();
 
-      /* Description */
-      if (!isQualifierUpdate) {
-        ICategory[] categories = newFeature.getSite().getCategories();
-        if (categories.length > 0) {
-          IURLEntry descriptionEntry = categories[0].getDescription();
-          if (descriptionEntry != null)
-            description = descriptionEntry.getAnnotation();
-        }
-      } else
+      /* Description (if present) */
+      ICategory[] categories = newFeature.getSite().getCategories();
+      if (categories.length > 0) {
+        IURLEntry descriptionEntry = categories[0].getDescription();
+        if (descriptionEntry != null)
+          description = descriptionEntry.getAnnotation();
+      }
+
+      if (!StringUtils.isSet(description))
         description = Messages.UpdateDialog_QUALIFIER_UPDATE_DESCRIPTION;
 
       showUpdateDescription(oldVer, newVer, dlSize, provider, description);
