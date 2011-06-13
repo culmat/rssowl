@@ -46,12 +46,9 @@ import java.util.Set;
 /**
  * Interpreter that will fill a {@link IFeed} with values obtained from a
  * {@link JSONObject}.
- *
+ * 
  * @author bpasero
  */
-//TODO Carry over read state to application service layer and use there
-//TODO Carry over labels information to application service layer and use there
-//TODO Can we support marking a news as UNREAD instead of NEW? Any state for this?
 public class JSONInterpreter {
 
   /* Constants used to obtain data from the JSON Objects */
@@ -78,6 +75,7 @@ public class JSONInterpreter {
   private static final String GOOGLE_LABEL_PART = "/label/"; //$NON-NLS-1$
   private static final String GOOGLE_CATEGORY_PREFIX = "user/"; //$NON-NLS-1$
   private static final String GOOGLE_STATE_READ = "/state/com.google/read"; //$NON-NLS-1$
+  private static final String GOOGLE_STATE_UNREAD = "/state/com.google/kept-unread"; //$NON-NLS-1$
   private static final String GOOGLE_STATE_STARRED = "/state/com.google/starred"; //$NON-NLS-1$
 
   /**
@@ -201,6 +199,11 @@ public class JSONInterpreter {
         /* News is marked read */
         else if (category.endsWith(GOOGLE_STATE_READ)) {
           properties.putBoolean(SyncUtils.GOOGLE_MARKED_READ, true); //Can not use state here for core reasons
+        }
+
+        /* News is marked unread */
+        else if (category.endsWith(GOOGLE_STATE_UNREAD)) {
+          properties.putBoolean(SyncUtils.GOOGLE_MARKED_UNREAD, true); //Can not use state here for core reasons
         }
 
         /* News is starred */
