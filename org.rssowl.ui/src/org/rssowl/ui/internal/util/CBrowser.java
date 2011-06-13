@@ -146,7 +146,7 @@ public class CBrowser {
       box.setText(Messages.CBrowser_ERROR_CREATE_BROWSER);
       box.setMessage(Messages.CBrowser_ERROR_CREATE_BROWSER_MSG);
       if (box.open() == SWT.OK)
-        BrowserUtils.openLinkExternal("http://www.rssowl.org/help"); //$NON-NLS-1$
+        BrowserUtils.openLinkExternal("http://www.rssowl.org/help#item_6j"); //$NON-NLS-1$
 
       throw e;
     }
