@@ -158,9 +158,9 @@
 	
 	<target name="postPackage">
 		<!-- copy build results for rcp build -->
-		<copy todir="${buildResultsDirectory}" flatten="true">
+		<!--<copy todir="${buildResultsDirectory}" flatten="true">
 			<fileset dir="${buildDirectory}" includes="${buildType}-**/*.zip" />
-		</copy>
+		</copy>-->
 	</target>
 
 	<!-- ===================================================================== -->
