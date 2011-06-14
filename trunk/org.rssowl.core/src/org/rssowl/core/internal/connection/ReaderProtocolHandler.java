@@ -34,6 +34,7 @@ import org.rssowl.core.connection.ConnectionException;
 import org.rssowl.core.connection.IConnectionPropertyConstants;
 import org.rssowl.core.connection.ICredentials;
 import org.rssowl.core.connection.ICredentialsProvider;
+import org.rssowl.core.connection.SyncConnectionException;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.interpreter.json.JSONException;
 import org.rssowl.core.internal.interpreter.json.JSONObject;
@@ -81,7 +82,11 @@ public class ReaderProtocolHandler extends DefaultProtocolHandler {
     try {
       String authToken = handleAuthentication(false, monitor);
       inS = openGoogleConnection(authToken, googleLink, monitor, properties);
-    } catch (AuthenticationRequiredException e) {
+    } catch (ConnectionException e) {
+
+      /* Rethrow if this exception is not about Authentication issues */
+      if (!(e instanceof AuthenticationRequiredException) && !(e instanceof SyncConnectionException))
+        throw e;
 
       /* Return on Cancelation or Shutdown */
       if (monitor.isCanceled()) {
