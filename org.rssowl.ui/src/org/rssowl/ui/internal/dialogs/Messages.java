@@ -87,6 +87,7 @@ public class Messages extends NLS {
   public static String LabelDialog_LABEL_EXISTS;
   public static String LabelDialog_NAME;
   public static String LabelDialog_NEW_LABEL;
+  public static String LoginDialog_CREATE_NEW_ACCOUNT;
   public static String LoginDialog_ENTER_USER_PW;
   public static String LoginDialog_ENTER_USER_PW_REALM;
   public static String LoginDialog_FEED_REQUIRES_AUTH;

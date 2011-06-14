@@ -2896,8 +2896,7 @@ public class OwlUI {
 
     if (shell != null) {
       URI googleLoginUri = URI.create(SyncUtils.GOOGLE_LOGIN);
-      LoginDialog dialog = new LoginDialog(shell, googleLoginUri, null);
-      dialog.setStorePermanently(Application.SYNC);
+      LoginDialog dialog = new LoginDialog(shell, googleLoginUri, null, true);
       dialog.setHeader(Messages.OwlUI_SYNC_LOGIN);
       dialog.setSubline(Messages.OwlUI_SYNC_LOGIN_TEXT);
       dialog.setTitleImageDescriptor(OwlUI.getImageDescriptor("icons/wizban/reader_wiz.png")); //$NON-NLS-1$
