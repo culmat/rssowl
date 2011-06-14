@@ -420,15 +420,15 @@ public class DefaultProtocolHandler implements IProtocolHandler {
   private InputStream internalOpenStream(URI link, URI authLink, String authRealm, Map<Object, Object> properties) throws ConnectionException {
 
     /* Handle File Protocol at first */
-    if ("file".equals(link.getScheme())) //$NON-NLS-1$
+    if (URIUtils.FILE_SCHEME.equals(link.getScheme()))
       return loadFileProtocol(link);
 
     /* SSL Support */
-    if ("https".equals(link.getScheme())) //$NON-NLS-1$
+    if (URIUtils.HTTPS_SCHEME.equals(link.getScheme()))
       initSSLProtocol();
 
     /* Feed Support */
-    if ("feed".equals(link.getScheme())) //$NON-NLS-1$
+    if (URIUtils.FEED_SCHEME.equals(link.getScheme()))
       initFeedProtocol();
 
     /* Init Client */
@@ -624,8 +624,8 @@ public class DefaultProtocolHandler implements IProtocolHandler {
       return;
 
     /* Register Easy Protocol Socket Factory with HTTPS */
-    Protocol easyHttpsProtocol = new Protocol("https", (ProtocolSocketFactory) Owl.getConnectionService().getSecureProtocolSocketFactory(), 443); //$NON-NLS-1$
-    Protocol.registerProtocol("https", easyHttpsProtocol); //$NON-NLS-1$
+    Protocol easyHttpsProtocol = new Protocol(URIUtils.HTTPS_SCHEME, (ProtocolSocketFactory) Owl.getConnectionService().getSecureProtocolSocketFactory(), 443);
+    Protocol.registerProtocol(URIUtils.HTTPS_SCHEME, easyHttpsProtocol);
 
     fgSSLInitialized = true;
   }
@@ -634,8 +634,8 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     if (fgFeedProtocolInitialized)
       return;
 
-    Protocol feed = new Protocol("feed", new DefaultProtocolSocketFactory(), 80); //$NON-NLS-1$
-    Protocol.registerProtocol("feed", feed); //$NON-NLS-1$
+    Protocol feed = new Protocol(URIUtils.FEED_SCHEME, new DefaultProtocolSocketFactory(), 80);
+    Protocol.registerProtocol(URIUtils.FEED_SCHEME, feed);
 
     fgFeedProtocolInitialized = true;
   }

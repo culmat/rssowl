@@ -268,7 +268,7 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
       return null;
 
     String host = URIUtils.safeGetHost(link);
-    boolean isSSL = "https".equals(link.getScheme()); //$NON-NLS-1$
+    boolean isSSL = URIUtils.HTTPS_SCHEME.equals(link.getScheme());
 
     /* Retrieve Proxy Data */
     final IProxyData proxyData = proxyService.getProxyDataForHost(host, isSSL ? IProxyData.HTTPS_PROXY_TYPE : IProxyData.HTTP_PROXY_TYPE);
@@ -376,7 +376,7 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
   public void setProxyCredentials(IProxyCredentials credentials, URI link) {
     IProxyService proxyService = Activator.getDefault().getProxyService();
     proxyService.setProxiesEnabled(true);
-    boolean isSSL = "https".equals(link.getScheme()); //$NON-NLS-1$
+    boolean isSSL = URIUtils.HTTPS_SCHEME.equals(link.getScheme());
 
     /* Retrieve Proxy Data */
     final IProxyData proxyData = proxyService.getProxyData(isSSL ? IProxyData.HTTPS_PROXY_TYPE : IProxyData.HTTP_PROXY_TYPE);
