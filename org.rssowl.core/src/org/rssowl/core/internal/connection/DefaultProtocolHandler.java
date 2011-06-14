@@ -67,6 +67,7 @@ import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.StringUtils;
+import org.rssowl.core.util.SyncUtils;
 import org.rssowl.core.util.Triple;
 import org.rssowl.core.util.URIUtils;
 
@@ -458,13 +459,17 @@ public class DefaultProtocolHandler implements IProtocolHandler {
       throw new ConnectionException(Activator.getDefault().createErrorStatus(e.getMessage(), e));
     }
 
-    /* In case authentication required / failed */
+    /* In case authentication required */
     if (method.getStatusCode() == HTTP_ERROR_AUTH_REQUIRED) {
       AuthState hostAuthState = method.getHostAuthState();
       throw new AuthenticationRequiredException(hostAuthState != null ? hostAuthState.getRealm() : null, Activator.getDefault().createErrorStatus(Messages.DefaultProtocolHandler_ERROR_AUTHENTICATION_REQUIRED, null));
     }
 
-    /* In case of Forbidden Status with Error Code (Google Reader) */
+    /* In case sync authentication failed (Forbidden) */
+    else if (isSyncAuthenticationIssue(method, authLink))
+      throw new AuthenticationRequiredException(null, Activator.getDefault().createErrorStatus(Messages.DefaultProtocolHandler_GR_ERROR_BAD_AUTH, null));
+
+ /* In case of Forbidden Status with Error Code (Google Reader) */
     else if (method.getStatusCode() == HTTP_ERROR_FORBIDDEN && method.getResponseHeader(HEADER_RESPONSE_ERROR) != null)
       handleForbidden(method);
 
@@ -496,6 +501,18 @@ public class DefaultProtocolHandler implements IProtocolHandler {
 
     /* Return a Stream that releases the connection once closed */
     return new HttpConnectionInputStream(link, method, monitor, inS);
+  }
+
+  private boolean isSyncAuthenticationIssue(HttpMethodBase method, URI link) {
+
+    /* Handle Google Error Response "Forbidden" for synced connections */
+    if (method.getStatusCode() == HTTP_ERROR_FORBIDDEN && SyncUtils.fromGoogle(link.toString())) {
+      Header errorHeader = method.getResponseHeader(HEADER_RESPONSE_ERROR);
+      if (errorHeader == null || ERROR_BAD_AUTH.equals(errorHeader.getValue()))
+        return true;
+    }
+
+    return false;
   }
 
   protected void handleForbidden(HttpMethodBase method) throws ConnectionException {
