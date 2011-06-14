@@ -26,9 +26,11 @@ package org.rssowl.core.util;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rssowl.core.Owl;
+import org.rssowl.core.connection.AuthenticationRequiredException;
 import org.rssowl.core.connection.ConnectionException;
 import org.rssowl.core.connection.IConnectionPropertyConstants;
 import org.rssowl.core.connection.IProtocolHandler;
+import org.rssowl.core.connection.SyncConnectionException;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.persist.IBookMark;
@@ -53,8 +55,8 @@ public class SyncUtils {
   /** Google Client Login Site */
   public static final String GOOGLE_LOGIN = "https://www.google.com/accounts/ClientLogin"; //$NON-NLS-1$
 
-  /** Google Token Service */
-  public static final String TOKEN_URL = "http://www.google.com/reader/api/0/token"; //$NON-NLS-1$
+  /** Google API Token Service */
+  public static final String API_TOKEN_URL = "http://www.google.com/reader/api/0/token"; //$NON-NLS-1$
 
   /** Schemes to use for synced feeds */
   public static final String READER_HTTP_SCHEME = "reader"; //$NON-NLS-1$
@@ -168,6 +170,8 @@ public class SyncUtils {
   }
 
   /**
+   * Returns the header value to authenticate against any Google REST services.
+   *
    * @param authToken the authorization token that can be obtained from
    * {@link SyncUtils#getGoogleAuthToken(String, String, boolean, IProgressMonitor)}
    * @return a header value that can be used inside <code>Authorization</code>
@@ -175,6 +179,72 @@ public class SyncUtils {
    */
   public static String getGoogleAuthorizationHeader(String authToken) {
     return GOOGLE_LOGIN_HEADER_VALUE + authToken;
+  }
+
+  /**
+   * Obtains the Google API Token to perform REST operations for Google
+   * Services.
+   *
+   * @param email the user account for google
+   * @param pw the password for the user account
+   * @param monitor an instance of {@link IProgressMonitor} that can be used to
+   * cancel the operation and report progress.
+   * @return the Google API Token to perform REST operations for Google
+   * Services.
+   * @throws ConnectionException Checked Exception to be used in case of any
+   * Exception.
+   */
+  public static String getGoogleApiToken(String email, String pw, IProgressMonitor monitor) throws ConnectionException {
+    try {
+
+      /* First try to use shared authentication token */
+      try {
+        return internalGetGoogleApiToken(email, pw, false, monitor);
+      } catch (ConnectionException e) {
+
+        /* Rethrow if this exception is not about Authentication issues */
+        if (!(e instanceof AuthenticationRequiredException) && !(e instanceof SyncConnectionException))
+          throw e;
+
+        /* Second try with up to date authentication token */
+        return internalGetGoogleApiToken(email, pw, true, monitor);
+      }
+
+    } catch (URISyntaxException e) {
+      throw new ConnectionException(Activator.getDefault().createErrorStatus(e.getMessage(), e));
+    } catch (IOException e) {
+      throw new ConnectionException(Activator.getDefault().createErrorStatus(e.getMessage(), e));
+    }
+  }
+
+  private static String internalGetGoogleApiToken(String email, String pw, boolean refresh, IProgressMonitor monitor) throws ConnectionException, IOException, URISyntaxException {
+    URI uri = new URI(API_TOKEN_URL);
+    IProtocolHandler handler = Owl.getConnectionService().getHandler(uri);
+    if (handler != null) {
+
+      String token = SyncUtils.getGoogleAuthToken(email, pw, refresh, monitor);
+
+      Map<String, String> headers = new HashMap<String, String>();
+      headers.put("Authorization", SyncUtils.getGoogleAuthorizationHeader(token)); //$NON-NLS-1$
+
+      Map<Object, Object> properties = new HashMap<Object, Object>();
+      properties.put(IConnectionPropertyConstants.HEADERS, headers);
+
+      BufferedReader reader = null;
+      try {
+        InputStream inS = handler.openStream(uri, monitor, properties);
+        reader = new BufferedReader(new InputStreamReader(inS));
+        String line;
+        while (!monitor.isCanceled() && (line = reader.readLine()) != null) {
+          return line;
+        }
+      } finally {
+        if (reader != null)
+          reader.close();
+      }
+    }
+
+    return null;
   }
 
   /**
