@@ -409,10 +409,12 @@ public class NotificationService {
         updateEnabledFeedCache();
 
       Boolean notifierEnabled = fNotifierEnablementCache.get(feedLink);
-      if (notifierEnabled != null && notifierEnabled)
-        return true;
+      if (notifierEnabled == null) {
+        notifierEnabled = false;
+        fNotifierEnablementCache.put(feedLink, notifierEnabled);
+      }
 
-      return false;
+      return notifierEnabled;
     }
   }
 
