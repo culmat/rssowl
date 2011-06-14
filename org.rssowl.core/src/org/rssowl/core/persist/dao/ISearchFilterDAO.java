@@ -24,9 +24,12 @@
 
 package org.rssowl.core.persist.dao;
 
+import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.event.SearchFilterEvent;
 import org.rssowl.core.persist.event.SearchFilterListener;
+
+import java.util.Collection;
 
 /**
  * A data-access-object for <code>ISearchFilter</code>s.
@@ -34,5 +37,14 @@ import org.rssowl.core.persist.event.SearchFilterListener;
  * @author Ismael Juma (ismael@juma.me.uk)
  */
 public interface ISearchFilterDAO extends IEntityDAO<ISearchFilter, SearchFilterListener, SearchFilterEvent> {
-  // No new methods
+
+  /**
+   * Notify <code>SearchFilterListener</code> that the provided search filter
+   * was applied to the given list of news.
+   *
+   * @param filter the instance of {@link ISearchFilter} that was applied.
+   * @param news the {@link Collection} of {@link INews} the
+   * {@link ISearchFilter} was running on.
+   */
+  void fireFilterApplied(ISearchFilter filter, Collection<INews> news);
 }

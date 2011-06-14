@@ -25,10 +25,13 @@
 package org.rssowl.core.internal.persist.dao;
 
 import org.rssowl.core.internal.persist.SearchFilter;
+import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.dao.ISearchFilterDAO;
 import org.rssowl.core.persist.event.SearchFilterEvent;
 import org.rssowl.core.persist.event.SearchFilterListener;
+
+import java.util.Collection;
 
 /**
  * A data-access-object for <code>ISearchFilter</code>s.
@@ -59,5 +62,16 @@ public class SearchFilterDAOImpl extends AbstractEntityDAO<ISearchFilter, Search
   @Override
   protected SearchFilterEvent createDeleteEventTemplate(ISearchFilter entity) {
     return createSaveEventTemplate(entity);
+  }
+
+  /*
+   * @see
+   * org.rssowl.core.persist.dao.ISearchFilterDAO#fireFilterApplied(java.util
+   * .Collection)
+   */
+  public void fireFilterApplied(ISearchFilter filter, Collection<INews> news) {
+    for (SearchFilterListener listener : fEntityListeners) {
+      listener.filterApplied(filter, news);
+    }
   }
 }

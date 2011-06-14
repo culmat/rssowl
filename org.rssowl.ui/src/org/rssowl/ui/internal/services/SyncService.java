@@ -27,9 +27,12 @@ package org.rssowl.ui.internal.services;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rssowl.core.connection.ConnectionException;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.event.NewsAdapter;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.NewsListener;
+import org.rssowl.core.persist.event.SearchFilterAdapter;
 import org.rssowl.core.util.BatchedBuffer;
 import org.rssowl.core.util.BatchedBuffer.Receiver;
 import org.rssowl.core.util.SyncUtils;
@@ -50,8 +53,9 @@ public class SyncService {
   /* Delay in Milies before syncing */
   private static final int SYNC_DELAY = 2000;
 
-  private NewsListener fListener;
   private final BatchedBuffer<NewsEvent> fSynchronizer;
+  private NewsListener fNewsListener;
+  private SearchFilterAdapter fSearchFilterListener;
 
   /* Receiver to process news events for syncing */
   private class SyncReceiver implements Receiver<NewsEvent> {
@@ -73,24 +77,29 @@ public class SyncService {
   }
 
   private void registerListeners() {
-    fListener = new NewsListener() {
+
+    /* News Listener */
+    fNewsListener = new NewsAdapter() {
+      @Override
       public void entitiesUpdated(Set<NewsEvent> events) {
         fSynchronizer.addAll(events);
       }
+    };
+    DynamicDAO.addEntityListener(INews.class, fNewsListener);
 
-      public void entitiesDeleted(Set<NewsEvent> events) {
-        /* Not Used For Syncing */
-      }
-
-      public void entitiesAdded(Set<NewsEvent> events) {
-        /* Not Used For Syncing */
+    /* News Filter Listener */
+    fSearchFilterListener = new SearchFilterAdapter() {
+      @Override
+      public void filterApplied(ISearchFilter filter, Collection<INews> news) {
+        System.out.println(news); //TODO
       }
     };
-    DynamicDAO.addEntityListener(INews.class, fListener);
+    DynamicDAO.addEntityListener(ISearchFilter.class, fSearchFilterListener);
   }
 
   private void unregisterListeners() {
-    DynamicDAO.removeEntityListener(INews.class, fListener);
+    DynamicDAO.removeEntityListener(INews.class, fNewsListener);
+    DynamicDAO.removeEntityListener(ISearchFilter.class, fSearchFilterListener);
   }
 
   /**

@@ -24,7 +24,10 @@
 
 package org.rssowl.core.persist.event;
 
+import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchFilter;
+
+import java.util.Collection;
 
 /**
  * A Listener being notified whenever the type <code>ISearchFilter</code> was
@@ -33,5 +36,14 @@ import org.rssowl.core.persist.ISearchFilter;
  * @author bpasero
  */
 public interface SearchFilterListener extends EntityListener<SearchFilterEvent, ISearchFilter> {
-  // No new methods
+
+  /**
+   * Notifies that a {@link ISearchFilter} was applied on a {@link Collection}
+   * of {@link INews}.
+   *
+   * @param filter the instance of {@link ISearchFilter} that was applied.
+   * @param news the {@link Collection} of {@link INews} the
+   * {@link ISearchFilter} was running on.
+   */
+  void filterApplied(ISearchFilter filter, Collection<INews> news);
 }
