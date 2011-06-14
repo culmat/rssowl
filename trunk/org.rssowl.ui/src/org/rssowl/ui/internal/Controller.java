@@ -874,6 +874,10 @@ public class Controller {
       /* Store locally */
       if (shouldProceedReloading(monitor, bookmark))
         OwlUI.storeImage(bookmark.getId(), faviconBytes, OwlUI.BOOKMARK, 16, 16);
+
+      /* This will trigger an update to the viewer to show the favicon */
+      if (faviconBytes != null)
+        DynamicDAO.save(bookmark);
     } catch (UnknownProtocolException e) {
       Activator.getDefault().getLog().log(e.getStatus());
     } catch (ConnectionException e) {
