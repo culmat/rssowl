@@ -58,6 +58,9 @@ public class SyncUtils {
   /** Google API Token Service */
   public static final String API_TOKEN_URL = "http://www.google.com/reader/api/0/token"; //$NON-NLS-1$
 
+  /** Google Account Creation URL (follows to Google Reader after signup) */
+  public static final String GOOGLE_NEW_ACCOUNT_URL = "https://www.google.com/accounts/NewAccount?continue=http%3A%2F%2Fwww.google.com%2Freader%2F&followup=http%3A%2F%2Fwww.google.com%2Freader%2F&service=reader"; //$NON-NLS-1$
+
   /** Schemes to use for synced feeds */
   public static final String READER_HTTP_SCHEME = "reader"; //$NON-NLS-1$
   public static final String READER_HTTPS_SCHEME = "readers"; //$NON-NLS-1$
