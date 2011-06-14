@@ -273,7 +273,24 @@ public class SyncUtils {
     if (!InternalOwl.SYNC)
       return false;
 
-    String link = bm.getFeedLinkReference().getLinkAsText();
+    return isSynchronized(bm.getFeedLinkReference().getLinkAsText());
+  }
+
+  /**
+   * @param link the link to check for synchronization.
+   * @return <code>true</code> if the link is under synchronization control and
+   * <code>false</code> otherwise.
+   */
+  public static boolean isSynchronized(String link) {
     return link.startsWith(READER_HTTP_SCHEME);
+  }
+
+  /**
+   * @param link the link to check for belonging to google sync services.
+   * @return <code>true</code> if the link is from google sync services and
+   * <code>false</code> otherwise.
+   */
+  public static boolean fromGoogle(String link) {
+    return isSynchronized(link) || GOOGLE_LOGIN.equals(link) || API_TOKEN_URL.equals(link);
   }
 }
