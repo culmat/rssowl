@@ -81,9 +81,11 @@ public class URIUtils {
   /** Identifier for a Protocol */
   public static final String PROTOCOL_IDENTIFIER = "://"; //$NON-NLS-1$
 
-  /** Some HTTP Schemes */
+  /** Some URI Schemes */
   public static final String HTTP_SCHEME = "http"; //$NON-NLS-1$
   public static final String HTTPS_SCHEME = "https"; //$NON-NLS-1$
+  public static final String FEED_SCHEME = "feed"; //$NON-NLS-1$
+  public static final String FILE_SCHEME = "file"; //$NON-NLS-1$
 
   /** The JavaScript Identifier */
   public static final String JS_IDENTIFIER = "javascript:"; //$NON-NLS-1$

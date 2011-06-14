@@ -142,9 +142,6 @@ public class ImportElementsPage extends WizardPage {
   /* URL to export from Google Reader */
   private static final String GOOGLE_READER_OPML_URI = "https://www.google.com/reader/subscriptions/export"; //$NON-NLS-1$
 
-  /* HTTPS Protocol used for secure feeds */
-  private static final String HTTPS = "https"; //$NON-NLS-1$
-
   private CheckboxTreeViewer fViewer;
   private FolderChildCheckboxTree fFolderChildTree;
   private Button fDeselectAll;
@@ -975,7 +972,7 @@ public class ImportElementsPage extends WizardPage {
   }
 
   private URI enableSynchronization(URI uri) throws URISyntaxException {
-    String scheme = HTTPS.equals(uri.getScheme()) ? SyncUtils.READER_HTTPS_SCHEME : SyncUtils.READER_HTTP_SCHEME;
+    String scheme = URIUtils.HTTPS_SCHEME.equals(uri.getScheme()) ? SyncUtils.READER_HTTPS_SCHEME : SyncUtils.READER_HTTP_SCHEME;
     return new URI(scheme, uri.getUserInfo(), uri.getHost(), uri.getPort(), uri.getPath(), uri.getQuery(), uri.getFragment());
   }
 

@@ -64,7 +64,10 @@ import java.util.Map;
  */
 public class ReaderProtocolHandler extends DefaultProtocolHandler {
 
-  /* Normal Protocol Constants */
+  /* Some Protocol Constants */
+  private static final String REQUEST_HEADER_USER_AGENT = "User-Agent"; //$NON-NLS-1$
+  private static final String REQUEST_HEADER_ACCEPT_CHARSET = "Accept-Charset"; //$NON-NLS-1$
+  private static final String REQUEST_HEADER_AUTHORIZATION = "Authorization"; //$NON-NLS-1$
   private static final String UTF_8 = "UTF-8"; //$NON-NLS-1$
   private static final String BROWSER_USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; rv:2.0.1) Gecko/20100101 Firefox/4.0.1"; //$NON-NLS-1$
 
@@ -138,9 +141,9 @@ public class ReaderProtocolHandler extends DefaultProtocolHandler {
 
     /* Fill necessary headers to retrieve feed from Google */
     Map<String, String> headers = new HashMap<String, String>();
-    headers.put("Authorization", SyncUtils.getGoogleAuthorizationHeader(authToken)); //$NON-NLS-1$
-    headers.put("Accept-Charset", UTF_8.toLowerCase()); //$NON-NLS-1$
-    headers.put("User-Agent", BROWSER_USER_AGENT); //Necessary as otherwise the content is not sent over as gzip for some unknown reason //$NON-NLS-1$
+    headers.put(REQUEST_HEADER_AUTHORIZATION, SyncUtils.getGoogleAuthorizationHeader(authToken));
+    headers.put(REQUEST_HEADER_ACCEPT_CHARSET, UTF_8.toLowerCase());
+    headers.put(REQUEST_HEADER_USER_AGENT, BROWSER_USER_AGENT); //Necessary as otherwise the content is not sent over as gzip for some unknown reason
     properties.put(IConnectionPropertyConstants.HEADERS, headers);
 
     /* Add Monitor to support early cancelation */
