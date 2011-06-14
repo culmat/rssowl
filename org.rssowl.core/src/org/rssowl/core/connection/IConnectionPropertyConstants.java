@@ -60,6 +60,9 @@ public interface IConnectionPropertyConstants {
   /** Key for forcing a POST */
   public static final String POST = "POST"; //$NON-NLS-1$
 
+  /** Key for number of items to receive */
+  public static final String ITEM_LIMIT = "ITEM_LIMIT"; //$NON-NLS-1$
+
   /**
    * Key for storing an instance of <code>IProgressMonitor</code> to support
    * early cancelation while a Stream is read from the Connection. See

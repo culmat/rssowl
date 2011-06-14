@@ -64,12 +64,13 @@ import java.util.Map;
  */
 public class ReaderProtocolHandler extends DefaultProtocolHandler {
 
-  /* Some Protocol Constants */
+  /* Some Sync Constants */
   private static final String REQUEST_HEADER_USER_AGENT = "User-Agent"; //$NON-NLS-1$
   private static final String REQUEST_HEADER_ACCEPT_CHARSET = "Accept-Charset"; //$NON-NLS-1$
   private static final String REQUEST_HEADER_AUTHORIZATION = "Authorization"; //$NON-NLS-1$
   private static final String UTF_8 = "UTF-8"; //$NON-NLS-1$
   private static final String BROWSER_USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; rv:2.0.1) Gecko/20100101 Firefox/4.0.1"; //$NON-NLS-1$
+  private static final int DEFAULT_ITEM_LIMIT = 200;
 
   /*
    * @see
@@ -78,7 +79,14 @@ public class ReaderProtocolHandler extends DefaultProtocolHandler {
    */
   @Override
   public Triple<IFeed, IConditionalGet, URI> reload(URI link, IProgressMonitor monitor, Map<Object, Object> properties) throws CoreException {
-    URI googleLink = readerToGoogle(link);
+    int itemLimit = DEFAULT_ITEM_LIMIT;
+    if (properties != null && properties.containsKey(IConnectionPropertyConstants.ITEM_LIMIT)) {
+      Object itemLimitObj = properties.get(IConnectionPropertyConstants.ITEM_LIMIT);
+      if (itemLimitObj instanceof Integer)
+        itemLimit = (Integer) itemLimitObj;
+    }
+
+    URI googleLink = readerToGoogle(link, itemLimit);
     InputStream inS = null;
 
     /* First Try: Use shared token */
@@ -182,11 +190,10 @@ public class ReaderProtocolHandler extends DefaultProtocolHandler {
    * </ul>
    */
   //TODO Consider using some way of conditional get if finding a better sync solution
-  //TODO Should read out the clean up setting from connection properties to match clean up settings
-  private URI readerToGoogle(URI uri) throws ConnectionException {
+  private URI readerToGoogle(URI uri, int itemLimit) throws ConnectionException {
     URI httpUri = readerToHTTP(uri);
     try {
-      return new URI("http://www.google.com/reader/api/0/stream/contents/feed/" + URIUtils.urlEncode(httpUri.toString()) + "?n=200&client=scroll&ck=" + System.currentTimeMillis()); //$NON-NLS-1$ //$NON-NLS-2$
+      return new URI("http://www.google.com/reader/api/0/stream/contents/feed/" + URIUtils.urlEncode(httpUri.toString()) + "?n=" + itemLimit + "&client=scroll&ck=" + System.currentTimeMillis()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     } catch (URISyntaxException e) {
       throw new ConnectionException(Activator.getDefault().createErrorStatus(e.getMessage(), e));
     }
