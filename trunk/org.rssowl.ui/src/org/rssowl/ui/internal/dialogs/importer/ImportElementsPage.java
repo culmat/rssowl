@@ -864,7 +864,7 @@ public class ImportElementsPage extends WizardPage {
           }
 
           /* Obtain Google Account Credentials */
-          ICredentials credentials = Owl.getConnectionService().getAuthCredentials(URI.create(SyncUtils.GOOGLE_LOGIN), null);
+          ICredentials credentials = Owl.getConnectionService().getAuthCredentials(URI.create(SyncUtils.GOOGLE_LOGIN_URL), null);
           if (credentials == null) {
             canceled = true;
             return;

@@ -53,13 +53,16 @@ import java.util.Map;
 public class SyncUtils {
 
   /** Google Client Login Site */
-  public static final String GOOGLE_LOGIN = "https://www.google.com/accounts/ClientLogin"; //$NON-NLS-1$
+  public static final String GOOGLE_LOGIN_URL = "https://www.google.com/accounts/ClientLogin"; //$NON-NLS-1$
 
   /** Google API Token Service */
-  public static final String API_TOKEN_URL = "http://www.google.com/reader/api/0/token"; //$NON-NLS-1$
+  public static final String GOOGLE_API_TOKEN_URL = "http://www.google.com/reader/api/0/token"; //$NON-NLS-1$
 
   /** Google Account Creation URL (follows to Google Reader after signup) */
   public static final String GOOGLE_NEW_ACCOUNT_URL = "https://www.google.com/accounts/NewAccount?continue=http%3A%2F%2Fwww.google.com%2Freader%2F&followup=http%3A%2F%2Fwww.google.com%2Freader%2F&service=reader"; //$NON-NLS-1$
+
+  /** Google Reader URL */
+  public static final String GOOGLE_READER_URL = "https://reader.google.com"; //$NON-NLS-1$
 
   /** Schemes to use for synced feeds */
   public static final String READER_HTTP_SCHEME = "reader"; //$NON-NLS-1$
@@ -114,7 +117,7 @@ public class SyncUtils {
       return null;
 
     /* Obtain a new token (only 1 Thread permitted) */
-    synchronized (GOOGLE_LOGIN) {
+    synchronized (GOOGLE_LOGIN_URL) {
 
       /* Another thread might have won the race */
       if (fgSharedAuthToken != null)
@@ -138,7 +141,7 @@ public class SyncUtils {
   }
 
   private static String internalGetGoogleAuthToken(String email, String pw, IProgressMonitor monitor) throws ConnectionException, URISyntaxException, IOException {
-    URI uri = new URI(GOOGLE_LOGIN);
+    URI uri = new URI(GOOGLE_LOGIN_URL);
     IProtocolHandler handler = Owl.getConnectionService().getHandler(uri);
     if (handler != null) {
 
@@ -221,7 +224,7 @@ public class SyncUtils {
   }
 
   private static String internalGetGoogleApiToken(String email, String pw, boolean refresh, IProgressMonitor monitor) throws ConnectionException, IOException, URISyntaxException {
-    URI uri = new URI(API_TOKEN_URL);
+    URI uri = new URI(GOOGLE_API_TOKEN_URL);
     IProtocolHandler handler = Owl.getConnectionService().getHandler(uri);
     if (handler != null) {
 
@@ -291,6 +294,6 @@ public class SyncUtils {
    * <code>false</code> otherwise.
    */
   public static boolean fromGoogle(String link) {
-    return isSynchronized(link) || GOOGLE_LOGIN.equals(link) || API_TOKEN_URL.equals(link);
+    return isSynchronized(link) || GOOGLE_LOGIN_URL.equals(link) || GOOGLE_API_TOKEN_URL.equals(link);
   }
 }
