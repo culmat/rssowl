@@ -271,7 +271,7 @@ public class ApplicationServiceImpl implements IApplicationService {
           }
 
           /* News Marked Unread */
-          else if (properties.getBoolean(SyncUtils.GOOGLE_MARKED_UNREAD)) {
+          if (properties.getBoolean(SyncUtils.GOOGLE_MARKED_UNREAD)) {
             item.setState(INews.State.UNREAD);
             properties.delete(SyncUtils.GOOGLE_MARKED_UNREAD);
           }

@@ -444,12 +444,15 @@ public class News extends AbstractEntity implements INews {
   void setLabels(Set<ILabel> labels) {
     fLock.acquireWriteLock();
     try {
-      if (fLabels == null)
-        fLabels = new HashSet<ILabel>(1);
-      else
-        fLabels.clear();
+      if (labels == null || labels.isEmpty())
+        clearLabels();
 
-      fLabels.addAll(labels);
+      if (fLabels == null)
+        fLabels = new HashSet<ILabel>(labels);
+      else {
+        fLabels.clear();
+        fLabels.addAll(labels);
+      }
     } finally {
       fLock.releaseWriteLock();
     }
@@ -1152,10 +1155,7 @@ public class News extends AbstractEntity implements INews {
   }
 
   private State getState(INews news) {
-    if (!isVisible())
-      return news.getState(); //Avoid marking a deleted news as visible from a sync merge
-
-    if (SyncUtils.isSynchronized(news)) {
+    if (isVisible() && SyncUtils.isSynchronized(news)) { //Avoid marking a deleted news as visible from a sync merge
       if (news.getProperty(SyncUtils.GOOGLE_MARKED_READ) != null)
         return State.READ;
 
