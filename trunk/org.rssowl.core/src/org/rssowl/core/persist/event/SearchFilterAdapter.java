@@ -24,6 +24,10 @@
 
 package org.rssowl.core.persist.event;
 
+import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.ISearchFilter;
+
+import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -51,4 +55,11 @@ public class SearchFilterAdapter implements SearchFilterListener {
    * org.rssowl.core.persist.event.EntityListener#entitiesUpdated(java.util.Set)
    */
   public void entitiesUpdated(Set<SearchFilterEvent> events) {}
+
+  /*
+   * @see
+   * org.rssowl.core.persist.event.SearchFilterListener#filterApplied(org.rssowl
+   * .core.persist.ISearchFilter, java.util.Collection)
+   */
+  public void filterApplied(ISearchFilter filter, Collection<INews> news) {}
 }

@@ -24,11 +24,13 @@
 
 package org.rssowl.core.internal.persist.dao;
 
+import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.dao.ISearchFilterDAO;
 import org.rssowl.core.persist.event.SearchFilterEvent;
 import org.rssowl.core.persist.event.SearchFilterListener;
 
+import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -57,6 +59,19 @@ public class CachingSearchFilterDAO extends CachingDAO<SearchFilterDAOImpl, ISea
       public void entitiesUpdated(Set<SearchFilterEvent> events) {
         putAll(events);
       }
+
+      public void filterApplied(ISearchFilter filter, Collection<INews> news) {
+        /* No action needed */
+      }
     };
+  }
+
+  /*
+   * @see
+   * org.rssowl.core.persist.dao.ISearchFilterDAO#fireFilterApplied(org.rssowl
+   * .core.persist.ISearchFilter, java.util.Collection)
+   */
+  public void fireFilterApplied(ISearchFilter filter, Collection<INews> news) {
+    getDAO().fireFilterApplied(filter, news);
   }
 }

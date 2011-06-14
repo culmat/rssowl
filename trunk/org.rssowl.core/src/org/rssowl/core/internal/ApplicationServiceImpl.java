@@ -551,7 +551,7 @@ public class ApplicationServiceImpl implements IApplicationService {
     return false;
   }
 
-  private void applyFilter(ISearchFilter filter, final List<INews> news) {
+  private void applyFilter(final ISearchFilter filter, final List<INews> news) {
     final Map<INews, INews> replacements = new HashMap<INews, INews>();
     Collection<IFilterAction> actions = CoreUtils.getActions(filter); //Need to sort structural actions to end
     for (final IFilterAction action : actions) {
@@ -564,6 +564,13 @@ public class ApplicationServiceImpl implements IApplicationService {
         });
       }
     }
+
+    /* Notify listeners */
+    SafeRunner.run(new LoggingSafeRunnable() {
+      public void run() throws Exception {
+        DynamicDAO.getDAO(ISearchFilterDAO.class).fireFilterApplied(filter, news);
+      }
+    });
   }
 
   private void lockNewsObjects(MergeResult mergeResult) {
