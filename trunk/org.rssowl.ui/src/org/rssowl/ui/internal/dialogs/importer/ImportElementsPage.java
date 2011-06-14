@@ -966,9 +966,10 @@ public class ImportElementsPage extends WizardPage {
     FeedLinkReference feedLinkReference = bm.getFeedLinkReference();
     bm.setFeedLinkReference(new FeedLinkReference(enableSynchronization(feedLinkReference.getLink())));
 
-    /* Configure Feed to reload on startup to enforce Synchronization */
+    /* Add some specific settings that improve the sync experience */
     IPreferenceScope preferences = Owl.getPreferenceService().getEntityScope(bm);
     preferences.putBoolean(DefaultPreferences.BM_RELOAD_ON_STARTUP, true);
+    preferences.putBoolean(DefaultPreferences.NEVER_DEL_LABELED_NEWS_STATE, false);
   }
 
   private URI enableSynchronization(URI uri) throws URISyntaxException {

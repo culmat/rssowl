@@ -666,6 +666,20 @@ public class Controller {
       Map<Object, Object> properties = new HashMap<Object, Object>();
       properties.put(IConnectionPropertyConstants.CON_TIMEOUT, fConnectionTimeout);
 
+      /* Sync Specific Item Limit derived from retention settings */
+      if (SyncUtils.isSynchronized(bookmark)) {
+        IPreferenceScope defaultPreferences = Owl.getPreferenceService().getDefaultScope();
+        IPreferenceScope preferences = Owl.getPreferenceService().getEntityScope(bookmark);
+
+        int itemLimit;
+        if (preferences.getBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE))
+          itemLimit= preferences.getInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE);
+        else
+          itemLimit = defaultPreferences.getInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE);
+
+        properties.put(IConnectionPropertyConstants.ITEM_LIMIT, itemLimit);
+      }
+
       /* Add Conditional GET Headers if present */
       if (conditionalGet != null) {
         String ifModifiedSince = conditionalGet.getIfModifiedSince();
