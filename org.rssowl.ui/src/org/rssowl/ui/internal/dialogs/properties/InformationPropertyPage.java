@@ -49,6 +49,7 @@ import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.util.StringUtils;
+import org.rssowl.core.util.SyncUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.dialogs.properties.IEntityPropertyPage;
 import org.rssowl.ui.dialogs.properties.IPropertyDialogSite;
@@ -209,6 +210,8 @@ public class InformationPropertyPage implements IEntityPropertyPage {
             Object errorLink = bm.getProperty(Controller.LOAD_ERROR_LINK_KEY);
             if (errorLink != null)
               uri = new URI(errorLink.toString());
+            else if (SyncUtils.isSynchronized(bm))
+              uri = new URI(SyncUtils.GOOGLE_READER_URL);
             else
               uri = new URI("http://www.feedvalidator.org/check.cgi?url=" + URIUtils.urlEncode(URIUtils.toHTTP(bm.getFeedLinkReference().getLinkAsText()))); //$NON-NLS-1$
 

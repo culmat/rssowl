@@ -2895,7 +2895,7 @@ public class OwlUI {
       shell = getActiveShell();
 
     if (shell != null) {
-      URI googleLoginUri = URI.create(SyncUtils.GOOGLE_LOGIN);
+      URI googleLoginUri = URI.create(SyncUtils.GOOGLE_LOGIN_URL);
       LoginDialog dialog = new LoginDialog(shell, googleLoginUri, null, true);
       dialog.setHeader(Messages.OwlUI_SYNC_LOGIN);
       dialog.setSubline(Messages.OwlUI_SYNC_LOGIN_TEXT);
