@@ -53,13 +53,14 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
  * Extends the {@link DefaultProtocolHandler} dealing with Google Reader
  * synchronization. The result from loading a feed is a JSON Object that is
  * passed on to the responsible JSON interpreter service.
- * 
+ *
  * @author bpasero
  */
 public class ReaderProtocolHandler extends DefaultProtocolHandler {
@@ -190,6 +191,38 @@ public class ReaderProtocolHandler extends DefaultProtocolHandler {
    * </ul>
    */
   private URI readerToGoogle(URI uri, int itemLimit) throws ConnectionException {
+
+    /* Handle Special Feeds */
+    String linkVal = uri.toString();
+    try {
+
+      /* All Items */
+      if (SyncUtils.GOOGLE_READER_ALL_ITEMS_FEED.equals(linkVal))
+        return new URI(SyncUtils.GOOGLE_STREAM_CONTENTS_URL + "user/-/state/com.google/reading-list?n=" + itemLimit + "&client=scroll&ck=" + System.currentTimeMillis()); //$NON-NLS-1$ //$NON-NLS-2$
+
+      /* Starred Items */
+      else if (SyncUtils.GOOGLE_READER_STARRED_FEED.equals(linkVal))
+        return new URI(SyncUtils.GOOGLE_STREAM_CONTENTS_URL + "user/-/state/com.google/starred?n=" + itemLimit + "&client=scroll&ck=" + System.currentTimeMillis()); //$NON-NLS-1$ //$NON-NLS-2$
+
+      /* Shared Items */
+      else if (SyncUtils.GOOGLE_READER_SHARED_ITEMS_FEED.equals(linkVal))
+        return new URI(SyncUtils.GOOGLE_STREAM_CONTENTS_URL + "user/-/state/com.google/broadcast?n=" + itemLimit + "&client=scroll&ck=" + System.currentTimeMillis()); //$NON-NLS-1$ //$NON-NLS-2$
+
+      /* Recommended Items */
+      else if (SyncUtils.GOOGLE_READER_RECOMMENDED_ITEMS_FEED.equals(linkVal)) {
+        String language = Locale.getDefault().getLanguage();
+        String exclude = "&xt=user/-/state/com.google/read&xt=user/-/state/com.google/dislike"; //$NON-NLS-1$
+        return new URI(SyncUtils.GOOGLE_STREAM_CONTENTS_URL + "user/-/state/com.google/itemrecs/" + language + "?n=" + itemLimit + "&client=scroll&ck=" + System.currentTimeMillis() + exclude); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      }
+
+      /* Notes */
+      else if (SyncUtils.GOOGLE_READER_NOTES_FEED.equals(linkVal))
+        return new URI(SyncUtils.GOOGLE_STREAM_CONTENTS_URL + "user/-/state/com.google/created?n=" + itemLimit + "&client=scroll&ck=" + System.currentTimeMillis()); //$NON-NLS-1$ //$NON-NLS-2$
+    } catch (URISyntaxException e) {
+      throw new ConnectionException(Activator.getDefault().createErrorStatus(e.getMessage(), e));
+    }
+
+    /* Normal Synchronized Feed */
     URI httpUri = readerToHTTP(uri);
     try {
       return new URI(SyncUtils.GOOGLE_FEED_URL + URIUtils.urlEncode(httpUri.toString()) + "?n=" + itemLimit + "&client=scroll&ck=" + System.currentTimeMillis()); //$NON-NLS-1$ //$NON-NLS-2$
@@ -216,6 +249,21 @@ public class ReaderProtocolHandler extends DefaultProtocolHandler {
   @Override
   public byte[] getFeedIcon(URI link, IProgressMonitor monitor) {
     try {
+      String linkVal = link.toString();
+
+      /* Do not try to resolve special Google Reader feed icons */
+      if (SyncUtils.GOOGLE_READER_ALL_ITEMS_FEED.equals(linkVal))
+        return null;
+      else if (SyncUtils.GOOGLE_READER_STARRED_FEED.equals(linkVal))
+        return null;
+      else if (SyncUtils.GOOGLE_READER_SHARED_ITEMS_FEED.equals(linkVal))
+        return null;
+      else if (SyncUtils.GOOGLE_READER_RECOMMENDED_ITEMS_FEED.equals(linkVal))
+        return null;
+      else if (SyncUtils.GOOGLE_READER_NOTES_FEED.equals(linkVal))
+        return null;
+
+      /* Otherwise proceed loading feed icon through HTTP */
       return super.getFeedIcon(readerToHTTP(link), monitor);
     } catch (ConnectionException e) {
       return null;
@@ -229,6 +277,21 @@ public class ReaderProtocolHandler extends DefaultProtocolHandler {
    */
   @Override
   public String getLabel(URI link, IProgressMonitor monitor) throws ConnectionException {
+    String linkVal = link.toString();
+
+    /* Do not try to resolve special Google Reader feed labels */
+    if (SyncUtils.GOOGLE_READER_ALL_ITEMS_FEED.equals(linkVal))
+      return Messages.ReaderProtocolHandler_GR_ALL_ITEMS;
+    else if (SyncUtils.GOOGLE_READER_STARRED_FEED.equals(linkVal))
+      return Messages.ReaderProtocolHandler_GR_STARRED_ITEMS;
+    else if (SyncUtils.GOOGLE_READER_SHARED_ITEMS_FEED.equals(linkVal))
+      return Messages.ReaderProtocolHandler_GR_SHARED_ITEMS;
+    else if (SyncUtils.GOOGLE_READER_RECOMMENDED_ITEMS_FEED.equals(linkVal))
+      return Messages.ReaderProtocolHandler_GR_RECOMMENDED_ITEMS;
+    else if (SyncUtils.GOOGLE_READER_NOTES_FEED.equals(linkVal))
+      return Messages.ReaderProtocolHandler_GR_NOTES;
+
+    /* Otherwise proceed loading feed label through HTTP */
     return super.getLabel(readerToHTTP(link), monitor);
   }
 
@@ -245,7 +308,7 @@ public class ReaderProtocolHandler extends DefaultProtocolHandler {
   /**
    * Do not override default URLStreamHandler of HTTP/HTTPS and therefor return
    * NULL.
-   * 
+   *
    * @see org.rssowl.core.connection.IProtocolHandler#getURLStreamHandler()
    */
   @Override

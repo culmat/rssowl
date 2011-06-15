@@ -72,6 +72,7 @@ import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.ILabel;
+import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.IPreference;
 import org.rssowl.core.persist.ISearchFilter;
@@ -884,7 +885,7 @@ public class ImportElementsPage extends WizardPage {
 
           /* Try to Import */
           try {
-            final List<? extends IEntity> types = Owl.getInterpreter().importFrom(in);
+            final List<IEntity> types = Owl.getInterpreter().importFrom(in);
             if (Application.SYNC)
               enableSynchronization(types);
 
@@ -941,12 +942,35 @@ public class ImportElementsPage extends WizardPage {
     getContainer().run(true, true, runnable);
   }
 
-  private void enableSynchronization(List<? extends IEntity> types) throws URISyntaxException {
+  private void enableSynchronization(List<IEntity> types) throws URISyntaxException {
+
+    /* Convert to Synchronized Feeds */
     for (IEntity entity : types) {
       if (entity instanceof IFolder)
         enableSynchronization((IFolder) entity);
       else if (entity instanceof IBookMark)
         enableSynchronization((IBookMark) entity);
+    }
+
+    /* Add Special Google Reader Feeds */
+    if (!types.isEmpty() && types.get(0) instanceof IFolder) {
+      IModelFactory factory = Owl.getModelFactory();
+      IFolder root = (IFolder) types.get(0);
+
+      /* Shared Items */
+      FeedLinkReference feedLinkRef = new FeedLinkReference(URI.create(SyncUtils.GOOGLE_READER_SHARED_ITEMS_FEED));
+      IBookMark bm = factory.createBookMark(null, root, feedLinkRef, Messages.ImportElementsPage_GR_SHARED_ITEMS);
+      setSynchronizationProperties(bm);
+
+      /* Recommended Items */
+      feedLinkRef = new FeedLinkReference(URI.create(SyncUtils.GOOGLE_READER_RECOMMENDED_ITEMS_FEED));
+      bm = factory.createBookMark(null, root, feedLinkRef, Messages.ImportElementsPage_GR_RECOMMENDED_ITEMS);
+      setSynchronizationProperties(bm);
+
+      /* Notes */
+      feedLinkRef = new FeedLinkReference(URI.create(SyncUtils.GOOGLE_READER_NOTES_FEED));
+      bm = factory.createBookMark(null, root, feedLinkRef, Messages.ImportElementsPage_GR_NOTES);
+      setSynchronizationProperties(bm);
     }
   }
 
@@ -967,6 +991,10 @@ public class ImportElementsPage extends WizardPage {
     bm.setFeedLinkReference(new FeedLinkReference(enableSynchronization(feedLinkReference.getLink())));
 
     /* Add some specific settings that improve the sync experience */
+    setSynchronizationProperties(bm);
+  }
+
+  private void setSynchronizationProperties(IBookMark bm) {
     IPreferenceScope preferences = Owl.getPreferenceService().getEntityScope(bm);
     preferences.putBoolean(DefaultPreferences.BM_RELOAD_ON_STARTUP, true);
     preferences.putBoolean(DefaultPreferences.NEVER_DEL_LABELED_NEWS_STATE, false);

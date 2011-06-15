@@ -39,6 +39,9 @@ public class Messages extends NLS {
   public static String ImportElementsPage_FEED_TITLE;
   public static String ImportElementsPage_FETCHING_RESULTS;
   public static String ImportElementsPage_FLATTEN;
+  public static String ImportElementsPage_GR_NOTES;
+  public static String ImportElementsPage_GR_RECOMMENDED_ITEMS;
+  public static String ImportElementsPage_GR_SHARED_ITEMS;
   public static String ImportElementsPage_HIDDEN_ELEMENTS_INFO;
   public static String ImportElementsPage_HIDE_EXISTING;
   public static String ImportElementsPage_IMPORT_GOOGLE_READER;

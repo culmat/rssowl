@@ -538,7 +538,7 @@ public class SyncService {
         if (isCanceled(monitor))
           return;
 
-        URI uri = URI.create(SyncUtils.GOOGLE_EDIT_TAG_URL);
+        URI uri = URI.create(SyncUtils.GOOGLE_EDIT_TAG_URL + "?client=scroll"); //$NON-NLS-1$
         IProtocolHandler handler = Owl.getConnectionService().getHandler(uri);
         InputStream inS = null;
         try {
