@@ -61,6 +61,9 @@ public class SyncUtils {
   /** Google Edit-Tag Service */
   public static final String GOOGLE_EDIT_TAG_URL = "http://www.google.com/reader/api/0/edit-tag?client=scroll"; //$NON-NLS-1$
 
+  /** Google Feed Service */
+  public static final String GOOGLE_FEED_URL = "http://www.google.com/reader/api/0/stream/contents/feed/"; //$NON-NLS-1$
+
   /** Google Account Creation URL (follows to Google Reader after signup) */
   public static final String GOOGLE_NEW_ACCOUNT_URL = "https://www.google.com/accounts/NewAccount?continue=http%3A%2F%2Fwww.google.com%2Freader%2F&followup=http%3A%2F%2Fwww.google.com%2Freader%2F&service=reader"; //$NON-NLS-1$
 
