@@ -71,6 +71,24 @@ public class SyncUtils {
   public static final String READER_HTTP_SCHEME = "reader"; //$NON-NLS-1$
   public static final String READER_HTTPS_SCHEME = "readers"; //$NON-NLS-1$
 
+  /** Some special preferences a news can have after parsed from the JSONInterpreter */
+  public static final String GOOGLE_MARKED_UNREAD = "org.rssowl.pref.GoogleMarkedUnRead"; //$NON-NLS-1$
+  public static final String GOOGLE_MARKED_READ = "org.rssowl.pref.GoogleMarkedRead"; //$NON-NLS-1$
+  public static final String GOOGLE_LABELS = "org.rssowl.pref.GoogleLabels"; //$NON-NLS-1$
+
+  /** Google Categories */
+  public static final String CATEGORY_STARRED = "user/-/state/com.google/starred"; //$NON-NLS-1$
+  public static final String CATEGORY_READ = "user/-/state/com.google/read"; //$NON-NLS-1$
+  public static final String CATEGORY_UNREAD = "user/-/state/com.google/kept-unread"; //$NON-NLS-1$
+  public static final String CATEGORY_LABEL_PREFIX = "user/-/label/"; //$NON-NLS-1$
+
+  /** Google API Parameters */
+  public static final String API_PARAM_TOKEN = "T"; //$NON-NLS-1$
+  public static final String API_PARAM_STREAM = "s"; //$NON-NLS-1$
+  public static final String API_PARAM_IDENTIFIER = "i"; //$NON-NLS-1$
+  public static final String API_PARAM_TAG_TO_ADD = "a"; //$NON-NLS-1$
+  public static final String API_PARAM_TAG_TO_REMOVE = "r"; //$NON-NLS-1$
+
   /* Part of the identifier of synchronized news */
   private static final String SYNCED_NEWS_ID_PART = "tag:google.com"; //$NON-NLS-1$
 
@@ -86,11 +104,6 @@ public class SyncUtils {
   /* Google URL Prefixes */
   private static final String GOOGLE_HTTP_URL_PREFIX = "http://www.google.com"; //$NON-NLS-1$
   private static final String GOOGLE_HTTPS_URL_PREFIX = "https://www.google.com"; //$NON-NLS-1$
-
-  /** Some special preferences a news can have after parsed from the JSONInterpreter */
-  public static final String GOOGLE_MARKED_UNREAD = "org.rssowl.pref.GoogleMarkedUnRead"; //$NON-NLS-1$
-  public static final String GOOGLE_MARKED_READ = "org.rssowl.pref.GoogleMarkedRead"; //$NON-NLS-1$
-  public static final String GOOGLE_LABELS = "org.rssowl.pref.GoogleLabels"; //$NON-NLS-1$
 
   /**
    * Obtains the Google Auth Token to perform REST operations for Google
