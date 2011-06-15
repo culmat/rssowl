@@ -82,7 +82,7 @@ public class OPMLImporter implements ITypeImporter {
    * @see
    * org.rssowl.core.interpreter.ITypeImporter#importFrom(org.jdom.Document)
    */
-  public List<? extends IEntity> importFrom(Document document) {
+  public List<IEntity> importFrom(Document document) {
     DateFormat dateFormat = DateFormat.getDateInstance();
     Element root = document.getRootElement();
 

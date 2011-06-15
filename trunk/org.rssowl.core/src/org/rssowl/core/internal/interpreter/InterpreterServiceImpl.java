@@ -174,7 +174,7 @@ public class InterpreterServiceImpl implements IInterpreterService {
    * org.rssowl.core.interpreter.IInterpreterService#importFrom(java.io.InputStream
    * )
    */
-  public List<? extends IEntity> importFrom(InputStream inS) throws InterpreterException, ParserException {
+  public List<IEntity> importFrom(InputStream inS) throws InterpreterException, ParserException {
     Document document = fXMLParserImpl.parse(inS, null);
 
     /* A Root Element is required */

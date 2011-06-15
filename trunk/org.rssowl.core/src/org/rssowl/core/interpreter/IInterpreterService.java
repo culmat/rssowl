@@ -54,7 +54,7 @@ import java.util.Set;
  * <li>Contribute a new xml parser using the XMLParser extension point if you
  * are not happy with the default one.</li>
  * </ul>
- * 
+ *
  * @author bpasero
  * @see IFormatInterpreter
  * @see IElementHandler
@@ -66,7 +66,7 @@ public interface IInterpreterService {
   /**
    * Parse the given InputStream into a <code>org.jdom.Document</code> and
    * delegate the Interpretation to the contributed FormatInterpreters.
-   * 
+   *
    * @param inS The InputStream to Interpret as <code>IFeed</code>.
    * @param feed An instance of <code>IFeed</code> that stores the interpretion.
    * @param properties a map of properties to configure interpretion or
@@ -79,7 +79,7 @@ public interface IInterpreterService {
   /**
    * Interpret the given <code>org.w3c.dom.Document</code> as Feed by delegating
    * the Interpretation to the contributed FormatInterpreters.
-   * 
+   *
    * @param w3cDocument The Document to interpret as <code>IFeed</code>.
    * @param feed An instance of <code>IFeed</code> that stores the interpretion.
    * @throws InterpreterException In case of an Error while Interpreting.
@@ -89,7 +89,7 @@ public interface IInterpreterService {
   /**
    * Interpret the given <code>org.jdom.Document</code> as Feed by delegating
    * the Interpretation to the contributed FormatInterpreters.
-   * 
+   *
    * @param document The Document to interpret as <code>IFeed</code>.
    * @param feed An instance of <code>IFeed</code> that stores the interpretion.
    * @throws InterpreterException In case of an Error while Interpreting.
@@ -98,7 +98,7 @@ public interface IInterpreterService {
 
   /**
    * Interpret the given {@link JSONObject} as Feed.
-   * 
+   *
    * @param json The {@link JSONObject} to interpret as <code>IFeed</code>.
    * @param feed An instance of <code>IFeed</code> that stores the interpretion.
    * @throws InterpreterException In case of an Error while Interpreting.
@@ -107,18 +107,18 @@ public interface IInterpreterService {
 
   /**
    * Imports the given Document as OPML into Types and returns them.
-   * 
+   *
    * @param inS The InputStream to Interpret as Document.
    * @return Returns the Types imported from the Document.
    * @throws InterpreterException In case of an Error while Interpreting.
    * @throws ParserException In case of an Error while Parsing.
    */
-  List<? extends IEntity> importFrom(InputStream inS) throws InterpreterException, ParserException;
+  List<IEntity> importFrom(InputStream inS) throws InterpreterException, ParserException;
 
   /**
    * Perform Export of provided {@link IFolderChild} with {@link Options} to
    * consider.
-   * 
+   *
    * @param destination the destination {@link File} to export to.
    * @param elements the list of {@link IFolderChild} to export.
    * @param options a set of {@link Options} for the export.
@@ -128,7 +128,7 @@ public interface IInterpreterService {
 
   /**
    * Returns a {@link List} of all formats supported for an export.
-   * 
+   *
    * @return a {@link List} of all formats supported for an export.
    */
   Collection<String> getExportFormats();
@@ -136,7 +136,7 @@ public interface IInterpreterService {
   /**
    * Get the Namespace Handler for the given Namespace or NULL if not
    * contributed.
-   * 
+   *
    * @param namespaceUri The Namespace URI as String.
    * @return The Namespace Handler for the given Namespace or NULL if not
    * contributed.
@@ -146,7 +146,7 @@ public interface IInterpreterService {
   /**
    * Get the Element Handler for the given Element and Namespace or NULL if not
    * contributed.
-   * 
+   *
    * @param elementName The Name of the Element.
    * @param rootName The Name of the root element of the used Format.
    * @return The Namespace Handler for the given Namespace or NULL if not

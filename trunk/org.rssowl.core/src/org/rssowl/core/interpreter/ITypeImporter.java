@@ -68,5 +68,5 @@ public interface ITypeImporter {
    * @throws InterpreterException Checked Exception to be used in case of any
    * Exception.
    */
-  List<? extends IEntity> importFrom(Document document) throws InterpreterException;
+  List<IEntity> importFrom(Document document) throws InterpreterException;
 }

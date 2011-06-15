@@ -118,6 +118,7 @@ import org.rssowl.ui.internal.services.SyncService;
 import org.rssowl.ui.internal.util.ImportUtils;
 import org.rssowl.ui.internal.util.JobRunner;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -673,7 +674,7 @@ public class Controller {
 
         int itemLimit;
         if (preferences.getBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE))
-          itemLimit= preferences.getInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE);
+          itemLimit = preferences.getInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE);
         else
           itemLimit = defaultPreferences.getInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE);
 
@@ -863,8 +864,23 @@ public class Controller {
     try {
       byte[] faviconBytes = null;
 
+      /* Specially Handle Synchronized Feeds if matching a set of URLs */
+      if (SyncUtils.isSynchronized(bookmark)) {
+        String link = bookmark.getFeedLinkReference().getLinkAsText();
+        if (SyncUtils.GOOGLE_READER_ALL_ITEMS_FEED.equals(link))
+          faviconBytes = toByte("/icons/obj16/bookmark.gif"); //$NON-NLS-1$
+        else if (SyncUtils.GOOGLE_READER_STARRED_FEED.equals(link))
+          faviconBytes = toByte("/icons/obj16/gr_starred.gif"); //$NON-NLS-1$
+        else if (SyncUtils.GOOGLE_READER_SHARED_ITEMS_FEED.equals(link))
+          faviconBytes = toByte("/icons/obj16/gr_shared.gif"); //$NON-NLS-1$
+        else if (SyncUtils.GOOGLE_READER_RECOMMENDED_ITEMS_FEED.equals(link))
+          faviconBytes = toByte("/icons/obj16/gr_recommended.gif"); //$NON-NLS-1$
+        else if (SyncUtils.GOOGLE_READER_NOTES_FEED.equals(link))
+          faviconBytes = toByte("/icons/obj16/gr_notes.gif"); //$NON-NLS-1$
+      }
+
       /* First try using the Homepage of the Feed */
-      if (feedHomepage != null && StringUtils.isSet(feedHomepage.toString()) && feedHomepage.isAbsolute())
+      if (faviconBytes == null && feedHomepage != null && StringUtils.isSet(feedHomepage.toString()) && feedHomepage.isAbsolute())
         faviconBytes = Owl.getConnectionService().getFeedIcon(feedHomepage, monitor);
 
       /* Then try with Feed address itself */
@@ -883,6 +899,14 @@ public class Controller {
     } catch (ConnectionException e) {
       Activator.getDefault().getLog().log(e.getStatus());
     }
+  }
+
+  private byte[] toByte(String file) {
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    InputStream fileStream = getClass().getResourceAsStream(file);
+    CoreUtils.copy(fileStream, out);
+
+    return out.toByteArray();
   }
 
   private void updateErrorIndicator(final IBookMark bookmark, final IProgressMonitor monitor, CoreException ex) {

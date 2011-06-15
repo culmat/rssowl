@@ -47,6 +47,12 @@ public class Messages extends NLS {
   public static String DefaultProtocolHandler_GR_ERROR_SERVICE_UNAVAILABLE;
   public static String DefaultProtocolHandler_GR_ERROR_UNKNOWN;
   public static String DefaultProtocolHandler_INFO_NOT_MODIFIED_SINCE;
+  public static String ReaderProtocolHandler_GR_ALL_ITEMS;
+  public static String ReaderProtocolHandler_GR_NOTES;
+  public static String ReaderProtocolHandler_GR_RECOMMENDED_ITEMS;
+
+  public static String ReaderProtocolHandler_GR_SHARED_ITEMS;
+  public static String ReaderProtocolHandler_GR_STARRED_ITEMS;
 
   private Messages() {}
 

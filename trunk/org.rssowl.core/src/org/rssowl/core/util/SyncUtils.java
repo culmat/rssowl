@@ -55,14 +55,20 @@ public class SyncUtils {
   /** Google Client Login Site */
   public static final String GOOGLE_LOGIN_URL = "https://www.google.com/accounts/ClientLogin"; //$NON-NLS-1$
 
+  /** Google Stream Service */
+  public static final String GOOGLE_API_URL = "http://www.google.com/reader/api/0/"; //$NON-NLS-1$
+
   /** Google API Token Service */
-  public static final String GOOGLE_API_TOKEN_URL = "http://www.google.com/reader/api/0/token"; //$NON-NLS-1$
+  public static final String GOOGLE_API_TOKEN_URL = GOOGLE_API_URL + "token"; //$NON-NLS-1$
 
   /** Google Edit-Tag Service */
-  public static final String GOOGLE_EDIT_TAG_URL = "http://www.google.com/reader/api/0/edit-tag?client=scroll"; //$NON-NLS-1$
+  public static final String GOOGLE_EDIT_TAG_URL = GOOGLE_API_URL + "edit-tag"; //$NON-NLS-1$
 
   /** Google Feed Service */
-  public static final String GOOGLE_FEED_URL = "http://www.google.com/reader/api/0/stream/contents/feed/"; //$NON-NLS-1$
+  public static final String GOOGLE_FEED_URL = GOOGLE_API_URL + "stream/contents/feed/"; //$NON-NLS-1$
+
+  /** Google Stream Contents Service */
+  public static final String GOOGLE_STREAM_CONTENTS_URL = GOOGLE_API_URL + "stream/contents/"; //$NON-NLS-1$
 
   /** Google Account Creation URL (follows to Google Reader after signup) */
   public static final String GOOGLE_NEW_ACCOUNT_URL = "https://www.google.com/accounts/NewAccount?continue=http%3A%2F%2Fwww.google.com%2Freader%2F&followup=http%3A%2F%2Fwww.google.com%2Freader%2F&service=reader"; //$NON-NLS-1$
@@ -73,6 +79,13 @@ public class SyncUtils {
   /** Schemes to use for synced feeds */
   public static final String READER_HTTP_SCHEME = "reader"; //$NON-NLS-1$
   public static final String READER_HTTPS_SCHEME = "readers"; //$NON-NLS-1$
+
+  /** Special Google Reader Feeds */
+  public static final String GOOGLE_READER_ALL_ITEMS_FEED = "reader://readinglist"; //$NON-NLS-1$
+  public static final String GOOGLE_READER_STARRED_FEED = "reader://starred"; //$NON-NLS-1$
+  public static final String GOOGLE_READER_SHARED_ITEMS_FEED = "reader://shared"; //$NON-NLS-1$
+  public static final String GOOGLE_READER_RECOMMENDED_ITEMS_FEED = "reader://recommended"; //$NON-NLS-1$
+  public static final String GOOGLE_READER_NOTES_FEED = "reader://notes"; //$NON-NLS-1$
 
   /** Some special preferences a news can have after parsed from the JSONInterpreter */
   public static final String GOOGLE_MARKED_UNREAD = "org.rssowl.pref.GoogleMarkedUnRead"; //$NON-NLS-1$
