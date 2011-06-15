@@ -59,7 +59,7 @@ import java.util.Map;
  * Extends the {@link DefaultProtocolHandler} dealing with Google Reader
  * synchronization. The result from loading a feed is a JSON Object that is
  * passed on to the responsible JSON interpreter service.
- *
+ * 
  * @author bpasero
  */
 public class ReaderProtocolHandler extends DefaultProtocolHandler {
@@ -189,11 +189,10 @@ public class ReaderProtocolHandler extends DefaultProtocolHandler {
    * <li>client=[your client] : You can use the default Google client (scroll).</li>
    * </ul>
    */
-  //TODO Consider using some way of conditional get if finding a better sync solution
   private URI readerToGoogle(URI uri, int itemLimit) throws ConnectionException {
     URI httpUri = readerToHTTP(uri);
     try {
-      return new URI("http://www.google.com/reader/api/0/stream/contents/feed/" + URIUtils.urlEncode(httpUri.toString()) + "?n=" + itemLimit + "&client=scroll&ck=" + System.currentTimeMillis()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      return new URI(SyncUtils.GOOGLE_FEED_URL + URIUtils.urlEncode(httpUri.toString()) + "?n=" + itemLimit + "&client=scroll&ck=" + System.currentTimeMillis()); //$NON-NLS-1$ //$NON-NLS-2$
     } catch (URISyntaxException e) {
       throw new ConnectionException(Activator.getDefault().createErrorStatus(e.getMessage(), e));
     }
@@ -246,7 +245,7 @@ public class ReaderProtocolHandler extends DefaultProtocolHandler {
   /**
    * Do not override default URLStreamHandler of HTTP/HTTPS and therefor return
    * NULL.
-   *
+   * 
    * @see org.rssowl.core.connection.IProtocolHandler#getURLStreamHandler()
    */
   @Override
