@@ -465,7 +465,7 @@ public class ImportElementsPage extends WizardPage {
   private void updateMessage(boolean clearErrors) {
     List<?> input = (List<?>) fViewer.getInput();
     if (!input.isEmpty() && fViewer.getTree().getItemCount() == 0 && fViewer.getFilters().length > 0)
-      setMessage(Messages.ImportElementsPage_HIDDEN_ELEMENTS_INFO, IMessageProvider.WARNING);
+      setMessage(Messages.ImportElementsPage_HIDDEN_ELEMENTS_INFO, IMessageProvider.INFORMATION);
     else
       setMessage(Messages.ImportElementsPage_CHOOSE_ELEMENTS_MESSAGE);
 
