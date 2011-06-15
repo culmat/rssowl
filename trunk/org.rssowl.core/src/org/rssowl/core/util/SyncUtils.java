@@ -58,6 +58,9 @@ public class SyncUtils {
   /** Google API Token Service */
   public static final String GOOGLE_API_TOKEN_URL = "http://www.google.com/reader/api/0/token"; //$NON-NLS-1$
 
+  /** Google Edit-Tag Service */
+  public static final String GOOGLE_EDIT_TAG_URL = "http://www.google.com/reader/api/0/edit-tag?client=scroll"; //$NON-NLS-1$
+
   /** Google Account Creation URL (follows to Google Reader after signup) */
   public static final String GOOGLE_NEW_ACCOUNT_URL = "https://www.google.com/accounts/NewAccount?continue=http%3A%2F%2Fwww.google.com%2Freader%2F&followup=http%3A%2F%2Fwww.google.com%2Freader%2F&service=reader"; //$NON-NLS-1$
 
@@ -80,7 +83,11 @@ public class SyncUtils {
   /* Google Authentication Token can be shared during the session */
   private static String fgSharedAuthToken;
 
-  /* Some special preferences a news can have after parsed from the JSONInterpreter */
+  /* Google URL Prefixes */
+  private static final String GOOGLE_HTTP_URL_PREFIX = "http://www.google.com"; //$NON-NLS-1$
+  private static final String GOOGLE_HTTPS_URL_PREFIX = "https://www.google.com"; //$NON-NLS-1$
+
+  /** Some special preferences a news can have after parsed from the JSONInterpreter */
   public static final String GOOGLE_MARKED_UNREAD = "org.rssowl.pref.GoogleMarkedUnRead"; //$NON-NLS-1$
   public static final String GOOGLE_MARKED_READ = "org.rssowl.pref.GoogleMarkedRead"; //$NON-NLS-1$
   public static final String GOOGLE_LABELS = "org.rssowl.pref.GoogleLabels"; //$NON-NLS-1$
@@ -294,6 +301,6 @@ public class SyncUtils {
    * <code>false</code> otherwise.
    */
   public static boolean fromGoogle(String link) {
-    return isSynchronized(link) || GOOGLE_LOGIN_URL.equals(link) || GOOGLE_API_TOKEN_URL.equals(link);
+    return isSynchronized(link) || link.startsWith(GOOGLE_HTTP_URL_PREFIX) || link.startsWith(GOOGLE_HTTPS_URL_PREFIX);
   }
 }
