@@ -450,7 +450,6 @@ public class SyncService {
     /* Synchronize for each Stream */
     Set<Entry<String, Map<String, SyncItem>>> entries = mapFeedToSyncItems.entrySet();
     for (Entry<String, Map<String, SyncItem>> entry : entries) {
-      String streamId = entry.getKey();
       Collection<SyncItem> syncItems = (entry.getValue() != null) ? entry.getValue().values() : Collections.<SyncItem> emptyList();
       if (syncItems.isEmpty())
         continue;
@@ -484,13 +483,14 @@ public class SyncService {
         /* POST Parameters */
         Map<String, String[]> parameters = new HashMap<String, String[]>();
         parameters.put(SyncUtils.API_PARAM_TOKEN, new String[] { token });
-        parameters.put(SyncUtils.API_PARAM_STREAM, new String[] { streamId });
 
-        Set<String> identifiers = new HashSet<String>();
+        List<String> identifiers = new ArrayList<String>();
+        List<String> streamIds = new ArrayList<String>();
         Set<String> tagsToAdd = new HashSet<String>();
         Set<String> tagsToRemove = new HashSet<String>();
         for (SyncItem item : equivalentItems) {
           identifiers.add(item.getId());
+          streamIds.add(item.getStreamId());
 
           if (item.isMarkedRead())
             tagsToAdd.add(SyncUtils.CATEGORY_READ);
@@ -522,6 +522,7 @@ public class SyncService {
         }
 
         parameters.put(SyncUtils.API_PARAM_IDENTIFIER, identifiers.toArray(new String[identifiers.size()]));
+        parameters.put(SyncUtils.API_PARAM_STREAM, streamIds.toArray(new String[streamIds.size()]));
         if (!tagsToAdd.isEmpty())
           parameters.put(SyncUtils.API_PARAM_TAG_TO_ADD, tagsToAdd.toArray(new String[tagsToAdd.size()]));
         if (!tagsToRemove.isEmpty())
