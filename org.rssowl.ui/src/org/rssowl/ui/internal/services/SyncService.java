@@ -181,11 +181,19 @@ public class SyncService {
       if (item.fUnStarred)
         fUnStarred = true;
 
-      if (item.fAddedLabels != null)
-        fAddedLabels = item.fAddedLabels;
+      if (item.fAddedLabels != null) {
+        if (fAddedLabels == null)
+          fAddedLabels = item.fAddedLabels;
+        else
+          fAddedLabels.addAll(item.fAddedLabels);
+      }
 
-      if (item.fRemovedLabels != null)
-        fRemovedLabels = item.fRemovedLabels;
+      if (item.fRemovedLabels != null) {
+        if (fRemovedLabels == null)
+          fRemovedLabels = item.fRemovedLabels;
+        else
+          fRemovedLabels.addAll(item.fRemovedLabels);
+      }
     }
 
     boolean isEquivalent(SyncItem item) {
