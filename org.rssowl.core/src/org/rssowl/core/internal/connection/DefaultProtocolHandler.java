@@ -469,7 +469,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     else if (isSyncAuthenticationIssue(method, authLink))
       throw new AuthenticationRequiredException(null, Activator.getDefault().createErrorStatus(Messages.DefaultProtocolHandler_GR_ERROR_BAD_AUTH, null));
 
- /* In case of Forbidden Status with Error Code (Google Reader) */
+    /* In case of Forbidden Status with Error Code (Google Reader) */
     else if (method.getStatusCode() == HTTP_ERROR_FORBIDDEN && method.getResponseHeader(HEADER_RESPONSE_ERROR) != null)
       handleForbidden(method);
 
@@ -737,7 +737,15 @@ public class DefaultProtocolHandler implements IProtocolHandler {
       Set<?> entries = parameters.entrySet();
       for (Object obj : entries) {
         Entry<?, ?> entry = (Entry<?, ?>) obj;
-        ((PostMethod) method).addParameter((String) entry.getKey(), (String) entry.getValue());
+        String key = (String) entry.getKey();
+        if (entry.getValue() instanceof String)
+          ((PostMethod) method).addParameter(key, (String) entry.getValue());
+        else if (entry.getValue() instanceof String[]) {
+          String[] parameterValues = (String[]) entry.getValue();
+          for (String value : parameterValues) {
+            ((PostMethod) method).addParameter(key, value);
+          }
+        }
       }
     }
 
