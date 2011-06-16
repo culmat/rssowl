@@ -290,7 +290,7 @@ public class SyncService {
   private Collection<SyncItem> filter(Set<NewsEvent> events) {
     List<SyncItem> filteredEvents = new ArrayList<SyncItem>();
     for (NewsEvent event : events) {
-      if (event.getOldNews() == null || !SyncUtils.isSynchronized(event.getEntity()))
+      if (event.isMerged() || event.getOldNews() == null || !SyncUtils.isSynchronized(event.getEntity()))
         continue;
 
       SyncItem syncItem = toSyncItem(event);

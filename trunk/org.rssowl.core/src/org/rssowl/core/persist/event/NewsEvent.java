@@ -37,6 +37,7 @@ import org.rssowl.core.persist.event.runnable.NewsEventRunnable;
  */
 public final class NewsEvent extends ModelEvent {
   private final INews fOldNews;
+  private final boolean fIsMerged;
 
   /**
    * Stores an instance of <code>INews</code> for the affected Type in this
@@ -47,6 +48,7 @@ public final class NewsEvent extends ModelEvent {
   public NewsEvent(INews news) {
     super(news);
     fOldNews = null;
+    fIsMerged = false;
   }
 
   /**
@@ -61,6 +63,25 @@ public final class NewsEvent extends ModelEvent {
   public NewsEvent(INews oldNews, INews currentNews, boolean isRoot) {
     super(currentNews, isRoot);
     fOldNews = oldNews;
+    fIsMerged = false;
+  }
+
+  /**
+   * Creates an instance of this event type.
+   *
+   * @param oldNews The previous saved version of the affected type or
+   * <code>null</code> if not known.
+   * @param currentNews The affected type.
+   * @param isRoot <code>TRUE</code> if this Event is a Root-Event,
+   * <code>FALSE</code> otherwise.
+   * @param isMerged if <code>true</code>, indicates that this event is
+   * triggered from a news that got merged with another one (e.g. on feed
+   * reload) and <code>false</code> otherwise.
+   */
+  public NewsEvent(INews oldNews, INews currentNews, boolean isRoot, boolean isMerged) {
+    super(currentNews, isRoot);
+    fOldNews = oldNews;
+    fIsMerged = isMerged;
   }
 
   /*
@@ -84,5 +105,14 @@ public final class NewsEvent extends ModelEvent {
    */
   public final INews getOldNews() {
     return fOldNews;
+  }
+
+  /**
+   * @return <code>true</code> indicates that this event is triggered from a
+   * news that got merged with another one (e.g. on feed reload) and
+   * <code>false</code> otherwise.
+   */
+  public boolean isMerged() {
+    return fIsMerged;
   }
 }

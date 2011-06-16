@@ -287,18 +287,14 @@ public final class DBHelper {
     return oldNews;
   }
 
-  public static final void saveNews(ObjectContainer db, INews news) {
-    saveNews(db, news, 2);
-  }
-
-  public static final void saveNews(ObjectContainer db, INews news, Integer updateDepth) {
+  public static final void saveUpdatedNews(ObjectContainer db, INews news) {
     INews oldNews = peekPersistedNews(db, news);
     if (oldNews != null) {
-      ModelEvent newsEventTemplate = new NewsEvent(oldNews, news, false);
+      ModelEvent newsEventTemplate = new NewsEvent(oldNews, news, false, true);
       DBHelper.putEventTemplate(newsEventTemplate);
     }
 
-    db.ext().set(news, updateDepth);
+    db.ext().set(news, 2);
   }
 
   static final boolean feedExists(ObjectContainer db, URI link) {
