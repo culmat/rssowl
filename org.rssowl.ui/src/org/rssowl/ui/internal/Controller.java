@@ -1296,7 +1296,7 @@ public class Controller {
 
     /* Stop the Sync Service */
     if (fSyncService != null)
-      fSyncService.stopService();
+      fSyncService.stopService(false);
 
     /* Shutdown ApplicationServer */
     ApplicationServer.getDefault().shutdown();

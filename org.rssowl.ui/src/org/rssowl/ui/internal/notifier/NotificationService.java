@@ -126,7 +126,7 @@ public class NotificationService {
 
   /** Shutdown this Service */
   public void stopService() {
-    fBatchedBuffer.cancel();
+    fBatchedBuffer.cancel(false);
     DynamicDAO.removeEntityListener(INews.class, fNewsListener);
     DynamicDAO.removeEntityListener(ISearchMark.class, fSearchMarkListener);
     DynamicDAO.removeEntityListener(IBookMark.class, fBookMarkListener);

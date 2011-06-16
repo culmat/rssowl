@@ -76,7 +76,7 @@ import java.util.Set;
 public class SyncService {
 
   /* Delay in Milies before syncing */
-  private static final int SYNC_DELAY = 5000;
+  private static final int SYNC_DELAY = 2000;
 
   /* Set of unread states */
   private static final Set<INews.State> UNREAD_STATES = EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED);
@@ -413,10 +413,14 @@ public class SyncService {
 
   /**
    * Stops the Synchronizer.
+   *
+   * @param emergency if <code>true</code>, indicates that RSSOwl is shutting
+   * down in an emergency situation where methods should return fast and
+   * <code>false</code> otherwise.
    */
-  public void stopService() {
+  public void stopService(boolean emergency) {
     unregisterListeners();
-    fSynchronizer.cancel();
+    fSynchronizer.cancel(!emergency);
   }
 
   private void sync(Collection<SyncItem> items, IProgressMonitor monitor) throws ConnectionException {
