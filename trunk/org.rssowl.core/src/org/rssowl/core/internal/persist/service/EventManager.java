@@ -505,8 +505,9 @@ public class EventManager implements DatabaseListener {
     ModelEvent template = templatesMap.get(entity); //TODO In some cases, the template is complete. We can save some object allocation by reusing it.
 
     boolean root = isRoot(template);
+    boolean merged = isMerged(template);
     if (entity instanceof INews) {
-      modelEvent = createNewsEvent((INews) entity, template, root);
+      modelEvent = createNewsEvent((INews) entity, template, root, merged);
     } else if (entity instanceof IAttachment) {
       IAttachment attachment = (IAttachment) entity;
       modelEvent = new AttachmentEvent(attachment, root);
@@ -561,12 +562,12 @@ public class EventManager implements DatabaseListener {
     return modelEvent;
   }
 
-  private ModelEvent createNewsEvent(INews news, ModelEvent template, boolean root) {
+  private ModelEvent createNewsEvent(INews news, ModelEvent template, boolean root, boolean merged) {
     ModelEvent modelEvent;
     NewsEvent newsTemplate = (NewsEvent) template;
     INews oldNews = newsTemplate == null ? null : newsTemplate.getOldNews();
 
-    modelEvent = new NewsEvent(oldNews, news, root);
+    modelEvent = new NewsEvent(oldNews, news, root, merged);
     return modelEvent;
   }
 
@@ -575,6 +576,13 @@ public class EventManager implements DatabaseListener {
       return false;
 
     return template.isRoot();
+  }
+
+  private boolean isMerged(ModelEvent template) {
+    if (template == null)
+      return false;
+
+    return template instanceof NewsEvent && ((NewsEvent)template).isMerged();
   }
 
   private void setId(IEntity entity) {
