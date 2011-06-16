@@ -682,7 +682,7 @@ public class ApplicationServiceImpl implements IApplicationService {
     List<Object> otherObjects = new ArrayList<Object>();
     for (Object o : mergeResult.getUpdatedObjects()) {
       if (o instanceof INews)
-        DBHelper.saveNews(fDb, (INews) o);
+        DBHelper.saveUpdatedNews(fDb, (INews) o);
       else {
         if (o instanceof Description)
           descriptionUpdatedIds.add(((Description) o).getNews().getId());
