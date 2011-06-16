@@ -110,10 +110,29 @@ public class BatchedBuffer<T> {
 
   /**
    * Cancels the BatchedBuffer from running or processing tasks.
+   *
+   * @param joinRunning If <code>TRUE</code>, join the running Jobs that are not
+   * yet done.
    */
-  public void cancel() {
+  public void cancel(boolean joinRunning) {
+
+    /* Seal the Buffer */
     fSealed.set(true);
-    fBufferProcessor.cancel();
+
+    /* Wait until Buffer has completed work */
+    if (joinRunning) {
+      while (Job.getJobManager().find(this).length != 0) {
+        try {
+          Thread.sleep(50);
+        } catch (InterruptedException e) {
+          break;
+        }
+      }
+    }
+
+    /* Cancel Batched Buffer and don't wait for finish */
+    else
+      fBufferProcessor.cancel();
   }
 
   /* Creates a Job to process the contents of the Buffer */
@@ -130,6 +149,11 @@ public class BatchedBuffer<T> {
         }
 
         return Status.OK_STATUS;
+      }
+
+      @Override
+      public boolean belongsTo(Object family) {
+        return family == BatchedBuffer.this;
       }
     };
 
