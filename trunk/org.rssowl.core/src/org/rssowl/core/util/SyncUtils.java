@@ -105,6 +105,12 @@ public class SyncUtils {
   public static final String API_PARAM_TAG_TO_ADD = "a"; //$NON-NLS-1$
   public static final String API_PARAM_TAG_TO_REMOVE = "r"; //$NON-NLS-1$
 
+  /** Default Connection Timeouts in MS */
+  public static final int DEFAULT_CON_TIMEOUT = 30000;
+
+  /** Short Connection Timeouts in MS */
+  public static final int SHORT_CON_TIMEOUT = 5000;
+
   /* Part of the identifier of synchronized news */
   private static final String SYNCED_NEWS_ID_PART = "tag:google.com"; //$NON-NLS-1$
 
@@ -192,6 +198,7 @@ public class SyncUtils {
       Map<Object, Object> properties = new HashMap<Object, Object>();
       properties.put(IConnectionPropertyConstants.PARAMETERS, parameters);
       properties.put(IConnectionPropertyConstants.POST, Boolean.TRUE);
+      properties.put(IConnectionPropertyConstants.CON_TIMEOUT, getConnectionTimeout());
 
       BufferedReader reader = null;
       try {
@@ -271,6 +278,7 @@ public class SyncUtils {
 
       Map<Object, Object> properties = new HashMap<Object, Object>();
       properties.put(IConnectionPropertyConstants.HEADERS, headers);
+      properties.put(IConnectionPropertyConstants.CON_TIMEOUT, getConnectionTimeout());
 
       BufferedReader reader = null;
       try {
@@ -331,5 +339,9 @@ public class SyncUtils {
    */
   public static boolean fromGoogle(String link) {
     return isSynchronized(link) || link.startsWith(GOOGLE_HTTP_URL_PREFIX) || link.startsWith(GOOGLE_HTTPS_URL_PREFIX);
+  }
+
+  private static long getConnectionTimeout() {
+    return Owl.isShuttingDown() ? SyncUtils.SHORT_CON_TIMEOUT : SyncUtils.DEFAULT_CON_TIMEOUT;
   }
 }
