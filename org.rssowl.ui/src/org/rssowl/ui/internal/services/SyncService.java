@@ -545,6 +545,7 @@ public class SyncService {
         properties.put(IConnectionPropertyConstants.HEADERS, headers);
         properties.put(IConnectionPropertyConstants.POST, Boolean.TRUE);
         properties.put(IConnectionPropertyConstants.PARAMETERS, parameters);
+        properties.put(IConnectionPropertyConstants.CON_TIMEOUT, getConnectionTimeout());
 
         /* Return on cancellation or shutdown */
         if (isCanceled(monitor))
@@ -582,6 +583,10 @@ public class SyncService {
   }
 
   private boolean isCanceled(IProgressMonitor monitor) {
-    return Controller.getDefault().isShuttingDown() || (monitor != null && monitor.isCanceled());
+    return (monitor != null && monitor.isCanceled());
+  }
+
+  private long getConnectionTimeout() {
+    return Controller.getDefault().isShuttingDown() ? SyncUtils.SHORT_CON_TIMEOUT : SyncUtils.DEFAULT_CON_TIMEOUT;
   }
 }
