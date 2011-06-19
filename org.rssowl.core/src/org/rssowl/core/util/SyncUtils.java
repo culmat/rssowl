@@ -341,7 +341,7 @@ public class SyncUtils {
     return isSynchronized(link) || link.startsWith(GOOGLE_HTTP_URL_PREFIX) || link.startsWith(GOOGLE_HTTPS_URL_PREFIX);
   }
 
-  private static long getConnectionTimeout() {
+  private static int getConnectionTimeout() {
     return Owl.isShuttingDown() ? SyncUtils.SHORT_CON_TIMEOUT : SyncUtils.DEFAULT_CON_TIMEOUT;
   }
 }
