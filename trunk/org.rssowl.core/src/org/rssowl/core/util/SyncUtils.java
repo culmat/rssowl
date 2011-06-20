@@ -96,6 +96,7 @@ public class SyncUtils {
   public static final String CATEGORY_STARRED = "user/-/state/com.google/starred"; //$NON-NLS-1$
   public static final String CATEGORY_READ = "user/-/state/com.google/read"; //$NON-NLS-1$
   public static final String CATEGORY_UNREAD = "user/-/state/com.google/kept-unread"; //$NON-NLS-1$
+  public static final String CATEGORY_TRACKING_UNREAD = "user/-/state/com.google/tracking-kept-unread "; //$NON-NLS-1$
   public static final String CATEGORY_LABEL_PREFIX = "user/-/label/"; //$NON-NLS-1$
 
   /** Google API Parameters */
