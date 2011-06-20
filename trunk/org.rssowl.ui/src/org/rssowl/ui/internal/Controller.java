@@ -136,6 +136,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -208,6 +209,9 @@ public class Controller {
   /* Flag for an Out of Memory Exception and Emergency Shutdown */
   private static final AtomicBoolean OOM_EMERGENCY_SHUTDOWN = new AtomicBoolean(false);
 
+  /* Threshold in millies for ignoring any authentication challenges from Google Reader if user cancels */
+  private static final int GOOGLE_LOGIN_THRESHOLD = 5000;
+
   /* Queue for reloading Feeds */
   private final JobQueue fReloadFeedQueue;
 
@@ -273,6 +277,7 @@ public class Controller {
   private final ILabelDAO fLabelDao;
   private final IModelFactory fFactory;
   private final Lock fLoginDialogLock = new ReentrantLock();
+  private final AtomicLong fLastGoogleLoginCancel= new AtomicLong(0);
   private BookMarkAdapter fBookMarkListener;
   private LabelAdapter fLabelListener;
   private ListenerList fBookMarkLoadListeners = new ListenerList();
@@ -795,11 +800,16 @@ public class Controller {
                 }
 
                 /* Show Login Dialog */
-                int status;
-                if (isSynchronizedFeed)
-                  status = OwlUI.openSyncLogin(shellAr[0]);
-                else
+                int status = -1;
+                if (isSynchronizedFeed) {
+                  if (System.currentTimeMillis() - fLastGoogleLoginCancel.get() > GOOGLE_LOGIN_THRESHOLD) //Avoid login dialog spam if user hit cancel
+                    status = OwlUI.openSyncLogin(shellAr[0]);
+                } else
                   status = new LoginDialog(shellAr[0], feedLink, authEx.getRealm()).open();
+
+                /* Remember time when user hit cancel from a Google Reader login challenge */
+                if (status == Window.CANCEL && isSynchronizedFeed)
+                  fLastGoogleLoginCancel.set(System.currentTimeMillis());
 
                 /* Trigger another Reload if credentials have been provided */
                 if (status == Window.OK && shouldProceedReloading(monitor, bookmark)) {
