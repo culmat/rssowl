@@ -62,7 +62,7 @@ public class SyncUtils {
   public static final String GOOGLE_API_TOKEN_URL = GOOGLE_API_URL + "token"; //$NON-NLS-1$
 
   /** Google Edit-Tag Service */
-  public static final String GOOGLE_EDIT_TAG_URL = GOOGLE_API_URL + "edit-tag"; //$NON-NLS-1$
+  public static final String GOOGLE_EDIT_TAG_URL = GOOGLE_API_URL + "edit-tag?client=scroll"; //$NON-NLS-1$
 
   /** Google Feed Service */
   public static final String GOOGLE_FEED_URL = GOOGLE_API_URL + "stream/contents/feed/"; //$NON-NLS-1$
