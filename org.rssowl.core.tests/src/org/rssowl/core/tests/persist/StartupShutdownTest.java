@@ -33,6 +33,7 @@ import static org.junit.Assert.assertNull;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.InternalOwl;
@@ -210,6 +211,7 @@ public class StartupShutdownTest extends LargeBlockSizeTest {
    * @throws Exception
    */
   @Test
+  @Ignore
   public void testRecreateOPMLProfile() throws IOException, InterpreterException, ParserException {
     IFeed feed = DynamicDAO.save(createFeed());
     INews news = createNews(feed);
