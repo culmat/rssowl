@@ -26,6 +26,7 @@ package org.rssowl.ui.internal.services;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.rssowl.core.Owl;
 import org.rssowl.core.connection.AuthenticationRequiredException;
 import org.rssowl.core.connection.ConnectionException;
@@ -45,6 +46,8 @@ import org.rssowl.core.util.BatchedBuffer.Receiver;
 import org.rssowl.core.util.SyncUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Controller;
+import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.util.JobRunner;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -58,6 +61,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
 
 /**
  * A service that listens to changes of {@link INews} and then synchronizes with
@@ -200,9 +204,33 @@ public class SyncService implements Receiver<SyncItem> {
   public void receive(Collection<SyncItem> items, IProgressMonitor monitor) {
     try {
       sync(monitor);
-    } catch (ConnectionException e) {
-      //TODO Must properly handle AuthenticationExceptions, how would the user know otherwise or be able to login?
+    }
+
+    /* Authentication Required */
+    catch (AuthenticationRequiredException e) {
+      handleAuthenticationRequired();
+    }
+
+    /* Any other Connection Exception */
+    catch (ConnectionException e) {
       Activator.getDefault().logError(e.getMessage(), e);
+    }
+  }
+
+  private void handleAuthenticationRequired() {
+    Lock loginLock = Controller.getDefault().getLoginDialogLock();
+    if (loginLock.tryLock()) { //Avoid multiple login dialogs if login dialog already showing
+      try {
+        JobRunner.runSyncedInUIThread(new Runnable() {
+          public void run() {
+            int status = OwlUI.openSyncLogin(null);
+            if (status == IDialogConstants.OK_ID)
+              fSynchronizer.addAll(fSyncItemsManager.getUncommittedItems());
+          }
+        });
+      } finally {
+        loginLock.unlock();
+      }
     }
   }
 
