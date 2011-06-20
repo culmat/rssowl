@@ -86,7 +86,27 @@ public class SyncService implements Receiver<SyncItem> {
   public SyncService() {
     fSynchronizer = new BatchedBuffer<SyncItem>(this, SYNC_DELAY);
     fSyncItemsManager = new SyncItemsManager();
+    init();
+  }
+
+  private void init() {
+
+    /* Listen to Events for Syncing */
     registerListeners();
+
+    /* Deserialize uncommitted items from previous session */
+    try {
+      fSyncItemsManager.startup();
+    } catch (IOException e) {
+      Activator.getDefault().logError(e.getMessage(), e);
+    } catch (ClassNotFoundException e) {
+      Activator.getDefault().logError(e.getMessage(), e);
+    }
+
+    /* Schedule Sync of previously uncommitted items as needed */
+    List<SyncItem> uncommittedItems = fSyncItemsManager.getUncommittedItems();
+    if (!uncommittedItems.isEmpty())
+      fSynchronizer.addAll(uncommittedItems);
   }
 
   private void registerListeners() {
