@@ -209,9 +209,6 @@ public class Controller {
   /* Flag for an Out of Memory Exception and Emergency Shutdown */
   private static final AtomicBoolean OOM_EMERGENCY_SHUTDOWN = new AtomicBoolean(false);
 
-  /* Threshold in millies for ignoring any authentication challenges from Google Reader if user cancels */
-  private static final int GOOGLE_LOGIN_THRESHOLD = 5000;
-
   /* Queue for reloading Feeds */
   private final JobQueue fReloadFeedQueue;
 
@@ -277,7 +274,7 @@ public class Controller {
   private final ILabelDAO fLabelDao;
   private final IModelFactory fFactory;
   private final Lock fLoginDialogLock = new ReentrantLock();
-  private final AtomicLong fLastGoogleLoginCancel= new AtomicLong(0);
+  private final AtomicLong fLastGoogleLoginCancel = new AtomicLong(0);
   private BookMarkAdapter fBookMarkListener;
   private LabelAdapter fLabelListener;
   private ListenerList fBookMarkLoadListeners = new ListenerList();
@@ -773,71 +770,84 @@ public class Controller {
 
         /* Only one Login Dialog at the same time */
         if (shellAr[0] != null && !shellAr[0].isDisposed()) {
-          fLoginDialogLock.lock();
-          try {
-            final AuthenticationRequiredException authEx = (AuthenticationRequiredException) e;
-            JobRunner.runSyncedInUIThread(shellAr[0], new Runnable() {
-              public void run() {
+          final boolean isSynchronizedFeed = SyncUtils.isSynchronized(bookmark);
+          boolean openLoginDialog = false;
 
-                /* Return on Cancelation or shutdown or deletion */
-                if (!shouldProceedReloading(monitor, bookmark))
-                  return;
+          /* Normal Feed (one Login Dialog per feed) */
+          if (!isSynchronizedFeed) {
+            fLoginDialogLock.lock();
+            openLoginDialog = true;
+          }
 
-                /* If this feed is synchronized, we offer a special Login Dialog */
-                boolean isSynchronizedFeed = SyncUtils.isSynchronized(bookmark);
+          /* Synchronized Feed (only open login dialog once) */
+          else {
+            openLoginDialog = fLoginDialogLock.tryLock();
+          }
 
-                /* Credentials might have been provided meanwhile in another dialog */
-                if (!isSynchronizedFeed) {
-                  try {
-                    URI normalizedUri = URIUtils.normalizeUri(feedLink, true);
-                    if (Owl.getConnectionService().getAuthCredentials(normalizedUri, authEx.getRealm()) != null) {
-                      reloadQueued(bookmark, shellAr[0]);
-                      return;
+          /* Open Login Dialog */
+          final AuthenticationRequiredException authEx = (AuthenticationRequiredException) e;
+          if (openLoginDialog) {
+            try {
+              JobRunner.runSyncedInUIThread(shellAr[0], new Runnable() {
+                public void run() {
+
+                  /* Return on Cancelation or shutdown or deletion */
+                  if (!shouldProceedReloading(monitor, bookmark))
+                    return;
+
+                  /* Credentials might have been provided meanwhile in another dialog */
+                  if (!isSynchronizedFeed) {
+                    try {
+                      URI normalizedUri = URIUtils.normalizeUri(feedLink, true);
+                      if (Owl.getConnectionService().getAuthCredentials(normalizedUri, authEx.getRealm()) != null) {
+                        reloadQueued(bookmark, shellAr[0]);
+                        return;
+                      }
+                    } catch (CredentialsException exe) {
+                      Activator.getDefault().getLog().log(exe.getStatus());
                     }
-                  } catch (CredentialsException exe) {
-                    Activator.getDefault().getLog().log(exe.getStatus());
                   }
-                }
 
-                /* Show Login Dialog */
-                int status = -1;
-                if (isSynchronizedFeed) {
-                  if (System.currentTimeMillis() - fLastGoogleLoginCancel.get() > GOOGLE_LOGIN_THRESHOLD) //Avoid login dialog spam if user hit cancel
+                  /* Show Login Dialog */
+                  int status = -1;
+                  if (isSynchronizedFeed)
                     status = OwlUI.openSyncLogin(shellAr[0]);
-                } else
-                  status = new LoginDialog(shellAr[0], feedLink, authEx.getRealm()).open();
+                  else if (!isSynchronizedFeed)
+                    status = new LoginDialog(shellAr[0], feedLink, authEx.getRealm()).open();
 
-                /* Remember time when user hit cancel from a Google Reader login challenge */
-                if (status == Window.CANCEL && isSynchronizedFeed)
-                  fLastGoogleLoginCancel.set(System.currentTimeMillis());
+                  /* Remember time when user hit cancel from a Google Reader login challenge */
+                  if (status == Window.CANCEL && isSynchronizedFeed)
+                    fLastGoogleLoginCancel.set(System.currentTimeMillis());
 
-                /* Trigger another Reload if credentials have been provided */
-                if (status == Window.OK && shouldProceedReloading(monitor, bookmark)) {
+                  /* Trigger another Reload if credentials have been provided */
+                  if (status == Window.OK && shouldProceedReloading(monitor, bookmark)) {
 
-                  /* Store info about Realm in Bookmark */
-                  if (StringUtils.isSet(authEx.getRealm())) {
-                    bookmark.setProperty(BM_REALM_PROPERTY, authEx.getRealm());
-                    fBookMarkDAO.save(bookmark);
+                    /* Store info about Realm in Bookmark */
+                    if (StringUtils.isSet(authEx.getRealm())) {
+                      bookmark.setProperty(BM_REALM_PROPERTY, authEx.getRealm());
+                      fBookMarkDAO.save(bookmark);
+                    }
+
+                    /* Re-Reload Bookmark */
+                    reloadQueued(bookmark, shellAr[0]);
                   }
 
-                  /* Re-Reload Bookmark */
-                  reloadQueued(bookmark, shellAr[0]);
+                  /* Update Error Flag if user hit Cancel */
+                  else if (shouldProceedReloading(monitor, bookmark) && !bookmark.isErrorLoading()) {
+                    updateErrorLoading(bookmark, authEx);
+                  }
                 }
+              });
 
-                /* Update Error Flag if user hit Cancel */
-                else if (shouldProceedReloading(monitor, bookmark) && !bookmark.isErrorLoading()) {
-                  bookmark.setErrorLoading(true);
-                  if (StringUtils.isSet(authEx.getMessage()))
-                    bookmark.setProperty(LOAD_ERROR_KEY, authEx.getMessage());
-                  bookmark.removeProperty(LOAD_ERROR_LINK_KEY);
-                  fBookMarkDAO.save(bookmark);
-                }
-              }
-            });
+              return Status.OK_STATUS;
+            } finally {
+              fLoginDialogLock.unlock();
+            }
+          }
 
-            return Status.OK_STATUS;
-          } finally {
-            fLoginDialogLock.unlock();
+          /* Update error flag for other synchronized feeds not loading */
+          else if (shouldProceedReloading(monitor, bookmark) && !bookmark.isErrorLoading()) {
+            updateErrorLoading(bookmark, authEx);
           }
         }
       }
@@ -868,6 +878,17 @@ public class Controller {
     }
 
     return Status.OK_STATUS;
+  }
+
+  private void updateErrorLoading(final IBookMark bookmark, final AuthenticationRequiredException authEx) {
+    bookmark.setErrorLoading(true);
+
+    if (StringUtils.isSet(authEx.getMessage()))
+      bookmark.setProperty(LOAD_ERROR_KEY, authEx.getMessage());
+
+    bookmark.removeProperty(LOAD_ERROR_LINK_KEY);
+
+    fBookMarkDAO.save(bookmark);
   }
 
   private void loadFavicon(final IBookMark bookmark, final IProgressMonitor monitor, final URI feedLink, URI feedHomepage) {
