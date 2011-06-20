@@ -45,7 +45,7 @@ import java.util.Set;
  * <p>
  * The model is safe to be used from multiple threads.
  * </p>
- * 
+ *
  * @author bpasero
  */
 public class NewsBrowserViewModel {
@@ -113,7 +113,7 @@ public class NewsBrowserViewModel {
 
   /**
    * Updates this view model with the contents of the provided elements.
-   * 
+   *
    * @param elements the elements to create the view model from.
    * @param pageSize the number of elements per page or <code>0</code> in case
    * paging is disabled.
@@ -196,6 +196,17 @@ public class NewsBrowserViewModel {
   public boolean hasGroup(long groupId) {
     synchronized (fLock) {
       return fEntityGroupToNewsMap.containsKey(groupId);
+    }
+  }
+
+  /**
+   * @param newsId the news identifier to look for
+   * @return <code>true</code> if a news with the given identifier exists and
+   * <code>false</code> otherwise.
+   */
+  public boolean hasNews(long newsId) {
+    synchronized (fLock) {
+      return fNewsMap.containsKey(newsId);
     }
   }
 
@@ -479,7 +490,7 @@ public class NewsBrowserViewModel {
   /**
    * Returns the first news that is hidden and optionally unread or
    * <code>-1</code> if none.
-   * 
+   *
    * @param onlyUnread if set to <code>true</code>, only unread news will be
    * considered.
    * @return the identifier of the first hidden news or <code>-1</code> if none.
@@ -505,7 +516,7 @@ public class NewsBrowserViewModel {
 
   /**
    * Returns the last news that is visible or <code>-1</code> if none.
-   * 
+   *
    * @return the identifier of the last hidden news or <code>-1</code> if none.
    */
   public long getLastVisibleNews() {
@@ -671,7 +682,7 @@ public class NewsBrowserViewModel {
 
   /**
    * Retrieves the identifiers of the elements for the next page.
-   * 
+   *
    * @param pageSize the number of elements per page.
    * @return a {@link Triple} of lists. The first contains the identifiers of
    * groups revealed and the second the list of news identifiers.
@@ -714,7 +725,7 @@ public class NewsBrowserViewModel {
    * Will return lists of groups (if any) and news that are hidden up to the
    * provided news and including the entire page the news is in. This allows to
    * reveal the actual page the provided news is in if hidden.
-   * 
+   *
    * @param newsId the identifier of the news item that is being revealed.
    * @param pageSize the number of elements per page.
    * @return a {@link Pair} of lists. The first contains the identifiers of
