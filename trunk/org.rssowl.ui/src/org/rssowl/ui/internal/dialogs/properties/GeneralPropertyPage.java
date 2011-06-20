@@ -105,6 +105,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
   private Text fFeedInput;
   private FolderChooser fFolderChooser;
   private Button fOpenOnStartupCheck;
+  private Button fReloadOnStartupCheck;
   private boolean fReloadRequired;
   private boolean fSettingsChanged;
   private boolean fIsSingleBookMark;
@@ -114,6 +115,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
   private boolean fPrefUpdateIntervalState;
   private long fPrefUpdateInterval;
   private boolean fPrefOpenOnStartup;
+  private boolean fPrefReloadOnStartup;
   private Spinner fReloadSpinner;
   private int fUpdateIntervalScope;
   private Button fUpdateCheck;
@@ -147,6 +149,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
     fPrefUpdateIntervalState = firstScope.getBoolean(DefaultPreferences.BM_UPDATE_INTERVAL_STATE);
     fPrefUpdateInterval = firstScope.getLong(DefaultPreferences.BM_UPDATE_INTERVAL);
     fPrefOpenOnStartup = firstScope.getBoolean(DefaultPreferences.BM_OPEN_ON_STARTUP);
+    fPrefReloadOnStartup = firstScope.getBoolean(DefaultPreferences.BM_RELOAD_ON_STARTUP);
 
     /* For any other scope not sharing the initial values, use the default */
     IPreferenceScope defaultScope = Owl.getPreferenceService().getDefaultScope();
@@ -161,6 +164,9 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
 
       if (otherScope.getBoolean(DefaultPreferences.BM_OPEN_ON_STARTUP) != fPrefOpenOnStartup)
         fPrefOpenOnStartup = defaultScope.getBoolean(DefaultPreferences.BM_OPEN_ON_STARTUP);
+
+      if (otherScope.getBoolean(DefaultPreferences.BM_RELOAD_ON_STARTUP) != fPrefReloadOnStartup)
+        fPrefReloadOnStartup = defaultScope.getBoolean(DefaultPreferences.BM_RELOAD_ON_STARTUP);
     }
 
     fUpdateIntervalScope = getUpdateIntervalScope();
@@ -307,12 +313,18 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
       fReloadCombo.add(Messages.GeneralPropertyPage_DAYS);
       fReloadCombo.select(fUpdateIntervalScope);
       fReloadCombo.setEnabled(fPrefUpdateIntervalState);
+
+      /* Reload on Startup */
+      fReloadOnStartupCheck = new Button(otherSettingsContainer, SWT.CHECK);
+      fReloadOnStartupCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+      fReloadOnStartupCheck.setText(fEntities.size() == 1 ? Messages.GeneralPropertyPage_AUTO_UPDATE_FEED_STARTUP : Messages.GeneralPropertyPage_AUTO_UPDATE_FEEDS_STARTUP);
+      fReloadOnStartupCheck.setSelection(fPrefReloadOnStartup);
     }
 
     /* Open on Startup */
     fOpenOnStartupCheck = new Button(otherSettingsContainer, SWT.CHECK);
     fOpenOnStartupCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-    fOpenOnStartupCheck.setText(getDisplaySettingName());
+    fOpenOnStartupCheck.setText(getOpenOnStartupSettingName());
     fOpenOnStartupCheck.setSelection(fPrefOpenOnStartup);
 
     return container;
@@ -325,7 +337,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
     return null;
   }
 
-  private String getDisplaySettingName() {
+  private String getOpenOnStartupSettingName() {
     if (fEntities.size() == 1) {
       if (fEntities.get(0) instanceof INewsBin)
         return Messages.GeneralPropertyPage_DISPLAY_BIN_ONSTARTUP;
@@ -661,6 +673,15 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
       boolean bVal = fOpenOnStartupCheck.getSelection();
       if (fPrefOpenOnStartup != bVal) {
         scope.putBoolean(DefaultPreferences.BM_OPEN_ON_STARTUP, bVal);
+        changed = true;
+      }
+    }
+
+    /* Reload on Startup */
+    if (fReloadOnStartupCheck != null) {
+      boolean bVal = fReloadOnStartupCheck.getSelection();
+      if (fPrefReloadOnStartup != bVal) {
+        scope.putBoolean(DefaultPreferences.BM_RELOAD_ON_STARTUP, bVal);
         changed = true;
       }
     }
