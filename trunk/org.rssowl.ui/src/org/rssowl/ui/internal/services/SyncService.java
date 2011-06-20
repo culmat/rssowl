@@ -116,18 +116,22 @@ public class SyncService {
 
     void setMarkedRead() {
       fMarkedRead = true;
+      fMarkedUnread = false;
     }
 
     void setMarkedUnread() {
       fMarkedUnread = true;
+      fMarkedRead = false;
     }
 
     void setStarred() {
       fStarred = true;
+      fUnStarred = false;
     }
 
     void setUnStarred() {
       fUnStarred = true;
+      fStarred = false;
     }
 
     void addLabel(String label) {
@@ -135,6 +139,7 @@ public class SyncService {
         fAddedLabels = new ArrayList<String>(3);
 
       fAddedLabels.add(label);
+      fRemovedLabels.remove(label);
     }
 
     void removeLabel(String label) {
@@ -142,6 +147,7 @@ public class SyncService {
         fRemovedLabels = new ArrayList<String>(1);
 
       fRemovedLabels.add(label);
+      fAddedLabels.remove(label);
     }
 
     boolean isMarkedRead() {
@@ -170,29 +176,27 @@ public class SyncService {
 
     void merge(SyncItem item) {
       if (item.fMarkedRead)
-        fMarkedRead = true;
+        setMarkedRead();
 
       if (item.fMarkedUnread)
-        fMarkedUnread = true;
+        setMarkedUnread();
 
       if (item.fStarred)
-        fStarred = true;
+        setStarred();
 
       if (item.fUnStarred)
-        fUnStarred = true;
+        setUnStarred();
 
       if (item.fAddedLabels != null) {
-        if (fAddedLabels == null)
-          fAddedLabels = item.fAddedLabels;
-        else
-          fAddedLabels.addAll(item.fAddedLabels);
+        for (String label : item.fAddedLabels) {
+          addLabel(label);
+        }
       }
 
       if (item.fRemovedLabels != null) {
-        if (fRemovedLabels == null)
-          fRemovedLabels = item.fRemovedLabels;
-        else
-          fRemovedLabels.addAll(item.fRemovedLabels);
+        for (String label : item.fRemovedLabels) {
+          removeLabel(label);
+        }
       }
     }
 
