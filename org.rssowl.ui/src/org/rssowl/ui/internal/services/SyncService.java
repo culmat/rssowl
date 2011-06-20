@@ -272,6 +272,7 @@ public class SyncService implements Receiver<SyncItem> {
 
           if (item.isMarkedUnread()) {
             tagsToAdd.add(SyncUtils.CATEGORY_UNREAD);
+            tagsToAdd.add(SyncUtils.CATEGORY_TRACKING_UNREAD);
             tagsToRemove.add(SyncUtils.CATEGORY_READ);
           }
 
