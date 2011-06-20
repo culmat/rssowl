@@ -141,6 +141,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -1225,7 +1226,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
     }
 
     /* Operate on a Copy of the Content Providers News (either passed in or obtain) */
-    final Collection<INews> news = (visibleNews != null) ? visibleNews : fContentProvider.getCachedNewsCopy();
+    final Collection<INews> news = (visibleNews != null) ? filterHidden(visibleNews) : filterHidden(fContentProvider.getCachedNewsCopy());
     IPreferenceScope inputPreferences = Owl.getPreferenceService().getEntityScope(inputMark);
 
     /*
@@ -1327,6 +1328,27 @@ public class FeedView extends EditorPart implements IReusableEditor {
         }
       });
     }
+  }
+
+  /*
+   * In newspaper and headlines layout there is a chance that the user was not accepting incoming news
+   * (by refreshing). In this case, we are not applying any state changes to those news hidden by asking
+   * the browser view model for the visible news
+   */
+  private Collection<INews> filterHidden(Collection<INews> news) {
+    if (fLayout == Layout.NEWSPAPER || fLayout == Layout.HEADLINES) {
+      NewsBrowserViewModel model = fNewsBrowserControl.getViewer().getViewModel();
+      if (model != null) {
+        Iterator<INews> iterator = news.iterator();
+        while (iterator.hasNext()) {
+          Long id = iterator.next().getId();
+          if (id != null && !model.hasNews(id))
+            iterator.remove();
+        }
+      }
+    }
+
+    return news;
   }
 
   private void performCleanUp(IBookMark bookmark, Collection<INews> news) {
