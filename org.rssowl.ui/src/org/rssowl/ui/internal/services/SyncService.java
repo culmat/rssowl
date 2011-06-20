@@ -61,6 +61,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 
 /**
@@ -208,7 +209,16 @@ public class SyncService implements Receiver<SyncItem> {
 
     /* Authentication Required */
     catch (AuthenticationRequiredException e) {
-      handleAuthenticationRequired();
+      boolean reschedule = handleAuthenticationRequired();
+
+      /* Reschedule as necessary */
+      if (reschedule) {
+        try {
+          sync(monitor);
+        } catch (ConnectionException ex) {
+          Activator.getDefault().logError(e.getMessage(), ex);
+        }
+      }
     }
 
     /* Any other Connection Exception */
@@ -217,7 +227,9 @@ public class SyncService implements Receiver<SyncItem> {
     }
   }
 
-  private void handleAuthenticationRequired() {
+  private boolean handleAuthenticationRequired() {
+    final AtomicBoolean reschedule = new AtomicBoolean(false);
+
     Lock loginLock = Controller.getDefault().getLoginDialogLock();
     if (loginLock.tryLock()) { //Avoid multiple login dialogs if login dialog already showing
       try {
@@ -225,13 +237,15 @@ public class SyncService implements Receiver<SyncItem> {
           public void run() {
             int status = OwlUI.openSyncLogin(null);
             if (status == IDialogConstants.OK_ID)
-              fSynchronizer.addAll(fSyncItemsManager.getUncommittedItems());
+              reschedule.set(true);
           }
         });
       } finally {
         loginLock.unlock();
       }
     }
+
+    return reschedule.get();
   }
 
   private void sync(IProgressMonitor monitor) throws ConnectionException {
