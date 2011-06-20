@@ -126,6 +126,19 @@ public class JobRunner {
   /**
    * @param runnable
    */
+  public static void runSyncedInUIThread(final Runnable runnable) {
+    Assert.isNotNull(runnable);
+
+    Display.getDefault().syncExec(new Runnable() {
+      public void run() {
+        runnable.run();
+      }
+    });
+  }
+
+  /**
+   * @param runnable
+   */
   public static void runInBackgroundThread(final Runnable runnable) {
     runInBackgroundThread(0, runnable);
   }
