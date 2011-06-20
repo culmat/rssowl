@@ -98,6 +98,9 @@ public class SyncItemsManager {
     if (store.exists() && !store.delete())
       throw new IOException(NLS.bind("Synchronization: Unable to delete file ''{0}''", store.toString())); //$NON-NLS-1$
 
+    if (fItems.isEmpty())
+      return;
+
     ObjectOutputStream outS = null;
     try {
       outS = new ObjectOutputStream(new FileOutputStream(store));
