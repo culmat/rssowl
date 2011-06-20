@@ -211,7 +211,9 @@ public class SyncItem implements Serializable {
       fAddedLabels = new ArrayList<String>(3);
 
     fAddedLabels.add(label);
-    fRemovedLabels.remove(label);
+
+    if (fRemovedLabels != null)
+      fRemovedLabels.remove(label);
   }
 
   void removeLabel(String label) {
@@ -219,7 +221,9 @@ public class SyncItem implements Serializable {
       fRemovedLabels = new ArrayList<String>(1);
 
     fRemovedLabels.add(label);
-    fAddedLabels.remove(label);
+
+    if (fAddedLabels != null)
+      fAddedLabels.remove(label);
   }
 
   boolean isMarkedRead() {
