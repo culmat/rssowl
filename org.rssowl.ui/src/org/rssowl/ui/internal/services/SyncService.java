@@ -586,7 +586,7 @@ public class SyncService {
     return (monitor != null && monitor.isCanceled());
   }
 
-  private long getConnectionTimeout() {
+  private int getConnectionTimeout() {
     return Controller.getDefault().isShuttingDown() ? SyncUtils.SHORT_CON_TIMEOUT : SyncUtils.DEFAULT_CON_TIMEOUT;
   }
 }
