@@ -2283,8 +2283,8 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       /* Update for each Event */
       for (NewsEvent newsEvent : newsEvents) {
         INews news = newsEvent.getEntity();
-        if (!fViewModel.isNewsVisible(news))
-          continue; //Do not update if news not visible at all
+        if (!fViewModel.isNewsVisible(news) || news.getId() == null || !fViewModel.hasNews(news.getId()))
+          continue; //Do not update if news not visible at all or not part of the browsers content
 
         StringBuilder js = new StringBuilder();
 
@@ -2396,6 +2396,8 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     for (Object element : elements) {
       if (element instanceof INews) {
         INews news = (INews) element;
+        if (news.getId() == null || !fViewModel.hasNews(news.getId()))
+          continue; //Do not update if news not part of the browsers content at all
 
         /* Remove from View Model */
         long groupToUpdate = fViewModel.removeNews(news);
