@@ -33,11 +33,6 @@ import org.rssowl.core.connection.IConnectionPropertyConstants;
 import org.rssowl.core.connection.ICredentials;
 import org.rssowl.core.connection.ICredentialsProvider;
 import org.rssowl.core.connection.IProtocolHandler;
-import org.rssowl.core.internal.newsaction.LabelNewsAction;
-import org.rssowl.core.internal.newsaction.MarkReadNewsAction;
-import org.rssowl.core.internal.newsaction.MarkStickyNewsAction;
-import org.rssowl.core.persist.IFilterAction;
-import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.dao.DynamicDAO;
@@ -51,14 +46,12 @@ import org.rssowl.core.util.SyncUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Controller;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -72,14 +65,10 @@ import java.util.Set;
  *
  * @author bpasero
  */
-//TODO Must properly handle AuthenticationExceptions, how would the user know otherwise or be able to login?
-public class SyncService {
+public class SyncService implements Receiver<SyncItem> {
 
   /* Delay in Milies before syncing */
   private static final int SYNC_DELAY = 2000;
-
-  /* Set of unread states */
-  private static final Set<INews.State> UNREAD_STATES = EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED);
 
   /* HTTP Constants */
   private static final String REQUEST_HEADER_CONTENT_TYPE = "Content-Type"; //$NON-NLS-1$
@@ -87,172 +76,16 @@ public class SyncService {
   private static final String CONTENT_TYPE_FORM_ENCODED = "application/x-www-form-urlencoded"; //$NON-NLS-1$
 
   private final BatchedBuffer<SyncItem> fSynchronizer;
+  private final SyncItemsManager fSyncItemsManager;
   private NewsListener fNewsListener;
   private SearchFilterAdapter fSearchFilterListener;
-
-  /* Contains everything needed to synchronize */
-  private static class SyncItem {
-    private final String fId;
-    private final String fStreamId;
-    private boolean fMarkedRead;
-    private boolean fMarkedUnread;
-    private boolean fStarred;
-    private boolean fUnStarred;
-    private List<String> fAddedLabels;
-    private List<String> fRemovedLabels;
-
-    SyncItem(String id, String streamId) {
-      fId = id;
-      fStreamId = streamId;
-    }
-
-    String getId() {
-      return fId;
-    }
-
-    String getStreamId() {
-      return fStreamId;
-    }
-
-    void setMarkedRead() {
-      fMarkedRead = true;
-      fMarkedUnread = false;
-    }
-
-    void setMarkedUnread() {
-      fMarkedUnread = true;
-      fMarkedRead = false;
-    }
-
-    void setStarred() {
-      fStarred = true;
-      fUnStarred = false;
-    }
-
-    void setUnStarred() {
-      fUnStarred = true;
-      fStarred = false;
-    }
-
-    void addLabel(String label) {
-      if (fAddedLabels == null)
-        fAddedLabels = new ArrayList<String>(3);
-
-      fAddedLabels.add(label);
-      fRemovedLabels.remove(label);
-    }
-
-    void removeLabel(String label) {
-      if (fRemovedLabels == null)
-        fRemovedLabels = new ArrayList<String>(1);
-
-      fRemovedLabels.add(label);
-      fAddedLabels.remove(label);
-    }
-
-    boolean isMarkedRead() {
-      return fMarkedRead;
-    }
-
-    boolean isMarkedUnread() {
-      return fMarkedUnread;
-    }
-
-    boolean isStarred() {
-      return fStarred;
-    }
-
-    boolean isUnStarred() {
-      return fUnStarred;
-    }
-
-    List<String> getAddedLabels() {
-      return fAddedLabels != null ? fAddedLabels : Collections.<String> emptyList();
-    }
-
-    List<String> getRemovedLabels() {
-      return fRemovedLabels != null ? fRemovedLabels : Collections.<String> emptyList();
-    }
-
-    void merge(SyncItem item) {
-      if (item.fMarkedRead)
-        setMarkedRead();
-
-      if (item.fMarkedUnread)
-        setMarkedUnread();
-
-      if (item.fStarred)
-        setStarred();
-
-      if (item.fUnStarred)
-        setUnStarred();
-
-      if (item.fAddedLabels != null) {
-        for (String label : item.fAddedLabels) {
-          addLabel(label);
-        }
-      }
-
-      if (item.fRemovedLabels != null) {
-        for (String label : item.fRemovedLabels) {
-          removeLabel(label);
-        }
-      }
-    }
-
-    boolean isEquivalent(SyncItem item) {
-      if (fMarkedRead != item.fMarkedRead)
-        return false;
-
-      if (fMarkedUnread != item.fMarkedUnread)
-        return false;
-
-      if (fStarred != item.fStarred)
-        return false;
-
-      if (fUnStarred != item.fUnStarred)
-        return false;
-
-      if (!isLabelsEquivalent(fAddedLabels, item.fAddedLabels))
-        return false;
-
-      if (!isLabelsEquivalent(fRemovedLabels, item.fRemovedLabels))
-        return false;
-
-      return true;
-    }
-
-    @SuppressWarnings("null")
-    boolean isLabelsEquivalent(List<String> labelsA, List<String> labelsB) {
-      if (labelsA == null && labelsB != null)
-        return false;
-
-      if (labelsA != null && labelsB == null)
-        return false;
-
-      if (labelsA == null && labelsB == null)
-        return true;
-
-      return Arrays.equals(labelsA.toArray(), labelsB.toArray());
-    }
-  }
-
-  /* Receiver to process news events for syncing */
-  private class SyncReceiver implements Receiver<SyncItem> {
-    public void receive(Collection<SyncItem> items, IProgressMonitor monitor) {
-      try {
-        sync(items, monitor);
-      } catch (ConnectionException e) {
-        Activator.getDefault().logError(e.getMessage(), e);
-      }
-    }
-  }
 
   /**
    * Starts the synchronizer by listening to news events.
    */
   public SyncService() {
-    fSynchronizer = new BatchedBuffer<SyncItem>(new SyncReceiver(), SYNC_DELAY);
+    fSynchronizer = new BatchedBuffer<SyncItem>(this, SYNC_DELAY);
+    fSyncItemsManager = new SyncItemsManager();
     registerListeners();
   }
 
@@ -262,7 +95,9 @@ public class SyncService {
     fNewsListener = new NewsAdapter() {
       @Override
       public void entitiesUpdated(Set<NewsEvent> events) {
-        fSynchronizer.addAll(filter(events));
+        Collection<SyncItem> items = filter(events);
+        fSyncItemsManager.addUncommitted(items);
+        fSynchronizer.addAll(items);
       }
     };
     DynamicDAO.addEntityListener(INews.class, fNewsListener);
@@ -271,7 +106,9 @@ public class SyncService {
     fSearchFilterListener = new SearchFilterAdapter() {
       @Override
       public void filterApplied(ISearchFilter filter, Collection<INews> news) {
-        fSynchronizer.addAll(filter(filter, news));
+        Collection<SyncItem> items = filter(filter, news);
+        fSyncItemsManager.addUncommitted(items);
+        fSynchronizer.addAll(items);
       }
     };
     DynamicDAO.addEntityListener(ISearchFilter.class, fSearchFilterListener);
@@ -283,7 +120,7 @@ public class SyncService {
       if (!SyncUtils.isSynchronized(item))
         continue;
 
-      SyncItem syncItem = toSyncItem(filter, item);
+      SyncItem syncItem = SyncItem.toSyncItem(filter, item);
       if (syncItem != null)
         filteredEvents.add(syncItem);
     }
@@ -297,117 +134,12 @@ public class SyncService {
       if (event.isMerged() || event.getOldNews() == null || !SyncUtils.isSynchronized(event.getEntity()))
         continue;
 
-      SyncItem syncItem = toSyncItem(event);
+      SyncItem syncItem = SyncItem.toSyncItem(event);
       if (syncItem != null)
         filteredEvents.add(syncItem);
     }
 
     return filteredEvents;
-  }
-
-  private SyncItem toSyncItem(NewsEvent event) {
-    boolean requiresSync = false;
-    INews item = event.getEntity();
-    SyncItem syncItem = toSyncItem(item);
-
-    /* State Change */
-    INews.State oldState = event.getOldNews().getState();
-    INews.State newState = item.getState();
-    if (oldState != newState) {
-
-      /* Marked Read */
-      if (newState == INews.State.READ && UNREAD_STATES.contains(oldState)) {
-        syncItem.setMarkedRead();
-        requiresSync = true;
-      }
-
-      /* Marked Unread */
-      else if (newState == INews.State.UNREAD && oldState == INews.State.READ) {
-        syncItem.setMarkedUnread();
-        requiresSync = true;
-      }
-    }
-
-    /* Sticky Change */
-    boolean oldSticky = event.getOldNews().isFlagged();
-    boolean newSticky = item.isFlagged();
-    if (oldSticky != newSticky) {
-      if (oldSticky)
-        syncItem.setUnStarred();
-      else
-        syncItem.setStarred();
-
-      requiresSync = true;
-    }
-
-    /* Label Change */
-    Set<ILabel> oldLabels = event.getOldNews().getLabels();
-    Set<ILabel> newLabels = item.getLabels();
-
-    if (!Arrays.equals(oldLabels.toArray(), newLabels.toArray())) {
-      Set<String> oldLabelNames = new HashSet<String>(oldLabels.size());
-      for (ILabel oldLabel : oldLabels) {
-        oldLabelNames.add(oldLabel.getName());
-      }
-
-      for (ILabel newLabel : newLabels) {
-        if (!oldLabelNames.remove(newLabel.getName())) {
-          syncItem.addLabel(newLabel.getName());
-          requiresSync = true;
-        }
-      }
-
-      for (String oldLabelName : oldLabelNames) {
-        syncItem.removeLabel(oldLabelName);
-        requiresSync = true;
-      }
-    }
-
-    return requiresSync ? syncItem : null;
-  }
-
-  private SyncItem toSyncItem(ISearchFilter filter, INews item) {
-    boolean requiresSync = false;
-    SyncItem syncItem = toSyncItem(item);
-
-    List<IFilterAction> actions = filter.getActions();
-    for (IFilterAction action : actions) {
-      String actionId = action.getActionId();
-
-      /* State Change */
-      if (MarkReadNewsAction.ID.equals(actionId)) {
-        syncItem.setMarkedRead();
-        requiresSync = true;
-      }
-
-      /* Sticky Change */
-      if (MarkStickyNewsAction.ID.equals(actionId)) {
-        syncItem.setStarred();
-        requiresSync = true;
-      }
-
-      /* Label Change */
-      if (LabelNewsAction.ID.equals(actionId)) {
-        Object data = action.getData();
-        if (data != null && data instanceof Long) {
-          Long labelId = (Long) data;
-          ILabel label = DynamicDAO.load(ILabel.class, labelId);
-          if (label != null) {
-            syncItem.addLabel(label.getName());
-            requiresSync = true;
-          }
-        }
-      }
-    }
-
-    return requiresSync ? syncItem : null;
-  }
-
-  private SyncItem toSyncItem(INews news) {
-    String itemId = news.getGuid().getValue();
-    String streamId = news.getInReplyTo();
-
-    return new SyncItem(itemId, streamId);
   }
 
   private void unregisterListeners() {
@@ -423,33 +155,50 @@ public class SyncService {
    * <code>false</code> otherwise.
    */
   public void stopService(boolean emergency) {
+
+    /* Stop Listening */
     unregisterListeners();
+
+    /* Wait until the Synchronizer has finished synchronizing (if not in emergency shutdown) */
     fSynchronizer.cancel(!emergency);
+
+    /* Serialize uncomitted synchronization items */
+    if (!emergency) {
+      try {
+        fSyncItemsManager.shutdown();
+      } catch (FileNotFoundException e) {
+        Activator.getDefault().logError(e.getMessage(), e);
+      } catch (IOException e) {
+        Activator.getDefault().logError(e.getMessage(), e);
+      }
+    }
   }
 
-  private void sync(Collection<SyncItem> items, IProgressMonitor monitor) throws ConnectionException {
+  /*
+   * @see org.rssowl.core.util.BatchedBuffer.Receiver#receive(java.util.Collection, org.eclipse.core.runtime.IProgressMonitor)
+   */
+  public void receive(Collection<SyncItem> items, IProgressMonitor monitor) {
+    try {
+      sync(monitor);
+    } catch (ConnectionException e) {
+      //TODO Must properly handle AuthenticationExceptions, how would the user know otherwise or be able to login?
+      Activator.getDefault().logError(e.getMessage(), e);
+    }
+  }
 
-    /* Return on cancellation or shutdown */
+  private void sync(IProgressMonitor monitor) throws ConnectionException {
+
+    /* Receive all uncommitted items from the manager */
+    Collection<SyncItem> items = fSyncItemsManager.getUncommittedItems();
+
+    /* Return on cancellation */
     if (isCanceled(monitor))
       return;
 
     /* Group Sync Items by Feed and Merge Duplictates */
-    Map<String, Map<String, SyncItem>> mapFeedToSyncItems = new HashMap<String, Map<String, SyncItem>>();
-    for (SyncItem item : items) {
-      Map<String, SyncItem> streamItems = mapFeedToSyncItems.get(item.getStreamId());
-      if (streamItems == null) {
-        streamItems = new HashMap<String, SyncItem>();
-        mapFeedToSyncItems.put(item.getStreamId(), streamItems);
-      }
+    Map<String, Map<String, SyncItem>> mapFeedToSyncItems = groupByStream(items);
 
-      SyncItem existingItem = streamItems.get(item.getId());
-      if (existingItem == null)
-        streamItems.put(item.getId(), item);
-      else
-        existingItem.merge(item);
-    }
-
-    /* Return on cancellation or shutdown */
+    /* Return on cancellation */
     if (isCanceled(monitor))
       return;
 
@@ -459,32 +208,20 @@ public class SyncService {
     if (token == null || authToken == null)
       throw new ConnectionException(Activator.getDefault().createErrorStatus("Unable to obtain a token for Google API access.")); //$NON-NLS-1$
 
-    /* Return on cancellation or shutdown */
+    /* Return on cancellation */
     if (isCanceled(monitor))
       return;
 
     /* Synchronize for each Stream */
     Set<Entry<String, Map<String, SyncItem>>> entries = mapFeedToSyncItems.entrySet();
     for (Entry<String, Map<String, SyncItem>> entry : entries) {
-      Collection<SyncItem> syncItems = (entry.getValue() != null) ? entry.getValue().values() : Collections.<SyncItem> emptyList();
-      if (syncItems.isEmpty())
+      if (entry.getValue() == null)
         continue;
 
+      Collection<SyncItem> syncItems = entry.getValue().values();
+
       /* Find Equivalent Items to Sync with 1 Connection */
-      List<List<SyncItem>> equivalentItemLists = new ArrayList<List<SyncItem>>();
-      List<SyncItem> currentItemList = new ArrayList<SyncService.SyncItem>();
-      equivalentItemLists.add(currentItemList);
-      for (SyncItem item : syncItems) {
-        if (currentItemList.isEmpty())
-          currentItemList.add(item);
-        else if (item.isEquivalent(currentItemList.get(0)))
-          currentItemList.add(item);
-        else {
-          currentItemList = new ArrayList<SyncService.SyncItem>();
-          currentItemList.add(item);
-          equivalentItemLists.add(currentItemList);
-        }
-      }
+      List<List<SyncItem>> equivalentItemLists = findEquivalents(syncItems);
 
       /* For each list of equivalent items */
       for (List<SyncItem> equivalentItems : equivalentItemLists) {
@@ -508,8 +245,10 @@ public class SyncService {
           identifiers.add(item.getId());
           streamIds.add(item.getStreamId());
 
-          if (item.isMarkedRead())
+          if (item.isMarkedRead()) {
             tagsToAdd.add(SyncUtils.CATEGORY_READ);
+            tagsToRemove.add(SyncUtils.CATEGORY_UNREAD);
+          }
 
           if (item.isMarkedUnread()) {
             tagsToAdd.add(SyncUtils.CATEGORY_UNREAD);
@@ -539,8 +278,10 @@ public class SyncService {
 
         parameters.put(SyncUtils.API_PARAM_IDENTIFIER, identifiers.toArray(new String[identifiers.size()]));
         parameters.put(SyncUtils.API_PARAM_STREAM, streamIds.toArray(new String[streamIds.size()]));
+
         if (!tagsToAdd.isEmpty())
           parameters.put(SyncUtils.API_PARAM_TAG_TO_ADD, tagsToAdd.toArray(new String[tagsToAdd.size()]));
+
         if (!tagsToRemove.isEmpty())
           parameters.put(SyncUtils.API_PARAM_TAG_TO_REMOVE, tagsToRemove.toArray(new String[tagsToRemove.size()]));
 
@@ -551,15 +292,17 @@ public class SyncService {
         properties.put(IConnectionPropertyConstants.PARAMETERS, parameters);
         properties.put(IConnectionPropertyConstants.CON_TIMEOUT, getConnectionTimeout());
 
-        /* Return on cancellation or shutdown */
+        /* Return on cancellation */
         if (isCanceled(monitor))
           return;
 
-        URI uri = URI.create(SyncUtils.GOOGLE_EDIT_TAG_URL + "?client=scroll"); //$NON-NLS-1$
+        /* Perform POST */
+        URI uri = URI.create(SyncUtils.GOOGLE_EDIT_TAG_URL);
         IProtocolHandler handler = Owl.getConnectionService().getHandler(uri);
         InputStream inS = null;
         try {
           inS = handler.openStream(uri, monitor, properties);
+          fSyncItemsManager.removeUncommitted(equivalentItems);
         } finally {
           if (inS != null) {
             try {
@@ -570,11 +313,52 @@ public class SyncService {
           }
         }
 
-        /* Return on cancellation or shutdown */
+        /* Return on cancellation */
         if (isCanceled(monitor))
           return;
       }
     }
+  }
+
+  private Map<String, Map<String, SyncItem>> groupByStream(Collection<SyncItem> items) {
+    Map<String, Map<String, SyncItem>> mapFeedToSyncItems = new HashMap<String, Map<String, SyncItem>>();
+
+    for (SyncItem item : items) {
+      Map<String, SyncItem> streamItems = mapFeedToSyncItems.get(item.getStreamId());
+      if (streamItems == null) {
+        streamItems = new HashMap<String, SyncItem>();
+        mapFeedToSyncItems.put(item.getStreamId(), streamItems);
+      }
+
+      SyncItem existingItem = streamItems.get(item.getId());
+      if (existingItem == null)
+        streamItems.put(item.getId(), item);
+      else {
+        existingItem.merge(item);
+        fSyncItemsManager.removeUncommitted(item); //Item got merged, so remove from manager
+      }
+    }
+
+    return mapFeedToSyncItems;
+  }
+
+  private List<List<SyncItem>> findEquivalents(Collection<SyncItem> syncItems) {
+    List<List<SyncItem>> equivalentItemLists = new ArrayList<List<SyncItem>>();
+    List<SyncItem> currentItemList = new ArrayList<SyncItem>();
+    equivalentItemLists.add(currentItemList);
+    for (SyncItem item : syncItems) {
+      if (currentItemList.isEmpty())
+        currentItemList.add(item);
+      else if (item.isEquivalent(currentItemList.get(0)))
+        currentItemList.add(item);
+      else {
+        currentItemList = new ArrayList<SyncItem>();
+        currentItemList.add(item);
+        equivalentItemLists.add(currentItemList);
+      }
+    }
+
+    return equivalentItemLists;
   }
 
   private String getGoogleApiToken(IProgressMonitor monitor) throws ConnectionException {
