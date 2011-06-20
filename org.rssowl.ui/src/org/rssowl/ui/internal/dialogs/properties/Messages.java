@@ -39,6 +39,8 @@ public class Messages extends NLS {
   public static String DisplayPropertyPage_USE_LINK_TRANSFORMER;
   public static String EntityPropertyDialog_PROPERTIES;
   public static String EntityPropertyDialog_PROPERTIES_FOR_N;
+  public static String GeneralPropertyPage_AUTO_UPDATE_FEED_STARTUP;
+  public static String GeneralPropertyPage_AUTO_UPDATE_FEEDS_STARTUP;
   public static String GeneralPropertyPage_CHANGE_LINK_WARNING;
   public static String GeneralPropertyPage_DAYS;
   public static String GeneralPropertyPage_DISPLAY_BIN_ONSTARTUP;
