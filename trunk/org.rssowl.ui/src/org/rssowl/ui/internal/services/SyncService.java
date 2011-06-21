@@ -25,8 +25,11 @@
 package org.rssowl.ui.internal.services;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.osgi.util.NLS;
 import org.rssowl.core.Owl;
 import org.rssowl.core.connection.AuthenticationRequiredException;
 import org.rssowl.core.connection.ConnectionException;
@@ -67,13 +70,13 @@ import java.util.concurrent.locks.Lock;
 /**
  * A service that listens to changes of {@link INews} and then synchronizes with
  * an online server to notify about changes.
- *
+ * 
  * @author bpasero
  */
 public class SyncService implements Receiver<SyncItem> {
 
   /* Delay in Milies before syncing */
-  private static final int SYNC_DELAY = 2000;
+  private static final int SYNC_DELAY = 30000;
 
   /* HTTP Constants */
   private static final String REQUEST_HEADER_CONTENT_TYPE = "Content-Type"; //$NON-NLS-1$
@@ -89,7 +92,7 @@ public class SyncService implements Receiver<SyncItem> {
    * Starts the synchronizer by listening to news events.
    */
   public SyncService() {
-    fSynchronizer = new BatchedBuffer<SyncItem>(this, SYNC_DELAY);
+    fSynchronizer = new BatchedBuffer<SyncItem>(this, SYNC_DELAY, Messages.SyncService_SYNC_ARTICLES);
     fSyncItemsManager = new SyncItemsManager();
     init();
   }
@@ -174,7 +177,7 @@ public class SyncService implements Receiver<SyncItem> {
 
   /**
    * Stops the Synchronizer.
-   *
+   * 
    * @param emergency if <code>true</code>, indicates that RSSOwl is shutting
    * down in an emergency situation where methods should return fast and
    * <code>false</code> otherwise.
@@ -200,10 +203,13 @@ public class SyncService implements Receiver<SyncItem> {
   }
 
   /*
-   * @see org.rssowl.core.util.BatchedBuffer.Receiver#receive(java.util.Collection, org.eclipse.core.runtime.IProgressMonitor)
+   * @see org.rssowl.core.util.BatchedBuffer.Receiver#receive(java.util.Collection, org.eclipse.core.runtime.jobs.Job, org.eclipse.core.runtime.IProgressMonitor)
    */
-  public void receive(Collection<SyncItem> items, IProgressMonitor monitor) {
+  public IStatus receive(Collection<SyncItem> items, Job job, IProgressMonitor monitor) {
+
+    /* Synchronize */
     try {
+      monitor.beginTask(NLS.bind(Messages.SyncService_SYNC_N_ARTICLES, fSyncItemsManager.getUncommittedItems().size()), IProgressMonitor.UNKNOWN);
       sync(monitor);
     }
 
@@ -224,7 +230,11 @@ public class SyncService implements Receiver<SyncItem> {
     /* Any other Connection Exception */
     catch (ConnectionException e) {
       Activator.getDefault().logError(e.getMessage(), e);
+    } finally {
+      monitor.done();
     }
+
+    return Status.OK_STATUS; //Intentionally using OK here to not spam the activity dialog
   }
 
   private boolean handleAuthenticationRequired() {
