@@ -41,8 +41,6 @@ public class Messages extends NLS {
   public static String DownloadService_OPEN_FOLDER;
   public static String DownloadService_RE_DOWNLOAD;
   public static String DownloadService_TRY_AGAIN;
-  public static String SyncService_SYNC_ARTICLES;
-  public static String SyncService_SYNC_N_ARTICLES;
 
   private Messages() {}
 

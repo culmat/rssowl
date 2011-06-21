@@ -28,7 +28,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.osgi.util.NLS;
 import org.rssowl.core.Owl;
 import org.rssowl.core.connection.AuthenticationRequiredException;
 import org.rssowl.core.connection.ConnectionException;
@@ -94,7 +93,7 @@ public class SyncService implements Receiver<SyncItem> {
    * Starts the synchronizer by listening to news events.
    */
   public SyncService() {
-    fSynchronizer = new BatchedBuffer<SyncItem>(this, SYNC_DELAY, Messages.SyncService_SYNC_ARTICLES);
+    fSynchronizer = new BatchedBuffer<SyncItem>(this, SYNC_DELAY);
     fSyncItemsManager = new SyncItemsManager();
     init();
   }
@@ -252,7 +251,6 @@ public class SyncService implements Receiver<SyncItem> {
 
     /* Synchronize */
     try {
-      monitor.beginTask(NLS.bind(Messages.SyncService_SYNC_N_ARTICLES, fSyncItemsManager.getUncommittedItems().size()), IProgressMonitor.UNKNOWN);
       sync(monitor);
     }
 
@@ -264,8 +262,6 @@ public class SyncService implements Receiver<SyncItem> {
     /* Any other Connection Exception */
     catch (ConnectionException e) {
       Activator.getDefault().logError(e.getMessage(), e);
-    } finally {
-      monitor.done();
     }
 
     return Status.OK_STATUS; //Intentionally using OK here to not spam the activity dialog
