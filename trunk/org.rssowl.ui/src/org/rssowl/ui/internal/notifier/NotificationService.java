@@ -25,6 +25,9 @@
 package org.rssowl.ui.internal.notifier;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Shell;
 import org.rssowl.core.Owl;
@@ -110,9 +113,11 @@ public class NotificationService {
 
     /* Process Events batched */
     BatchedBuffer.Receiver<NotificationItem> receiver = new BatchedBuffer.Receiver<NotificationItem>() {
-      public void receive(Collection<NotificationItem> items, IProgressMonitor monitor) {
+      public IStatus receive(Collection<NotificationItem> items, Job job, IProgressMonitor monitor) {
         if (!monitor.isCanceled())
           showItems(items, Mode.INCOMING_AUTOMATIC, monitor);
+
+        return Status.OK_STATUS;
       }
     };
 
