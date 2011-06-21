@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.rssowl.core.Owl;
 import org.rssowl.core.connection.AuthenticationRequiredException;
 import org.rssowl.core.connection.ConnectionException;
+import org.rssowl.core.connection.CredentialsException;
 import org.rssowl.core.connection.IConnectionPropertyConstants;
 import org.rssowl.core.connection.IProtocolHandler;
 import org.rssowl.core.connection.SyncConnectionException;
@@ -340,6 +341,18 @@ public class SyncUtils {
    */
   public static boolean fromGoogle(String link) {
     return isSynchronized(link) || link.startsWith(GOOGLE_HTTP_URL_PREFIX) || link.startsWith(GOOGLE_HTTPS_URL_PREFIX);
+  }
+
+  /**
+   * @return <code>true</code> if the user has stored credentials for Google
+   * Reader synchronization and <code>false</code> otherwise.
+   */
+  public static boolean hasSyncCredentials() {
+    try {
+      return Owl.getConnectionService().getAuthCredentials(URI.create(SyncUtils.GOOGLE_LOGIN_URL), null) != null;
+    } catch (CredentialsException e) {
+      return false;
+    }
   }
 
   private static int getConnectionTimeout() {
