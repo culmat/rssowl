@@ -611,30 +611,36 @@ public class ApplicationServiceImpl implements IApplicationService {
     /* Find Links and GUIDs */
     List<URI> links = new ArrayList<URI>();
     List<IGuid> guids = new ArrayList<IGuid>();
-    for (INews newsItem : news) {
-      if (newsItem.getGuid() != null)
-        guids.add(newsItem.getGuid());
-      else if (newsItem.getLink() != null)
-        links.add(newsItem.getLink());
+    for (INews item : news) {
+      if (SyncUtils.isSynchronized(item))
+        continue; //Not offering state sync from duplicates for synced news items
+
+      if (item.getGuid() != null)
+        guids.add(item.getGuid());
+      else if (item.getLink() != null)
+        links.add(item.getLink());
     }
+
+    if (links.isEmpty() && guids.isEmpty())
+      return;
 
     /* Search existing News by Links and GUIDs */
     ModelSearchImpl modelSearch = (ModelSearchImpl) Owl.getPersistenceService().getModelSearch();
     Map<URI, List<NewsReference>> linkToNewsRefs = modelSearch.searchNewsByLinks(links, false, monitor);
     Map<IGuid, List<NewsReference>> guidToNewsRefs = modelSearch.searchNewsByGuids(guids, false, monitor);
-    for (INews newsItem : news) {
+    for (INews item : news) {
 
       /* Return early on cancellation */
       if (monitor.isCanceled() || Owl.isShuttingDown())
         return;
 
       /* Lookup equivalent news via GUID */
-      List<NewsReference> equivalentNewsRefs = guidToNewsRefs.get(newsItem.getGuid());
+      List<NewsReference> equivalentNewsRefs = guidToNewsRefs.get(item.getGuid());
       if (equivalentNewsRefs != null && !equivalentNewsRefs.isEmpty()) {
         NewsReference newsRef = equivalentNewsRefs.get(0);
         INews resolvedNews = newsRef.resolve();
         if (resolvedNews != null && resolvedNews.isVisible())
-          newsItem.setState(resolvedNews.getState());
+          item.setState(resolvedNews.getState());
         else {
           logWarning(NLS.bind(Messages.ApplicationServiceImpl_ERROR_STALE_LUCENE_INDEX, newsRef.getId()));
           CoreUtils.reportIndexIssue();
@@ -643,12 +649,12 @@ public class ApplicationServiceImpl implements IApplicationService {
 
       /* Lookup equivalent news via Link */
       else {
-        equivalentNewsRefs = linkToNewsRefs.get(newsItem.getLink());
+        equivalentNewsRefs = linkToNewsRefs.get(item.getLink());
         if (equivalentNewsRefs != null && !equivalentNewsRefs.isEmpty()) {
           NewsReference newsRef = equivalentNewsRefs.get(0);
           INews resolvedNews = newsRef.resolve();
           if (resolvedNews != null && resolvedNews.isVisible())
-            newsItem.setState(resolvedNews.getState());
+            item.setState(resolvedNews.getState());
           else {
             logWarning(NLS.bind(Messages.ApplicationServiceImpl_ERROR_STALE_LUCENE_INDEX, newsRef.getId()));
             CoreUtils.reportIndexIssue();
