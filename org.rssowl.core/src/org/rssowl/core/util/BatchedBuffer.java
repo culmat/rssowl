@@ -134,7 +134,7 @@ public class BatchedBuffer<T> {
 
     /* Wait until Buffer has completed work */
     if (joinRunning) {
-      while (Job.getJobManager().find(this).length != 0) {
+      while (isScheduled()) {
         try {
           Thread.sleep(50);
         } catch (InterruptedException e) {
@@ -146,6 +146,14 @@ public class BatchedBuffer<T> {
     /* Cancel Batched Buffer and don't wait for finish */
     else
       fBufferProcessor.cancel();
+  }
+
+  /**
+   * @return <code>true</code> if this buffer is running or scheduled and
+   * <code>false</code> otherwise.
+   */
+  public boolean isScheduled() {
+    return Job.getJobManager().find(this).length != 0;
   }
 
   /* Creates a Job to process the contents of the Buffer */
