@@ -45,6 +45,7 @@ import org.eclipse.swt.widgets.Text;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.StringUtils;
+import org.rssowl.core.util.SyncUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.JobRunner;
@@ -167,6 +168,7 @@ public class AddCredentialsDialog extends Dialog {
           });
 
           values.addAll(CoreUtils.getFeedLinks());
+          values.add(SyncUtils.GOOGLE_LOGIN_URL);
 
           /* Remember for Validation */
           fFeedLinks = new HashSet<String>(values);
