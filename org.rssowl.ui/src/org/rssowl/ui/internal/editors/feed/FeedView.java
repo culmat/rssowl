@@ -1351,6 +1351,22 @@ public class FeedView extends EditorPart implements IReusableEditor {
     return news;
   }
 
+  /**
+   * @param news the {@link INews} to check for being part of the browser
+   * @return <code>true</code> if the feedview is configured to show headlines
+   * or newspaper layout and the news is part of the displayed items and
+   * <code>false</code> otherwise.
+   */
+  public boolean isHidden(INews news) {
+    if (fLayout == Layout.NEWSPAPER || fLayout == Layout.HEADLINES) {
+      NewsBrowserViewModel model = fNewsBrowserControl.getViewer().getViewModel();
+      if (model != null && news.getId() != null)
+        return !model.hasNews(news.getId());
+    }
+
+    return false;
+  }
+
   private void performCleanUp(IBookMark bookmark, Collection<INews> news) {
     if (System.currentTimeMillis() - fLastCleanUpRun.get() > CLEAN_UP_BLOCK_DELAY) {
       RetentionStrategy.process(bookmark, news);

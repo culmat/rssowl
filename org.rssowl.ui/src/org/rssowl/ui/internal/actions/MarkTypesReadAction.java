@@ -49,6 +49,8 @@ import org.rssowl.core.util.RetentionStrategy;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.FolderNewsMark;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.editors.feed.FeedView;
+import org.rssowl.ui.internal.editors.feed.FeedViewInput;
 import org.rssowl.ui.internal.undo.NewsStateOperation;
 import org.rssowl.ui.internal.undo.UndoStack;
 import org.rssowl.ui.internal.util.JobRunner;
@@ -109,7 +111,15 @@ public class MarkTypesReadAction extends Action implements IWorkbenchWindowActio
   private void internalRun() {
 
     /* Only consider Entities */
-    List<IEntity> entities = ModelUtils.getEntities(fSelection);
+    FeedView feedView = null;
+    List<IEntity> entities;
+    if (fSelection.size() == 1 && fSelection.getFirstElement() instanceof FeedView) {
+      feedView = (FeedView) fSelection.getFirstElement();
+      FeedViewInput input = (FeedViewInput) feedView.getEditorInput();
+      entities = ModelUtils.getEntities(new StructuredSelection(input.getMark()));
+    } else {
+      entities = ModelUtils.getEntities(fSelection);
+    }
 
     /* Retrieve any Folder that is to be marked read */
     Set<IFolder> folders = null;
@@ -134,13 +144,13 @@ public class MarkTypesReadAction extends Action implements IWorkbenchWindowActio
     Set<INews> news = new HashSet<INews>();
     for (IEntity element : entities) {
       if (element instanceof IFolder)
-        fillNews((IFolder) element, news, retentionHelperMap);
+        fillNews((IFolder) element, news, retentionHelperMap, feedView);
       else if (element instanceof IBookMark)
-        fillNews((IBookMark) element, news, retentionHelperMap);
+        fillNews((IBookMark) element, news, retentionHelperMap, feedView);
       else if (element instanceof FolderNewsMark)
-        fillNews(((FolderNewsMark) element).getFolder(), news, retentionHelperMap);
+        fillNews(((FolderNewsMark) element).getFolder(), news, retentionHelperMap, feedView);
       else if (element instanceof INewsMark)
-        fillNews((INewsMark) element, news);
+        fillNews((INewsMark) element, news, feedView);
       else if (element instanceof INews && enumSet.contains(((INews) element).getState()))
         news.add((INews) element);
     }
@@ -189,19 +199,19 @@ public class MarkTypesReadAction extends Action implements IWorkbenchWindowActio
     return folders != null && folders.size() == rootFolders.size() && rootFolders.containsAll(folders);
   }
 
-  private void fillNews(IFolder folder, Collection<INews> news, Map<IBookMark, Collection<INews>> bookMarkNewsMap) {
+  private void fillNews(IFolder folder, Collection<INews> news, Map<IBookMark, Collection<INews>> bookMarkNewsMap, FeedView feedView) {
     List<IFolderChild> children = folder.getChildren();
     for (IFolderChild child : children) {
       if (child instanceof IBookMark)
-        fillNews((IBookMark) child, news, bookMarkNewsMap);
+        fillNews((IBookMark) child, news, bookMarkNewsMap, feedView);
       else if (child instanceof INewsMark)
-        fillNews((INewsMark) child, news);
+        fillNews((INewsMark) child, news, feedView);
       else if (child instanceof IFolder)
-        fillNews((IFolder) child, news, bookMarkNewsMap);
+        fillNews((IFolder) child, news, bookMarkNewsMap, feedView);
     }
   }
 
-  private void fillNews(IBookMark bookmark, Collection<INews> news, Map<IBookMark, Collection<INews>> bookMarkNewsMap) {
+  private void fillNews(IBookMark bookmark, Collection<INews> news, Map<IBookMark, Collection<INews>> bookMarkNewsMap, FeedView feedView) {
     IPreferenceScope bookMarkPrefs = Owl.getPreferenceService().getEntityScope(bookmark);
     boolean requiresRetention = bookMarkPrefs.getBoolean(DefaultPreferences.DEL_READ_NEWS_STATE);
 
@@ -210,23 +220,37 @@ public class MarkTypesReadAction extends Action implements IWorkbenchWindowActio
     /* Retention on read News required, load *read* as well */
     if (requiresRetention) {
       Collection<INews> feedsNews = fNewsDao.loadAll(bookmark.getFeedLinkReference(), INews.State.getVisible());
-      for (INews newsItem : feedsNews) {
+      for (INews item : feedsNews) {
+        if (feedView != null && feedView.isHidden(item))
+          continue; //Ignore hidden news when marking as read
 
         /* Do not add READ news */
-        if (enumSet.contains(newsItem.getState()))
-          news.add(newsItem);
+        if (enumSet.contains(item.getState()))
+          news.add(item);
       }
       bookMarkNewsMap.put(bookmark, feedsNews);
     }
 
     /* No retention required, just load the ones being affected */
     else if (bookmark.getNewsCount(enumSet) > 0) {
-      news.addAll(fNewsDao.loadAll(bookmark.getFeedLinkReference(), enumSet));
+      Collection<INews> items = fNewsDao.loadAll(bookmark.getFeedLinkReference(), enumSet);
+      for (INews item : items) {
+        if (feedView != null && feedView.isHidden(item))
+          continue; //Ignore hidden news when marking as read
+
+        news.add(item);
+      }
     }
   }
 
-  private void fillNews(INewsMark newsmark, Collection<INews> news) {
-    news.addAll(newsmark.getNews(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)));
+  private void fillNews(INewsMark newsmark, Collection<INews> news, FeedView feedView) {
+    List<INews> items = newsmark.getNews(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED));
+    for (INews item : items) {
+      if (feedView != null && feedView.isHidden(item))
+        continue; //Ignore hidden news when marking as read
+
+      news.add(item);
+    }
   }
 
   /*
