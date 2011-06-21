@@ -1089,7 +1089,7 @@ public class Controller {
     fDownloadService = new DownloadService();
 
     /* Create the Sync Service */
-    if (!InternalOwl.TESTING && Application.SYNC)
+    if (!InternalOwl.TESTING)
       fSyncService = new SyncService();
 
     /* Register Listeners */
