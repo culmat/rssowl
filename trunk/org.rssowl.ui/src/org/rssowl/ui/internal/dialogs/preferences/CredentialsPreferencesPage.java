@@ -307,7 +307,11 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
 
         switch (cell.getColumnIndex()) {
           case 0:
-            cell.setText(data.getNormalizedLink().toString());
+            String link = data.getNormalizedLink().toString();
+            if (SyncUtils.GOOGLE_LOGIN_URL.equals(link))
+              cell.setText("Google Reader"); //$NON-NLS-1$
+            else
+              cell.setText(link);
             break;
 
           case 1:
