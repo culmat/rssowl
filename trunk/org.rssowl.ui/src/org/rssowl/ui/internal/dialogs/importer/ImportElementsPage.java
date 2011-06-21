@@ -582,6 +582,20 @@ public class ImportElementsPage extends WizardPage {
         /* Log and Show any Exception during Import */
         catch (Exception e) {
 
+          /* Offer a Login Dialog in case Google Reader import fails with provided credentials */
+          if (e instanceof InvocationTargetException && e.getCause() instanceof AuthenticationRequiredException && source == Source.GOOGLE) {
+            if (OwlUI.openSyncLogin(getShell()) == IDialogConstants.OK_ID) {
+              try {
+                importFromGoogleReader();
+                return;
+              } catch (InvocationTargetException ex1) {
+                e = ex1; //Pass exception on to outer handling
+              } catch (InterruptedException ex2) {
+                e = ex2; //Pass exception on to outer handling
+              }
+            }
+          }
+
           /* Handle SyncConnectionException */
           if (e instanceof InvocationTargetException && e.getCause() instanceof SyncConnectionException) {
             String userLink = ((SyncConnectionException) e.getCause()).getUserUrl();
