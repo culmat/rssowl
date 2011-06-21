@@ -1581,7 +1581,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
     /* Donate */
     helpMenu.add(new Separator());
-    helpMenu.add(new Action("&Donate") { //$NON-NLS-1$
+    helpMenu.add(new Action(Messages.ApplicationActionBarAdvisor_DONATE) {
       @Override
       public void run() {
         BrowserUtils.openLinkExternal("http://sourceforge.net/donate/index.php?group_id=86683"); //$NON-NLS-1$
