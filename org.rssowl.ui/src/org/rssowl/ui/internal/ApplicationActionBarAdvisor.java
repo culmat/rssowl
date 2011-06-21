@@ -119,6 +119,7 @@ import org.rssowl.ui.internal.dialogs.preferences.ManageLabelsPreferencePage;
 import org.rssowl.ui.internal.dialogs.preferences.NotifierPreferencesPage;
 import org.rssowl.ui.internal.dialogs.preferences.OverviewPreferencesPage;
 import org.rssowl.ui.internal.dialogs.preferences.SharingPreferencesPage;
+import org.rssowl.ui.internal.dialogs.welcome.TutorialPage.Chapter;
 import org.rssowl.ui.internal.dialogs.welcome.TutorialWizard;
 import org.rssowl.ui.internal.editors.browser.WebBrowserContext;
 import org.rssowl.ui.internal.editors.feed.FeedView;
@@ -1426,6 +1427,20 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
       @Override
       public String getActionDefinitionId() {
         return TutorialHandler.ID;
+      }
+    });
+
+    /* Google Reader Synchronization */
+    helpMenu.add(new Action(Messages.ApplicationActionBarAdvisor_GOOGLE_READER_SYNC) {
+      @Override
+      public void run() {
+        TutorialWizard wizard = new TutorialWizard(Chapter.SYNCHRONIZATION);
+        OwlUI.openWizard(getActionBarConfigurer().getWindowConfigurer().getWindow().getShell(), wizard, false, false, null);
+      }
+
+      @Override
+      public ImageDescriptor getImageDescriptor() {
+        return OwlUI.getImageDescriptor("icons/elcl16/reader.gif"); //$NON-NLS-1$
       }
     });
 

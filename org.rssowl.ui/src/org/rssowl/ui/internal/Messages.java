@@ -61,6 +61,7 @@ public class Messages extends NLS {
   public static String ApplicationActionBarAdvisor_FILTER_NEWS;
   public static String ApplicationActionBarAdvisor_FULL_SCREEN;
   public static String ApplicationActionBarAdvisor_GO;
+  public static String ApplicationActionBarAdvisor_GOOGLE_READER_SYNC;
   public static String ApplicationActionBarAdvisor_GROUP_NEWS;
   public static String ApplicationActionBarAdvisor_H_ARTICLES;
   public static String ApplicationActionBarAdvisor_HEADLINES_LAYOUT;
