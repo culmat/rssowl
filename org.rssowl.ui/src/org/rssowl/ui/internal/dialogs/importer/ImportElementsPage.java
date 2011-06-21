@@ -886,8 +886,7 @@ public class ImportElementsPage extends WizardPage {
           /* Try to Import */
           try {
             final List<IEntity> types = Owl.getInterpreter().importFrom(in);
-            if (Application.SYNC)
-              enableSynchronization(types);
+            enableSynchronization(types);
 
             /* Return on Cancellation */
             if (monitor.isCanceled() || Controller.getDefault().isShuttingDown()) {

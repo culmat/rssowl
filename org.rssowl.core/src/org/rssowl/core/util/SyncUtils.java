@@ -33,7 +33,6 @@ import org.rssowl.core.connection.IConnectionPropertyConstants;
 import org.rssowl.core.connection.IProtocolHandler;
 import org.rssowl.core.connection.SyncConnectionException;
 import org.rssowl.core.internal.Activator;
-import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.INews;
 
@@ -304,11 +303,7 @@ public class SyncUtils {
    * @return <code>true</code> if the news is under synchronization control and
    * <code>false</code> otherwise.
    */
-  @SuppressWarnings("unused")
   public static boolean isSynchronized(INews news) {
-    if (!InternalOwl.SYNC)
-      return false;
-
     return news != null && news.getGuid() != null && news.getGuid().getValue().startsWith(SYNCED_NEWS_ID_PART) && StringUtils.isSet(news.getInReplyTo());
   }
 
@@ -317,11 +312,7 @@ public class SyncUtils {
    * @return <code>true</code> if the bookmark is under synchronization control
    * and <code>false</code> otherwise.
    */
-  @SuppressWarnings("unused")
   public static boolean isSynchronized(IBookMark bm) {
-    if (!InternalOwl.SYNC)
-      return false;
-
     return isSynchronized(bm.getFeedLinkReference().getLinkAsText());
   }
 

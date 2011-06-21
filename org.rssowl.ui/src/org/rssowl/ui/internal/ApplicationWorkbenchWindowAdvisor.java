@@ -436,8 +436,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     }
 
     /* Trigger synchronization as the user is leaving the RSSOwl window */
-    if (Application.SYNC)
-      Controller.getDefault().getSyncService().synchronize();
+    Controller.getDefault().getSyncService().synchronize();
   }
 
   private void onClose() {
