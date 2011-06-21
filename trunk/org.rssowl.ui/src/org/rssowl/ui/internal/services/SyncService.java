@@ -114,7 +114,7 @@ public class SyncService implements Receiver<SyncItem> {
     /* Schedule Sync of previously uncommitted items as needed */
     List<SyncItem> uncommittedItems = fSyncItemsManager.getUncommittedItems();
     if (!uncommittedItems.isEmpty())
-      fSynchronizer.addAll(uncommittedItems);
+      addAllAsync(uncommittedItems); //Must add async because the buffer is blocking while running
   }
 
   private void registerListeners() {
@@ -125,7 +125,7 @@ public class SyncService implements Receiver<SyncItem> {
       public void entitiesUpdated(Set<NewsEvent> events) {
         Collection<SyncItem> items = filter(events);
         fSyncItemsManager.addUncommitted(items);
-        fSynchronizer.addAll(items);
+        addAllAsync(items); //Must add async because the buffer is blocking while running
       }
     };
     DynamicDAO.addEntityListener(INews.class, fNewsListener);
@@ -136,10 +136,18 @@ public class SyncService implements Receiver<SyncItem> {
       public void filterApplied(ISearchFilter filter, Collection<INews> news) {
         Collection<SyncItem> items = filter(filter, news);
         fSyncItemsManager.addUncommitted(items);
-        fSynchronizer.addAll(items);
+        addAllAsync(items); //Must add async because the buffer is blocking while running
       }
     };
     DynamicDAO.addEntityListener(ISearchFilter.class, fSearchFilterListener);
+  }
+
+  private void addAllAsync(final Collection<SyncItem> items) {
+    JobRunner.runInBackgroundThread(new Runnable() {
+      public void run() {
+        fSynchronizer.addAll(items);
+      }
+    });
   }
 
   private Collection<SyncItem> filter(ISearchFilter filter, Collection<INews> news) {
