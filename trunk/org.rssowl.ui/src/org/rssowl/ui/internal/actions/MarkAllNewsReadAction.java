@@ -32,7 +32,6 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.editors.feed.FeedView;
-import org.rssowl.ui.internal.editors.feed.FeedViewInput;
 
 /**
  * @author bpasero
@@ -56,10 +55,8 @@ public class MarkAllNewsReadAction extends Action implements IWorkbenchWindowAct
   @Override
   public void run() {
     FeedView activeFeedView = OwlUI.getActiveFeedView();
-    if (activeFeedView != null) {
-      FeedViewInput input = (FeedViewInput) activeFeedView.getEditorInput();
-      new MarkTypesReadAction(new StructuredSelection(input.getMark())).run();
-    }
+    if (activeFeedView != null)
+      new MarkTypesReadAction(new StructuredSelection(activeFeedView)).run();
   }
 
   /*
