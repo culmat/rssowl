@@ -75,8 +75,11 @@ import java.util.concurrent.locks.Lock;
  */
 public class SyncService implements Receiver<SyncItem> {
 
-  /* Delay in Milies before syncing */
-  private static final int SYNC_DELAY = 30000;
+  /* Delay in Millies before syncing */
+  private static final int SYNC_DELAY = 30000; // 30 seconds
+
+  /* Sync scheduler interval in Millies */
+  private static final int SYNC_SCHEDULER = 300000; // 5 minutes
 
   /* HTTP Constants */
   private static final String REQUEST_HEADER_CONTENT_TYPE = "Content-Type"; //$NON-NLS-1$
@@ -85,6 +88,7 @@ public class SyncService implements Receiver<SyncItem> {
 
   private final BatchedBuffer<SyncItem> fSynchronizer;
   private final SyncItemsManager fSyncItemsManager;
+  private Job fSyncScheduler;
   private NewsListener fNewsListener;
   private SearchFilterAdapter fSearchFilterListener;
 
@@ -112,9 +116,29 @@ public class SyncService implements Receiver<SyncItem> {
     }
 
     /* Schedule Sync of previously uncommitted items as needed */
-    List<SyncItem> uncommittedItems = fSyncItemsManager.getUncommittedItems();
-    if (!uncommittedItems.isEmpty())
-      addAllAsync(uncommittedItems); //Must add async because the buffer is blocking while running
+    if (fSyncItemsManager.hasUncommittedItems())
+      addAllAsync(fSyncItemsManager.getUncommittedItems()); //Must add async because the buffer is blocking while running
+
+    /* Start a Job that periodically tries to sync uncommitted items */
+    fSyncScheduler = new Job("") { //$NON-NLS-1$
+      @Override
+      protected IStatus run(IProgressMonitor monitor) {
+        if (!Controller.getDefault().isShuttingDown() && !monitor.isCanceled()) {
+
+          /* Only trigger synchronization if the synchronizer is not already running and if we have uncommitted items */
+          if (fSyncItemsManager.hasUncommittedItems() && !fSynchronizer.isScheduled())
+            fSynchronizer.addAll(fSyncItemsManager.getUncommittedItems());
+
+          /* Re-Schedule */
+          schedule(SYNC_SCHEDULER);
+        }
+
+        return Status.OK_STATUS;
+      }
+    };
+    fSyncScheduler.setSystem(true);
+    fSyncScheduler.setUser(false);
+    fSyncScheduler.schedule(SYNC_SCHEDULER);
   }
 
   private void registerListeners() {
@@ -192,8 +216,9 @@ public class SyncService implements Receiver<SyncItem> {
    */
   public void stopService(boolean emergency) {
 
-    /* Stop Listening */
+    /* Stop Listening and Scheduling */
     unregisterListeners();
+    fSyncScheduler.cancel();
 
     /* Wait until the Synchronizer has finished synchronizing (if not in emergency shutdown) */
     fSynchronizer.cancel(!emergency);
