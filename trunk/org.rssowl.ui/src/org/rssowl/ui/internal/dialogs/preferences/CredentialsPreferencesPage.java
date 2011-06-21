@@ -58,7 +58,9 @@ import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.StringUtils;
+import org.rssowl.core.util.SyncUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Application;
@@ -73,6 +75,7 @@ import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -550,10 +553,22 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
   private Set<CredentialsModelData> loadCredentials() {
     Set<CredentialsModelData> credentials = new HashSet<CredentialsModelData>();
 
+    /* Add all Feeds */
+    List<Pair<URI, String>> pairs = new ArrayList<Pair<URI, String>>();
     Collection<IBookMark> bookmarks = DynamicDAO.loadAll(IBookMark.class);
     for (IBookMark bookmark : bookmarks) {
       String realm = (String) bookmark.getProperty(Controller.BM_REALM_PROPERTY);
       URI feedLink = bookmark.getFeedLinkReference().getLink();
+
+      pairs.add(Pair.create(feedLink, realm));
+    }
+
+    /* Also add Google Reader Login */
+    pairs.add(Pair.create(URI.create(SyncUtils.GOOGLE_LOGIN_URL), (String) null));
+
+    for (Pair<URI, String> pair : pairs) {
+      URI feedLink = pair.getFirst();
+      String realm = pair.getSecond();
       URI normalizedLink = URIUtils.normalizeUri(feedLink, true);
 
       try {
