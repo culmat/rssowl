@@ -28,7 +28,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.osgi.util.NLS;
 import org.rssowl.core.Owl;
 import org.rssowl.core.connection.AuthenticationRequiredException;
@@ -64,13 +63,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 
 /**
  * A service that listens to changes of {@link INews} and then synchronizes with
  * an online server to notify about changes.
- *
+ * 
  * @author bpasero
  */
 public class SyncService implements Receiver<SyncItem> {
@@ -221,7 +219,7 @@ public class SyncService implements Receiver<SyncItem> {
 
   /**
    * Stops the Synchronizer.
-   *
+   * 
    * @param emergency if <code>true</code>, indicates that RSSOwl is shutting
    * down in an emergency situation where methods should return fast and
    * <code>false</code> otherwise.
@@ -260,16 +258,7 @@ public class SyncService implements Receiver<SyncItem> {
 
     /* Authentication Required */
     catch (AuthenticationRequiredException e) {
-      boolean reschedule = handleAuthenticationRequired();
-
-      /* Reschedule as necessary */
-      if (reschedule) {
-        try {
-          sync(monitor);
-        } catch (ConnectionException ex) {
-          Activator.getDefault().logError(e.getMessage(), ex);
-        }
-      }
+      handleAuthenticationRequired();
     }
 
     /* Any other Connection Exception */
@@ -282,28 +271,26 @@ public class SyncService implements Receiver<SyncItem> {
     return Status.OK_STATUS; //Intentionally using OK here to not spam the activity dialog
   }
 
-  private boolean handleAuthenticationRequired() {
-    final AtomicBoolean reschedule = new AtomicBoolean(false);
-
-    /* Only offer Login Dialog if not shutting down */
+  private void handleAuthenticationRequired() {
     if (!Controller.getDefault().isShuttingDown()) {
-      Lock loginLock = Controller.getDefault().getLoginDialogLock();
-      if (loginLock.tryLock()) { //Avoid multiple login dialogs if login dialog already showing
-        try {
-          JobRunner.runSyncedInUIThread(new Runnable() {
+      JobRunner.runInBackgroundThread(new Runnable() { //Run in background thread to avoid lock contention in buffer due to UI lock
             public void run() {
-              int status = OwlUI.openSyncLogin(null);
-              if (status == IDialogConstants.OK_ID)
-                reschedule.set(true);
+              Lock loginLock = Controller.getDefault().getLoginDialogLock();
+              if (!Controller.getDefault().isShuttingDown() && loginLock.tryLock()) { //Avoid multiple login dialogs if login dialog already showing
+                try {
+                  JobRunner.runSyncedInUIThread(new Runnable() {
+                    public void run() {
+                      if (!Controller.getDefault().isShuttingDown())
+                        OwlUI.openSyncLogin(null);
+                    }
+                  });
+                } finally {
+                  loginLock.unlock();
+                }
+              }
             }
           });
-        } finally {
-          loginLock.unlock();
-        }
-      }
     }
-
-    return reschedule.get();
   }
 
   private void sync(IProgressMonitor monitor) throws ConnectionException {
