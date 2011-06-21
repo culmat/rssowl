@@ -70,7 +70,7 @@ import java.util.concurrent.locks.Lock;
 /**
  * A service that listens to changes of {@link INews} and then synchronizes with
  * an online server to notify about changes.
- * 
+ *
  * @author bpasero
  */
 public class SyncService implements Receiver<SyncItem> {
@@ -177,7 +177,7 @@ public class SyncService implements Receiver<SyncItem> {
 
   /**
    * Stops the Synchronizer.
-   * 
+   *
    * @param emergency if <code>true</code>, indicates that RSSOwl is shutting
    * down in an emergency situation where methods should return fast and
    * <code>false</code> otherwise.
@@ -240,18 +240,21 @@ public class SyncService implements Receiver<SyncItem> {
   private boolean handleAuthenticationRequired() {
     final AtomicBoolean reschedule = new AtomicBoolean(false);
 
-    Lock loginLock = Controller.getDefault().getLoginDialogLock();
-    if (loginLock.tryLock()) { //Avoid multiple login dialogs if login dialog already showing
-      try {
-        JobRunner.runSyncedInUIThread(new Runnable() {
-          public void run() {
-            int status = OwlUI.openSyncLogin(null);
-            if (status == IDialogConstants.OK_ID)
-              reschedule.set(true);
-          }
-        });
-      } finally {
-        loginLock.unlock();
+    /* Only offer Login Dialog if not shutting down */
+    if (!Controller.getDefault().isShuttingDown()) {
+      Lock loginLock = Controller.getDefault().getLoginDialogLock();
+      if (loginLock.tryLock()) { //Avoid multiple login dialogs if login dialog already showing
+        try {
+          JobRunner.runSyncedInUIThread(new Runnable() {
+            public void run() {
+              int status = OwlUI.openSyncLogin(null);
+              if (status == IDialogConstants.OK_ID)
+                reschedule.set(true);
+            }
+          });
+        } finally {
+          loginLock.unlock();
+        }
       }
     }
 
