@@ -51,6 +51,7 @@ public class TutorialWizard extends Wizard {
     addPage(new TutorialPage(Chapter.NOTIFIER));
     addPage(new TutorialPage(Chapter.SHARING));
     addPage(new TutorialPage(Chapter.IMPORT_EXPORT));
+    addPage(new TutorialPage(Chapter.SYNCHRONIZATION));
     addPage(new TutorialPage(Chapter.PREFERENCES));
     addPage(new TutorialPage(Chapter.TIPS));
     addPage(new TutorialPage(Chapter.FINISH));
