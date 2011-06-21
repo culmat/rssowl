@@ -62,7 +62,19 @@ public class TutorialPage extends WizardPage {
 
   /** Chapters of the Tutorial */
   public enum Chapter {
-    INTRO, LAYOUT, NEWS, SAVEDSEARCH, NEWSBIN, NEWSFILTER, NOTIFIER, SHARING, IMPORT_EXPORT, PREFERENCES, TIPS, FINISH
+    INTRO,
+    LAYOUT,
+    NEWS,
+    SAVEDSEARCH,
+    NEWSBIN,
+    NEWSFILTER,
+    NOTIFIER,
+    SHARING,
+    IMPORT_EXPORT,
+    SYNCHRONIZATION,
+    PREFERENCES,
+    TIPS,
+    FINISH
   }
 
   TutorialPage(Chapter chapter) {
@@ -91,6 +103,8 @@ public class TutorialPage extends WizardPage {
         return Messages.TutorialPage_SHARING;
       case IMPORT_EXPORT:
         return Messages.TutorialPage_IMPORT_EXPORT;
+      case SYNCHRONIZATION:
+        return Messages.TutorialPage_SYNCHRONIZATION;
       case PREFERENCES:
         return Messages.TutorialPage_PREFERENCES;
       case TIPS:
@@ -122,6 +136,8 @@ public class TutorialPage extends WizardPage {
         return Messages.TutorialPage_SHARE_FEEDS_TITLE;
       case IMPORT_EXPORT:
         return Messages.TutorialPage_IMPORT_EXPORT_TITLE;
+      case SYNCHRONIZATION:
+        return Messages.TutorialPage_SYNCHRONIZATION_TITLE;
       case PREFERENCES:
         return Messages.TutorialPage_CONFIGURE_TITLE;
       case TIPS:
@@ -151,6 +167,8 @@ public class TutorialPage extends WizardPage {
         return OwlUI.getImageDescriptor("icons/wizban/sharing_wiz.gif"); //$NON-NLS-1$
       case IMPORT_EXPORT:
         return OwlUI.getImageDescriptor("icons/wizban/import_wiz.png"); //$NON-NLS-1$
+      case SYNCHRONIZATION:
+        return OwlUI.getImageDescriptor("icons/wizban/reader_wiz.png"); //$NON-NLS-1$
       case PREFERENCES:
         return OwlUI.getImageDescriptor("icons/wizban/preferences_wiz.gif"); //$NON-NLS-1$
       case TIPS:
@@ -218,6 +236,9 @@ public class TutorialPage extends WizardPage {
       case IMPORT_EXPORT:
         createImportExportPage(container);
         break;
+      case SYNCHRONIZATION:
+        createSynchronizationPage(container);
+        break;
       case PREFERENCES:
         createPreferencesPage(container);
         break;
@@ -273,6 +294,11 @@ public class TutorialPage extends WizardPage {
   private void createImportExportPage(Composite container) {
     StyledText text = createStyledText(container);
     applyRichText(Messages.TutorialPage_IMPORT_EXPORT_TEXT, text);
+  }
+
+  private void createSynchronizationPage(Composite container) {
+    StyledText text = createStyledText(container);
+    applyRichText(Messages.TutorialPage_SYNCHRONIZATION_TEXT, text);
   }
 
   private void createPreferencesPage(Composite container) {
