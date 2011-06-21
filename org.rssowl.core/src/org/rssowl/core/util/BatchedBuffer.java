@@ -61,10 +61,12 @@ public class BatchedBuffer<T> {
      *
      * @param objects A Collection of Objects that have been added during
      * <code>batchInterval</code>.
+     * @param job the {@link Job} that is calling the receive method.
      * @param monitor a progress monitor to report progress and react on
      * cancellation.
+     * @return the {@link IStatus} of the operation.
      */
-    void receive(Collection<T> objects, IProgressMonitor monitor);
+    IStatus receive(Collection<T> objects, Job job, IProgressMonitor monitor);
   }
 
   /**
@@ -73,10 +75,21 @@ public class BatchedBuffer<T> {
    * @param batchInterval The interval in millies before types get processed.
    */
   public BatchedBuffer(Receiver<T> receiver, int batchInterval) {
+    this(receiver, batchInterval, null);
+  }
+
+  /**
+   * @param receiver An instance of <code>Receiver</code> to process the
+   * elements of this buffer after <code>batchInterval</code> millies.
+   * @param batchInterval The interval in millies before types get processed.
+   * @param taskName if provided, the batched buffer will show progress with the
+   * given name.
+   */
+  public BatchedBuffer(Receiver<T> receiver, int batchInterval, String taskName) {
     fReceiver = receiver;
     fBatchInterval = batchInterval;
     fBuffer = new ArrayList<T>();
-    fBufferProcessor = createBufferProcessor();
+    fBufferProcessor = createBufferProcessor(taskName);
   }
 
   /**
@@ -136,19 +149,20 @@ public class BatchedBuffer<T> {
   }
 
   /* Creates a Job to process the contents of the Buffer */
-  private Job createBufferProcessor() {
-    Job job = new Job("") { //$NON-NLS-1$
+  private Job createBufferProcessor(String taskName) {
+    Job job = new Job(taskName != null ? taskName : "") { //$NON-NLS-1$
       @Override
       protected IStatus run(IProgressMonitor monitor) {
         if (monitor.isCanceled())
           return Status.CANCEL_STATUS;
 
+        IStatus status;
         synchronized (fBuffer) {
-          fReceiver.receive(new ArrayList<T>(fBuffer), monitor);
+          status = fReceiver.receive(new ArrayList<T>(fBuffer), this, monitor);
           fBuffer.clear();
         }
 
-        return Status.OK_STATUS;
+        return status;
       }
 
       @Override
@@ -157,8 +171,10 @@ public class BatchedBuffer<T> {
       }
     };
 
-    job.setSystem(true);
-    job.setUser(false);
+    if (!StringUtils.isSet(taskName)) {
+      job.setSystem(true);
+      job.setUser(false);
+    }
 
     return job;
   }
