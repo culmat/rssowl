@@ -68,13 +68,13 @@ import java.util.concurrent.locks.Lock;
 /**
  * A service that listens to changes of {@link INews} and then synchronizes with
  * an online server to notify about changes.
- * 
+ *
  * @author bpasero
  */
 public class SyncService implements Receiver<SyncItem> {
 
   /* Delay in Millies before syncing */
-  private static final int SYNC_DELAY = 30000; // 30 seconds
+  private static final int SYNC_DELAY = 2000; // 2 seconds
 
   /* Sync scheduler interval in Millies */
   private static final int SYNC_SCHEDULER = 300000; // 5 minutes
@@ -219,7 +219,7 @@ public class SyncService implements Receiver<SyncItem> {
 
   /**
    * Stops the Synchronizer.
-   * 
+   *
    * @param emergency if <code>true</code>, indicates that RSSOwl is shutting
    * down in an emergency situation where methods should return fast and
    * <code>false</code> otherwise.
