@@ -545,7 +545,7 @@ public class ImportElementsPage extends WizardPage {
 
     /* Ask for Username and Password if importing from Google */
     if (source == Source.GOOGLE) {
-      if (OwlUI.openSyncLogin(getShell()) != IDialogConstants.OK_ID) {
+      if (!SyncUtils.hasSyncCredentials() && OwlUI.openSyncLogin(getShell()) != IDialogConstants.OK_ID) {
         setErrorMessage(Messages.ImportElementsPage_MISSING_ACCOUNT);
         setPageComplete(false);
         fCurrentSourceKind = null;
