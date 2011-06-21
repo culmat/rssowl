@@ -1579,7 +1579,15 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
       }
     });
 
-    // helpMenu.add(getAction(ActionFactory.INTRO.getId()));
+    /* Donate */
+    helpMenu.add(new Separator());
+    helpMenu.add(new Action("&Donate") { //$NON-NLS-1$
+      @Override
+      public void run() {
+        BrowserUtils.openLinkExternal("http://sourceforge.net/donate/index.php?group_id=86683"); //$NON-NLS-1$
+      }
+    });
+
     helpMenu.add(new Separator());
 
     helpMenu.add(new Separator());
