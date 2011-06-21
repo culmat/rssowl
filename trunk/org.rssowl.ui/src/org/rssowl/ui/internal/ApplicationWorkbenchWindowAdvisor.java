@@ -434,6 +434,10 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       FeedView feedView = (FeedView) activeEditor;
       feedView.notifyUIEvent(FeedView.UIEvent.MINIMIZE);
     }
+
+    /* Trigger synchronization as the user is leaving the RSSOwl window */
+    if (Application.SYNC)
+      Controller.getDefault().getSyncService().synchronize();
   }
 
   private void onClose() {
