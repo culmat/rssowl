@@ -564,6 +564,13 @@ public class Controller {
   }
 
   /**
+   * @return Returns the synchronization service.
+   */
+  public SyncService getSyncService() {
+    return fSyncService;
+  }
+
+  /**
    * @return Returns the contextService.
    */
   public ContextService getContextService() {

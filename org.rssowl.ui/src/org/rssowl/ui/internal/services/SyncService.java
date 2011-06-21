@@ -208,6 +208,18 @@ public class SyncService implements Receiver<SyncItem> {
   }
 
   /**
+   * Asks this service to synchronize all outstanding items.
+   */
+  public void synchronize() {
+    JobRunner.runInBackgroundThread(new Runnable() {
+      public void run() {
+        if (!Controller.getDefault().isShuttingDown() && fSyncItemsManager.hasUncommittedItems() && !fSynchronizer.isScheduled())
+          fSynchronizer.addAll(fSyncItemsManager.getUncommittedItems());
+      }
+    });
+  }
+
+  /**
    * Stops the Synchronizer.
    *
    * @param emergency if <code>true</code>, indicates that RSSOwl is shutting
