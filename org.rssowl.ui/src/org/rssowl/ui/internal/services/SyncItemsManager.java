@@ -78,6 +78,12 @@ public class SyncItemsManager {
     }
   }
 
+  boolean hasUncommittedItems() {
+    synchronized (fItems) {
+      return !fItems.isEmpty();
+    }
+  }
+
   void removeUncommitted(Collection<SyncItem> items) {
     synchronized (fItems) {
       fItems.removeAll(items);
