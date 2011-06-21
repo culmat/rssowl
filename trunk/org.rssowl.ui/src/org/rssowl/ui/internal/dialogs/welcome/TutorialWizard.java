@@ -24,6 +24,7 @@
 
 package org.rssowl.ui.internal.dialogs.welcome;
 
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.rssowl.ui.internal.dialogs.welcome.TutorialPage.Chapter;
 
@@ -33,6 +34,15 @@ import org.rssowl.ui.internal.dialogs.welcome.TutorialPage.Chapter;
  * @author bpasero
  */
 public class TutorialWizard extends Wizard {
+  private final Chapter fStartingPage;
+
+  public TutorialWizard() {
+    this(Chapter.INTRO);
+  }
+
+  public TutorialWizard(Chapter startingPage) {
+    fStartingPage = startingPage;
+  }
 
   /*
    * @see org.eclipse.jface.wizard.Wizard#addPages()
@@ -55,6 +65,20 @@ public class TutorialWizard extends Wizard {
     addPage(new TutorialPage(Chapter.PREFERENCES));
     addPage(new TutorialPage(Chapter.TIPS));
     addPage(new TutorialPage(Chapter.FINISH));
+  }
+
+  /*
+   * @see org.eclipse.jface.wizard.Wizard#getStartingPage()
+   */
+  @Override
+  public IWizardPage getStartingPage() {
+    if (fStartingPage != Chapter.INTRO) {
+      IWizardPage[] pages = getPages();
+      if (pages.length > fStartingPage.ordinal())
+        return pages[fStartingPage.ordinal()];
+    }
+
+    return super.getStartingPage();
   }
 
   /*
