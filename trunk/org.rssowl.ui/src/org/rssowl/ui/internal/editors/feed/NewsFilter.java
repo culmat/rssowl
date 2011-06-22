@@ -426,7 +426,7 @@ public class NewsFilter extends ViewerFilter {
       return Collections.emptySet();
 
     /* Convert to Wildcard Query */
-    if (!pattern.endsWith("*")) //$NON-NLS-1$
+    if (StringUtils.supportsTrailingWildcards(pattern))
       pattern = pattern + "*"; //$NON-NLS-1$
 
     /* Match on Location (not supported for search marks and folder news marks) */
