@@ -561,12 +561,12 @@ public class SearchConditionItem extends Composite {
               /* Determine any Search Warning to show depending on field and text value */
               SearchWarning warning = SearchWarning.NO_WARNING;
               if (field.getId() == INews.CATEGORIES || field.getId() == INews.SOURCE || field.getId() == INews.FEED || field.getId() == INews.LINK) {
-                if (isPhraseSearch(textValue))
+                if (StringUtils.isPhraseSearch(textValue))
                   warning = SearchWarning.PHRASE_SEARCH_UNSUPPORTED;
               } else {
-                if (isPhraseSearchWithWildcardToken(textValue))
+                if (StringUtils.isPhraseSearchWithWildcardToken(textValue))
                   warning = SearchWarning.PHRASE_AND_WILDCARD_SEARCH_COMBINED;
-                else if (isSpecialCharacterSearchWithWildcardToken(textValue))
+                else if (StringUtils.isSpecialCharacterSearchWithWildcardToken(textValue))
                   warning = SearchWarning.WILDCARD_AND_SPECIAL_CHAR_SEARCH;
               }
 
@@ -665,65 +665,6 @@ public class SearchConditionItem extends Composite {
       else
         deco.setDescriptionText(Messages.SearchConditionItem_SEARCH_HELP);
     }
-  }
-
-  private boolean isPhraseSearch(String str) {
-    if (!StringUtils.isSet(str))
-      return false;
-
-    str = str.trim();
-
-    /* Check for Phrase Quotes */
-    return (str.startsWith("\"") && str.endsWith("\"") && str.length() != 1); //$NON-NLS-1$ //$NON-NLS-2$
-  }
-
-  private boolean isPhraseSearchWithWildcardToken(String str) {
-    if (!isPhraseSearch(str))
-      return false;
-
-    /* Check for Wildcard Chars */
-    return str.contains("*") || str.contains("?"); //$NON-NLS-1$ //$NON-NLS-2$
-  }
-
-  private boolean isSpecialCharacterSearchWithWildcardToken(String str) {
-    if (!StringUtils.isSet(str))
-      return false;
-
-    str = str.trim();
-
-    boolean containsSpecialChars = false;
-    boolean containsWildcards = false;
-
-    for (int i = 0; i < str.length(); i++) {
-      char c = str.charAt(i);
-
-      /* Wildcard Found */
-      if (c == '*' || c == '?') {
-        containsWildcards = true;
-        if (containsSpecialChars)
-          return true;
-
-        continue;
-      }
-
-      /* Dot and At are working ok (exceptions) */
-      if (c == '.' || c == '@')
-        continue;
-
-      /* Special Char Found */
-      if ((c > 32 && c < 48) || // !, ", #, $, %, &, ', (, ), *, +, ,, -, ., /
-          (c > 57 && c < 65) || // :, ;, <, =, >, ?, @
-          (c > 90 && c < 97) || // [, \, ], ^, _, `
-          (c > 122 && c < 127) || // {, |, }, ~
-          (String.valueOf(c).equals("§")) //Not part of ASCII //$NON-NLS-1$
-      ) {
-        containsSpecialChars = true;
-        if (containsWildcards)
-          return true;
-      }
-    }
-
-    return false;
   }
 
   private int getAgeValue(Spinner valueSpinner, Combo scopeCombo) {
