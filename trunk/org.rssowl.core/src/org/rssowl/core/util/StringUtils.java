@@ -53,7 +53,7 @@ public class StringUtils {
 
   /* This utility class constructor is hidden */
   private StringUtils() {
-  // Protect default constructor
+    // Protect default constructor
   }
 
   /**
@@ -372,5 +372,94 @@ public class StringUtils {
       str.append(buf, 0, len);
 
     return str.toString();
+  }
+
+  /**
+   * @param str the {@link String} to check for.
+   * @return <code>true</code> if the provided {@link String} is a phrase search
+   * and <code>false</code> otherwise.
+   */
+  public static boolean isPhraseSearch(String str) {
+    if (!StringUtils.isSet(str))
+      return false;
+
+    str = str.trim();
+
+    /* Check for Phrase Quotes */
+    return (str.startsWith("\"") && str.endsWith("\"") && str.length() != 1); //$NON-NLS-1$ //$NON-NLS-2$
+  }
+
+  /**
+   * @param str the {@link String} to check for.
+   * @return <code>true</code> if the provided {@link String} contains special
+   * characters and phrase search tokens and <code>false</code> otherwise.
+   */
+  public static boolean isPhraseSearchWithWildcardToken(String str) {
+    if (!isPhraseSearch(str))
+      return false;
+
+    /* Check for Wildcard Chars */
+    return str.contains("*") || str.contains("?"); //$NON-NLS-1$ //$NON-NLS-2$
+  }
+
+  /**
+   * @param str the {@link String} to check for.
+   * @return <code>true</code> if the provided {@link String} contains special
+   * characters and wildcard tokens and <code>false</code> otherwise.
+   */
+  public static boolean isSpecialCharacterSearchWithWildcardToken(String str) {
+    if (!StringUtils.isSet(str))
+      return false;
+
+    str = str.trim();
+
+    boolean containsSpecialChars = false;
+    boolean containsWildcards = false;
+
+    for (int i = 0; i < str.length(); i++) {
+      char c = str.charAt(i);
+
+      /* Wildcard Found */
+      if (c == '*' || c == '?') {
+        containsWildcards = true;
+        if (containsSpecialChars)
+          return true;
+
+        continue;
+      }
+
+      /* Dot and At are working ok (exceptions) */
+      if (c == '.' || c == '@')
+        continue;
+
+      /* Special Char Found */
+      if ((c > 32 && c < 48) || // !, ", #, $, %, &, ', (, ), *, +, ,, -, ., /
+          (c > 57 && c < 65) || // :, ;, <, =, >, ?, @
+          (c > 90 && c < 97) || // [, \, ], ^, _, `
+          (c > 122 && c < 127) || // {, |, }, ~
+          (String.valueOf(c).equals("§")) //Not part of ASCII //$NON-NLS-1$
+      ) {
+        containsSpecialChars = true;
+        if (containsWildcards)
+          return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * @param str the {@link String} to check for.
+   * @return <code>true</code> in case the provided {@link String} supports
+   * trailing wildcards and <code>false</code> otherwise.
+   */
+  public static boolean supportsTrailingWildcards(String str) {
+    if (StringUtils.isSet(str) && !str.endsWith("*") && !str.endsWith("?") && !StringUtils.isPhraseSearch(str)) { //$NON-NLS-1$ //$NON-NLS-2$
+      str = str + "*"; //$NON-NLS-1$
+      if (!StringUtils.isSpecialCharacterSearchWithWildcardToken(str))
+        return true;
+    }
+
+    return false;
   }
 }
