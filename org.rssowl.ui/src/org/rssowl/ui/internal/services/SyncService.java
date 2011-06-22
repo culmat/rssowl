@@ -26,6 +26,7 @@ package org.rssowl.ui.internal.services;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.rssowl.core.Owl;
@@ -73,7 +74,7 @@ import java.util.concurrent.locks.Lock;
 public class SyncService implements Receiver<SyncItem> {
 
   /* Delay in Millies before syncing */
-  private static final int SYNC_DELAY = 2000; // 2 seconds
+  private static final int SYNC_DELAY = 30000; // 30 seconds
 
   /* Sync scheduler interval in Millies */
   private static final int SYNC_SCHEDULER = 300000; // 5 minutes
@@ -256,7 +257,7 @@ public class SyncService implements Receiver<SyncItem> {
 
     /* Authentication Required */
     catch (AuthenticationRequiredException e) {
-      handleAuthenticationRequired();
+      handleAuthenticationRequired(monitor);
     }
 
     /* Any other Connection Exception */
@@ -267,25 +268,25 @@ public class SyncService implements Receiver<SyncItem> {
     return Status.OK_STATUS; //Intentionally using OK here to not spam the activity dialog
   }
 
-  private void handleAuthenticationRequired() {
-    if (!Controller.getDefault().isShuttingDown()) {
+  private void handleAuthenticationRequired(final IProgressMonitor monitor) {
+    if (!Controller.getDefault().isShuttingDown() && !monitor.isCanceled()) {
       JobRunner.runInBackgroundThread(new Runnable() { //Run in background thread to avoid lock contention in buffer due to UI lock
-            public void run() {
-              Lock loginLock = Controller.getDefault().getLoginDialogLock();
-              if (!Controller.getDefault().isShuttingDown() && loginLock.tryLock()) { //Avoid multiple login dialogs if login dialog already showing
-                try {
-                  JobRunner.runSyncedInUIThread(new Runnable() {
-                    public void run() {
-                      if (!Controller.getDefault().isShuttingDown())
-                        OwlUI.openSyncLogin(null);
-                    }
-                  });
-                } finally {
-                  loginLock.unlock();
+        public void run() {
+          Lock loginLock = Controller.getDefault().getLoginDialogLock();
+          if (!Controller.getDefault().isShuttingDown() && !monitor.isCanceled() && loginLock.tryLock()) { //Avoid multiple login dialogs if login dialog already showing
+            try {
+              JobRunner.runSyncedInUIThread(new Runnable() {
+                public void run() {
+                  if (!Controller.getDefault().isShuttingDown() && !monitor.isCanceled())
+                    OwlUI.openSyncLogin(null);
                 }
-              }
+              });
+            } finally {
+              loginLock.unlock();
             }
-          });
+          }
+        }
+      });
     }
   }
 
@@ -405,7 +406,7 @@ public class SyncService implements Receiver<SyncItem> {
         IProtocolHandler handler = Owl.getConnectionService().getHandler(uri);
         InputStream inS = null;
         try {
-          inS = handler.openStream(uri, monitor, properties);
+          inS = handler.openStream(uri, new NullProgressMonitor(), properties); //Do not allow to cancel this outgoing request for transactional reasons
           fSyncItemsManager.removeUncommitted(equivalentItems);
         } finally {
           if (inS != null) {

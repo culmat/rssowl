@@ -48,6 +48,7 @@ public class BatchedBuffer<T> {
   private final Job fBufferProcessor;
   private final Receiver<T> fReceiver;
   private final AtomicBoolean fSealed = new AtomicBoolean(false);
+  private final AtomicBoolean fRunning = new AtomicBoolean(false);
 
   /**
    * @param <T> The type that will be received from the
@@ -104,6 +105,10 @@ public class BatchedBuffer<T> {
       return;
 
     synchronized (fBuffer) {
+      
+      /* Check again for being sealed */
+      if (fSealed.get())
+        return;
 
       /* New Batch */
       if (fBuffer.isEmpty()) {
@@ -134,6 +139,14 @@ public class BatchedBuffer<T> {
 
     /* Wait until Buffer has completed work */
     if (joinRunning) {
+
+      /* Do not wait until buffer is scheduled, schedule right now instead */
+      if (isScheduled() && !isRunning()) {
+        fBufferProcessor.cancel();
+        fBufferProcessor.schedule();
+      }
+
+      /* Wait until Buffer is done processing */
       while (isScheduled()) {
         try {
           Thread.sleep(50);
@@ -153,7 +166,15 @@ public class BatchedBuffer<T> {
    * <code>false</code> otherwise.
    */
   public boolean isScheduled() {
-    return Job.getJobManager().find(this).length != 0;
+    return isRunning() || Job.getJobManager().find(this).length != 0;
+  }
+
+  /**
+   * @return <code>true</code> if this buffer is running and <code>false</code>
+   * otherwise.
+   */
+  public boolean isRunning() {
+    return fRunning.get();
   }
 
   /* Creates a Job to process the contents of the Buffer */
@@ -161,16 +182,21 @@ public class BatchedBuffer<T> {
     Job job = new Job(taskName != null ? taskName : "") { //$NON-NLS-1$
       @Override
       protected IStatus run(IProgressMonitor monitor) {
-        if (monitor.isCanceled())
-          return Status.CANCEL_STATUS;
+        fRunning.set(true);
+        try {
+          if (monitor.isCanceled())
+            return Status.CANCEL_STATUS;
 
-        IStatus status;
-        synchronized (fBuffer) {
-          status = fReceiver.receive(new ArrayList<T>(fBuffer), this, monitor);
-          fBuffer.clear();
+          IStatus status;
+          synchronized (fBuffer) {
+            status = fReceiver.receive(new ArrayList<T>(fBuffer), this, monitor);
+            fBuffer.clear();
+          }
+
+          return status;
+        } finally {
+          fRunning.set(false);
         }
-
-        return status;
       }
 
       @Override
