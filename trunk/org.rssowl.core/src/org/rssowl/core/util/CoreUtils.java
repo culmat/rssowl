@@ -150,6 +150,9 @@ public class CoreUtils {
   /* Reserved Characters for Filenames on Windows */
   private static final String[] RESERVED_FILENAME_CHARACTERS_WINDOWS = new String[] { "<", ">", ":", "\"", "/", "\\", "|", "?", "*" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$
 
+  /* A list of non-character, non-digit delimiters for tokenizing words */
+  private static final String NON_CHAR_DIGIT_DELIMS = " \t\n\r\f!§$%&/\\´`^°()=?*+~\"'#-_.:,;<>|@[]{}"; //$NON-NLS-1$
+
   /* This utility class constructor is hidden */
   private CoreUtils() {
     // Protect default constructor
@@ -1142,11 +1145,10 @@ public class CoreUtils {
   }
 
   /**
-   * @param conditions
-   * @param ignoreStopWords
+   * @param conditions the conditions to extract words from.
    * @return Returns a set of words from the given conditions.
    */
-  public static Set<String> extractWords(List<ISearchCondition> conditions, boolean ignoreStopWords) {
+  public static Set<String> extractWords(List<ISearchCondition> conditions) {
     Set<String> words = new HashSet<String>(conditions.size());
 
     /* Check Search Conditions for String-Values */
@@ -1159,16 +1161,29 @@ public class CoreUtils {
           continue;
 
         /* Split into Words */
-        value = StringUtils.replaceAll(value, "\"", ""); //$NON-NLS-1$ //$NON-NLS-2$
-        StringTokenizer tokenizer = new StringTokenizer(value);
-        while (tokenizer.hasMoreElements()) {
-          String nextWord = tokenizer.nextElement().toString().toLowerCase();
-
-          /* Ignore Stop Words if required */
-          if (!ignoreStopWords || !STOP_WORDS.contains(nextWord))
-            words.add(nextWord);
-        }
+        words.addAll(extractWords(value));
       }
+    }
+
+    return words;
+  }
+
+  /**
+   * @param str the string to extract words from.
+   * @return Returns a set of words from the given string.
+   */
+  public static Set<String> extractWords(String str) {
+    if (!StringUtils.isSet(str))
+      return Collections.emptySet();
+
+    Set<String> words = new HashSet<String>();
+
+    /* Tokenize by characters and digits */
+    StringTokenizer tokenizer = new StringTokenizer(str, NON_CHAR_DIGIT_DELIMS);
+    while (tokenizer.hasMoreElements()) {
+      String nextWord = tokenizer.nextElement().toString().toLowerCase();
+      if (!STOP_WORDS.contains(nextWord) && StringUtils.isSet(nextWord))
+        words.add(nextWord);
     }
 
     return words;
