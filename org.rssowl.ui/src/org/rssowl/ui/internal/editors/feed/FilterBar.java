@@ -788,7 +788,7 @@ public class FilterBar {
       String text = fSearchInput.getText();
 
       /* Convert to Wildcard Query */
-      if (StringUtils.isSet(text) && !text.endsWith("*")) //$NON-NLS-1$
+      if (StringUtils.supportsTrailingWildcards(text))
         text = text + "*"; //$NON-NLS-1$
 
       switch (target) {

@@ -2487,7 +2487,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       /* Extract from Conditions if any */
       if (mark instanceof ISearch) {
         List<ISearchCondition> conditions = ((ISearch) mark).getSearchConditions();
-        extractedWords = CoreUtils.extractWords(conditions, true);
+        extractedWords = CoreUtils.extractWords(conditions);
       } else
         extractedWords = new HashSet<String>(1);
 
@@ -2495,13 +2495,12 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       if (fNewsFilter != null && StringUtils.isSet(fNewsFilter.getPatternString())) {
         String pattern = fNewsFilter.getPatternString();
 
-        /* News Filter always converts to wildcard query */
-        if (!pattern.endsWith("*")) //$NON-NLS-1$
+        /* News Filter sometimes converts to wildcard query */
+        if (StringUtils.supportsTrailingWildcards(pattern))
           pattern = pattern + "*"; //$NON-NLS-1$
 
-        StringTokenizer tokenizer = new StringTokenizer(pattern);
-        while (tokenizer.hasMoreElements())
-          extractedWords.add(tokenizer.nextToken());
+        /* Extract Words */
+        extractedWords.addAll(CoreUtils.extractWords(pattern));
       }
 
       return extractedWords;
