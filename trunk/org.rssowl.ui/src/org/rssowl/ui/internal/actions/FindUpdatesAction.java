@@ -104,9 +104,12 @@ public class FindUpdatesAction extends Action implements IWorkbenchWindowActionD
         public void done(IJobChangeEvent event) {
           JobRunner.runInUIThread(fShell, new Runnable() {
             public void run() {
-              if (!Controller.getDefault().isShuttingDown() && job.getStatus().isOK())
+              if (Controller.getDefault().isShuttingDown() || (fShell != null && fShell.isDisposed()))
+                return;
+
+              if (job.getStatus().isOK())
                 handleUpdates(job.getUpdates());
-              else if (!Controller.getDefault().isShuttingDown())
+              else
                 handleError(job.getStatus());
             }
           });
