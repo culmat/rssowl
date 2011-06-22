@@ -340,7 +340,6 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
     });
 
     setLimitNotificationEnabled(fShowNotificationPopup.getSelection() && fLimitNotifierToSelectionCheck.getSelection());
-    fLimitNotifierToSelectionCheck.setEnabled(fShowNotificationPopup.getSelection());
   }
 
   private void setCheckedElements(IFolderChild entity, boolean parentChecked) {
@@ -508,7 +507,6 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
         @Override
         public void widgetSelected(SelectionEvent e) {
           setLimitNotificationEnabled(fShowNotificationPopup.getSelection() && fLimitNotifierToSelectionCheck.getSelection());
-          fLimitNotifierToSelectionCheck.setEnabled(fShowNotificationPopup.getSelection());
         }
       });
 
@@ -647,7 +645,6 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
 
     /* Limit to Selected Elements */
     fLimitNotifierToSelectionCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.LIMIT_NOTIFIER_TO_SELECTION));
-    fLimitNotifierToSelectionCheck.setEnabled(fShowNotificationPopup.getSelection());
     setLimitNotificationEnabled(fShowNotificationPopup.getSelection() && fLimitNotifierToSelectionCheck.getSelection());
 
     updateApplyEnablement(true);
