@@ -678,11 +678,7 @@ public class CoreUtilsTest {
     conditions.add(fFactory.createSearchCondition(field2, SearchSpecifier.CONTAINS, "benjamin ?asero"));
     conditions.add(fFactory.createSearchCondition(field3, SearchSpecifier.CONTAINS, "see the code"));
 
-    Set<String> words = CoreUtils.extractWords(conditions, false);
-    assertEquals(7, words.size());
-    assertTrue(words.containsAll(Arrays.asList(new String[] { "foo", "bar", "benjamin", "?asero", "see", "the", "code" })));
-
-    words = CoreUtils.extractWords(conditions, true);
+    Set<String> words = CoreUtils.extractWords(conditions);
     assertEquals(6, words.size());
     assertTrue(words.containsAll(Arrays.asList(new String[] { "foo", "bar", "benjamin", "?asero", "see", "code" })));
   }
