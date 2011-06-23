@@ -751,7 +751,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
   private void onSingleClick(Shell shell) {
     NotificationService service = Controller.getDefault().getNotificationService();
     List<INews> newsToShow = new ArrayList<INews>();
-    Mode mode;
+    Mode mode = Mode.RECENT;
 
     /* Return early if Notifier already showing */
     if (service.isPopupVisible())
@@ -764,7 +764,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         for (int i = fTeasingNewsCache.size() - 1; i >= 0; i--) {
           NewsReference reference = new NewsReference(fTeasingNewsCache.get(i));
           INews newsitem = reference.resolve();
-          if (newsitem != null && newsitem.isVisible() && service.shouldShow(newsitem)) {
+          if (newsitem != null && newsitem.getState() == INews.State.NEW && service.shouldShow(newsitem)) {
             newsToShow.add(newsitem);
 
             if (++counter >= TEASE_LIMIT)
@@ -780,8 +780,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       mode = Mode.INCOMING_MANUAL;
     }
 
-    /* Show Recent News */
-    else {
+    /* Show Recent News if no teasing news present */
+    if (newsToShow.isEmpty()) {
 
       /* Build the Search if not yet done */
       if (fTodaysNewsSearch == null) {
