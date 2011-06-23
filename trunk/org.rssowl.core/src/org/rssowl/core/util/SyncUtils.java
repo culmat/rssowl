@@ -322,7 +322,7 @@ public class SyncUtils {
    * <code>false</code> otherwise.
    */
   public static boolean isSynchronized(String link) {
-    return link.startsWith(READER_HTTP_SCHEME);
+    return link != null && link.startsWith(READER_HTTP_SCHEME);
   }
 
   /**

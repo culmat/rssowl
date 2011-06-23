@@ -46,7 +46,7 @@ import java.util.Set;
 /**
  * Interpreter that will fill a {@link IFeed} with values obtained from a
  * {@link JSONObject}.
- * 
+ *
  * @author bpasero
  */
 public class JSONInterpreter {

@@ -41,6 +41,9 @@ import java.util.Map;
  */
 public class MarkUnreadNewsAction implements INewsAction {
 
+  /** ID of this Action */
+  public static final String ID = "org.rssowl.core.MarkUnreadNewsAction"; //$NON-NLS-1$
+
   /*
    * @see org.rssowl.core.INewsAction#run(java.util.List, java.util.Map,
    * java.lang.Object)
