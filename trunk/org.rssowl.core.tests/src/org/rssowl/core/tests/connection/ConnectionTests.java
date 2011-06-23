@@ -27,6 +27,7 @@ package org.rssowl.core.tests.connection;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -88,7 +89,7 @@ public class ConnectionTests {
    */
   @Before
   public void setUp() throws Exception {
-    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
+    ((PersistenceServiceImpl) Owl.getPersistenceService()).recreateSchemaForTests();
   }
 
   /**
@@ -670,6 +671,13 @@ public class ConnectionTests {
     String authToken = SyncUtils.getGoogleAuthToken("rssowl@mailinator.com", "rssowl.org", true, new NullProgressMonitor());
     assertNotNull(authToken);
 
+    assertEquals(authToken, SyncUtils.getGoogleAuthToken("rssowl@mailinator.com", "rssowl.org", false, new NullProgressMonitor()));
+
+    String newAuthToken = SyncUtils.getGoogleAuthToken("rssowl@mailinator.com", "rssowl.org", true, new NullProgressMonitor());
+    assertFalse(authToken.equals(newAuthToken));
+
+    authToken = newAuthToken;
+
     URI uri = URI.create("https://www.google.com/reader/subscriptions/export");
     IProtocolHandler handler = Owl.getConnectionService().getHandler(uri);
 
@@ -683,6 +691,15 @@ public class ConnectionTests {
 
     List<? extends IEntity> elements = Owl.getInterpreter().importFrom(inS);
     assertTrue(!elements.isEmpty());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testGetGoogleReaderAPIToken() throws Exception {
+    String apiToken = SyncUtils.getGoogleApiToken("rssowl@mailinator.com", "rssowl.org", new NullProgressMonitor());
+    assertNotNull(apiToken);
   }
 
   /**

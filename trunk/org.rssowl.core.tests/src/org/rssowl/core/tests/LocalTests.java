@@ -62,6 +62,7 @@ import org.rssowl.core.tests.ui.TreeTraversalTest;
 import org.rssowl.core.tests.util.CoreUtilsTest;
 import org.rssowl.core.tests.util.MergeUtilsTest;
 import org.rssowl.core.tests.util.StringUtilsTest;
+import org.rssowl.core.tests.util.SyncUtilsTest;
 import org.rssowl.core.tests.util.URIUtilsTest;
 
 /**
@@ -101,6 +102,7 @@ import org.rssowl.core.tests.util.URIUtilsTest;
   MergeUtilsTest.class,
   INewsTest.class,
   StringUtilsTest.class,
+  SyncUtilsTest.class,
   CoreUtilsTest.class,
   URIUtilsTest.class,
   MigrationsTest.class,

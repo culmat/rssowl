@@ -203,4 +203,24 @@ public class URIUtilsTest {
     assertEquals("foo.de", URIUtils.safeGetHost(URI.create("http://foo.de")));
     assertEquals("foo_bar.de", URIUtils.safeGetHost(URI.create("http://foo_bar.de")));
   }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testToHttp() throws Exception {
+    assertEquals("http://foo.de", URIUtils.toHTTP(URI.create("http://foo.de")).toString());
+    assertEquals("http://foo.de", URIUtils.toHTTP("http://foo.de").toString());
+    assertEquals("https://foo.de", URIUtils.toHTTP(URI.create("https://foo.de")).toString());
+    assertEquals("https://foo.de", URIUtils.toHTTP("https://foo.de").toString());
+    assertEquals("http://foo.de", URIUtils.toHTTP(URI.create("feed://foo.de")).toString());
+    assertEquals("http://foo.de", URIUtils.toHTTP("feed://foo.de").toString());
+    assertEquals("http://foo.de", URIUtils.toHTTP(URI.create("reader://foo.de")).toString());
+    assertEquals("http://foo.de", URIUtils.toHTTP("reader://foo.de").toString());
+    assertEquals("https://foo.de", URIUtils.toHTTP(URI.create("readers://foo.de")).toString());
+    assertEquals("https://foo.de", URIUtils.toHTTP("readers://foo.de").toString());
+
+    assertEquals("https://foo.de/test/123.html/?help=true&foo=bar", URIUtils.toHTTP(URI.create("readers://foo.de/test/123.html/?help=true&foo=bar")).toString());
+    assertEquals("https://foo.de/test/123.html/?help=true&foo=bar", URIUtils.toHTTP("readers://foo.de/test/123.html/?help=true&foo=bar").toString());
+  }
 }
