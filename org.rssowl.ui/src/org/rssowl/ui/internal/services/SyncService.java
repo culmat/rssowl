@@ -89,6 +89,31 @@ public class SyncService implements Receiver<SyncItem> {
   private Job fSyncScheduler;
   private NewsListener fNewsListener;
   private SearchFilterAdapter fSearchFilterListener;
+  private SyncStatus fStatus;
+
+  /** Status holder used for reporting Sync Status */
+  public class SyncStatus extends Status {
+    private final long fTime = System.currentTimeMillis();
+    private final int fItemCount;
+
+    public SyncStatus(int itemCount) {
+      super(IStatus.OK, Activator.PLUGIN_ID, null, null);
+      fItemCount = itemCount;
+    }
+
+    public SyncStatus(String message, Throwable exception) {
+      super(IStatus.ERROR, Activator.PLUGIN_ID, message, exception);
+      fItemCount = 0;
+    }
+
+    public long getTime() {
+      return fTime;
+    }
+
+    public int getItemCount() {
+      return fItemCount;
+    }
+  }
 
   /**
    * Starts the synchronizer by listening to news events.
@@ -218,6 +243,13 @@ public class SyncService implements Receiver<SyncItem> {
   }
 
   /**
+   * @return the {@link SyncStatus} of the last synchronization run.
+   */
+  public SyncStatus getStatus() {
+    return fStatus;
+  }
+
+  /**
    * Stops the Synchronizer.
    *
    * @param emergency if <code>true</code>, indicates that RSSOwl is shutting
@@ -252,17 +284,21 @@ public class SyncService implements Receiver<SyncItem> {
 
     /* Synchronize */
     try {
-      sync(monitor);
+      int itemCount = sync(monitor);
+      if (itemCount > 0)
+        fStatus = new SyncStatus(itemCount);
     }
 
     /* Authentication Required */
     catch (AuthenticationRequiredException e) {
+      fStatus = new SyncStatus(e.getMessage(), e);
       handleAuthenticationRequired(monitor);
     }
 
     /* Any other Connection Exception */
     catch (ConnectionException e) {
       Activator.getDefault().logError(e.getMessage(), e);
+      fStatus = new SyncStatus(e.getMessage(), e);
     }
 
     return Status.OK_STATUS; //Intentionally using OK here to not spam the activity dialog
@@ -290,21 +326,21 @@ public class SyncService implements Receiver<SyncItem> {
     }
   }
 
-  private void sync(IProgressMonitor monitor) throws ConnectionException {
+  private int sync(IProgressMonitor monitor) throws ConnectionException {
 
     /* Receive all uncommitted items from the manager */
     Collection<SyncItem> items = fSyncItemsManager.getUncommittedItems();
 
     /* Return on cancellation */
     if (isCanceled(monitor))
-      return;
+      return 0;
 
     /* Group Sync Items by Feed and Merge Duplictates */
     Map<String, Map<String, SyncItem>> mapFeedToSyncItems = groupByStream(items);
 
     /* Return on cancellation */
     if (isCanceled(monitor))
-      return;
+      return 0;
 
     /* Obtain API Token */
     String token = getGoogleApiToken(monitor);
@@ -314,9 +350,10 @@ public class SyncService implements Receiver<SyncItem> {
 
     /* Return on cancellation */
     if (isCanceled(monitor))
-      return;
+      return 0;
 
     /* Synchronize for each Stream */
+    int itemCount = 0;
     Set<Entry<String, Map<String, SyncItem>>> entries = mapFeedToSyncItems.entrySet();
     for (Entry<String, Map<String, SyncItem>> entry : entries) {
       if (entry.getValue() == null)
@@ -399,7 +436,7 @@ public class SyncService implements Receiver<SyncItem> {
 
         /* Return on cancellation */
         if (isCanceled(monitor))
-          return;
+          return itemCount;
 
         /* Perform POST */
         URI uri = URI.create(SyncUtils.GOOGLE_EDIT_TAG_URL);
@@ -408,6 +445,7 @@ public class SyncService implements Receiver<SyncItem> {
         try {
           inS = handler.openStream(uri, new NullProgressMonitor(), properties); //Do not allow to cancel this outgoing request for transactional reasons
           fSyncItemsManager.removeUncommitted(equivalentItems);
+          itemCount += equivalentItems.size();
         } finally {
           if (inS != null) {
             try {
@@ -420,9 +458,11 @@ public class SyncService implements Receiver<SyncItem> {
 
         /* Return on cancellation */
         if (isCanceled(monitor))
-          return;
+          return itemCount;
       }
     }
+
+    return itemCount;
   }
 
   private Map<String, Map<String, SyncItem>> groupByStream(Collection<SyncItem> items) {
