@@ -1437,11 +1437,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         TutorialWizard wizard = new TutorialWizard(Chapter.SYNCHRONIZATION);
         OwlUI.openWizard(getActionBarConfigurer().getWindowConfigurer().getWindow().getShell(), wizard, false, false, null);
       }
-
-      @Override
-      public ImageDescriptor getImageDescriptor() {
-        return OwlUI.getImageDescriptor("icons/elcl16/reader.gif"); //$NON-NLS-1$
-      }
     });
 
     /* Link to Help */

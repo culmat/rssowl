@@ -375,6 +375,14 @@
             label="%actionSet.label.6"
             visible="true">
          <action
+               class="org.rssowl.ui.internal.actions.ShowSynchronizationStatusAction"
+               icon="icons/elcl16/reader.gif"
+               id="org.rssowl.ui.ShowSynchronizationStatusAction"
+               label="%action.label.34"
+               menubarPath="tools/end"
+               style="push">
+         </action>
+         <action
                class="org.rssowl.ui.internal.actions.ShowActivityAction"
                definitionId="org.rssowl.ui.ShowActivityAction"
                icon="icons/elcl16/activity.gif"
