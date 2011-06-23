@@ -52,45 +52,79 @@ public class SyncItemsManager {
 
   private List<SyncItem> fItems = new ArrayList<SyncItem>();
 
-  /* Deserialize Items from Filesystem */
-  void startup() throws IOException, ClassNotFoundException {
+  /**
+   * Deserialize Items from Filesystem
+   *
+   * @throws IOException
+   * @throws ClassNotFoundException
+   */
+  public void startup() throws IOException, ClassNotFoundException {
     synchronized (fItems) {
       fItems = deserializeSyncItems();
     }
   }
 
-  /* Serialize Items to Filesystem */
-  void shutdown() throws IOException {
+  /**
+   * Serialize Items to Filesystem
+   *
+   * @throws IOException
+   */
+  public void shutdown() throws IOException {
     synchronized (fItems) {
       serializeSyncItems(fItems);
+      fItems.clear();
     }
   }
 
-  void addUncommitted(Collection<SyncItem> items) {
+  /**
+   * @param items the uncommitted {@link SyncItem} to add.
+   */
+  public void addUncommitted(Collection<SyncItem> items) {
     synchronized (fItems) {
       fItems.addAll(items);
     }
   }
 
-  List<SyncItem> getUncommittedItems() {
+  /**
+   * @return all uncommitted {@link SyncItem}.
+   */
+  public List<SyncItem> getUncommittedItems() {
     synchronized (fItems) {
       return new ArrayList<SyncItem>(fItems);
     }
   }
 
-  boolean hasUncommittedItems() {
+  /**
+   * @return <code>true</code> if there are uncommitted {@link SyncItem}.
+   */
+  public boolean hasUncommittedItems() {
     synchronized (fItems) {
       return !fItems.isEmpty();
     }
   }
 
-  void removeUncommitted(Collection<SyncItem> items) {
+  /**
+   * Removes all uncommitted {@link SyncItem}.
+   */
+  public void clearUncommittedItems() {
+    synchronized(fItems) {
+      fItems.clear();
+    }
+  }
+
+  /**
+   * @param items the uncommitted {@link SyncItem} to remove.
+   */
+  public void removeUncommitted(Collection<SyncItem> items) {
     synchronized (fItems) {
       fItems.removeAll(items);
     }
   }
 
-  void removeUncommitted(SyncItem item) {
+  /**
+   * @param item the uncommitted {@link SyncItem} to remove.
+   */
+  public void removeUncommitted(SyncItem item) {
     synchronized (fItems) {
       fItems.remove(item);
     }

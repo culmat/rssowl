@@ -27,6 +27,7 @@ package org.rssowl.ui.internal.services;
 import org.rssowl.core.internal.newsaction.LabelNewsAction;
 import org.rssowl.core.internal.newsaction.MarkReadNewsAction;
 import org.rssowl.core.internal.newsaction.MarkStickyNewsAction;
+import org.rssowl.core.internal.newsaction.MarkUnreadNewsAction;
 import org.rssowl.core.persist.IFilterAction;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
@@ -66,8 +67,13 @@ public class SyncItem implements Serializable {
   private List<String> fAddedLabels;
   private List<String> fRemovedLabels;
 
-  /* Creates a SyncItem out of a NewsEvent */
-  static SyncItem toSyncItem(NewsEvent event) {
+  /**
+   * Creates a {@link SyncItem} out of a {@link NewsEvent}.
+   *
+   * @param event the {@link NewsEvent} to create a {@link SyncItem} from.
+   * @return the {@link SyncItem} from the {@link NewsEvent}.
+   */
+  public static SyncItem toSyncItem(NewsEvent event) {
     boolean requiresSync = false;
     INews item = event.getEntity();
     SyncItem syncItem = toSyncItem(item);
@@ -128,8 +134,14 @@ public class SyncItem implements Serializable {
     return requiresSync ? syncItem : null;
   }
 
-  /* Creates a SyncItem out of a Filter operating on a News */
-  static SyncItem toSyncItem(ISearchFilter filter, INews item) {
+  /**
+   * Creates a {@link SyncItem} out of a {@link ISearchFilter}.
+   *
+   * @param filter the {@link ISearchFilter} to create a {@link SyncItem} from.
+   * @param item the {@link INews} the {@link ISearchFilter} is operating on.
+   * @return the {@link SyncItem} from the {@link ISearchFilter}.
+   */
+  public static SyncItem toSyncItem(ISearchFilter filter, INews item) {
     boolean requiresSync = false;
     SyncItem syncItem = toSyncItem(item);
 
@@ -137,9 +149,15 @@ public class SyncItem implements Serializable {
     for (IFilterAction action : actions) {
       String actionId = action.getActionId();
 
-      /* State Change */
+      /* State Change (Mark Read) */
       if (MarkReadNewsAction.ID.equals(actionId)) {
         syncItem.setMarkedRead();
+        requiresSync = true;
+      }
+
+      /* State Change (Mark Unread) */
+      if (MarkUnreadNewsAction.ID.equals(actionId)) {
+        syncItem.setMarkedUnread();
         requiresSync = true;
       }
 
@@ -166,7 +184,11 @@ public class SyncItem implements Serializable {
     return requiresSync ? syncItem : null;
   }
 
-  private static SyncItem toSyncItem(INews news) {
+  /**
+   * @param news the {@link INews} to create a {@link SyncItem} from.
+   * @return the {@link SyncItem} from the given {@link INews}.
+   */
+  public static SyncItem toSyncItem(INews news) {
     String itemId = news.getGuid().getValue();
     String streamId = news.getInReplyTo();
 
@@ -178,79 +200,129 @@ public class SyncItem implements Serializable {
     fStreamId = streamId;
   }
 
-  String getId() {
+  /**
+   * @return the identifier of this item.
+   */
+  public String getId() {
     return fId;
   }
 
-  String getStreamId() {
+  /**
+   * @return the identifier of the stream this item belongs to.
+   */
+  public String getStreamId() {
     return fStreamId;
   }
 
-  void setMarkedRead() {
+  /**
+   * Marks the item as read.
+   */
+  public void setMarkedRead() {
     fMarkedRead = true;
     fMarkedUnread = false;
   }
 
-  void setMarkedUnread() {
+  /**
+   * Marks the item as unread.
+   */
+  public void setMarkedUnread() {
     fMarkedUnread = true;
     fMarkedRead = false;
   }
 
-  void setStarred() {
+  /**
+   * Marks the item as starred.
+   */
+  public void setStarred() {
     fStarred = true;
     fUnStarred = false;
   }
 
-  void setUnStarred() {
+  /**
+   * Marks the item as un-starred.
+   */
+  public void setUnStarred() {
     fUnStarred = true;
     fStarred = false;
   }
 
-  void addLabel(String label) {
+  /**
+   * @param label the label to add to the item.
+   */
+  public void addLabel(String label) {
     if (fAddedLabels == null)
       fAddedLabels = new ArrayList<String>(3);
 
-    fAddedLabels.add(label);
+    if (!fAddedLabels.contains(label))
+      fAddedLabels.add(label);
 
     if (fRemovedLabels != null)
       fRemovedLabels.remove(label);
   }
 
-  void removeLabel(String label) {
+  /**
+   * @param label the label to remove from the item.
+   */
+  public void removeLabel(String label) {
     if (fRemovedLabels == null)
       fRemovedLabels = new ArrayList<String>(1);
 
-    fRemovedLabels.add(label);
+    if (!fRemovedLabels.contains(label))
+      fRemovedLabels.add(label);
 
     if (fAddedLabels != null)
       fAddedLabels.remove(label);
   }
 
-  boolean isMarkedRead() {
+  /**
+   * @return <code>true</code> if the item is marked read.
+   */
+  public boolean isMarkedRead() {
     return fMarkedRead;
   }
 
-  boolean isMarkedUnread() {
+  /**
+   * @return <code>true</code> if the item is marked unread.
+   */
+  public boolean isMarkedUnread() {
     return fMarkedUnread;
   }
 
-  boolean isStarred() {
+  /**
+   * @return <code>true</code> if the item is starred.
+   */
+  public boolean isStarred() {
     return fStarred;
   }
 
-  boolean isUnStarred() {
+  /**
+   * @return <code>true</code> if the item is unstarred.
+   */
+  public boolean isUnStarred() {
     return fUnStarred;
   }
 
-  List<String> getAddedLabels() {
+  /**
+   * @return the {@link List} of labels to add.
+   */
+  public List<String> getAddedLabels() {
     return fAddedLabels != null ? fAddedLabels : Collections.<String> emptyList();
   }
 
-  List<String> getRemovedLabels() {
+  /**
+   * @return the {@link List} of labels to be removed.
+   */
+  public List<String> getRemovedLabels() {
     return fRemovedLabels != null ? fRemovedLabels : Collections.<String> emptyList();
   }
 
-  void merge(SyncItem item) {
+  /**
+   * Takes the properties from the provided {@link SyncItem} and updates them in
+   * this item.
+   *
+   * @param item the other {@link SyncItem} to merge into this item.
+   */
+  public void merge(SyncItem item) {
     if (item.fMarkedRead)
       setMarkedRead();
 
@@ -276,7 +348,12 @@ public class SyncItem implements Serializable {
     }
   }
 
-  boolean isEquivalent(SyncItem item) {
+  /**
+   * @param item the other {@link SyncItem} to check for equivalence.
+   * @return <code>true</code> in case the provided {@link SyncItem} has the
+   * identical properties as this one and <code>false</code> otherwise.
+   */
+  public boolean isEquivalent(SyncItem item) {
     if (fMarkedRead != item.fMarkedRead)
       return false;
 
@@ -299,7 +376,7 @@ public class SyncItem implements Serializable {
   }
 
   @SuppressWarnings("null")
-  boolean isLabelsEquivalent(List<String> labelsA, List<String> labelsB) {
+  private boolean isLabelsEquivalent(List<String> labelsA, List<String> labelsB) {
     if (labelsA == null && labelsB != null)
       return false;
 
