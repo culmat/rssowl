@@ -41,6 +41,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
 import org.rssowl.core.connection.SyncConnectionException;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.ImportAction;
@@ -156,7 +157,7 @@ public class SynchronizationStatusDialog extends TitleAreaDialog {
 
       /* Other general connection issue */
       else {
-        dialogMessageLink.setText(NLS.bind(Messages.SynchronizationStatusDialog_LAST_SYNC_ERROR_MSG, fDateFormat.format(fStatus.getTime()), fStatus.getException().getMessage()));
+        dialogMessageLink.setText(NLS.bind(Messages.SynchronizationStatusDialog_LAST_SYNC_ERROR_MSG, fDateFormat.format(fStatus.getTime()), CoreUtils.toMessage(fStatus.getException())));
       }
     }
 

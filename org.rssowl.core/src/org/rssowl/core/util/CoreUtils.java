@@ -24,7 +24,6 @@
 
 package org.rssowl.core.util;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.util.NLS;
@@ -1738,14 +1737,14 @@ public class CoreUtils {
   }
 
   /**
-   * @param ex the {@link CoreException} that occured.
+   * @param ex the {@link Throwable} that occured.
    * @return a human readable message for the occured exception.
    */
-  public static String toMessage(Exception ex) {
+  public static String toMessage(Throwable ex) {
 
     /* Specially treat InvocationTargetExceptions */
     if (ex instanceof InvocationTargetException && ex.getCause() != null && ex.getCause() instanceof Exception) {
-      ex = (Exception) ex.getCause();
+      ex = ex.getCause();
     }
 
     /* Protocol Unsupported */
