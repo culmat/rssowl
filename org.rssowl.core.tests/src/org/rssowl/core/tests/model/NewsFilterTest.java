@@ -49,6 +49,7 @@ import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.event.SearchFilterAdapter;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.DateUtils;
@@ -58,9 +59,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Tests functionality of news filters.
@@ -86,7 +90,7 @@ public class NewsFilterTest extends LargeBlockSizeTest {
    */
   @Before
   public void setUp() throws Exception {
-    ((PersistenceServiceImpl)Owl.getPersistenceService()).recreateSchemaForTests();
+    ((PersistenceServiceImpl) Owl.getPersistenceService()).recreateSchemaForTests();
     fFactory = Owl.getModelFactory();
     fAppService = Owl.getApplicationService();
   }
@@ -108,7 +112,7 @@ public class NewsFilterTest extends LargeBlockSizeTest {
     INews news3 = createNews(feed, "News3");
     news3.setState(INews.State.NEW);
 
-    ISearchFilter filter = fFactory.createSearchFilter(null, null, "All News");
+    final ISearchFilter filter = fFactory.createSearchFilter(null, null, "All News");
     filter.setMatchAllNews(true);
     filter.setEnabled(true);
 
@@ -117,13 +121,30 @@ public class NewsFilterTest extends LargeBlockSizeTest {
 
     DynamicDAO.save(filter);
 
-    fAppService.handleFeedReload(bm, feed, null, false, new NullProgressMonitor());
+    final AtomicBoolean listenerCalled = new AtomicBoolean();
+    SearchFilterAdapter listener = new SearchFilterAdapter() {
+      @Override
+      public void filterApplied(ISearchFilter f, Collection<INews> news) {
+        if (filter.equals(f) && news.size() == 3)
+          listenerCalled.set(true);
+      }
+    };
 
-    List<INews> news = bm.getFeedLinkReference().resolve().getNews();
-    assertEquals(3, bm.getNewsCount(EnumSet.of(INews.State.READ)));
-    assertEquals(3, news.size());
-    for (INews newsitem : news) {
-      assertEquals(INews.State.READ, newsitem.getState());
+    DynamicDAO.addEntityListener(ISearchFilter.class, listener);
+
+    try {
+      fAppService.handleFeedReload(bm, feed, null, false, new NullProgressMonitor());
+
+      assertTrue(listenerCalled.get());
+
+      List<INews> news = bm.getFeedLinkReference().resolve().getNews();
+      assertEquals(3, bm.getNewsCount(EnumSet.of(INews.State.READ)));
+      assertEquals(3, news.size());
+      for (INews newsitem : news) {
+        assertEquals(INews.State.READ, newsitem.getState());
+      }
+    } finally {
+      DynamicDAO.removeEntityListener(ISearchFilter.class, listener);
     }
   }
 
@@ -694,7 +715,23 @@ public class NewsFilterTest extends LargeBlockSizeTest {
       DynamicDAO.save(filter);
     }
 
-    fAppService.handleFeedReload(bm, feed, null, false, new NullProgressMonitor());
+    final AtomicInteger listenerCalled = new AtomicInteger();
+    SearchFilterAdapter listener = new SearchFilterAdapter() {
+      @Override
+      public void filterApplied(ISearchFilter f, Collection<INews> news) {
+        listenerCalled.incrementAndGet();
+      }
+    };
+
+    DynamicDAO.addEntityListener(ISearchFilter.class, listener);
+
+    try {
+      fAppService.handleFeedReload(bm, feed, null, false, new NullProgressMonitor());
+    } finally {
+      DynamicDAO.removeEntityListener(ISearchFilter.class, listener);
+    }
+
+    assertEquals(3, listenerCalled.get());
 
     List<INews> news = bm.getFeedLinkReference().resolve().getNews();
     assertEquals(4, news.size());

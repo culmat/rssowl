@@ -25,6 +25,7 @@
 package org.rssowl.core.tests.util;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -175,5 +176,74 @@ public class StringUtilsTest {
     assertEquals("<foo> bar", StringUtils.filterTags("<foo> bar", new HashSet<String>(Arrays.asList(new String[] { "a", "br" })), false));
     assertEquals("alles       bar", StringUtils.filterTags("alles <foo> bar", new HashSet<String>(Arrays.asList(new String[] { "foo", "br" })), false));
     assertEquals("      bar", StringUtils.filterTags("<foo> bar", new HashSet<String>(Arrays.asList(new String[] { "foo", "br" })), false));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testIsPhraseSearch() throws Exception {
+    assertFalse(StringUtils.isPhraseSearch(null));
+    assertFalse(StringUtils.isPhraseSearch(""));
+    assertFalse(StringUtils.isPhraseSearch("hello \" world"));
+    assertFalse(StringUtils.isPhraseSearch("hello world"));
+    assertFalse(StringUtils.isPhraseSearch("\"hello world"));
+    assertFalse(StringUtils.isPhraseSearch("\""));
+
+    assertTrue(StringUtils.isPhraseSearch("\"hello world\""));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testIsPhraseSearchWithWildcardToken() throws Exception {
+    assertFalse(StringUtils.isPhraseSearchWithWildcardToken(null));
+    assertFalse(StringUtils.isPhraseSearchWithWildcardToken(""));
+    assertFalse(StringUtils.isPhraseSearchWithWildcardToken("hello \" world"));
+    assertFalse(StringUtils.isPhraseSearchWithWildcardToken("hello world"));
+    assertFalse(StringUtils.isPhraseSearchWithWildcardToken("\"hello world"));
+    assertFalse(StringUtils.isPhraseSearchWithWildcardToken("\""));
+    assertFalse(StringUtils.isPhraseSearchWithWildcardToken("\"hello world\""));
+
+    assertTrue(StringUtils.isPhraseSearchWithWildcardToken("\"hello * world\""));
+    assertTrue(StringUtils.isPhraseSearchWithWildcardToken("\"hello ? world\""));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testIsSpecialCharacterSearchWithWildcardToken() throws Exception {
+    assertFalse(StringUtils.isSpecialCharacterSearchWithWildcardToken(null));
+    assertFalse(StringUtils.isSpecialCharacterSearchWithWildcardToken(""));
+    assertFalse(StringUtils.isSpecialCharacterSearchWithWildcardToken("hello"));
+    assertFalse(StringUtils.isSpecialCharacterSearchWithWildcardToken("hello world"));
+    assertFalse(StringUtils.isSpecialCharacterSearchWithWildcardToken("*"));
+    assertFalse(StringUtils.isSpecialCharacterSearchWithWildcardToken("?"));
+    assertFalse(StringUtils.isSpecialCharacterSearchWithWildcardToken("hello ? world*"));
+
+    assertTrue(StringUtils.isSpecialCharacterSearchWithWildcardToken("hel_lo ? world*"));
+    assertTrue(StringUtils.isSpecialCharacterSearchWithWildcardToken("hel§lo ? world*"));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testSupportsTrailingWildcards() throws Exception {
+    assertFalse(StringUtils.supportsTrailingWildcards(null));
+    assertFalse(StringUtils.supportsTrailingWildcards(""));
+    assertFalse(StringUtils.supportsTrailingWildcards("?"));
+    assertFalse(StringUtils.supportsTrailingWildcards("*"));
+    assertFalse(StringUtils.supportsTrailingWildcards("hello*"));
+    assertFalse(StringUtils.supportsTrailingWildcards("\"hello world\""));
+    assertFalse(StringUtils.supportsTrailingWildcards("\"hell!o world\""));
+    assertFalse(StringUtils.supportsTrailingWildcards("yes () can"));
+
+    assertTrue(StringUtils.supportsTrailingWildcards("foo"));
+    assertTrue(StringUtils.supportsTrailingWildcards("hello world"));
+    assertTrue(StringUtils.supportsTrailingWildcards("hel?o world"));
+    assertTrue(StringUtils.supportsTrailingWildcards("hel*o world"));
   }
 }

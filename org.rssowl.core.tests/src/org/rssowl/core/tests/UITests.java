@@ -38,6 +38,7 @@ import org.rssowl.core.tests.ui.MiscUITests;
 import org.rssowl.core.tests.ui.ModelUtilsTest;
 import org.rssowl.core.tests.ui.NewsBrowserViewModelTests;
 import org.rssowl.core.tests.ui.NewsGroupFilterTest;
+import org.rssowl.core.tests.ui.SyncServiceTest;
 import org.rssowl.core.tests.ui.UndoTest;
 
 /**
@@ -60,5 +61,6 @@ import org.rssowl.core.tests.ui.UndoTest;
   FileImportTest.class,
   DownloadServiceTests.class,
   NewsBrowserViewModelTests.class,
+  SyncServiceTest.class,
   UndoTest.class })
 public class UITests {}
