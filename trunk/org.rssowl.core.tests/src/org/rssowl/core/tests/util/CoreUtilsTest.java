@@ -37,6 +37,7 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.internal.persist.service.PersistenceServiceImpl;
 import org.rssowl.core.interpreter.ITypeImporter;
+import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
@@ -668,7 +669,7 @@ public class CoreUtilsTest {
    * @throws Exception
    */
   @Test
-  public void testExtractWords() throws Exception {
+  public void testExtractWordsFromSearch() throws Exception {
     ISearchField field1 = fFactory.createSearchField(INews.TITLE, INews.class.getName());
     ISearchField field2 = fFactory.createSearchField(INews.DESCRIPTION, INews.class.getName());
     ISearchField field3 = fFactory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
@@ -680,7 +681,26 @@ public class CoreUtilsTest {
 
     Set<String> words = CoreUtils.extractWords(conditions);
     assertEquals(6, words.size());
-    assertTrue(words.containsAll(Arrays.asList(new String[] { "foo", "bar", "benjamin", "?asero", "see", "code" })));
+    assertTrue(words.containsAll(Arrays.asList(new String[] { "foo", "bar", "benjamin", "asero", "see", "code" })));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testExtractWordsFromText() throws Exception {
+    assertTrue(CoreUtils.extractWords((String)null).isEmpty());
+    assertTrue(CoreUtils.extractWords("").isEmpty());
+    assertTrue(CoreUtils.extractWords("??").isEmpty());
+    assertTrue(CoreUtils.extractWords("**").isEmpty());
+
+    Set<String> words = CoreUtils.extractWords("hello world ba?r");
+    assertEquals(4, words.size());
+    assertTrue(words.containsAll(Arrays.asList(new String[] { "hello", "world", "ba", "r" })));
+
+    words = CoreUtils.extractWords("see the world ba?r");
+    assertEquals(4, words.size());
+    assertTrue(words.containsAll(Arrays.asList(new String[] { "see", "world", "ba", "r" })));
   }
 
   /**
@@ -1855,5 +1875,22 @@ public class CoreUtilsTest {
   public void testReportIndexIssue() throws Exception {
     CoreUtils.reportIndexIssue();
     assertTrue(Owl.getPreferenceService().getGlobalScope().getBoolean(DefaultPreferences.CLEAN_UP_INDEX));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testHasAttachment() throws Exception {
+    IFeed feed = fFactory.createFeed(null, new URI("feed"));
+    INews news1 = fFactory.createNews(null, feed, new Date());
+
+    assertFalse(CoreUtils.hasAttachment(news1, null));
+    assertFalse(CoreUtils.hasAttachment(news1, URI.create("rssowl.org")));
+
+    IAttachment att = fFactory.createAttachment(null, news1);
+    att.setLink(URI.create("rssowl.org"));
+
+    assertTrue(CoreUtils.hasAttachment(news1, URI.create("rssowl.org")));
   }
 }
