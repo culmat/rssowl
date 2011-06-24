@@ -87,6 +87,9 @@ public class ReaderProtocolHandler extends DefaultProtocolHandler {
         itemLimit = (Integer) itemLimitObj;
     }
 
+    if (properties == null)
+      properties= new HashMap<Object, Object>();
+
     URI googleLink = readerToGoogle(link, itemLimit);
     InputStream inS = null;
 
