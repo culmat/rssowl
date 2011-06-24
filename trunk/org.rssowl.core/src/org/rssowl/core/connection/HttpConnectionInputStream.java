@@ -58,6 +58,7 @@ public class HttpConnectionInputStream extends FilterInputStream implements ICon
   private static final String HEADER_RESPONSE_CONTENT_LENGTH = "Content-Length"; //$NON-NLS-1$
   private static final String HEADER_RESPONSE_CONTENT_TYPE = "Content-Type"; //$NON-NLS-1$
   private static final String HEADER_RESPONSE_CONTENT_DISPOSITION = "Content-Disposition"; //$NON-NLS-1$
+  private static final String HEADER_RESPONSE_CONTENT_ENCODING = "Content-Encoding"; //$NON-NLS-1$
 
   private final HttpMethodBase fMethod;
   private final IProgressMonitor fMonitor;
@@ -229,6 +230,18 @@ public class HttpConnectionInputStream extends FilterInputStream implements ICon
    */
   public String getContentDisposition() {
     Header header = fMethod.getResponseHeader(HEADER_RESPONSE_CONTENT_DISPOSITION);
+    if (header != null)
+      return header.getValue();
+
+    return null;
+  }
+
+  /**
+   * @return the content encoding of the content served by this stream or
+   * null if not available.
+   */
+  public String getContentEncoding() {
+    Header header = fMethod.getResponseHeader(HEADER_RESPONSE_CONTENT_ENCODING);
     if (header != null)
       return header.getValue();
 
