@@ -63,6 +63,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 
 /**
@@ -86,6 +87,7 @@ public class SyncService implements Receiver<SyncItem> {
 
   private final BatchedBuffer<SyncItem> fSynchronizer;
   private final SyncItemsManager fSyncItemsManager;
+  private final AtomicInteger fTotalSyncItemCount = new AtomicInteger();
   private Job fSyncScheduler;
   private NewsListener fNewsListener;
   private SearchFilterAdapter fSearchFilterListener;
@@ -95,15 +97,18 @@ public class SyncService implements Receiver<SyncItem> {
   public class SyncStatus extends Status {
     private final long fTime = System.currentTimeMillis();
     private final int fItemCount;
+    private final int fTotalItemCount;
 
-    public SyncStatus(int itemCount) {
+    public SyncStatus(int itemCount, int totalItemCount) {
       super(IStatus.OK, Activator.PLUGIN_ID, null, null);
       fItemCount = itemCount;
+      fTotalItemCount = totalItemCount;
     }
 
     public SyncStatus(String message, Throwable exception) {
       super(IStatus.ERROR, Activator.PLUGIN_ID, message, exception);
       fItemCount = 0;
+      fTotalItemCount = 0;
     }
 
     public long getTime() {
@@ -112,6 +117,10 @@ public class SyncService implements Receiver<SyncItem> {
 
     public int getItemCount() {
       return fItemCount;
+    }
+
+    public int getTotalItemCount() {
+      return fTotalItemCount;
     }
   }
 
@@ -284,9 +293,10 @@ public class SyncService implements Receiver<SyncItem> {
 
     /* Synchronize */
     try {
-      int itemCount = sync(monitor);
+      int itemCount = sync(fSyncItemsManager.getUncommittedItems(), monitor);
+      int totalItemCount = fTotalSyncItemCount.addAndGet(itemCount);
       if (itemCount > 0)
-        fStatus = new SyncStatus(itemCount);
+        fStatus = new SyncStatus(itemCount, totalItemCount);
     }
 
     /* Authentication Required */
@@ -326,10 +336,7 @@ public class SyncService implements Receiver<SyncItem> {
     }
   }
 
-  private int sync(IProgressMonitor monitor) throws ConnectionException {
-
-    /* Receive all uncommitted items from the manager */
-    Collection<SyncItem> items = fSyncItemsManager.getUncommittedItems();
+  private int sync(Collection<SyncItem> items, IProgressMonitor monitor) throws ConnectionException {
 
     /* Return on cancellation */
     if (isCanceled(monitor))
@@ -521,5 +528,13 @@ public class SyncService implements Receiver<SyncItem> {
 
   private int getConnectionTimeout() {
     return Controller.getDefault().isShuttingDown() ? SyncUtils.SHORT_CON_TIMEOUT : SyncUtils.DEFAULT_CON_TIMEOUT;
+  }
+
+  /* Only used for testing */
+  public void testSync(Collection<SyncItem> items) throws ConnectionException {
+    int itemCount = sync(items, new NullProgressMonitor());
+    int totalItemCount = fTotalSyncItemCount.addAndGet(itemCount);
+    if (itemCount > 0)
+      fStatus = new SyncStatus(itemCount, totalItemCount);
   }
 }

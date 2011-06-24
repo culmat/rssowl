@@ -135,9 +135,9 @@ public class SynchronizationStatusDialog extends TitleAreaDialog {
     /* b) Synchronized OK */
     else if (fStatus.isOK()) {
       if (fStatus.getItemCount() == 1)
-        dialogMessageLink.setText(NLS.bind(Messages.SynchronizationStatusDialog_LAST_SYNC_OK_MSG, fDateFormat.format(fStatus.getTime())));
+        dialogMessageLink.setText(NLS.bind(Messages.SynchronizationStatusDialog_LAST_SYNC_OK_MSG, fDateFormat.format(fStatus.getTime()), fStatus.getTotalItemCount()));
       else
-        dialogMessageLink.setText(NLS.bind(Messages.SynchronizationStatusDialog_LAST_SYNC_OK_MSG_N, fStatus.getItemCount(), fDateFormat.format(fStatus.getTime())));
+        dialogMessageLink.setText(NLS.bind(Messages.SynchronizationStatusDialog_LAST_SYNC_OK_MSG_N, new Object[] { fStatus.getItemCount(), fDateFormat.format(fStatus.getTime()), fStatus.getTotalItemCount() }));
     }
 
     /* c) Synchronization ERROR */
