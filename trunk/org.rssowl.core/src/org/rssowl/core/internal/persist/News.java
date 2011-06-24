@@ -35,6 +35,7 @@ import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.ISource;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.NewsReference;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.MergeUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.SyncUtils;
@@ -436,23 +437,6 @@ public class News extends AbstractEntity implements INews {
         return;
 
       fLabels.clear();
-    } finally {
-      fLock.releaseWriteLock();
-    }
-  }
-
-  void setLabels(Set<ILabel> labels) {
-    fLock.acquireWriteLock();
-    try {
-      if (labels == null || labels.isEmpty())
-        clearLabels();
-
-      if (fLabels == null)
-        fLabels = new HashSet<ILabel>(labels);
-      else {
-        fLabels.clear();
-        fLabels.addAll(labels);
-      }
     } finally {
       fLock.releaseWriteLock();
     }
@@ -1074,7 +1058,7 @@ public class News extends AbstractEntity implements INews {
         updated |= processListMergeResult(result, mergeSource(n.fSource));
 
         if (isVisible() && SyncUtils.isSynchronized(this)) {
-          updated |= mergeLabels(n.fLabels);
+          updated |= mergeLabels(n);
           updated |= (fIsFlagged != n.fIsFlagged);
           fIsFlagged = n.fIsFlagged;
         }
@@ -1244,31 +1228,33 @@ public class News extends AbstractEntity implements INews {
     return mergeResult;
   }
 
-  private boolean mergeLabels(Set<ILabel> labels) {
+  private boolean mergeLabels(INews news) {
 
-    /* Identical #1: Null, Null */
-    if (fLabels == null && labels == null)
-      return false;
+    /* Sort the labels because we can not predict the order */
+    Set<ILabel> thisLabels = CoreUtils.getSortedLabels(this);
+    Set<ILabel> otherLabels = CoreUtils.getSortedLabels(news);
 
-    /* Identical #2: Null, Empty */
-    if (fLabels == null && labels != null && labels.isEmpty())
-      return false;
-
-    /* Identical #3: Empty, Null */
-    if (fLabels != null && fLabels.isEmpty() && labels == null)
-      return false;
-
-    /* Identical #4: Equals */
-    if (fLabels != null && labels != null && Arrays.equals(fLabels.toArray(), labels.toArray()))
+    /* Identical Equals */
+    if (Arrays.equals(thisLabels.toArray(), otherLabels.toArray()))
       return false;
 
     /* Remove All Labels */
-    if (labels == null || labels.isEmpty())
+    if (otherLabels.isEmpty()) {
       clearLabels();
+      return true;
+    }
 
-    /* Set All Labels */
-    else
-      setLabels(labels);
+    /* Add Specific Labels */
+    for (ILabel otherLabel : otherLabels) {
+      if (!thisLabels.contains(otherLabel))
+        addLabel(otherLabel);
+    }
+
+    /* Remove Specific Labels */
+    for (ILabel thisLabel : thisLabels) {
+      if (!otherLabels.contains(thisLabel))
+        removeLabel(thisLabel);
+    }
 
     return true;
   }
