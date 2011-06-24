@@ -1231,18 +1231,20 @@ public class BookMarkExplorer extends ViewPart {
 
         /* Open */
         manager.add(new Separator(OwlUI.M_OPEN));
-        if (!eclipsePreferences.getBoolean(DefaultPreferences.ECLIPSE_SINGLE_CLICK_OPEN))
-          manager.add(new OpenAction(fViewSite.getPage(), fViewer));
+        if (!selection.isEmpty()) {
+          if (!eclipsePreferences.getBoolean(DefaultPreferences.ECLIPSE_SINGLE_CLICK_OPEN))
+            manager.add(new OpenAction(fViewSite.getPage(), fViewer));
 
-        /* Tab related Actions */
-        if (globalPreferences.getBoolean(DefaultPreferences.ALWAYS_REUSE_FEEDVIEW) && OwlUI.isTabbedBrowsingEnabled()) {
+          /* Tab related Actions */
+          if (globalPreferences.getBoolean(DefaultPreferences.ALWAYS_REUSE_FEEDVIEW) && OwlUI.isTabbedBrowsingEnabled()) {
 
-          /* Open in new Tab */
-          manager.add(new OpenInNewTabAction(fViewSite.getPage(), fViewer));
+            /* Open in new Tab */
+            manager.add(new OpenInNewTabAction(fViewSite.getPage(), fViewer));
 
-          /* Open Feeds of Folder in Tabs */
-          if (selectedFolder != null)
-            manager.add(new OpenInNewTabAction(fViewSite.getPage(), selectedFolder));
+            /* Open Feeds of Folder in Tabs */
+            if (selectedFolder != null)
+              manager.add(new OpenInNewTabAction(fViewSite.getPage(), selectedFolder));
+          }
         }
 
         manager.add(new GroupMarker(IWorkbenchActionConstants.OPEN_EXT));
