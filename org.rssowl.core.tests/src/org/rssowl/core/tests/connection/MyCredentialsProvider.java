@@ -28,6 +28,7 @@ import org.rssowl.core.connection.CredentialsException;
 import org.rssowl.core.connection.ICredentials;
 import org.rssowl.core.connection.IProxyCredentials;
 import org.rssowl.core.connection.PlatformCredentialsProvider;
+import org.rssowl.core.util.SyncUtils;
 
 import java.net.URI;
 
@@ -46,7 +47,7 @@ public class MyCredentialsProvider extends PlatformCredentialsProvider {
   @Override
   @SuppressWarnings( { "nls", "unused" })
   public ICredentials getAuthCredentials(URI link, String realm) throws CredentialsException {
-    if (!fAuthDeleted && link.toString().equals("http://www.rssowl.org/rssowl2dg/tests/connection/authrequired/feed_rdf.xml"))
+    if (!fAuthDeleted && link.toString().equals("http://www.rssowl.org/rssowl2dg/tests/connection/authrequired/feed_rdf.xml")) {
       return new ICredentials() {
         public String getUsername() {
           return "bpasero";
@@ -60,6 +61,23 @@ public class MyCredentialsProvider extends PlatformCredentialsProvider {
           return "";
         }
       };
+    }
+
+    if (SyncUtils.fromGoogle(link.toString())) {
+      return new ICredentials() {
+        public String getUsername() {
+          return "rssowl@mailinator.com";
+        }
+
+        public String getPassword() {
+          return "rssowl.org";
+        }
+
+        public String getDomain() {
+          return "";
+        }
+      };
+    }
 
     return super.getAuthCredentials(link, realm);
   }
@@ -70,7 +88,7 @@ public class MyCredentialsProvider extends PlatformCredentialsProvider {
   @Override
   @SuppressWarnings( { "unused", "nls" })
   public IProxyCredentials getProxyCredentials(URI link) {
-    if (!fProxyDeleted && link.toString().equals("http://www.rssowl.org/rssowl2dg/tests/connection/authrequired/feed_rdf.xml"))
+    if (!fProxyDeleted && link.toString().equals("http://www.rssowl.org/rssowl2dg/tests/connection/authrequired/feed_rdf.xml")) {
       return new IProxyCredentials() {
         public String getHost() {
           return "127.0.0.1";
@@ -92,6 +110,7 @@ public class MyCredentialsProvider extends PlatformCredentialsProvider {
           return "";
         }
       };
+    }
 
     return null;
   }

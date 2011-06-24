@@ -224,7 +224,7 @@ public class StringUtilsTest {
     assertFalse(StringUtils.isSpecialCharacterSearchWithWildcardToken("hello ? world*"));
 
     assertTrue(StringUtils.isSpecialCharacterSearchWithWildcardToken("hel_lo ? world*"));
-    assertTrue(StringUtils.isSpecialCharacterSearchWithWildcardToken("hel§lo ? world*"));
+    assertTrue(StringUtils.isSpecialCharacterSearchWithWildcardToken("hel$lo ? world*"));
   }
 
   /**

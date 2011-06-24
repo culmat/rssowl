@@ -1059,8 +1059,14 @@ public class InterpreterTest {
     Object object = news1.getProperty(SyncUtils.GOOGLE_LABELS);
     assertTrue(object instanceof String[]);
     assertEquals(2, ((String[]) object).length);
-    assertEquals("RSSOwl Label", ((String[]) object)[0]);
-    assertEquals("Foo", ((String[]) object)[1]);
+    int count = 0;
+    for (String str : ((String[]) object)) {
+      if ("RSSOwl Label".equals(str))
+        count++;
+      else if ("Foo".equals(str))
+        count++;
+    }
+    assertEquals(2, count);
 
     INews news2 = feed.getNews().get(1);
     assertEquals("http://www.rssowl.org/node/278", news2.getLink().toString());
