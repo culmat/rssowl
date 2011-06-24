@@ -25,6 +25,18 @@
       <credentialsProvider
             class="org.rssowl.core.tests.connection.MyCredentialsProvider"
             protocol="http"/>
+      <credentialsProvider
+            class="org.rssowl.core.tests.connection.MyCredentialsProvider"
+            protocol="https">
+      </credentialsProvider>
+      <credentialsProvider
+            class="org.rssowl.core.tests.connection.MyCredentialsProvider"
+            protocol="reader">
+      </credentialsProvider>
+      <credentialsProvider
+            class="org.rssowl.core.tests.connection.MyCredentialsProvider"
+            protocol="readers">
+      </credentialsProvider>
    </extension>
    <extension
          point="org.rssowl.core.ElementHandler">

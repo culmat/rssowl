@@ -28,17 +28,19 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 import org.rssowl.core.tests.connection.ConnectionTests;
+import org.rssowl.core.tests.connection.SyncConnectionTests;
 import org.rssowl.core.tests.controller.ControllerTestNetwork;
 
 /**
  * Test-Suite for Core-Tests requireing Network-Access.
- * 
+ *
  * @author bpasero
  * @author Ismael Juma (ismael@juma.me.uk)
  */
 @RunWith(Suite.class)
 @SuiteClasses({
   ConnectionTests.class,
+  SyncConnectionTests.class,
   ControllerTestNetwork.class
 })
 public class NetworkTests {}
