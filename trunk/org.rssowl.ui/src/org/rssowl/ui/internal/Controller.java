@@ -819,7 +819,7 @@ public class Controller {
                   int status = -1;
                   if (isSynchronizedFeed)
                     status = OwlUI.openSyncLogin(shellAr[0]);
-                  else if (!isSynchronizedFeed)
+                  else
                     status = new LoginDialog(shellAr[0], feedLink, authEx.getRealm()).open();
 
                   /* Remember time when user hit cancel from a Google Reader login challenge */
