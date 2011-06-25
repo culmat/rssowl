@@ -246,4 +246,25 @@ public class StringUtilsTest {
     assertTrue(StringUtils.supportsTrailingWildcards("hel?o world"));
     assertTrue(StringUtils.supportsTrailingWildcards("hel*o world"));
   }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testIsWildcardsOnly() throws Exception {
+    assertFalse(StringUtils.isWildcardsOnly(null));
+    assertFalse(StringUtils.isWildcardsOnly(""));
+    assertTrue(StringUtils.isWildcardsOnly("?"));
+    assertTrue(StringUtils.isWildcardsOnly("*"));
+    assertTrue(StringUtils.isWildcardsOnly("**"));
+    assertTrue(StringUtils.isWildcardsOnly("*?*"));
+    assertFalse(StringUtils.isWildcardsOnly("hello*"));
+    assertFalse(StringUtils.isWildcardsOnly("\"hello world\""));
+    assertFalse(StringUtils.isWildcardsOnly("\"hell!o world\""));
+    assertFalse(StringUtils.isWildcardsOnly("yes () can"));
+    assertFalse(StringUtils.isWildcardsOnly("foo"));
+    assertFalse(StringUtils.isWildcardsOnly("hello world"));
+    assertFalse(StringUtils.isWildcardsOnly("hel?o world"));
+    assertFalse(StringUtils.isWildcardsOnly("hel*o world"));
+  }
 }

@@ -150,7 +150,7 @@ public class CoreUtils {
   private static final String[] RESERVED_FILENAME_CHARACTERS_WINDOWS = new String[] { "<", ">", ":", "\"", "/", "\\", "|", "?", "*" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$
 
   /* A list of non-character, non-digit delimiters for tokenizing words */
-  private static final String NON_CHAR_DIGIT_DELIMS = " \t\n\r\f!§$%&/\\´`^°()=?*+~\"'#-_.:,;<>|@[]{}"; //$NON-NLS-1$
+  private static final String NON_CHAR_DIGIT_DELIMS = " \t\n\r\f!§$%&/\\´`^°()=+~\"'#-_.:,;<>|@[]{}"; //$NON-NLS-1$
 
   /* This utility class constructor is hidden */
   private CoreUtils() {
@@ -1153,14 +1153,9 @@ public class CoreUtils {
     /* Check Search Conditions for String-Values */
     for (ISearchCondition cond : conditions) {
       if (cond.getValue() instanceof String) {
-        String value = cond.getValue().toString();
-
-        /* Ignore Wildcard Only Values (e.g. search for Labels) */
-        if ("?".equals(value) || "*".equals(value)) //$NON-NLS-1$//$NON-NLS-2$
-          continue;
 
         /* Split into Words */
-        words.addAll(extractWords(value));
+        words.addAll(extractWords(cond.getValue().toString()));
       }
     }
 
@@ -1181,7 +1176,7 @@ public class CoreUtils {
     StringTokenizer tokenizer = new StringTokenizer(str, NON_CHAR_DIGIT_DELIMS);
     while (tokenizer.hasMoreElements()) {
       String nextWord = tokenizer.nextElement().toString().toLowerCase();
-      if (!STOP_WORDS.contains(nextWord) && StringUtils.isSet(nextWord))
+      if (!STOP_WORDS.contains(nextWord) && StringUtils.isSet(nextWord) && !StringUtils.isWildcardsOnly(str))
         words.add(nextWord);
     }
 
