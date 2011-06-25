@@ -1155,6 +1155,9 @@ public class News extends AbstractEntity implements INews {
     if (thisState != State.READ && thisState != State.UNREAD)
       return false;
 
+    if (SyncUtils.isSynchronized(this))
+      return false; //Unsupported for synchronized news
+
     String title = news.getTitle();
     if (!(fTitle == null ? title == null : fTitle.equals(title)))
       return true;
