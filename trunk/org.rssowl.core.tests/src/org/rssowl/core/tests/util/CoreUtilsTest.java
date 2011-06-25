@@ -677,11 +677,14 @@ public class CoreUtilsTest {
     List<ISearchCondition> conditions = new ArrayList<ISearchCondition>();
     conditions.add(fFactory.createSearchCondition(field1, SearchSpecifier.CONTAINS, "foo bar"));
     conditions.add(fFactory.createSearchCondition(field2, SearchSpecifier.CONTAINS, "benjamin ?asero"));
-    conditions.add(fFactory.createSearchCondition(field3, SearchSpecifier.CONTAINS, "see the code"));
+    conditions.add(fFactory.createSearchCondition(field3, SearchSpecifier.CONTAINS, "see the code*"));
+    conditions.add(fFactory.createSearchCondition(field3, SearchSpecifier.CONTAINS, "*"));
+    conditions.add(fFactory.createSearchCondition(field3, SearchSpecifier.CONTAINS, "?"));
+    conditions.add(fFactory.createSearchCondition(field3, SearchSpecifier.CONTAINS, "**"));
 
     Set<String> words = CoreUtils.extractWords(conditions);
     assertEquals(6, words.size());
-    assertTrue(words.containsAll(Arrays.asList(new String[] { "foo", "bar", "benjamin", "asero", "see", "code" })));
+    assertTrue(words.containsAll(Arrays.asList(new String[] { "foo", "bar", "benjamin", "?asero", "see", "code*" })));
   }
 
   /**
@@ -693,14 +696,16 @@ public class CoreUtilsTest {
     assertTrue(CoreUtils.extractWords("").isEmpty());
     assertTrue(CoreUtils.extractWords("??").isEmpty());
     assertTrue(CoreUtils.extractWords("**").isEmpty());
+    assertTrue(CoreUtils.extractWords("*").isEmpty());
+    assertTrue(CoreUtils.extractWords("?").isEmpty());
 
     Set<String> words = CoreUtils.extractWords("hello world ba?r");
-    assertEquals(4, words.size());
-    assertTrue(words.containsAll(Arrays.asList(new String[] { "hello", "world", "ba", "r" })));
+    assertEquals(3, words.size());
+    assertTrue(words.containsAll(Arrays.asList(new String[] { "hello", "world", "ba?r" })));
 
     words = CoreUtils.extractWords("see the world ba?r");
-    assertEquals(4, words.size());
-    assertTrue(words.containsAll(Arrays.asList(new String[] { "see", "world", "ba", "r" })));
+    assertEquals(3, words.size());
+    assertTrue(words.containsAll(Arrays.asList(new String[] { "see", "world", "ba?r" })));
   }
 
   /**

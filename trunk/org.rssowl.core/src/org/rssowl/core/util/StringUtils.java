@@ -404,6 +404,28 @@ public class StringUtils {
 
   /**
    * @param str the {@link String} to check for.
+   * @return <code>true</code> if the provided {@link String} only contains of
+   * wildcards and <code>false</code> otherwise.
+   */
+  public static boolean isWildcardsOnly(String str) {
+    if (!StringUtils.isSet(str))
+      return false;
+
+    str = str.trim();
+
+    for (int i = 0; i < str.length(); i++) {
+      char c = str.charAt(i);
+
+      /* Non Wildcard Found */
+      if (c != '*' && c != '?')
+        return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * @param str the {@link String} to check for.
    * @return <code>true</code> if the provided {@link String} contains special
    * characters and wildcard tokens and <code>false</code> otherwise.
    */
