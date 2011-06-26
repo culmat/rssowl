@@ -98,6 +98,7 @@ public class Messages extends NLS {
   public static String RetentionPropertyPage_DELETE_UNREAD;
   public static String RetentionPropertyPage_MAX_AGE;
   public static String RetentionPropertyPage_MAX_NUMBER;
+  public static String RetentionPropertyPage_MAX_NUMBER_SYNCHRONIZED;
   public static String RetentionPropertyPage_NEVER_DELETE_LABELED;
   public static String RetentionPropertyPage_PERFORMING_CLEANUP;
   public static String SearchMarkPropertyPage_ADD_TO_ALL;
