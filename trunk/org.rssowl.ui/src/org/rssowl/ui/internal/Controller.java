@@ -681,6 +681,7 @@ public class Controller {
         IPreferenceScope defaultPreferences = Owl.getPreferenceService().getDefaultScope();
         IPreferenceScope preferences = Owl.getPreferenceService().getEntityScope(bookmark);
 
+        /* Item Limit */
         int itemLimit;
         if (preferences.getBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE))
           itemLimit = preferences.getInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE);
@@ -688,6 +689,16 @@ public class Controller {
           itemLimit = defaultPreferences.getInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE);
 
         properties.put(IConnectionPropertyConstants.ITEM_LIMIT, itemLimit);
+
+        /* Date Limit */
+        long dateLimit = 0;
+        if (preferences.getBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE)) {
+          int days = preferences.getInteger(DefaultPreferences.DEL_NEWS_BY_AGE_VALUE);
+          dateLimit = DateUtils.getToday().getTimeInMillis() - (days * DateUtils.DAY);
+        }
+
+        if (dateLimit != 0)
+          properties.put(IConnectionPropertyConstants.DATE_LIMIT, dateLimit);
       }
 
       /* Add Conditional GET Headers if present */
