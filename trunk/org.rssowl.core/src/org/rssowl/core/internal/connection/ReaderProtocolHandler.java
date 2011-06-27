@@ -38,11 +38,11 @@ import org.rssowl.core.connection.SyncConnectionException;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.interpreter.json.JSONException;
 import org.rssowl.core.internal.interpreter.json.JSONObject;
+import org.rssowl.core.internal.interpreter.json.JSONTokener;
 import org.rssowl.core.interpreter.ParserException;
 import org.rssowl.core.persist.IConditionalGet;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IModelFactory;
-import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.SyncUtils;
 import org.rssowl.core.util.Triple;
 import org.rssowl.core.util.URIUtils;
@@ -81,16 +81,29 @@ public class ReaderProtocolHandler extends DefaultProtocolHandler {
   @Override
   public Triple<IFeed, IConditionalGet, URI> reload(URI link, IProgressMonitor monitor, Map<Object, Object> properties) throws CoreException {
     int itemLimit = DEFAULT_ITEM_LIMIT;
-    if (properties != null && properties.containsKey(IConnectionPropertyConstants.ITEM_LIMIT)) {
-      Object itemLimitObj = properties.get(IConnectionPropertyConstants.ITEM_LIMIT);
-      if (itemLimitObj instanceof Integer)
-        itemLimit = (Integer) itemLimitObj;
-    }
+    long dateLimit = 0;
 
-    if (properties == null)
+    /* Look for Sync-Connection specific properties */
+    if (properties != null) {
+
+      /* Item Limit */
+      if (properties.containsKey(IConnectionPropertyConstants.ITEM_LIMIT)) {
+        Object itemLimitObj = properties.get(IConnectionPropertyConstants.ITEM_LIMIT);
+        if (itemLimitObj instanceof Integer)
+          itemLimit = (Integer) itemLimitObj;
+      }
+
+      /* Date Limit */
+      if (properties.containsKey(IConnectionPropertyConstants.DATE_LIMIT)) {
+        Object dateLimitObj = properties.get(IConnectionPropertyConstants.DATE_LIMIT);
+        if (dateLimitObj instanceof Long) {
+          dateLimit = (Long) dateLimitObj / 1000; //Google only seems to accept seconds here
+        }
+      }
+    } else
       properties= new HashMap<Object, Object>();
 
-    URI googleLink = readerToGoogle(link, itemLimit);
+    URI googleLink = readerToGoogle(link, itemLimit, dateLimit);
     InputStream inS = null;
 
     /* First Try: Use shared token */
@@ -134,7 +147,7 @@ public class ReaderProtocolHandler extends DefaultProtocolHandler {
     IFeed feed = typesFactory.createFeed(null, link);
     feed.setBase(readerToHTTP(link));
     try {
-      JSONObject obj = new JSONObject(StringUtils.readString(new InputStreamReader(inS, UTF_8)));
+      JSONObject obj = new JSONObject(new JSONTokener(new InputStreamReader(inS, UTF_8)));
       Owl.getInterpreter().interpretJSONObject(obj, feed);
     } catch (JSONException e) {
       throw new ParserException(Activator.getDefault().createErrorStatus(e.getMessage(), e));
@@ -193,34 +206,43 @@ public class ReaderProtocolHandler extends DefaultProtocolHandler {
    * <li>client=[your client] : You can use the default Google client (scroll).</li>
    * </ul>
    */
-  private URI readerToGoogle(URI uri, int itemLimit) throws ConnectionException {
+  private URI readerToGoogle(URI uri, int itemLimit, long dateLimit) throws ConnectionException {
 
     /* Handle Special Feeds */
     String linkVal = uri.toString();
     try {
+      String uriStr = null;
 
       /* All Items */
       if (SyncUtils.GOOGLE_READER_ALL_ITEMS_FEED.equals(linkVal))
-        return new URI(SyncUtils.GOOGLE_STREAM_CONTENTS_URL + "user/-/state/com.google/reading-list?n=" + itemLimit + "&client=scroll&ck=" + System.currentTimeMillis()); //$NON-NLS-1$ //$NON-NLS-2$
+        uriStr = SyncUtils.GOOGLE_STREAM_CONTENTS_URL + "user/-/state/com.google/reading-list?n=" + itemLimit + "&client=scroll&ck=" + System.currentTimeMillis(); //$NON-NLS-1$ //$NON-NLS-2$
 
       /* Starred Items */
       else if (SyncUtils.GOOGLE_READER_STARRED_FEED.equals(linkVal))
-        return new URI(SyncUtils.GOOGLE_STREAM_CONTENTS_URL + "user/-/state/com.google/starred?n=" + itemLimit + "&client=scroll&ck=" + System.currentTimeMillis()); //$NON-NLS-1$ //$NON-NLS-2$
+        uriStr = SyncUtils.GOOGLE_STREAM_CONTENTS_URL + "user/-/state/com.google/starred?n=" + itemLimit + "&client=scroll&ck=" + System.currentTimeMillis(); //$NON-NLS-1$ //$NON-NLS-2$
 
       /* Shared Items */
       else if (SyncUtils.GOOGLE_READER_SHARED_ITEMS_FEED.equals(linkVal))
-        return new URI(SyncUtils.GOOGLE_STREAM_CONTENTS_URL + "user/-/state/com.google/broadcast?n=" + itemLimit + "&client=scroll&ck=" + System.currentTimeMillis()); //$NON-NLS-1$ //$NON-NLS-2$
+        uriStr = SyncUtils.GOOGLE_STREAM_CONTENTS_URL + "user/-/state/com.google/broadcast?n=" + itemLimit + "&client=scroll&ck=" + System.currentTimeMillis(); //$NON-NLS-1$ //$NON-NLS-2$
 
       /* Recommended Items */
       else if (SyncUtils.GOOGLE_READER_RECOMMENDED_ITEMS_FEED.equals(linkVal)) {
         String language = Locale.getDefault().getLanguage();
         String exclude = "&xt=user/-/state/com.google/read&xt=user/-/state/com.google/dislike"; //$NON-NLS-1$
-        return new URI(SyncUtils.GOOGLE_STREAM_CONTENTS_URL + "user/-/state/com.google/itemrecs/" + language + "?n=" + itemLimit + "&client=scroll&ck=" + System.currentTimeMillis() + exclude); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        uriStr = SyncUtils.GOOGLE_STREAM_CONTENTS_URL + "user/-/state/com.google/itemrecs/" + language + "?n=" + itemLimit + "&client=scroll&ck=" + System.currentTimeMillis() + exclude; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       }
 
       /* Notes */
       else if (SyncUtils.GOOGLE_READER_NOTES_FEED.equals(linkVal))
-        return new URI(SyncUtils.GOOGLE_STREAM_CONTENTS_URL + "user/-/state/com.google/created?n=" + itemLimit + "&client=scroll&ck=" + System.currentTimeMillis()); //$NON-NLS-1$ //$NON-NLS-2$
+        uriStr = SyncUtils.GOOGLE_STREAM_CONTENTS_URL + "user/-/state/com.google/created?n=" + itemLimit + "&client=scroll&ck=" + System.currentTimeMillis(); //$NON-NLS-1$ //$NON-NLS-2$
+
+      /* Append conditional age value as necessary and return */
+      if (uriStr != null) {
+        if (dateLimit > 0)
+          uriStr = uriStr + "&ot=" + dateLimit; //$NON-NLS-1$
+
+        return new URI(uriStr);
+      }
     } catch (URISyntaxException e) {
       throw new ConnectionException(Activator.getDefault().createErrorStatus(e.getMessage(), e));
     }
@@ -228,7 +250,11 @@ public class ReaderProtocolHandler extends DefaultProtocolHandler {
     /* Normal Synchronized Feed */
     URI httpUri = readerToHTTP(uri);
     try {
-      return new URI(SyncUtils.GOOGLE_FEED_URL + URIUtils.urlEncode(httpUri.toString()) + "?n=" + itemLimit + "&client=scroll&ck=" + System.currentTimeMillis()); //$NON-NLS-1$ //$NON-NLS-2$
+      String uriStr = SyncUtils.GOOGLE_FEED_URL + URIUtils.urlEncode(httpUri.toString()) + "?n=" + itemLimit + "&client=scroll&ck=" + System.currentTimeMillis(); //$NON-NLS-1$ //$NON-NLS-2$
+      if (dateLimit > 0)
+        uriStr = uriStr + "&ot=" + dateLimit; //$NON-NLS-1$
+
+      return new URI(uriStr);
     } catch (URISyntaxException e) {
       throw new ConnectionException(Activator.getDefault().createErrorStatus(e.getMessage(), e));
     }
