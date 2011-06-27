@@ -24,6 +24,7 @@
 
 package org.rssowl.ui.internal.services;
 
+import org.rssowl.core.internal.newsaction.DeleteNewsAction;
 import org.rssowl.core.internal.newsaction.LabelNewsAction;
 import org.rssowl.core.internal.newsaction.MarkReadNewsAction;
 import org.rssowl.core.internal.newsaction.MarkStickyNewsAction;
@@ -94,6 +95,14 @@ public class SyncItem implements Serializable {
         syncItem.setMarkedUnread();
         requiresSync = true;
       }
+
+      /* Delete (Sync like Mark Read and remove Star) */
+      else if ((newState == INews.State.HIDDEN || newState == INews.State.DELETED) && UNREAD_STATES.contains(oldState)) {
+        syncItem.setMarkedRead();
+        if (item.isFlagged())
+          syncItem.setUnStarred();
+        requiresSync = true;
+      }
     }
 
     /* Sticky Change */
@@ -158,6 +167,12 @@ public class SyncItem implements Serializable {
       /* State Change (Mark Unread) */
       if (MarkUnreadNewsAction.ID.equals(actionId)) {
         syncItem.setMarkedUnread();
+        requiresSync = true;
+      }
+
+      /* Delete (Sync like Mark Read) */
+      if (DeleteNewsAction.ID.equals(actionId)) {
+        syncItem.setMarkedRead();
         requiresSync = true;
       }
 

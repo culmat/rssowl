@@ -32,6 +32,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
+import org.rssowl.core.internal.newsaction.DeleteNewsAction;
 import org.rssowl.core.internal.newsaction.LabelNewsAction;
 import org.rssowl.core.internal.newsaction.MarkReadNewsAction;
 import org.rssowl.core.internal.newsaction.MarkStickyNewsAction;
@@ -191,6 +192,26 @@ public class SyncServiceTest {
     assertTrue(item.isUnStarred());
     assertEquals(0, item.getAddedLabels().size());
     assertEquals(2, item.getRemovedLabels().size());
+
+    currentNews.setState(INews.State.HIDDEN);
+    oldNews.setState(INews.State.NEW);
+    item = SyncItem.toSyncItem(new NewsEvent(oldNews, currentNews, true));
+    assertTrue(item.isMarkedRead());
+    assertFalse(item.isMarkedUnread());
+    assertFalse(item.isStarred());
+    assertTrue(item.isUnStarred());
+    assertEquals(0, item.getAddedLabels().size());
+    assertEquals(2, item.getRemovedLabels().size());
+
+    currentNews.setFlagged(true);
+    oldNews.setFlagged(true);
+    item = SyncItem.toSyncItem(new NewsEvent(oldNews, currentNews, true));
+    assertTrue(item.isMarkedRead());
+    assertFalse(item.isMarkedUnread());
+    assertFalse(item.isStarred());
+    assertTrue(item.isUnStarred());
+    assertEquals(0, item.getAddedLabels().size());
+    assertEquals(2, item.getRemovedLabels().size());
   }
 
   /**
@@ -264,6 +285,18 @@ public class SyncServiceTest {
 
     assertFalse(item.isMarkedRead());
     assertTrue(item.isMarkedUnread());
+    assertTrue(item.isStarred());
+    assertFalse(item.isUnStarred());
+    assertEquals(2, item.getAddedLabels().size());
+    assertEquals("Foo", item.getAddedLabels().get(0));
+    assertEquals("Bar", item.getAddedLabels().get(1));
+    assertTrue(item.getRemovedLabels().isEmpty());
+
+    action = fFactory.createFilterAction(DeleteNewsAction.ID);
+    filter.addAction(action);
+    item = SyncItem.toSyncItem(filter, currentNews);
+    assertTrue(item.isMarkedRead());
+    assertFalse(item.isMarkedUnread());
     assertTrue(item.isStarred());
     assertFalse(item.isUnStarred());
     assertEquals(2, item.getAddedLabels().size());
