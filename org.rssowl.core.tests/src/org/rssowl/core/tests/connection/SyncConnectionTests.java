@@ -53,6 +53,7 @@ import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.NewsListener;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.FeedLinkReference;
+import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.SyncUtils;
 import org.rssowl.core.util.Triple;
 import org.rssowl.ui.internal.Controller;
@@ -65,6 +66,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -894,7 +896,7 @@ public class SyncConnectionTests {
     IFeed slashdotFeed = Owl.getModelFactory().createFeed(null, new URI("reader://rss.slashdot.org/Slashdot/slashdot"));
     DynamicDAO.save(slashdotFeed);
 
-    IBookMark slashdotBm = Owl.getModelFactory().createBookMark(null, root, new FeedLinkReference(slashdotFeed.getLink()), "Bild");
+    IBookMark slashdotBm = Owl.getModelFactory().createBookMark(null, root, new FeedLinkReference(slashdotFeed.getLink()), "Slashdot");
     IPreferenceScope prefs = Owl.getPreferenceService().getEntityScope(slashdotBm);
     prefs.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
     prefs.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 800);
@@ -906,7 +908,8 @@ public class SyncConnectionTests {
     SyncService service = new SyncService();
     assertTrue(service.getStatus() == null);
 
-    assertEquals(800, slashdotFeed.getNews().size());
+    int itemCount = slashdotFeed.getNews().size();
+    assertTrue(itemCount > 790); //Sometimes seems to hit 799
 
     List<SyncItem> items= new ArrayList<SyncItem>();
     for (INews news : slashdotFeed.getNews()) {
@@ -925,8 +928,8 @@ public class SyncConnectionTests {
     }
 
     service.testSync(items);
-    assertEquals(800, service.getStatus().getItemCount());
-    assertEquals(800, service.getStatus().getTotalItemCount());
+    assertEquals(itemCount, service.getStatus().getItemCount());
+    assertEquals(itemCount, service.getStatus().getTotalItemCount());
 
     items= new ArrayList<SyncItem>();
     for (INews news : slashdotFeed.getNews()) {
@@ -944,7 +947,34 @@ public class SyncConnectionTests {
     }
 
     service.testSync(items);
-    assertEquals(800, service.getStatus().getItemCount());
-    assertEquals(1600, service.getStatus().getTotalItemCount());
+    assertEquals(itemCount, service.getStatus().getItemCount());
+    assertEquals(itemCount * 2, service.getStatus().getTotalItemCount());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testSyncRecentNewsFromFeed() throws Exception {
+    IFolder root = Owl.getModelFactory().createFolder(null, null, "Root");
+
+    IFeed slashdotFeed = Owl.getModelFactory().createFeed(null, new URI("reader://rss.slashdot.org/Slashdot/slashdot"));
+    DynamicDAO.save(slashdotFeed);
+
+    IBookMark slashdotBm = Owl.getModelFactory().createBookMark(null, root, new FeedLinkReference(slashdotFeed.getLink()), "Slashdot");
+    IPreferenceScope prefs = Owl.getPreferenceService().getEntityScope(slashdotBm);
+    prefs.putBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE, true);
+    prefs.putInteger(DefaultPreferences.DEL_NEWS_BY_AGE_VALUE, 2);
+
+    long ageLimit = DateUtils.getToday().getTimeInMillis() - (2 * DateUtils.DAY);
+
+    DynamicDAO.save(root);
+
+    Controller.getDefault().reload(slashdotBm, null, null);
+
+    for (INews news : slashdotFeed.getNews()) {
+      Date date = news.getPublishDate();
+      assertTrue(ageLimit <= date.getTime());
+    }
   }
 }
