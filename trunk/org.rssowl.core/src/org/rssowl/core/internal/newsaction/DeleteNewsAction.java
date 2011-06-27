@@ -40,6 +40,9 @@ import java.util.Map;
  */
 public class DeleteNewsAction implements INewsAction {
 
+  /** ID of this Action */
+  public static final String ID = "org.rssowl.core.DeleteNewsAction"; //$NON-NLS-1$
+
   /*
    * @see org.rssowl.core.INewsAction#run(java.util.List, java.util.Map,
    * java.lang.Object)
