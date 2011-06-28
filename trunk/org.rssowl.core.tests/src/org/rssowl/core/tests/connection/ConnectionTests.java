@@ -678,7 +678,7 @@ public class ConnectionTests {
 
     authToken = newAuthToken;
 
-    URI uri = URI.create("https://www.google.com/reader/subscriptions/export");
+    URI uri = URI.create(SyncUtils.GOOGLE_READER_OPML_URI);
     IProtocolHandler handler = Owl.getConnectionService().getHandler(uri);
 
     Map<Object, Object> properties = new HashMap<Object, Object>();

@@ -76,6 +76,12 @@ public class SyncUtils {
   /** Google Reader URL */
   public static final String GOOGLE_READER_URL = "https://reader.google.com"; //$NON-NLS-1$
 
+  /** URL to export from Google Reader */
+  public static final String GOOGLE_READER_OPML_URI = "https://www.google.com/reader/subscriptions/export"; //$NON-NLS-1$
+
+  /** URL to unlock the Google Account using a captcha */
+  public static final String CAPTCHA_UNLOCK_URL = "https://www.google.com/accounts/DisplayUnlockCaptcha"; //$NON-NLS-1$
+
   /** Schemes to use for synced feeds */
   public static final String READER_HTTP_SCHEME = "reader"; //$NON-NLS-1$
   public static final String READER_HTTPS_SCHEME = "readers"; //$NON-NLS-1$
