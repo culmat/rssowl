@@ -140,9 +140,6 @@ public class ImportElementsPage extends WizardPage {
   /* Default Feed Search Language */
   private static final String DEFAULT_LANGUAGE = "en"; //$NON-NLS-1$
 
-  /* URL to export from Google Reader */
-  private static final String GOOGLE_READER_OPML_URI = "https://www.google.com/reader/subscriptions/export"; //$NON-NLS-1$
-
   private CheckboxTreeViewer fViewer;
   private FolderChildCheckboxTree fFolderChildTree;
   private Button fDeselectAll;
@@ -889,7 +886,7 @@ public class ImportElementsPage extends WizardPage {
           String googleAuthToken = SyncUtils.getGoogleAuthToken(credentials.getUsername(), credentials.getPassword(), true, monitor);
 
           /* Open Stream */
-          in = openStream(URI.create(GOOGLE_READER_OPML_URI), monitor, INITIAL_CON_TIMEOUT, false, false, googleAuthToken);
+          in = openStream(URI.create(SyncUtils.GOOGLE_READER_OPML_URI), monitor, INITIAL_CON_TIMEOUT, false, false, googleAuthToken);
 
           /* Return on Cancellation */
           if (monitor.isCanceled() || Controller.getDefault().isShuttingDown()) {

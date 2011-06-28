@@ -126,7 +126,6 @@ public class DefaultProtocolHandler implements IProtocolHandler {
   private static final String ERROR_NOT_VERIFIED = "NotVerified"; //$NON-NLS-1$
   private static final String ERROR_NO_TERMS = "TermsNotAgreed"; //$NON-NLS-1$
   private static final String ERROR_CAPTCHA_REQUIRED = "CaptchaRequired"; //$NON-NLS-1$
-  private static final String CAPTCHA_UNLOCK_URL = "https://www.google.com/accounts/DisplayUnlockCaptcha"; //$NON-NLS-1$
   private static final String ERROR_UNKNOWN = "Unknown"; //$NON-NLS-1$
   private static final String ERROR_ACCOUNT_DELETED = "AccountDeleted"; //$NON-NLS-1$
   private static final String ERROR_ACCOUNT_DISABLED = "AccountDisabled"; //$NON-NLS-1$
@@ -541,7 +540,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
         errorMsg = Messages.DefaultProtocolHandler_GR_ERROR_SERVICE_UNAVAILABLE;
       else if (ERROR_CAPTCHA_REQUIRED.equals(errorCode)) {
         errorMsg = Messages.DefaultProtocolHandler_GR_ERROR_CAPTCHA_REQUIRED;
-        errorUrl = CAPTCHA_UNLOCK_URL;
+        errorUrl = SyncUtils.CAPTCHA_UNLOCK_URL;
       }
 
       /* Also look up specified Error URL as necessary */
