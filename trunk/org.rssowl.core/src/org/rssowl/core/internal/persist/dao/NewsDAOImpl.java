@@ -155,15 +155,11 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
           if (newsItem.getId() == null)
             throw new IllegalArgumentException("newsItem was never saved to the database"); //$NON-NLS-1$
 
-          /*
-           * Already handled this news because it's equivalent to one of the
-           * ones processed earlier
-           */
           if (changedNews.contains(newsItem))
-            continue;
+            continue; //Already handled this news because it's equivalent to one of the ones processed earlier
 
           if (!newsItem.isVisible() && affectEquivalentNews)
-            throw new IllegalArgumentException("affectEquivalentNews is not supported for invisible news"); //$NON-NLS-1$
+            continue; //It is possible that another thread marked the news as deleted meanwhile, in this case, continue.
 
           List<INews> equivalentNews;
 
