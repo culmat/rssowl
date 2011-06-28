@@ -96,12 +96,22 @@ public class SyncItem implements Serializable {
         requiresSync = true;
       }
 
-      /* Delete (Sync like Mark Read and remove Star) */
-      else if ((newState == INews.State.HIDDEN || newState == INews.State.DELETED) && UNREAD_STATES.contains(oldState)) {
-        syncItem.setMarkedRead();
-        if (item.isFlagged())
+      /* Delete */
+      else if ((newState == INews.State.HIDDEN || newState == INews.State.DELETED)) {
+
+        /* Mark Read if Unread and remove Star if Flagged */
+        if (UNREAD_STATES.contains(oldState)) {
+          syncItem.setMarkedRead();
+          if (item.isFlagged())
+            syncItem.setUnStarred();
+          requiresSync = true;
+        }
+
+        /* Remove Star if Flagged */
+        else if (oldState == INews.State.READ && item.isFlagged()) {
           syncItem.setUnStarred();
-        requiresSync = true;
+          requiresSync = true;
+        }
       }
     }
 
