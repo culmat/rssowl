@@ -165,6 +165,8 @@ public class PreferencesInitializer implements IPreferencesInitializer {
 
     defaultScope.putBoolean(Preference.CLEAN_UP_REMINDER_STATE.id(), true);
     defaultScope.putInteger(Preference.CLEAN_UP_REMINDER_DAYS_VALUE.id(), 30);
+
+    defaultScope.putBoolean(Preference.CLEAN_UP_BM_BY_SYNCHRONIZATION.id(), true);
   }
 
   /**

@@ -218,6 +218,7 @@ public class CleanUpWizard extends Wizard {
 
         preferences.putBoolean(DefaultPreferences.CLEAN_UP_BM_BY_LAST_UPDATE_STATE, operations.deleteFeedByLastUpdate());
         preferences.putInteger(DefaultPreferences.CLEAN_UP_BM_BY_LAST_UPDATE_VALUE, operations.getLastUpdateDays());
+        preferences.putBoolean(DefaultPreferences.CLEAN_UP_BM_BY_SYNCHRONIZATION, operations.deleteFeedsBySynchronization());
 
         preferences.putBoolean(DefaultPreferences.CLEAN_UP_BM_BY_CON_ERROR, operations.deleteFeedsByConError());
         preferences.putBoolean(DefaultPreferences.CLEAN_UP_BM_BY_DUPLICATES, operations.deleteFeedsByDuplicates());

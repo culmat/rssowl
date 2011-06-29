@@ -32,25 +32,26 @@ package org.rssowl.ui.internal.dialogs.cleanup;
 public class CleanUpOperations {
 
   /* Feed Operations */
-  private boolean fLastVisitInDaysState;
-  private int fLastVisitInDays;
+  private final boolean fLastVisitInDaysState;
+  private final int fLastVisitInDays;
 
-  private boolean fLastUpdateInDaysState;
-  private int fLastUpdateInDays;
+  private final boolean fLastUpdateInDaysState;
+  private final int fLastUpdateInDays;
 
-  private boolean fDeleteFeedsByConError;
+  private final boolean fDeleteFeedsByConError;
   private final boolean fDeleteFeedsByDuplicates;
 
   /* News Operations */
-  private boolean fMaxNewsCountPerFeedState;
-  private int fMaxNewsCountPerFeed;
+  private final boolean fMaxNewsCountPerFeedState;
+  private final int fMaxNewsCountPerFeed;
 
-  private boolean fMaxNewsAgeState;
-  private int fMaxNewsAge;
+  private final boolean fMaxNewsAgeState;
+  private final int fMaxNewsAge;
 
-  private boolean fDeleteReadNews;
-  private boolean fKeepUnreadNews;
-  private boolean fKeepLabeledNews;
+  private final boolean fDeleteReadNews;
+  private final boolean fKeepUnreadNews;
+  private final boolean fKeepLabeledNews;
+  private final boolean fDeleteFeedsBySynchronization;
 
   /**
    * @param lastVisitState
@@ -59,6 +60,7 @@ public class CleanUpOperations {
    * @param lastUpdateInDays
    * @param deleteFeedsByConError
    * @param deleteFeedsByDuplicates
+   * @param deleteFeedsBySynchronization
    * @param maxNewsCountPerFeedState
    * @param maxNewsCountPerFeed
    * @param maxNewsAgeState
@@ -67,13 +69,14 @@ public class CleanUpOperations {
    * @param keepUnreadNews
    * @param keepLabeledNews
    */
-  public CleanUpOperations(boolean lastVisitState, int lastVisitInDays, boolean lastUpdateState, int lastUpdateInDays, boolean deleteFeedsByConError, boolean deleteFeedsByDuplicates, boolean maxNewsCountPerFeedState, int maxNewsCountPerFeed, boolean maxNewsAgeState, int maxNewsAge, boolean deleteReadNews, boolean keepUnreadNews, boolean keepLabeledNews) {
+  public CleanUpOperations(boolean lastVisitState, int lastVisitInDays, boolean lastUpdateState, int lastUpdateInDays, boolean deleteFeedsByConError, boolean deleteFeedsByDuplicates, boolean deleteFeedsBySynchronization, boolean maxNewsCountPerFeedState, int maxNewsCountPerFeed, boolean maxNewsAgeState, int maxNewsAge, boolean deleteReadNews, boolean keepUnreadNews, boolean keepLabeledNews) {
     fLastVisitInDaysState = lastVisitState;
     fLastVisitInDays = lastVisitInDays;
     fLastUpdateInDaysState = lastUpdateState;
     fLastUpdateInDays = lastUpdateInDays;
     fDeleteFeedsByConError = deleteFeedsByConError;
     fDeleteFeedsByDuplicates = deleteFeedsByDuplicates;
+    fDeleteFeedsBySynchronization = deleteFeedsBySynchronization;
     fMaxNewsCountPerFeedState = maxNewsCountPerFeedState;
     fMaxNewsCountPerFeed = maxNewsCountPerFeed;
     fMaxNewsAgeState = maxNewsAgeState;
@@ -101,6 +104,10 @@ public class CleanUpOperations {
 
   boolean deleteFeedsByConError() {
     return fDeleteFeedsByConError;
+  }
+
+  boolean deleteFeedsBySynchronization() {
+    return fDeleteFeedsBySynchronization;
   }
 
   boolean deleteFeedsByDuplicates() {
