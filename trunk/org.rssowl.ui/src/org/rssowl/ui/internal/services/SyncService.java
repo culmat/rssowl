@@ -76,7 +76,7 @@ import java.util.concurrent.locks.Lock;
 public class SyncService implements Receiver<SyncItem> {
 
   /* Delay in Millies before syncing */
-  private static final int SYNC_DELAY = 5000; // 5 seconds (intentionally low due to potential race condition with feed reload)
+  private static final int SYNC_DELAY = 15000; // 15 seconds
 
   /* Sync scheduler interval in Millies */
   private static final int SYNC_SCHEDULER = 300000; // 5 minutes
