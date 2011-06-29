@@ -44,6 +44,7 @@ import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.NewsListener;
 import org.rssowl.core.persist.event.SearchFilterAdapter;
 import org.rssowl.core.util.BatchedBuffer;
+import org.rssowl.core.util.SyncItem;
 import org.rssowl.core.util.BatchedBuffer.Receiver;
 import org.rssowl.core.util.SyncUtils;
 import org.rssowl.ui.internal.Activator;

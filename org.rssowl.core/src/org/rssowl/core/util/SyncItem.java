@@ -22,7 +22,7 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.ui.internal.services;
+package org.rssowl.core.util;
 
 import org.rssowl.core.internal.newsaction.DeleteNewsAction;
 import org.rssowl.core.internal.newsaction.LabelNewsAction;
