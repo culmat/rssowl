@@ -77,7 +77,6 @@ import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.dao.ISearchFilterDAO;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.runnable.NewsEventRunnable;
-import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IDGenerator;
 import org.rssowl.core.util.CoreUtils;
@@ -199,9 +198,9 @@ public class ApplicationServiceImpl implements IApplicationService {
         /* Collect All Incoming Labels */
         Set<String> incomingLabels = new HashSet<String>();
         for (INews item : interpretedFeed.getNews()) {
-          IPreferenceScope properties = Owl.getPreferenceService().getEntityScope(item);
-          String[] labels = properties.getStrings(SyncUtils.GOOGLE_LABELS);
-          if (labels != null) {
+          Object labelsObj = item.getProperty(SyncUtils.GOOGLE_LABELS);
+          if (labelsObj != null && labelsObj instanceof String[]) {
+            String[] labels = (String[]) labelsObj;
             for (String label : labels) {
               incomingLabels.add(label);
             }
@@ -237,16 +236,16 @@ public class ApplicationServiceImpl implements IApplicationService {
 
           /* Assign Labels to News */
           for (INews item : interpretedFeed.getNews()) {
-            IPreferenceScope properties = Owl.getPreferenceService().getEntityScope(item);
-            String[] labels = properties.getStrings(SyncUtils.GOOGLE_LABELS);
-            if (labels != null) {
+            Object labelsObj = item.getProperty(SyncUtils.GOOGLE_LABELS);
+            if (labelsObj != null && labelsObj instanceof String[]) {
+              String[] labels = (String[]) labelsObj;
               for (String labelName : labels) {
                 ILabel label = mapNameToLabel.get(labelName);
                 if (label != null)
                   item.addLabel(label);
               }
             }
-            properties.delete(SyncUtils.GOOGLE_LABELS);
+            item.removeProperty(SyncUtils.GOOGLE_LABELS);
           }
         }
 
@@ -262,18 +261,17 @@ public class ApplicationServiceImpl implements IApplicationService {
       /* Now adjust News State based on Sync */
       if (isSynced) {
         for (INews item : newNewsAdded) {
-          IPreferenceScope properties = Owl.getPreferenceService().getEntityScope(item);
 
           /* News Marked Read */
-          if (properties.getBoolean(SyncUtils.GOOGLE_MARKED_READ)) {
+          if (item.getProperty(SyncUtils.GOOGLE_MARKED_READ) != null) {
             item.setState(INews.State.READ);
-            properties.delete(SyncUtils.GOOGLE_MARKED_READ);
+            item.removeProperty(SyncUtils.GOOGLE_MARKED_READ);
           }
 
           /* News Marked Unread */
-          if (properties.getBoolean(SyncUtils.GOOGLE_MARKED_UNREAD)) {
+          if (item.getProperty(SyncUtils.GOOGLE_MARKED_UNREAD) != null) {
             item.setState(INews.State.UNREAD);
-            properties.delete(SyncUtils.GOOGLE_MARKED_UNREAD);
+            item.removeProperty(SyncUtils.GOOGLE_MARKED_UNREAD);
           }
         }
       }

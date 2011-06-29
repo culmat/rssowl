@@ -33,7 +33,6 @@ import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPerson;
-import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.SyncUtils;
 
@@ -122,7 +121,6 @@ public class JSONInterpreter {
     IModelFactory factory = Owl.getModelFactory();
     INews news = factory.createNews(null, feed, new Date());
     news.setBase(feed.getBase());
-    IPreferenceScope properties = Owl.getPreferenceService().getEntityScope(news);
 
     /* GUID */
     if (item.has(ID))
@@ -198,12 +196,12 @@ public class JSONInterpreter {
 
         /* News is marked read */
         else if (category.endsWith(GOOGLE_STATE_READ)) {
-          properties.putBoolean(SyncUtils.GOOGLE_MARKED_READ, true); //Can not use state here for core reasons
+          news.setProperty(SyncUtils.GOOGLE_MARKED_READ, true); //Can not use state here for core reasons
         }
 
         /* News is marked unread */
         else if (category.endsWith(GOOGLE_STATE_UNREAD)) {
-          properties.putBoolean(SyncUtils.GOOGLE_MARKED_UNREAD, true); //Can not use state here for core reasons
+          news.setProperty(SyncUtils.GOOGLE_MARKED_UNREAD, true); //Can not use state here for core reasons
         }
 
         /* News is starred */
@@ -224,7 +222,7 @@ public class JSONInterpreter {
        * with a single Thread to avoid that Labels are created as duplicates.
        */
       if (!labels.isEmpty())
-        properties.putStrings(SyncUtils.GOOGLE_LABELS, labels.toArray(new String[labels.size()]));
+        news.setProperty(SyncUtils.GOOGLE_LABELS, labels.toArray(new String[labels.size()]));
     }
   }
 
