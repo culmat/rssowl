@@ -2091,6 +2091,40 @@ public class DBManagerTest extends LargeBlockSizeTest {
     DynamicDAO.delete(feed);
   }
 
+  public void testNewsDAOSetStateFromDeletedWithAffectEquivalentNews() {
+    final IFeed feed;
+    feed = DynamicDAO.save(createFeed());
+    final News initialNews = (News) createNews(feed);
+    initialNews.setState(State.NEW);
+    INews newsItem = null;
+    NewsReference newsRef = null;
+    newsItem = DynamicDAO.save(initialNews);
+    newsRef = new NewsReference(newsItem.getId());
+    List<INews> newsList = new ArrayList<INews>();
+    newsList.add(newsItem);
+    Owl.getPersistenceService().getDAOService().getNewsDAO().setState(newsList, State.DELETED, true, false);
+    INews news = newsRef.resolve();
+    assertEquals(State.DELETED, news.getState());
+    Owl.getPersistenceService().getDAOService().getNewsDAO().setState(newsList, State.HIDDEN, true, false);
+  }
+
+  public void testNewsDAOSetStateFromHiddenWithAffectEquivalentNews() {
+    final IFeed feed;
+    feed = DynamicDAO.save(createFeed());
+    final News initialNews = (News) createNews(feed);
+    initialNews.setState(State.NEW);
+    INews newsItem = null;
+    NewsReference newsRef = null;
+    newsItem = DynamicDAO.save(initialNews);
+    newsRef = new NewsReference(newsItem.getId());
+    List<INews> newsList = new ArrayList<INews>();
+    newsList.add(newsItem);
+    Owl.getPersistenceService().getDAOService().getNewsDAO().setState(newsList, State.HIDDEN, true, false);
+    INews news = newsRef.resolve();
+    assertEquals(State.HIDDEN, news.getState());
+    Owl.getPersistenceService().getDAOService().getNewsDAO().setState(newsList, State.READ, true, false);
+  }
+
   /**
    * Tests that the folders inside the folder are returned from the db in the
    * same order as they were saved.
