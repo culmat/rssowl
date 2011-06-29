@@ -701,7 +701,8 @@ public class Controller {
           properties.put(IConnectionPropertyConstants.DATE_LIMIT, dateLimit);
 
         /* Uncommitted Synchronized Items */
-        properties.put(IConnectionPropertyConstants.UNCOMMITTED_ITEMS, fSyncService.getUncommittedItems());
+        if (fSyncService != null)
+          properties.put(IConnectionPropertyConstants.UNCOMMITTED_ITEMS, fSyncService.getUncommittedItems());
       }
 
       /* Add Conditional GET Headers if present */

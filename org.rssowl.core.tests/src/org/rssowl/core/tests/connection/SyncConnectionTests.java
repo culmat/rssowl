@@ -379,9 +379,9 @@ public class SyncConnectionTests {
     SyncService service = new SyncService();
     assertTrue(service.getStatus() == null);
 
-    List<INews> newsToSync= new ArrayList<INews>();
+    List<INews> newsToSync = new ArrayList<INews>();
     List<SyncItem> syncItems = new ArrayList<SyncItem>();
-    Set<String> guids= new HashSet<String>();
+    Set<String> guids = new HashSet<String>();
     for (int i = 0; i < 20; i++) {
       INews newsitem = feed.getNews().get(i);
       SyncItem item = SyncItem.toSyncItem(newsitem);
@@ -911,7 +911,7 @@ public class SyncConnectionTests {
     int itemCount = slashdotFeed.getNews().size();
     assertTrue(itemCount > 790); //Sometimes seems to hit 799
 
-    List<SyncItem> items= new ArrayList<SyncItem>();
+    List<SyncItem> items = new ArrayList<SyncItem>();
     for (INews news : slashdotFeed.getNews()) {
       SyncItem item = SyncItem.toSyncItem(news);
       item.setStarred();
@@ -931,7 +931,7 @@ public class SyncConnectionTests {
     assertEquals(itemCount, service.getStatus().getItemCount());
     assertEquals(itemCount, service.getStatus().getTotalItemCount());
 
-    items= new ArrayList<SyncItem>();
+    items = new ArrayList<SyncItem>();
     for (INews news : slashdotFeed.getNews()) {
       SyncItem item = SyncItem.toSyncItem(news);
       item.setUnStarred();
@@ -975,6 +975,55 @@ public class SyncConnectionTests {
     for (INews news : slashdotFeed.getNews()) {
       Date date = news.getPublishDate();
       assertTrue(ageLimit <= date.getTime());
+    }
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testIncomingMergeConflict() throws Exception {
+    URI slashdot = new URI("reader://rss.slashdot.org/Slashdot/slashdot");
+    IConnectionService conManager = Owl.getConnectionService();
+    IProtocolHandler handler = conManager.getHandler(slashdot);
+
+    Map<Object, Object> properties = new HashMap<Object, Object>();
+    Map<String, SyncItem> syncitems = new HashMap<String, SyncItem>();
+    properties.put(IConnectionPropertyConstants.UNCOMMITTED_ITEMS, syncitems);
+
+    Triple<IFeed, IConditionalGet, URI> result = handler.reload(slashdot, new NullProgressMonitor(), null);
+
+    List<INews> news = result.getFirst().getNews();
+    for (int i = 0; i < 10; i++) {
+      INews item = news.get(i);
+      SyncItem sync = SyncItem.toSyncItem(item);
+      syncitems.put(sync.getId(), sync);
+      sync.setMarkedRead();
+      sync.setStarred();
+      sync.addLabel("Foo");
+    }
+
+    result = handler.reload(slashdot, new NullProgressMonitor(), properties);
+    news = result.getFirst().getNews();
+    for (INews item : news) {
+      if (syncitems.containsKey(item.getGuid().getValue())) {
+        assertTrue(item.getProperty(SyncUtils.GOOGLE_MARKED_READ) != null);
+        assertTrue(item.isFlagged());
+
+        Object labelsObj = item.getProperty(SyncUtils.GOOGLE_LABELS);
+        assertNotNull(labelsObj);
+
+        String[] labels = (String[]) labelsObj;
+        boolean labelFound = false;
+        for (String label : labels) {
+          if ("Foo".equals(label)) {
+            labelFound = true;
+            break;
+          }
+        }
+
+        assertTrue(labelFound);
+      }
     }
   }
 }
