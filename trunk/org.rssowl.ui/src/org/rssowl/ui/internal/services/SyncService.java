@@ -44,8 +44,8 @@ import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.NewsListener;
 import org.rssowl.core.persist.event.SearchFilterAdapter;
 import org.rssowl.core.util.BatchedBuffer;
-import org.rssowl.core.util.SyncItem;
 import org.rssowl.core.util.BatchedBuffer.Receiver;
+import org.rssowl.core.util.SyncItem;
 import org.rssowl.core.util.SyncUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Controller;
@@ -257,6 +257,13 @@ public class SyncService implements Receiver<SyncItem> {
    */
   public SyncStatus getStatus() {
     return fStatus;
+  }
+
+  /**
+   * @return a {@link Map} of uncommitted {@link SyncItem} at this moment in time.
+   */
+  public Map<String, SyncItem> getUncommittedItems() {
+    return fSyncItemsManager.getUncommittedItems();
   }
 
   /**
