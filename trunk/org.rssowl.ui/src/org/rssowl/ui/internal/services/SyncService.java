@@ -149,7 +149,7 @@ public class SyncService implements Receiver<SyncItem> {
 
     /* Schedule Sync of previously uncommitted items as needed */
     if (fSyncItemsManager.hasUncommittedItems())
-      addAllAsync(fSyncItemsManager.getUncommittedItems()); //Must add async because the buffer is blocking while running
+      addAllAsync(fSyncItemsManager.getUncommittedItems().values()); //Must add async because the buffer is blocking while running
 
     /* Start a Job that periodically tries to sync uncommitted items */
     fSyncScheduler = new Job("") { //$NON-NLS-1$
@@ -159,7 +159,7 @@ public class SyncService implements Receiver<SyncItem> {
 
           /* Only trigger synchronization if the synchronizer is not already running and if we have uncommitted items */
           if (fSyncItemsManager.hasUncommittedItems() && !fSynchronizer.isScheduled())
-            fSynchronizer.addAll(fSyncItemsManager.getUncommittedItems());
+            fSynchronizer.addAll(fSyncItemsManager.getUncommittedItems().values());
 
           /* Re-Schedule */
           schedule(SYNC_SCHEDULER);
@@ -246,7 +246,7 @@ public class SyncService implements Receiver<SyncItem> {
     JobRunner.runInBackgroundThread(new Runnable() {
       public void run() {
         if (!Controller.getDefault().isShuttingDown() && fSyncItemsManager.hasUncommittedItems() && !fSynchronizer.isScheduled())
-          fSynchronizer.addAll(fSyncItemsManager.getUncommittedItems());
+          fSynchronizer.addAll(fSyncItemsManager.getUncommittedItems().values());
       }
     });
   }
@@ -293,7 +293,7 @@ public class SyncService implements Receiver<SyncItem> {
 
     /* Synchronize */
     try {
-      int itemCount = sync(fSyncItemsManager.getUncommittedItems(), monitor);
+      int itemCount = sync(fSyncItemsManager.getUncommittedItems().values(), monitor);
       int totalItemCount = fTotalSyncItemCount.addAndGet(itemCount);
       if (itemCount > 0)
         fStatus = new SyncStatus(itemCount, totalItemCount);
@@ -317,22 +317,22 @@ public class SyncService implements Receiver<SyncItem> {
   private void handleAuthenticationRequired(final IProgressMonitor monitor) {
     if (!Controller.getDefault().isShuttingDown() && !monitor.isCanceled()) {
       JobRunner.runInBackgroundThread(new Runnable() { //Run in background thread to avoid lock contention in buffer due to UI lock
-        public void run() {
-          Lock loginLock = Controller.getDefault().getLoginDialogLock();
-          if (!Controller.getDefault().isShuttingDown() && !monitor.isCanceled() && loginLock.tryLock()) { //Avoid multiple login dialogs if login dialog already showing
-            try {
-              JobRunner.runSyncedInUIThread(new Runnable() {
-                public void run() {
-                  if (!Controller.getDefault().isShuttingDown() && !monitor.isCanceled())
-                    OwlUI.openSyncLogin(null);
+            public void run() {
+              Lock loginLock = Controller.getDefault().getLoginDialogLock();
+              if (!Controller.getDefault().isShuttingDown() && !monitor.isCanceled() && loginLock.tryLock()) { //Avoid multiple login dialogs if login dialog already showing
+                try {
+                  JobRunner.runSyncedInUIThread(new Runnable() {
+                    public void run() {
+                      if (!Controller.getDefault().isShuttingDown() && !monitor.isCanceled())
+                        OwlUI.openSyncLogin(null);
+                    }
+                  });
+                } finally {
+                  loginLock.unlock();
                 }
-              });
-            } finally {
-              loginLock.unlock();
+              }
             }
-          }
-        }
-      });
+          });
     }
   }
 
@@ -482,13 +482,7 @@ public class SyncService implements Receiver<SyncItem> {
         mapFeedToSyncItems.put(item.getStreamId(), streamItems);
       }
 
-      SyncItem existingItem = streamItems.get(item.getId());
-      if (existingItem == null)
-        streamItems.put(item.getId(), item);
-      else {
-        existingItem.merge(item);
-        fSyncItemsManager.removeUncommitted(item); //Item got merged, so remove from manager
-      }
+      streamItems.put(item.getId(), item);
     }
 
     return mapFeedToSyncItems;
