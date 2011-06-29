@@ -101,7 +101,7 @@ public class ReaderProtocolHandler extends DefaultProtocolHandler {
         }
       }
     } else
-      properties= new HashMap<Object, Object>();
+      properties = new HashMap<Object, Object>();
 
     URI googleLink = readerToGoogle(link, itemLimit, dateLimit);
     InputStream inS = null;
@@ -211,38 +211,28 @@ public class ReaderProtocolHandler extends DefaultProtocolHandler {
     /* Handle Special Feeds */
     String linkVal = uri.toString();
     try {
-      String uriStr = null;
 
       /* All Items */
       if (SyncUtils.GOOGLE_READER_ALL_ITEMS_FEED.equals(linkVal))
-        uriStr = SyncUtils.GOOGLE_STREAM_CONTENTS_URL + "user/-/state/com.google/reading-list?n=" + itemLimit + "&client=scroll&ck=" + System.currentTimeMillis(); //$NON-NLS-1$ //$NON-NLS-2$
+        return new URI(appendCommonParams(SyncUtils.GOOGLE_STREAM_CONTENTS_URL + "user/-/state/com.google/reading-list", itemLimit, dateLimit, false)); //$NON-NLS-1$
 
       /* Starred Items */
       else if (SyncUtils.GOOGLE_READER_STARRED_FEED.equals(linkVal))
-        uriStr = SyncUtils.GOOGLE_STREAM_CONTENTS_URL + "user/-/state/com.google/starred?n=" + itemLimit + "&client=scroll&ck=" + System.currentTimeMillis(); //$NON-NLS-1$ //$NON-NLS-2$
+        return new URI(appendCommonParams(SyncUtils.GOOGLE_STREAM_CONTENTS_URL + "user/-/state/com.google/starred", itemLimit, dateLimit, false)); //$NON-NLS-1$
 
       /* Shared Items */
       else if (SyncUtils.GOOGLE_READER_SHARED_ITEMS_FEED.equals(linkVal))
-        uriStr = SyncUtils.GOOGLE_STREAM_CONTENTS_URL + "user/-/state/com.google/broadcast?n=" + itemLimit + "&client=scroll&ck=" + System.currentTimeMillis(); //$NON-NLS-1$ //$NON-NLS-2$
+        return new URI(appendCommonParams(SyncUtils.GOOGLE_STREAM_CONTENTS_URL + "user/-/state/com.google/broadcast", itemLimit, dateLimit, false)); //$NON-NLS-1$
 
       /* Recommended Items */
       else if (SyncUtils.GOOGLE_READER_RECOMMENDED_ITEMS_FEED.equals(linkVal)) {
         String language = Locale.getDefault().getLanguage();
-        String exclude = "&xt=user/-/state/com.google/read&xt=user/-/state/com.google/dislike"; //$NON-NLS-1$
-        uriStr = SyncUtils.GOOGLE_STREAM_CONTENTS_URL + "user/-/state/com.google/itemrecs/" + language + "?n=" + itemLimit + "&client=scroll&ck=" + System.currentTimeMillis() + exclude; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        return new URI(appendCommonParams(SyncUtils.GOOGLE_STREAM_CONTENTS_URL + "user/-/state/com.google/itemrecs/" + language, itemLimit, dateLimit, true)); //$NON-NLS-1$
       }
 
       /* Notes */
       else if (SyncUtils.GOOGLE_READER_NOTES_FEED.equals(linkVal))
-        uriStr = SyncUtils.GOOGLE_STREAM_CONTENTS_URL + "user/-/state/com.google/created?n=" + itemLimit + "&client=scroll&ck=" + System.currentTimeMillis(); //$NON-NLS-1$ //$NON-NLS-2$
-
-      /* Append conditional age value as necessary and return */
-      if (uriStr != null) {
-        if (dateLimit > 0)
-          uriStr = uriStr + "&ot=" + dateLimit; //$NON-NLS-1$
-
-        return new URI(uriStr);
-      }
+        return new URI(appendCommonParams(SyncUtils.GOOGLE_STREAM_CONTENTS_URL + "user/-/state/com.google/created", itemLimit, dateLimit, false)); //$NON-NLS-1$
     } catch (URISyntaxException e) {
       throw new ConnectionException(Activator.getDefault().createErrorStatus(e.getMessage(), e));
     }
@@ -250,14 +240,36 @@ public class ReaderProtocolHandler extends DefaultProtocolHandler {
     /* Normal Synchronized Feed */
     URI httpUri = readerToHTTP(uri);
     try {
-      String uriStr = SyncUtils.GOOGLE_FEED_URL + URIUtils.urlEncode(httpUri.toString()) + "?n=" + itemLimit + "&client=scroll&ck=" + System.currentTimeMillis(); //$NON-NLS-1$ //$NON-NLS-2$
-      if (dateLimit > 0)
-        uriStr = uriStr + "&ot=" + dateLimit; //$NON-NLS-1$
-
-      return new URI(uriStr);
+      return new URI(appendCommonParams(SyncUtils.GOOGLE_FEED_URL + URIUtils.urlEncode(httpUri.toString()), itemLimit, dateLimit, false));
     } catch (URISyntaxException e) {
       throw new ConnectionException(Activator.getDefault().createErrorStatus(e.getMessage(), e));
     }
+  }
+
+  private String appendCommonParams(String link, int itemLimit, long dateLimit, boolean onlyRecommended) {
+    StringBuilder str = new StringBuilder(link);
+
+    /* Item Limit */
+    str.append("?n=").append(itemLimit); //$NON-NLS-1$
+
+    /* Client */
+    str.append("&client=scroll"); //$NON-NLS-1$
+
+    /* Date Limit */
+    if (dateLimit > 0)
+      str.append("&ot=").append(dateLimit); //$NON-NLS-1$
+
+    /* No comments or likes */
+    str.append("&likes=false&comments=false"); //$NON-NLS-1$
+
+    /* Only Recommended */
+    if (onlyRecommended)
+      str.append("&xt=user/-/state/com.google/read&xt=user/-/state/com.google/dislike"); //$NON-NLS-1$
+
+    /* Caching Time */
+    str.append("&ck=").append(System.currentTimeMillis()); //$NON-NLS-1$
+
+    return str.toString();
   }
 
   /*
