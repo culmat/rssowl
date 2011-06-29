@@ -27,6 +27,7 @@ package org.rssowl.ui.internal.services;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.osgi.util.NLS;
+import org.rssowl.core.util.SyncItem;
 import org.rssowl.ui.internal.Activator;
 
 import java.io.File;

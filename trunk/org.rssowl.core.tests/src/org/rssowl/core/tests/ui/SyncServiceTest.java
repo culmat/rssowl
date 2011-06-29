@@ -46,13 +46,15 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.event.NewsEvent;
-import org.rssowl.ui.internal.services.SyncItem;
+import org.rssowl.core.util.SyncItem;
 import org.rssowl.ui.internal.services.SyncItemsManager;
 
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
-import java.util.List;
+import java.util.Iterator;
 
 /**
  * Tests for the {@link SyncService}, {@link SyncItemsManager} and
@@ -69,7 +71,7 @@ public class SyncServiceTest {
   @Before
   public void setUp() throws Exception {
     ((PersistenceServiceImpl) Owl.getPersistenceService()).recreateSchemaForTests();
-    SyncItemsManager manager= new SyncItemsManager();
+    SyncItemsManager manager = new SyncItemsManager();
     manager.startup();
     manager.clearUncommittedItems();
     manager.shutdown();
@@ -553,13 +555,30 @@ public class SyncServiceTest {
     manager.startup();
     assertTrue(manager.hasUncommittedItems());
 
-    List<SyncItem> uncommittedItems = manager.getUncommittedItems();
+    Collection<SyncItem> uncommittedItems = manager.getUncommittedItems().values();
     assertEquals(2, uncommittedItems.size());
 
-    SyncItem loadedItem1 = uncommittedItems.get(0);
-    SyncItem loadedItem2 = uncommittedItems.get(1);
+    Iterator<SyncItem> iterator = uncommittedItems.iterator();
+    SyncItem loadedItem1 = iterator.next();
+    SyncItem loadedItem2 = iterator.next();
 
     assertTrue(item1.isEquivalent(loadedItem1));
     assertTrue(item2.isEquivalent(loadedItem2));
+
+    SyncItem item3 = SyncItem.toSyncItem(news1);
+    item3.setMarkedUnread();
+    item3.setStarred();
+
+    manager.addUncommitted(Collections.singleton(item3));
+
+    uncommittedItems = manager.getUncommittedItems().values();
+    assertEquals(2, uncommittedItems.size());
+
+    iterator = uncommittedItems.iterator();
+    loadedItem1 = iterator.next();
+
+    assertFalse(loadedItem1.isMarkedRead());
+    assertTrue(loadedItem1.isMarkedUnread());
+    assertTrue(loadedItem1.isStarred());
   }
 }
