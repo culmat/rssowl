@@ -27,6 +27,7 @@ package org.rssowl.core.tests.ui;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
@@ -47,6 +48,7 @@ import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.util.SyncItem;
+import org.rssowl.core.util.SyncUtils;
 import org.rssowl.ui.internal.services.SyncItemsManager;
 
 import java.net.URI;
@@ -455,6 +457,102 @@ public class SyncServiceTest {
     assertEquals("world", item1.getAddedLabels().get(2));
     assertEquals(1, item1.getRemovedLabels().size());
     assertEquals("hello", item1.getRemovedLabels().get(0));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testApplySyncItem() throws Exception {
+    IFeed feed = fFactory.createFeed(null, URI.create("rssowl.org"));
+
+    INews news1 = fFactory.createNews(null, feed, new Date());
+    news1.setInReplyTo(feed.getLink().toString());
+    news1.setGuid(fFactory.createGuid(news1, "tag:google.com/foo", true));
+
+    SyncItem sync = SyncItem.toSyncItem(news1);
+    sync.applyTo(news1);
+
+    assertTrue(news1.getState() == INews.State.NEW);
+    assertNull(news1.getProperty(SyncUtils.GOOGLE_MARKED_READ));
+    assertNull(news1.getProperty(SyncUtils.GOOGLE_MARKED_UNREAD));
+    assertFalse(news1.isFlagged());
+    assertTrue(news1.getLabels().isEmpty());
+
+    sync.setMarkedRead();
+    sync.applyTo(news1);
+
+    assertTrue(news1.getState() == INews.State.NEW);
+    assertNotNull(news1.getProperty(SyncUtils.GOOGLE_MARKED_READ));
+    assertNull(news1.getProperty(SyncUtils.GOOGLE_MARKED_UNREAD));
+    assertFalse(news1.isFlagged());
+    assertTrue(news1.getLabels().isEmpty());
+
+    sync.setMarkedUnread();
+    sync.applyTo(news1);
+
+    assertTrue(news1.getState() == INews.State.NEW);
+    assertNull(news1.getProperty(SyncUtils.GOOGLE_MARKED_READ));
+    assertNotNull(news1.getProperty(SyncUtils.GOOGLE_MARKED_UNREAD));
+    assertFalse(news1.isFlagged());
+    assertTrue(news1.getLabels().isEmpty());
+
+    sync.setStarred();
+    sync.applyTo(news1);
+
+    assertTrue(news1.getState() == INews.State.NEW);
+    assertNull(news1.getProperty(SyncUtils.GOOGLE_MARKED_READ));
+    assertNotNull(news1.getProperty(SyncUtils.GOOGLE_MARKED_UNREAD));
+    assertTrue(news1.isFlagged());
+    assertTrue(news1.getLabels().isEmpty());
+
+    sync.setUnStarred();
+    sync.applyTo(news1);
+
+    assertTrue(news1.getState() == INews.State.NEW);
+    assertNull(news1.getProperty(SyncUtils.GOOGLE_MARKED_READ));
+    assertNotNull(news1.getProperty(SyncUtils.GOOGLE_MARKED_UNREAD));
+    assertFalse(news1.isFlagged());
+    assertTrue(news1.getLabels().isEmpty());
+
+    sync.addLabel("Foo");
+    sync.addLabel("Hello World");
+    sync.removeLabel("Bar");
+    sync.applyTo(news1);
+
+    assertTrue(news1.getState() == INews.State.NEW);
+    assertNull(news1.getProperty(SyncUtils.GOOGLE_MARKED_READ));
+    assertNotNull(news1.getProperty(SyncUtils.GOOGLE_MARKED_UNREAD));
+    assertFalse(news1.isFlagged());
+    assertTrue(news1.getLabels().isEmpty());
+
+    Object labelsObj = news1.getProperty(SyncUtils.GOOGLE_LABELS);
+    assertNotNull(labelsObj);
+    assertTrue(labelsObj instanceof String[]);
+
+    String[] labels = (String[]) labelsObj;
+    assertEquals(2, labels.length);
+    assertTrue(labels[0].equals("Foo") || labels[1].equals("Foo"));
+    assertTrue(labels[0].equals("Hello World") || labels[1].equals("Hello World"));
+
+    sync.removeLabel("Foo");
+    sync.removeLabel("Hello World");
+    sync.addLabel("Bar");
+    sync.applyTo(news1);
+
+    assertTrue(news1.getState() == INews.State.NEW);
+    assertNull(news1.getProperty(SyncUtils.GOOGLE_MARKED_READ));
+    assertNotNull(news1.getProperty(SyncUtils.GOOGLE_MARKED_UNREAD));
+    assertFalse(news1.isFlagged());
+    assertTrue(news1.getLabels().isEmpty());
+
+    labelsObj = news1.getProperty(SyncUtils.GOOGLE_LABELS);
+    assertNotNull(labelsObj);
+    assertTrue(labelsObj instanceof String[]);
+
+    labels = (String[]) labelsObj;
+    assertEquals(1, labels.length);
+    assertTrue(labels[0].equals("Bar"));
   }
 
   /**

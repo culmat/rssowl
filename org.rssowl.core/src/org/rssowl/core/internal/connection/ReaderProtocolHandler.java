@@ -43,6 +43,8 @@ import org.rssowl.core.interpreter.ParserException;
 import org.rssowl.core.persist.IConditionalGet;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IModelFactory;
+import org.rssowl.core.persist.INews;
+import org.rssowl.core.util.SyncItem;
 import org.rssowl.core.util.SyncUtils;
 import org.rssowl.core.util.Triple;
 import org.rssowl.core.util.URIUtils;
@@ -53,6 +55,7 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -78,6 +81,7 @@ public class ReaderProtocolHandler extends DefaultProtocolHandler {
    * org.rssowl.core.internal.connection.DefaultProtocolHandler#reload(java.
    * net.URI, org.eclipse.core.runtime.IProgressMonitor, java.util.Map)
    */
+  @SuppressWarnings("unchecked")
   @Override
   public Triple<IFeed, IConditionalGet, URI> reload(URI link, IProgressMonitor monitor, Map<Object, Object> properties) throws CoreException {
     int itemLimit = DEFAULT_ITEM_LIMIT;
@@ -153,6 +157,27 @@ public class ReaderProtocolHandler extends DefaultProtocolHandler {
       throw new ParserException(Activator.getDefault().createErrorStatus(e.getMessage(), e));
     } catch (IOException e) {
       throw new ParserException(Activator.getDefault().createErrorStatus(e.getMessage(), e));
+    }
+
+    /* Update News based on uncommitted Items */
+    Object uncommittedItemsObj = properties.get(IConnectionPropertyConstants.UNCOMMITTED_ITEMS);
+    if (uncommittedItemsObj != null) {
+      Map<String, SyncItem> uncommittedItems = (Map<String, SyncItem>) uncommittedItemsObj;
+      if (!uncommittedItems.isEmpty()) {
+        List<INews> news = feed.getNews();
+        for (INews item : news) {
+          if (item.getGuid() == null || item.getGuid().getValue() == null)
+            continue;
+
+          /* Check for Existing Uncommitted SyncItem */
+          SyncItem syncItem = uncommittedItems.get(item.getGuid().getValue());
+          if (syncItem == null)
+            continue;
+
+          /* Apply State from SyncItem to News */
+          syncItem.applyTo(item);
+        }
+      }
     }
 
     return Triple.create(feed, conditionalGet, link);

@@ -348,27 +348,81 @@ public class SyncItem implements Serializable {
    * @param item the other {@link SyncItem} to merge into this item.
    */
   public void merge(SyncItem item) {
+
+    /* Mark Read */
     if (item.fMarkedRead)
       setMarkedRead();
 
+    /* Mark Unread */
     if (item.fMarkedUnread)
       setMarkedUnread();
 
+    /* Set Starred */
     if (item.fStarred)
       setStarred();
 
+    /* Set Unstarred */
     if (item.fUnStarred)
       setUnStarred();
 
+    /* Add Labels */
     if (item.fAddedLabels != null) {
       for (String label : item.fAddedLabels) {
         addLabel(label);
       }
     }
 
+    /* Remove Labels */
     if (item.fRemovedLabels != null) {
       for (String label : item.fRemovedLabels) {
         removeLabel(label);
+      }
+    }
+  }
+
+  /**
+   * This method will apply the properties of this {@link SyncItem} to the given
+   * {@link INews}.
+   *
+   * @param news the {@link INews} to apply all properties of this
+   * {@link SyncItem} to.
+   */
+  public void applyTo(INews news) {
+
+    /* Mark Read */
+    if (isMarkedRead()) {
+      news.setProperty(SyncUtils.GOOGLE_MARKED_READ, true);
+      news.removeProperty(SyncUtils.GOOGLE_MARKED_UNREAD);
+    }
+
+    /* Mark Unread */
+    if (isMarkedUnread()) {
+      news.setProperty(SyncUtils.GOOGLE_MARKED_UNREAD, true);
+      news.removeProperty(SyncUtils.GOOGLE_MARKED_READ);
+    }
+
+    /* Set Starred */
+    if (isStarred())
+      news.setFlagged(true);
+
+    /* Set Unstarred */
+    if (isUnStarred())
+      news.setFlagged(false);
+
+    /* Update Labels */
+    if (fAddedLabels != null || fRemovedLabels != null) {
+      Object labelsObj = news.getProperty(SyncUtils.GOOGLE_LABELS);
+      if (labelsObj == null)
+        labelsObj = new String[0];
+
+      if (labelsObj instanceof String[]) {
+        Set<String> labels = new HashSet<String>(Arrays.asList((String[]) labelsObj));
+        if (fAddedLabels != null)
+          labels.addAll(fAddedLabels);
+        if (fRemovedLabels != null)
+          labels.removeAll(fRemovedLabels);
+
+        news.setProperty(SyncUtils.GOOGLE_LABELS, labels.toArray(new String[labels.size()]));
       }
     }
   }
