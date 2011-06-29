@@ -107,7 +107,7 @@ public class CleanUpTests {
     marks.add(bm3);
 
     /* Last Visit Date = 3 days */
-    CleanUpOperations ops = new CleanUpOperations(true, 3, false, 0, false, false, false, 0, false, 0, false, false, false);
+    CleanUpOperations ops = new CleanUpOperations(true, 3, false, 0, false, false, false, false, 0, false, 0, false, false, false);
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
@@ -241,7 +241,7 @@ public class CleanUpTests {
     marks.add(bm3);
 
     /* Last Update Date = 3 days */
-    CleanUpOperations ops = new CleanUpOperations(false, 0, true, 3, false, false, false, 0, false, 0, false, false, false);
+    CleanUpOperations ops = new CleanUpOperations(false, 0, true, 3, false, false, false, false, 0, false, 0, false, false, false);
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
@@ -294,7 +294,7 @@ public class CleanUpTests {
     marks.add(bm3);
 
     /* Last Update Date = 3 days */
-    CleanUpOperations ops = new CleanUpOperations(false, 0, false, 0, true, false, false, 0, false, 0, false, false, false);
+    CleanUpOperations ops = new CleanUpOperations(false, 0, false, 0, true, false, false, false, 0, false, 0, false, false, false);
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
@@ -361,7 +361,7 @@ public class CleanUpTests {
     marks.add(bm3);
 
     /* Delete Duplicates */
-    CleanUpOperations ops = new CleanUpOperations(false, 0, false, 0, false, true, false, 0, false, 0, false, false, false);
+    CleanUpOperations ops = new CleanUpOperations(false, 0, false, 0, false, true, false, false, 0, false, 0, false, false, false);
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
@@ -427,7 +427,7 @@ public class CleanUpTests {
     marks.add(bm3);
 
     /* Last Update Date = 3 days, Last Visit = 3 days */
-    CleanUpOperations ops = new CleanUpOperations(true, 3, true, 3, false, false, false, 0, false, 0, false, false, false);
+    CleanUpOperations ops = new CleanUpOperations(true, 3, true, 3, false, false, false, false, 0, false, 0, false, false, false);
 
     bm3.setLastVisitDate(new Date(System.currentTimeMillis() - 4 * DAY));
 
@@ -511,7 +511,7 @@ public class CleanUpTests {
     marks.add(bm3);
 
     /* Max News Count: 1 */
-    CleanUpOperations ops = new CleanUpOperations(false, 0, false, 0, false, false, true, 1, false, 0, false, false, false);
+    CleanUpOperations ops = new CleanUpOperations(false, 0, false, 0, false, false, false, true, 1, false, 0, false, false, false);
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
@@ -529,7 +529,7 @@ public class CleanUpTests {
     }
 
     /* Max News Count: 2 */
-    ops = new CleanUpOperations(false, 0, false, 0, false, false, true, 2, false, 0, false, false, false);
+    ops = new CleanUpOperations(false, 0, false, 0, false, false, false, true, 2, false, 0, false, false, false);
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
@@ -582,7 +582,7 @@ public class CleanUpTests {
     marks.add(bm3);
 
     /* Max News Age = 3 days */
-    CleanUpOperations ops = new CleanUpOperations(false, 0, false, 0, false, false, false, 0, true, 3, false, false, false);
+    CleanUpOperations ops = new CleanUpOperations(false, 0, false, 0, false, false, false, false, 0, true, 3, false, false, false);
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
@@ -600,7 +600,7 @@ public class CleanUpTests {
     }
 
     /* Max News Age = 1 days */
-    ops = new CleanUpOperations(false, 0, false, 0, false, false, false, 0, true, 1, false, false, false);
+    ops = new CleanUpOperations(false, 0, false, 0, false, false, false, false, 0, true, 1, false, false, false);
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
@@ -659,7 +659,7 @@ public class CleanUpTests {
     marks.add(bm3);
 
     /* Max News Age = 3 days and keep unread */
-    CleanUpOperations ops = new CleanUpOperations(false, 0, false, 0, false, false, false, 0, true, 3, false, true, false);
+    CleanUpOperations ops = new CleanUpOperations(false, 0, false, 0, false, false, false, false, 0, true, 3, false, true, false);
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
@@ -731,7 +731,7 @@ public class CleanUpTests {
     marks.add(bm3);
 
     /* Max News Age = 3 days and keep unread */
-    CleanUpOperations ops = new CleanUpOperations(false, 0, false, 0, false, false, false, 0, true, 3, false, false, true);
+    CleanUpOperations ops = new CleanUpOperations(false, 0, false, 0, false, false, false, false, 0, true, 3, false, false, true);
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
@@ -804,7 +804,7 @@ public class CleanUpTests {
     marks.add(bm3);
 
     /* Max News Age = 3 days and keep unread */
-    CleanUpOperations ops = new CleanUpOperations(false, 0, false, 0, false, false, false, 0, true, 3, false, false, true);
+    CleanUpOperations ops = new CleanUpOperations(false, 0, false, 0, false, false, false, false, 0, true, 3, false, false, true);
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
@@ -883,7 +883,7 @@ public class CleanUpTests {
     marks.add(bm3);
 
     /* Max Last Visit Age = 3 days && Max News Age = 3 days */
-    CleanUpOperations ops = new CleanUpOperations(true, 3, false, 0, false, false, false, 0, true, 3, false, false, false);
+    CleanUpOperations ops = new CleanUpOperations(true, 3, false, 0, false, false, false, false, 0, true, 3, false, false, false);
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
@@ -947,7 +947,7 @@ public class CleanUpTests {
     marks.add(bm3);
 
     /* Max News Age = 3 days and Max Count = 1 */
-    CleanUpOperations ops = new CleanUpOperations(false, 0, false, 0, false, false, true, 1, true, 3, false, false, false);
+    CleanUpOperations ops = new CleanUpOperations(false, 0, false, 0, false, false, false, true, 1, true, 3, false, false, false);
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
