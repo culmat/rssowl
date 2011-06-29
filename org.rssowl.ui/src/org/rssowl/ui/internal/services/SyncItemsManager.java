@@ -35,9 +35,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The {@link SyncItemsManager} serializes and deserializes uncommitted
@@ -50,7 +50,7 @@ public class SyncItemsManager {
   /* File of uncommitted sync items */
   private static final String UNCOMMITTED_SYNCITEMS_FILE = "syncitems"; //$NON-NLS-1$
 
-  private List<SyncItem> fItems = new ArrayList<SyncItem>();
+  private Map<String, SyncItem> fItems = new HashMap<String, SyncItem>();
 
   /**
    * Deserialize Items from Filesystem
@@ -81,16 +81,22 @@ public class SyncItemsManager {
    */
   public void addUncommitted(Collection<SyncItem> items) {
     synchronized (fItems) {
-      fItems.addAll(items);
+      for (SyncItem item : items) {
+        SyncItem existingItem = fItems.get(item.getId());
+        if (existingItem != null)
+          existingItem.merge(item);
+        else
+          fItems.put(item.getId(), item);
+      }
     }
   }
 
   /**
    * @return all uncommitted {@link SyncItem}.
    */
-  public List<SyncItem> getUncommittedItems() {
+  public Map<String, SyncItem> getUncommittedItems() {
     synchronized (fItems) {
-      return new ArrayList<SyncItem>(fItems);
+      return new HashMap<String, SyncItem>(fItems);
     }
   }
 
@@ -107,7 +113,7 @@ public class SyncItemsManager {
    * Removes all uncommitted {@link SyncItem}.
    */
   public void clearUncommittedItems() {
-    synchronized(fItems) {
+    synchronized (fItems) {
       fItems.clear();
     }
   }
@@ -117,7 +123,9 @@ public class SyncItemsManager {
    */
   public void removeUncommitted(Collection<SyncItem> items) {
     synchronized (fItems) {
-      fItems.removeAll(items);
+      for (SyncItem item : items) {
+        fItems.remove(item.getId());
+      }
     }
   }
 
@@ -126,11 +134,11 @@ public class SyncItemsManager {
    */
   public void removeUncommitted(SyncItem item) {
     synchronized (fItems) {
-      fItems.remove(item);
+      fItems.remove(item.getId());
     }
   }
 
-  private void serializeSyncItems(List<SyncItem> items) throws IOException {
+  private void serializeSyncItems(Map<String, SyncItem> items) throws IOException {
     File store = getUncommittedSyncItemsFile();
     if (store == null)
       return;
@@ -152,8 +160,8 @@ public class SyncItemsManager {
   }
 
   @SuppressWarnings("unchecked")
-  private List<SyncItem> deserializeSyncItems() throws IOException, ClassNotFoundException {
-    List<SyncItem> items = new ArrayList<SyncItem>();
+  private Map<String, SyncItem> deserializeSyncItems() throws IOException, ClassNotFoundException {
+    Map<String, SyncItem> items = new HashMap<String, SyncItem>();
 
     File store = getUncommittedSyncItemsFile();
     if (store == null || !store.exists())
@@ -164,8 +172,8 @@ public class SyncItemsManager {
       inS = new ObjectInputStream(new FileInputStream(store));
 
       Object obj = inS.readObject();
-      if (obj instanceof List)
-        items.addAll((List) obj);
+      if (obj instanceof Map)
+        items.putAll((Map) obj);
     } finally {
       if (inS != null)
         inS.close();
