@@ -1036,51 +1036,43 @@ public class News extends AbstractEntity implements INews {
     Assert.isNotNull(news, "news cannot be null"); //$NON-NLS-1$
     Assert.isLegal(this != news, "Trying to merge the same news, this is most likely a mistake, news: " + news); //$NON-NLS-1$
 
-    //TODO It's _in theory_ possible for a deadlock to occur here. Even though
-    //we may want to remove that possibility at some point, it should not happen
-    //in practice because merge is always called on an existing news and passed
-    //a news reloaded from the site. The latter is not yet visible to the app
-    //so no locks should be held.
     News n = (News) news;
     n.fLock.acquireReadLock();
     try {
       fLock.acquireWriteLock();
       try {
         boolean isSynchronized = SyncUtils.isSynchronized(this);
+
+        /*
+         * Optimization: Since synchronized feeds typically have hundreds of news every time the feed is loaded, we will only
+         * merge news if either modified or published date have changed or the articles title. This ensures to keep the computational
+         * overhead low while still supporting updates to articles that are marked as such.
+         */
         boolean onlyMergeUserState = false;
         if (isSynchronized) {
           onlyMergeUserState = true;
-
-          /*
-           * Optimization: Since synchronized feeds typically have hundreds of news every time the feed is loaded, we will only
-           * merge news if either modified or published date have changed or the articles title. This ensures to keep the computational
-           * overhead low while still supporting updates to articles that are marked as such.
-           */
           if (!MergeUtils.equals(fModifiedDate, n.fModifiedDate) || !MergeUtils.equals(fPublishDate, n.fPublishDate) || !MergeUtils.equals(fTitle, n.fTitle))
             onlyMergeUserState = false;
         }
 
-        MergeResult result = new MergeResult();
-
+        /* Merge News User State */
         boolean updated = mergeState(news);
-
-        if (!onlyMergeUserState) {
-          updated |= processListMergeResult(result, mergeAttachments(n.fAttachments));
-          updated |= processListMergeResult(result, mergeCategories(n.fCategories));
-          updated |= processListMergeResult(result, mergeAuthor(n.fAuthor));
-          updated |= mergeGuid(n.fGuid);
-          mergeDescription(result, n);
-          updated |= processListMergeResult(result, mergeSource(n.fSource));
-        }
-
         if (isVisible() && isSynchronized) {
           updated |= mergeLabels(n);
           updated |= (fIsFlagged != n.fIsFlagged);
           fIsFlagged = n.fIsFlagged;
         }
 
-        ComplexMergeResult<?> propertiesResult = null;
+        /* Merge News Content */
+        MergeResult newsMergeResult = new MergeResult();
+        ComplexMergeResult<?> propertiesMergeResult = null;
         if (!onlyMergeUserState) {
+          updated |= processListMergeResult(newsMergeResult, mergeAttachments(n.fAttachments));
+          updated |= processListMergeResult(newsMergeResult, mergeCategories(n.fCategories));
+          updated |= processListMergeResult(newsMergeResult, mergeAuthor(n.fAuthor));
+          updated |= mergeGuid(n.fGuid);
+          mergeDescription(newsMergeResult, n);
+          updated |= processListMergeResult(newsMergeResult, mergeSource(n.fSource));
           updated |= !simpleFieldsEqual(n);
           fBaseUri = n.fBaseUri;
           fComments = n.fComments;
@@ -1090,16 +1082,17 @@ public class News extends AbstractEntity implements INews {
           fTitle = n.fTitle;
           fInReplyTo = n.fInReplyTo;
 
-          propertiesResult = MergeUtils.mergeProperties(this, news);
+          propertiesMergeResult = MergeUtils.mergeProperties(this, news);
         }
 
-        if (updated || (propertiesResult != null && propertiesResult.isStructuralChange())) {
-          result.addUpdatedObject(this);
-          if (propertiesResult != null)
-            result.addAll(propertiesResult);
+        /* Configure News Merge Result based on Merge Results */
+        if (updated || (propertiesMergeResult != null && propertiesMergeResult.isStructuralChange())) {
+          newsMergeResult.addUpdatedObject(this);
+          if (propertiesMergeResult != null)
+            newsMergeResult.addAll(propertiesMergeResult);
         }
 
-        return result;
+        return newsMergeResult;
       } finally {
         fLock.releaseWriteLock();
       }
