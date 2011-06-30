@@ -825,7 +825,7 @@ public class SyncConnectionTests {
     IFeed testFeed = Owl.getModelFactory().createFeed(null, new URI("reader://www.test.de/rss/themen/alle/alles/"));
     DynamicDAO.save(testFeed);
 
-    IBookMark testBm = Owl.getModelFactory().createBookMark(null, root, new FeedLinkReference(testFeed.getLink()), "Bild");
+    IBookMark testBm = Owl.getModelFactory().createBookMark(null, root, new FeedLinkReference(testFeed.getLink()), "Test");
 
     DynamicDAO.save(root);
 
