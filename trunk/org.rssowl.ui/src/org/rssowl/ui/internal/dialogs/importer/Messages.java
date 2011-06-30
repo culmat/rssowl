@@ -45,6 +45,7 @@ public class Messages extends NLS {
   public static String ImportElementsPage_HIDDEN_ELEMENTS_INFO;
   public static String ImportElementsPage_HIDE_EXISTING;
   public static String ImportElementsPage_IMPORT_GOOGLE_READER;
+  public static String ImportElementsPage_INVALID_OPML_WARNING;
   public static String ImportElementsPage_MISSING_ACCOUNT;
   public static String ImportElementsPage_N_RESULTS;
   public static String ImportElementsPage_NO_FEEDS_FOUND;
