@@ -665,6 +665,8 @@ public class ImportElementsPage extends WizardPage {
 
     /* Then try to parse links found in the file as Feeds */
     if (bruteForce) {
+      setMessage(Messages.ImportElementsPage_INVALID_OPML_WARNING, IMessageProvider.WARNING);
+
       IRunnableWithProgress runnable = new IRunnableWithProgress() {
         public void run(final IProgressMonitor monitor) throws InvocationTargetException {
           monitor.beginTask(Messages.ImportElementsPage_SEARCHING_FOR_FEEDS, IProgressMonitor.UNKNOWN);
