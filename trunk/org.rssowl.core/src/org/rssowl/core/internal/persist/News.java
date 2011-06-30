@@ -1046,36 +1046,57 @@ public class News extends AbstractEntity implements INews {
     try {
       fLock.acquireWriteLock();
       try {
+        boolean isSynchronized = SyncUtils.isSynchronized(this);
+        boolean onlyMergeUserState = false;
+        if (isSynchronized) {
+          onlyMergeUserState = true;
+
+          /*
+           * Optimization: Since synchronized feeds typically have hundreds of news every time the feed is loaded, we will only
+           * merge news if either modified or published date have changed or the articles title. This ensures to keep the computational
+           * overhead low while still supporting updates to articles that are marked as such.
+           */
+          if (!MergeUtils.equals(fModifiedDate, n.fModifiedDate) || !MergeUtils.equals(fPublishDate, n.fPublishDate) || !MergeUtils.equals(fTitle, n.fTitle))
+            onlyMergeUserState = false;
+        }
+
+        MergeResult result = new MergeResult();
+
         boolean updated = mergeState(news);
 
-        /* Merge all items except for feed and id */
-        MergeResult result = new MergeResult();
-        updated |= processListMergeResult(result, mergeAttachments(n.fAttachments));
-        updated |= processListMergeResult(result, mergeCategories(n.fCategories));
-        updated |= processListMergeResult(result, mergeAuthor(n.fAuthor));
-        updated |= mergeGuid(n.fGuid);
-        mergeDescription(result, n);
-        updated |= processListMergeResult(result, mergeSource(n.fSource));
+        if (!onlyMergeUserState) {
+          updated |= processListMergeResult(result, mergeAttachments(n.fAttachments));
+          updated |= processListMergeResult(result, mergeCategories(n.fCategories));
+          updated |= processListMergeResult(result, mergeAuthor(n.fAuthor));
+          updated |= mergeGuid(n.fGuid);
+          mergeDescription(result, n);
+          updated |= processListMergeResult(result, mergeSource(n.fSource));
+        }
 
-        if (isVisible() && SyncUtils.isSynchronized(this)) {
+        if (isVisible() && isSynchronized) {
           updated |= mergeLabels(n);
           updated |= (fIsFlagged != n.fIsFlagged);
           fIsFlagged = n.fIsFlagged;
         }
 
-        updated |= !simpleFieldsEqual(n);
-        fBaseUri = n.fBaseUri;
-        fComments = n.fComments;
-        fLinkText = n.fLinkText;
-        fModifiedDate = n.fModifiedDate;
-        fPublishDate = n.fPublishDate;
-        fTitle = n.fTitle;
-        fInReplyTo = n.fInReplyTo;
+        ComplexMergeResult<?> propertiesResult = null;
+        if (!onlyMergeUserState) {
+          updated |= !simpleFieldsEqual(n);
+          fBaseUri = n.fBaseUri;
+          fComments = n.fComments;
+          fLinkText = n.fLinkText;
+          fModifiedDate = n.fModifiedDate;
+          fPublishDate = n.fPublishDate;
+          fTitle = n.fTitle;
+          fInReplyTo = n.fInReplyTo;
 
-        ComplexMergeResult<?> propertiesResult = MergeUtils.mergeProperties(this, news);
-        if (updated || propertiesResult.isStructuralChange()) {
+          propertiesResult = MergeUtils.mergeProperties(this, news);
+        }
+
+        if (updated || (propertiesResult != null && propertiesResult.isStructuralChange())) {
           result.addUpdatedObject(this);
-          result.addAll(propertiesResult);
+          if (propertiesResult != null)
+            result.addAll(propertiesResult);
         }
 
         return result;
