@@ -118,9 +118,6 @@ public class SyncUtils {
   /** Short Connection Timeouts in MS */
   public static final int SHORT_CON_TIMEOUT = 5000;
 
-  /* Part of the identifier of synchronized news */
-  private static final String SYNCED_NEWS_ID_PART = "tag:google.com"; //$NON-NLS-1$
-
   /* Google Auth Identifier */
   private static final String AUTH_IDENTIFIER = "Auth="; //$NON-NLS-1$
 
@@ -310,7 +307,7 @@ public class SyncUtils {
    * <code>false</code> otherwise.
    */
   public static boolean isSynchronized(INews news) {
-    return news != null && news.getGuid() != null && news.getGuid().getValue().startsWith(SYNCED_NEWS_ID_PART) && StringUtils.isSet(news.getInReplyTo());
+    return news != null && news.getParentId() == 0 && isSynchronized(news.getFeedLinkAsText());
   }
 
   /**
