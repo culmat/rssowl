@@ -51,7 +51,7 @@ public class SyncUtilsTest {
    */
   @Test
   public void testIsNewsSynchronized() throws Exception {
-    IFeed feed = Owl.getModelFactory().createFeed(null, new URI("rssowl.org"));
+    IFeed feed = Owl.getModelFactory().createFeed(null, new URI("reader://rssowl.org"));
 
     INews news1 = Owl.getModelFactory().createNews(null, feed, new Date());
     news1.setLink(URI.create("http://www.rssowl.org"));
@@ -60,12 +60,12 @@ public class SyncUtilsTest {
     INews news3 = Owl.getModelFactory().createNews(null, feed, new Date());
     news3.setLink(URI.create("readers://www.rssowl.org"));
 
-    assertFalse(SyncUtils.isSynchronized(news1));
-    assertFalse(SyncUtils.isSynchronized(news2));
-    assertFalse(SyncUtils.isSynchronized(news3));
+    assertTrue(SyncUtils.isSynchronized(news1));
+    assertTrue(SyncUtils.isSynchronized(news2));
+    assertTrue(SyncUtils.isSynchronized(news3));
 
     news2.setInReplyTo("Foo");
-    assertFalse(SyncUtils.isSynchronized(news2));
+    assertTrue(SyncUtils.isSynchronized(news2));
 
     news2.setGuid(Owl.getModelFactory().createGuid(news2, "tag:google.com/foo", true));
     assertTrue(SyncUtils.isSynchronized(news2));

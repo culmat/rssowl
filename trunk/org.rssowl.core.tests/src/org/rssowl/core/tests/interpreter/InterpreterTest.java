@@ -1017,7 +1017,7 @@ public class InterpreterTest {
   @SuppressWarnings("nls")
   public void testJSON() throws Exception {
     InputStream inS = getClass().getResourceAsStream("/data/interpreter/feed_json.txt");
-    IFeed feed = new Feed(new URI("http://www.data.interpreter.feed_json.txt"));
+    IFeed feed = new Feed(new URI("reader://www.data.interpreter.feed_json.txt"));
 
     JSONObject obj = new JSONObject(StringUtils.readString(new InputStreamReader(inS, "UTF-8")));
 
