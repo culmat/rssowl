@@ -23,6 +23,7 @@
  **  **********************************************************************  */
 package org.rssowl.core.tests.persist;
 
+import static junit.framework.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -194,5 +195,47 @@ public class INewsTest {
     Set<ILabel> labels = news.getLabels();
     labels.add(fFactory.createLabel(null, "Another label"));
     assertEquals(1, labels.size());
+  }
+
+  /**
+   * Tests that calling INews#merge merges the permalink of the Guid correctly.
+   * @throws Exception
+   */
+  @Test
+  public void testMergeSyncedNews() throws Exception {
+    IFeed feed = fFactory.createFeed(null, new URI("reader://www.feed.com"));
+
+    INews news = fFactory.createNews(null, feed, new Date());
+    news.setTitle("Hello World");
+    news.setId(1L);
+
+    INews otherNews = fFactory.createNews(null, feed, new Date());
+    otherNews.setTitle("Hello World");
+    otherNews.setFlagged(true);
+    otherNews.setComments("Comments");
+    otherNews.setId(1L);
+
+    news.merge(otherNews);
+    assertTrue(news.isFlagged());
+    assertNull(news.getComments());
+
+    otherNews.setTitle("Hello World *Updated*");
+    news.merge(otherNews);
+    assertTrue(news.isFlagged());
+    assertEquals("Comments", news.getComments());
+
+    otherNews.setPublishDate(new Date(1000));
+    otherNews.setComments("Updated Comments");
+
+    news.merge(otherNews);
+    assertTrue(news.isFlagged());
+    assertEquals("Updated Comments", news.getComments());
+
+    otherNews.setModifiedDate(new Date(1000));
+    otherNews.setComments("Updated Comments *Update*");
+
+    news.merge(otherNews);
+    assertTrue(news.isFlagged());
+    assertEquals("Updated Comments *Update*", news.getComments());
   }
 }
