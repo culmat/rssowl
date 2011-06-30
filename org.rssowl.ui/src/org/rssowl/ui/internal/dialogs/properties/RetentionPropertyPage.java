@@ -152,6 +152,8 @@ public class RetentionPropertyPage implements IEntityPropertyPage {
    * @see org.rssowl.ui.internal.dialogs.properties.IEntityPropertyPage#createContents(org.eclipse.swt.widgets.Composite)
    */
   public Control createContents(Composite parent) {
+    boolean isSynchronized = isSynchronized(fEntities);
+
     Composite container = new Composite(parent, SWT.NONE);
     container.setLayout(LayoutUtils.createGridLayout(2, 10, 10, 5, 5, false));
 
@@ -164,7 +166,7 @@ public class RetentionPropertyPage implements IEntityPropertyPage {
     fDeleteNewsByCountCheck = new Button(container, SWT.CHECK);
     fDeleteNewsByCountCheck.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
     fDeleteNewsByCountCheck.setSelection(fPrefDeleteNewsByCountState);
-    fDeleteNewsByCountCheck.setText(isSynchronized(fEntities) ? Messages.RetentionPropertyPage_MAX_NUMBER_SYNCHRONIZED : Messages.RetentionPropertyPage_MAX_NUMBER);
+    fDeleteNewsByCountCheck.setText(isSynchronized ? Messages.RetentionPropertyPage_MAX_NUMBER_SYNCHRONIZED : Messages.RetentionPropertyPage_MAX_NUMBER);
     fDeleteNewsByCountCheck.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -183,7 +185,7 @@ public class RetentionPropertyPage implements IEntityPropertyPage {
     fDeleteNewsByAgeCheck = new Button(container, SWT.CHECK);
     fDeleteNewsByAgeCheck.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
     fDeleteNewsByAgeCheck.setSelection(fPrefDeleteNewsByAgeState);
-    fDeleteNewsByAgeCheck.setText(Messages.RetentionPropertyPage_MAX_AGE);
+    fDeleteNewsByAgeCheck.setText(isSynchronized ? Messages.RetentionPropertyPage_MAX_AGE_SYNCHRONIZED : Messages.RetentionPropertyPage_MAX_AGE);
     fDeleteNewsByAgeCheck.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
