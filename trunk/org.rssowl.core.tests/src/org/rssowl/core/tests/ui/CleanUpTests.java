@@ -969,4 +969,54 @@ public class CleanUpTests {
       assertEquals(news1, ((NewsTask) tasks2.get(0)).getNews().iterator().next().resolve());
     }
   }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testCleanUpBookmarksBySynchronization() throws Exception {
+    IFolder rootFolder = fFactory.createFolder(null, null, "Root");
+    DynamicDAO.save(rootFolder);
+
+    IFeed feed1 = fFactory.createFeed(null, new URI("reader://www.feed1.com"));
+    IFeed feed2 = fFactory.createFeed(null, new URI("reader://www.feed2.com"));
+    IFeed feed3 = fFactory.createFeed(null, new URI("reader://www.rssowl.org/node/feed"));
+
+    DynamicDAO.save(feed1);
+    DynamicDAO.save(feed2);
+    DynamicDAO.save(feed3);
+
+    IBookMark bm1 = fFactory.createBookMark(null, rootFolder, new FeedLinkReference(feed1.getLink()), "BM1");
+    IBookMark bm2 = fFactory.createBookMark(null, rootFolder, new FeedLinkReference(feed2.getLink()), "BM2");
+    IBookMark bm3 = fFactory.createBookMark(null, rootFolder, new FeedLinkReference(feed3.getLink()), "BM3");
+
+    DynamicDAO.save(bm1);
+    DynamicDAO.save(bm2);
+    DynamicDAO.save(bm3);
+
+    List<IBookMark> marks = new ArrayList<IBookMark>();
+    marks.add(bm1);
+    marks.add(bm2);
+    marks.add(bm3);
+
+    /* Last Update Date = 3 days */
+    CleanUpOperations ops = new CleanUpOperations(false, 0, false, 0, false, false, true, false, 0, false, 0, false, false, false);
+
+    {
+      CleanUpModel model = new CleanUpModel(ops, marks);
+      model.generate(new NullProgressMonitor());
+      List<CleanUpGroup> groups = model.getTasks();
+
+      /* Assert Filled */
+      assertEquals(2, groups.size());
+
+      List<CleanUpTask> tasks = groups.get(1).getTasks();
+      assertEquals(2, tasks.size());
+      assertEquals(true, tasks.get(0) instanceof BookMarkTask);
+      assertEquals(true, tasks.get(1) instanceof BookMarkTask);
+
+      assertEquals(bm1, ((BookMarkTask) tasks.get(0)).getMark());
+      assertEquals(bm2, ((BookMarkTask) tasks.get(1)).getMark());
+    }
+  }
 }
