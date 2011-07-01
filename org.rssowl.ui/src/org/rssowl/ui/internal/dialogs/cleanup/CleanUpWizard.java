@@ -42,6 +42,7 @@ import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.StringUtils;
+import org.rssowl.core.util.SyncUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
@@ -218,7 +219,8 @@ public class CleanUpWizard extends Wizard {
 
         preferences.putBoolean(DefaultPreferences.CLEAN_UP_BM_BY_LAST_UPDATE_STATE, operations.deleteFeedByLastUpdate());
         preferences.putInteger(DefaultPreferences.CLEAN_UP_BM_BY_LAST_UPDATE_VALUE, operations.getLastUpdateDays());
-        preferences.putBoolean(DefaultPreferences.CLEAN_UP_BM_BY_SYNCHRONIZATION, operations.deleteFeedsBySynchronization());
+        if (SyncUtils.hasSyncCredentials())
+          preferences.putBoolean(DefaultPreferences.CLEAN_UP_BM_BY_SYNCHRONIZATION, operations.deleteFeedsBySynchronization());
 
         preferences.putBoolean(DefaultPreferences.CLEAN_UP_BM_BY_CON_ERROR, operations.deleteFeedsByConError());
         preferences.putBoolean(DefaultPreferences.CLEAN_UP_BM_BY_DUPLICATES, operations.deleteFeedsByDuplicates());
