@@ -1652,7 +1652,7 @@
             icon="icons/obj16/fav_live.gif"
             id="org.rssowl.ui.LiveKeywordFeed"
             name="%keywordFeed.name.2"
-            url="http://www.bing.com/search?q=[:]&amp;format=rss&amp;count=25">
+            url="http://api.bing.com/rss.aspx?Source=Web&amp;Query=[:]">
       </keywordFeed>
       <keywordFeed
             icon="icons/obj16/fav_digg.gif"
