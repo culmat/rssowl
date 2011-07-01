@@ -576,9 +576,9 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
     /* Footer Line */
     writer.append("div.footerline { clear: both; ").append(fVerySmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
-    writer.append("div.footerline a { ").append(fLinkFGColorCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
-    writer.append("div.footerline a:visited { ").append(fLinkFGColorCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
-    writer.append("div.footerline a:hover { ").append(fLinkFGColorCSS).append(" text-decoration: none; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("div.footerline a { color: rgb(80,80,80); text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.append("div.footerline a:visited { color: rgb(80,80,80); text-decoration: none; }\n"); //$NON-NLS-1$
+    writer.append("div.footerline a:hover { color: rgb(80,80,80); text-decoration: none; }\n"); //$NON-NLS-1$
     writer.append("table.footerline { margin: 0; padding: 0; }\n"); //$NON-NLS-1$
     writer.append("tr.footerline { margin: 0; padding: 0; }\n"); //$NON-NLS-1$
     writer.append("td.footerline { margin: 0; padding: 0; padding-right: 5px; ").append(fVerySmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
