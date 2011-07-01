@@ -312,11 +312,11 @@ public class CleanUpModel {
 
       if (googleReaderFeeds != null) {
         for (IBookMark mark : fBookmarks) {
-          if (!SyncUtils.isSynchronized(mark))
+          if (bookmarksToDelete.contains(mark) || !SyncUtils.isSynchronized(mark))
             continue;
 
           String feedLink = URIUtils.toHTTP(mark.getFeedLinkReference().getLinkAsText());
-          if (!bookmarksToDelete.contains(mark) && !googleReaderFeeds.contains(feedLink)) {
+          if (!googleReaderFeeds.contains(feedLink)) {
             bookmarksToDelete.add(mark);
             group.addTask(new BookMarkTask(group, mark));
           }
