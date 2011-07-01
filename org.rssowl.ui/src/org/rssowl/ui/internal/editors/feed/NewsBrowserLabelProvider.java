@@ -635,7 +635,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.append("div.delete { padding-top: 5px; text-align: right; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* Subline */
-    writer.append("div.subline { margin: 6px 0px 0px 0px; padding: 0; clear: left; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("div.subline { margin: 8px 0px 0px 0px; padding: 0; clear: left; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* Footer */
     writer.append("      div.footer { padding: 3px 5px 3px 5px; line-height: 20px; border-top: dotted 1px silver; clear: both; }\n"); //$NON-NLS-1$
