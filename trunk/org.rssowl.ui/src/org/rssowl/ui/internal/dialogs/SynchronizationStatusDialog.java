@@ -42,6 +42,7 @@ import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
 import org.rssowl.core.connection.SyncConnectionException;
 import org.rssowl.core.util.CoreUtils;
+import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.ImportAction;
@@ -51,6 +52,7 @@ import org.rssowl.ui.internal.util.BrowserUtils;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.text.DateFormat;
+import java.util.Date;
 
 /**
  * Dialog to show Synchronization Status from the {@link SyncService}.
@@ -61,6 +63,7 @@ public class SynchronizationStatusDialog extends TitleAreaDialog {
   private LocalResourceManager fResources;
   private final SyncStatus fStatus;
   private final DateFormat fDateFormat = OwlUI.getShortDateFormat();
+  private final DateFormat fTimeFormat = OwlUI.getShortTimeFormat();
 
   /**
    * @param parentShell the parent shell
@@ -119,6 +122,9 @@ public class SynchronizationStatusDialog extends TitleAreaDialog {
     Link dialogMessageLink = new Link(composite, SWT.WRAP);
     dialogMessageLink.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
+    boolean isToday = DateUtils.isAfterIncludingToday(new Date(fStatus.getTime()),  DateUtils.getToday().getTimeInMillis());
+    DateFormat format = isToday ? fTimeFormat : fDateFormat;
+
     /* a) Never Synchronized */
     if (fStatus == null) {
       dialogMessageLink.setText(Messages.SynchronizationStatusDialog_NO_STATUS_MSG);
@@ -135,9 +141,9 @@ public class SynchronizationStatusDialog extends TitleAreaDialog {
     /* b) Synchronized OK */
     else if (fStatus.isOK()) {
       if (fStatus.getItemCount() == 1)
-        dialogMessageLink.setText(NLS.bind(Messages.SynchronizationStatusDialog_LAST_SYNC_OK_MSG, fDateFormat.format(fStatus.getTime()), fStatus.getTotalItemCount()));
+        dialogMessageLink.setText(NLS.bind(Messages.SynchronizationStatusDialog_LAST_SYNC_OK_MSG, format.format(fStatus.getTime()), fStatus.getTotalItemCount()));
       else
-        dialogMessageLink.setText(NLS.bind(Messages.SynchronizationStatusDialog_LAST_SYNC_OK_MSG_N, new Object[] { fStatus.getItemCount(), fDateFormat.format(fStatus.getTime()), fStatus.getTotalItemCount() }));
+        dialogMessageLink.setText(NLS.bind(Messages.SynchronizationStatusDialog_LAST_SYNC_OK_MSG_N, new Object[] { fStatus.getItemCount(), format.format(fStatus.getTime()), fStatus.getTotalItemCount() }));
     }
 
     /* c) Synchronization ERROR */
@@ -146,7 +152,7 @@ public class SynchronizationStatusDialog extends TitleAreaDialog {
 
       /* Google provided link to solve the issue */
       if (StringUtils.isSet(userUrl)) {
-        dialogMessageLink.setText(NLS.bind(Messages.SynchronizationStatusDialog_LAST_SYNC_ERROR_MSG_LINK, fDateFormat.format(fStatus.getTime()), fStatus.getException().getMessage()));
+        dialogMessageLink.setText(NLS.bind(Messages.SynchronizationStatusDialog_LAST_SYNC_ERROR_MSG_LINK, format.format(fStatus.getTime()), fStatus.getException().getMessage()));
         dialogMessageLink.addSelectionListener(new SelectionAdapter() {
           @Override
           public void widgetSelected(SelectionEvent e) {
@@ -157,7 +163,7 @@ public class SynchronizationStatusDialog extends TitleAreaDialog {
 
       /* Other general connection issue */
       else {
-        dialogMessageLink.setText(NLS.bind(Messages.SynchronizationStatusDialog_LAST_SYNC_ERROR_MSG, fDateFormat.format(fStatus.getTime()), CoreUtils.toMessage(fStatus.getException())));
+        dialogMessageLink.setText(NLS.bind(Messages.SynchronizationStatusDialog_LAST_SYNC_ERROR_MSG, format.format(fStatus.getTime()), CoreUtils.toMessage(fStatus.getException())));
       }
     }
 
