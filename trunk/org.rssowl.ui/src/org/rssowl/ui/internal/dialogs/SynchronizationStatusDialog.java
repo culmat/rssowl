@@ -122,7 +122,7 @@ public class SynchronizationStatusDialog extends TitleAreaDialog {
     Link dialogMessageLink = new Link(composite, SWT.WRAP);
     dialogMessageLink.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
-    boolean isToday = DateUtils.isAfterIncludingToday(new Date(fStatus.getTime()),  DateUtils.getToday().getTimeInMillis());
+    boolean isToday = fStatus != null ? DateUtils.isAfterIncludingToday(new Date(fStatus.getTime()),  DateUtils.getToday().getTimeInMillis()) : false;
     DateFormat format = isToday ? fTimeFormat : fDateFormat;
 
     /* a) Never Synchronized */
