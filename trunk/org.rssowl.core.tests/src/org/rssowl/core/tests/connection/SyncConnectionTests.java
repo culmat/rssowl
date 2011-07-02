@@ -967,6 +967,7 @@ public class SyncConnectionTests {
     prefs.putInteger(DefaultPreferences.DEL_NEWS_BY_AGE_VALUE, 2);
 
     long ageLimit = DateUtils.getToday().getTimeInMillis() - (2 * DateUtils.DAY);
+    ageLimit -= 1000 * 60 * 60; //Tolerate some invariance
 
     DynamicDAO.save(root);
 
