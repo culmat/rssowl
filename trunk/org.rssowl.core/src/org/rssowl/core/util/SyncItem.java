@@ -75,9 +75,6 @@ public class SyncItem implements Serializable {
    * @return the {@link SyncItem} from the {@link NewsEvent}.
    */
   public static SyncItem toSyncItem(NewsEvent event) {
-    if (event.getOldNews() == null)
-      return null;
-
     boolean requiresSync = false;
     INews item = event.getEntity();
     SyncItem syncItem = toSyncItem(item);
