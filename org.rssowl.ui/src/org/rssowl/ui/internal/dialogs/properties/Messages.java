@@ -59,6 +59,7 @@ public class Messages extends NLS {
   public static String GeneralPropertyPage_LOCATION;
   public static String GeneralPropertyPage_MINUTES;
   public static String GeneralPropertyPage_NAME;
+  public static String GeneralPropertyPage_SECONDS;
   public static String GeneralPropertyPage_UPDATE_FEED;
   public static String GeneralPropertyPage_UPDATE_FEEDS;
   public static String GeneralPropertyPage_WARNING;

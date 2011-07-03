@@ -95,9 +95,10 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
   private static final long MINUTE_IN_SECONDS = 60;
 
   /* Interval-Indeces in Combo */
-  private static final int MINUTES_SCOPE = 0;
-  private static final int HOURS_SCOPE = 1;
-  private static final int DAYS_SCOPE = 2;
+  private static final int SECONDS_SCOPE = 0;
+  private static final int MINUTES_SCOPE = 1;
+  private static final int HOURS_SCOPE = 2;
+  private static final int DAYS_SCOPE = 3;
 
   private Composite fParent;
   private IPropertyDialogSite fSite;
@@ -305,7 +306,9 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
       fReloadSpinner.setMaximum(999);
       fReloadSpinner.setEnabled(fPrefUpdateIntervalState);
 
-      if (fUpdateIntervalScope == MINUTES_SCOPE)
+      if (fUpdateIntervalScope == SECONDS_SCOPE)
+        fReloadSpinner.setSelection((int) (fPrefUpdateInterval));
+      else if (fUpdateIntervalScope == MINUTES_SCOPE)
         fReloadSpinner.setSelection((int) (fPrefUpdateInterval / MINUTE_IN_SECONDS));
       else if (fUpdateIntervalScope == HOURS_SCOPE)
         fReloadSpinner.setSelection((int) (fPrefUpdateInterval / HOUR_IN_SECONDS));
@@ -313,6 +316,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
         fReloadSpinner.setSelection((int) (fPrefUpdateInterval / DAY_IN_SECONDS));
 
       fReloadCombo = new Combo(autoReloadContainer, SWT.READ_ONLY);
+      fReloadCombo.add(Messages.GeneralPropertyPage_SECONDS);
       fReloadCombo.add(Messages.GeneralPropertyPage_MINUTES);
       fReloadCombo.add(Messages.GeneralPropertyPage_HOURS);
       fReloadCombo.add(Messages.GeneralPropertyPage_DAYS);
@@ -447,7 +451,10 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
     if (fPrefUpdateInterval % HOUR_IN_SECONDS == 0)
       return HOURS_SCOPE;
 
-    return MINUTES_SCOPE;
+    if (fPrefUpdateInterval % MINUTE_IN_SECONDS == 0)
+      return MINUTES_SCOPE;
+
+    return SECONDS_SCOPE;
   }
 
   private String getName(IEntity entity) {
@@ -660,7 +667,9 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
       long lVal;
       fUpdateIntervalScope = fReloadCombo.getSelectionIndex();
 
-      if (fUpdateIntervalScope == MINUTES_SCOPE)
+      if (fUpdateIntervalScope == SECONDS_SCOPE)
+        lVal = fReloadSpinner.getSelection();
+      else if (fUpdateIntervalScope == MINUTES_SCOPE)
         lVal = fReloadSpinner.getSelection() * MINUTE_IN_SECONDS;
       else if (fUpdateIntervalScope == HOURS_SCOPE)
         lVal = fReloadSpinner.getSelection() * HOUR_IN_SECONDS;

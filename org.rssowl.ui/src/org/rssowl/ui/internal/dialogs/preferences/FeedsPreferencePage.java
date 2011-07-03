@@ -95,9 +95,10 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
   private static final long MINUTE_IN_SECONDS = 60;
 
   /* Interval-Indeces in Combo */
-  private static final int MINUTES_SCOPE = 0;
-  private static final int HOURS_SCOPE = 1;
-  private static final int DAYS_SCOPE = 2;
+  private static final int SECONDS_SCOPE = 0;
+  private static final int MINUTES_SCOPE = 1;
+  private static final int HOURS_SCOPE = 2;
+  private static final int DAYS_SCOPE = 3;
 
   private IPreferenceScope fGlobalScope;
   private FeedReloadService fReloadService;
@@ -248,7 +249,9 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     long updateInterval = fGlobalScope.getLong(DefaultPreferences.BM_UPDATE_INTERVAL);
     int updateScope = getUpdateIntervalScope();
 
-    if (updateScope == MINUTES_SCOPE)
+    if (updateScope == SECONDS_SCOPE)
+      fUpdateValueSpinner.setSelection((int) (updateInterval));
+    else if (updateScope == MINUTES_SCOPE)
       fUpdateValueSpinner.setSelection((int) (updateInterval / MINUTE_IN_SECONDS));
     else if (updateScope == HOURS_SCOPE)
       fUpdateValueSpinner.setSelection((int) (updateInterval / HOUR_IN_SECONDS));
@@ -256,6 +259,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
       fUpdateValueSpinner.setSelection((int) (updateInterval / DAY_IN_SECONDS));
 
     fUpdateScopeCombo = new Combo(autoReloadContainer, SWT.READ_ONLY);
+    fUpdateScopeCombo.add(Messages.FeedsPreferencePage_INTERVAL_SECONDS);
     fUpdateScopeCombo.add(Messages.FeedsPreferencePage_MINUTES);
     fUpdateScopeCombo.add(Messages.FeedsPreferencePage_HOURS);
     fUpdateScopeCombo.add(Messages.FeedsPreferencePage_DAYS);
@@ -673,7 +677,9 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     long lVal;
     int updateScope = fUpdateScopeCombo.getSelectionIndex();
 
-    if (updateScope == MINUTES_SCOPE)
+    if (updateScope == SECONDS_SCOPE)
+      lVal = fUpdateValueSpinner.getSelection();
+    else if (updateScope == MINUTES_SCOPE)
       lVal = fUpdateValueSpinner.getSelection() * MINUTE_IN_SECONDS;
     else if (updateScope == HOURS_SCOPE)
       lVal = fUpdateValueSpinner.getSelection() * HOUR_IN_SECONDS;
@@ -872,7 +878,9 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     long updateInterval = defaultScope.getLong(DefaultPreferences.BM_UPDATE_INTERVAL);
     int updateScope = getUpdateIntervalScope();
 
-    if (updateScope == MINUTES_SCOPE)
+    if (updateScope == SECONDS_SCOPE)
+      fUpdateValueSpinner.setSelection((int) (updateInterval));
+    else if (updateScope == MINUTES_SCOPE)
       fUpdateValueSpinner.setSelection((int) (updateInterval / MINUTE_IN_SECONDS));
     else if (updateScope == HOURS_SCOPE)
       fUpdateValueSpinner.setSelection((int) (updateInterval / HOUR_IN_SECONDS));
@@ -933,7 +941,10 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     if (updateInterval % HOUR_IN_SECONDS == 0)
       return HOURS_SCOPE;
 
-    return MINUTES_SCOPE;
+    if (updateInterval % MINUTE_IN_SECONDS == 0)
+      return MINUTES_SCOPE;
+
+    return SECONDS_SCOPE;
   }
 
   private void updateApplyEnablement(boolean enable) {

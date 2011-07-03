@@ -76,6 +76,7 @@ public class Messages extends NLS {
   public static String FeedsPreferencePage_GENERAL;
   public static String FeedsPreferencePage_GROUP_NEWS;
   public static String FeedsPreferencePage_HOURS;
+  public static String FeedsPreferencePage_INTERVAL_SECONDS;
   public static String FeedsPreferencePage_LAYOUT;
   public static String FeedsPreferencePage_LOAD_IMAGES;
   public static String FeedsPreferencePage_LOAD_MEDIA;
