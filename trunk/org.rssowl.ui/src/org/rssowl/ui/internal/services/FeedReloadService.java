@@ -118,7 +118,7 @@ public class FeedReloadService {
 
       /* Reload */
       if (!monitor.isCanceled() && !Controller.getDefault().isShuttingDown())
-        Controller.getDefault().reloadQueued(fBookMark, null);
+        Controller.getDefault().reloadQueued(fBookMark, null, null);
 
       /* Re-Schedule */
       if (!monitor.isCanceled() && !Controller.getDefault().isShuttingDown() && updateIntervalInSeconds != null)
@@ -205,7 +205,7 @@ public class FeedReloadService {
     if (!bookmarksToReloadOnStartup.isEmpty()) {
       JobRunner.runInUIThread(null, new Runnable() {
         public void run() {
-          Controller.getDefault().reloadQueued(bookmarksToReloadOnStartup, null);
+          Controller.getDefault().reloadQueued(bookmarksToReloadOnStartup, null, null);
         }
       });
     }
