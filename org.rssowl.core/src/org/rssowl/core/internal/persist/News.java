@@ -1042,18 +1042,14 @@ public class News extends AbstractEntity implements INews {
       fLock.acquireWriteLock();
       try {
         boolean isSynchronized = SyncUtils.isSynchronized(this);
+        boolean wasModified = !MergeUtils.equals(fModifiedDate, n.fModifiedDate) || !MergeUtils.equals(fPublishDate, n.fPublishDate) || !MergeUtils.equals(fTitle, n.fTitle);
 
         /*
          * Optimization: Since synchronized feeds typically have hundreds of news every time the feed is loaded, we will only
          * merge news if either modified or published date have changed or the articles title. This ensures to keep the computational
          * overhead low while still supporting updates to articles that are marked as such.
          */
-        boolean onlyMergeUserState = false;
-        if (isSynchronized) {
-          onlyMergeUserState = true;
-          if (!MergeUtils.equals(fModifiedDate, n.fModifiedDate) || !MergeUtils.equals(fPublishDate, n.fPublishDate) || !MergeUtils.equals(fTitle, n.fTitle))
-            onlyMergeUserState = false;
-        }
+        boolean onlyMergeUserState = isSynchronized && !wasModified;
 
         /* Merge News User State */
         boolean updated = mergeState(news);
@@ -1071,7 +1067,8 @@ public class News extends AbstractEntity implements INews {
           updated |= processListMergeResult(newsMergeResult, mergeCategories(n.fCategories));
           updated |= processListMergeResult(newsMergeResult, mergeAuthor(n.fAuthor));
           updated |= mergeGuid(n.fGuid);
-          mergeDescription(newsMergeResult, n);
+          if (wasModified)
+            mergeDescription(newsMergeResult, n); //Optimization: We only merge in description if the news was modified and indicates this
           updated |= processListMergeResult(newsMergeResult, mergeSource(n.fSource));
           updated |= !simpleFieldsEqual(n);
           fBaseUri = n.fBaseUri;
