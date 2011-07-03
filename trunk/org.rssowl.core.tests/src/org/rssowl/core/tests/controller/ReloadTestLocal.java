@@ -1092,7 +1092,7 @@ public class ReloadTestLocal extends LargeBlockSizeTest {
 
       /* Reload with updated description */
       String updatedDescription = "updatedDescription";
-      InMemoryProtocolHandler.FEED = generateFeed("Title *updated*", "http://www.link_updated.de", "http://www.guid.de", fDateFormat.format(now), updatedDescription);
+      InMemoryProtocolHandler.FEED = generateFeed("Title *updated*", "http://www.link_updated.de", "http://www.guid.de", fDateFormat.format(now + 1000), updatedDescription);
       fController.reload(bookmark, null, new NullProgressMonitor());
       assertEquals(1, feedRef.resolve().getNews().size());
       assertEquals(0, getUnreadCount(feed));
@@ -1333,7 +1333,7 @@ public class ReloadTestLocal extends LargeBlockSizeTest {
       assertEquals(1, updatedCounter[0]);
 
       /* Second Reload - changed Description */
-      InMemoryProtocolHandler.FEED = generateFeed("Title", "http://www.link.de", null, null, "Hello World Changed", "bpasero", null, "mp3");
+      InMemoryProtocolHandler.FEED = generateFeed("Title", "http://www.link.de", null, fDateFormat.format(new Date()), "Hello World Changed", "bpasero", null, "mp3");
       fController.reload(bookmark, null, new NullProgressMonitor());
       assertEquals(1, feedRef.resolve().getNews().size());
       assertEquals(1, getUnreadCount(feed));
