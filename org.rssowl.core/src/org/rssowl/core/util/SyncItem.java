@@ -75,6 +75,9 @@ public class SyncItem implements Serializable {
    * @return the {@link SyncItem} from the {@link NewsEvent}.
    */
   public static SyncItem toSyncItem(NewsEvent event) {
+    if (event.getOldNews() == null)
+      return null;
+
     boolean requiresSync = false;
     INews item = event.getEntity();
     SyncItem syncItem = toSyncItem(item);
@@ -97,7 +100,7 @@ public class SyncItem implements Serializable {
       }
 
       /* Delete */
-      else if ((newState == INews.State.HIDDEN || newState == INews.State.DELETED)) {
+      else if (newState == INews.State.HIDDEN || newState == INews.State.DELETED) {
 
         /* Mark Read if Unread and remove Star if Flagged */
         if (UNREAD_STATES.contains(oldState)) {
@@ -110,6 +113,22 @@ public class SyncItem implements Serializable {
         /* Remove Star if Flagged */
         else if (oldState == INews.State.READ && item.isFlagged()) {
           syncItem.setUnStarred();
+          requiresSync = true;
+        }
+      }
+
+      /* Restored */
+      else if (!event.getOldNews().isVisible() && event.getEntity().isVisible()) {
+
+        /* Restore Unread if previously unread */
+        if (UNREAD_STATES.contains(newState)) {
+          syncItem.setMarkedUnread();
+          requiresSync = true;
+        }
+
+        /* Restore Star if previously starred */
+        if (event.getEntity().isFlagged()) {
+          syncItem.setStarred();
           requiresSync = true;
         }
       }
@@ -476,7 +495,7 @@ public class SyncItem implements Serializable {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((fId == null) ? 0 : fId.hashCode());
-    
+
     return result;
   }
 
