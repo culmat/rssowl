@@ -70,6 +70,9 @@ public class SyncUtils {
   /** Google Stream Contents Service */
   public static final String GOOGLE_STREAM_CONTENTS_URL = GOOGLE_API_URL + "stream/contents/"; //$NON-NLS-1$
 
+  /** Google Unread Count Service */
+  public static final String GOOGLE_UNREAD_COUNT_URL = GOOGLE_API_URL + "unread-count"; //$NON-NLS-1$
+
   /** Google Account Creation URL (follows to Google Reader after signup) */
   public static final String GOOGLE_NEW_ACCOUNT_URL = "https://www.google.com/accounts/NewAccount?continue=http%3A%2F%2Fwww.google.com%2Freader%2F&followup=http%3A%2F%2Fwww.google.com%2Freader%2F&service=reader"; //$NON-NLS-1$
 
