@@ -178,7 +178,7 @@ public class ReloadTypesAction extends Action implements IObjectActionDelegate {
     Controller.getDefault().getSavedSearchService().forceQuickUpdate();
 
     /* Pass to controller for a queued reloading using ITasks */
-    Controller.getDefault().reloadQueued(selectedBookMarks, fShell);
+    Controller.getDefault().reloadQueued(selectedBookMarks, null, fShell);
   }
 
   private void getBookMarks(IFolder folder, Set<IBookMark> bookmarks) {

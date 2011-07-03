@@ -150,7 +150,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * Note: As required by the UI, the controller should be filled with more
  * methods.
  * </p>
- *
+ * 
  * @author bpasero
  */
 public class Controller {
@@ -311,8 +311,10 @@ public class Controller {
     private final IBookMark fBookMark;
     private final Shell fShell;
     private final Priority fPriority;
+    private final Map<Object, Object> fProperties;
 
-    ReloadTask(IBookMark bookmark, Shell shell, ITask.Priority priority) {
+    ReloadTask(IBookMark bookmark, Map<Object, Object> properties, Shell shell, ITask.Priority priority) {
+      fProperties = properties;
       Assert.isNotNull(bookmark);
       Assert.isNotNull(bookmark.getId());
 
@@ -323,7 +325,7 @@ public class Controller {
     }
 
     public IStatus run(IProgressMonitor monitor) {
-      IStatus status = reload(fBookMark, fShell, monitor);
+      IStatus status = reload(fBookMark, fProperties, fShell, monitor);
       return status;
     }
 
@@ -600,12 +602,14 @@ public class Controller {
    * Reload the given List of BookMarks. The BookMarks are processed in a queue
    * that stores all Tasks of this kind and guarantees that a certain amount of
    * Jobs process the Task concurrently.
-   *
+   * 
    * @param bookmarks The BookMarks to reload.
+   * @param properties any kind of properties to use for the reload or
+   * <code>null</code> if none.
    * @param shell The Shell this operation is running in, used to open Dialogs
    * if necessary.
    */
-  public void reloadQueued(Set<IBookMark> bookmarks, final Shell shell) {
+  public void reloadQueued(Set<IBookMark> bookmarks, Map<Object, Object> properties, final Shell shell) {
 
     /* Decide wether this is a high prio Job */
     boolean highPrio = bookmarks.size() == 1;
@@ -613,7 +617,7 @@ public class Controller {
     /* Create a Task for each Feed to Reload */
     List<ITask> tasks = new ArrayList<ITask>();
     for (final IBookMark bookmark : bookmarks) {
-      ReloadTask task = new ReloadTask(bookmark, shell, highPrio ? ITask.Priority.SHORT : ITask.Priority.DEFAULT);
+      ReloadTask task = new ReloadTask(bookmark, properties, shell, highPrio ? ITask.Priority.SHORT : ITask.Priority.DEFAULT);
 
       /* Check if Task is not yet Queued already */
       if (!fReloadFeedQueue.isQueued(task))
@@ -627,15 +631,17 @@ public class Controller {
    * Reload the given BookMark. The BookMark is processed in a queue that stores
    * all Tasks of this kind and guarantees that a certain amount of Jobs process
    * the Task concurrently.
-   *
+   * 
    * @param bookmark The BookMark to reload.
+   * @param properties any kind of properties to use for the reload or
+   * <code>null</code> if none.
    * @param shell The Shell this operation is running in, used to open Dialogs
    * if necessary.
    */
-  public void reloadQueued(IBookMark bookmark, final Shell shell) {
+  public void reloadQueued(IBookMark bookmark, Map<Object, Object> properties, final Shell shell) {
 
     /* Create a Task for the Bookmark to Reload */
-    ReloadTask task = new ReloadTask(bookmark, shell, ITask.Priority.DEFAULT);
+    ReloadTask task = new ReloadTask(bookmark, properties, shell, ITask.Priority.DEFAULT);
 
     /* Check if Task is not yet Queued already */
     if (!fReloadFeedQueue.isQueued(task))
@@ -644,7 +650,7 @@ public class Controller {
 
   /**
    * Reload the given BookMark.
-   *
+   * 
    * @param bookmark The BookMark to reload.
    * @param shell The Shell this operation is running in, used to open Dialogs
    * if necessary, or <code>NULL</code> if no Shell is available.
@@ -653,6 +659,10 @@ public class Controller {
    * @return Returns the Status of the Operation.
    */
   public IStatus reload(final IBookMark bookmark, Shell shell, final IProgressMonitor monitor) {
+    return reload(bookmark, null, shell, monitor);
+  }
+
+  private IStatus reload(final IBookMark bookmark, Map<Object, Object> properties, Shell shell, final IProgressMonitor monitor) {
     Assert.isNotNull(bookmark);
     CoreException ex = null;
 
@@ -673,7 +683,8 @@ public class Controller {
       IConditionalGet conditionalGet = fConditionalGetDAO.load(feedLink);
 
       /* Define Properties for Connection */
-      Map<Object, Object> properties = new HashMap<Object, Object>();
+      if (properties == null)
+        properties = new HashMap<Object, Object>();
       properties.put(IConnectionPropertyConstants.CON_TIMEOUT, fConnectionTimeout);
 
       /* Sync Specific Item Limit derived from retention settings */
@@ -822,7 +833,7 @@ public class Controller {
                     try {
                       URI normalizedUri = URIUtils.normalizeUri(feedLink, true);
                       if (Owl.getConnectionService().getAuthCredentials(normalizedUri, authEx.getRealm()) != null) {
-                        reloadQueued(bookmark, shellAr[0]);
+                        reloadQueued(bookmark, null, shellAr[0]);
                         return;
                       }
                     } catch (CredentialsException exe) {
@@ -851,7 +862,7 @@ public class Controller {
                     }
 
                     /* Re-Reload Bookmark */
-                    reloadQueued(bookmark, shellAr[0]);
+                    reloadQueued(bookmark, null, shellAr[0]);
                   }
 
                   /* Update Error Flag if user hit Cancel */
@@ -1296,7 +1307,7 @@ public class Controller {
   /**
    * Tells the Controller to stop. This method is called automatically from osgi
    * as soon as the org.rssowl.ui bundle gets stopped.
-   *
+   * 
    * @param emergency If set to <code>TRUE</code>, this method is called from a
    * shutdown hook that got triggered from a non-normal shutdown (e.g. System
    * Shutdown).
@@ -1495,7 +1506,7 @@ public class Controller {
 
   /**
    * Returns wether the application is in process of shutting down.
-   *
+   * 
    * @return <code>TRUE</code> if the application has been closed, and
    * <code>FALSE</code> otherwise.
    */
@@ -1505,7 +1516,7 @@ public class Controller {
 
   /**
    * Returns wether the application is in process of an emergency shut down.
-   *
+   * 
    * @return <code>TRUE</code> if the application is in the process of an
    * emergency shut down, and <code>FALSE</code> otherwise.
    */
@@ -1515,7 +1526,7 @@ public class Controller {
 
   /**
    * Returns wether the application is in process of restarting.
-   *
+   * 
    * @return <code>TRUE</code> if the application is restarting, and
    * <code>FALSE</code> otherwise.
    */
@@ -1525,7 +1536,7 @@ public class Controller {
 
   /**
    * Returns wether the application has finished starting.
-   *
+   * 
    * @return <code>TRUE</code> if the application is started, and
    * <code>FALSE</code> otherwise if still initializing.
    */
@@ -1536,7 +1547,7 @@ public class Controller {
   /**
    * This method is called immediately prior to workbench shutdown before any
    * windows have been closed.
-   *
+   * 
    * @return <code>true</code> to allow the workbench to proceed with shutdown,
    * <code>false</code> to veto a non-forced shutdown
    */
@@ -1846,7 +1857,7 @@ public class Controller {
   /**
    * Start a Workbench emergency shutdown due to an unrecoverable Out of Memory
    * error.
-   *
+   * 
    * @param error the {@link OutOfMemoryError} that causes an emergent shutdown.
    */
   public void emergencyOutOfMemoryShutdown(final OutOfMemoryError error) {
