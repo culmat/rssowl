@@ -624,7 +624,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
 
     /* Reload if required */
     if (fReloadRequired && fEntities.size() == 1)
-      Controller.getDefault().reloadQueued((IBookMark) fEntities.get(0), getWorkbenchShell());
+      Controller.getDefault().reloadQueued((IBookMark) fEntities.get(0), null, getWorkbenchShell());
 
     /* Reparent if necessary */
     IFolder sameParent = getSameParent(fEntities);
