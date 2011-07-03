@@ -467,4 +467,40 @@ public class SyncItem implements Serializable {
 
     return Arrays.equals(labelsA.toArray(), labelsB.toArray());
   }
+
+  /*
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((fId == null) ? 0 : fId.hashCode());
+    
+    return result;
+  }
+
+  /*
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+
+    if (obj == null)
+      return false;
+
+    if (getClass() != obj.getClass())
+      return false;
+
+    SyncItem other = (SyncItem) obj;
+    if (fId == null) {
+      if (other.fId != null)
+        return false;
+    } else if (!fId.equals(other.fId))
+      return false;
+
+    return true;
+  }
 }
