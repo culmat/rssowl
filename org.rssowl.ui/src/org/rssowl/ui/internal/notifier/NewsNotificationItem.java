@@ -64,6 +64,7 @@ public class NewsNotificationItem extends NotificationItem {
   private boolean fIsNewsRead;
   private String fCachedDescriptionExcerpt;
   private String fCachedOrigin;
+  private ImageDescriptor fImage;
   private RGB fColor;
 
   /**
@@ -79,7 +80,7 @@ public class NewsNotificationItem extends NotificationItem {
    * none.
    */
   public NewsNotificationItem(INews news, RGB color) {
-    super(makeText(news), makeImage(news));
+    super(makeText(news), OwlUI.BOOKMARK); //We resolve the real favicon later lazily
 
     fNewsLink = CoreUtils.getLink(news);
     fFeedReference = news.getFeedReference();
@@ -115,8 +116,8 @@ public class NewsNotificationItem extends NotificationItem {
     return content.length() > 0 ? content : null;
   }
 
-  private static ImageDescriptor makeImage(INews news) {
-    IBookMark bookMark = CoreUtils.getBookMark(news.getFeedReference());
+  private static ImageDescriptor makeImage(FeedLinkReference feedReference) {
+    IBookMark bookMark = CoreUtils.getBookMark(feedReference);
     if (bookMark != null) {
       ImageDescriptor favicon = OwlUI.getFavicon(bookMark);
       if (favicon != null)
@@ -124,6 +125,17 @@ public class NewsNotificationItem extends NotificationItem {
     }
 
     return OwlUI.BOOKMARK;
+  }
+
+  /*
+   * @see org.rssowl.ui.internal.notifier.NotificationItem#getImage()
+   */
+  @Override
+  public ImageDescriptor getImage() {
+    if (fImage == null)
+      fImage = makeImage(fFeedReference);
+
+    return fImage;
   }
 
   private static String makeText(INews news) {
