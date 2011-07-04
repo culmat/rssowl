@@ -461,43 +461,62 @@ public class DefaultProtocolHandler implements IProtocolHandler {
       if (inS != null)
         inS = pipeStream(inS, method);
     } catch (IOException e) {
+      abortAndRelease(method);
       throw new ConnectionException(Activator.getDefault().createErrorStatus(e.getMessage(), e));
     }
 
     /* In case authentication required */
-    if (method.getStatusCode() == HTTP_ERROR_AUTH_REQUIRED) {
+    int statusCode = method.getStatusCode();
+    if (statusCode == HTTP_ERROR_AUTH_REQUIRED) {
       AuthState hostAuthState = method.getHostAuthState();
-      throw new AuthenticationRequiredException(hostAuthState != null ? hostAuthState.getRealm() : null, Activator.getDefault().createErrorStatus(Messages.DefaultProtocolHandler_ERROR_AUTHENTICATION_REQUIRED, null));
+      String realm = hostAuthState != null ? hostAuthState.getRealm() : null;
+      abortAndRelease(method);
+
+      throw new AuthenticationRequiredException(realm, Activator.getDefault().createErrorStatus(Messages.DefaultProtocolHandler_ERROR_AUTHENTICATION_REQUIRED, null));
     }
 
     /* In case sync authentication failed (Forbidden) */
-    else if (isSyncAuthenticationIssue(method, authLink))
+    else if (isSyncAuthenticationIssue(method, authLink)) {
+      abortAndRelease(method);
+
       throw new AuthenticationRequiredException(null, Activator.getDefault().createErrorStatus(Messages.DefaultProtocolHandler_GR_ERROR_BAD_AUTH, null));
+    }
 
     /* In case of Forbidden Status with Error Code (Google Reader) */
-    else if (method.getStatusCode() == HTTP_ERROR_FORBIDDEN && method.getResponseHeader(HEADER_RESPONSE_ERROR) != null)
+    else if (statusCode == HTTP_ERROR_FORBIDDEN && method.getResponseHeader(HEADER_RESPONSE_ERROR) != null)
       handleForbidden(method);
 
     /* In case proxy-authentication required / failed */
-    else if (method.getStatusCode() == HTTP_ERROR_PROXY_AUTH_REQUIRED)
+    else if (statusCode == HTTP_ERROR_PROXY_AUTH_REQUIRED) {
+      abortAndRelease(method);
+
       throw new ProxyAuthenticationRequiredException(Activator.getDefault().createErrorStatus(Messages.DefaultProtocolHandler_ERROR_PROXY_AUTHENTICATION_REQUIRED, null));
+    }
 
     /* If status code is 4xx, throw an IOException with the status code included */
-    else if (method.getStatusCode() >= HTTP_ERRORS) {
-      String error = getError(method.getStatusCode());
-      if (error != null)
-        throw new ConnectionException(Activator.getDefault().createErrorStatus(NLS.bind(Messages.DefaultProtocolHandler_ERROR_HTTP_STATUS_MSG, String.valueOf(method.getStatusCode()), error), null));
+    else if (statusCode >= HTTP_ERRORS) {
+      String error = getError(statusCode);
+      abortAndRelease(method);
 
-      throw new ConnectionException(Activator.getDefault().createErrorStatus(NLS.bind(Messages.DefaultProtocolHandler_ERROR_HTTP_STATUS, String.valueOf(method.getStatusCode())), null));
+      if (error != null)
+        throw new ConnectionException(Activator.getDefault().createErrorStatus(NLS.bind(Messages.DefaultProtocolHandler_ERROR_HTTP_STATUS_MSG, String.valueOf(statusCode), error), null));
+
+      throw new ConnectionException(Activator.getDefault().createErrorStatus(NLS.bind(Messages.DefaultProtocolHandler_ERROR_HTTP_STATUS, String.valueOf(statusCode)), null));
     }
 
     /* In case the Feed has not been modified since */
-    else if (method.getStatusCode() == HTTP_STATUS_NOT_MODIFIED)
+    else if (statusCode == HTTP_STATUS_NOT_MODIFIED) {
+      abortAndRelease(method);
+
       throw new NotModifiedException(Activator.getDefault().createInfoStatus(Messages.DefaultProtocolHandler_INFO_NOT_MODIFIED_SINCE, null));
+    }
 
     /* In case response body is not available */
-    if (inS == null)
+    if (inS == null) {
+      abortAndRelease(method);
+
       throw new ConnectionException(Activator.getDefault().createErrorStatus(Messages.DefaultProtocolHandler_ERROR_STREAM_UNAVAILABLE, null));
+    }
 
     /* Check wether a Progress Monitor is provided to support early cancelation */
     IProgressMonitor monitor = null;
@@ -506,6 +525,13 @@ public class DefaultProtocolHandler implements IProtocolHandler {
 
     /* Return a Stream that releases the connection once closed */
     return new HttpConnectionInputStream(link, method, monitor, inS);
+  }
+
+  private void abortAndRelease(HttpMethodBase method) {
+    if (method != null) {
+      method.abort();
+      method.releaseConnection();
+    }
   }
 
   private boolean isSyncAuthenticationIssue(HttpMethodBase method, URI link) {
@@ -560,6 +586,8 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     /* Otherwise throw generic Forbidden Exception */
     if (errorMsg == null)
       errorMsg = Messages.DefaultProtocolHandler_ERROR_FORBIDDEN;
+
+    abortAndRelease(method);
 
     if (errorUrl != null)
       throw new SyncConnectionException(errorUrl, Activator.getDefault().createErrorStatus(errorMsg, null));
