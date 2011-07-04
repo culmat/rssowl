@@ -29,6 +29,7 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.NTCredentials;
+import org.apache.commons.httpclient.SimpleHttpConnectionManager;
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
@@ -700,6 +701,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
 
     /* Create a new HttpClient */
     HttpClient client = new HttpClient();
+    client.setHttpConnectionManager(new SimpleHttpConnectionManager(true));
 
     /* Socket Timeout - Max. time to wait for an answer */
     client.getHttpConnectionManager().getParams().setSoTimeout(conTimeout);
