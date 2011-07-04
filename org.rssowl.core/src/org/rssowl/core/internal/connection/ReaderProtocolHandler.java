@@ -31,6 +31,7 @@ import org.osgi.service.url.URLStreamHandlerService;
 import org.rssowl.core.Owl;
 import org.rssowl.core.connection.AuthenticationRequiredException;
 import org.rssowl.core.connection.ConnectionException;
+import org.rssowl.core.connection.IAbortable;
 import org.rssowl.core.connection.IConnectionPropertyConstants;
 import org.rssowl.core.connection.ICredentials;
 import org.rssowl.core.connection.ICredentialsProvider;
@@ -147,16 +148,30 @@ public class ReaderProtocolHandler extends DefaultProtocolHandler {
     }
 
     /* Read JSON Object from Response and parse */
+    InputStreamReader reader = null;
+    boolean isError = false;
     IModelFactory typesFactory = Owl.getModelFactory();
     IFeed feed = typesFactory.createFeed(null, link);
     feed.setBase(readerToHTTP(link));
     try {
-      JSONObject obj = new JSONObject(new JSONTokener(new InputStreamReader(inS, UTF_8)));
+      reader = new InputStreamReader(inS, UTF_8);
+      JSONObject obj = new JSONObject(new JSONTokener(reader));
       Owl.getInterpreter().interpretJSONObject(obj, feed);
     } catch (JSONException e) {
+      isError = true;
       throw new ParserException(Activator.getDefault().createErrorStatus(e.getMessage(), e));
     } catch (IOException e) {
+      isError = true;
       throw new ParserException(Activator.getDefault().createErrorStatus(e.getMessage(), e));
+    } finally {
+      try {
+        if (isError && inS instanceof IAbortable)
+          ((IAbortable) inS).abort();
+        else if (reader != null)
+          reader.close();
+      } catch (IOException e) {
+        /* Ignore */
+      }
     }
 
     /* Update News based on uncommitted Items */
