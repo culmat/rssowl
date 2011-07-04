@@ -377,17 +377,17 @@ public class NotificationService {
       Shell primaryShell = OwlUI.getPrimaryShell();
       if (primaryShell != null) {
         JobRunner.runInUIThread(primaryShell, new Runnable() { //MUST NOT RUN SYNCED IN UI THREAD FROM EVENT - DEADLOCK ALERT !!!
-              public void run() {
-                if (Controller.getDefault().isShuttingDown())
-                  return;
+          public void run() {
+            if (Controller.getDefault().isShuttingDown())
+              return;
 
-                ApplicationWorkbenchWindowAdvisor advisor = ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor;
-                if (advisor != null && !advisor.isMinimizedToTray() && !advisor.isMinimized())
-                  return;
+            ApplicationWorkbenchWindowAdvisor advisor = ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor;
+            if (advisor != null && !advisor.isMinimizedToTray() && !advisor.isMinimized())
+              return;
 
-                JobRunner.runInBackgroundThread(runnable);
-              }
-            });
+            JobRunner.runInBackgroundThread(runnable);
+          }
+        });
       }
     }
 
