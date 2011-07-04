@@ -49,9 +49,9 @@ import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.core.persist.pref.IPreferenceScope.Kind;
 import org.rssowl.core.persist.pref.IPreferenceType;
 import org.rssowl.core.persist.pref.Preference;
-import org.rssowl.core.persist.pref.IPreferenceScope.Kind;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.StringUtils;
 
@@ -69,9 +69,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
-import java.util.Map.Entry;
 
 /**
  * Implementation of {@link ITypeExporter} for the OPML XML format.
@@ -361,7 +361,7 @@ public class OPMLExporter implements ITypeExporter {
     for (ISearchFilter filter : filters) {
       String name = filter.getName();
       int order = filter.getOrder();
-      boolean isEnabled = filter.isEnabled();
+      boolean isEnabled = filter.isEnabled() && !CoreUtils.isOrphaned(filter);
       boolean matchAllNews = filter.matchAllNews();
 
       Element filterElement = new Element(Tag.FILTER.get(), RSSOWL_NS);

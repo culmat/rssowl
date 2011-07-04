@@ -27,22 +27,17 @@ package org.rssowl.ui.internal.util;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.rssowl.core.Owl;
-import org.rssowl.core.internal.newsaction.CopyNewsAction;
-import org.rssowl.core.internal.newsaction.MoveNewsAction;
 import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
-import org.rssowl.core.persist.IFilterAction;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
-import org.rssowl.core.persist.ISearch;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchField;
-import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.NewsReference;
@@ -374,80 +369,6 @@ public class ModelUtils {
 
     List<SearchHit<NewsReference>> result = Owl.getPersistenceService().getModelSearch().searchNews(Collections.singleton(condition), false);
     return result.size();
-  }
-
-  /**
-   * Find out if a given {@link ISearchFilter} is based on locations that no
-   * longer exist.
-   *
-   * @param filter the {@link ISearchFilter} to be checked for being orphaned.
-   * @return <code>true</code> if the {@link ISearchField} is scoped to a
-   * location that no longer exists or contains only a action to move/copy to a
-   * bin that no longer exists.
-   */
-  public static boolean isOrphaned(ISearchFilter filter) {
-
-    /* Check Search */
-    ISearch search = filter.getSearch();
-    if (search != null && isOrphaned(search))
-      return true;
-
-    /* Check Actions */
-    boolean isOrphaned = false;
-    List<IFilterAction> actions = filter.getActions();
-    for (IFilterAction action : actions) {
-
-      /* Any action not moving/copying means the filter can run independently of any location */
-      if (!CopyNewsAction.ID.equals(action.getActionId()) && !MoveNewsAction.ID.equals(action.getActionId()))
-        return false;
-
-      Object data = action.getData();
-      if (data instanceof Long[][]) {
-        List<IFolderChild> entities = CoreUtils.toEntities((Long[][]) data);
-        if (!entities.isEmpty())
-          return false;
-
-        isOrphaned = true;
-      }
-    }
-
-    return isOrphaned;
-  }
-
-  /**
-   * Find out if a given {@link ISearch} is based on locations that no longer
-   * exist.
-   *
-   * @param search the {@link ISearch} to be checked for being orphaned.
-   * @return <code>true</code> if the {@link ISearch} is scoped to a location
-   * that no longer exists.
-   */
-  public static boolean isOrphaned(ISearch search) {
-    List<ISearchCondition> conditions = search.getSearchConditions();
-    for (ISearchCondition condition : conditions) {
-
-      /* Check for Scope */
-      if (condition.getSpecifier() == SearchSpecifier.SCOPE) {
-        Object value = condition.getValue();
-        if (value instanceof Long[][]) {
-          List<IFolderChild> entities = CoreUtils.toEntities((Long[][]) value);
-          if (entities.isEmpty())
-            return true;
-        }
-      }
-
-      /* Check for Location */
-      else if (condition.getField().getId() == INews.LOCATION) {
-        Object value = condition.getValue();
-        if (value instanceof Long[][]) {
-          List<IFolderChild> entities = CoreUtils.toEntities((Long[][]) value);
-          if (entities.isEmpty() && (search.matchAllConditions() || conditions.size() == 1))
-            return true;
-        }
-      }
-    }
-
-    return false;
   }
 
   /**
