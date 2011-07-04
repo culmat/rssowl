@@ -181,8 +181,10 @@ public class SyncService implements Receiver<SyncItem> {
       @Override
       public void entitiesUpdated(Set<NewsEvent> events) {
         Collection<SyncItem> items = filter(events);
-        fSyncItemsManager.addUncommitted(items);
-        addAllAsync(items); //Must add async because the buffer is blocking while running
+        if (!items.isEmpty()) {
+          fSyncItemsManager.addUncommitted(items);
+          addAllAsync(items); //Must add async because the buffer is blocking while running
+        }
       }
     };
     DynamicDAO.addEntityListener(INews.class, fNewsListener);
@@ -192,8 +194,10 @@ public class SyncService implements Receiver<SyncItem> {
       @Override
       public void filterApplied(ISearchFilter filter, Collection<INews> news) {
         Collection<SyncItem> items = filter(filter, news);
-        fSyncItemsManager.addUncommitted(items);
-        addAllAsync(items); //Must add async because the buffer is blocking while running
+        if (!items.isEmpty()) {
+          fSyncItemsManager.addUncommitted(items);
+          addAllAsync(items); //Must add async because the buffer is blocking while running
+        }
       }
     };
     DynamicDAO.addEntityListener(ISearchFilter.class, fSearchFilterListener);
