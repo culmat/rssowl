@@ -266,6 +266,8 @@ public class DefaultProtocolHandler implements IProtocolHandler {
 
   /* Load a possible Favicon from the given Feed */
   byte[] loadFavicon(URI link, boolean isFavicon, boolean rewriteHost, IProgressMonitor monitor) {
+    InputStream inS = null;
+    boolean isError = false;
     try {
 
       /* Define Properties for Connection */
@@ -278,19 +280,20 @@ public class DefaultProtocolHandler implements IProtocolHandler {
       if (faviconLink == null)
         return null;
 
-      InputStream fis = openStream(faviconLink, properties);
+      inS = openStream(faviconLink, properties);
 
       ByteArrayOutputStream fos = new ByteArrayOutputStream();
       byte buffer[] = new byte[0xffff];
       int nbytes;
 
-      while ((nbytes = fis.read(buffer)) != -1)
+      while ((nbytes = inS.read(buffer)) != -1)
         fos.write(buffer, 0, nbytes);
 
       return fos.toByteArray();
     } catch (URISyntaxException e) {
       /* Ignore */
     } catch (ConnectionException e) {
+      isError = true;
 
       /* Try rewriting the Host to obtain the Favicon */
       if (!rewriteHost && !isFavicon) {
@@ -302,6 +305,8 @@ public class DefaultProtocolHandler implements IProtocolHandler {
       }
     } catch (IOException e) {
       /* Ignore */
+    } finally {
+      closeStream(inS, isError);
     }
 
     return null;
