@@ -58,7 +58,6 @@ import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.SyncUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
-import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -151,7 +150,7 @@ public class CleanUpModel {
       List<ISearchMark> orphanedSearches = new ArrayList<ISearchMark>();
       Collection<ISearchMark> searches = DynamicDAO.loadAll(ISearchMark.class);
       for (ISearchMark search : searches) {
-        if (ModelUtils.isOrphaned(search))
+        if (CoreUtils.isOrphaned(search))
           orphanedSearches.add(search);
       }
 
@@ -164,7 +163,7 @@ public class CleanUpModel {
       List<ISearchFilter> orphanedFilters = new ArrayList<ISearchFilter>();
       Collection<ISearchFilter> filters = DynamicDAO.loadAll(ISearchFilter.class);
       for (ISearchFilter filter : filters) {
-        if (filter.isEnabled() && ModelUtils.isOrphaned(filter))
+        if (filter.isEnabled() && CoreUtils.isOrphaned(filter))
           orphanedFilters.add(filter);
       }
 

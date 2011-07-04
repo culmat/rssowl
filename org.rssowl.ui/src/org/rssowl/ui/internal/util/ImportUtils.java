@@ -266,6 +266,14 @@ public class ImportUtils {
 
       /* Save */
       DynamicDAO.saveAll(filters);
+
+      /* Fix Orphaned Filters */
+      for (ISearchFilter filter : filters) {
+        if (filter.isEnabled() && CoreUtils.isOrphaned(filter)) {
+          filter.setEnabled(false);
+          DynamicDAO.save(filter);
+        }
+      }
     }
 
     /* Import Preferences */

@@ -34,6 +34,8 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
+import org.rssowl.core.internal.newsaction.LabelNewsAction;
+import org.rssowl.core.internal.newsaction.MoveNewsAction;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.internal.persist.service.PersistenceServiceImpl;
 import org.rssowl.core.interpreter.ITypeImporter;
@@ -41,6 +43,7 @@ import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
+import org.rssowl.core.persist.IFilterAction;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IGuid;
@@ -1897,5 +1900,194 @@ public class CoreUtilsTest {
     att.setLink(URI.create("rssowl.org"));
 
     assertTrue(CoreUtils.hasAttachment(news1, URI.create("rssowl.org")));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testOrphanedNewsFilters() throws Exception {
+    IFolderChild root = fFactory.createFolder(null, null, "Root");
+
+    IFeed feed = fFactory.createFeed(null, new URI("http://www.rssowl.org"));
+    DynamicDAO.save(feed);
+
+    IFolderChild bm1 = fFactory.createBookMark(null, (IFolder) root, new FeedLinkReference(feed.getLink()), "Bookmark 1");
+
+    IFolderChild bin1 = fFactory.createNewsBin(null, (IFolder) root, "Bin 1");
+
+    DynamicDAO.save(root);
+
+    ISearchField locationField = fFactory.createSearchField(INews.LOCATION, INews.class.getName());
+    ISearchCondition condition = fFactory.createSearchCondition(locationField, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Arrays.asList(bin1)));
+    ISearch search = fFactory.createSearch(null);
+    search.addSearchCondition(condition);
+    DynamicDAO.save(search);
+
+    /* Filter 1: With Search */
+    ISearchFilter filter1 = fFactory.createSearchFilter(null, search, "Filter 1");
+    DynamicDAO.save(filter1);
+    assertTrue(!CoreUtils.isOrphaned(filter1));
+
+    /* Filter 2: With Move Action */
+    ISearchFilter filter2 = fFactory.createSearchFilter(null, null, "Filter 2");
+    IFilterAction action2 = fFactory.createFilterAction(MoveNewsAction.ID);
+    action2.setData(ModelUtils.toPrimitive(Arrays.asList(bm1, bin1)));
+    filter2.addAction(action2);
+    DynamicDAO.save(filter2);
+    assertTrue(!CoreUtils.isOrphaned(filter2));
+
+    /* Filter 3: With Move and Label Action */
+    ISearchFilter filter3 = fFactory.createSearchFilter(null, null, "Filter 3");
+    IFilterAction action3 = fFactory.createFilterAction(MoveNewsAction.ID);
+    action3.setData(ModelUtils.toPrimitive(Arrays.asList(bm1, bin1)));
+    filter3.addAction(action3);
+    filter3.addAction(fFactory.createFilterAction(LabelNewsAction.ID));
+    DynamicDAO.save(filter3);
+    assertTrue(!CoreUtils.isOrphaned(filter3));
+
+    DynamicDAO.delete(bin1);
+    assertTrue(CoreUtils.isOrphaned(filter1));
+    assertTrue(!CoreUtils.isOrphaned(filter2));
+    assertTrue(!CoreUtils.isOrphaned(filter3));
+
+    DynamicDAO.delete(bm1);
+    assertTrue(CoreUtils.isOrphaned(filter1));
+    assertTrue(CoreUtils.isOrphaned(filter2));
+    assertTrue(!CoreUtils.isOrphaned(filter3));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testOrphanedSearchMarks() throws Exception {
+    IFolderChild root = fFactory.createFolder(null, null, "Root");
+    IFolderChild subfolder = fFactory.createFolder(null, (IFolder) root, "Sub Folder");
+
+    IFeed feed = fFactory.createFeed(null, new URI("http://www.rssowl.org"));
+    DynamicDAO.save(feed);
+
+    IFolderChild bm1 = fFactory.createBookMark(null, (IFolder) root, new FeedLinkReference(feed.getLink()), "Bookmark 1");
+
+    IFolderChild bin1 = fFactory.createNewsBin(null, (IFolder) root, "Bin 1");
+
+    DynamicDAO.save(root);
+
+    ISearchField locationField = fFactory.createSearchField(INews.LOCATION, INews.class.getName());
+    ISearchField allField = fFactory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
+
+    /* SM with Scope (Root) */
+    ISearchCondition condition1 = fFactory.createSearchCondition(locationField, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Arrays.asList(root)));
+    ISearch search1 = fFactory.createSearch(null);
+    search1.addSearchCondition(condition1);
+    DynamicDAO.save(search1);
+    assertTrue(!CoreUtils.isOrphaned(search1));
+
+    /* SM with Scope (Sub Folder) */
+    ISearchCondition condition2 = fFactory.createSearchCondition(locationField, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Arrays.asList(subfolder)));
+    ISearch search2 = fFactory.createSearch(null);
+    search2.addSearchCondition(condition2);
+    DynamicDAO.save(search2);
+    assertTrue(!CoreUtils.isOrphaned(search2));
+
+    /* SM with Scope (Bookmark) */
+    ISearchCondition condition3 = fFactory.createSearchCondition(locationField, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Arrays.asList(bm1)));
+    ISearch search3 = fFactory.createSearch(null);
+    search3.addSearchCondition(condition3);
+    DynamicDAO.save(search3);
+    assertTrue(!CoreUtils.isOrphaned(search3));
+
+    /* SM with Scope (Bin) */
+    ISearchCondition condition4 = fFactory.createSearchCondition(locationField, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Arrays.asList(bin1)));
+    ISearch search4 = fFactory.createSearch(null);
+    search4.addSearchCondition(condition4);
+    DynamicDAO.save(search4);
+    assertTrue(!CoreUtils.isOrphaned(search4));
+
+    /* SM with Scope (Folder, Bookmark, Bin) */
+    ISearchCondition condition5 = fFactory.createSearchCondition(locationField, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Arrays.asList(subfolder, bm1, bin1)));
+    ISearch search5 = fFactory.createSearch(null);
+    search5.addSearchCondition(condition5);
+    DynamicDAO.save(search5);
+    assertTrue(!CoreUtils.isOrphaned(search5));
+
+    /* SM with Location - Match Any - (Folder, Bookmark, Bin) */
+    ISearchCondition condition6 = fFactory.createSearchCondition(locationField, SearchSpecifier.IS, ModelUtils.toPrimitive(Arrays.asList(subfolder, bm1, bin1)));
+    ISearch search6 = fFactory.createSearch(null);
+    search6.addSearchCondition(condition6);
+    search6.setMatchAllConditions(false);
+    DynamicDAO.save(search6);
+    assertTrue(!CoreUtils.isOrphaned(search6));
+
+    /* SM with Location - Match All - (Folder, Bookmark, Bin) */
+    ISearchCondition condition7 = fFactory.createSearchCondition(locationField, SearchSpecifier.IS, ModelUtils.toPrimitive(Arrays.asList(subfolder, bm1, bin1)));
+    ISearch search7 = fFactory.createSearch(null);
+    search7.addSearchCondition(condition7);
+    search7.setMatchAllConditions(true);
+    DynamicDAO.save(search7);
+    assertTrue(!CoreUtils.isOrphaned(search7));
+
+    /* SM with Location (Match All) */
+    ISearchCondition condition8 = fFactory.createSearchCondition(locationField, SearchSpecifier.IS, ModelUtils.toPrimitive(Arrays.asList(subfolder, bm1, bin1)));
+    ISearch search8 = fFactory.createSearch(null);
+    search8.addSearchCondition(condition8);
+    search8.addSearchCondition(fFactory.createSearchCondition(allField, SearchSpecifier.CONTAINS, "foo"));
+    search8.setMatchAllConditions(true);
+    DynamicDAO.save(search8);
+    assertTrue(!CoreUtils.isOrphaned(search8));
+
+    /* SM with Location (Match Any) */
+    ISearchCondition condition9 = fFactory.createSearchCondition(locationField, SearchSpecifier.IS, ModelUtils.toPrimitive(Arrays.asList(subfolder, bm1, bin1)));
+    ISearch search9 = fFactory.createSearch(null);
+    search9.addSearchCondition(condition9);
+    search9.addSearchCondition(fFactory.createSearchCondition(allField, SearchSpecifier.CONTAINS, "foo"));
+    search9.setMatchAllConditions(false);
+    DynamicDAO.save(search9);
+    assertTrue(!CoreUtils.isOrphaned(search9));
+
+    DynamicDAO.delete(bm1);
+    assertTrue(!CoreUtils.isOrphaned(search1));
+    assertTrue(!CoreUtils.isOrphaned(search2));
+    assertTrue(CoreUtils.isOrphaned(search3));
+    assertTrue(!CoreUtils.isOrphaned(search4));
+    assertTrue(!CoreUtils.isOrphaned(search5));
+    assertTrue(!CoreUtils.isOrphaned(search6));
+    assertTrue(!CoreUtils.isOrphaned(search7));
+    assertTrue(!CoreUtils.isOrphaned(search8));
+    assertTrue(!CoreUtils.isOrphaned(search9));
+
+    DynamicDAO.delete(bin1);
+    assertTrue(!CoreUtils.isOrphaned(search1));
+    assertTrue(!CoreUtils.isOrphaned(search2));
+    assertTrue(CoreUtils.isOrphaned(search3));
+    assertTrue(CoreUtils.isOrphaned(search4));
+    assertTrue(!CoreUtils.isOrphaned(search5));
+    assertTrue(!CoreUtils.isOrphaned(search6));
+    assertTrue(!CoreUtils.isOrphaned(search7));
+    assertTrue(!CoreUtils.isOrphaned(search8));
+    assertTrue(!CoreUtils.isOrphaned(search9));
+
+    DynamicDAO.delete(subfolder);
+    assertTrue(!CoreUtils.isOrphaned(search1));
+    assertTrue(CoreUtils.isOrphaned(search2));
+    assertTrue(CoreUtils.isOrphaned(search3));
+    assertTrue(CoreUtils.isOrphaned(search4));
+    assertTrue(CoreUtils.isOrphaned(search5));
+    assertTrue(CoreUtils.isOrphaned(search6));
+    assertTrue(CoreUtils.isOrphaned(search7));
+    assertTrue(CoreUtils.isOrphaned(search8));
+    assertTrue(!CoreUtils.isOrphaned(search9));
+
+    DynamicDAO.delete(root);
+    assertTrue(CoreUtils.isOrphaned(search1));
+    assertTrue(CoreUtils.isOrphaned(search2));
+    assertTrue(CoreUtils.isOrphaned(search3));
+    assertTrue(CoreUtils.isOrphaned(search4));
+    assertTrue(CoreUtils.isOrphaned(search5));
+    assertTrue(CoreUtils.isOrphaned(search6));
+    assertTrue(CoreUtils.isOrphaned(search7));
+    assertTrue(CoreUtils.isOrphaned(search8));
+    assertTrue(!CoreUtils.isOrphaned(search9));
   }
 }
