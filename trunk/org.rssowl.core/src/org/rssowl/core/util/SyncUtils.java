@@ -217,8 +217,12 @@ public class SyncUtils {
             return line.substring(AUTH_IDENTIFIER.length());
         }
       } finally {
-        if (reader != null)
-          reader.close();
+        try {
+          if (reader != null)
+            reader.close();
+        } catch (IOException e) {
+          /* Ignore */
+        }
       }
     }
 
@@ -296,8 +300,12 @@ public class SyncUtils {
           return line;
         }
       } finally {
-        if (reader != null)
-          reader.close();
+        try {
+          if (reader != null)
+            reader.close();
+        } catch (IOException e) {
+          /* Ignore */
+        }
       }
     }
 
