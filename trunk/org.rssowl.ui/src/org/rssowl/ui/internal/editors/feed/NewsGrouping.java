@@ -39,6 +39,7 @@ import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.StringUtils;
+import org.rssowl.core.util.SyncUtils;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.EntityGroupItem;
 import org.rssowl.ui.internal.OwlUI;
@@ -335,7 +336,7 @@ public class NewsGrouping {
 
         /* Determine Group ID */
         String groupId;
-        if (StringUtils.isSet(news.getInReplyTo()))
+        if (!SyncUtils.isSynchronized(news) && StringUtils.isSet(news.getInReplyTo()))
           groupId = news.getInReplyTo();
         else
           groupId = normalizedTitle;
