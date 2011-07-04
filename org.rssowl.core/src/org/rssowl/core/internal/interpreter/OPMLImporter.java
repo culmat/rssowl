@@ -282,6 +282,8 @@ public class OPMLImporter implements ITypeImporter {
     if (valueElement == null)
       return null;
     Object value = getValue(valueElement, RSSOWL_NS, dateFormat);
+    if (value == null)
+      return null;
 
     /* Search Field */
     Element fieldElement = conditionElement.getChild(Tag.SEARCH_FIELD.get(), RSSOWL_NS);
@@ -298,14 +300,7 @@ public class OPMLImporter implements ITypeImporter {
     else //Since 2.0 M10
       searchField = Owl.getModelFactory().createSearchField(Integer.parseInt(fieldId), entityName);
 
-    /*
-     * Guard against null (Location Conditions may potentially lead to NULL if
-     * they are stale since they are not updated when locations change)
-     */
-    if (value != null)
-      return Owl.getModelFactory().createSearchCondition(searchField, searchSpecifier, value);
-
-    return null;
+    return Owl.getModelFactory().createSearchCondition(searchField, searchSpecifier, value);
   }
 
   /* Support for RSSOwl pre 2.0 M10 */
