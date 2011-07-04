@@ -705,8 +705,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
       conTimeout = (Integer) properties.get(IConnectionPropertyConstants.CON_TIMEOUT);
 
     /* Create a new HttpClient */
-    HttpClient client = new HttpClient();
-    client.setHttpConnectionManager(new SimpleHttpConnectionManager(true));
+    HttpClient client = new HttpClient(new SimpleHttpConnectionManager(true));
 
     /* Socket Timeout - Max. time to wait for an answer */
     client.getHttpConnectionManager().getParams().setSoTimeout(conTimeout);
