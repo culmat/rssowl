@@ -761,7 +761,7 @@ public class ApplicationServer {
   }
 
   private String unicodeToEntities(String str) {
-    StringBuilder strBuf = new StringBuilder();
+    StringBuilder strBuf = new StringBuilder(str.length());
 
     /* For each character */
     for (int i = 0; i < str.length(); i++) {
@@ -783,6 +783,7 @@ public class ApplicationServer {
         strBuf.append(ch);
       }
     }
+
     return strBuf.toString();
   }
 
