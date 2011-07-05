@@ -24,8 +24,11 @@
 
 package org.rssowl.ui.internal.dialogs.preferences;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
@@ -45,6 +48,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -52,6 +56,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
@@ -60,16 +65,19 @@ import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.ILabelDAO;
 import org.rssowl.core.util.CoreUtils;
+import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.dialogs.ConfirmDialog;
 import org.rssowl.ui.internal.dialogs.LabelDialog;
-import org.rssowl.ui.internal.dialogs.NewsFiltersListDialog;
 import org.rssowl.ui.internal.dialogs.LabelDialog.DialogMode;
+import org.rssowl.ui.internal.dialogs.NewsFiltersListDialog;
+import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
 import org.rssowl.ui.internal.util.ModelUtils;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -333,7 +341,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
   private void onDelete() {
     IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
     if (!selection.isEmpty()) {
-      List<ILabel> selectedLabels = ModelUtils.getEntities(selection, ILabel.class);
+      final List<ILabel> selectedLabels = ModelUtils.getEntities(selection, ILabel.class);
 
       String msg;
       if (selectedLabels.size() == 1)
@@ -343,17 +351,69 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
 
       ConfirmDialog dialog = new ConfirmDialog(getShell(), Messages.ManageLabelsPreferencePage_CONFIRM_DELETE, Messages.ManageLabelsPreferencePage_NO_UNDO, msg, null);
       if (dialog.open() == IDialogConstants.OK_ID) {
+        deleteInBackground(new Runnable() {
+          public void run() {
 
-        /* Can have an impact on news, thereby force quick update */
-        Controller.getDefault().getSavedSearchService().forceQuickUpdate();
+            /* Can have an impact on news, thereby force quick update */
+            Controller.getDefault().getSavedSearchService().forceQuickUpdate();
 
-        /* Delete Label from DB */
-        DynamicDAO.deleteAll(selectedLabels);
-        fViewer.refresh();
-        fixOrderAfterDelete();
+            /* Delete Label from DB */
+            DynamicDAO.deleteAll(selectedLabels);
+
+            /* Update UI */
+            JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
+              public void run() {
+                fViewer.refresh();
+                fixOrderAfterDelete();
+              }
+            });
+          }
+        });
       }
     }
     fViewer.getTree().setFocus();
+  }
+
+  private void deleteInBackground(final Runnable deleteRunnable) {
+
+    /* Runnable with Progress */
+    IRunnableWithProgress runnableWithProgress = new IRunnableWithProgress() {
+      public void run(IProgressMonitor monitor) {
+        monitor.beginTask(Messages.ManageLabelsPreferencePage_WAIT_DELETE, IProgressMonitor.UNKNOWN);
+        try {
+          deleteRunnable.run();
+        } finally {
+          monitor.done();
+        }
+      }
+    };
+
+    /* Progress Dialog */
+    ProgressMonitorDialog dialog = new ProgressMonitorDialog(getShell()) {
+      @Override
+      protected void initializeBounds() {
+        super.initializeBounds();
+
+        /* Size */
+        Shell shell = getShell();
+        int width = convertHorizontalDLUsToPixels(OwlUI.MIN_DIALOG_WIDTH_DLU);
+        shell.setSize(width, shell.getSize().y);
+
+        /* New Location */
+        Rectangle containerBounds = shell.getParent().getBounds();
+        int x = Math.max(0, containerBounds.x + (containerBounds.width - width) / 2);
+        shell.setLocation(x, shell.getLocation().y);
+      }
+    };
+
+    /* Open and Run */
+    try {
+      dialog.run(true, false, runnableWithProgress);
+    } catch (InvocationTargetException e) {
+      Activator.safeLogError(e.getMessage(), e);
+    } catch (InterruptedException e) {
+      Activator.safeLogError(e.getMessage(), e);
+    }
   }
 
   /* Ensure that after Delete, the orders are in sync again */
