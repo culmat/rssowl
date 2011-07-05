@@ -385,6 +385,9 @@ public class DefaultPreferences {
   /** Global: Number of Elements in Browser before starting to Page */
   public static final String NEWS_BROWSER_PAGE_SIZE = Preference.NEWS_BROWSER_PAGE_SIZE.id();
 
+  /** Global: Deleted Labels (to ignore from synced feeds) */
+  public static final String DELETED_LABELS = Preference.DELETED_LABELS.id();
+
   /**
    * Eclipse Preferences Follow
    */

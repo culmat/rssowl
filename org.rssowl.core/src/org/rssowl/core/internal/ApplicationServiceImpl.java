@@ -195,15 +195,27 @@ public class ApplicationServiceImpl implements IApplicationService {
       boolean isSynced = SyncUtils.isSynchronized(bookMark);
       if (isSynced) {
 
+        /* Determine those Labels the user has explicitly deleted and ignore */
+        String[] labelsToIgnore = Owl.getPreferenceService().getGlobalScope().getStrings(DefaultPreferences.DELETED_LABELS);
+        List<String> labelsToIgnoreList = (labelsToIgnore != null) ? new ArrayList<String>(labelsToIgnore.length) : Collections.<String> emptyList();
+        if (labelsToIgnore != null) {
+          for (String label : labelsToIgnore) {
+            labelsToIgnoreList.add(label);
+          }
+        }
+
         /* Collect All Incoming Labels */
+        boolean hasLabels = false;
         Set<String> incomingLabels = new HashSet<String>();
         for (INews item : interpretedFeed.getNews()) {
           Object labelsObj = item.getProperty(SyncUtils.GOOGLE_LABELS);
           if (labelsObj != null && labelsObj instanceof String[]) {
             String[] labels = (String[]) labelsObj;
             for (String label : labels) {
-              incomingLabels.add(label);
+              if (!labelsToIgnoreList.contains(label))
+                incomingLabels.add(label);
             }
+            hasLabels = true;
           }
         }
 
@@ -245,6 +257,13 @@ public class ApplicationServiceImpl implements IApplicationService {
                   item.addLabel(label);
               }
             }
+            item.removeProperty(SyncUtils.GOOGLE_LABELS);
+          }
+        }
+
+        /* Otherwise make sure to clean up properties for Labels */
+        else if (hasLabels) {
+          for (INews item : interpretedFeed.getNews()) {
             item.removeProperty(SyncUtils.GOOGLE_LABELS);
           }
         }
