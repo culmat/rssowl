@@ -49,6 +49,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -408,7 +409,17 @@ public class News extends AbstractEntity implements INews {
     try {
       if (fLabels == null)
         return new HashSet<ILabel>(0);
-      return new HashSet<ILabel>(fLabels);
+
+      /* Bug: For some reason a label can become null when it was deleted, ignore null thereby */
+      Set<ILabel> labels= new HashSet<ILabel>(fLabels.size());
+      Iterator<ILabel> iterator = fLabels.iterator();
+      while(iterator.hasNext()) {
+        ILabel label = iterator.next();
+        if (label != null)
+          labels.add(label);
+      }
+
+      return labels;
     } finally {
       fLock.releaseReadLock();
     }
