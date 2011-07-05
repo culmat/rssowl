@@ -325,6 +325,18 @@ public class ImportExportOPMLTest {
     filter.addAction(action);
 
     DynamicDAO.save(filter);
+
+    /* 9) Location is DELETED - Enabled - Mark Read */
+    search = fFactory.createSearch(null);
+    locationField = fFactory.createSearchField(INews.LOCATION, INews.class.getName());
+    Long[][] result = new Long[3][];
+    result[0] = new Long[] { 99999l };
+    search.addSearchCondition(fFactory.createSearchCondition(locationField, SearchSpecifier.SCOPE, result));
+    filter = fFactory.createSearchFilter(null, search, "Filter 9");
+    filter.setMatchAllNews(false);
+    filter.setOrder(9);
+    filter.addAction(fFactory.createFilterAction("org.rssowl.core.MarkReadNewsAction"));
+    DynamicDAO.save(filter);
   }
 
   private void fillLabels() {
@@ -843,7 +855,7 @@ public class ImportExportOPMLTest {
 
   private void assertFilters() {
     Collection<ISearchFilter> filters = DynamicDAO.loadAll(ISearchFilter.class);
-    assertEquals(8, filters.size());
+    assertEquals(9, filters.size());
 
     for (ISearchFilter filter : filters) {
       if ("Filter 1".equals(filter.getName())) {
@@ -970,6 +982,10 @@ public class ImportExportOPMLTest {
         assertEquals("bar", props.getProperty("foo"));
         assertEquals(" world hello ", props.getProperty("hello world"));
         assertEquals("foo & bar", props.getProperty("<some xml>tags</a>"));
+      }
+
+      else if ("Filter 9".equals(filter.getName())) {
+        assertTrue(!filter.isEnabled());
       }
 
       else
