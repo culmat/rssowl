@@ -1276,7 +1276,7 @@ public class CoreUtils {
    */
   public static Set<ILabel> getSortedLabels(INews news) {
     Set<ILabel> newsLabels = news.getLabels();
-    if (newsLabels.isEmpty() || newsLabels.size() == 1)
+    if (newsLabels.isEmpty() || (newsLabels.size() == 1 && newsLabels.iterator().next() != null))
       return newsLabels;
 
     return sortLabels(newsLabels);
@@ -1302,7 +1302,10 @@ public class CoreUtils {
     });
 
     /* Add Labels */
-    sortedLabels.addAll(labels);
+    for (ILabel label : labels) {
+      if (label != null)
+        sortedLabels.add(label);
+    }
 
     return sortedLabels;
   }
