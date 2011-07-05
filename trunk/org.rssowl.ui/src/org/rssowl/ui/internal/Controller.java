@@ -82,8 +82,9 @@ import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.dao.ISearchMarkDAO;
 import org.rssowl.core.persist.event.BookMarkAdapter;
 import org.rssowl.core.persist.event.BookMarkEvent;
-import org.rssowl.core.persist.event.LabelAdapter;
 import org.rssowl.core.persist.event.LabelEvent;
+import org.rssowl.core.persist.event.LabelListener;
+import org.rssowl.core.persist.event.runnable.EventType;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.CoreUtils;
@@ -150,7 +151,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * Note: As required by the UI, the controller should be filled with more
  * methods.
  * </p>
- * 
+ *
  * @author bpasero
  */
 public class Controller {
@@ -276,7 +277,7 @@ public class Controller {
   private final Lock fLoginDialogLock = new ReentrantLock();
   private final AtomicLong fLastGoogleLoginCancel = new AtomicLong(0);
   private BookMarkAdapter fBookMarkListener;
-  private LabelAdapter fLabelListener;
+  private LabelListener fLabelListener;
   private ListenerList fBookMarkLoadListeners = new ListenerList();
   private final int fConnectionTimeout;
   private List<ShareProvider> fShareProviders = new ArrayList<ShareProvider>();
@@ -417,17 +418,25 @@ public class Controller {
     DynamicDAO.addEntityListener(IBookMark.class, fBookMarkListener);
 
     /* Update Label conditions when Label name changes */
-    fLabelListener = new LabelAdapter() {
+    fLabelListener = new LabelListener() {
 
-      @Override
       public void entitiesAdded(Set<LabelEvent> events) {
-        if (!fShuttingDown && PlatformUI.isWorkbenchRunning())
+        if (fShuttingDown)
+          return;
+
+        onLabelsChange(events, EventType.PERSIST);
+
+        if (PlatformUI.isWorkbenchRunning())
           updateLabelCommands();
       }
 
-      @Override
       public void entitiesUpdated(Set<LabelEvent> events) {
-        if (!fShuttingDown && PlatformUI.isWorkbenchRunning()) {
+        if (fShuttingDown)
+          return;
+
+        onLabelsChange(events, EventType.UPDATE);
+
+        if (PlatformUI.isWorkbenchRunning()) {
           updateLabelCommands();
 
           for (LabelEvent event : events) {
@@ -440,14 +449,80 @@ public class Controller {
         }
       }
 
-      @Override
       public void entitiesDeleted(Set<LabelEvent> events) {
-        if (!fShuttingDown && PlatformUI.isWorkbenchRunning())
+        if (fShuttingDown)
+          return;
+
+        onLabelsChange(events, EventType.REMOVE);
+
+        if (PlatformUI.isWorkbenchRunning())
           updateLabelCommands();
       }
     };
 
     DynamicDAO.addEntityListener(ILabel.class, fLabelListener);
+  }
+
+  private void onLabelsChange(Set<LabelEvent> events, EventType type) {
+    boolean needsSave = false;
+
+    /* Retrieve List of Deleted Labels */
+    IPreferenceScope preferences = Owl.getPreferenceService().getGlobalScope();
+    String[] deletedLabels = preferences.getStrings(DefaultPreferences.DELETED_LABELS);
+    Set<String> deletedLabelsSet = new HashSet<String>();
+    if (deletedLabels != null) {
+      for (String label : deletedLabels) {
+        deletedLabelsSet.add(label);
+      }
+    }
+
+    /* Can return early if no deleted labels known and labels added or updated */
+    else if (type == EventType.PERSIST || type == EventType.UPDATE) {
+      return;
+    }
+
+    /* Handle Events */
+    switch (type) {
+
+    /* Labels Added */
+      case PERSIST:
+        for (LabelEvent event : events) {
+          if (deletedLabelsSet.remove(event.getEntity().getName()))
+            needsSave = true;
+        }
+        break;
+
+      /* Labels Deleted */
+      case REMOVE:
+        for (LabelEvent event : events) {
+          deletedLabelsSet.add(event.getEntity().getName());
+        }
+        needsSave = true;
+        break;
+
+      /* Labels Updated (only react on name change) */
+      case UPDATE:
+        for (LabelEvent event : events) {
+          if (event.getOldLabel() != null) {
+            String oldName = event.getOldLabel().getName();
+            String newName = event.getEntity().getName();
+
+            if (newName != null && !newName.equals(oldName)) {
+              if (deletedLabelsSet.remove(newName))
+                needsSave = true;
+            }
+          }
+        }
+        break;
+    }
+
+    /* Update List of Deleted Labels */
+    if (needsSave) {
+      if (deletedLabelsSet.isEmpty())
+        preferences.delete(DefaultPreferences.DELETED_LABELS);
+      else
+        preferences.putStrings(DefaultPreferences.DELETED_LABELS, deletedLabelsSet.toArray(new String[deletedLabelsSet.size()]));
+    }
   }
 
   private void updateLabelConditions(String oldLabelName, String newLabelName) {
@@ -602,7 +677,7 @@ public class Controller {
    * Reload the given List of BookMarks. The BookMarks are processed in a queue
    * that stores all Tasks of this kind and guarantees that a certain amount of
    * Jobs process the Task concurrently.
-   * 
+   *
    * @param bookmarks The BookMarks to reload.
    * @param properties any kind of properties to use for the reload or
    * <code>null</code> if none.
@@ -631,7 +706,7 @@ public class Controller {
    * Reload the given BookMark. The BookMark is processed in a queue that stores
    * all Tasks of this kind and guarantees that a certain amount of Jobs process
    * the Task concurrently.
-   * 
+   *
    * @param bookmark The BookMark to reload.
    * @param properties any kind of properties to use for the reload or
    * <code>null</code> if none.
@@ -650,7 +725,7 @@ public class Controller {
 
   /**
    * Reload the given BookMark.
-   * 
+   *
    * @param bookmark The BookMark to reload.
    * @param shell The Shell this operation is running in, used to open Dialogs
    * if necessary, or <code>NULL</code> if no Shell is available.
@@ -1307,7 +1382,7 @@ public class Controller {
   /**
    * Tells the Controller to stop. This method is called automatically from osgi
    * as soon as the org.rssowl.ui bundle gets stopped.
-   * 
+   *
    * @param emergency If set to <code>TRUE</code>, this method is called from a
    * shutdown hook that got triggered from a non-normal shutdown (e.g. System
    * Shutdown).
@@ -1506,7 +1581,7 @@ public class Controller {
 
   /**
    * Returns wether the application is in process of shutting down.
-   * 
+   *
    * @return <code>TRUE</code> if the application has been closed, and
    * <code>FALSE</code> otherwise.
    */
@@ -1516,7 +1591,7 @@ public class Controller {
 
   /**
    * Returns wether the application is in process of an emergency shut down.
-   * 
+   *
    * @return <code>TRUE</code> if the application is in the process of an
    * emergency shut down, and <code>FALSE</code> otherwise.
    */
@@ -1526,7 +1601,7 @@ public class Controller {
 
   /**
    * Returns wether the application is in process of restarting.
-   * 
+   *
    * @return <code>TRUE</code> if the application is restarting, and
    * <code>FALSE</code> otherwise.
    */
@@ -1536,7 +1611,7 @@ public class Controller {
 
   /**
    * Returns wether the application has finished starting.
-   * 
+   *
    * @return <code>TRUE</code> if the application is started, and
    * <code>FALSE</code> otherwise if still initializing.
    */
@@ -1547,7 +1622,7 @@ public class Controller {
   /**
    * This method is called immediately prior to workbench shutdown before any
    * windows have been closed.
-   * 
+   *
    * @return <code>true</code> to allow the workbench to proceed with shutdown,
    * <code>false</code> to veto a non-forced shutdown
    */
@@ -1857,7 +1932,7 @@ public class Controller {
   /**
    * Start a Workbench emergency shutdown due to an unrecoverable Out of Memory
    * error.
-   * 
+   *
    * @param error the {@link OutOfMemoryError} that causes an emergent shutdown.
    */
   public void emergencyOutOfMemoryShutdown(final OutOfMemoryError error) {

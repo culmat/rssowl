@@ -382,6 +382,9 @@ public enum Preference {
   /** Global: Number of Elements in Browser before starting to Page */
   NEWS_BROWSER_PAGE_SIZE("org.rssowl.pref.NewsBrowserPageSize", IPreferenceType.INTEGER), //$NON-NLS-1$
 
+  /** Global: Deleted Labels (to ignore from synced feeds) */
+  DELETED_LABELS("org.rssowl.pref.DeletedLabels", IPreferenceType.STRINGS), //$NON-NLS-1$
+
   /******************************
    * Eclipse Preferences Follow *
    ******************************/
