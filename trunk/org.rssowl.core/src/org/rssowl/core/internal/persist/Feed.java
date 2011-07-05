@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.persist.ICategory;
 import org.rssowl.core.persist.ICloud;
 import org.rssowl.core.persist.IFeed;
+import org.rssowl.core.persist.IGuid;
 import org.rssowl.core.persist.IImage;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INews.State;
@@ -36,6 +37,7 @@ import org.rssowl.core.persist.ITextInput;
 import org.rssowl.core.persist.reference.FeedReference;
 import org.rssowl.core.util.ArrayUtils;
 import org.rssowl.core.util.MergeUtils;
+import org.rssowl.core.util.SyncUtils;
 
 import java.net.URI;
 import java.text.DateFormat;
@@ -836,6 +838,12 @@ public class Feed extends AbstractEntity implements IFeed {
   }
 
   private List<INews> copyWithoutDuplicates(List<INews> newsList) {
+
+    /* Perform fast lookup for synchronized feeds using GUID */
+    if (SyncUtils.isSynchronized(fLinkText))
+      return copyWithoutDuplicatesSynced(newsList);
+
+    /* Otherwise search rawly */
     List<INews> newsListCopy = new ArrayList<INews>(newsList.size());
     for (INews outerNews : newsList) {
       boolean containsNews = false;
@@ -848,6 +856,23 @@ public class Feed extends AbstractEntity implements IFeed {
 
       if (!containsNews)
         newsListCopy.add(outerNews);
+    }
+
+    return newsListCopy;
+  }
+
+  private List<INews> copyWithoutDuplicatesSynced(List<INews> newsList) {
+    Set<String> guids= new HashSet<String>();
+    List<INews> newsListCopy = new ArrayList<INews>(newsList.size());
+    for (INews news : newsList) {
+      IGuid guid = news.getGuid();
+      if (guid == null)
+        continue; //Can not happen for a synchronized feed
+
+      if (!guids.contains(guid.getValue())) {
+        guids.add(guid.getValue());
+        newsListCopy.add(news);
+      }
     }
 
     return newsListCopy;
