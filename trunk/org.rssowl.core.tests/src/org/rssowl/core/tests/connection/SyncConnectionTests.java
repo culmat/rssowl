@@ -65,6 +65,7 @@ import org.rssowl.ui.internal.services.SyncService.SyncStatus;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -1025,6 +1026,59 @@ public class SyncConnectionTests {
 
         assertTrue(labelFound);
       }
+    }
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testSyncWithDeletedLabels() throws Exception {
+    IFolder root = Owl.getModelFactory().createFolder(null, null, "Root");
+
+    IFeed bbcFeed = Owl.getModelFactory().createFeed(null, new URI("reader://feeds.bbci.co.uk/news/rss.xml"));
+    DynamicDAO.save(bbcFeed);
+
+    IBookMark bbcBM = Owl.getModelFactory().createBookMark(null, root, new FeedLinkReference(bbcFeed.getLink()), "Slashdot");
+
+    DynamicDAO.save(root);
+
+    Controller.getDefault().reload(bbcBM, null, null);
+
+    Collection<ILabel> labels = DynamicDAO.loadAll(ILabel.class);
+    boolean bbcLabelFound = false;
+    ILabel bbcLabel = null;
+    for (ILabel label : labels) {
+      if ("BBC".equals(label.getName())) {
+        bbcLabelFound = true;
+        bbcLabel = label;
+        break;
+      }
+    }
+
+    assertTrue(bbcLabelFound);
+
+    DynamicDAO.delete(bbcLabel);
+
+    for (INews news : bbcFeed.getNews()) {
+      assertTrue(news.getLabels().isEmpty());
+    }
+
+    Controller.getDefault().reload(bbcBM, null, null);
+
+    labels = DynamicDAO.loadAll(ILabel.class);
+    bbcLabelFound = false;
+    for (ILabel label : labels) {
+      if ("BBC".equals(label.getName())) {
+        bbcLabelFound = true;
+        break;
+      }
+    }
+
+    assertFalse(bbcLabelFound);
+
+    for (INews news : bbcFeed.getNews()) {
+      assertTrue(news.getLabels().isEmpty());
     }
   }
 }
