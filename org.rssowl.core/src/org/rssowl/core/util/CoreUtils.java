@@ -1276,7 +1276,7 @@ public class CoreUtils {
    */
   public static Set<ILabel> getSortedLabels(INews news) {
     Set<ILabel> newsLabels = news.getLabels();
-    if (newsLabels.isEmpty())
+    if (newsLabels.isEmpty() || newsLabels.size() == 1)
       return newsLabels;
 
     return sortLabels(newsLabels);

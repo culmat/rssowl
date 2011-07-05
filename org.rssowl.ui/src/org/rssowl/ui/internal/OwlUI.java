@@ -346,6 +346,9 @@ public class OwlUI {
   /* Name of Folder for storing Icons */
   private static final String ICONS_FOLDER = "icons"; //$NON-NLS-1$
 
+  /* Black Color in RGB Notation */
+  private static final String RGB_BLACK = "0,0,0"; //$NON-NLS-1$
+
   /* Shared Clipboard instance */
   private static Clipboard fgClipboard;
 
@@ -839,6 +842,9 @@ public class OwlUI {
   public static RGB getRGB(String rgb) {
     if (!StringUtils.isSet(rgb))
       return null;
+
+    if (RGB_BLACK.equals(rgb))
+      return new RGB(0, 0, 0);
 
     String color[] = rgb.split(","); //$NON-NLS-1$
     return new RGB(Integer.parseInt(color[0]), Integer.parseInt(color[1]), Integer.parseInt(color[2]));
