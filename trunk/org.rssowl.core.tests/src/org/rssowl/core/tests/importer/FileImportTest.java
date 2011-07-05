@@ -584,6 +584,25 @@ public class FileImportTest {
    */
   @Test
   @SuppressWarnings( { "nls", "null", "unused", "unchecked" })
+  public void testImport_Orphaned_Filter() throws Exception {
+
+    /* Import */
+    List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/orphaned_filter.opml"));
+    ImportUtils.doImport(null, elements, true);
+    assertEquals(1, elements.size());
+    assertEquals(1, count(SearchFilter.class.getName(), elements));
+
+    for (IEntity item : elements) {
+      if ("All News in 'RSSOwl News'".equals(((ISearchFilter) item).getName()))
+        assertFalse(((ISearchFilter) item).isEnabled());
+    }
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings( { "nls", "null", "unused", "unchecked" })
   public void testImport_Filter_Order() throws Exception {
     IFolder root = DynamicDAO.save(Owl.getModelFactory().createFolder(null, null, "Root"));
 
