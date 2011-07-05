@@ -410,6 +410,10 @@ public class NewsContentProvider implements ITreeContentProvider {
     if (filter == Type.SHOW_ALL)
       return false;
 
+    /* Return if filter can already quickly be handled from bookmark itself */
+    if (filter == Type.SHOW_NEW || filter == Type.SHOW_UNREAD)
+      return false;
+
     /* Check for number of new, unread and updated news */
     if (input.getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)) > BOOKMARK_SCOPE_SEARCH_LIMIT)
       return true;
