@@ -37,7 +37,6 @@ import org.rssowl.core.persist.ITextInput;
 import org.rssowl.core.persist.reference.FeedReference;
 import org.rssowl.core.util.ArrayUtils;
 import org.rssowl.core.util.MergeUtils;
-import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.SyncUtils;
 
 import java.net.URI;
@@ -47,7 +46,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -778,53 +776,20 @@ public class Feed extends AbstractEntity implements IFeed {
       newsToCleanUp = new int[fNews.size() / 2];
 
     ComplexMergeResult<List<INews>> mergeResult = ComplexMergeResult.create(newsListCopy);
+    for (int i = fNews.size() - 1; i >= 0; --i) {
+      INews existingNews = fNews.get(i);
+      int existingNewsIndex = findNews(newsListCopy, existingNews);
 
-    /* Synchronized Feed (speed up by relying on GUID) */
-    if (SyncUtils.isSynchronized(fLinkText)) {
-
-      /* Map unique GUID to Pair of Index/News */
-      Map<String, Pair<Integer, INews>> mapGuidToPair = new HashMap<String, Pair<Integer, INews>>(newsListCopy.size());
-      for (int i = 0; i < newsListCopy.size(); i++) {
-        INews news = newsListCopy.get(i);
-        if (news.getGuid() != null)
-          mapGuidToPair.put(news.getGuid().getValue(), Pair.create(i, news));
-      }
-
-      for (int i = fNews.size() - 1; i >= 0; --i) {
-        INews existingNews = fNews.get(i);
-        Pair<Integer, INews> pair = existingNews.getGuid() != null ? mapGuidToPair.get(existingNews.getGuid().getValue()) : null;
-
-        /* News exists in feed: Merge it */
-        if (pair != null) {
-          mergeResult.addAll(existingNews.merge(pair.getSecond()));
-          newsListCopy.remove(pair.getFirst().intValue());
-        }
-
-        /* News does not exist in feed: Delete it */
-        else if ((newsToCleanUp != null) && (existingNews.getState() == INews.State.DELETED)) {
-          newsToCleanUp = ArrayUtils.ensureCapacity(newsToCleanUp, newsToCleanUpSize + 1);
-          newsToCleanUp[newsToCleanUpSize++] = i;
-        }
-      }
-    }
-
-    /* Non Synchronized Feed */
-    else {
-      for (int i = fNews.size() - 1; i >= 0; --i) {
-        INews existingNews = fNews.get(i);
-        int existingNewsIndex = findNews(newsListCopy, existingNews);
-
-        /* News exists in feed: Merge it */
-        if (existingNewsIndex > -1) {
-          mergeResult.addAll(existingNews.merge(newsListCopy.get(existingNewsIndex)));
-          newsListCopy.remove(existingNewsIndex);
-        }
-
-        /* News does not exist in feed: Delete it */
-        else if ((newsToCleanUp != null) && (existingNews.getState() == INews.State.DELETED)) {
-          newsToCleanUp = ArrayUtils.ensureCapacity(newsToCleanUp, newsToCleanUpSize + 1);
-          newsToCleanUp[newsToCleanUpSize++] = i;
-        }
+      /* News exists in feed: Merge it */
+      if (existingNewsIndex > -1) {
+        mergeResult.addAll(existingNews.merge(newsListCopy.get(existingNewsIndex)));
+        newsListCopy.remove(existingNewsIndex);
+      } 
+      
+      /* News does not exist in feed: Delete it */
+      else if ((newsToCleanUp != null) && (existingNews.getState() == INews.State.DELETED)) {
+        newsToCleanUp = ArrayUtils.ensureCapacity(newsToCleanUp, newsToCleanUpSize + 1);
+        newsToCleanUp[newsToCleanUpSize++] = i;
       }
     }
 
@@ -864,6 +829,7 @@ public class Feed extends AbstractEntity implements IFeed {
           mergeResult.addRemovedObject(news);
         }
       }
+
     }
 
     for (INews news : newsListCopy) {
