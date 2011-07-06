@@ -95,7 +95,7 @@ public class SyncService implements Receiver<SyncItem> {
   private SyncStatus fStatus;
 
   /** Status holder used for reporting Sync Status */
-  public class SyncStatus extends Status {
+  public static class SyncStatus extends Status {
     private final long fTime = System.currentTimeMillis();
     private final int fItemCount;
     private final int fTotalItemCount;
