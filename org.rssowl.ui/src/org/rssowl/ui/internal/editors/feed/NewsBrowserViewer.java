@@ -2322,7 +2322,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
         /* Label (Title Foreground, Label List) */
         if (CoreUtils.isLabelChange(newsEvent)) {
           Set<ILabel> labels = CoreUtils.getSortedLabels(news);
-          String defaultColor = CoreUtils.getLink(news) != null ? "#009" : "rgb(0,0,0)"; //$NON-NLS-1$ //$NON-NLS-2$
+          String defaultColor = (CoreUtils.getLink(news) != null && !isHeadlinesLayout()) ? "#009" : "rgb(0,0,0)"; //$NON-NLS-1$ //$NON-NLS-2$
           String color = (labels.isEmpty()) ? defaultColor : "rgb(" + OwlUI.toString(OwlUI.getRGB(labels.iterator().next())) + ")"; //$NON-NLS-1$ //$NON-NLS-2$
           if ("rgb(0,0,0)".equals(color)) //Don't let black override link color //$NON-NLS-1$
             color = defaultColor;
