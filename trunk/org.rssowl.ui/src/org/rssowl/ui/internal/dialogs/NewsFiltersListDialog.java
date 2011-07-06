@@ -490,7 +490,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
   private void applyFilter(final List<SearchHit<NewsReference>> news, final ISearchFilter filter) {
     IRunnableWithProgress runnable = new IRunnableWithProgress() {
       public void run(IProgressMonitor monitor) {
-        List<List<SearchHit<NewsReference>>> chunks = toChunks(FILTER_CHUNK_SIZE, news);
+        List<List<SearchHit<NewsReference>>> chunks = CoreUtils.toChunks(news, FILTER_CHUNK_SIZE);
         monitor.beginTask(NLS.bind(Messages.NewsFiltersListDialog_WAIT_FILTER_APPLIED, filter.getName()), chunks.size());
 
         if (monitor.isCanceled())
@@ -561,27 +561,6 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
     /* Make sure that changed entities are saved for all actions */
     if (!entitiesToSave.isEmpty())
       DynamicDAO.saveAll(entitiesToSave);
-  }
-
-  private List<List<SearchHit<NewsReference>>> toChunks(int size, List<SearchHit<NewsReference>> list) {
-    List<List<SearchHit<NewsReference>>> chunkList = new ArrayList<List<SearchHit<NewsReference>>>();
-    List<SearchHit<NewsReference>> currentChunk = new ArrayList<SearchHit<NewsReference>>(size);
-    chunkList.add(currentChunk);
-
-    int counter = 0;
-    for (SearchHit<NewsReference> entry : list) {
-      currentChunk.add(entry);
-      counter++;
-      if (counter % size == 0) {
-        currentChunk = new ArrayList<SearchHit<NewsReference>>(size);
-        chunkList.add(currentChunk);
-      }
-    }
-
-    if (currentChunk.isEmpty())
-      chunkList.remove(currentChunk);
-
-    return chunkList;
   }
 
   private void updateTitle() {
