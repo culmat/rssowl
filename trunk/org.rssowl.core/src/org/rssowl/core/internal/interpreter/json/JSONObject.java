@@ -989,7 +989,7 @@ public class JSONObject {
    * @throws JSONException If the key is null.
    */
   public JSONObject put(String key, int value) throws JSONException {
-    put(key, new Integer(value));
+    put(key, Integer.valueOf(value));
     return this;
   }
 
@@ -1002,7 +1002,7 @@ public class JSONObject {
    * @throws JSONException If the key is null.
    */
   public JSONObject put(String key, long value) throws JSONException {
-    put(key, new Long(value));
+    put(key, Long.valueOf(value));
     return this;
   }
 
@@ -1191,7 +1191,7 @@ public class JSONObject {
     if ((b >= '0' && b <= '9') || b == '.' || b == '-' || b == '+') {
       if (b == '0' && string.length() > 2 && (string.charAt(1) == 'x' || string.charAt(1) == 'X')) {
         try {
-          return new Integer(Integer.parseInt(string.substring(2), 16));
+          return Integer.valueOf(Integer.parseInt(string.substring(2), 16));
         } catch (Exception ignore) {
         }
       }
@@ -1201,7 +1201,7 @@ public class JSONObject {
 
         Long myLong = new Long(string);
         if (myLong.longValue() == myLong.intValue())
-          return new Integer(myLong.intValue());
+          return Integer.valueOf(myLong.intValue());
 
         return myLong;
       } catch (Exception ignore) {

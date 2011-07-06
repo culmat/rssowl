@@ -53,6 +53,7 @@ public class SyncItemsManager {
   private static final String UNCOMMITTED_SYNCITEMS_FILE = "syncitems"; //$NON-NLS-1$
 
   private Map<String, SyncItem> fItems = new HashMap<String, SyncItem>();
+  private final Object fLock = new Object();
 
   /**
    * Deserialize Items from Filesystem
@@ -61,7 +62,7 @@ public class SyncItemsManager {
    * @throws ClassNotFoundException
    */
   public void startup() throws IOException, ClassNotFoundException {
-    synchronized (fItems) {
+    synchronized (fLock) {
       fItems = deserializeSyncItems();
     }
   }
@@ -72,7 +73,7 @@ public class SyncItemsManager {
    * @throws IOException
    */
   public void shutdown() throws IOException {
-    synchronized (fItems) {
+    synchronized (fLock) {
       serializeSyncItems(fItems);
       fItems.clear();
     }
@@ -82,7 +83,7 @@ public class SyncItemsManager {
    * @param items the uncommitted {@link SyncItem} to add.
    */
   public void addUncommitted(Collection<SyncItem> items) {
-    synchronized (fItems) {
+    synchronized (fLock) {
       for (SyncItem item : items) {
         SyncItem existingItem = fItems.get(item.getId());
         if (existingItem != null)
@@ -97,7 +98,7 @@ public class SyncItemsManager {
    * @return all uncommitted {@link SyncItem}.
    */
   public Map<String, SyncItem> getUncommittedItems() {
-    synchronized (fItems) {
+    synchronized (fLock) {
       if (fItems.isEmpty())
         return Collections.emptyMap();
 
@@ -109,7 +110,7 @@ public class SyncItemsManager {
    * @return <code>true</code> if there are uncommitted {@link SyncItem}.
    */
   public boolean hasUncommittedItems() {
-    synchronized (fItems) {
+    synchronized (fLock) {
       return !fItems.isEmpty();
     }
   }
@@ -118,7 +119,7 @@ public class SyncItemsManager {
    * Removes all uncommitted {@link SyncItem}.
    */
   public void clearUncommittedItems() {
-    synchronized (fItems) {
+    synchronized (fLock) {
       fItems.clear();
     }
   }
@@ -127,7 +128,7 @@ public class SyncItemsManager {
    * @param items the uncommitted {@link SyncItem} to remove.
    */
   public void removeUncommitted(Collection<SyncItem> items) {
-    synchronized (fItems) {
+    synchronized (fLock) {
       for (SyncItem item : items) {
         fItems.remove(item.getId());
       }
@@ -138,7 +139,7 @@ public class SyncItemsManager {
    * @param item the uncommitted {@link SyncItem} to remove.
    */
   public void removeUncommitted(SyncItem item) {
-    synchronized (fItems) {
+    synchronized (fLock) {
       fItems.remove(item.getId());
     }
   }

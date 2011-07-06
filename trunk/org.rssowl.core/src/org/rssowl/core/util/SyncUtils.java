@@ -129,6 +129,7 @@ public class SyncUtils {
 
   /* Google Authentication Token can be shared during the session */
   private static String fgSharedAuthToken;
+  private static final Object AUTH_TOKEN_LOCK= new Object();
 
   /* Google URL Prefixes */
   private static final String GOOGLE_HTTP_URL_PREFIX = "http://www.google.com"; //$NON-NLS-1$
@@ -166,7 +167,7 @@ public class SyncUtils {
       return null;
 
     /* Obtain a new token (only 1 Thread permitted) */
-    synchronized (GOOGLE_LOGIN_URL) {
+    synchronized (AUTH_TOKEN_LOCK) {
 
       /* Another thread might have won the race */
       if (fgSharedAuthToken != null)
