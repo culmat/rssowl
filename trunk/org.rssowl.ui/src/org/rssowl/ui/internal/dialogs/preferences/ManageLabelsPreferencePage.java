@@ -62,9 +62,15 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.rssowl.core.Owl;
 import org.rssowl.core.persist.ILabel;
+import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.ISearchCondition;
+import org.rssowl.core.persist.ISearchField;
+import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.ILabelDAO;
+import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.CoreUtils;
+import org.rssowl.core.util.SearchHit;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.Controller;
@@ -89,6 +95,9 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
 
   /** ID of the Page */
   public static final String ID = "org.rssowl.ui.ManageLabels"; //$NON-NLS-1$
+
+  /* Number of News to process when deleting labels */
+  private static final int LABEL_DELETE_CHUNK_SIZE = 100;
 
   private LocalResourceManager fResources;
   private TreeViewer fViewer;
@@ -350,38 +359,70 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
         msg = NLS.bind(Messages.ManageLabelsPreferencePage_DELETE_N_LABELS, selectedLabels.size());
 
       ConfirmDialog dialog = new ConfirmDialog(getShell(), Messages.ManageLabelsPreferencePage_CONFIRM_DELETE, Messages.ManageLabelsPreferencePage_NO_UNDO, msg, null);
-      if (dialog.open() == IDialogConstants.OK_ID) {
-        deleteInBackground(new Runnable() {
-          public void run() {
-
-            /* Can have an impact on news, thereby force quick update */
-            Controller.getDefault().getSavedSearchService().forceQuickUpdate();
-
-            /* Delete Label from DB */
-            DynamicDAO.deleteAll(selectedLabels);
-
-            /* Update UI */
-            JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
-              public void run() {
-                fViewer.refresh();
-                fixOrderAfterDelete();
-              }
-            });
-          }
-        });
-      }
+      if (dialog.open() == IDialogConstants.OK_ID)
+        deleteInBackground(selectedLabels);
     }
-    fViewer.getTree().setFocus();
   }
 
-  private void deleteInBackground(final Runnable deleteRunnable) {
+  private void deleteInBackground(final List<ILabel> labelsToDelete) {
 
     /* Runnable with Progress */
     IRunnableWithProgress runnableWithProgress = new IRunnableWithProgress() {
       public void run(IProgressMonitor monitor) {
         monitor.beginTask(Messages.ManageLabelsPreferencePage_WAIT_DELETE, IProgressMonitor.UNKNOWN);
         try {
-          deleteRunnable.run();
+
+          /* Can have an impact on news, thereby force quick update */
+          Controller.getDefault().getSavedSearchService().forceQuickUpdate();
+
+          /* Remove Labels from News in batched mode to reduce load */
+          List<SearchHit<NewsReference>> labeledNews = findLabeledNews(labelsToDelete);
+          if (!labeledNews.isEmpty()) {
+            monitor.subTask(NLS.bind(Messages.ManageLabelsPreferencePage_UPDATE_NEWS_REMOVE_LABELS, labeledNews.size()));
+
+            /* Chunkify */
+            List<List<SearchHit<NewsReference>>> chunks = CoreUtils.toChunks(labeledNews, LABEL_DELETE_CHUNK_SIZE);
+            for (List<SearchHit<NewsReference>> chunk : chunks) {
+              List<INews> newsToSave = new ArrayList<INews>(chunk.size());
+
+              /* For each item in chunk */
+              for (SearchHit<NewsReference> hit : chunk) {
+                boolean needsSave = false;
+                INews item = hit.getResult().resolve();
+
+                /* Item Exists */
+                if (item != null && item.isVisible()) {
+                  for (ILabel labelToDelete : labelsToDelete) {
+                    if (item.removeLabel(labelToDelete))
+                      needsSave = true;
+                  }
+
+                  if (needsSave)
+                    newsToSave.add(item);
+                }
+
+                /* Index Issue */
+                else
+                  CoreUtils.reportIndexIssue();
+              }
+
+              /* Save */
+              if (!newsToSave.isEmpty())
+                DynamicDAO.saveAll(newsToSave);
+            }
+          }
+
+          /* Delete Labels from DB */
+          DynamicDAO.deleteAll(labelsToDelete);
+
+          /* Update UI */
+          JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
+            public void run() {
+              fViewer.refresh();
+              fixOrderAfterDelete();
+              fViewer.getTree().setFocus();
+            }
+          });
         } finally {
           monitor.done();
         }
@@ -414,6 +455,17 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
     } catch (InterruptedException e) {
       Activator.safeLogError(e.getMessage(), e);
     }
+  }
+
+  private List<SearchHit<NewsReference>> findLabeledNews(List<ILabel> selectedLabels) {
+    List<ISearchCondition> conditions = new ArrayList<ISearchCondition>(selectedLabels.size());
+    ISearchField labelField = Owl.getModelFactory().createSearchField(INews.LABEL, INews.class.getName());
+    for (ILabel label : selectedLabels) {
+      ISearchCondition condition = Owl.getModelFactory().createSearchCondition(labelField, SearchSpecifier.IS, label.getName());
+      conditions.add(condition);
+    }
+
+    return Owl.getPersistenceService().getModelSearch().searchNews(conditions, false);
   }
 
   /* Ensure that after Delete, the orders are in sync again */
