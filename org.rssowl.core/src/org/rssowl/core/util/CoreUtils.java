@@ -2130,4 +2130,31 @@ public class CoreUtils {
 
     return false;
   }
+
+  /**
+   * @param <T> the type of List to chunkify.
+   * @param chunkSize the size of one chunk
+   * @param list the {@link List} to chunkify.
+   * @return a list of chunks from the provided list.
+   */
+  public static <T> List<List<T>> toChunks(List<T> list, int chunkSize) {
+    List<List<T>> chunkList = new ArrayList<List<T>>();
+    List<T> currentChunk = new ArrayList<T>(chunkSize);
+    chunkList.add(currentChunk);
+
+    int counter = 0;
+    for (T entry : list) {
+      currentChunk.add(entry);
+      counter++;
+      if (counter % chunkSize == 0) {
+        currentChunk = new ArrayList<T>(chunkSize);
+        chunkList.add(currentChunk);
+      }
+    }
+
+    if (currentChunk.isEmpty())
+      chunkList.remove(currentChunk);
+
+    return chunkList;
+  }
 }
