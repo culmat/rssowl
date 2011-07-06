@@ -70,10 +70,14 @@ public final class LabelDAOImpl extends AbstractEntityDAO<ILabel, LabelListener,
     query.descend("fLabels").constrain(entity); //$NON-NLS-1$
     @SuppressWarnings("unchecked")
     List<INews> news = query.execute();
-    for (INews newsItem : news) {
-      newsItem.removeLabel(entity);
+    if (!news.isEmpty()) {
+      activateAll(news);
+      for (INews newsItem : news) {
+        newsItem.removeLabel(entity);
+      }
+      DynamicDAO.saveAll(news);
     }
-    DynamicDAO.saveAll(news);
+
     super.doDelete(entity);
   }
 
