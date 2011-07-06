@@ -168,27 +168,29 @@ public class InformationPropertyPage implements IEntityPropertyPage {
   }
 
   private void fillBookMarkInfo(final IBookMark bm) {
+    boolean isSynchronized = SyncUtils.isSynchronized(bm);
     String message;
 
     /* Status */
     createLabel(fContainer, Messages.InformationPropertyPage_STATUS, true);
 
+
     /* Error Loading */
     if (bm.isErrorLoading()) {
       message = (String) bm.getProperty(Controller.LOAD_ERROR_KEY);
       if (!StringUtils.isSet(message))
-        message = Messages.InformationPropertyPage_LOAD_FAILED_UNKNOWN;
+        message = isSynchronized ? Messages.InformationPropertyPage_LOAD_FAILED_UNKNOWN_SYNCED : Messages.InformationPropertyPage_LOAD_FAILED_UNKNOWN;
       else
-        message = NLS.bind(Messages.InformationPropertyPage_LOAD_FAILED_REASON, message);
+        message = isSynchronized ? NLS.bind(Messages.InformationPropertyPage_LOAD_FAILED_REASON_SYNCED, message) : NLS.bind(Messages.InformationPropertyPage_LOAD_FAILED_REASON, message);
     }
 
     /* Never Loaded */
     else if (bm.getMostRecentNewsDate() == null)
-      message = Messages.InformationPropertyPage_NOT_LOADED;
+      message = isSynchronized ? Messages.InformationPropertyPage_NOT_SYNCED : Messages.InformationPropertyPage_NOT_LOADED;
 
     /* Successfully Loaded */
     else
-      message = Messages.InformationPropertyPage_LOADED_OK;
+      message = isSynchronized ? Messages.InformationPropertyPage_SYNCED_OK : Messages.InformationPropertyPage_LOADED_OK;
 
     Label msgLabel = new Label(fContainer, SWT.WRAP);
     msgLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
