@@ -181,10 +181,7 @@ public class SyncService implements Receiver<SyncItem> {
       @Override
       public void entitiesUpdated(Set<NewsEvent> events) {
         Collection<SyncItem> items = filter(events);
-        if (!items.isEmpty()) {
-          fSyncItemsManager.addUncommitted(items);
-          addAllAsync(items); //Must add async because the buffer is blocking while running
-        }
+        synchronize(items);
       }
     };
     DynamicDAO.addEntityListener(INews.class, fNewsListener);
@@ -194,10 +191,7 @@ public class SyncService implements Receiver<SyncItem> {
       @Override
       public void filterApplied(ISearchFilter filter, Collection<INews> news) {
         Collection<SyncItem> items = filter(filter, news);
-        if (!items.isEmpty()) {
-          fSyncItemsManager.addUncommitted(items);
-          addAllAsync(items); //Must add async because the buffer is blocking while running
-        }
+        synchronize(items);
       }
     };
     DynamicDAO.addEntityListener(ISearchFilter.class, fSearchFilterListener);
@@ -257,6 +251,16 @@ public class SyncService implements Receiver<SyncItem> {
   }
 
   /**
+   * @param items a {@link Collection} of {@link SyncItem} to process.
+   */
+  public void synchronize(Collection<SyncItem> items) {
+    if (!items.isEmpty()) {
+      fSyncItemsManager.addUncommitted(items);
+      addAllAsync(items); //Must add async because the buffer is blocking while running
+    }
+  }
+
+  /**
    * @return the {@link SyncStatus} of the last synchronization run.
    */
   public SyncStatus getStatus() {
@@ -264,7 +268,8 @@ public class SyncService implements Receiver<SyncItem> {
   }
 
   /**
-   * @return a {@link Map} of uncommitted {@link SyncItem} at this moment in time.
+   * @return a {@link Map} of uncommitted {@link SyncItem} at this moment in
+   * time.
    */
   public Map<String, SyncItem> getUncommittedItems() {
     return fSyncItemsManager.getUncommittedItems();
@@ -329,22 +334,22 @@ public class SyncService implements Receiver<SyncItem> {
   private void handleAuthenticationRequired(final IProgressMonitor monitor) {
     if (!Controller.getDefault().isShuttingDown() && !monitor.isCanceled()) {
       JobRunner.runInBackgroundThread(new Runnable() { //Run in background thread to avoid lock contention in buffer due to UI lock
-        public void run() {
-          Lock loginLock = Controller.getDefault().getLoginDialogLock();
-          if (!Controller.getDefault().isShuttingDown() && !monitor.isCanceled() && loginLock.tryLock()) { //Avoid multiple login dialogs if login dialog already showing
-            try {
-              JobRunner.runSyncedInUIThread(new Runnable() {
-                public void run() {
-                  if (!Controller.getDefault().isShuttingDown() && !monitor.isCanceled())
-                    OwlUI.openSyncLogin(null);
+            public void run() {
+              Lock loginLock = Controller.getDefault().getLoginDialogLock();
+              if (!Controller.getDefault().isShuttingDown() && !monitor.isCanceled() && loginLock.tryLock()) { //Avoid multiple login dialogs if login dialog already showing
+                try {
+                  JobRunner.runSyncedInUIThread(new Runnable() {
+                    public void run() {
+                      if (!Controller.getDefault().isShuttingDown() && !monitor.isCanceled())
+                        OwlUI.openSyncLogin(null);
+                    }
+                  });
+                } finally {
+                  loginLock.unlock();
                 }
-              });
-            } finally {
-              loginLock.unlock();
+              }
             }
-          }
-        }
-      });
+          });
     }
   }
 
