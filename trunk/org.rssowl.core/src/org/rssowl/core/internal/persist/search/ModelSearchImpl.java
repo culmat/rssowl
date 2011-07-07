@@ -27,6 +27,7 @@ package org.rssowl.core.internal.persist.search;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.NumberTools;
 import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.IndexFileNameFilter;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
@@ -60,6 +61,7 @@ import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.persist.service.ProfileLockedException;
 import org.rssowl.core.util.SearchHit;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
@@ -109,6 +111,26 @@ public class ModelSearchImpl implements IModelSearch {
     try {
       if (fDirectory == null) {
         String path = Activator.getDefault().getStateLocation().toOSString();
+
+        /*
+         * Delete Lucene Files if clearIndex == true. While Lucene is actually
+         * capable of recreating the index without deleting files, we have seen
+         * IOExceptions while Lucene was trying to recreate the index. Making sure
+         * the index files are deleted will prevent these situations from occuring.
+         */
+        if (clearIndex) {
+          File directory = new File(path);
+          File[] indexFiles = directory.listFiles(new IndexFileNameFilter());
+          try {
+            for (File file : indexFiles) {
+              file.delete();
+            }
+          } catch (Exception e) {
+            Activator.getDefault().logError(e.getMessage(), e);
+          }
+        }
+
+        /* Create Directory */
         LockFactory lockFactory = new NativeFSLockFactory(path);
         fDirectory = FSDirectory.getDirectory(path, lockFactory);
       }
