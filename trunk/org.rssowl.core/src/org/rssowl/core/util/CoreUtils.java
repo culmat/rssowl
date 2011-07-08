@@ -1076,14 +1076,7 @@ public class CoreUtils {
    * Feed or <code>null</code> if none.
    */
   public static IBookMark getBookMark(FeedLinkReference feedRef) {
-    IBookMarkDAO bookMarkDAO = Owl.getPersistenceService().getDAOService().getBookMarkDAO();
-    Collection<IBookMark> bookMarks = bookMarkDAO.loadAll();
-    for (IBookMark bookMark : bookMarks) {
-      if (bookMark.getFeedLinkReference().equals(feedRef))
-        return bookMark;
-    }
-
-    return null;
+    return getBookMark(feedRef.getLinkAsText());
   }
 
   /**
