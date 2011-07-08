@@ -44,6 +44,7 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.RetentionStrategy;
 import org.rssowl.ui.internal.Controller;
@@ -244,12 +245,27 @@ public class MarkTypesReadAction extends Action implements IWorkbenchWindowActio
   }
 
   private void fillNews(INewsMark newsmark, Collection<INews> news, FeedView feedView) {
-    List<INews> items = newsmark.getNews(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED));
-    for (INews item : items) {
-      if (feedView != null && feedView.isHidden(item))
-        continue; //Ignore hidden news when marking as read
 
-      news.add(item);
+    /* Feedview provided, obtain news from cache */
+    if (feedView != null) {
+
+      List<NewsReference> refs = newsmark.getNewsRefs(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED));
+      for (NewsReference reference : refs) {
+        if (feedView.isHidden(reference))
+          continue; //Ignore hidden news when marking as read
+
+        INews item = feedView.obtainFromCache(reference);
+        if (item == null)
+          item = reference.resolve();
+
+        if (item != null)
+          news.add(item);
+      }
+    }
+
+    /* Feedview is not provided */
+    else {
+      news.addAll(newsmark.getNews(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)));
     }
   }
 

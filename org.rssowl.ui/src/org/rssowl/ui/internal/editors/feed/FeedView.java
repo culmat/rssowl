@@ -1358,10 +1358,26 @@ public class FeedView extends EditorPart implements IReusableEditor {
    * <code>false</code> otherwise.
    */
   public boolean isHidden(INews news) {
+    Long id = news.getId();
+    return id != null && isHidden(id);
+  }
+
+  /**
+   * @param reference the {@link NewsReference} to check for being part of the
+   * browser
+   * @return <code>true</code> if the feedview is configured to show headlines
+   * or newspaper layout and the news is part of the displayed items and
+   * <code>false</code> otherwise.
+   */
+  public boolean isHidden(NewsReference reference) {
+    return isHidden(reference.getId());
+  }
+
+  private boolean isHidden(long newsId) {
     if (fLayout == Layout.NEWSPAPER || fLayout == Layout.HEADLINES) {
       NewsBrowserViewModel model = fNewsBrowserControl.getViewer().getViewModel();
-      if (model != null && news.getId() != null)
-        return !model.hasNews(news.getId());
+      if (model != null)
+        return !model.hasNews(newsId);
     }
 
     return false;
@@ -1375,6 +1391,16 @@ public class FeedView extends EditorPart implements IReusableEditor {
    */
   public boolean contains(INews news) {
     return fContentProvider != null && fContentProvider.hasCachedNews(news);
+  }
+
+  /**
+   * @param reference the reference of the {@link INews} to obtain from this
+   * feed views cache.
+   * @return the fully resolved {@link INews} from the cache or
+   * <code>null</code> otherwise.
+   */
+  public INews obtainFromCache(NewsReference reference) {
+    return fContentProvider != null ? fContentProvider.obtainFromCache(reference.getId()) : null;
   }
 
   private void performCleanUp(IBookMark bookmark, Collection<INews> news) {
