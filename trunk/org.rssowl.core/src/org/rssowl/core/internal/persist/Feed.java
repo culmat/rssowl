@@ -900,7 +900,7 @@ public class Feed extends AbstractEntity implements IFeed {
   }
 
   private List<INews> copyWithoutDuplicatesSynced(List<INews> newsList) {
-    Set<String> guids= new HashSet<String>();
+    Set<String> guids= new HashSet<String>(newsList.size());
     List<INews> newsListCopy = new ArrayList<INews>(newsList.size());
     for (INews news : newsList) {
       IGuid guid = news.getGuid();
