@@ -259,21 +259,16 @@ public class ImportUtils {
         }
       }
 
-      /* Fix Order */
+      /* Fix Order and Enablement */
       for (ISearchFilter filter : filters) {
         filter.setOrder(filter.getOrder() + existingFiltersCount);
+
+        if (filter.isEnabled() && CoreUtils.isOrphaned(filter))
+          filter.setEnabled(false);
       }
 
       /* Save */
       DynamicDAO.saveAll(filters);
-
-      /* Fix Orphaned Filters */
-      for (ISearchFilter filter : filters) {
-        if (filter.isEnabled() && CoreUtils.isOrphaned(filter)) {
-          filter.setEnabled(false);
-          DynamicDAO.save(filter);
-        }
-      }
     }
 
     /* Import Preferences */
