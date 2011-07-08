@@ -1367,6 +1367,16 @@ public class FeedView extends EditorPart implements IReusableEditor {
     return false;
   }
 
+  /**
+   * @param news the {@link INews} to check for being contained in this
+   * {@link FeedView}.
+   * @return <code>true</code> if this {@link FeedView} contains the given news
+   * and <code>false</code> otherwise.
+   */
+  public boolean contains(INews news) {
+    return fContentProvider != null && fContentProvider.hasCachedNews(news);
+  }
+
   private void performCleanUp(IBookMark bookmark, Collection<INews> news) {
     if (System.currentTimeMillis() - fLastCleanUpRun.get() > CLEAN_UP_BLOCK_DELAY) {
       RetentionStrategy.process(bookmark, news);
