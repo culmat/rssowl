@@ -204,6 +204,7 @@ public class NewsNotificationItem extends NotificationItem {
       if (news != null) {
         OpenNewsAction action = new OpenNewsAction(new StructuredSelection(news));
         action.setRestoreWindow(true);
+        action.setPreferActiveFeedView();
         action.run();
       }
     }
