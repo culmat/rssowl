@@ -248,7 +248,6 @@ public class MarkTypesReadAction extends Action implements IWorkbenchWindowActio
 
     /* Feedview provided, obtain news from cache */
     if (feedView != null) {
-
       List<NewsReference> refs = newsmark.getNewsRefs(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED));
       for (NewsReference reference : refs) {
         if (feedView.isHidden(reference))
