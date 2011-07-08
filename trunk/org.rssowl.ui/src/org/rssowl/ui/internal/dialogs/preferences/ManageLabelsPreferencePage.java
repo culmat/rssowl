@@ -99,7 +99,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
   public static final String ID = "org.rssowl.ui.ManageLabels"; //$NON-NLS-1$
 
   /* Number of News to process when deleting labels */
-  private static final int LABEL_DELETE_CHUNK_SIZE = 100;
+  private static final int LABELS_CHUNK_SIZE = 100;
 
   private LocalResourceManager fResources;
   private TreeViewer fViewer;
@@ -382,7 +382,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
 
           /* Find all news that are under sync control and have the label assigned */
           List<SearchHit<NewsReference>> result = Owl.getPersistenceService().getModelSearch().searchNews(Arrays.asList(labelCondition, feedCondition), true);
-          List<List<SearchHit<NewsReference>>> chunks = CoreUtils.toChunks(result, LABEL_DELETE_CHUNK_SIZE);
+          List<List<SearchHit<NewsReference>>> chunks = CoreUtils.toChunks(result, LABELS_CHUNK_SIZE);
           for (List<SearchHit<NewsReference>> chunk : chunks) {
             for (SearchHit<NewsReference> item : chunk) {
               INews news = item.getResult().resolve();
@@ -441,8 +441,6 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
   }
 
   private void deleteInBackground(final List<ILabel> labelsToDelete) {
-
-    /* Runnable with Progress */
     IRunnableWithProgress runnableWithProgress = new IRunnableWithProgress() {
       public void run(IProgressMonitor monitor) {
         monitor.beginTask(Messages.ManageLabelsPreferencePage_WAIT_DELETE, IProgressMonitor.UNKNOWN);
@@ -457,7 +455,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
             monitor.subTask(NLS.bind(Messages.ManageLabelsPreferencePage_UPDATE_NEWS_REMOVE_LABELS, labeledNews.size()));
 
             /* Chunkify */
-            List<List<SearchHit<NewsReference>>> chunks = CoreUtils.toChunks(labeledNews, LABEL_DELETE_CHUNK_SIZE);
+            List<List<SearchHit<NewsReference>>> chunks = CoreUtils.toChunks(labeledNews, LABELS_CHUNK_SIZE);
             for (List<SearchHit<NewsReference>> chunk : chunks) {
               List<INews> newsToSave = new ArrayList<INews>(chunk.size());
 
