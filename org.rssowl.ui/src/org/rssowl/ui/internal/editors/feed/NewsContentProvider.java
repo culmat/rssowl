@@ -830,7 +830,7 @@ public class NewsContentProvider implements ITreeContentProvider {
     return !fCachedNews.isEmpty();
   }
 
-  private synchronized boolean hasCachedNews(INews news) {
+  synchronized boolean hasCachedNews(INews news) {
     return news.getId() != null && hasCachedNews(news.getId());
   }
 
