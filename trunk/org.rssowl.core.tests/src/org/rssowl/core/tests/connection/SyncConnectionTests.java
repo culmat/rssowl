@@ -1080,5 +1080,59 @@ public class SyncConnectionTests {
     for (INews news : bbcFeed.getNews()) {
       assertTrue(news.getLabels().isEmpty());
     }
+
+    bbcLabel = Owl.getModelFactory().createLabel(null, "BBC");
+    DynamicDAO.save(bbcLabel);
+
+    Controller.getDefault().reload(bbcBM, null, null);
+    bbcLabelFound = false;
+    for (INews news : bbcFeed.getNews()) {
+      if (news.getLabels().contains(bbcLabel)) {
+        bbcLabelFound = true;
+        break;
+      }
+    }
+
+    assertTrue(bbcLabelFound);
+
+    DynamicDAO.delete(bbcLabel);
+
+    for (INews news : bbcFeed.getNews()) {
+      assertTrue(news.getLabels().isEmpty());
+    }
+
+    Controller.getDefault().reload(bbcBM, null, null);
+
+    labels = DynamicDAO.loadAll(ILabel.class);
+    bbcLabelFound = false;
+    for (ILabel label : labels) {
+      if ("BBC".equals(label.getName())) {
+        bbcLabelFound = true;
+        break;
+      }
+    }
+
+    assertFalse(bbcLabelFound);
+
+    for (INews news : bbcFeed.getNews()) {
+      assertTrue(news.getLabels().isEmpty());
+    }
+
+    bbcLabel = Owl.getModelFactory().createLabel(null, "BBC Other");
+    DynamicDAO.save(bbcLabel);
+
+    bbcLabel.setName("BBC");
+    DynamicDAO.save(bbcLabel);
+
+    Controller.getDefault().reload(bbcBM, null, null);
+    bbcLabelFound = false;
+    for (INews news : bbcFeed.getNews()) {
+      if (news.getLabels().contains(bbcLabel)) {
+        bbcLabelFound = true;
+        break;
+      }
+    }
+
+    assertTrue(bbcLabelFound);
   }
 }
