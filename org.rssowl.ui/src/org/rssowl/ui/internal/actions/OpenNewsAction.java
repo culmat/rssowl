@@ -32,12 +32,14 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
+import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.CoreUtils;
+import org.rssowl.ui.internal.FolderNewsMark;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
@@ -59,6 +61,7 @@ public class OpenNewsAction extends Action {
   private IStructuredSelection fSelection;
   private Shell fShellToMinimize;
   private boolean fRestoreWindow;
+  private boolean fPreferActiveFeedView;
 
   /**
    * @param selection
@@ -86,6 +89,16 @@ public class OpenNewsAction extends Action {
    */
   public void setRestoreWindow(boolean restoreWindow) {
     fRestoreWindow = restoreWindow;
+  }
+
+  /**
+   * Indicates that this action should prefer the currently active feedview when
+   * opening a news. This can be useful in situations where the user is having a
+   * search open where the news is contained in and would prevent to open the
+   * actual bookmark instead.
+   */
+  public void setPreferActiveFeedView() {
+    fPreferActiveFeedView = true;
   }
 
   /*
@@ -150,6 +163,29 @@ public class OpenNewsAction extends Action {
     if (newsToOpen.size() > 0 && fShellToMinimize != null)
       fShellToMinimize.setMinimized(true);
 
+    /* Handle case where active feed view is prefered for 1 news */
+    if (fPreferActiveFeedView && newsToOpen.size() == 1) {
+      INews news = newsToOpen.get(0);
+
+      /* Active Feedview contains News */
+      FeedView feedView = OwlUI.getActiveFeedView();
+      if (feedView != null && feedView.contains(news)) {
+
+        /* Activate and Select News */
+        feedView.getSite().getPage().activate(feedView);
+        feedView.setSelection(new StructuredSelection(news));
+
+        /* Reveal in Bookmark Explorer */
+        IFolderChild child = ((FeedViewInput) feedView.getEditorInput()).getMark();
+        if (child instanceof FolderNewsMark)
+          child = ((FolderNewsMark) child).getFolder();
+
+        reveal(child);
+
+        return;
+      }
+    }
+
     /* Open Bookmarks belonging to the News */
     INewsMark lastOpenedNewsMark = null;
     for (int i = 0; i < newsToOpen.size() && openedEditors < maxOpenEditors; i++) {
@@ -169,10 +205,13 @@ public class OpenNewsAction extends Action {
     }
 
     /* Reveal Newsmark of last opened News */
+    reveal(lastOpenedNewsMark);
+  }
+
+  private void reveal(IFolderChild child) {
     BookMarkExplorer explorer = OwlUI.getOpenedBookMarkExplorer();
-    if (explorer != null && lastOpenedNewsMark != null && !explorer.isLinkingEnabled()) {
-      explorer.reveal(lastOpenedNewsMark, false);
-    }
+    if (explorer != null && child != null && !explorer.isLinkingEnabled())
+      explorer.reveal(child, false);
   }
 
   private void openAndSelect(IWorkbenchPage page, INews news, INewsMark newsmark) {
