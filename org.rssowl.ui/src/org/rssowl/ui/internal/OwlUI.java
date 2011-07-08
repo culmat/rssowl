@@ -346,9 +346,6 @@ public class OwlUI {
   /* Name of Folder for storing Icons */
   private static final String ICONS_FOLDER = "icons"; //$NON-NLS-1$
 
-  /* Black Color in RGB Notation */
-  private static final String RGB_BLACK = "0,0,0"; //$NON-NLS-1$
-
   /* Shared Clipboard instance */
   private static Clipboard fgClipboard;
 
@@ -373,6 +370,9 @@ public class OwlUI {
   private static final int WINDOWS_PACKED_WIZARD_WIDTH = 380;
   private static final int LINUX_PACKED_WIZARD_WIDTH = 370;
   private static final int MAC_PACKED_WIZARD_WIDTH = 300;
+
+  /* Map Common Label Colors to RGB Values */
+  private static final Map<String, RGB> fgMapCommonColorToRGB = new HashMap<String, RGB>();
 
   /* Map Common Mime Types to Extensions (used for Attachments) */
   private static final Map<String, String> fgMapMimeToExtension = new HashMap<String, String>();
@@ -411,6 +411,28 @@ public class OwlUI {
     fgMapMimeToExtension.put("application/rtf", "rtf"); //$NON-NLS-1$ //$NON-NLS-2$
     fgMapMimeToExtension.put("text/richtext", "rtf"); //$NON-NLS-1$ //$NON-NLS-2$
     fgMapMimeToExtension.put("application/x-rtf", "rtf"); //$NON-NLS-1$ //$NON-NLS-2$
+
+    /* Common Colors to RGB */
+    fgMapCommonColorToRGB.put("0,0,0", new RGB(0, 0, 0)); // "Black",//$NON-NLS-1$
+    fgMapCommonColorToRGB.put("124,10,2", new RGB(124, 10, 2)); // "Barn Red",//$NON-NLS-1$
+    fgMapCommonColorToRGB.put("163,21,2", new RGB(163, 21, 2)); // "Salem Red",//$NON-NLS-1$
+    fgMapCommonColorToRGB.put("214,148,99", new RGB(214, 148, 99)); // "Salmon",//$NON-NLS-1$
+    fgMapCommonColorToRGB.put("200,118,10", new RGB(200, 118, 10)); // "Pumpkin",//$NON-NLS-1$
+    fgMapCommonColorToRGB.put("240,177,12", new RGB(240, 177, 12)); // "Marigold Yellow",//$NON-NLS-1$
+    fgMapCommonColorToRGB.put("209,161,17", new RGB(209, 161, 17)); // "Mustard",//$NON-NLS-1$
+    fgMapCommonColorToRGB.put("136,128,54", new RGB(136, 128, 54)); // "Bayberry Green",//$NON-NLS-1$
+    fgMapCommonColorToRGB.put("129,150,93", new RGB(129, 150, 93)); // "Tavern Green",//$NON-NLS-1$
+    fgMapCommonColorToRGB.put("82,92,58", new RGB(82, 92, 58)); // "Lexington Green",//$NON-NLS-1$
+    fgMapCommonColorToRGB.put("126,135,130", new RGB(126, 135, 130)); // "Sea Green",//$NON-NLS-1$
+    fgMapCommonColorToRGB.put("111,121,174", new RGB(111, 121, 174)); // "Federal Blue",//$NON-NLS-1$
+    fgMapCommonColorToRGB.put("92,101,126", new RGB(92, 101, 126)); // "Soldier Blue",//$NON-NLS-1$
+    fgMapCommonColorToRGB.put("144,152,163", new RGB(144, 152, 163)); // "Slate",//$NON-NLS-1$
+    fgMapCommonColorToRGB.put("25,16,17", new RGB(25, 16, 17)); // "Pitch Black",//$NON-NLS-1$
+    fgMapCommonColorToRGB.put("82,66,41", new RGB(82, 66, 41)); // "Driftwood",//$NON-NLS-1$
+    fgMapCommonColorToRGB.put("82,16,0", new RGB(82, 16, 0)); // "Chocolate Brown" //$NON-NLS-1$
+    fgMapCommonColorToRGB.put("255,0,0", new RGB(255, 0, 0)); // "Red" //$NON-NLS-1$
+    fgMapCommonColorToRGB.put("0,255,0", new RGB(0, 255, 0)); // "Greeen" //$NON-NLS-1$
+    fgMapCommonColorToRGB.put("0,0,255", new RGB(0, 0, 255)); // "Blue" //$NON-NLS-1$
   }
 
   /** An enumeration of Operating System Themes */
@@ -843,8 +865,9 @@ public class OwlUI {
     if (!StringUtils.isSet(rgb))
       return null;
 
-    if (RGB_BLACK.equals(rgb))
-      return new RGB(0, 0, 0);
+    RGB commonRGB = fgMapCommonColorToRGB.get(rgb);
+    if (commonRGB != null)
+      return commonRGB;
 
     String color[] = rgb.split(","); //$NON-NLS-1$
     return new RGB(Integer.parseInt(color[0]), Integer.parseInt(color[1]), Integer.parseInt(color[2]));
