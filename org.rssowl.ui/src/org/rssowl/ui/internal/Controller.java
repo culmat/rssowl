@@ -1497,7 +1497,7 @@ public class Controller {
     else if (!Application.IS_ECLIPSE && !fDisableUpdate) {
       JobRunner.runInUIThread(5000, OwlUI.getActiveShell(), new Runnable() {
         public void run() {
-          if (Owl.getPreferenceService().getGlobalScope().getBoolean(DefaultPreferences.UPDATE_ON_STARTUP)) {
+          if (!fShuttingDown && Owl.getPreferenceService().getGlobalScope().getBoolean(DefaultPreferences.UPDATE_ON_STARTUP)) {
             FindUpdatesAction action = new FindUpdatesAction(false);
             action.init(OwlUI.getWindow());
             action.run();
@@ -1513,6 +1513,14 @@ public class Controller {
       if (shell != null)
         MessageDialog.openError(shell, Messages.Controller_ERROR, NLS.bind(Messages.Controller_ERROR_STARTING_SERVER, server.getPort(), server.getHost()));
     }
+
+    /* Update Saved Searches if not yet done (required if feeds view hidden on startup) */
+    JobRunner.runInBackgroundThread(50, new Runnable() {
+      public void run() {
+        if (!fShuttingDown)
+          fSavedSearchService.updateSavedSearches(false);
+      }
+    });
 
     /* Indicate Application is started */
     fIsStarted = true;

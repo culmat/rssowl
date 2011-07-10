@@ -337,13 +337,6 @@ public class BookMarkExplorer extends ViewPart {
     /* Set the initial Input based on selected Bookmark Set */
     fViewer.setInput(fSelectedBookMarkSet);
 
-    /* Update Saved Searches if not yet done */
-    JobRunner.runInBackgroundThread(50, new Runnable() {
-      public void run() {
-        Controller.getDefault().getSavedSearchService().updateSavedSearches(false);
-      }
-    });
-
     /* Enable "Link to FeedView" */
     fViewer.addPostSelectionChangedListener(new ISelectionChangedListener() {
       public void selectionChanged(SelectionChangedEvent event) {
