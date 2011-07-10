@@ -918,7 +918,8 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       if (news != null) {
 
         /* Remove Focus from Link */
-        blur(Dynamic.NEWS_MENU_LINK.getId(news));
+        blur(Dynamic.NEWS_MENU_LINK.getId(news), true);
+        blur(Dynamic.FOOTER_NEWS_MENU_LINK.getId(news), true);
 
         /* Show Menu */
         setSelection(new StructuredSelection(news));
