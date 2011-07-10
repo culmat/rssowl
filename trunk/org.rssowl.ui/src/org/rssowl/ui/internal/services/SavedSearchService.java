@@ -31,11 +31,20 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.InternalOwl;
+import org.rssowl.core.persist.IBookMark;
+import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INews.State;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.ISearchMarkDAO;
+import org.rssowl.core.persist.event.BookMarkAdapter;
+import org.rssowl.core.persist.event.BookMarkEvent;
+import org.rssowl.core.persist.event.FolderAdapter;
+import org.rssowl.core.persist.event.FolderEvent;
+import org.rssowl.core.persist.event.NewsBinAdapter;
+import org.rssowl.core.persist.event.NewsBinEvent;
 import org.rssowl.core.persist.event.SearchMarkEvent;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IModelSearch;
@@ -73,15 +82,18 @@ public class SavedSearchService {
   private static final int SHORT_THRESHOLD = 1;
 
   private final Job fBatchJob;
-  private final IndexListener fIndexListener;
   private final AtomicBoolean fBatchInProcess = new AtomicBoolean(false);
   private final AtomicBoolean fUpdatedOnce = new AtomicBoolean(false);
   private final AtomicBoolean fForceQuickUpdate = new AtomicBoolean(false);
+  private IndexListener fIndexListener;
+  private BookMarkAdapter fBookmarkListener;
+  private NewsBinAdapter fNewsBinListener;
+  private FolderAdapter fFolderListener;
 
   /** Creates and Starts this Service */
   public SavedSearchService() {
     fBatchJob = createBatchJob();
-    fIndexListener = registerListeners();
+    registerListeners();
   }
 
   private Job createBatchJob() {
@@ -109,24 +121,92 @@ public class SavedSearchService {
     return job;
   }
 
-  private IndexListener registerListeners() {
-    IndexListener listener = new IndexListener() {
+  private void registerListeners() {
+
+    /* Index Listener */
+    fIndexListener = new IndexListener() {
       public void indexUpdated(int entitiesCount) {
-        if (!Controller.getDefault().isShuttingDown()) {
-          if (!InternalOwl.TESTING)
-            onIndexUpdated(entitiesCount);
-          else
-            updateSavedSearches(true);
+        updateSavedSearchesFromEvent(entitiesCount);
+      }
+    };
+
+    Owl.getPersistenceService().getModelSearch().addIndexListener(fIndexListener);
+
+    /* Bookmark Listener: Update on Reparent */
+    fBookmarkListener = new BookMarkAdapter() {
+      @Override
+      public void entitiesUpdated(Set<BookMarkEvent> events) {
+        for (BookMarkEvent event : events) {
+          if (event.isRoot()) {
+            IFolder oldParent = event.getOldParent();
+            IFolder parent = event.getEntity().getParent();
+
+            if (oldParent != null && !oldParent.equals(parent)) {
+              updateSavedSearchesFromEvent(1);
+              break;
+            }
+          }
         }
       }
     };
 
-    Owl.getPersistenceService().getModelSearch().addIndexListener(listener);
-    return listener;
+    DynamicDAO.addEntityListener(IBookMark.class, fBookmarkListener);
+
+    /* News Bin Listener: Update on Reparent */
+    fNewsBinListener = new NewsBinAdapter() {
+      @Override
+      public void entitiesUpdated(Set<NewsBinEvent> events) {
+        for (NewsBinEvent event : events) {
+          if (event.isRoot()) {
+            IFolder oldParent = event.getOldParent();
+            IFolder parent = event.getEntity().getParent();
+
+            if (oldParent != null && !oldParent.equals(parent)) {
+              updateSavedSearchesFromEvent(1);
+              break;
+            }
+          }
+        }
+      }
+    };
+
+    DynamicDAO.addEntityListener(INewsBin.class, fNewsBinListener);
+
+    /* Folder Listener: Update on Reparent */
+    fFolderListener = new FolderAdapter() {
+      @Override
+      public void entitiesUpdated(Set<FolderEvent> events) {
+        for (FolderEvent event : events) {
+          if (event.isRoot()) {
+            IFolder oldParent = event.getOldParent();
+            IFolder parent = event.getEntity().getParent();
+
+            if (oldParent != null && !oldParent.equals(parent)) {
+              updateSavedSearchesFromEvent(1);
+              break;
+            }
+          }
+        }
+      }
+    };
+
+    DynamicDAO.addEntityListener(IFolder.class, fFolderListener);
+  }
+
+  private void updateSavedSearchesFromEvent(int entitiesCount) {
+    if (!Controller.getDefault().isShuttingDown()) {
+      if (!InternalOwl.TESTING)
+        onIndexUpdated(entitiesCount);
+      else
+        updateSavedSearches(true);
+    }
   }
 
   private void unregisterListeners() {
     Owl.getPersistenceService().getModelSearch().removeIndexListener(fIndexListener);
+    DynamicDAO.removeEntityListener(IBookMark.class, fBookmarkListener);
+    DynamicDAO.removeEntityListener(INewsBin.class, fNewsBinListener);
+    DynamicDAO.removeEntityListener(IFolder.class, fFolderListener);
   }
 
   private void onIndexUpdated(int entitiesCount) {
