@@ -140,6 +140,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
@@ -1394,13 +1395,11 @@ public class FeedView extends EditorPart implements IReusableEditor {
   }
 
   /**
-   * @param reference the reference of the {@link INews} to obtain from this
-   * feed views cache.
-   * @return the fully resolved {@link INews} from the cache or
-   * <code>null</code> otherwise.
+   * @return a {@link Collection} of {@link INews} that contains the currently
+   * cached news items displayed in the feed view.
    */
-  public INews obtainFromCache(NewsReference reference) {
-    return fContentProvider != null ? fContentProvider.obtainFromCache(reference.getId()) : null;
+  public Collection<INews> getCachedNewsCopy() {
+    return fContentProvider != null ? fContentProvider.getCachedNewsCopy() : Collections.<INews> emptyList();
   }
 
   private void performCleanUp(IBookMark bookmark, Collection<INews> news) {
