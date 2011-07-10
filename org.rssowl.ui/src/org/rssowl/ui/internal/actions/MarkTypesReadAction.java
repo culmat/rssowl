@@ -144,20 +144,11 @@ public class MarkTypesReadAction extends Action implements IWorkbenchWindowActio
     Map<IBookMark, Collection<INews>> retentionHelperMap = new HashMap<IBookMark, Collection<INews>>();
 
     /* Retrieve affected News */
-    EnumSet<State> enumSet = EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED);
-    Set<INews> news = new HashSet<INews>();
-    for (IEntity element : entities) {
-      if (element instanceof IFolder)
-        fillNews((IFolder) element, news, retentionHelperMap, feedView);
-      else if (element instanceof IBookMark)
-        fillNews((IBookMark) element, news, retentionHelperMap, feedView);
-      else if (element instanceof FolderNewsMark)
-        fillNews(((FolderNewsMark) element).getFolder(), news, retentionHelperMap, feedView);
-      else if (element instanceof INewsMark)
-        fillNews((INewsMark) element, news, feedView);
-      else if (element instanceof INews && enumSet.contains(((INews) element).getState()))
-        news.add((INews) element);
-    }
+    Collection<INews> news;
+    if (feedView != null)
+      news = getNews(feedView);
+    else
+      news = resolveNews(entities, retentionHelperMap);
 
     /* Only affect equivalent News if not all News are affected */
     boolean affectEquivalentNews = OwlUI.markReadDuplicates() && !equalsRootFolders(folders);
@@ -198,12 +189,43 @@ public class MarkTypesReadAction extends Action implements IWorkbenchWindowActio
     }
   }
 
+  private Collection<INews> getNews(FeedView feedView) {
+    EnumSet<State> enumSet = EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED);
+
+    Collection<INews> newsCache = feedView.getCachedNewsCopy();
+    Set<INews> news = new HashSet<INews>();
+    for (INews item : newsCache) {
+      if (item != null && enumSet.contains(item.getState()) && !feedView.isHidden(item))
+        news.add(item);
+    }
+
+    return news;
+  }
+
+  private Set<INews> resolveNews(List<IEntity> entities, Map<IBookMark, Collection<INews>> retentionHelperMap) {
+    EnumSet<State> enumSet = EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED);
+    Set<INews> news = new HashSet<INews>();
+    for (IEntity element : entities) {
+      if (element instanceof IFolder)
+        fillNews((IFolder) element, news, retentionHelperMap);
+      else if (element instanceof IBookMark)
+        fillNews((IBookMark) element, news, retentionHelperMap);
+      else if (element instanceof FolderNewsMark)
+        fillNews(((FolderNewsMark) element).getFolder(), news, retentionHelperMap);
+      else if (element instanceof INewsMark)
+        fillNews((INewsMark) element, news);
+      else if (element instanceof INews && enumSet.contains(((INews) element).getState()))
+        news.add((INews) element);
+    }
+    return news;
+  }
+
   private boolean equalsRootFolders(Collection<IFolder> folders) {
     Collection<IFolder> rootFolders = DynamicDAO.getDAO(IFolderDAO.class).loadRoots();
     return folders != null && folders.size() == rootFolders.size() && rootFolders.containsAll(folders);
   }
 
-  private void fillNews(IFolder folder, Collection<INews> news, Map<IBookMark, Collection<INews>> bookMarkNewsMap, FeedView feedView) {
+  private void fillNews(IFolder folder, Collection<INews> news, Map<IBookMark, Collection<INews>> bookMarkNewsMap) {
 
     /* Determine if any included Bookmark requires retention */
     boolean requiresRetention = false;
@@ -218,29 +240,19 @@ public class MarkTypesReadAction extends Action implements IWorkbenchWindowActio
 
     /* Fallback to classic resolution if feedView not provided or retention required */
     if (requiresRetention)
-      fillNewsByResolve(folder, news, bookMarkNewsMap, feedView);
+      fillNewsByResolve(folder, news, bookMarkNewsMap);
 
     /* Otherwise use FolderNewsMark to resolve Elements of Folder */
     else
-      fillNewsBySearch(folder, news, feedView);
+      fillNewsBySearch(folder, news);
   }
 
-  private void fillNewsBySearch(IFolder folder, Collection<INews> news, FeedView feedView) {
+  private void fillNewsBySearch(IFolder folder, Collection<INews> news) {
     FolderNewsMark folderNewsMark = new FolderNewsMark(folder);
     folderNewsMark.resolve(Type.SHOW_UNREAD, new NullProgressMonitor());
     List<NewsReference> newsRefs = folderNewsMark.getNewsRefs();
     for (NewsReference reference : newsRefs) {
-      INews item = null;
-      if (feedView != null) {
-        if (feedView.isHidden(reference))
-          continue; //Ignore hidden news when marking as read
-
-        item = feedView.obtainFromCache(reference);
-      }
-
-      if (item == null)
-        item = reference.resolve();
-
+      INews item = reference.resolve();
       if (item != null)
         news.add(item);
       else
@@ -248,19 +260,19 @@ public class MarkTypesReadAction extends Action implements IWorkbenchWindowActio
     }
   }
 
-  private void fillNewsByResolve(IFolder folder, Collection<INews> news, Map<IBookMark, Collection<INews>> bookMarkNewsMap, FeedView feedView) {
+  private void fillNewsByResolve(IFolder folder, Collection<INews> news, Map<IBookMark, Collection<INews>> bookMarkNewsMap) {
     List<IFolderChild> children = folder.getChildren();
     for (IFolderChild child : children) {
       if (child instanceof IBookMark)
-        fillNews((IBookMark) child, news, bookMarkNewsMap, feedView);
+        fillNews((IBookMark) child, news, bookMarkNewsMap);
       else if (child instanceof INewsMark)
-        fillNews((INewsMark) child, news, feedView);
+        fillNews((INewsMark) child, news);
       else if (child instanceof IFolder)
-        fillNewsByResolve((IFolder) child, news, bookMarkNewsMap, feedView);
+        fillNewsByResolve((IFolder) child, news, bookMarkNewsMap);
     }
   }
 
-  private void fillNews(IBookMark bookmark, Collection<INews> news, Map<IBookMark, Collection<INews>> bookMarkNewsMap, FeedView feedView) {
+  private void fillNews(IBookMark bookmark, Collection<INews> news, Map<IBookMark, Collection<INews>> bookMarkNewsMap) {
     IPreferenceScope bookMarkPrefs = Owl.getPreferenceService().getEntityScope(bookmark);
     boolean requiresRetention = bookMarkPrefs.getBoolean(DefaultPreferences.DEL_READ_NEWS_STATE);
 
@@ -270,8 +282,6 @@ public class MarkTypesReadAction extends Action implements IWorkbenchWindowActio
     if (requiresRetention) {
       Collection<INews> feedsNews = fNewsDao.loadAll(bookmark.getFeedLinkReference(), INews.State.getVisible());
       for (INews item : feedsNews) {
-        if (feedView != null && feedView.isHidden(item))
-          continue; //Ignore hidden news when marking as read
 
         /* Do not add READ news */
         if (enumSet.contains(item.getState()))
@@ -282,38 +292,12 @@ public class MarkTypesReadAction extends Action implements IWorkbenchWindowActio
 
     /* No retention required, just load the ones being affected */
     else if (bookmark.getNewsCount(enumSet) > 0) {
-      Collection<INews> items = fNewsDao.loadAll(bookmark.getFeedLinkReference(), enumSet);
-      for (INews item : items) {
-        if (feedView != null && feedView.isHidden(item))
-          continue; //Ignore hidden news when marking as read
-
-        news.add(item);
-      }
+      news.addAll(fNewsDao.loadAll(bookmark.getFeedLinkReference(), enumSet));
     }
   }
 
-  private void fillNews(INewsMark newsmark, Collection<INews> news, FeedView feedView) {
-
-    /* Feedview provided, obtain news from cache */
-    if (feedView != null) {
-      List<NewsReference> refs = newsmark.getNewsRefs(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED));
-      for (NewsReference reference : refs) {
-        if (feedView.isHidden(reference))
-          continue; //Ignore hidden news when marking as read
-
-        INews item = feedView.obtainFromCache(reference);
-        if (item == null)
-          item = reference.resolve();
-
-        if (item != null)
-          news.add(item);
-      }
-    }
-
-    /* Feedview is not provided */
-    else {
-      news.addAll(newsmark.getNews(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)));
-    }
+  private void fillNews(INewsMark newsmark, Collection<INews> news) {
+    news.addAll(newsmark.getNews(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)));
   }
 
   /*
