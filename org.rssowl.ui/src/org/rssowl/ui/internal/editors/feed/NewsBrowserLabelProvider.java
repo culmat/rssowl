@@ -29,6 +29,7 @@ import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.ARCHIVE_HAND
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.ATTACHMENTS_MENU_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.ATTACHMENT_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.COLLAPSE_GROUP_HANDLER_ID;
+import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.COLLAPSE_NEWS_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.DELETE_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.EXPAND_NEWS_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.GROUP_MENU_HANDLER_ID;
@@ -142,6 +143,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     FOOTER_NEWS_MENU_LINK("footerNewsMenuLink"), //$NON-NLS-1$
     ATTACHMENTS_MENU_LINK("attachmentsMenuLink"), //$NON-NLS-1$
     ATTACHMENT_LINK("attachmentLink"), //$NON-NLS-1$
+    COLLAPSE_LINK("collapseLink"), //$NON-NLS-1$
     FULL_CONTENT_LINK("fullContentLink"), //$NON-NLS-1$
     FULL_CONTENT_LINK_TEXT("fullContentLinkText"), //$NON-NLS-1$
     LABELS("labels"), //$NON-NLS-1$
@@ -1102,6 +1104,18 @@ public class NewsBrowserLabelProvider extends LabelProvider {
         div(builder, "footerline"); //$NON-NLS-1$
         builder.append("<table class=\"footerline\">"); //$NON-NLS-1$
         builder.append("<tr class=\"footerline\">"); //$NON-NLS-1$
+
+        /* Collapse News */
+        if (fHeadlinesOnly) {
+          builder.append("<td class=\"footerline\">"); //$NON-NLS-1$
+          String link = HANDLER_PROTOCOL + COLLAPSE_NEWS_HANDLER_ID + "?" + news.getId(); //$NON-NLS-1$
+          imageLink(builder, link, Messages.NewsBrowserLabelProvider_COLLAPSE, Messages.NewsBrowserLabelProvider_COLLAPSE_NEWS, null, "/icons/obj16/mono_collapse.gif", "mono_collapse.gif", Dynamic.COLLAPSE_LINK.getId(news), null, null); //$NON-NLS-1$ //$NON-NLS-2$
+          builder.append("</td>"); //$NON-NLS-1$
+
+          builder.append("<td class=\"footerlineseparator\">"); //$NON-NLS-1$
+          builder.append("|"); //$NON-NLS-1$
+          builder.append("</td>"); //$NON-NLS-1$
+        }
 
         /* News Menu */
         builder.append("<td class=\"footerline\">"); //$NON-NLS-1$
