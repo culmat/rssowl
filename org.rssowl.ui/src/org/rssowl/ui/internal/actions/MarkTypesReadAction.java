@@ -243,6 +243,8 @@ public class MarkTypesReadAction extends Action implements IWorkbenchWindowActio
 
       if (item != null)
         news.add(item);
+      else
+        CoreUtils.reportIndexIssue(); //Report, since the foldernewsmark uses a search to find news
     }
   }
 
