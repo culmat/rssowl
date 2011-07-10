@@ -24,6 +24,7 @@
 
 package org.rssowl.ui.internal.actions;
 
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
@@ -52,12 +53,14 @@ import org.rssowl.ui.internal.FolderNewsMark;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
+import org.rssowl.ui.internal.editors.feed.NewsFilter.Type;
 import org.rssowl.ui.internal.undo.NewsStateOperation;
 import org.rssowl.ui.internal.undo.UndoStack;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -201,6 +204,49 @@ public class MarkTypesReadAction extends Action implements IWorkbenchWindowActio
   }
 
   private void fillNews(IFolder folder, Collection<INews> news, Map<IBookMark, Collection<INews>> bookMarkNewsMap, FeedView feedView) {
+
+    /* Determine if any included Bookmark requires retention */
+    boolean requiresRetention = false;
+    Set<IBookMark> bookmarks = new HashSet<IBookMark>();
+    CoreUtils.fillBookMarks(bookmarks, Collections.singleton(folder));
+    for (IBookMark bookmark : bookmarks) {
+      if (Owl.getPreferenceService().getEntityScope(bookmark).getBoolean(DefaultPreferences.DEL_READ_NEWS_STATE)) {
+        requiresRetention = true;
+        break;
+      }
+    }
+
+    /* Fallback to classic resolution if feedView not provided or retention required */
+    if (requiresRetention)
+      fillNewsByResolve(folder, news, bookMarkNewsMap, feedView);
+
+    /* Otherwise use FolderNewsMark to resolve Elements of Folder */
+    else
+      fillNewsBySearch(folder, news, feedView);
+  }
+
+  private void fillNewsBySearch(IFolder folder, Collection<INews> news, FeedView feedView) {
+    FolderNewsMark folderNewsMark = new FolderNewsMark(folder);
+    folderNewsMark.resolve(Type.SHOW_UNREAD, new NullProgressMonitor());
+    List<NewsReference> newsRefs = folderNewsMark.getNewsRefs();
+    for (NewsReference reference : newsRefs) {
+      INews item = null;
+      if (feedView != null) {
+        if (feedView.isHidden(reference))
+          continue; //Ignore hidden news when marking as read
+
+        item = feedView.obtainFromCache(reference);
+      }
+
+      if (item == null)
+        item = reference.resolve();
+
+      if (item != null)
+        news.add(item);
+    }
+  }
+
+  private void fillNewsByResolve(IFolder folder, Collection<INews> news, Map<IBookMark, Collection<INews>> bookMarkNewsMap, FeedView feedView) {
     List<IFolderChild> children = folder.getChildren();
     for (IFolderChild child : children) {
       if (child instanceof IBookMark)
@@ -208,7 +254,7 @@ public class MarkTypesReadAction extends Action implements IWorkbenchWindowActio
       else if (child instanceof INewsMark)
         fillNews((INewsMark) child, news, feedView);
       else if (child instanceof IFolder)
-        fillNews((IFolder) child, news, bookMarkNewsMap, feedView);
+        fillNewsByResolve((IFolder) child, news, bookMarkNewsMap, feedView);
     }
   }
 
