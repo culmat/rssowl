@@ -445,11 +445,11 @@ public class ModelUtils {
 
       case SHOW_LAST_5_DAYS:
         field = factory.createSearchField(INews.AGE_IN_DAYS, INews.class.getName());
-        return factory.createSearchCondition(field, SearchSpecifier.IS_LESS_THAN, 5);
+        return factory.createSearchCondition(field, SearchSpecifier.IS_LESS_THAN, 6);
 
       case SHOW_RECENT:
         field = factory.createSearchField(INews.AGE_IN_DAYS, INews.class.getName());
-        return factory.createSearchCondition(field, SearchSpecifier.IS_LESS_THAN, 1);
+        return factory.createSearchCondition(field, SearchSpecifier.IS_LESS_THAN, 2);
     }
 
     return null;
