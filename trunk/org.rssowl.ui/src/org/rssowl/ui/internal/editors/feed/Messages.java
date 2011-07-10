@@ -124,12 +124,12 @@ public class Messages extends NLS {
   public static String NewsFilter_LABELS;
   public static String NewsFilter_LAST_DAYS;
   public static String NewsFilter_NEW_NEWS;
-  public static String NewsFilter_RECENT_NEWS;
+  public static String NewsFilter_TODAYS_NEWS;
   public static String NewsFilter_SHOW_ALL;
   public static String NewsFilter_SHOW_LABELED_NEWS;
   public static String NewsFilter_SHOW_LAST_DAYS;
   public static String NewsFilter_SHOW_NEW;
-  public static String NewsFilter_SHOW_RECENT;
+  public static String NewsFilter_SHOW_TODAY;
   public static String NewsFilter_SHOW_STICKY;
   public static String NewsFilter_SHOW_UNREAD;
   public static String NewsFilter_SOURCE;

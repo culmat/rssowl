@@ -93,7 +93,7 @@ public class Messages extends NLS {
   public static String ImportWizard_NEW_UPDATED_NEWS;
   public static String ImportWizard_NEWS_WITH_ATTACHMENTS;
   public static String ImportWizard_PREFERENCE_OVERWRITE;
-  public static String ImportWizard_RECENT_NEWS;
+  public static String ImportWizard_TODAYS_NEWS;
   public static String ImportWizard_RESTART_RSSOWL;
   public static String ImportWizard_RESTART_RSSOWL_INFO;
   public static String ImportWizard_STICKY_NEWS;

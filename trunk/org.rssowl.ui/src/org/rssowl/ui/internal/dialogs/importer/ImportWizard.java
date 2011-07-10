@@ -401,13 +401,13 @@ public class ImportWizard extends Wizard implements IImportWizard {
       factory.createSearchCondition(null, mark, field1, SearchSpecifier.IS, EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED));
     }
 
-    /* SearchCondition: Recent News */
+    /* SearchCondition: Todays News */
     {
-      ISearchMark mark = factory.createSearchMark(null, root, Messages.ImportWizard_RECENT_NEWS);
+      ISearchMark mark = factory.createSearchMark(null, root, Messages.ImportWizard_TODAYS_NEWS);
       mark.setMatchAllConditions(true);
 
       ISearchField field1 = factory.createSearchField(INews.AGE_IN_DAYS, newsEntityName);
-      factory.createSearchCondition(null, mark, field1, SearchSpecifier.IS_LESS_THAN, 2);
+      factory.createSearchCondition(null, mark, field1, SearchSpecifier.IS_LESS_THAN, 1);
     }
 
     /* SearchCondition: News with Attachments */
