@@ -43,6 +43,7 @@ import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.util.CoreUtils;
+import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.SearchHit;
 import org.rssowl.core.util.URIUtils;
@@ -444,12 +445,18 @@ public class ModelUtils {
         return factory.createSearchCondition(field, SearchSpecifier.IS, "*"); //$NON-NLS-1$
 
       case SHOW_LAST_5_DAYS:
-        field = factory.createSearchField(INews.AGE_IN_DAYS, INews.class.getName());
-        return factory.createSearchCondition(field, SearchSpecifier.IS_LESS_THAN, 6);
+        long now = System.currentTimeMillis();
+        long lastFiveDays = DateUtils.getToday().getTimeInMillis() - 5 * DateUtils.DAY;
+        long minutes = (now - lastFiveDays) / 60000;
+        field = factory.createSearchField(INews.AGE_IN_MINUTES, INews.class.getName());
+        return factory.createSearchCondition(field, SearchSpecifier.IS_LESS_THAN, (int) (minutes * -1));
 
       case SHOW_RECENT:
-        field = factory.createSearchField(INews.AGE_IN_DAYS, INews.class.getName());
-        return factory.createSearchCondition(field, SearchSpecifier.IS_LESS_THAN, 2);
+        now = System.currentTimeMillis();
+        long recent = DateUtils.getToday().getTimeInMillis() - DateUtils.DAY;
+        minutes = (now - recent) / 60000;
+        field = factory.createSearchField(INews.AGE_IN_MINUTES, INews.class.getName());
+        return factory.createSearchCondition(field, SearchSpecifier.IS_LESS_THAN, (int) (minutes * -1));
     }
 
     return null;
