@@ -301,7 +301,7 @@ public class NewsFilter extends ViewerFilter {
           isMatch = !news.getLabels().isEmpty();
           break;
 
-        /* Show Recent News (max 24h old) */
+        /* Show Recent News (max 48h old) */
         case SHOW_RECENT:
           Date date = DateUtils.getRecentDate(news);
           isMatch = (date.getTime() >= (DateUtils.getToday().getTimeInMillis() - DateUtils.DAY));
