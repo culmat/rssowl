@@ -641,8 +641,8 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.append("div.subline { margin: 8px 0px 0px 0px; padding: 0; clear: left; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* Footer */
-    writer.append("      div.footer { padding: 3px 5px 3px 5px; line-height: 20px; border-top: dotted 1px silver; clear: both; }\n"); //$NON-NLS-1$
-    writer.append("div.footerSticky { padding: 3px 5px 3px 5px; line-height: 20px; border-top: dotted 1px silver; clear: both; ").append(fStickyBGColorCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("      div.footer { padding: 3px 5px 5px 5px; line-height: 20px; border-top: dotted 1px silver; clear: both; }\n"); //$NON-NLS-1$
+    writer.append("div.footerSticky { padding: 3px 5px 5px 5px; line-height: 20px; border-top: dotted 1px silver; clear: both; ").append(fStickyBGColorCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
   }
 
   /* Common CSS for Newspaper Layout */
