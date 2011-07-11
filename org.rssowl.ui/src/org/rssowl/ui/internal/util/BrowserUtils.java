@@ -39,6 +39,7 @@ import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.StreamGobbler;
+import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Application;
@@ -57,10 +58,10 @@ import java.io.IOException;
 public class BrowserUtils {
 
   /* Either netscape or mozilla for Linux / Solaris */
-  private static String webBrowser;
+  private static String fgWebBrowser;
 
   /* Flag to indicate a successfull launch on Linux / Solaris */
-  private static boolean webBrowserSuccessfullyOpened;
+  private static boolean fgWebBrowserSuccessfullyOpened;
 
   /* This utility class constructor is hidden */
   private BrowserUtils() {
@@ -211,22 +212,22 @@ public class BrowserUtils {
     Process p = null;
 
     /* Try Netscape as default browser */
-    if (webBrowser == null) {
+    if (fgWebBrowser == null) {
       try {
-        webBrowser = "netscape"; //$NON-NLS-1$
-        p = Runtime.getRuntime().exec(webBrowser + "  " + href); //$NON-NLS-1$
+        fgWebBrowser = "netscape"; //$NON-NLS-1$
+        p = Runtime.getRuntime().exec(fgWebBrowser + "  " + href); //$NON-NLS-1$
       } catch (IOException e) {
-        webBrowser = "mozilla"; //$NON-NLS-1$
+        fgWebBrowser = "mozilla"; //$NON-NLS-1$
       }
     }
 
     /* Try Mozilla as default browser */
     if (p == null) {
       try {
-        p = Runtime.getRuntime().exec(webBrowser + " " + href); //$NON-NLS-1$
+        p = Runtime.getRuntime().exec(fgWebBrowser + " " + href); //$NON-NLS-1$
       } catch (IOException e) {
         Activator.getDefault().logError(e.getMessage(), e);
-        showErrorIfExternalBrowserFails();
+        showErrorIfExternalBrowserFails(fgWebBrowser);
       }
     }
     return p;
@@ -243,7 +244,7 @@ public class BrowserUtils {
 
     /* Show Error Dialog on Windows */
     if (Application.IS_WINDOWS) {
-      showErrorIfExternalBrowserFails();
+      showErrorIfExternalBrowserFails(null);
     }
 
     /* Launch default browser on Mac */
@@ -265,7 +266,7 @@ public class BrowserUtils {
       /* Show error message, default browser could not be launched */
       catch (IOException e) {
         Activator.getDefault().logError(e.getMessage(), e);
-        showErrorIfExternalBrowserFails();
+        showErrorIfExternalBrowserFails(null);
       }
     }
 
@@ -283,8 +284,8 @@ public class BrowserUtils {
               return;
 
             /* The default browser was successfully launched once, use again */
-            if (webBrowserSuccessfullyOpened) {
-              Process proc = Runtime.getRuntime().exec(webBrowser + " -remote openURL(" + link + ")"); //$NON-NLS-1$ //$NON-NLS-2$
+            if (fgWebBrowserSuccessfullyOpened) {
+              Process proc = Runtime.getRuntime().exec(fgWebBrowser + " -remote openURL(" + link + ")"); //$NON-NLS-1$ //$NON-NLS-2$
 
               /* Let StreamGobbler handle error message */
               StreamGobbler errorGobbler = new StreamGobbler(proc.getErrorStream());
@@ -300,7 +301,7 @@ public class BrowserUtils {
             /* The default browser was not yet launched, try NS and Mozilla */
             else {
               Process proc = openWebBrowser(link);
-              webBrowserSuccessfullyOpened = true;
+              fgWebBrowserSuccessfullyOpened = true;
 
               if (proc != null) {
 
@@ -322,7 +323,7 @@ public class BrowserUtils {
               } catch (InterruptedException e) {
                 Activator.safeLogError(e.getMessage(), e);
               } finally {
-                webBrowserSuccessfullyOpened = false;
+                fgWebBrowserSuccessfullyOpened = false;
               }
             }
           }
@@ -330,7 +331,7 @@ public class BrowserUtils {
           /* Show error, default browser could not be launched */
           catch (IOException e) {
             Activator.safeLogError(e.getMessage(), e);
-            showErrorIfExternalBrowserFails();
+            showErrorIfExternalBrowserFails(null);
           }
         }
       };
@@ -339,7 +340,7 @@ public class BrowserUtils {
     }
   }
 
-  private static void showErrorIfExternalBrowserFails() {
+  private static void showErrorIfExternalBrowserFails(final String browser) {
     final IWorkbenchWindow window = OwlUI.getWindow();
     if (window == null)
       return;
@@ -348,7 +349,10 @@ public class BrowserUtils {
       public void run() {
         MessageBox box = new MessageBox(window.getShell(), SWT.ICON_WARNING | SWT.OK | SWT.CANCEL);
         box.setText(Messages.BrowserUtils_ERROR_LAUNCH_BROWSER);
-        box.setMessage(Messages.BrowserUtils_ERROR_LAUNCH_BROWSER_MSG);
+        if (StringUtils.isSet(browser))
+          box.setMessage(NLS.bind(Messages.BrowserUtils_ERROR_LAUNCH_BROWSER_MSG_N, browser));
+        else
+          box.setMessage(Messages.BrowserUtils_ERROR_LAUNCH_BROWSER_MSG);
 
         if (box.open() == SWT.OK)
           PreferencesUtil.createPreferenceDialogOn(window.getShell(), BrowserPreferencePage.ID, null, null).open();
@@ -357,7 +361,7 @@ public class BrowserUtils {
   }
 
   private static void useCustomBrowser(final String link) {
-    String browser = Owl.getPreferenceService().getGlobalScope().getString(DefaultPreferences.CUSTOM_BROWSER_PATH);
+    final String browser = Owl.getPreferenceService().getGlobalScope().getString(DefaultPreferences.CUSTOM_BROWSER_PATH);
     final String executable = browser + " " + link; //$NON-NLS-1$
 
     /* Launch custom browser in seperate thread */
@@ -387,12 +391,12 @@ public class BrowserUtils {
           proc.waitFor();
         } catch (IOException e) {
           Activator.safeLogError(e.getMessage(), e);
+          showErrorIfExternalBrowserFails(browser);
 
-          /* Use default browser if custom browser is not working */
+          /* Fallback to use default browser if custom browser is not working */
           useDefaultBrowser(link);
-
         } catch (InterruptedException e) {
-          Activator.safeLogError(e.getMessage(), e);
+          Activator.safeLogError(e.getMessage(), e);          
         }
       }
     };

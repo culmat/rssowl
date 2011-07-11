@@ -31,6 +31,7 @@ public class Messages extends NLS {
   public static String BrowserUtils_ATTACH_REPORT_ADVISE;
   public static String BrowserUtils_ERROR_LAUNCH_BROWSER;
   public static String BrowserUtils_ERROR_LAUNCH_BROWSER_MSG;
+  public static String BrowserUtils_ERROR_LAUNCH_BROWSER_MSG_N;
   public static String CBrowser_BACK;
   public static String CBrowser_ERROR_CREATE_BROWSER;
   public static String CBrowser_ERROR_CREATE_BROWSER_MSG;
