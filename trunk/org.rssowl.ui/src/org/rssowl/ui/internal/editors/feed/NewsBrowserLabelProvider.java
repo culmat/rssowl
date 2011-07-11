@@ -685,8 +685,8 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   private void writeNewspaperUngroupedCSS(Writer writer) throws IOException {
 
     /* News Container */
-    writer.write("div.newsitemRead   { margin: 0px 0px 20px 0px; border-bottom: 1px solid white; }\n"); //$NON-NLS-1$
-    writer.write("div.newsitemUnread { margin: 0px 0px 20px 0px; border-bottom: 1px solid white; }\n"); //$NON-NLS-1$
+    writer.write("div.newsitemRead   { margin: 0px 0px 10px 0px; border-bottom: 1px solid white; }\n"); //$NON-NLS-1$
+    writer.write("div.newsitemUnread { margin: 0px 0px 10px 0px; border-bottom: 1px solid white; }\n"); //$NON-NLS-1$
 
     /* Header */
     writer.append("      div.header { padding: 10px 10px 5px 10px; border-top: 1px solid white; }\n"); //$NON-NLS-1$
@@ -697,8 +697,8 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   private void writeNewspaperGroupedCSS(Writer writer) throws IOException {
 
     /* News Container */
-    writer.write("  div.newsitemRead { margin: 0px 0px 20px 10px; border-bottom: 1px solid white; }\n"); //$NON-NLS-1$
-    writer.write("div.newsitemUnread { margin: 0px 0px 20px 10px; border-bottom: 1px solid white; }\n"); //$NON-NLS-1$
+    writer.write("  div.newsitemRead { margin: 0px 0px 10px 10px; border-bottom: 1px solid white; }\n"); //$NON-NLS-1$
+    writer.write("div.newsitemUnread { margin: 0px 0px 10px 10px; border-bottom: 1px solid white; }\n"); //$NON-NLS-1$
 
     /* Header */
     writer.append("      div.header { padding: 10px 10px 5px 10px; border-top: 1px solid white; }\n"); //$NON-NLS-1$
