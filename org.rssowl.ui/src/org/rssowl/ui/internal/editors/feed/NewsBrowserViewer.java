@@ -249,7 +249,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
           js.append("}"); //$NON-NLS-1$
 
           if (!monitor.isCanceled() && !fCBrowser.getControl().isDisposed())
-            fCBrowser.execute(js.toString());
+            fCBrowser.execute(js.toString(), "UserInteractionTask#0"); //$NON-NLS-1$
         }
       }
 
@@ -307,7 +307,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
         js.append("}"); //$NON-NLS-1$
 
         if (!monitor.isCanceled() && !fCBrowser.getControl().isDisposed())
-          fCBrowser.execute(js.toString());
+          fCBrowser.execute(js.toString(), "UserInteractionTask#1"); //$NON-NLS-1$
       }
 
       return Status.OK_STATUS;
@@ -1145,7 +1145,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     /* Block external navigation while setting innerHTML */
     fBrowser.blockExternalNavigationWhile(new Runnable() {
       public void run() {
-        fBrowser.execute(js.toString());
+        fBrowser.execute(js.toString(), "setNewsExpanded"); //$NON-NLS-1$
       }
     });
 
@@ -1286,7 +1286,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     }
 
     /* Execute */
-    fBrowser.execute(js.toString());
+    fBrowser.execute(js.toString(), "setGroupExpanded"); //$NON-NLS-1$
 
     /* Update View Model */
     fViewModel.setGroupExpanded(groupId, expanded);
@@ -1304,7 +1304,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       js.append("}"); //$NON-NLS-1$
     } else
       js.append(getElementById(elementId).append(".blur();")); //$NON-NLS-1$
-    fBrowser.execute(js.toString());
+    fBrowser.execute(js.toString(), "blur"); //$NON-NLS-1$
   }
 
   private void transformNews(final INews news) {
@@ -1317,7 +1317,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     js.append(getElementById(Dynamic.FULL_CONTENT_LINK_TEXT.getId(news)).append(".innerHTML='").append(escapeForInnerHtml(Messages.NewsBrowserViewer_LOADING)).append("'; ")); //$NON-NLS-1$ //$NON-NLS-2$
     js.append(getElementById(Dynamic.FULL_CONTENT_LINK.getId(news)).append(".blur(); ")); //$NON-NLS-1$
     js.append(getElementById(Dynamic.FULL_CONTENT_LINK.getId(news)).append(".style.fontStyle = 'italic'; ")); //$NON-NLS-1$
-    fBrowser.execute(js.toString());
+    fBrowser.execute(js.toString(), "transformNews"); //$NON-NLS-1$
 
     /* First cancel all running jobs for this news if any */
     NewsReference reference = news.toReference();
@@ -1403,7 +1403,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     /* Block external navigation while setting innerHTML */
     fBrowser.blockExternalNavigationWhile(new Runnable() {
       public void run() {
-        fBrowser.execute(js.toString());
+        fBrowser.execute(js.toString(), "showTransformation"); //$NON-NLS-1$
       }
     });
   }
@@ -1503,7 +1503,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       /* Block external navigation while setting innerHTML */
       fBrowser.blockExternalNavigationWhile(new Runnable() {
         public void run() {
-          fBrowser.execute(newsJs.toString());
+          fBrowser.execute(newsJs.toString(), "revealItems#0"); //$NON-NLS-1$
         }
       });
     }
@@ -1518,7 +1518,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     /* Block external navigation while setting innerHTML */
     fBrowser.blockExternalNavigationWhile(new Runnable() {
       public void run() {
-        fBrowser.execute(js.toString());
+        fBrowser.execute(js.toString(), "revealItems#1"); //$NON-NLS-1$
       }
     });
   }
@@ -1667,7 +1667,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
       /* Move scroll position to top if set */
       if (moveToTop)
-        fBrowser.execute("scroll(0,0);"); //$NON-NLS-1$
+        fBrowser.execute("scroll(0,0);", "refresh"); //$NON-NLS-1$ //$NON-NLS-2$
 
       /* Refresh */
       refresh();
@@ -1907,7 +1907,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       else {
         StringBuilder js = new StringBuilder();
         js.append(getElementById(Dynamic.NEWS.getId(newsToShow))).append(".scrollIntoView(true);"); //$NON-NLS-1$
-        fBrowser.execute(js.toString());
+        fBrowser.execute(js.toString(), "showSelection"); //$NON-NLS-1$
       }
     }
   }
@@ -1985,7 +1985,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     }
 
     /* Execute in Browser */
-    fBrowser.execute(js.toString());
+    fBrowser.execute(js.toString(), "navigateInNewspaper"); //$NON-NLS-1$
 
     /* If we are at the end of the page, reveal more items if possible */
     onUserInteraction();
@@ -2022,7 +2022,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       setNewsExpanded(resolve(targetNews), true, false);
       StringBuilder js = new StringBuilder();
       js.append(getElementById(Dynamic.NEWS.getId(targetNews))).append(".scrollIntoView(true); "); //$NON-NLS-1$
-      fBrowser.execute(js.toString());
+      fBrowser.execute(js.toString(), "navigateInHeadlines#0"); //$NON-NLS-1$
 
       /* If we are at the end of the page, reveal more items if possible */
       onUserInteraction();
@@ -2032,7 +2032,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     else if (unread || fViewModel.hasItems()) { //Workaround for a Bug that would cause endless navigation if viewer contains no news otherwise
       StringBuilder js = new StringBuilder();
       js.append("window.location.href = '").append(ILinkHandler.HANDLER_PROTOCOL + getNavigationActionId(next, unread)).append("'; "); //$NON-NLS-1$ //$NON-NLS-2$
-      fBrowser.execute(js.toString());
+      fBrowser.execute(js.toString(), "navigateInHeadlines#1"); //$NON-NLS-1$
     }
   }
 
@@ -2365,7 +2365,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
         /* Execute */
         if (js.length() > 0) {
-          boolean res = fBrowser.execute(js.toString(), false);
+          boolean res = fBrowser.execute(js.toString(), false, "internalUpdate"); //$NON-NLS-1$
           if (!res)
             return false;
         }
@@ -2465,7 +2465,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     /* Update Latch as necessary */
     updateLatchIfNecessary(js);
 
-    return fBrowser.execute(js.toString());
+    return fBrowser.execute(js.toString(), "internalRemove"); //$NON-NLS-1$
   }
 
   private void assertElementsNotNull(Object[] elements) {
