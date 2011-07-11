@@ -578,7 +578,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.append("div.date { float: left; ").append(fSmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* Footer Line */
-    writer.append("div.footerline { clear: both; ").append(fVerySmallFontCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("div.footerline { clear: both; ").append(fVerySmallFontCSS).append(" padding-left: 3px; }\n"); //$NON-NLS-1$ //$NON-NLS-2$
     writer.append("div.footerline a { color: rgb(80,80,80); text-decoration: none; }\n"); //$NON-NLS-1$
     writer.append("div.footerline a:visited { color: rgb(80,80,80); text-decoration: none; }\n"); //$NON-NLS-1$
     writer.append("div.footerline a:hover { color: rgb(80,80,80); text-decoration: none; }\n"); //$NON-NLS-1$
@@ -701,8 +701,8 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.write("div.newsitemUnread { margin: 0px 0px 20px 10px; border-bottom: 1px solid white; }\n"); //$NON-NLS-1$
 
     /* Header */
-    writer.append("      div.header { padding: 10px 10px 5px 5px; border-top: 1px solid white; }\n"); //$NON-NLS-1$
-    writer.append("div.headerSticky { padding: 10px 10px 5px 5px; border-top: 1px dotted silver; ").append(fStickyBGColorCSS).append("}\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.append("      div.header { padding: 10px 10px 5px 10px; border-top: 1px solid white; }\n"); //$NON-NLS-1$
+    writer.append("div.headerSticky { padding: 10px 10px 5px 10px; border-top: 1px dotted silver; ").append(fStickyBGColorCSS).append("}\n"); //$NON-NLS-1$ //$NON-NLS-2$
   }
 
   /* Headlines Ungrouped */
@@ -728,8 +728,8 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.write("div.newsitemUnread { margin: 0px 0px 0px 10px; }\n"); //$NON-NLS-1$
 
     /* Header */
-    writer.write("       div.header { padding: 5px 10px 5px 5px; }\n"); //$NON-NLS-1$
-    writer.append("div.headerSticky { padding: 5px 10px 5px 5px; ").append(fStickyBGColorCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    writer.write("       div.header { padding: 5px 10px 5px 10px; }\n"); //$NON-NLS-1$
+    writer.append("div.headerSticky { padding: 5px 10px 5px 10px; ").append(fStickyBGColorCSS).append(" }\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
     /* Headlines Separator */
     writer.append("div.headlinesSeparator { margin: 0px 0px 0px 10px; padding: 0; border-bottom: 1px dotted silver; }\n"); //$NON-NLS-1$
