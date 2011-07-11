@@ -334,22 +334,22 @@ public class SyncService implements Receiver<SyncItem> {
   private void handleAuthenticationRequired(final IProgressMonitor monitor) {
     if (!Controller.getDefault().isShuttingDown() && !monitor.isCanceled()) {
       JobRunner.runInBackgroundThread(new Runnable() { //Run in background thread to avoid lock contention in buffer due to UI lock
-            public void run() {
-              Lock loginLock = Controller.getDefault().getLoginDialogLock();
-              if (!Controller.getDefault().isShuttingDown() && !monitor.isCanceled() && loginLock.tryLock()) { //Avoid multiple login dialogs if login dialog already showing
-                try {
-                  JobRunner.runSyncedInUIThread(new Runnable() {
-                    public void run() {
-                      if (!Controller.getDefault().isShuttingDown() && !monitor.isCanceled())
-                        OwlUI.openSyncLogin(null);
-                    }
-                  });
-                } finally {
-                  loginLock.unlock();
+        public void run() {
+          Lock loginLock = Controller.getDefault().getLoginDialogLock();
+          if (!Controller.getDefault().isShuttingDown() && !monitor.isCanceled() && loginLock.tryLock()) { //Avoid multiple login dialogs if login dialog already showing
+            try {
+              JobRunner.runSyncedInUIThread(new Runnable() {
+                public void run() {
+                  if (!Controller.getDefault().isShuttingDown() && !monitor.isCanceled())
+                    OwlUI.openSyncLogin(null);
                 }
-              }
+              });
+            } finally {
+              loginLock.unlock();
             }
-          });
+          }
+        }
+      });
     }
   }
 
