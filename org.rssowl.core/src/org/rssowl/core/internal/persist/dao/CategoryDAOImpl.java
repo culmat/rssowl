@@ -73,7 +73,7 @@ public final class CategoryDAOImpl extends AbstractEntityDAO<ICategory, Category
     for (ICategory category : loadAll()) {
       String name = StringUtils.safeTrim(category.getName());
       if (StringUtils.isSet(name))
-        names.add(category.getName().trim());
+        names.add(name);
     }
 
     return names;
