@@ -72,7 +72,7 @@ public class NewsFilter extends ViewerFilter {
     SHOW_UNREAD(Messages.NewsFilter_SHOW_UNREAD, Messages.NewsFilter_UNREAD_NEWS),
 
     /** Show Recent News */
-    SHOW_RECENT(Messages.NewsFilter_SHOW_TODAY, Messages.NewsFilter_TODAYS_NEWS),
+    SHOW_RECENT(Messages.NewsFilter_SHOW_RECENT, Messages.NewsFilter_RECENT_NEWS),
 
     /** Show Sticky News */
     SHOW_STICKY(Messages.NewsFilter_SHOW_STICKY, Messages.NewsFilter_STICKY_NEWS),
