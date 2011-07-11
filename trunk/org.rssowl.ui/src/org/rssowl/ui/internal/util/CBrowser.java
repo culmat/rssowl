@@ -32,6 +32,7 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.osgi.service.datalocation.Location;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.browser.Browser;
@@ -493,18 +494,20 @@ public class CBrowser {
    * @return <code>TRUE</code> in case of success, <code>FALSE</code> otherwise
    */
   public boolean print() {
-    return execute(JAVA_SCRIPT_PRINT);
+    return execute(JAVA_SCRIPT_PRINT, null);
   }
 
   /**
    * Executes JavaScript in this Browser instance.
    *
    * @param js the JavaScript to execute in the browser.
+   * @param context the context from where the call is made, will be added to
+   * the log in case execution fails.
    * @return <code>true</code> if the JavaScript was successfully executed and
    * <code>false</code> otherwise.
    */
-  public boolean execute(String js) {
-    return execute(js, true);
+  public boolean execute(String js, String context) {
+    return execute(js, true, context);
   }
 
   /**
@@ -513,32 +516,37 @@ public class CBrowser {
    * @param js the JavaScript to execute in the browser.
    * @param handleJSEnablement if <code>true</code> make sure that JS becomes
    * enabled if not and <code>false</code> otherwise
+   * @param context the context from where the call is made, will be added to
+   * the log in case execution fails.
    * @return <code>true</code> if the JavaScript was successfully executed and
    * <code>false</code> otherwise.
    */
-  public boolean execute(String js, boolean handleJSEnablement) {
+  public boolean execute(String js, boolean handleJSEnablement, String context) {
     if (fBrowser.isDisposed())
       return false;
 
     if (handleJSEnablement && shouldDisableScript())
       setScriptDisabled(false);
     try {
-      return internalExecute(js);
+      return internalExecute(js, context);
     } finally {
       if (handleJSEnablement && shouldDisableScript())
         setScriptDisabled(true);
     }
   }
 
-  private boolean internalExecute(String js) {
+  private boolean internalExecute(String js, String context) {
     boolean res = fBrowser.execute(js);
     if (!res) {
       if (fgFailingJSCounter.incrementAndGet() < MAX_FAILING_JS_LOGS) {
+        if (!StringUtils.isSet(context))
+          context = "Unknown Context"; //$NON-NLS-1$
+
         boolean isMozilla = isMozillaRunningOnWindows();
         if (!isMozilla)
-          Activator.getDefault().logError("Failed to execute JavaScript: " + js, null); //$NON-NLS-1$
+          Activator.getDefault().logError(NLS.bind("Failed to execute JavaScript ({0}): {1}", context, js), null); //$NON-NLS-1$
         else
-          Activator.getDefault().logError("Failed to execute JavaScript (XULRunner): " + js, null); //$NON-NLS-1$
+          Activator.getDefault().logError(NLS.bind("Failed to execute JavaScript ({0}, XULRunner): {1}", context, js), null); //$NON-NLS-1$
       }
     }
 
