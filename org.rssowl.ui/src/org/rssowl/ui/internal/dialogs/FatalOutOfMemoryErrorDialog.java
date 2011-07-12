@@ -34,6 +34,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -82,6 +83,14 @@ public class FatalOutOfMemoryErrorDialog extends TitleAreaDialog {
     super.configureShell(newShell);
 
     newShell.setText(Messages.StartupErrorDialog_RSSOWL_CRASH_REPORTER);
+
+    /* Images no longer initialized */
+    Image img_16x16 = OwlUI.getImage(fResources, "icons/product/16x16.png"); //$NON-NLS-1$
+    Image img_32x32 = OwlUI.getImage(fResources, "icons/product/32x32.png"); //$NON-NLS-1$
+    Image img_48x48 = OwlUI.getImage(fResources, "icons/product/48x48.png"); //$NON-NLS-1$
+    Image img_64x64 = OwlUI.getImage(fResources, "icons/product/64x64.png"); //$NON-NLS-1$
+    Image img_128x128 = OwlUI.getImage(fResources, "icons/product/128x128.png"); //$NON-NLS-1$
+    newShell.setImages(new Image[] { img_16x16, img_32x32, img_48x48, img_64x64, img_128x128 });
   }
 
   /*
@@ -102,29 +111,11 @@ public class FatalOutOfMemoryErrorDialog extends TitleAreaDialog {
     setTitleImage(OwlUI.getImage(fResources, "icons/wizban/welcome_wiz.gif")); //$NON-NLS-1$
 
     /* Title Message */
-    setMessage(Messages.StartupErrorDialog_RSSOWL_CRASHED, IMessageProvider.WARNING);
-
-    /* Crash Report Label */
-    Link dialogMessageLabel = new Link(composite, SWT.WRAP);
-    dialogMessageLabel.setText(Messages.StartupErrorDialog_CRASH_DIAGNOSE);
-    dialogMessageLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
-    dialogMessageLabel.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        try {
-          if ("save".equals(e.text)) //$NON-NLS-1$
-            OwlUI.saveCrashReport(getShell());
-          else
-            BrowserUtils.sendErrorLog();
-        } catch (Throwable t) {
-          setMessage(t.getMessage(), IMessageProvider.ERROR);
-        }
-      }
-    });
+    setMessage(Messages.FatalOutOfMemoryErrorDialog_RSSOWL_CRASHED_OOM, IMessageProvider.WARNING);
 
     /* Recovery Label */
     Link recoveryMessageLabel = new Link(composite, SWT.WRAP);
-    recoveryMessageLabel.setText(Messages.StartupErrorDialog_CRASH_ADVISE);
+    recoveryMessageLabel.setText(Messages.FatalOutOfMemoryErrorDialog_CRASH_ADVISE_OOM);
     recoveryMessageLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
     recoveryMessageLabel.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -134,6 +125,24 @@ public class FatalOutOfMemoryErrorDialog extends TitleAreaDialog {
             BrowserUtils.openFAQ(fErrorStatus);
           else if ("forum".equals(e.text)) //$NON-NLS-1$
             BrowserUtils.openHelpForum(fErrorStatus);
+        } catch (Throwable t) {
+          setMessage(t.getMessage(), IMessageProvider.ERROR);
+        }
+      }
+    });
+
+    /* Crash Report Label */
+    Link dialogMessageLabel = new Link(composite, SWT.WRAP);
+    dialogMessageLabel.setText(Messages.FatalOutOfMemoryErrorDialog_CRASH_DIAGNOSE_OOM);
+    dialogMessageLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
+    dialogMessageLabel.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        try {
+          if ("save".equals(e.text)) //$NON-NLS-1$
+            OwlUI.saveCrashReport(getShell());
+          else
+            BrowserUtils.sendErrorLog();
         } catch (Throwable t) {
           setMessage(t.getMessage(), IMessageProvider.ERROR);
         }
@@ -182,7 +191,6 @@ public class FatalOutOfMemoryErrorDialog extends TitleAreaDialog {
   @Override
   protected void createButtonsForButtonBar(Composite parent) {
     createButton(parent, IDialogConstants.HELP_ID, Messages.StartupErrorDialog_HELP, true);
-    createButton(parent, IDialogConstants.CLOSE_ID, Messages.StartupErrorDialog_QUIT_RSSOWL, false);
     getButton(IDialogConstants.HELP_ID).setFocus();
   }
 
