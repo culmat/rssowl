@@ -62,7 +62,7 @@ import java.net.URL;
  * @author bpasero
  */
 public class FindUpdatesAction extends Action implements IWorkbenchWindowActionDelegate {
-  private static final String UPDATE_SITE = "http://boreal.rssowl.org/update/beta/program/"; //$NON-NLS-1$
+  private static final String UPDATE_SITE = "http://boreal.rssowl.org/update/program/"; //$NON-NLS-1$
   private Shell fShell;
   private final boolean fUserInitiated;
 
